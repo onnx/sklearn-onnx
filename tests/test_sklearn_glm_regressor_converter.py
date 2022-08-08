@@ -3,7 +3,7 @@
 """Tests GLMRegressor converter."""
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 try:
@@ -75,7 +75,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             basename="SklearnLinearRegressionBlackOp-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="old onnxruntime does not support double")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_linear_regression_multi(self):
@@ -91,7 +91,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             basename="SklearnLinearRegressionMulti-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="old onnxruntime does not support double")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_linear_regression64(self):
@@ -106,7 +106,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             basename="SklearnLinearRegression64-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.5.0"),
+        pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="old onnxruntime does not support double")
     def test_model_linear_regression64_multiple(self):
         model, X = fit_regression_model(linear_model.LinearRegression(),
@@ -477,7 +477,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
         assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
         assert_almost_equal(std, outputs[1].ravel(), decimal=4)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.3.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.3.0"),
                      reason="output type")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_bayesian_ridge_return_std_double(self):
@@ -516,7 +516,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
         assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
         assert_almost_equal(std, outputs[1].ravel(), decimal=4)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion("1.3.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.3.0"),
                      reason="output type")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_bayesian_ridge_return_std_normalize_double(self):

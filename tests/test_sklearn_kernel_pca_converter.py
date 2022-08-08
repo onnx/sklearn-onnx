@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from onnxruntime import __version__ as ort_version
 from sklearn.datasets import load_diabetes
@@ -32,7 +32,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="all needed operators not available")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.3.0'),
                      reason="discrepancies")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_default_float(self):
@@ -45,7 +45,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="all needed operators not available")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.3.0'),
                      reason="discrepancies")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_default_double(self):
@@ -58,7 +58,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 13,
                      reason="all needed operators not available")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.3.0'),
                      reason="discrepancies")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_float(self):
@@ -74,7 +74,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 13,
                      reason="all needed operators not available")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.3.0'),
                      reason="discrepancies")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_double(self):
@@ -91,7 +91,7 @@ class TestSklearnKernelPCAConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 13,
                      reason="all needed operators not available")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.3.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.3.0'),
                      reason="discrepancies")
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_kernel_pca_double_cdist(self):

@@ -50,7 +50,7 @@ model.fit(X)
 labels = model.predict(X)
 
 fig, ax = plt.subplots(1, 1)
-for k in (0, 1):
+for k in (-1, 1):
     ax.plot(X[labels == k, 0], X[labels == k, 1], 'o', label="cl%d" % k)
 ax.set_title("Sample")
 
@@ -59,7 +59,8 @@ ax.set_title("Sample")
 # ++++
 
 
-onx = to_onnx(model, X[:1].astype(numpy.float32))
+onx = to_onnx(model, X[:1].astype(numpy.float32),
+              target_opset={'': 15, 'ai.onnx.ml': 2})
 print(onx)
 
 ##########################
@@ -89,9 +90,10 @@ def get_domain_opset(onx):
     return {d['domain']: d['version'] for d in res}
 
 
-for opset in range(1, onnx_opset_version() + 1):
+for opset in range(6, onnx_opset_version() + 1):
     try:
-        onx = to_onnx(model, X[:1].astype(numpy.float32), target_opset=opset)
+        onx = to_onnx(model, X[:1].astype(numpy.float32),
+                      target_opset={'': opset, 'ai.onnx.ml': 2})
     except RuntimeError as e:
         print('target: %r error: %r' % (opset, e))
         continue
@@ -112,9 +114,10 @@ for opset in range(1, onnx_opset_version() + 1):
 # ``''`` but the other opset domain can be changed as well.
 
 for opset in range(9, onnx_opset_version() + 1):
-    for opset_ml in range(1, 3):
+    for opset_ml in range(1, 4):
         tops = {'': opset, 'ai.onnx.ml': opset_ml}
         try:
+            print("try target_opset:", tops)
             onx = to_onnx(
                 model, X[:1].astype(numpy.float32), target_opset=tops)
         except RuntimeError as e:

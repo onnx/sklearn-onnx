@@ -1,8 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
-import onnx
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxSub
@@ -13,10 +12,9 @@ from test_utils import TARGET_OPSET
 
 class TestAlgebraDouble(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
-    @unittest.skipIf(StrictVersion(onnxruntime.__version__)
-                     <= StrictVersion("0.4.0"),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(onnxruntime.__version__)
+                     <= pv.Version("0.4.0"),
                      reason="Sub(7) not available")
     def test_algebra_converter(self):
 

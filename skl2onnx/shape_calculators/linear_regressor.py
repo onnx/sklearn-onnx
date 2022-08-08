@@ -64,3 +64,5 @@ register_shape_calculator('SklearnStackingRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnTweedieRegressor',
                           calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnGammaRegressor',
+                          calculate_linear_regressor_output_shapes)

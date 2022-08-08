@@ -4,9 +4,7 @@
 Tests scikit-learn's tfidf converter using downloaded data.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy as np
-import onnx
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.datasets import fetch_20newsgroups
@@ -17,9 +15,7 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_tfidf_20newsgroups(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
@@ -32,13 +28,9 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
             target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_test, model, onnx_model,
-            basename="SklearnTfidfVectorizer20newsgroups",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer20newsgroups")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_tfidf_20newsgroups_nolowercase(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
@@ -51,9 +43,7 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
             target_opset=TARGET_OPSET)
         dump_data_and_model(
             X_test, model, onnx_model,
-            basename="SklearnTfidfVectorizer20newsgroupsNOLower",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer20newsgroupsNOLower")
 
 
 if __name__ == "__main__":

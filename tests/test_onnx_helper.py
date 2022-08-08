@@ -4,7 +4,7 @@
 Tests on functions in *onnx_helper*.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
@@ -26,9 +26,9 @@ from test_utils import TARGET_OPSET
 
 
 def one_hot_encoder_supports_string():
-    # StrictVersion does not work with development versions
+    # pv.Version does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
-    return StrictVersion(vers) >= StrictVersion("0.20.0")
+    return pv.Version(vers) >= pv.Version("0.20.0")
 
 
 class TestOnnxHelper(unittest.TestCase):

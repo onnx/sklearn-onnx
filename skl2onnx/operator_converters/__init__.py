@@ -18,6 +18,7 @@ from . import dict_vectoriser
 from . import feature_selection
 from . import flatten_op
 from . import function_transformer
+from . import gamma_regressor
 from . import gaussian_process
 from . import gaussian_mixture
 from . import gradient_boosting
@@ -53,6 +54,7 @@ from . import replace_op
 from . import scaler_op
 from . import sequence
 from . import sgd_classifier
+from . import sgd_oneclass_svm
 from . import stacking
 from . import support_vector_machines
 from . import text_vectoriser
@@ -78,6 +80,7 @@ __all__ = [
     feature_selection,
     flatten_op,
     function_transformer,
+    gamma_regressor,
     gaussian_process,
     gaussian_mixture,
     gradient_boosting,
@@ -113,6 +116,7 @@ __all__ = [
     scaler_op,
     sequence,
     sgd_classifier,
+    sgd_oneclass_svm,
     stacking,
     support_vector_machines,
     text_vectoriser,

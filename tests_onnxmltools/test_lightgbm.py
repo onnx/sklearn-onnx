@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
@@ -38,7 +38,7 @@ except ImportError:
     from test_utils import dump_single_regression
 from test_utils import (
     dump_binary_classification, dump_multiple_classification,
-    TARGET_OPSET)
+    TARGET_OPSET, TARGET_OPSET_ML)
 
 
 def calculate_lightgbm_output_shapes(operator):
@@ -123,30 +123,47 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             calculate_linear_regressor_output_shapes,
             convert_lightgbm)
 
+    @unittest.skipIf(
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
+        reason="converter for lightgbm is too old")
     def test_lightgbm_classifier(self):
         model = LGBMClassifier(n_estimators=3, min_child_samples=1)
         dump_binary_classification(
-            model, allow_failure="StrictVersion(onnx.__version__) < "
-                                 "StrictVersion('1.3.0')")
+            model,
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         dump_multiple_classification(
             model,
-            allow_failure="StrictVersion(onnx.__version__) < "
-                          "StrictVersion('1.3.0')")
-
-    def test_lightgbm_regressor(self):
-        model = LGBMRegressor(n_estimators=3, min_child_samples=1)
-        dump_single_regression(model)
-
-    def test_lightgbm_regressor1(self):
-        model = LGBMRegressor(n_estimators=1, min_child_samples=1)
-        dump_single_regression(model, suffix="1")
-
-    def test_lightgbm_regressor2(self):
-        model = LGBMRegressor(n_estimators=2, max_depth=1, min_child_samples=1)
-        dump_single_regression(model, suffix="2")
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
     @unittest.skipIf(
-        StrictVersion(onnxmltools.__version__) < StrictVersion('1.8.1'),
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
+        reason="converter for lightgbm is too old")
+    def test_lightgbm_regressor(self):
+        model = LGBMRegressor(n_estimators=3, min_child_samples=1)
+        dump_single_regression(
+            model,
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
+
+    @unittest.skipIf(
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
+        reason="converter for lightgbm is too old")
+    def test_lightgbm_regressor1(self):
+        model = LGBMRegressor(n_estimators=1, min_child_samples=1)
+        dump_single_regression(
+            model, suffix="1",
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
+
+    @unittest.skipIf(
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
+        reason="converter for lightgbm is too old")
+    def test_lightgbm_regressor2(self):
+        model = LGBMRegressor(n_estimators=2, max_depth=1, min_child_samples=1)
+        dump_single_regression(
+            model, suffix="2",
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
+
+    @unittest.skipIf(
+        pv.Version(onnxmltools.__version__) < pv.Version('1.11'),
         reason="converter for lightgbm is too old")
     def test_lightgbm_booster_multi_classifier(self):
         X = [[0, 1], [1, 1], [2, 0], [1, 2], [-1, 2], [1, -2]]
@@ -176,7 +193,7 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
         model_onnx = to_onnx(
             model, initial_types=[('X', FloatTensorType([None, 2]))],
             options={WrappedLightGbmBoosterClassifier: {'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
         try:
             sess = InferenceSession(model_onnx.SerializeToString())

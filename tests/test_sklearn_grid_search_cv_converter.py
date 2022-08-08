@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 import onnx
@@ -16,7 +16,6 @@ from sklearn.datasets import load_iris
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     DoubleTensorType, FloatTensorType, Int64TensorType)
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model, fit_classification_model,
     fit_clustering_model,
@@ -24,8 +23,6 @@ from test_utils import (
 
 
 class TestSklearnGridSearchCVModels(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_binary_float(self):
         tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
@@ -42,8 +39,6 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGridSearchBinaryFloat-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_multiclass_float(self):
         tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
@@ -59,8 +54,6 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGridSearchMulticlassFloat")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_binary_int(self):
         tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
@@ -77,8 +70,6 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGridSearchBinaryInt-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_multiclass_int(self):
         tuned_parameters = [{'C': np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
@@ -124,7 +115,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             basename="SklearnGridSearchRegressionFloat-OneOffArray-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_float(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
@@ -142,7 +133,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
                      "-OneOffArray-Dec4")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime %s" % '0.4.0')
     def test_grid_search_gaussian_regressor_double(self):
         tuned_parameters = [{'alpha': np.logspace(-4, -0.5, 4)}]
@@ -159,8 +150,6 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             basename="SklearnGridSearchGaussianRegressionDouble"
                      "-OneOffArray-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_binary_float_nozipmap(self):
         tuned_parameters = [{'C': np.logspace(-1, 0, 30)}]
         clf = GridSearchCV(
@@ -181,8 +170,6 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             basename="SklearnGridSearchBinaryFloat-Out0",
             methods=['predict', 'decision_function'])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_svm(self):
         rand_seed = 0
         np.random.seed(rand_seed)
@@ -222,8 +209,6 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             x_test.astype(np.float32), model, model_onnx,
             basename="SklearnGridSearchSVC-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_grid_search_binary_kmeans(self):
         tuned_parameters = [{'n_clusters': [2, 3]}]
         clf = GridSearchCV(KMeans(), tuned_parameters, cv=5)

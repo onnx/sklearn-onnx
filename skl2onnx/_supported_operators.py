@@ -13,7 +13,7 @@ from sklearn.linear_model import (
     PassiveAggressiveClassifier,
     Perceptron,
     RidgeClassifier, RidgeClassifierCV,
-    SGDClassifier,
+    SGDClassifier
 )
 from sklearn.svm import LinearSVC, OneClassSVM
 
@@ -38,6 +38,11 @@ from sklearn.linear_model import (
     TheilSenRegressor
 )
 try:
+    from sklearn.linear_model import GammaRegressor
+except ImportError:
+    # available since sklearn>=1.1
+    GammaRegressor = None
+try:
     from sklearn.linear_model import QuantileRegressor
 except ImportError:
     # available since sklearn>=1.0
@@ -52,6 +57,12 @@ try:
 except ImportError:
     # available since sklearn>=0.23
     TweedieRegressor = None
+try:
+    from sklearn.linear_model import SGDOneClassSVM
+except ImportError:
+    # available since sklearn>=1.0
+    SGDOneClassSVM = None
+
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
@@ -313,7 +324,6 @@ def build_sklearn_operator_name_map():
         ComplementNB,
         CountVectorizer,
         DictVectorizer,
-        GaussianNB,
         DecisionTreeClassifier,
         DecisionTreeRegressor,
         ExtraTreeClassifier,
@@ -322,6 +332,8 @@ def build_sklearn_operator_name_map():
         ExtraTreesRegressor,
         FeatureUnion,
         FunctionTransformer,
+        GammaRegressor,
+        GaussianNB,
         GaussianMixture,
         GaussianProcessClassifier,
         GaussianProcessRegressor,
@@ -386,6 +398,7 @@ def build_sklearn_operator_name_map():
         SelectKBest,
         SelectPercentile,
         SGDClassifier,
+        SGDOneClassSVM,
         SimpleImputer,
         StackingClassifier,
         StackingRegressor,

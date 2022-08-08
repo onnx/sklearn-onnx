@@ -38,7 +38,7 @@ float(T_{ak + i}(x)) - \\sum_{i=1}^F T_i(x)|`.
 Train a LGBMRegressor
 +++++++++++++++++++++
 """
-from distutils.version import StrictVersion
+import packaging.version as pv
 import warnings
 import timeit
 import numpy
@@ -78,7 +78,7 @@ reg.fit(X, y)
 def skl2onnx_convert_lightgbm(scope, operator, container):
     options = scope.get_options(operator.raw_operator)
     if 'split' in options:
-        if StrictVersion(oml_version) < StrictVersion('1.9.2'):
+        if pv.Version(oml_version) < pv.Version('1.9.2'):
             warnings.warn(
                 "Option split was released in version 1.9.2 but %s is "
                 "installed. It will be ignored." % oml_version)
@@ -102,8 +102,10 @@ update_registered_converter(
 # TreeEnsembleRegressor node, or more. *split* parameter is the number of
 # trees per node TreeEnsembleRegressor.
 
-model_onnx = to_onnx(reg, X[:1].astype(numpy.float32), target_opset=14)
-model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32), target_opset=14,
+model_onnx = to_onnx(reg, X[:1].astype(numpy.float32),
+                     target_opset={'': 14, 'ai.onnx.ml': 2})
+model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32),
+                           target_opset={'': 14, 'ai.onnx.ml': 2},
                            options={'split': 100})
 
 ##########################
@@ -158,7 +160,7 @@ print("processing time split",
 res = []
 for i in tqdm(list(range(20, 170, 20)) + [200, 300, 400, 500]):
     model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32),
-                               target_opset=14,
+                               target_opset={'': 14, 'ai.onnx.ml': 2},
                                options={'split': i})
     sess_split = InferenceSession(model_onnx_split.SerializeToString())
     got_split = sess_split.run(None, {'X': X32})[0].ravel()
@@ -175,4 +177,4 @@ print(df)
 ax = df.plot(title="Sum of discrepancies against split\n"
                    "split = number of tree per node")
 
-plt.show()
+# plt.show()

@@ -62,7 +62,7 @@ def download_file(url, name, min_size):
 
 
 model_name = "squeezenet1.1-7.onnx"
-url_name = ("https://github.com/onnx/models/raw/master/vision/"
+url_name = ("https://github.com/onnx/models/raw/main/vision/"
             "classification/squeezenet/model")
 url_name += "/" + model_name
 try:

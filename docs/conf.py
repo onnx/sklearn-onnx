@@ -18,7 +18,7 @@ from github_link import make_linkcode_resolve  # noqa
 # -- Project information -----------------------------------------------------
 
 project = 'sklearn-onnx'
-copyright = '2018-2021, Microsoft'
+copyright = '2018-2022, Microsoft'
 author = 'Microsoft'
 version = skl2onnx.__version__
 release = version
@@ -61,7 +61,7 @@ pygments_style = 'default'
 html_theme = "sphinx_mo"
 html_static_path = ['_static']
 html_theme = "pydata_sphinx_theme"
-html_theme_path = pydata_sphinx_theme.get_html_theme_path()
+html_theme_path = ['_static']
 html_logo = "logo_main.png"
 
 # -- Options for graphviz ----------------------------------------------------

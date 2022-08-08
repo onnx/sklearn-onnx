@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
-import onnx
 import sklearn
 from sklearn import linear_model
 from sklearn.svm import LinearSVC
@@ -16,7 +15,6 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
     fit_classification_model,
@@ -30,12 +28,11 @@ ort_version = ort_version.split('+')[0]
 def _sklearn_version():
     # Remove development version 0.22.dev0 becomes 0.22.
     v = ".".join(sklearn.__version__.split('.')[:2])
-    return StrictVersion(v)
+    return pv.Version(v)
 
 
 class TestGLMClassifierConverter(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+
     def test_model_logistic_regression_binary_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2)
@@ -47,7 +44,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinary")
-        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+        if pv.Version(ort_version) >= pv.Version("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -55,8 +52,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             self.assertEqual(str(lb), "tensor(int64)")
             self.assertEqual(sh, [None])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_blacklist(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2)
@@ -69,7 +64,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinaryBlackList")
-        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+        if pv.Version(ort_version) >= pv.Version("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -77,8 +72,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             self.assertEqual(str(lb), "tensor(int64)")
             self.assertEqual(sh, [None])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_string(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=100), 2,
@@ -91,7 +84,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinary")
-        if StrictVersion(ort_version) >= StrictVersion("1.0.0"):
+        if pv.Version(ort_version) >= pv.Version("1.0.0"):
             sess = InferenceSession(model_onnx.SerializeToString())
             out = sess.get_outputs()
             lb = out[0].type
@@ -123,8 +116,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_linear_discriminant_analysis(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
@@ -139,8 +130,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnLinearDiscriminantAnalysisBin-Dec3")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_linear_discriminant_analysis_decfunc(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
@@ -157,8 +146,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnLinearDiscriminantAnalysisBinRawScore-Out0",
             methods=['predict', 'decision_function'])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_linear_discriminant_analysis_decfunc3(self):
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 3])
@@ -175,8 +162,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             basename="SklearnLinearDiscriminantAnalysisBinRawScore3-Out0",
             methods=['predict', 'decision_function'])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_binary_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegressionCV(max_iter=100), 2)
@@ -189,8 +174,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticCVRegressionBinary")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_int(self):
         try:
             model, X = fit_classification_model(
@@ -209,8 +192,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionCVInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_cv_bool(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegressionCV(max_iter=100), 3, is_bool=True)
@@ -223,8 +204,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionCVBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_nointercept(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -238,8 +217,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinaryNoIntercept")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 4)
@@ -252,8 +229,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_nocl(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 4,
@@ -271,8 +246,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx, classes=model.classes_,
             basename="SklearnLogitisticRegressionMultiNoCl")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_ovr(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -286,8 +259,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_multinomial(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -302,8 +273,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_no_intercept(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -317,11 +286,9 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiNoIntercept")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_lbfgs(self):
         penalty = (
-            'l2' if _sklearn_version() < StrictVersion('0.21.0')
+            'l2' if _sklearn_version() < pv.Version('0.21.0')
             else 'none')
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -335,8 +302,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiLbfgs")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_liblinear_l1(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
@@ -350,10 +315,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiLiblinearL1")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_multi_class_saga_elasticnet(self):
-        if _sklearn_version() < StrictVersion('0.21.0'):
+        if _sklearn_version() < pv.Version('0.21.0'):
             model, X = fit_classification_model(
                 linear_model.LogisticRegression(
                     solver='saga', max_iter=10000), 3)
@@ -371,8 +334,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionMultiSagaElasticnet")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_linear_svc_binary_class(self):
         model, X = fit_classification_model(LinearSVC(max_iter=10000), 2)
         model_onnx = convert_sklearn(
@@ -384,8 +345,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCBinary-NoProb")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_linear_svc_multi_class(self):
         model, X = fit_classification_model(LinearSVC(max_iter=100), 5)
         model_onnx = convert_sklearn(
@@ -397,8 +356,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_linear_svc_int(self):
         model, X = fit_classification_model(
             LinearSVC(max_iter=100), 5, is_int=True)
@@ -411,8 +368,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_linear_svc_bool(self):
         model, X = fit_classification_model(
             LinearSVC(max_iter=100), 5, is_bool=True)
@@ -425,8 +380,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLinearSVCBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_binary(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 2)
         model_onnx = convert_sklearn(
@@ -438,8 +391,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierBin")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_binary_nozipmap(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -469,8 +420,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierNZMBin")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_binary_mispelled_zipmap(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -485,8 +434,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
         except NameError as e:
             assert "Option 'zipmap ' not in" in str(e)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_binary_mispelled_zipmap_wrong_value(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -501,8 +448,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
         except ValueError as e:
             assert "Unexpected value ['True'] for option 'zipmap'" in str(e)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_multi_class(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 5)
         model_onnx = convert_sklearn(
@@ -514,8 +459,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_int(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifier(), 5, is_int=True)
@@ -528,8 +471,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_bool(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifier(), 4, is_bool=True)
@@ -542,8 +483,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_cv_binary(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2)
@@ -556,8 +495,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVBin")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_cv_int(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2, is_int=True)
@@ -570,8 +507,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVInt")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_cv_bool(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2, is_bool=True)
@@ -584,8 +519,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_ridge_classifier_cv_multi_class(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 5)
@@ -598,8 +531,6 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnRidgeClassifierCVMulti")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_model_logistic_regression_binary_class_decision_function(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2)
@@ -629,10 +560,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnRidgeClassifierCVMultiLabel")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.6'),
-                     reason="Requires onnx 1.6")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_model_classifier_multi_zipmap_columns(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(), 3,
@@ -652,10 +580,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         for i in range(prob.shape[1]):
             assert_almost_equal(prob[:, i], got[i+1])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion('1.6'),
-                     reason="Requires onnx 1.6")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_model_classifier_multi_class_string_zipmap_columns(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(), 3,

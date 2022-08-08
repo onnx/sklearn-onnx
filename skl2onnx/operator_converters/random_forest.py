@@ -92,6 +92,7 @@ def convert_sklearn_random_forest_classifier(
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
+    attr_dtype = dtype if op_version >= 3 else np.float32
     op = operator.raw_operator
 
     if hasattr(op, 'n_outputs_'):
@@ -180,9 +181,11 @@ def convert_sklearn_random_forest_classifier(
         if loss is not None:
             if use_raw_scores:
                 attr_pairs['post_transform'] = "NONE"
-            elif loss.__class__.__name__ == "BinaryCrossEntropy":
+            elif loss.__class__.__name__ in (
+                    "BinaryCrossEntropy", "HalfBinomialLoss"):
                 attr_pairs['post_transform'] = "LOGISTIC"
-            elif loss.__class__.__name__ == "CategoricalCrossEntropy":
+            elif loss.__class__.__name__ in (
+                    "CategoricalCrossEntropy", "HalfMultinomialLoss"):
                 attr_pairs['post_transform'] = "SOFTMAX"
             else:
                 raise NotImplementedError(
@@ -206,7 +209,8 @@ def convert_sklearn_random_forest_classifier(
                 if k in ('nodes_values', 'class_weights',
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
-                    attr_pairs[k] = np.array(attr_pairs[k], dtype=dtype)
+                    attr_pairs[k] = np.array(
+                        attr_pairs[k], dtype=attr_dtype).ravel()
 
         container.add_node(
             op_type, input_name,
@@ -246,7 +250,7 @@ def convert_sklearn_random_forest_classifier(
                     if k in ('nodes_values', 'class_weights',
                              'target_weights', 'nodes_hitrates',
                              'base_values'):
-                        attrs[k] = np.array(attrs[k], dtype=dtype)
+                        attrs[k] = np.array(attrs[k], dtype=attr_dtype).ravel()
 
             if options['decision_path']:
                 # decision_path
@@ -389,7 +393,7 @@ def convert_sklearn_random_forest_regressor_converter(
             if k in ('nodes_values', 'class_weights',
                      'target_weights', 'nodes_hitrates',
                      'base_values'):
-                attrs[k] = np.array(attrs[k], dtype=dtype)
+                attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
     container.add_node(
         op_type, input_name,
@@ -430,7 +434,7 @@ def convert_sklearn_random_forest_regressor_converter(
                 if k in ('nodes_values', 'class_weights',
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
-                    attrs[k] = np.array(attrs[k], dtype=dtype)
+                    attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
         if options.get('decision_path', False):
             # decision_path

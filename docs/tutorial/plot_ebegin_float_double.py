@@ -149,7 +149,8 @@ def diff(p1, p2):
     return d.max(), (d / numpy.abs(p1)).max()
 
 
-onx = to_onnx(model, Xi_train[:1].astype(numpy.float32))
+onx = to_onnx(model, Xi_train[:1].astype(numpy.float32),
+              target_opset=15)
 
 sess = InferenceSession(onx.SerializeToString())
 
@@ -207,7 +208,8 @@ model2.fit(Xi_train, yi_train)
 ##########################################
 # The discrepencies.
 
-onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32))
+onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32),
+               target_opset=15)
 
 sess2 = InferenceSession(onx2.SerializeToString())
 
@@ -232,7 +234,8 @@ model3 = Pipeline([
 
 model3.fit(Xi_train, yi_train)
 onx3 = to_onnx(model3, Xi_train[:1].astype(numpy.float32),
-               options={StandardScaler: {'div': 'div_cast'}})
+               options={StandardScaler: {'div': 'div_cast'}},
+               target_opset=15)
 
 sess3 = InferenceSession(onx3.SerializeToString())
 
@@ -278,7 +281,8 @@ model_onx.fit(Xi_train, yi_train)
 # The conversion.
 
 try:
-    onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32))
+    onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32),
+                   target_opset=15)
 except ValueError as e:
     print("Failing due to %r.\nYou need to update mlprodict." % e)
     import sys
@@ -321,7 +325,7 @@ tree = DecisionTreeRegressor(max_depth=max_depth)
 tree.fit(Xi_train, yi_train)
 
 model_onx = to_onnx_extended(tree, Xi_train[:1].astype(numpy.float64),
-                             rewrite_ops=True)
+                             rewrite_ops=True, target_opset=15)
 
 oinf5 = OnnxInference(model_onx, runtime='python_compiled')
 print(oinf5)
@@ -352,7 +356,8 @@ print(diff(skl5, ort5))
 ctree = CastRegressor(DecisionTreeRegressor(max_depth=max_depth))
 ctree.fit(Xi_train, yi_train)
 
-onx6 = to_onnx(ctree, Xi_train[:1].astype(numpy.float32))
+onx6 = to_onnx(ctree, Xi_train[:1].astype(numpy.float32),
+               target_opset=15)
 
 sess6 = InferenceSession(onx6.SerializeToString())
 

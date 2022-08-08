@@ -4,20 +4,16 @@
 Tests scikit-learn's count vectorizer converter.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-import onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnCountVectorizerBug(unittest.TestCase):
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_custom_tokenizer(self):
         corpus = numpy.array([
             '9999',
@@ -48,12 +44,10 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         dump_data_and_model(
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11CustomTokenizer-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            allow_failure="pv.Version(onnxruntime.__version__) <= "
+                          "pv.Version('0.4.0')")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_wrong_ngram(self):
         corpus = numpy.array([
             'A AABBB0',
@@ -74,8 +68,8 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         dump_data_and_model(
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer12Wngram-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.3.0')")
+            allow_failure="pv.Version(onnxruntime.__version__) <= "
+                          "pv.Version('0.3.0')")
 
 
 if __name__ == "__main__":

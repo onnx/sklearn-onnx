@@ -35,7 +35,7 @@ A transformer which decorrelates variables
 This time, the eigen values are not estimated at
 training time but at prediction time.
 """
-from mlprodict.onnxrt.shape_object import ShapeObject
+
 from mlprodict.onnxrt.ops_cpu import OpRunCustom, register_operator
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd,
@@ -284,7 +284,7 @@ def live_decorrelate_transformer_converter(scope, operator, container):
     # diag = numpy.diag(Linv)
     diag = OnnxMul(
         OnnxEyeLike(
-            numpy.array([op.nf_, op.nf_], dtype=numpy.int64),
+            numpy.zeros((op.nf_, op.nf_), dtype=numpy.int64),
             k=0, op_version=opv),
         Linv, op_version=opv)
     diag.set_onnx_name_prefix('diag')
@@ -331,25 +331,12 @@ class OpEig(OpRunCustom):
                              expected_attributes=OpEig.atts,
                              **options)
 
-    def run(self, x):
+    def run(self, x, **kwargs):
         # computation
         if self.eigv:
             return numpy.linalg.eig(x)
         return (numpy.linalg.eigvals(x), )
 
-    def infer_shapes(self, x):
-        # shape inference, if you don't know what to
-        # write, just return `ShapeObject(None)`
-        if self.eigv:
-            return (
-                ShapeObject(
-                    x.shape, dtype=x.dtype,
-                    name=self.__class__.__name__ + 'Values'),
-                ShapeObject(
-                    x.shape, dtype=x.dtype,
-                    name=self.__class__.__name__ + 'Vectors'))
-        return (ShapeObject(x.shape, dtype=x.dtype,
-                            name=self.__class__.__name__), )
 
 ########################################
 # Registration

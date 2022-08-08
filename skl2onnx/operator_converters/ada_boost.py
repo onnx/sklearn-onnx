@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from onnx.helper import make_tensor
 from sklearn import __version__
@@ -20,12 +20,12 @@ from .._supported_operators import sklearn_operator_name_map
 
 def _scikit_learn_before_022():
     if '.dev' in __version__:
-        return StrictVersion(
-            __version__.split(".dev")[0]) < StrictVersion("0.22")
+        return pv.Version(
+            __version__.split(".dev")[0]) < pv.Version("0.22")
     if '.post' in __version__:
-        return StrictVersion(
-            __version__.split(".post")[0]) < StrictVersion("0.22")
-    return StrictVersion(__version__) < StrictVersion("0.22")
+        return pv.Version(
+            __version__.split(".post")[0]) < pv.Version("0.22")
+    return pv.Version(__version__) < pv.Version("0.22")
 
 
 def _samme_proba(scope, container, proba_name, weight,

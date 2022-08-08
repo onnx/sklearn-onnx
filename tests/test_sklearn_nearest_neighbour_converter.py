@@ -7,10 +7,9 @@ import sys
 import warnings
 import unittest
 import functools
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
-import onnx
 from onnxruntime import InferenceSession, __version__ as ort_version
 from pandas import DataFrame
 try:
@@ -59,8 +58,8 @@ from test_utils import (
 
 def dont_test_radius():
     return (
-        StrictVersion(ort_version) <= StrictVersion("1.3.0") or
-        StrictVersion(onnx.__version__) <= StrictVersion("1.6.0"))
+        pv.Version(ort_version) <= pv.Version("1.3.0") or
+        TARGET_OPSET <= 11)
 
 
 ort_version = ".".join(ort_version.split('.')[:2])
@@ -113,7 +112,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return model, X
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor(self):
@@ -133,7 +132,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.8.0"),
+        pv.Version(ort_version) < pv.Version("1.8.0"),
         reason="produces nan values")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_radius(self):
@@ -159,18 +158,16 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     None, {'input': X.astype(numpy.float32)})
                 rows.append('--{}--'.format(out))
                 rows.append(str(res))
-            if (StrictVersion(ort_version) <
-                    StrictVersion("1.4.0")):
+            if (pv.Version(ort_version) <
+                    pv.Version("1.4.0")):
                 return
             raise AssertionError('\n'.join(rows))
         assert_almost_equal(exp.ravel(), got.ravel(), decimal=3)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.6.0"),
-        reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_double(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=2))
@@ -195,7 +192,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="nan may happen during computation")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_double_radius(self):
@@ -216,7 +213,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnRadiusNeighborsRegressor64")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_yint(self):
@@ -246,7 +243,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnRadiusNeighborsRegressorYInt")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_1(self):
@@ -312,11 +309,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         assert_almost_equal(exp, got, decimal=5)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-        reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_1_opset(self):
         model, X = self._fit_model(KNeighborsRegressor(n_neighbors=1),
@@ -336,7 +331,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     basename="SklearnKNeighborsRegressor2%d" % op)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_2(self):
@@ -352,7 +347,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressor2")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 9,
                      reason="needs higher target_opset")
@@ -408,7 +403,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 assert_almost_equal(exp, got.ravel(), decimal=3)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_metric_cityblock(self):
@@ -425,7 +420,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < TARGET_OPSET,
                      reason="needs higher target_opset")
@@ -465,7 +460,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multi_class(self):
@@ -504,7 +499,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multi_class_string(self):
@@ -523,7 +518,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierMulti")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_weights_distance(self):
@@ -538,7 +533,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierWeightsDistance")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_metric_cityblock(self):
@@ -553,7 +548,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierMetricCityblock")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_classifier_multilabel(self):
@@ -573,7 +568,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNNClassifierMultiLabel-Out0")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_int(self):
@@ -593,7 +588,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_equal(self):
@@ -627,7 +622,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         # assert_almost_equal(exp, res)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_multi_class_nocl(self):
@@ -648,7 +643,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNNMultiNoCl", verbose=False)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor2_2_pipee(self):
@@ -666,7 +661,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressorPipe2")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_onnx_test_knn_transform(self):
@@ -789,9 +784,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNNImputer is None,
                      reason="new in 0.22")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.4.1")),
-                     reason="ConstantOfShape op not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer(self):
         x_train = numpy.array(
@@ -815,9 +808,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(KNNImputer is None,
                      reason="new in 0.22")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.4.1")),
-                     reason="ConstantOfShape op not available")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_cdist(self):
         x_train = numpy.array(
@@ -850,10 +841,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 x_test, model, model_onnx,
                 basename="SklearnKNNImputer%dcdist" % opset)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
@@ -896,10 +885,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, onx,
             basename="SklearnRadiusNeighborsRegressorMReg")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")
@@ -940,10 +927,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             model, onx,
             basename="SklearnRadiusNeighborsClassifierMReg2-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("0.5.0"),
+        pv.Version(ort_version) < pv.Version("0.5.0"),
         reason="not available")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="needs higher target_opset")

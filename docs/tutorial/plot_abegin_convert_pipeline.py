@@ -72,7 +72,8 @@ pred_ort = sess.run(None, {'X': X_test.astype(numpy.float32)})[0]
 
 pred_skl = ereg.predict(X_test.astype(numpy.float32))
 
-pred_ort[:5], pred_skl[:5]
+print("Onnx Runtime prediction:\n", pred_ort[:5])
+print("Sklearn rediction:\n", pred_skl[:5])
 
 ####################################
 # .. _l-diff-dicrepencies:
@@ -122,6 +123,7 @@ print(diff(pred_skl, pred_pyrt))
 
 #############################
 # Final graph
+# You may need to install graphviz from https://graphviz.org/download/
 # +++++++++++
 
 ax = plot_graphviz(oinf.to_dot())

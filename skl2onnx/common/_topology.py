@@ -42,19 +42,37 @@ def _default_OPSET_TO_IR_VERSION():
     return {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
-        13: 7, 14: 7, 15: 8
+        13: 7, 14: 7, 15: 8, 16: 8, 17: 8
     }
 
 
 try:
     from onnxconverter_common.topology import OPSET_TO_IR_VERSION
-    assert OPSET_TO_IR_VERSION[15] is not None
+    assert OPSET_TO_IR_VERSION[17] is not None
 except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = _default_OPSET_TO_IR_VERSION()
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 15}
+OPSET_ML_TO_OPSET = {1: 11, 2: 15, 3: 17}
 
 logger = getLogger('skl2onnx')
+
+
+def get_default_opset_for_domain(domain):
+    """
+    Returns the associated for a domain given the main opset.
+    """
+    from .. import __max_supported_opset__ as main_opset
+    if domain == '':
+        return main_opset
+    if domain == 'ai.onnx.ml':
+        if main_opset >= 16:
+            return 3
+        if main_opset < 6:
+            return 1
+        return 2
+    if domain == 'ai.onnx.training':
+        return 1
+    return None
 
 
 class Variable:
@@ -150,7 +168,7 @@ class Variable:
             for k in self.type.shape:
                 if k is None:
                     continue
-                if not isinstance(k, (int, np.int64, np.intc)):
+                if not isinstance(k, (int, np.integer)):
                     raise ValueError(
                         "Unexpected type %r for shape %r."
                         "" % (type(k), self))
@@ -1090,11 +1108,14 @@ class Topology:
         for operator in self.unordered_operator_iterator():
             operator.init_status(is_evaluated=False)
 
-    def _propagate_status(self, operator, container, fed_variables):
+    def _propagate_status(self, operator, container, fed_variables,
+                          verbose=0):
         """
         Propagates status *is_fed* based on output variable
         and node added in the container.
         """
+        if verbose > 1:
+            print("[_propagate_status] after op=%r" % operator)
         vars = {}
         for node in container.nodes:
             for i in node.input:
@@ -1102,8 +1123,10 @@ class Topology:
                     vars[i] = []
                 vars[i].append(node)
 
-        stack = [v.onnx_name for v in operator.outputs if v.is_fed]
-        stack.extend(v.onnx_name for v in operator.inputs if v.is_fed)
+        if verbose > 1:
+            print("[_propagate_status] newly fed=%r" % list(
+                v.onnx_name for v in operator.outputs if v.is_fed))
+        stack = list(fed_variables)
         scope = self.scopes[0]
         while len(stack) > 0:
             nodes = {}
@@ -1117,11 +1140,15 @@ class Topology:
                 if all(fed_variables.get(n, False) for n in node.input):
                     for o in node.output:
                         if o not in fed_variables:
+                            if verbose > 1:
+                                print("[_propagate_status] add=%r" % o)
                             fed_variables[o] = o
                             stack.append(o)
                             if o in scope.variables:
                                 var = scope.variables[o]
                                 var.init_status(is_fed=True)
+                                if verbose > 1:
+                                    print("[_propagate_status] fed=%r" % var)
 
     def convert_operators(self, container=None, verbose=0):
         """
@@ -1239,7 +1266,9 @@ class Topology:
                     fed_variables.update(
                         {i.name: i for i in container.initializers
                          if i.name not in fed_variables})
-                    self._propagate_status(operator, container, fed_variables)
+                    self._propagate_status(operator, container, fed_variables,
+                                           verbose=verbose)
+
                     # unfed some variables (it happens when a node
                     # shares an output with another node)
                     rem = []
@@ -1505,7 +1534,16 @@ def _update_domain_version(container, onnx_model, verbose=0):
             print('[_update_domain_version] +opset %d: name=%r, version=%s' % (
                 i, op_domain, op_version))
         op_set.domain = op_domain
+        if op_set != '':
+            max_supported = get_default_opset_for_domain(op_domain)
+            if max_supported is not None and max_supported < op_version:
+                raise RuntimeError(
+                    "The model is using version %d of domain %r not supported "
+                    "yet by this library. You need to specify "
+                    "target_opset={%r: %r}." % (
+                        op_version, op_domain, op_domain, max_supported))
         op_set.version = op_version
+
         i += 1
         if container.target_opset_any_domain(op_domain) < op_version:
             raise RuntimeError(

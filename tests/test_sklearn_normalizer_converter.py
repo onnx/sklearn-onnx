@@ -15,6 +15,8 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 class TestSklearnNormalizerConverter(unittest.TestCase):
     def test_model_normalizer(self):
         model = Normalizer(norm="l2")
+        x = numpy.random.randn(10, 1).astype(numpy.int64)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", Int64TensorType([None, 1]))],
@@ -24,6 +26,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
 
     def test_model_normalizer_blackop(self):
         model = Normalizer(norm="l2")
+        x = numpy.random.randn(10, 3).astype(numpy.float32)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", FloatTensorType([None, 3]))],
@@ -37,6 +41,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
 
     def test_model_normalizer_float_l1(self):
         model = Normalizer(norm="l1")
+        x = numpy.random.randn(10, 3).astype(numpy.float32)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", FloatTensorType([None, 3]))],
@@ -50,6 +56,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
 
     def test_model_normalizer_float_l2(self):
         model = Normalizer(norm="l2")
+        x = numpy.random.randn(10, 3).astype(numpy.float32)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", FloatTensorType([None, 3]))],
@@ -63,6 +71,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
 
     def test_model_normalizer_double_l1(self):
         model = Normalizer(norm="l1")
+        x = numpy.random.randn(10, 3).astype(numpy.float64)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", DoubleTensorType([None, 3]))],
@@ -75,6 +85,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
 
     def test_model_normalizer_double_l2(self):
         model = Normalizer(norm="l2")
+        x = numpy.random.randn(10, 3).astype(numpy.float64)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", DoubleTensorType([None, 3]))],
@@ -87,6 +99,8 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
 
     def test_model_normalizer_float_noshape(self):
         model = Normalizer(norm="l2")
+        x = numpy.random.randn(10, 3).astype(numpy.float32)
+        model.fit(x)
         model_onnx = convert_sklearn(
             model, "scikit-learn normalizer",
             [("input", FloatTensorType([]))],

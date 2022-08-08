@@ -13,7 +13,8 @@ except ImportError:
     class OutlierMixin:
         pass
 
-from sklearn.ensemble import IsolationForest, RandomTreesEmbedding
+from sklearn.ensemble import (
+    IsolationForest, RandomTreesEmbedding, RandomForestClassifier)
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
@@ -47,7 +48,8 @@ from .common._registration import _converter_pool, _shape_calculator_pool
 from .common._topology import Topology, Variable
 from .common.data_types import (
     DictionaryType, Int64TensorType, SequenceType,
-    StringTensorType, TensorType, guess_tensor_type)
+    StringTensorType, TensorType, FloatTensorType,
+    guess_tensor_type)
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
@@ -153,8 +155,12 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
         # be fixed in shape inference phase.
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
+        if type(model) in [RandomForestClassifier]:
+            prob_dtype = FloatTensorType()
+        else:
+            prob_dtype = guess_tensor_type(inputs[0].type)
         probability_tensor_variable = scope.declare_local_variable(
-            'probabilities', guess_tensor_type(inputs[0].type))
+            'probabilities', prob_dtype)
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
 
@@ -226,14 +232,10 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
         if hasattr(model, 'get_feature_names_out'):
             try:
                 out_names = model.get_feature_names_out()
-            except AttributeError:
+            except (AttributeError, ValueError):
                 # Catch a bug in scikit-learn.
                 out_names = None
             this_operator.feature_names_out_ = out_names
-            if out_names is not None and len(out_names) == 0:
-                raise RuntimeError(
-                    "get_feature_names_out() cannot return an empty value, "
-                    "model is %r." % type(model))
         input_type = guess_tensor_type(inputs[0].type)
         variable = scope.declare_local_variable(
             'variable', input_type)

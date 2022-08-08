@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -27,8 +27,8 @@ except ImportError:
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
+    DoubleTensorType,
     Int64TensorType,
-    onnx_built_with_ml,
 )
 from skl2onnx import convert_sklearn, to_onnx
 from test_utils import (
@@ -60,23 +60,19 @@ except ImportError:
 def _sklearn_version():
     # Remove development version 0.22.dev0 becomes 0.22.
     v = ".".join(sklearn.__version__.split('.')[:2])
-    return StrictVersion(v)
+    return pv.Version(v)
 
 
 ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_random_forest_classifier(self):
         model = RandomForestClassifier(n_estimators=3)
         dump_one_class_classification(model)
         dump_binary_classification(model)
         dump_multiple_classification(model)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_random_forest_classifier_mismatched_estimator_counts(self):
         model = RandomForestClassifier(n_estimators=3)
@@ -96,8 +92,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                             model.__class__.__name__ +
                             '_mismatched_estimator_counts')
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor_mismatches(self):
         iris = load_iris()
@@ -117,8 +111,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                             clr.__class__.__name__ +
                             '_mismatched_estimator_counts')
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
@@ -144,8 +136,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                             model.__class__.__name__ +
                             "_mismatched_estimator_counts")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_extra_trees_classifier(self):
         model = ExtraTreesClassifier(n_estimators=3)
@@ -159,8 +149,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         dump_single_regression(model)
         dump_multiple_regression(model)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
@@ -179,8 +167,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X[:5], model, model_onnx, classes=model.classes_,
             basename="SklearnRFMultiNoCl")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_model_multi_class_nocl_all(self):
         model, X = fit_classification_model(
@@ -269,6 +255,22 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             basename="SklearnExtraTreesClassifierBool")
 
     @ignore_warnings(category=FutureWarning)
+    def test_random_forest_classifier_double(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(n_estimators=5, random_state=42),
+            3, is_double=True)
+        for opv in [1, 2, 3]:
+            model_onnx = convert_sklearn(
+                model, "random forest classifier",
+                [("input", DoubleTensorType([None, X.shape[1]]))],
+                target_opset={'ai.onnx.ml': opv,
+                              '': TARGET_OPSET})
+            self.assertIsNotNone(model_onnx)
+            dump_data_and_model(
+                X, model, model_onnx,
+                basename="SklearnRandomForestClassifierDouble")
+
+    @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):
         model = HistGradientBoostingRegressor(max_iter=5, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
@@ -291,21 +293,21 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnHGBRegressor", verbose=False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nan(self):
@@ -355,37 +357,37 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                 verbose=False,
                 methods=['predict', 'decision_function_binary'])
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('1.2.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
                      reason="issue with nan for earlier ort")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan_multi(self):
         self.common_test_model_hgb_classifier(False, n_classes=3)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
@@ -393,8 +395,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
     def test_model_hgb_classifier_nan_multi(self):
         self.common_test_model_hgb_classifier(True, n_classes=3)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
@@ -410,8 +410,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnRandomForestClassifierMultiLabel-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_multilabel_low_samples(self):
         model, X_test = fit_multilabel_classification_model(
@@ -428,8 +426,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnRandomForestClassifierMultiLabelLowSamples-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_model_extra_trees_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
@@ -445,8 +441,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnExtraTreesClassifierMultiLabel-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_model_extra_trees_classifier_multilabel_low_samples(self):
         model, X_test = fit_multilabel_classification_model(
@@ -463,8 +457,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnExtraTreesClassifierMultiLabelLowSamples-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_boston_pca_rf(self):
         data = load_boston()
@@ -537,8 +529,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnExtraTreesRegressorBool-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_randomforestregressor_decision_path(self):
@@ -560,8 +550,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[1]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_extratreesregressor_decision_path(self):
@@ -583,8 +571,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[1]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_randomforestclassifier_decision_path(self):
@@ -608,8 +594,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[2]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_extratreesclassifier_decision_path(self):
@@ -633,8 +617,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[2]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_rf_regressor_decision_leaf(self):
@@ -656,8 +638,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         exp = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
         assert exp.tolist() == res[1].tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_rf_regressor_decision_path_leaf(self):
@@ -682,8 +662,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         assert exp_path == got_path.ravel().tolist()
         assert exp_leaf.tolist() == res[2].tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_rf_classifier_decision_leaf(self):
@@ -704,8 +682,6 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         exp = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
         assert exp.tolist() == res[2].tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
     @ignore_warnings(category=FutureWarning)
     def test_rf_classifier_decision_path_leaf(self):

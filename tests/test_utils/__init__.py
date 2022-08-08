@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 import onnx
 from onnxruntime import __version__ as ort_version
@@ -57,20 +57,26 @@ def max_onnxruntime_opset():
     <https://github.com/microsoft/onnxruntime/blob/
     master/docs/Versioning.md>`_.
     """
-    vi = StrictVersion(ort_version.split('+')[0])
-    if vi >= StrictVersion("1.9.0"):
+    vi = pv.Version(ort_version.split('+')[0])
+    if vi >= pv.Version("1.12.0"):
+        return 17
+    if vi >= pv.Version("1.11.0"):
+        return 16
+    if vi >= pv.Version("1.10.0"):
         return 15
-    if vi >= StrictVersion("1.8.0"):
+    if vi >= pv.Version("1.9.0"):
+        return 15
+    if vi >= pv.Version("1.8.0"):
         return 14
-    if vi >= StrictVersion("1.6.0"):
+    if vi >= pv.Version("1.6.0"):
         return 13
-    if vi >= StrictVersion("1.3.0"):
+    if vi >= pv.Version("1.3.0"):
         return 12
-    if vi >= StrictVersion("1.0.0"):
+    if vi >= pv.Version("1.0.0"):
         return 11
-    if vi >= StrictVersion("0.4.0"):
+    if vi >= pv.Version("0.4.0"):
         return 10
-    if vi >= StrictVersion("0.3.0"):
+    if vi >= pv.Version("0.3.0"):
         return 9
     return 8
 
@@ -81,6 +87,16 @@ TARGET_OPSET = int(
         min(max_onnxruntime_opset(),
             min(max_opset,
                 onnx.defs.onnx_opset_version()))))
+
+value_ml = 3
+if TARGET_OPSET <= 16:
+    # TreeEnsemble* for opset-ml == 3 is implemented in onnxruntime==1.12.0
+    # but not in onnxruntime==1.11.0.
+    value_ml = 2
+if TARGET_OPSET <= 11:
+    value_ml = 1
+
+TARGET_OPSET_ML = int(os.environ.get('TEST_TARGET_OPSET_ML', value_ml))
 
 TARGET_IR = int(
     os.environ.get(

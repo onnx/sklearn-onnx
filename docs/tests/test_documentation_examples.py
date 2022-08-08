@@ -4,7 +4,7 @@
 Tests examples from the documentation.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import os
 import sys
 import importlib
@@ -36,8 +36,8 @@ class TestDocumentationExample(unittest.TestCase):
         for name in found:
             if name.startswith("plot_") and name.endswith(".py"):
                 if (name == "plot_pipeline_lightgbm.py" and
-                        StrictVersion(onnxruntime.__version__) <
-                            StrictVersion('1.0.0')):
+                        pv.Version(onnxruntime.__version__) <
+                            pv.Version('1.0.0')):
                     continue
                 print("run %r" % name)
                 try:

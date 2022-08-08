@@ -2,7 +2,7 @@
 
 import unittest
 import urllib.error as url_error
-from distutils.version import StrictVersion
+import packaging.version as pv
 from io import StringIO
 import warnings
 import numpy
@@ -52,19 +52,18 @@ from skl2onnx.common.data_types import (
     StringTensorType,
 )
 from sklearn.multioutput import MultiOutputClassifier
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model, fit_classification_model, TARGET_OPSET)
 from onnxruntime import __version__ as ort_version, InferenceSession
 
 
-# StrictVersion does not work with development versions
+# pv.Version does not work with development versions
 ort_version = ".".join(ort_version.split('.')[:2])
 skl_version = ".".join(skl_version.split('.')[:2])
 
 
 def check_scikit_version():
-    return StrictVersion(skl_version) >= StrictVersion("0.22")
+    return pv.Version(skl_version) >= pv.Version("0.22")
 
 
 class PipeConcatenateInput:
@@ -132,7 +131,7 @@ class TestSklearnPipeline(unittest.TestCase):
             model_onnx, basename="SklearnPipelineScaler11")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=FutureWarning)
     def test_combine_inputs_union_in_pipeline(self):
@@ -173,7 +172,7 @@ class TestSklearnPipeline(unittest.TestCase):
             model_onnx, basename="SklearnPipelineScaler11Union")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=FutureWarning)
     def test_combine_inputs_floats_ints(self):
@@ -203,11 +202,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="ColumnTransformer not available in 0.19")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @ignore_warnings(category=(RuntimeWarning, FutureWarning))
     def test_pipeline_column_transformer(self):
@@ -284,8 +280,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         not check_scikit_version(),
         reason="Scikit 0.20 causes some mismatches")
@@ -412,8 +406,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_weights(self):
         model, X = fit_classification_model(
@@ -434,8 +426,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_drop(self):
         model, X = fit_classification_model(
@@ -456,8 +446,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_passthrough(self):
         model, X = fit_classification_model(
@@ -479,8 +467,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_passthrough_no_weights(self):
         model, X = fit_classification_model(

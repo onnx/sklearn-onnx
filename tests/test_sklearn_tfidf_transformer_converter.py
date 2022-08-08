@@ -57,11 +57,7 @@ class TestSklearnTfidfTransformerConverter(unittest.TestCase):
                             data,
                             model,
                             model_onnx,
-                            basename="SklearnTfidfTransform" + suffix,
-                            # Operator mul is not implemented in onnxruntime
-                            allow_failure="StrictVersion(onnx.__version__)"
-                                          " < StrictVersion('1.2')",
-                        )
+                            basename="SklearnTfidfTransform" + suffix)
 
 
 if __name__ == "__main__":

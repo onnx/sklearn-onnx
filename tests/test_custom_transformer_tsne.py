@@ -4,7 +4,7 @@
 Tests scikit-learn's binarizer converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import inspect
 import numpy
 from sklearn.base import BaseEstimator, TransformerMixin, clone
@@ -12,7 +12,7 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import mean_squared_error
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn import datasets
-import onnxruntime as ort
+from onnxruntime import __version__ as ort_version
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common._registration import get_shape_calculator
@@ -20,6 +20,9 @@ from skl2onnx._parse import _get_sklearn_operator_name
 from skl2onnx._parse import _parse_sklearn_simple_model
 from skl2onnx._parse import update_registered_parser
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+ort_version = '.'.join(ort_version.split('.')[:2])
 
 
 class PredictableTSNE(BaseEstimator, TransformerMixin):
@@ -141,7 +144,7 @@ def predictable_tsne_converter(scope, operator, container):
 
 class TestCustomTransformerTSNE(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(ort.__version__) <= StrictVersion("0.3.0"),
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.3.0"),
                      reason="TopK is failing.")
     def test_custom_pipeline_scaler(self):
 
@@ -170,9 +173,7 @@ class TestCustomTransformerTSNE(unittest.TestCase):
             Xd.astype(numpy.float32)[:7],
             ptsne_knn,
             model_onnx,
-            basename="CustomTransformerTSNEkNN-OneOffArray",
-            allow_failure="StrictVersion(onnx.__version__) "
-                          "<= StrictVersion('1.5')")
+            basename="CustomTransformerTSNEkNN-OneOffArray")
 
         trace_line = []
 
@@ -193,10 +194,7 @@ class TestCustomTransformerTSNE(unittest.TestCase):
             Xd.astype(numpy.float32)[:7],
             ptsne_knn,
             model_onnx,
-            basename="CustomTransformerTSNEkNNCustomParser-OneOffArray",
-            allow_failure="StrictVersion(onnx.__version__) "
-            "<= StrictVersion('1.5')",
-        )
+            basename="CustomTransformerTSNEkNNCustomParser-OneOffArray")
 
         update_registered_parser(PredictableTSNE, my_parser)
         model_onnx = convert_sklearn(

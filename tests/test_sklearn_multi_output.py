@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 from logging import getLogger
 import numpy
 from numpy.testing import assert_almost_equal
@@ -91,7 +91,7 @@ class TestMultiOutputConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available.")
-    @unittest.skipIf(StrictVersion(skl_ver) < StrictVersion("0.22"),
+    @unittest.skipIf(pv.Version(skl_ver) < pv.Version("0.22"),
                      reason="classes_ attribute is missing")
     @ignore_warnings(category=(FutureWarning,
                                DeprecationWarning))
@@ -106,7 +106,7 @@ class TestMultiOutputConverter(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="SequenceConstruct not available.")
-    @unittest.skipIf(StrictVersion(skl_ver) < StrictVersion("0.22"),
+    @unittest.skipIf(pv.Version(skl_ver) < pv.Version("0.22"),
                      reason="classes_ attribute is missing")
     @ignore_warnings(category=(FutureWarning,
                                DeprecationWarning))

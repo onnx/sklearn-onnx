@@ -36,8 +36,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     license='Apache License v2.0',
-    author='Microsoft Corporation',
-    author_email='onnx@microsoft.com',
+    author='ONNX',
+    author_email='onnx-technical-discuss@lists.lfaidata.foundation',
     url='https://github.com/onnx/sklearn-onnx',
     packages=packages,
     include_package_data=True,
@@ -52,5 +52,6 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
         'License :: OSI Approved :: Apache Software License'],
 )
