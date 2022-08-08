@@ -75,7 +75,7 @@ class TestDocumentationTutorial(unittest.TestCase):
                             pass
                         elif ("This method should be overwritten for "
                               "operator") in st:
-                            # raised by old version of packages 
+                            # raised by old version of packages
                             # used in the documentation
                             pass
                         else:

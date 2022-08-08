@@ -43,6 +43,7 @@ from . import normaliser
 from . import one_hot_encoder
 from . import one_vs_rest_classifier
 from . import ordinal_encoder
+from . import ovr_decision_function
 from . import pipelines
 from . import polynomial_features
 from . import power_transformer
@@ -105,6 +106,7 @@ __all__ = [
     one_hot_encoder,
     one_vs_rest_classifier,
     ordinal_encoder,
+    ovr_decision_function,
     pipelines,
     polynomial_features,
     power_transformer,

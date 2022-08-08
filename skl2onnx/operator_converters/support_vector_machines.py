@@ -1,26 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
 import numbers
 import numpy as np
 from scipy.sparse import isspmatrix
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
-from ..common._apply_operation import (
-    apply_cast, apply_concat, apply_abs,
-    apply_add, apply_mul, apply_div)
-try:
-    from ..common._apply_operation import apply_less
-except ImportError:
-    # onnxconverter-common is too old
-    apply_less = None
+from ..common._apply_operation import apply_cast
 from ..common.data_types import (
     BooleanTensorType, Int64TensorType, guess_proto_type)
 from ..common._registration import register_converter
 from ..proto import onnx_proto
+from ..common._topology import Scope, Operator
+from ..common._container import ModelComponentContainer
 
 
 def convert_sklearn_svm_regressor(
-        scope, operator, container,
+        scope: Scope, operator: Operator,
+        container: ModelComponentContainer,
         op_type='SVMRegressor', op_domain='ai.onnx.ml', op_version=1):
     """
     Converter for model
@@ -121,7 +116,8 @@ def convert_sklearn_svm_regressor(
 
 
 def convert_sklearn_svm_classifier(
-        scope, operator, container,
+        scope: Scope, operator: Operator,
+        container: ModelComponentContainer,
         op_type='SVMClassifier', op_domain='ai.onnx.ml', op_version=1):
     """
     Converter for model
@@ -263,106 +259,19 @@ def convert_sklearn_svm_classifier(
         #         sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
         #     return votes + transformed_confidences
 
-        cst3 = scope.get_unique_variable_name('cst3')
-        container.add_initializer(cst3, proto_dtype, [], [3])
-        cst1 = scope.get_unique_variable_name('cst1')
-        container.add_initializer(cst1, proto_dtype, [], [1])
-        cst0 = scope.get_unique_variable_name('cst0')
-        container.add_initializer(cst0, proto_dtype, [], [0])
+        prob_var = scope.declare_local_variable(
+            "prob_name", operator.inputs[0].type.__class__())
+        container.add_node('Identity', [output_name], [prob_var.onnx_name])
+        this_operator = scope.declare_local_operator(
+            "SklearnOVRDecisionFunction", op)
+        this_operator.inputs.append(prob_var)
 
-        prediction = scope.get_unique_variable_name('prediction')
-        if apply_less is None:
-            raise RuntimeError(
-                "Function apply_less is missing. "
-                "onnxconverter-common is too old.")
-        proto_dtype = guess_proto_type(operator.inputs[0].type)
-        if proto_dtype != onnx_proto.TensorProto.DOUBLE:
-            proto_dtype = onnx_proto.TensorProto.FLOAT
-        apply_less(scope, [output_name, cst0], prediction, container)
-        iprediction = scope.get_unique_variable_name('iprediction')
-        apply_cast(scope, prediction, iprediction, container,
-                   to=proto_dtype)
-
-        n_classes = len(op.classes_)
-        sumc_name = [scope.get_unique_variable_name('svcsumc_%d' % i)
-                     for i in range(n_classes)]
-        vote_name = [scope.get_unique_variable_name('svcvote_%d' % i)
-                     for i in range(n_classes)]
-        sumc_add = {n: [] for n in sumc_name}
-        vote_add = {n: [] for n in vote_name}
-        k = 0
-        for i in range(n_classes):
-            for j in range(i + 1, n_classes):
-                name = scope.get_unique_operator_name(
-                    'ArrayFeatureExtractor')
-                ext = scope.get_unique_variable_name('Csvc_%d' % k)
-                ind = scope.get_unique_variable_name('Cind_%d' % k)
-                container.add_initializer(
-                    ind, onnx_proto.TensorProto.INT64, [], [k])
-                container.add_node(
-                    'ArrayFeatureExtractor', [output_name, ind],
-                    ext, op_domain='ai.onnx.ml', name=name)
-                sumc_add[sumc_name[i]].append(ext)
-
-                neg = scope.get_unique_variable_name('Cneg_%d' % k)
-                name = scope.get_unique_operator_name('Neg')
-                container.add_node(
-                    'Neg', ext, neg, op_domain='', name=name,
-                    op_version=6)
-                sumc_add[sumc_name[j]].append(neg)
-
-                # votes
-                name = scope.get_unique_operator_name(
-                    'ArrayFeatureExtractor')
-                ext = scope.get_unique_variable_name('Vsvcv_%d' % k)
-                container.add_node(
-                    'ArrayFeatureExtractor', [iprediction, ind],
-                    ext, op_domain='ai.onnx.ml', name=name)
-                vote_add[vote_name[j]].append(ext)
-                neg = scope.get_unique_variable_name('Vnegv_%d' % k)
-                name = scope.get_unique_operator_name('Neg')
-                container.add_node(
-                    'Neg', ext, neg, op_domain='', name=name,
-                    op_version=6)
-                neg1 = scope.get_unique_variable_name('Vnegv1_%d' % k)
-                apply_add(scope, [neg, cst1], neg1, container, broadcast=1,
-                          operator_name='AddCl_%d_%d' % (i, j))
-                vote_add[vote_name[i]].append(neg1)
-
-                # next
-                k += 1
-
-        for k, v in sumc_add.items():
-            name = scope.get_unique_operator_name('Sum')
-            container.add_node(
-                'Sum', v, k, op_domain='', name=name, op_version=8)
-        for k, v in vote_add.items():
-            name = scope.get_unique_operator_name('Sum')
-            container.add_node(
-                'Sum', v, k, op_domain='', name=name, op_version=8)
-
-        conc = scope.get_unique_variable_name('Csvcconc')
-        apply_concat(scope, sumc_name, conc, container, axis=1)
-        conc_vote = scope.get_unique_variable_name('Vsvcconcv')
-        apply_concat(scope, vote_name, conc_vote, container, axis=1)
-
-        conc_abs = scope.get_unique_variable_name('Cabs')
-        apply_abs(scope, conc, conc_abs, container)
-
-        conc_abs1 = scope.get_unique_variable_name('Cconc_abs1')
-        apply_add(scope, [conc_abs, cst1], conc_abs1, container, broadcast=1,
-                  operator_name='AddF0')
-        conc_abs3 = scope.get_unique_variable_name('Cconc_abs3')
-        apply_mul(scope, [conc_abs1, cst3], conc_abs3, container, broadcast=1)
-
-        final = scope.get_unique_variable_name('Csvcfinal')
-        apply_div(
-            scope, [conc, conc_abs3], final, container, broadcast=0)
+        ovr_name = scope.declare_local_variable(
+            'ovr_output', operator.inputs[0].type.__class__())
+        this_operator.outputs.append(ovr_name)
 
         output_name = operator.outputs[1].full_name
-        apply_add(
-            scope, [conc_vote, final], output_name, container, broadcast=0,
-            operator_name='AddF1')
+        container.add_node('Identity', [ovr_name.onnx_name], [output_name])
 
 
 register_converter('SklearnOneClassSVM', convert_sklearn_svm_regressor)
