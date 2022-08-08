@@ -3,15 +3,28 @@
 """Tests scikit-learn's DictVectorizer converter."""
 
 import unittest
+import numpy
+from numpy.testing import assert_almost_equal
+import onnx.checker
+from onnxruntime import InferenceSession
+from sklearn.pipeline import make_pipeline
 from sklearn.feature_extraction import DictVectorizer
+from sklearn.preprocessing import StandardScaler
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     DictionaryType,
     StringTensorType,
     FloatTensorType,
     Int64TensorType,
-)
+    BooleanTensorType)
+from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, TARGET_OPSET
+try:
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
+    from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph
+except ImportError:
+    InvalidArgument = None
+    InvalidGraph = None
 
 
 class TestSklearnDictVectorizerConverter(unittest.TestCase):
@@ -56,6 +69,72 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
                 [("input", DictionaryType(Int64TensorType([1]),
                   StringTensorType([1])))],
                 target_opset=TARGET_OPSET)
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_dict_vectorizer_pipeline_float(self):
+        data = [{'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}]
+        model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
+        model.fit(data)
+        expected = model.transform(data)
+        model_onnx = convert_sklearn(
+                model, 'dv',
+                [("input", DictionaryType(StringTensorType([1]),
+                  FloatTensorType([1])))],
+                target_opset=TARGET_OPSET)
+        onnx.checker.check_model(model_onnx)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        inp = {'ALL_LOWER': numpy.array([1], dtype=numpy.float32),
+               'NEXT_ALL_LOWER': numpy.array([1], dtype=numpy.float32)}
+        res = sess.run(None, {'input': inp})
+        assert_almost_equal(expected[0].ravel(), res[0].ravel())
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_dict_vectorizer_pipeline_int(self):
+        data = [{'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1},
+                {'PREV_ALL_LOWER': 1, 'ALL_LOWER': 1, 'NEXT_ALL_LOWER': 1}]
+        model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
+        model.fit(data)
+        # expected = model.transform(data)
+        model_onnx = convert_sklearn(
+                model, 'dv',
+                [("input", DictionaryType(StringTensorType([1]),
+                  Int64TensorType([1])))],
+                target_opset=TARGET_OPSET)
+        onnx.checker.check_model(model_onnx)
+        sess = InferenceSession(model_onnx.SerializeToString())
+        inp = {'ALL_LOWER': numpy.array([1], dtype=numpy.int64),
+               'NEXT_ALL_LOWER': numpy.array([1], dtype=numpy.int64)}
+        with self.assertRaises(InvalidArgument):
+            sess.run(None, {'input': inp})
+
+    @unittest.skipIf(not onnx_built_with_ml(),
+                     reason="Requires ONNX-ML extension.")
+    def test_model_dict_vectorizer_pipeline_boolean(self):
+        data = [{'ALL_LOWER': True, 'NEXT_ALL_LOWER': True},
+                {'PREV_ALL_LOWER': True, 'ALL_LOWER': True,
+                 'NEXT_ALL_LOWER': True},
+                {'PREV_ALL_LOWER': True, 'ALL_LOWER': True,
+                 'NEXT_ALL_LOWER': True},
+                {'PREV_ALL_LOWER': True, 'ALL_LOWER': True,
+                 'NEXT_ALL_LOWER': True}]
+
+        model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
+        model.fit(data)
+        model_onnx = convert_sklearn(
+                model, 'dv',
+                [("input", DictionaryType(StringTensorType([1]),
+                  BooleanTensorType([1])))],
+                target_opset=TARGET_OPSET)
+        onnx.checker.check_model(model_onnx)
+        with self.assertRaises(InvalidGraph):
+            InferenceSession(model_onnx.SerializeToString())
 
 
 if __name__ == "__main__":
