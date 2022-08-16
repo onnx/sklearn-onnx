@@ -23,8 +23,6 @@ All imports. It also registered onnx converters for :epgk:`xgboost`
 and :epkg:`lightgbm`.
 """
 import pprint
-import re
-import string
 import numpy
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
@@ -93,7 +91,7 @@ tfidf = Pipeline([
 #############################
 # We leave a couple of strings out of the training set.
 
-tfidf.fit(strings[:-2])  
+tfidf.fit(strings[:-2])
 tr = tfidf.transform(strings)
 tfidf_step = tfidf.steps[0][1].transformers_[0][1]
 # print(f"output columns: {tfidf_step.get_feature_names_out()}")
