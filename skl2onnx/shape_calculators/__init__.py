@@ -30,6 +30,7 @@ from . import multioutput
 from . import nearest_neighbours
 from . import one_hot_encoder
 from . import ordinal_encoder
+from . import one_vs_one_classifier
 from . import one_vs_rest_classifier
 from . import ovr_decision_function
 from . import pipelines

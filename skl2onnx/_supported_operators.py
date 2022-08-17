@@ -72,7 +72,7 @@ from sklearn.mixture import (
 )
 
 # Multi-class
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 
 # Tree-based models
 from sklearn.ensemble import (
@@ -284,6 +284,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     MLPClassifier,
     MultinomialNB,
     NuSVC,
+    OneVsOneClassifier,
     OneVsRestClassifier,
     PassiveAggressiveClassifier,
     Perceptron,
@@ -373,6 +374,7 @@ def build_sklearn_operator_name_map():
         Normalizer,
         OneClassSVM,
         OneHotEncoder,
+        OneVsOneClassifier,
         OneVsRestClassifier,
         OrdinalEncoder,
         PCA,
