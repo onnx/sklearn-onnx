@@ -48,11 +48,6 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
                                    "regressor with only one target.")
             p1 = score_name.onnx_name
         else:
-            if container.has_options(estimator, 'raw_scores'):
-                container.add_options(
-                    id(estimator), {'raw_scores': use_raw_scores})
-                scope.add_options(
-                    id(estimator), {'raw_scores': use_raw_scores})
             label_name = scope.declare_local_variable(
                 'label_%d' % i, Int64TensorType())
             prob_name = scope.declare_local_variable(
@@ -68,97 +63,46 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
 
         probs_names.append(p1)
 
-    if op.multilabel_:
-        # concatenates outputs
-        conc_name = operator.outputs[1].full_name
-        apply_concat(scope, probs_names, conc_name, container, axis=1)
 
-        # builds the labels (matrix with integer)
-        # scikit-learn may use probabilities or raw score
-        # but ONNX converters only uses probabilities.
-        # https://github.com/scikit-learn/scikit-learn/sklearn/
-        # multiclass.py#L290
-        # Raw score would mean: scores = conc_name.
-        thresh_name = scope.get_unique_variable_name('thresh')
-        container.add_initializer(
-            thresh_name, proto_dtype,
-            [1, len(op.classes_)], [.5] * len(op.classes_))
-        scores = scope.get_unique_variable_name('threshed')
-        apply_sub(scope, [conc_name, thresh_name], scores, container)
-
-        # sign
-        signed_input = scope.get_unique_variable_name('signed')
-        container.add_node('Sign', [scores], [signed_input],
-                           name=scope.get_unique_operator_name('Sign'))
-        # clip
-        signed_input_cast = scope.get_unique_variable_name('signed_int64')
-        apply_cast(scope, signed_input, signed_input_cast,
-                   container, to=onnx_proto.TensorProto.INT64)
-
-        label_name = scope.get_unique_variable_name('label')
-        if container.target_opset <= 11:
-            abs_name = scope.get_unique_variable_name('abs')
-            add_name = scope.get_unique_variable_name('add')
-            cst_2 = scope.get_unique_variable_name('cst2')
-            container.add_initializer(
-                cst_2, onnx_proto.TensorProto.INT64, [1], [2])
-            apply_abs(scope, [signed_input_cast], [abs_name], container)
-            apply_add(scope, [signed_input_cast, abs_name], [add_name],
-                      container)
-            apply_div(
-                scope, [add_name, cst_2], [label_name],
-                container)
-        else:
-            zero_cst = scope.get_unique_variable_name('zero')
-            container.add_initializer(
-                zero_cst, onnx_proto.TensorProto.INT64, [], [0])
-            container.add_node(
-                'Clip', [signed_input_cast, zero_cst],
-                [label_name],
-                name=scope.get_unique_operator_name('Clip'))
-        apply_reshape(scope, [label_name], [operator.outputs[0].full_name],
-                      container, desired_shape=(-1, op.n_classes_))
-    else:
-        # concatenates outputs
-        conc_name = scope.get_unique_variable_name('concatenated')
-        apply_concat(scope, probs_names, conc_name, container, axis=1)
-        if len(op.estimators_) == 1:
-            zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
-            merged_prob_name = scope.get_unique_variable_name('merged_prob')
-            unit_float_tensor_name = scope.get_unique_variable_name(
-                'unit_float_tensor')
-            if use_raw_scores:
-                container.add_initializer(
-                    unit_float_tensor_name, proto_dtype, [], [-1.0])
-                apply_mul(scope, [unit_float_tensor_name, conc_name],
-                          zeroth_col_name, container, broadcast=1)
-            else:
-                container.add_initializer(
-                    unit_float_tensor_name, proto_dtype, [], [1.0])
-                apply_sub(scope, [unit_float_tensor_name, conc_name],
-                          zeroth_col_name, container, broadcast=1)
-            apply_concat(scope, [zeroth_col_name, conc_name],
-                         merged_prob_name, container, axis=1)
-            conc_name = merged_prob_name
-
+    conc_name = scope.get_unique_variable_name('concatenated')
+    apply_concat(scope, probs_names, conc_name, container, axis=1)
+    if len(op.estimators_) == 1:
+        zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
+        merged_prob_name = scope.get_unique_variable_name('merged_prob')
+        unit_float_tensor_name = scope.get_unique_variable_name(
+            'unit_float_tensor')
         if use_raw_scores:
-            apply_identity(scope, conc_name,
-                           operator.outputs[1].full_name, container)
+            container.add_initializer(
+                unit_float_tensor_name, proto_dtype, [], [-1.0])
+            apply_mul(scope, [unit_float_tensor_name, conc_name],
+                        zeroth_col_name, container, broadcast=1)
         else:
-            # normalizes the outputs
-            apply_normalization(
-                scope, conc_name, operator.outputs[1].full_name,
-                container, axis=1, p=1)
+            container.add_initializer(
+                unit_float_tensor_name, proto_dtype, [], [1.0])
+            apply_sub(scope, [unit_float_tensor_name, conc_name],
+                        zeroth_col_name, container, broadcast=1)
+        apply_concat(scope, [zeroth_col_name, conc_name],
+                        merged_prob_name, container, axis=1)
+        conc_name = merged_prob_name
 
-        # extracts the labels
-        label_name = scope.get_unique_variable_name('label_name')
-        container.add_node('ArgMax', conc_name, label_name,
-                           name=scope.get_unique_operator_name('ArgMax'),
-                           axis=1)
+    if use_raw_scores:
+        apply_identity(scope, conc_name,
+                        operator.outputs[1].full_name, container)
+    else:
+        # normalizes the outputs
+        apply_normalization(
+            scope, conc_name, operator.outputs[1].full_name,
+            container, axis=1, p=1)
 
-        _finalize_converter_classes(scope, label_name,
-                                    operator.outputs[0].full_name, container,
-                                    op.classes_, proto_dtype)
+    # extracts the labels
+    label_name = scope.get_unique_variable_name('label_name')
+    container.add_node('ArgMax', conc_name, label_name,
+                        name=scope.get_unique_operator_name('ArgMax'),
+                        axis=1)
+
+    _finalize_converter_classes(scope, label_name,
+                                operator.outputs[0].full_name, container,
+                                op.classes_, proto_dtype)
 
 
 register_converter('SklearnOneVsOneClassifier',

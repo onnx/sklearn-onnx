@@ -78,6 +78,7 @@ __all__ = [
     nearest_neighbours,
     one_hot_encoder,
     ordinal_encoder,
+    one_vs_one_classifier,
     one_vs_rest_classifier,
     ovr_decision_function,
     pipelines,

@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import numpy as np
 import unittest
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -12,7 +13,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType)
-from test_utils import (
+from tests.test_utils import (
     dump_data_and_model,
     dump_multiple_classification,
     fit_classification_model,
@@ -44,7 +45,7 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
 
         sess = InferenceSession(model_onnx.SerializeToString())
-        XI = X_test[:10]
+        XI = X_test[:10].astype(np.float32)
         got = sess.run(None, {'input': XI})
         assert_almost_equal(exp_label, got[0])
 
