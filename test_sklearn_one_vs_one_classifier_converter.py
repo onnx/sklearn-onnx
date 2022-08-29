@@ -31,7 +31,8 @@ ort_version = '.'.join(ort_version.split('.')[:2])
 class TestOneVsOneClassifierConverter(unittest.TestCase):
     def test_one_vs_one_classifier_converter(self):
         X, y = load_iris(return_X_y=True)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True, random_state=0)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.33, shuffle=True, random_state=0)
         model = OneVsOneClassifier(LinearSVC(random_state=0)).fit(X_train, y_train)
         exp_label = model.predict(X_test[:10])
         print(exp_label)
@@ -49,12 +50,13 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
 
         onnx.save_model(model_onnx, "testovo.onnx")
 
-        print("onnx model saved")
+        print("onnx model saved!!!!")
 
         sess = InferenceSession(model_onnx.SerializeToString())
         XI = X_test[:10].astype(np.float32)
         got = sess.run(None, {'input': XI})
-        assert_almost_equal(exp_label, got[0])
+        print(got)
+        assert_almost_equal(exp_label, got[0].reshape(-1))
 
 
 if __name__ == "__main__":
