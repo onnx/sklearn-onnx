@@ -28,13 +28,35 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 ort_version = '.'.join(ort_version.split('.')[:2])
 
 
-class TestOneVsOneClassifierConverter(unittest.TestCase):
-    def test_one_vs_one_classifier_converter(self):
-        X, y = load_iris(return_X_y=True)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, shuffle=True, random_state=0)
-        model = OneVsOneClassifier(LinearSVC(random_state=0)).fit(X_train, y_train)
-        exp_label = model.predict(X_test[:10])
-        print(exp_label)
+class TestOvrDecisionFunction(unittest.TestCase):
+    def test_ovr_function(self):
+
+        label = np.array([
+            [1, 1, 1],
+            [1, 1, 0],
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+            [1, 1, 1],
+            [0, 0, 0],
+            [1, 1, 0],
+            [1, 1, 0],
+            [1, 1, 0]
+        ])
+
+        score = np.array([
+            [ 2.7691362 ,  1.3476608 ,  1.9489377 ],
+            [ 1.4604166 ,  0.45662668, -1.5390667 ],
+            [-1.7293018 , -1.5082803 , -7.805672  ],
+            [ 3.1502779 ,  1.4747248 ,  1.3853829 ],
+            [-1.2183753 , -1.1599588 , -6.503545  ],
+            [ 3.2527397 ,  1.6418446 ,  2.6538432 ],
+            [-1.3828267 , -1.2654455 , -6.772983  ],
+            [ 1.7424656 ,  0.6119384 , -1.1415086 ],
+            [ 1.8815211 ,  0.6829882 , -1.0046322 ],
+            [ 1.3255664 ,  0.3806743 , -1.6823313 ]
+        ])
+
 
 #        result = np.array([2 1 0 2 0 2 0 1 1 1])
 

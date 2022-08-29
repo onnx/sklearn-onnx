@@ -34,14 +34,17 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 ort_version = '.'.join(ort_version.split('.')[:2])
 
+from sklearn.svm import LinearSVC, SVC
+
 
 class TestOneVsRestClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr(self):
-        model = OneVsRestClassifier(LogisticRegression())
+        #model = OneVsRestClassifier(LogisticRegression())
+        model = OneVsRestClassifier(LinearSVC())
         dump_multiple_classification(
             model, target_opset=TARGET_OPSET)
-
+    '''
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version('1.4.0'),
         reason="onnxruntime too old")
@@ -492,7 +495,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         assert_almost_equal(exp, res[0])
         exp = model.decision_function(X_test)
         assert_almost_equal(exp, res[1][:, 1], decimal=5)
-
+    '''
 
 if __name__ == "__main__":
     unittest.main()
