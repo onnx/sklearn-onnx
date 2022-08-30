@@ -34,7 +34,7 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.33, shuffle=True, random_state=0)
         model = OneVsOneClassifier(LinearSVC(random_state=0)).fit(X_train, y_train)
-        exp_label = model.predict(X_test[:10])
+        exp_label = model.predict(X_test[20:30])
         print(exp_label)
 
 #        result = np.array([2 1 0 2 0 2 0 1 1 1])
@@ -53,9 +53,10 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
         print("onnx model saved!!!!")
 
         sess = InferenceSession(model_onnx.SerializeToString())
-        XI = X_test[:10].astype(np.float32)
+        XI = X_test[20:30].astype(np.float32)
         got = sess.run(None, {'input': XI})
-        print(got)
+        print(got[0].reshape(-1))
+        print(got[1])
         assert_almost_equal(exp_label, got[0].reshape(-1))
 
 
