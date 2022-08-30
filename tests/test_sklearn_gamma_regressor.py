@@ -44,7 +44,6 @@ class TestGammaRegressorConverter(unittest.TestCase):
         dump_data_and_model(test_x.astype(np.float32), model, model_onnx,
                             basename="SklearnGammaRegressor")
 
-
     @unittest.skipIf(GammaRegressor is None,
                      reason="scikit-learn<1.0")
     def test_gamma_regressor_int(self):
@@ -65,7 +64,6 @@ class TestGammaRegressorConverter(unittest.TestCase):
         dump_data_and_model(test_x.astype(np.int64), model, model_onnx,
                             basename="SklearnGammaRegressor")
 
-    
     @unittest.skipIf(GammaRegressor is None,
                      reason="scikit-learn<1.0")
     def test_gamma_regressor_double(self):
@@ -85,6 +83,7 @@ class TestGammaRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx is not None)
         dump_data_and_model(test_x.astype(np.double), model, model_onnx,
                             basename="SklearnGammaRegressor")
-        
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=3)
