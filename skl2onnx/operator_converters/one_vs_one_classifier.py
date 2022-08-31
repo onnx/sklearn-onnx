@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from sklearn.base import is_regressor
+from sklearn.svm import LinearSVC
 from ..proto import onnx_proto
 from ..common._apply_operation import (
     apply_concat, apply_identity, apply_mul, apply_reshape, apply_transpose)
@@ -11,12 +12,13 @@ from ..common._apply_operation import apply_normalization
 from ..common._apply_operation import (
     apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
 from ..common.utils_classifier import _finalize_converter_classes
-from ..common.data_types import guess_proto_type, Int64TensorType, FloatTensorType
+from ..common.data_types import (
+    guess_proto_type, Int64TensorType, FloatTensorType)
 from .._supported_operators import sklearn_operator_name_map
 
 
 def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
-                                   container: ModelComponentContainer):
+                                  container: ModelComponentContainer):
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
@@ -25,7 +27,7 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     options = container.get_options(op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
   
-    probs_names = []
+    label_names = []
     for i, estimator in enumerate(op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
@@ -33,42 +35,35 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
             op_type, raw_model=estimator)
         this_operator.inputs = operator.inputs
 
-        if is_regressor(estimator):
-            score_name = scope.declare_local_variable(
-                'score_%d' % i, operator.inputs[0].type.__class__())
-            this_operator.outputs.append(score_name)
+        if container.has_options(estimator, 'raw_scores'):
+            container.add_options(
+                id(estimator), {'raw_scores': use_raw_scores})
+            scope.add_options(
+                id(estimator), {'raw_scores': use_raw_scores})
+        label_name = scope.declare_local_variable(
+            'label_%d' % i, Int64TensorType())
+        prob_name = scope.declare_local_variable(
+            'proba_%d' % i, operator.inputs[0].type.__class__())
+        this_operator.outputs.append(label_name)
+        this_operator.outputs.append(prob_name)
 
-            if hasattr(estimator, 'coef_') and len(estimator.coef_.shape) == 2:
-                raise RuntimeError("OneVsRestClassifier accepts "
-                                   "regressor with only one target.")
-            p1 = score_name.onnx_name
-        else:
-            if container.has_options(estimator, 'raw_scores'):
-                container.add_options(
-                    id(estimator), {'raw_scores': use_raw_scores})
-                scope.add_options(
-                    id(estimator), {'raw_scores': use_raw_scores})
-            label_name = scope.declare_local_variable(
-                'label_%d' % i, Int64TensorType())
-            prob_name = scope.declare_local_variable(
-                'proba_%d' % i, operator.inputs[0].type.__class__())
-            this_operator.outputs.append(label_name)
-            this_operator.outputs.append(prob_name)
+        # gets the probability for the class 1
+        label = scope.get_unique_variable_name('lab_%d' % i)
+        apply_reshape(scope, label_name.onnx_name, label, container,
+                      desired_shape=(-1, 1))
+        cast_label = scope.get_unique_variable_name('cast_lab_%d' % i)
+        apply_cast(scope, label, cast_label, container,
+                   to=proto_dtype)
+        label_names.append(cast_label)
 
-            # gets the probability for the class 1
-            p1 = scope.get_unique_variable_name('probY_%d' % i)
-            apply_slice(scope, prob_name.onnx_name, p1, container, starts=[1],
-                        ends=[2], axes=[1],
-                        operator_name=scope.get_unique_operator_name('Slice'))
-
-        probs_names.append(p1)
-
-    conc_name = scope.get_unique_variable_name('concat_out')
-    apply_concat(scope, probs_names, conc_name, container, axis=1)
+    conc_name = scope.get_unique_variable_name('concat_out_ovo')
+    apply_concat(scope, label_names, conc_name, container, axis=1)
     
-    prob_var = scope.declare_local_variable('aaa_name', FloatTensorType(shape=[None, 6]))
+    prob_var = scope.declare_local_variable(
+        'aaa_name', operator.inputs[0].type.__class__(shape=[None, None]))
     container.add_node('Identity', [conc_name], [prob_var.onnx_name])
-    this_operator = scope.declare_local_operator("SklearnOVRDecisionFunction", op)
+    this_operator = scope.declare_local_operator(
+        "SklearnOVRDecisionFunction", op)
     this_operator.inputs.append(prob_var)
 
     ovr_name = scope.declare_local_variable(
