@@ -35,7 +35,7 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
             X, y, test_size=0.33, shuffle=True, random_state=0)
         model = OneVsOneClassifier(LinearSVC(random_state=0)).fit(X_train, y_train)
         exp_label = model.predict(X_test[20:30])
-        print(exp_label)
+        #print(exp_label)
 
 #        result = np.array([2 1 0 2 0 2 0 1 1 1])
 

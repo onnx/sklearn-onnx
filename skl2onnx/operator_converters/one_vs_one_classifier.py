@@ -63,15 +63,24 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
 
         probs_names.append(p1)
 
-
+    conc_name = scope.get_unique_variable_name('concat_out')
+    apply_concat(scope, probs_names, conc_name, container, axis=1)
+    
+    prob_var = scope.declare_local_variable('aaa_name', FloatTensorType(shape=[None, 6]))
+    container.add_node('Identity', [conc_name], [prob_var.onnx_name])
     this_operator = scope.declare_local_operator("SklearnOVRDecisionFunction", op)
-    this_operator.inputs.append(probs_names)
+    this_operator.inputs.append(prob_var)
+
     ovr_name = scope.declare_local_variable(
-        'ovr_output', operator.inputs[0].type.__class__())
+            'ovr_output', operator.inputs[0].type.__class__())
     this_operator.outputs.append(ovr_name)
 
     output_name = operator.outputs[1].full_name
     container.add_node('Identity', [ovr_name.onnx_name], [output_name])
+
+    container.add_node('ArgMax', 'ovr_output', 
+        operator.outputs[0].full_name, axis=1)
+
 
 register_converter('SklearnOneVsOneClassifier',
                    convert_one_vs_one_classifier,
@@ -79,6 +88,3 @@ register_converter('SklearnOneVsOneClassifier',
                             'nocl': [True, False],
                             'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
-
-
-
