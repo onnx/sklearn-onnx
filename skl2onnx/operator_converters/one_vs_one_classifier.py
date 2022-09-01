@@ -30,6 +30,10 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     # shape to use to reshape score
     cst0 = scope.get_unique_variable_name('cst0')
     container.add_initializer(cst0, onnx_proto.TensorProto.INT64, [1], [0])
+    cst1 = scope.get_unique_variable_name('cst1')
+    container.add_initializer(cst1, onnx_proto.TensorProto.INT64, [1], [1])
+    cst2 = scope.get_unique_variable_name('cst2')
+    container.add_initializer(cst2, onnx_proto.TensorProto.INT64, [1], [2])
     shape = scope.get_unique_variable_name('shape')
     container.add_node('Shape', [operator.inputs[0].full_name], [shape])
     first_dim = scope.get_unique_variable_name('dim')
@@ -42,6 +46,10 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     label_names = []
     prob_names = []
     for i, estimator in enumerate(op.estimators_):
+        if is_regressor(estimator):
+            raise NotImplementedError(
+                f"Conversion of OneVersusOneClassifier for regressors "
+                f"{type(estimator)} is not implemented yet.")
         op_type = sklearn_operator_name_map[type(estimator)]
 
         this_operator = scope.declare_local_operator(
@@ -49,10 +57,15 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
         this_operator.inputs = operator.inputs
 
         if container.has_options(estimator, 'raw_scores'):
-            container.add_options(
-                id(estimator), {'raw_scores': use_raw_scores})
-            scope.add_options(
-                id(estimator), {'raw_scores': use_raw_scores})
+            options = {'raw_scores': True}
+        elif container.has_options(estimator, 'zipmap'):
+            options = {'zipmap': False}
+        else:
+            options = None
+        if options is not None:
+            container.add_options(id(estimator), options)
+            scope.add_options(id(estimator), options)
+
         label_name = scope.declare_local_variable(
             'label_%d' % i, Int64TensorType())
         prob_name = scope.declare_local_variable(
@@ -73,7 +86,10 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
         prob_reshaped = scope.get_unique_variable_name('prob_%d' % i)
         container.add_node('Reshape', [prob_name.onnx_name, prob_shape],
                            [prob_reshaped])
-        prob_names.append(prob_reshaped)
+        prob1 = scope.get_unique_variable_name('prob1_%d' % i)
+        sliced = container.add_node(
+            'Slice', [prob_reshaped, cst1, cst2, cst1], prob1)
+        prob_names.append(prob1)
 
     conc_lab_name = scope.get_unique_variable_name('concat_out_ovo_label')
     apply_concat(scope, label_names, conc_lab_name, container, axis=1)
