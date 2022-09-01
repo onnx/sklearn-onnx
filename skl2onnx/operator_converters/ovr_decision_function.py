@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ..common._apply_operation import (
-    apply_cast, apply_concat, apply_abs,
+    apply_concat, apply_abs,
     apply_add, apply_mul, apply_div)
 try:
     from ..common._apply_operation import apply_less

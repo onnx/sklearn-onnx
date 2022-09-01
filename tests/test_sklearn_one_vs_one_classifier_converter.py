@@ -14,14 +14,8 @@ from sklearn.svm import LinearSVC
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     DoubleTensorType,
-    FloatTensorType,
-    Int64TensorType)
-from test_utils import (
-    dump_data_and_model,
-    dump_multiple_classification,
-    fit_classification_model,
-    fit_multilabel_classification_model,
-    TARGET_OPSET)
+    FloatTensorType)
+from test_utils import TARGET_OPSET
 
 warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 

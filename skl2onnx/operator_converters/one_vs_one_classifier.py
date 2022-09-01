@@ -1,19 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from sklearn.base import is_regressor
-from sklearn.svm import LinearSVC
 from ..proto import onnx_proto
-from ..common._apply_operation import (
-    apply_concat, apply_identity, apply_mul, apply_reshape, apply_transpose)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common._apply_operation import apply_normalization
-from ..common._apply_operation import (
-    apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
-from ..common.utils_classifier import _finalize_converter_classes
-from ..common.data_types import (
-    guess_proto_type, Int64TensorType, FloatTensorType)
+from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
+from ..common.data_types import guess_proto_type, Int64TensorType
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -70,7 +63,8 @@ def _iteration_one_versus(scope, container, inputs, i, estimator, cl_type,
         first_dim = scope.get_unique_variable_name('dim')
         container.add_node('Gather', [shape, cst0], [first_dim])
         cst_1 = scope.get_unique_variable_name('cst_1')
-        container.add_initializer(cst_1, onnx_proto.TensorProto.INT64, [1], [-1])
+        container.add_initializer(
+            cst_1, onnx_proto.TensorProto.INT64, [1], [-1])
         prob_shape = scope.get_unique_variable_name('shape')
         apply_concat(scope, [first_dim, cst_1], prob_shape, container, axis=0)
 
@@ -84,7 +78,7 @@ def _iteration_one_versus(scope, container, inputs, i, estimator, cl_type,
     container.add_initializer(cst2, onnx_proto.TensorProto.INT64, [1], [2])
 
     prob1 = scope.get_unique_variable_name('prob1_%d' % i)
-    sliced = container.add_node(
+    container.add_node(
         'Slice', [prob_reshaped, cst1, cst2, cst1], prob1)
     return prob_shape, cast_label, prob1
 
@@ -112,7 +106,7 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     container.add_initializer(cst_1, onnx_proto.TensorProto.INT64, [1], [-1])
     prob_shape = scope.get_unique_variable_name('shape')
     apply_concat(scope, [first_dim, cst_1], prob_shape, container, axis=0)
-  
+
     label_names = []
     prob_names = []
     prob_shape = None
@@ -149,8 +143,8 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     output_name = operator.outputs[1].full_name
     container.add_node('Identity', [ovr_name.onnx_name], [output_name])
 
-    container.add_node('ArgMax', 'ovr_output', 
-        operator.outputs[0].full_name, axis=1)
+    container.add_node(
+        'ArgMax', 'ovr_output', operator.outputs[0].full_name, axis=1)
 
 
 register_converter('SklearnOneVsOneClassifier',

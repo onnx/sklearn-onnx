@@ -14,6 +14,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.svm import LinearSVC
 try:
     from sklearn.utils._testing import ignore_warnings
 except ImportError:
@@ -33,8 +34,6 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 
 ort_version = '.'.join(ort_version.split('.')[:2])
-
-from sklearn.svm import LinearSVC, SVC
 
 
 class TestOneVsRestClassifierConverter(unittest.TestCase):
