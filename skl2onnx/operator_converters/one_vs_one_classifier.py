@@ -17,6 +17,78 @@ from ..common.data_types import (
 from .._supported_operators import sklearn_operator_name_map
 
 
+def _iteration_one_versus(scope, container, inputs, i, estimator, cl_type,
+                          proto_dtype, use_raw_scores=True, prob_shape=None):
+    op_type = sklearn_operator_name_map[type(estimator)]
+
+    this_operator = scope.declare_local_operator(op_type, raw_model=estimator)
+    this_operator.inputs = inputs
+
+    if is_regressor(estimator):
+        score_name = scope.declare_local_variable('score_%d' % i, cl_type())
+        this_operator.outputs.append(score_name)
+
+        if hasattr(estimator, 'coef_') and len(estimator.coef_.shape) == 2:
+            raise RuntimeError(
+                "OneVsRestClassifier or OneVsOneClassifier accepts "
+                "regressor with only one target.")
+        p1 = score_name.onnx_name
+        return None, None, p1
+
+    if container.has_options(estimator, 'raw_scores'):
+        options = {'raw_scores': use_raw_scores}
+    elif container.has_options(estimator, 'zipmap'):
+        options = {'zipmap': False}
+    else:
+        options = None
+    if options is not None:
+        container.add_options(id(estimator), options)
+        scope.add_options(id(estimator), options)
+
+    label_name = scope.declare_local_variable(
+        'label_%d' % i, Int64TensorType())
+    prob_name = scope.declare_local_variable(
+        'proba_%d' % i, inputs[0].type.__class__())
+    this_operator.outputs.append(label_name)
+    this_operator.outputs.append(prob_name)
+
+    # gets the label for the class 1
+    label = scope.get_unique_variable_name('lab_%d' % i)
+    apply_reshape(scope, label_name.onnx_name, label, container,
+                  desired_shape=(-1, 1))
+    cast_label = scope.get_unique_variable_name('cast_lab_%d' % i)
+    apply_cast(scope, label, cast_label, container,
+               to=proto_dtype)
+
+    # get the probability for the class 1
+    if prob_shape is None:
+        # shape to use to reshape score
+        cst0 = scope.get_unique_variable_name('cst0')
+        container.add_initializer(cst0, onnx_proto.TensorProto.INT64, [1], [0])
+        shape = scope.get_unique_variable_name('shape')
+        container.add_node('Shape', [inputs[0].full_name], [shape])
+        first_dim = scope.get_unique_variable_name('dim')
+        container.add_node('Gather', [shape, cst0], [first_dim])
+        cst_1 = scope.get_unique_variable_name('cst_1')
+        container.add_initializer(cst_1, onnx_proto.TensorProto.INT64, [1], [-1])
+        prob_shape = scope.get_unique_variable_name('shape')
+        apply_concat(scope, [first_dim, cst_1], prob_shape, container, axis=0)
+
+    prob_reshaped = scope.get_unique_variable_name('prob_%d' % i)
+    container.add_node('Reshape', [prob_name.onnx_name, prob_shape],
+                       [prob_reshaped])
+
+    cst1 = scope.get_unique_variable_name('cst1')
+    container.add_initializer(cst1, onnx_proto.TensorProto.INT64, [1], [1])
+    cst2 = scope.get_unique_variable_name('cst2')
+    container.add_initializer(cst2, onnx_proto.TensorProto.INT64, [1], [2])
+
+    prob1 = scope.get_unique_variable_name('prob1_%d' % i)
+    sliced = container.add_node(
+        'Slice', [prob_reshaped, cst1, cst2, cst1], prob1)
+    return prob_shape, cast_label, prob1
+
+
 def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
                                   container: ModelComponentContainer):
 
@@ -25,7 +97,6 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
         proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
     options = container.get_options(op, dict(raw_scores=False))
-    use_raw_scores = options['raw_scores']
 
     # shape to use to reshape score
     cst0 = scope.get_unique_variable_name('cst0')
@@ -45,50 +116,14 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
   
     label_names = []
     prob_names = []
+    prob_shape = None
+    cl_type = operator.inputs[0].type.__class__
     for i, estimator in enumerate(op.estimators_):
-        if is_regressor(estimator):
-            raise NotImplementedError(
-                f"Conversion of OneVersusOneClassifier for regressors "
-                f"{type(estimator)} is not implemented yet.")
-        op_type = sklearn_operator_name_map[type(estimator)]
+        prob_shape, cast_label, prob1 = _iteration_one_versus(
+            scope, container, operator.inputs, i, estimator, cl_type,
+            proto_dtype, True, prob_shape=prob_shape)
 
-        this_operator = scope.declare_local_operator(
-            op_type, raw_model=estimator)
-        this_operator.inputs = operator.inputs
-
-        if container.has_options(estimator, 'raw_scores'):
-            options = {'raw_scores': True}
-        elif container.has_options(estimator, 'zipmap'):
-            options = {'zipmap': False}
-        else:
-            options = None
-        if options is not None:
-            container.add_options(id(estimator), options)
-            scope.add_options(id(estimator), options)
-
-        label_name = scope.declare_local_variable(
-            'label_%d' % i, Int64TensorType())
-        prob_name = scope.declare_local_variable(
-            'proba_%d' % i, operator.inputs[0].type.__class__())
-        this_operator.outputs.append(label_name)
-        this_operator.outputs.append(prob_name)
-
-        # gets the label for the class 1
-        label = scope.get_unique_variable_name('lab_%d' % i)
-        apply_reshape(scope, label_name.onnx_name, label, container,
-                      desired_shape=(-1, 1))
-        cast_label = scope.get_unique_variable_name('cast_lab_%d' % i)
-        apply_cast(scope, label, cast_label, container,
-                   to=proto_dtype)
         label_names.append(cast_label)
-
-        # get the probability for the class 1
-        prob_reshaped = scope.get_unique_variable_name('prob_%d' % i)
-        container.add_node('Reshape', [prob_name.onnx_name, prob_shape],
-                           [prob_reshaped])
-        prob1 = scope.get_unique_variable_name('prob1_%d' % i)
-        sliced = container.add_node(
-            'Slice', [prob_reshaped, cst1, cst2, cst1], prob1)
         prob_names.append(prob1)
 
     conc_lab_name = scope.get_unique_variable_name('concat_out_ovo_label')
@@ -123,5 +158,4 @@ register_converter('SklearnOneVsOneClassifier',
                    convert_one_vs_one_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
-                            'output_class_labels': [False, True],
-                            'raw_scores': [True, False]})
+                            'output_class_labels': [False, True]})
