@@ -96,7 +96,6 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
-    options = container.get_options(op, dict(raw_scores=False))
 
     # shape to use to reshape score
     cst0 = scope.get_unique_variable_name('cst0')
