@@ -26,8 +26,21 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
     op = operator.raw_operator
     options = container.get_options(op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
+
+    # shape to use to reshape score
+    cst0 = scope.get_unique_variable_name('cst0')
+    container.add_initializer(cst0, onnx_proto.TensorProto.INT64, [1], [0])
+    shape = scope.get_unique_variable_name('shape')
+    container.add_node('Shape', [operator.inputs[0].full_name], [shape])
+    first_dim = scope.get_unique_variable_name('dim')
+    container.add_node('Gather', [shape, cst0], [first_dim])
+    cst_1 = scope.get_unique_variable_name('cst_1')
+    container.add_initializer(cst_1, onnx_proto.TensorProto.INT64, [1], [-1])
+    prob_shape = scope.get_unique_variable_name('shape')
+    apply_concat(scope, [first_dim, cst_1], prob_shape, container, axis=0)
   
     label_names = []
+    prob_names = []
     for i, estimator in enumerate(op.estimators_):
         op_type = sklearn_operator_name_map[type(estimator)]
 
@@ -47,7 +60,7 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
         this_operator.outputs.append(label_name)
         this_operator.outputs.append(prob_name)
 
-        # gets the probability for the class 1
+        # gets the label for the class 1
         label = scope.get_unique_variable_name('lab_%d' % i)
         apply_reshape(scope, label_name.onnx_name, label, container,
                       desired_shape=(-1, 1))
@@ -56,18 +69,31 @@ def convert_one_vs_one_classifier(scope: Scope, operator: Operator,
                    to=proto_dtype)
         label_names.append(cast_label)
 
-    conc_name = scope.get_unique_variable_name('concat_out_ovo')
-    apply_concat(scope, label_names, conc_name, container, axis=1)
-    
-    prob_var = scope.declare_local_variable(
-        'aaa_name', operator.inputs[0].type.__class__(shape=[None, None]))
-    container.add_node('Identity', [conc_name], [prob_var.onnx_name])
+        # get the probability for the class 1
+        prob_reshaped = scope.get_unique_variable_name('prob_%d' % i)
+        container.add_node('Reshape', [prob_name.onnx_name, prob_shape],
+                           [prob_reshaped])
+        prob_names.append(prob_reshaped)
+
+    conc_lab_name = scope.get_unique_variable_name('concat_out_ovo_label')
+    apply_concat(scope, label_names, conc_lab_name, container, axis=1)
+    conc_prob_name = scope.get_unique_variable_name('concat_out_ovo_prob')
+    apply_concat(scope, prob_names, conc_prob_name, container, axis=1)
+
+    # calls _ovr_decision_function
     this_operator = scope.declare_local_operator(
         "SklearnOVRDecisionFunction", op)
-    this_operator.inputs.append(prob_var)
 
-    ovr_name = scope.declare_local_variable(
-            'ovr_output', operator.inputs[0].type.__class__())
+    cl_type = operator.inputs[0].type.__class__
+    label = scope.declare_local_variable("label", cl_type())
+    container.add_node('Identity', [conc_lab_name], [label.onnx_name])
+    prob_score = scope.declare_local_variable("prob_score", cl_type())
+    container.add_node('Identity', [conc_prob_name], [prob_score.onnx_name])
+
+    this_operator.inputs.append(label)
+    this_operator.inputs.append(prob_score)
+
+    ovr_name = scope.declare_local_variable('ovr_output', cl_type())
     this_operator.outputs.append(ovr_name)
 
     output_name = operator.outputs[1].full_name

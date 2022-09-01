@@ -11,6 +11,11 @@ from ..common._registration import register_converter
 from ..proto import onnx_proto
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
+try:
+    from ..common._apply_operation import apply_less
+except ImportError:
+    # onnxconverter-common is too old
+    apply_less = None
 
 
 def convert_sklearn_svm_regressor(
@@ -240,6 +245,23 @@ def convert_sklearn_svm_classifier(
         # master/sklearn/utils/multiclass.py#L407:
         # ::
         #     _ovr_decision_function(dec < 0, -dec, len(self.classes_))
+
+        if apply_less is None:
+            raise RuntimeError(
+                "Function apply_less is missing. "
+                "onnxconverter-common is too old.")
+
+        cst0 = scope.get_unique_variable_name('cst0')
+        negative = scope.get_unique_variable_name('negative')
+        container.add_initializer(cst0, proto_dtype, [], [0])
+        apply_less(scope, [output_name, cst0], negative, container)
+        inegative = scope.get_unique_variable_name('inegative')
+        apply_cast(scope, negative, inegative, container,
+                   to=proto_dtype)
+
+        score_name = scope.get_unique_variable_name('neg')
+        container.add_node('Neg', [output_name], score_name)
+
         #
         #     ...
         #     def _ovr_decision_function(predictions, confidences, n_classes):
@@ -259,15 +281,19 @@ def convert_sklearn_svm_classifier(
         #         sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
         #     return votes + transformed_confidences
 
-        prob_var = scope.declare_local_variable(
-            "prob_name", operator.inputs[0].type.__class__())
-        container.add_node('Identity', [output_name], [prob_var.onnx_name])
         this_operator = scope.declare_local_operator(
             "SklearnOVRDecisionFunction", op)
-        this_operator.inputs.append(prob_var)
 
-        ovr_name = scope.declare_local_variable(
-            'ovr_output', operator.inputs[0].type.__class__())
+        cl_type = operator.inputs[0].type.__class__
+        prob_sign = scope.declare_local_variable("prob_sign", cl_type())
+        container.add_node('Identity', [inegative], [prob_sign.onnx_name])
+        prob_score = scope.declare_local_variable("prob_sign", cl_type())
+        container.add_node('Identity', [score_name], [prob_score.onnx_name])
+
+        this_operator.inputs.append(prob_sign)
+        this_operator.inputs.append(prob_score)
+
+        ovr_name = scope.declare_local_variable('ovr_output', cl_type())
         this_operator.outputs.append(ovr_name)
 
         output_name = operator.outputs[1].full_name

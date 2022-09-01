@@ -23,51 +23,34 @@ def convert_sklearn_ovr_decision_function(
     # See https://github.com/scikit-learn/scikit-learn/blob/
     # master/sklearn/utils/multiclass.py#L407:
     # ::
-    #     _ovr_decision_function(dec < 0, -dec, len(self.classes_))
-    #
-    #     ...
     #     def _ovr_decision_function(predictions, confidences, n_classes):
     #
-    #     n_samples = predictions.shape[0]
-    #     votes = np.zeros((n_samples, n_classes))
-    #     sum_of_confidences = np.zeros((n_samples, n_classes))
-    #     k = 0
-    #     for i in range(n_classes):
-    #         for j in range(i + 1, n_classes):
-    #             sum_of_confidences[:, i] -= confidences[:, k]
-    #             sum_of_confidences[:, j] += confidences[:, k]
-    #             votes[predictions[:, k] == 0, i] += 1
-    #             votes[predictions[:, k] == 1, j] += 1
-    #             k += 1
-    #     transformed_confidences = (
-    #         sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
-    #     return votes + transformed_confidences
-    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    #         n_samples = predictions.shape[0]
+    #         votes = np.zeros((n_samples, n_classes))
+    #         sum_of_confidences = np.zeros((n_samples, n_classes))
+    #         k = 0
+    #         for i in range(n_classes):
+    #             for j in range(i + 1, n_classes):
+    #                 sum_of_confidences[:, i] -= confidences[:, k]
+    #                 sum_of_confidences[:, j] += confidences[:, k]
+    #                 votes[predictions[:, k] == 0, i] += 1
+    #                 votes[predictions[:, k] == 1, j] += 1
+    #                 k += 1
+    #         transformed_confidences = (
+    #             sum_of_confidences / (3 * (np.abs(sum_of_confidences) + 1)))
+    #         return votes + transformed_confidences
+    proto_dtype = guess_proto_type(operator.inputs[1].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
     op = operator.raw_operator
-
-    input_name = operator.inputs[0].full_name
 
     cst3 = scope.get_unique_variable_name('cst3')
     container.add_initializer(cst3, proto_dtype, [], [3])
     cst1 = scope.get_unique_variable_name('cst1')
     container.add_initializer(cst1, proto_dtype, [], [1])
-    cst0 = scope.get_unique_variable_name('cst0')
-    container.add_initializer(cst0, proto_dtype, [], [0])
 
-    prediction = scope.get_unique_variable_name('prediction')
-    if apply_less is None:
-        raise RuntimeError(
-            "Function apply_less is missing. "
-            "onnxconverter-common is too old.")
-    proto_dtype = guess_proto_type(operator.inputs[0].type)
-    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
-        proto_dtype = onnx_proto.TensorProto.FLOAT
-    apply_less(scope, [input_name, cst0], prediction, container)
-    iprediction = scope.get_unique_variable_name('iprediction')
-    apply_cast(scope, prediction, iprediction, container,
-               to=proto_dtype)
+    iprediction = operator.inputs[0].full_name
+    score_name = operator.inputs[1].full_name
 
     n_classes = len(op.classes_)
     sumc_name = [scope.get_unique_variable_name('svcsumc_%d' % i)
@@ -79,37 +62,30 @@ def convert_sklearn_ovr_decision_function(
     k = 0
     for i in range(n_classes):
         for j in range(i + 1, n_classes):
-            name = scope.get_unique_operator_name(
-                'ArrayFeatureExtractor')
-            ext = scope.get_unique_variable_name('Csvc_%d' % k)
             ind = scope.get_unique_variable_name('Cind_%d' % k)
             container.add_initializer(
                 ind, onnx_proto.TensorProto.INT64, [], [k])
+
+            # confidences
+            ext = scope.get_unique_variable_name('Csvc_%d' % k)
             container.add_node(
-                'ArrayFeatureExtractor', [input_name, ind],
-                ext, op_domain='ai.onnx.ml', name=name)
-            sumc_add[sumc_name[i]].append(ext)
+                'ArrayFeatureExtractor', [score_name, ind],
+                ext, op_domain='ai.onnx.ml')
+            sumc_add[sumc_name[j]].append(ext)
 
             neg = scope.get_unique_variable_name('Cneg_%d' % k)
-            name = scope.get_unique_operator_name('Neg')
-            container.add_node(
-                'Neg', ext, neg, op_domain='', name=name,
-                op_version=6)
-            sumc_add[sumc_name[j]].append(neg)
+            container.add_node('Neg', ext, neg, op_domain='', op_version=6)
+            sumc_add[sumc_name[i]].append(neg)
 
             # votes
-            name = scope.get_unique_operator_name(
-                'ArrayFeatureExtractor')
             ext = scope.get_unique_variable_name('Vsvcv_%d' % k)
             container.add_node(
                 'ArrayFeatureExtractor', [iprediction, ind],
-                ext, op_domain='ai.onnx.ml', name=name)
+                ext, op_domain='ai.onnx.ml')
             vote_add[vote_name[j]].append(ext)
+
             neg = scope.get_unique_variable_name('Vnegv_%d' % k)
-            name = scope.get_unique_operator_name('Neg')
-            container.add_node(
-                'Neg', ext, neg, op_domain='', name=name,
-                op_version=6)
+            container.add_node('Neg', ext, neg, op_domain='', op_version=6)
             neg1 = scope.get_unique_variable_name('Vnegv1_%d' % k)
             apply_add(scope, [neg, cst1], neg1, container, broadcast=1,
                       operator_name='AddCl_%d_%d' % (i, j))
