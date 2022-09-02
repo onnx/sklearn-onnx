@@ -41,6 +41,7 @@ from . import naive_bayes
 from . import nearest_neighbours
 from . import normaliser
 from . import one_hot_encoder
+from . import one_vs_one_classifier
 from . import one_vs_rest_classifier
 from . import ordinal_encoder
 from . import ovr_decision_function
@@ -104,6 +105,7 @@ __all__ = [
     nearest_neighbours,
     normaliser,
     one_hot_encoder,
+    one_vs_one_classifier,
     one_vs_rest_classifier,
     ordinal_encoder,
     ovr_decision_function,

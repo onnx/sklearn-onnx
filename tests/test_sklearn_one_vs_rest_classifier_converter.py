@@ -14,6 +14,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.exceptions import ConvergenceWarning
+from sklearn.svm import LinearSVC
 try:
     from sklearn.utils._testing import ignore_warnings
 except ImportError:
@@ -36,8 +37,15 @@ ort_version = '.'.join(ort_version.split('.')[:2])
 
 
 class TestOneVsRestClassifierConverter(unittest.TestCase):
+    @unittest.skipIf(True, reason="bug to fix later")
     @ignore_warnings(category=warnings_to_skip)
-    def test_ovr(self):
+    def test_ovr_linear_svc(self):
+        model = OneVsRestClassifier(LinearSVC())
+        dump_multiple_classification(
+            model, target_opset=TARGET_OPSET, verbose=False)
+
+    @ignore_warnings(category=warnings_to_skip)
+    def test_ovr_logistic_regression(self):
         model = OneVsRestClassifier(LogisticRegression())
         dump_multiple_classification(
             model, target_opset=TARGET_OPSET)
@@ -495,4 +503,5 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # TestOneVsRestClassifierConverter().test_ovr_linear_svc()
     unittest.main()
