@@ -249,6 +249,24 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD)
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_kernel_rbf1_anisotropic(self):
+        ker = RBF(length_scale=np.array([1.1, 1.2, 1.3, 1.4, 1.5, 1.6],
+                                        dtype=np.float32),
+                  length_scale_bounds=(1e-3, 1e3))
+        onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType([None, None]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(Xtest_)
+        assert_almost_equal(m1, m2, decimal=5)
+
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD)
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_rbf10(self):
         ker = RBF(length_scale=10, length_scale_bounds=(1e-3, 1e3))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
@@ -1095,5 +1113,5 @@ if __name__ == "__main__":
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestSklearnGaussianProcessRegressor().test_issue_789()
+    # TestSklearnGaussianProcessRegressor().test_kernel_rbf1_anisotropic()
     unittest.main()

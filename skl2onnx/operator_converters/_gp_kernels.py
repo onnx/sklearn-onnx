@@ -81,10 +81,13 @@ def py_make_float_array(cst, dtype, as_tensor=False):
     if dtype not in (np.float32, np.float64):
         raise TypeError("A float array must be of dtype "
                         "np.float32 or np.float64 ({}).".format(dtype))
-    if not isinstance(cst, (int, float, np.float32, np.float64,
+    if isinstance(cst, np.ndarray):
+        res = cst.astype(dtype)
+    elif not isinstance(cst, (int, float, np.float32, np.float64,
                             np.int32, np.int64)):
         raise TypeError("cst must be a number not {}".format(type(cst)))
-    res = np.array([cst], dtype=dtype)
+    else:
+        res = np.array([cst], dtype=dtype)
     return from_array(res) if as_tensor else res
 
 
@@ -234,21 +237,20 @@ def convert_kernel(kernel, X, output_names=None,
                        op_version=op_version)
 
     if isinstance(kernel, RBF):
-        if not isinstance(kernel.length_scale, (float, int)):
-            raise NotImplementedError(
-                "length_scale should be float not {}.".format(
-                    type(kernel.length_scale)))
-
         # length_scale = np.squeeze(length_scale).astype(float)
         zeroh = _zero_vector_of_size(X, axis=1, keepdims=0, dtype=dtype,
                                      op_version=op_version)
         zerov = _zero_vector_of_size(X, axis=0, keepdims=1, dtype=dtype,
                                      op_version=op_version)
 
-        tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype,
-                                           as_tensor=True)
-        const = OnnxConstantOfShape(OnnxShape(zeroh, op_version=op_version),
-                                    value=tensor_value, op_version=op_version)
+        if (isinstance(kernel.length_scale, np.ndarray) and
+                len(kernel.length_scale) > 0):
+            const = kernel.length_scale.astype(dtype)
+        else:
+            tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype,
+                                               as_tensor=True)
+            const = OnnxConstantOfShape(OnnxShape(zeroh, op_version=op_version),
+                                        value=tensor_value, op_version=op_version)
         X_scaled = OnnxDiv(X, const, op_version=op_version)
         if x_train is None:
             dist = onnx_squareform_pdist(
