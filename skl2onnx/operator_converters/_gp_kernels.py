@@ -84,7 +84,7 @@ def py_make_float_array(cst, dtype, as_tensor=False):
     if isinstance(cst, np.ndarray):
         res = cst.astype(dtype)
     elif not isinstance(cst, (int, float, np.float32, np.float64,
-                            np.int32, np.int64)):
+                              np.int32, np.int64)):
         raise TypeError("cst must be a number not {}".format(type(cst)))
     else:
         res = np.array([cst], dtype=dtype)
@@ -247,10 +247,11 @@ def convert_kernel(kernel, X, output_names=None,
                 len(kernel.length_scale) > 0):
             const = kernel.length_scale.astype(dtype)
         else:
-            tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype,
-                                               as_tensor=True)
-            const = OnnxConstantOfShape(OnnxShape(zeroh, op_version=op_version),
-                                        value=tensor_value, op_version=op_version)
+            tensor_value = py_make_float_array(
+                kernel.length_scale, dtype=dtype, as_tensor=True)
+            const = OnnxConstantOfShape(
+                OnnxShape(zeroh, op_version=op_version),
+                value=tensor_value, op_version=op_version)
         X_scaled = OnnxDiv(X, const, op_version=op_version)
         if x_train is None:
             dist = onnx_squareform_pdist(
