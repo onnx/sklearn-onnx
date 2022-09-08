@@ -6,8 +6,10 @@ import numpy as np
 from ..common._apply_operation import (
     apply_cast,
     apply_concat,
+    apply_div,
     apply_mul,
     apply_reshape,
+    apply_reducesum,
     apply_transpose,
 )
 from ..common._registration import register_converter
@@ -90,6 +92,7 @@ def predict(model, scope, operator, container,
     proba_output_name = scope.get_unique_variable_name('proba_output')
     cast_result_name = scope.get_unique_variable_name('cast_result')
     reshaped_indices_name = scope.get_unique_variable_name('reshaped_indices')
+    sum_output_name = scope.get_unique_variable_name('sum_proba')
     value = model.tree_.value.transpose(1, 2, 0)
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
@@ -151,13 +154,18 @@ def predict(model, scope, operator, container,
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     apply_transpose(scope, out_values_name, proba_output_name,
                     container, perm=(0, 2, 1))
-    apply_cast(scope, proba_output_name, cast_result_name,
-               container, to=onnx_proto.TensorProto.BOOL)
+    # need to calculate sum
+    # apply_cast(scope, proba_output_name, cast_result_name,
+    #            container, to=onnx_proto.TensorProto.BOOL)
+
     if is_ensemble:
         proba_result_name = scope.get_unique_variable_name('proba_result')
-
-        apply_cast(scope, cast_result_name, proba_result_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
+        apply_reducesum(scope, proba_output_name, sum_output_name,
+                        container, keepdims=1, axes=[2])
+        apply_div(scope, [proba_output_name, sum_output_name],
+                  proba_result_name, container)
+        # apply_cast(scope, cast_result_name, proba_result_name,
+        #            container, to=onnx_proto.TensorProto.FLOAT)
         return proba_result_name
     apply_cast(scope, cast_result_name, operator.outputs[1].full_name,
                container, to=proto_dtype)
