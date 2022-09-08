@@ -53,7 +53,7 @@ jobs:
       Py39-Onnx1110-Rt1111-Skl10:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.21.0'
+        numpy.version: '>=1.22.3'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
         onnx.target_opset: ''
