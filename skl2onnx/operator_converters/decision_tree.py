@@ -166,9 +166,9 @@ def predict(model, scope, operator, container,
         return proba_result_name
     else:
         apply_cast(scope, proba_output_name, cast_result_name,
-                container, to=onnx_proto.TensorProto.BOOL)
+                   container, to=onnx_proto.TensorProto.BOOL)
         apply_cast(scope, cast_result_name, operator.outputs[1].full_name,
-                container, to=proto_dtype)
+                   container, to=proto_dtype)
         apply_transpose(scope, out_values_name, transposed_result_name,
                         container, perm=(2, 1, 0))
         return transposed_result_name

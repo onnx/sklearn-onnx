@@ -283,7 +283,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test.astype(np.int64), model, model_onnx,
+            X_test.astype(numpy.int64), model, model_onnx,
             basename="SklearnRandomForestClassifierMultiOutputInt")
 
     @ignore_warnings(category=FutureWarning)
