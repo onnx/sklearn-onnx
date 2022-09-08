@@ -154,9 +154,6 @@ def predict(model, scope, operator, container,
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
     apply_transpose(scope, out_values_name, proba_output_name,
                     container, perm=(0, 2, 1))
-    # need to calculate sum
-    # apply_cast(scope, proba_output_name, cast_result_name,
-    #            container, to=onnx_proto.TensorProto.BOOL)
 
     if is_ensemble:
         proba_result_name = scope.get_unique_variable_name('proba_result')
@@ -167,11 +164,14 @@ def predict(model, scope, operator, container,
         # apply_cast(scope, cast_result_name, proba_result_name,
         #            container, to=onnx_proto.TensorProto.FLOAT)
         return proba_result_name
-    apply_cast(scope, cast_result_name, operator.outputs[1].full_name,
-               container, to=proto_dtype)
-    apply_transpose(scope, out_values_name, transposed_result_name,
-                    container, perm=(2, 1, 0))
-    return transposed_result_name
+    else:
+        apply_cast(scope, proba_output_name, cast_result_name,
+                container, to=onnx_proto.TensorProto.BOOL)
+        apply_cast(scope, cast_result_name, operator.outputs[1].full_name,
+                container, to=proto_dtype)
+        apply_transpose(scope, out_values_name, transposed_result_name,
+                        container, perm=(2, 1, 0))
+        return transposed_result_name
 
 
 def _append_decision_output(
