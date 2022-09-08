@@ -161,8 +161,6 @@ def predict(model, scope, operator, container,
                         container, keepdims=1, axes=[2])
         apply_div(scope, [proba_output_name, sum_output_name],
                   proba_result_name, container)
-        # apply_cast(scope, cast_result_name, proba_result_name,
-        #            container, to=onnx_proto.TensorProto.FLOAT)
         return proba_result_name
     else:
         apply_cast(scope, proba_output_name, cast_result_name,
