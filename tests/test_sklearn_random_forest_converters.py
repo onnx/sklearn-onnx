@@ -42,6 +42,7 @@ from test_utils import (
     dump_single_regression,
     fit_classification_model,
     fit_multilabel_classification_model,
+    fit_multi_output_classification_model,
     fit_regression_model,
     path_to_leaf,
     TARGET_OPSET,
@@ -269,6 +270,21 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             dump_data_and_model(
                 X, model, model_onnx,
                 basename="SklearnRandomForestClassifierDouble")
+
+    @ignore_warnings(category=FutureWarning)
+    def test_model_random_forest_classifier_multi_output_int(self):
+        model, X_test = fit_multi_output_classification_model(
+            RandomForestClassifier(random_state=42, n_estimators=20))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model, "random forest classifier",
+            [("input", Int64TensorType([None, X_test.shape[1]]))],
+            options=options, target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test.astype(numpy.int64), model, model_onnx,
+            basename="SklearnRandomForestClassifierMultiOutputInt")
 
     @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):

@@ -476,7 +476,7 @@ def _compare_expected(expected,
     """
     tested = 0
     if isinstance(expected, list):
-        if isinstance(output, list):
+        if isinstance(output, (list, numpy.ndarray)):
             if 'Out0' in kwargs:
                 expected = expected[:1]
                 output = output[:1]

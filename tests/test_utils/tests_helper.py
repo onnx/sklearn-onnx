@@ -17,6 +17,7 @@ from sklearn.datasets import (
 from sklearn.model_selection import train_test_split
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.ensemble import RandomForestClassifier
 from .utils_backend import (
     compare_backend,
     extract_options,
@@ -106,6 +107,21 @@ def fit_multilabel_classification_model(model, n_classes=5, n_labels=2,
     X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                    random_state=42)
     model.fit(X_train, y_train)
+    return model, X_test
+
+
+def fit_multi_output_classification_model(model, n_classes=3, n_samples=100,
+                                          n_features=4, n_informative=5,
+                                          n_outputs=2):
+    numpy.random.seed(0)
+    X_train = numpy.random.randint(
+        0, n_informative, size=(n_samples, n_features))
+    y_train = numpy.random.randint(
+        0, n_classes, size=(n_samples, n_outputs))
+    model = RandomForestClassifier()
+    model.fit(X_train, y_train)
+    X_test = numpy.random.randint(
+        0, n_informative, size=(10, n_features))
     return model, X_test
 
 
