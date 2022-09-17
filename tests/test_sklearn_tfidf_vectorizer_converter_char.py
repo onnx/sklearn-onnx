@@ -45,8 +45,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                             [('input', StringTensorType([1]))],
                             target_opset=TARGET_OPSET)
         except RuntimeError as e:
-            assert ("Unable to split n-grams ' seco nd do' "
-                    "into tokens") in str(e)
+            assert ("Unable to split n-grams 'e fir st do'") in str(e)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_char(self):
@@ -137,7 +136,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
                 target_opset=TARGET_OPSET)
             self.assertTrue(model_onnx is not None)
         except RuntimeError as e:
-            if "Unable to split n-grams 'he  sec'" not in str(e):
+            if "Unable to split n-grams 't i s t'" not in str(e):
                 raise e
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")

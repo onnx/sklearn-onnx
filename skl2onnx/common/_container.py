@@ -692,10 +692,14 @@ class ModelComponentContainer(_WhiteBlackContainer):
         key = domain, op_type
         vers = self._op_versions.get(key, None)
         if vers is None:
-            warnings.warn(
-                "Unable to find operator '{}' in domain '{}' in ONNX, "
-                "op_version is forced to 1.".format(
-                    op_type, domain))
+            if domain == "com.microsoft":
+                # avoid a not necessarily necessary warning
+                vers = 1
+            else:
+                warnings.warn(
+                    "Unable to find operator '{}' in domain '{}' in ONNX, "
+                    "op_version is forced to 1.".format(
+                        op_type, domain))
             vers = [1]
         highest = self.target_opset_any_domain(domain)
         pos = len(vers) - 1

@@ -2,7 +2,7 @@
 
 
 import warnings
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 import numpy as np
 from ..common._apply_operation import (
     apply_cast, apply_reshape, apply_identity)
@@ -42,14 +42,54 @@ def _intelligent_split(text, op, tokenizer, existing):
             else:
                 spl[0] = " " * p1 + spl[0]
                 spl[-1] = spl[-1] + " " * p2_
-            if any(map(lambda g: g not in op.vocabulary_, spl)):
+            exc = None
+            if len(spl) == 1:
+                pass
+            elif len(spl) == 2:
+                if (spl[0] not in op.vocabulary_ or
+                        spl[1] not in op.vocabulary_):
+                    # This is neceassarily a single token.
+                    spl = [text]
+                elif spl[0] in op.vocabulary_ and spl[1] in op.vocabulary_:
+                    # ambiguity
+                    # w1, w2 can be either a 2-grams, either a token.
+                    # Usually, ' ' is not part of any token.
+                    pass
+            elif len(spl) == 3:
+                stok = (all([s in op.vocabulary_ for s in spl]), spl)
+                spl12 = (spl[2] in op.vocabulary_ and
+                         (spl[0] + ' ' + spl[1]) in op.vocabulary_,
+                         [spl[0] + ' ' + spl[1], spl[2]])
+                spl23 = (spl[0] in op.vocabulary_ and
+                         (spl[1] + ' ' + spl[2]) in op.vocabulary_,
+                         [spl[0], spl[1] + ' ' + spl[2]])
+                c = Counter(map(lambda t: t[0], [stok, spl12, spl23]))
+                if c.get(True, -1) == 0:
+                    spl = [text]
+                found = [el[1] for el in [stok, spl12, spl23] if el[0]]
+                if len(found) == 1:
+                    spl = found[0]
+                elif len(found) == 0:
+                    spl = [text]
+                elif stok[0]:
+                    # By default, we assume the token is just the sum of
+                    # single words.
+                    pass
+                else:
+                    exc = (
+                        "More than one decomposition in tokens: [" +
+                        ", ".join(map(lambda t: "-".join(t), found)) + "].")
+            elif any(map(lambda g: g in op.vocabulary_, spl)):
                 # TODO: handle this case with an algorithm
                 # which is able to break a string into
                 # known substrings.
-                raise RuntimeError("Unable to split n-grams '{}' "
-                                   "into tokens existing in the "
-                                   "vocabulary. This happens when "
-                                   "a token contain spaces.".format(text))
+                exc = "Unable to identify tokens in n-grams."
+            if exc:
+                raise RuntimeError(
+                    "Unable to split n-grams '{}' into tokens. "
+                    "{} This happens when a token contain "
+                    "spaces. Token '{}' may be a token or a n-gram '{}'."
+                    "".format(text, exc, text, spl))
         else:
             # We reuse the tokenizer hoping that will clear
             # ambiguities but this might be slow.
@@ -59,25 +99,20 @@ def _intelligent_split(text, op, tokenizer, existing):
 
     spl = tuple(spl)
     if spl in existing:
-        raise RuntimeError("The converter cannot guess how to "
-                           "split an expression into tokens. "
-                           "This happens when "
-                           "a token contain spaces.")
-    if op.ngram_range[0] == 1 and \
-            (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
+        raise RuntimeError(
+            f"The converter cannot guess how to split expression "
+            f"{text!r} into tokens. This case happens when tokens have "
+            f"spaces.")
+    if (op.ngram_range[0] == 1 and
+            (len(op.ngram_range) == 1 or op.ngram_range[1] > 1)):
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
-                nos = g.replace(" ", "")
-                couples = [(w, w.replace(" ", "")) for w in op.vocabulary_]
-                possible = ['{}'.format(w[0])
-                            for w in couples if w[1] == nos]
                 raise RuntimeError(
-                    "Unable to split n-grams '{}' due to '{}' "
-                    "into tokens existing in the "
-                    "vocabulary. This happens when "
-                    "a token contain spaces. Ambiguity found is '{}' "
-                    ".".format(text, g, possible))
+                    "Unable to split n-grams '{}' into tokens {} "
+                    "existing in the vocabulary. Token '{}' does not "
+                    "exist in the vocabulary."
+                    ".".format(text, spl, g))
     existing.add(spl)
     return spl
 
@@ -184,10 +219,6 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     if op.analyzer == 'word':
         default_pattern = '(?u)\\b\\w\\w+\\b'
         if options['separators'] == "DEFAULT" and options['tokenexp'] is None:
-            warnings.warn("Converter for TfidfVectorizer will use "
-                          "scikit-learn regular expression by default "
-                          "in version 1.6.",
-                          UserWarning)
             regex = op.token_pattern
             if regex == default_pattern:
                 regex = '[a-zA-Z0-9_]+'
@@ -330,9 +361,21 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     tokenizer = op.build_tokenizer()
     split_words = []
     existing = set()
+    errors = []
     for w in words:
-        spl = _intelligent_split(w, op, tokenizer, existing)
+        try:
+            spl = _intelligent_split(w, op, tokenizer, existing)
+        except RuntimeError as e:
+            errors.append(e)
+            continue
         split_words.append((spl, w))
+    if len(errors) > 0:
+        err = "\n".join(map(str, errors))
+        raise RuntimeError(
+            f"There were ambiguities between n-grams and tokens. "
+            f"{len(errors)} errors occurred.\nYou can learn more at "
+            f"You can learn more at https://github.com/scikit-learn/"
+            f"scikit-learn/issues/13733.\n{err}")
 
     ng_split_words = [(len(a[0]), a[0], i) for i, a in enumerate(split_words)]
     ng_split_words.sort()

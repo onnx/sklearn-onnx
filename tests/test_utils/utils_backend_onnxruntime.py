@@ -566,7 +566,7 @@ def _compare_expected(expected,
                 "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
         tested += 1
     else:
-        from scipy.sparse.csr import csr_matrix
+        from scipy.sparse import csr_matrix
         if isinstance(expected, csr_matrix):
             # DictVectorizer
             one_array = numpy.array(output)

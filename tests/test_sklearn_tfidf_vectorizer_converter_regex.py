@@ -302,6 +302,46 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             basename="SklearnTfidfVectorizer11ParenthesisIdRegex-"
                      "OneOff-SklCol")
 
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    def test_model_tfidf_vectorizer_issue(self):
+        corpus = numpy.array([
+            'the-first document.',
+            'this-is the-third-one.',
+            'this-the first-document?',
+        ]).reshape((3, 1))
+        vect = TfidfVectorizer(
+            ngram_range=(1, 2),
+            token_pattern=r"\b[a-z ]+\b")
+        vect.fit(corpus.ravel())
+        with self.assertRaises(RuntimeError) as e:
+            convert_sklearn(vect, 'TfidfVectorizer',
+                            [('input', StringTensorType([1]))],
+                            options=self.get_options(),
+                            target_opset=TARGET_OPSET)
+            self.assertIn("More one decomposition in tokens", str(e))
+            self.assertIn(
+                "Unable to split n-grams 'the first document' into tokens.",
+                str(e))
+
+        corpus = numpy.array([
+            'first document.',
+            'this-is the-third-one.',
+            'the first document',
+        ]).reshape((3, 1))
+        vect = TfidfVectorizer(
+            ngram_range=(1, 2),
+            token_pattern=r"\b[a-z ]+\b")
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1]))],
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus, vect, model_onnx,
+            basename="SklearnTfidfVectorizerIssue-OneOff-SklCol")
+
 
 if __name__ == "__main__":
+    TestSklearnTfidfVectorizerRegex().test_model_tfidf_vectorizer_issue()
     unittest.main()
