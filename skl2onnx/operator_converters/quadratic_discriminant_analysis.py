@@ -49,7 +49,7 @@ def convert_quadratic_discriminant_analysis_classifier(
         S = model.scalings_[i]
         scaling_name = scope.get_unique_variable_name('scalings')
         container.add_initializer(
-            scaling_name, onnx_proto.TensorProto.FLOAT, [S.shape[0], S.shape[1]], S)
+            scaling_name, onnx_proto.TensorProto.FLOAT, [S.shape[0], ], S)
 
         mean = model.means_[i]
         mean_name = scope.get_unique_variable_name('means')
