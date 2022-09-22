@@ -20,6 +20,8 @@ ort_version = ".".join(ort_version.split(".")[:2])
 
 
 class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
+    @unittest.skipIf(QuadraticDiscriminantAnalysis is None,
+                     reason="scikit-learn<1.0")
     def test_model_qda_svm_2c2f(self):
         # 2 classes, 2 features
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
@@ -41,6 +43,8 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
                             basename="SklearnQDA_2c2f")
 
+    @unittest.skipIf(QuadraticDiscriminantAnalysis is None,
+                     reason="scikit-learn<1.0")
     def test_model_qda_svm_2c3f(self):
         # 2 classes, 3 features
         X = np.array([[-1, -1, 0], [-2, -1, 1], [-3, -2, 0],
@@ -64,6 +68,8 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
                             basename="SklearnQDA_2c3f")
 
+    @unittest.skipIf(QuadraticDiscriminantAnalysis is None,
+                     reason="scikit-learn<1.0")
     def test_model_qda_svm_3c2f(self):
         # 3 classes, 2 features
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1],
