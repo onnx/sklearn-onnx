@@ -2,8 +2,10 @@
 
 """Tests scikit-learn's SGDClassifier converter."""
 
+import sklearn
 import unittest
 import numpy as np
+import packaging.version as pv
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
@@ -20,7 +22,7 @@ ort_version = ".".join(ort_version.split(".")[:2])
 
 
 class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
-    @unittest.skipIf(QuadraticDiscriminantAnalysis is None,
+    @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
     def test_model_qda_svm_2c2f(self):
         # 2 classes, 2 features
@@ -30,8 +32,6 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         skl_model = QuadraticDiscriminantAnalysis()
         skl_model.fit(X, y)
-        print(skl_model.predict(X_test))
-        print(skl_model.predict_proba(X_test))
 
         onnx_model = convert_sklearn(
             skl_model,
@@ -43,7 +43,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
                             basename="SklearnQDA_2c2f")
 
-    @unittest.skipIf(QuadraticDiscriminantAnalysis is None,
+    @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
     def test_model_qda_svm_2c3f(self):
         # 2 classes, 3 features
@@ -55,8 +55,6 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         skl_model = QuadraticDiscriminantAnalysis()
         skl_model.fit(X, y)
-        print(skl_model.predict(X_test))
-        print(skl_model.predict_proba(X_test))
 
         onnx_model = convert_sklearn(
             skl_model,
@@ -68,7 +66,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
                             basename="SklearnQDA_2c3f")
 
-    @unittest.skipIf(QuadraticDiscriminantAnalysis is None,
+    @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
     def test_model_qda_svm_3c2f(self):
         # 3 classes, 2 features
@@ -79,8 +77,6 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         skl_model = QuadraticDiscriminantAnalysis()
         skl_model.fit(X, y)
-        print(skl_model.predict(X_test))
-        print(skl_model.predict_proba(X_test))
 
         onnx_model = convert_sklearn(
             skl_model,
