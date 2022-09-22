@@ -8,6 +8,7 @@ import numpy as np
 import packaging.version as pv
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from onnxruntime import __version__ as ort_version
+from onnx import __version__ as onnx_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -19,11 +20,14 @@ from tests.test_utils import (
 )
 
 ort_version = ".".join(ort_version.split(".")[:2])
+onnx_version = ".".join(onnx_version.split('.')[:2])
 
 
 class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
+    @unittest.skipIf(pv.Version(onnx_version) < pv.Version('1.11'),
+                     reason="fails with onnx 1.10")
     def test_model_qda_svm_2c2f(self):
         # 2 classes, 2 features
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
@@ -45,6 +49,8 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
+    @unittest.skipIf(pv.Version(onnx_version) < pv.Version('1.11'),
+                     reason="fails with onnx 1.10")
     def test_model_qda_svm_2c3f(self):
         # 2 classes, 3 features
         X = np.array([[-1, -1, 0], [-2, -1, 1], [-3, -2, 0],
@@ -68,6 +74,8 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
+    @unittest.skipIf(pv.Version(onnx_version) < pv.Version('1.11'),
+                     reason="fails with onnx 1.10")
     def test_model_qda_svm_3c2f(self):
         # 3 classes, 2 features
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1],
