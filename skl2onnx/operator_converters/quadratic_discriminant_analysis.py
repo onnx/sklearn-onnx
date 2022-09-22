@@ -14,7 +14,7 @@ from ..proto import onnx_proto
 
 
 def convert_quadratic_discriminant_analysis_classifier(
-    scope: Scope, operator: Operator, container: ModelComponentContainer):
+        scope: Scope, operator: Operator, container: ModelComponentContainer):
 
     input_name = operator.inputs[0].full_name
     model = operator.raw_operator
@@ -80,7 +80,8 @@ def convert_quadratic_discriminant_analysis_classifier(
         apply_log(scope, [scaling_name], [log_name], container)
 
         sum_log_name = scope.get_unique_variable_name('sum_log')
-        apply_reducesum(scope, [log_name], [sum_log_name], container, keepdims=1)
+        apply_reducesum(
+            scope, [log_name], [sum_log_name], container, keepdims=1)
         sum_array_name.append(sum_log_name)
 
     concat_norm_name = scope.get_unique_variable_name('concat_norm')
@@ -97,15 +98,15 @@ def convert_quadratic_discriminant_analysis_classifier(
     apply_concat(scope, sum_array_name, ['concat_logsum'], container)
 
     add_norm2_u_name = scope.get_unique_variable_name('add_norm2_u')
-    apply_add(scope, [transpose_norm_name, 'concat_logsum'], [add_norm2_u_name],
-              container)
+    apply_add(scope, [transpose_norm_name, 'concat_logsum'],
+              [add_norm2_u_name], container)
 
     norm2_u_n05_name = scope.get_unique_variable_name('norm2_u_n05')
     apply_mul(
         scope, ['const_n05', add_norm2_u_name], [norm2_u_n05_name], container)
 
     container.add_initializer(
-        'priors', onnx_proto.TensorProto.FLOAT, [n_classes,], model.priors_)
+        'priors', onnx_proto.TensorProto.FLOAT, [n_classes, ], model.priors_)
     apply_log(scope, ['priors'], ['log_p'], container)
 
     apply_add(scope, [norm2_u_n05_name, 'log_p'], ['decision_fun'], container)
@@ -118,7 +119,7 @@ def convert_quadratic_discriminant_analysis_classifier(
     container.add_node(
         'ArrayFeatureExtractor',
         ['classes', 'argmax_out'],
-        [operator.outputs[0].full_name], 
+        [operator.outputs[0].full_name],
         op_domain='ai.onnx.ml'
     )
 
@@ -127,9 +128,9 @@ def convert_quadratic_discriminant_analysis_classifier(
         'ReduceMax', ['decision_fun'], ['df_max'], **attr)
     apply_sub(scope, ['decision_fun', 'df_max'], ['df_sub_max'], container)
     apply_exp(scope, ['df_sub_max'], ['likelihood'], container)
-    apply_reducesum(scope, ['likelihood'], ['likelihood_sum'], container, 
+    apply_reducesum(scope, ['likelihood'], ['likelihood_sum'], container,
                     axes=[1], keepdims=1)
-    apply_div(scope, ['likelihood', 'likelihood_sum'], 
+    apply_div(scope, ['likelihood', 'likelihood_sum'],
               [operator.outputs[1].full_name], container)
 
 

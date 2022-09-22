@@ -7,7 +7,6 @@ import numpy as np
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
-import onnx
 from skl2onnx.common.data_types import (
     FloatTensorType,
 )
