@@ -44,7 +44,8 @@ def convert_quadratic_discriminant_analysis_classifier(
         R = model.rotations_[i]
         rotation_name = scope.get_unique_variable_name('rotations')
         container.add_initializer(
-            rotation_name, onnx_proto.TensorProto.FLOAT, [R.shape[0], R.shape[1]], R)
+            rotation_name, onnx_proto.TensorProto.FLOAT,
+            [R.shape[0], R.shape[1]], R)
 
         S = model.scalings_[i]
         scaling_name = scope.get_unique_variable_name('scalings')
