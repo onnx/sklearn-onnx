@@ -291,7 +291,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     OneVsRestClassifier,
     PassiveAggressiveClassifier,
     Perceptron,
-    QuadraticDiscriminantAnalysis,    
+    QuadraticDiscriminantAnalysis,
     RandomForestClassifier,
     SGDClassifier,
     StackingClassifier,
