@@ -25,7 +25,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         # 2 classes, 2 features
         X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
         y = np.array([1, 1, 1, 2, 2, 2])
-        X_test = np.array([[-0.8, -1], [0.8, 1]])        
+        X_test = np.array([[-0.8, -1], [0.8, 1]])
 
         skl_model = QuadraticDiscriminantAnalysis()
         skl_model.fit(X, y)
@@ -37,9 +37,6 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
             "scikit-learn QDA",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        
-        onnx.save(onnx_model, 'QDA.onnx')
-        print("test_ovr_decision.onnx model saved!!!")
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
@@ -47,9 +44,11 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
     def test_model_qda_svm_2c3f(self):
         # 2 classes, 3 features
-        X = np.array([[-1, -1, 0], [-2, -1, 1], [-3, -2, 0], [1, 1, 0], [2, 1, 1], [3, 2, 1]])
+        X = np.array([[-1, -1, 0], [-2, -1, 1], [-3, -2, 0],
+                     [1, 1, 0], [2, 1, 1], [3, 2, 1]])
         y = np.array([1, 1, 1, 2, 2, 2])
-        X_test = np.array([[-0.8, -1, 0], [-1, -1.6, 0], [1, 1.5, 1], [3.1, 2.1, 1]])
+        X_test = np.array([[-0.8, -1, 0], [-1, -1.6, 0],
+                          [1, 1.5, 1], [3.1, 2.1, 1]])
 
         skl_model = QuadraticDiscriminantAnalysis()
         skl_model.fit(X, y)
@@ -68,7 +67,8 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
     def test_model_qda_svm_3c2f(self):
         # 3 classes, 2 features
-        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2], [-1, 2], [-2, 3], [-2, 2]])
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1],
+                     [2, 1], [3, 2], [-1, 2], [-2, 3], [-2, 2]])
         y = np.array([1, 1, 1, 2, 2, 2, 3, 3, 3])
         X_test = np.array([[-0.8, -1], [0.8, 1], [-0.8, 1]])
 
@@ -86,6 +86,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
                             basename="SklearnQDA_3c2f")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=3)
