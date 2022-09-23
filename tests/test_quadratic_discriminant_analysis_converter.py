@@ -15,7 +15,7 @@ from skl2onnx.common.data_types import (
     DoubleTensorType
 )
 
-from .test_utils import (
+from test_utils import (
     dump_data_and_model,
     TARGET_OPSET
 )
