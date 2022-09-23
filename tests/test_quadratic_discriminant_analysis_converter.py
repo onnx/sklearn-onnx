@@ -45,7 +45,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
-                            basename="SklearnQDA_2c2f")
+                            basename="SklearnQDA_2c2f_Float")
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
@@ -70,7 +70,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
-                            basename="SklearnQDA_2c3f")
+                            basename="SklearnQDA_2c3f_Float")
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
@@ -94,7 +94,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
-                            basename="SklearnQDA_3c2f")
+                            basename="SklearnQDA_3c2f_Float")
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
@@ -118,7 +118,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
-                            basename="SklearnQDA_2c2f")
+                            basename="SklearnQDA_2c2f_Double")
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
@@ -143,7 +143,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
-                            basename="SklearnQDA_2c3f")
+                            basename="SklearnQDA_2c3f_Double")
 
     @unittest.skipIf(pv.Version(sklearn.__version__) < pv.Version('1.0'),
                      reason="scikit-learn<1.0")
@@ -167,7 +167,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
 
         self.assertIsNotNone(onnx_model)
         dump_data_and_model(X_test.astype(np.float32), skl_model, onnx_model,
-                            basename="SklearnQDA_3c2f")
+                            basename="SklearnQDA_3c2f_Double")
 
 
 if __name__ == "__main__":
