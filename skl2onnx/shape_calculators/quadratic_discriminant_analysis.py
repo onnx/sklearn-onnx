@@ -5,9 +5,9 @@ from ..common.data_types import Int64TensorType
 
 
 def calculate_quadratic_discriminant_analysis_shapes(operator):
-    N = operator.inputs[0].get_first_dimension()
+    N = len(operator.raw_operator.classes_)
     operator.outputs[0].type = Int64TensorType([1, N])
-    operator.outputs[1].type.shape = [N, ]
+    operator.outputs[1].type.shape = [None, N]
 
 
 register_shape_calculator(
