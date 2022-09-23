@@ -35,27 +35,23 @@ def convert_quadratic_discriminant_analysis_classifier(
     norm_array_name = []
     sum_array_name = []
 
-    container.add_initializer(
-        'const_n05', onnx_proto.TensorProto.FLOAT, [], [-0.5])
-    container.add_initializer(
-        'const_p2', onnx_proto.TensorProto.FLOAT, [], [2])
+    container.add_initializer('const_n05', proto_dtype, [], [-0.5])
+    container.add_initializer('const_p2', proto_dtype, [], [2])
 
     for i in range(n_classes):
         R = model.rotations_[i]
         rotation_name = scope.get_unique_variable_name('rotations')
-        container.add_initializer(
-            rotation_name, onnx_proto.TensorProto.FLOAT,
-            [R.shape[0], R.shape[1]], R)
+        container.add_initializer(rotation_name, proto_dtype,
+                                  [R.shape[0], R.shape[1]], R)
 
         S = model.scalings_[i]
         scaling_name = scope.get_unique_variable_name('scalings')
         container.add_initializer(
-            scaling_name, onnx_proto.TensorProto.FLOAT, [S.shape[0], ], S)
+            scaling_name, proto_dtype, [S.shape[0], ], S)
 
         mean = model.means_[i]
         mean_name = scope.get_unique_variable_name('means')
-        container.add_initializer(
-            mean_name, onnx_proto.TensorProto.FLOAT, mean.shape, mean)
+        container.add_initializer(mean_name, proto_dtype, mean.shape, mean)
 
         Xm_name = scope.get_unique_variable_name('Xm')
         apply_sub(scope, [input_name, mean_name], [Xm_name], container)
@@ -107,7 +103,7 @@ def convert_quadratic_discriminant_analysis_classifier(
         scope, ['const_n05', add_norm2_u_name], [norm2_u_n05_name], container)
 
     container.add_initializer(
-        'priors', onnx_proto.TensorProto.FLOAT, [n_classes, ], model.priors_)
+        'priors', proto_dtype, [n_classes, ], model.priors_)
     apply_log(scope, ['priors'], ['log_p'], container)
 
     apply_add(scope, [norm2_u_n05_name, 'log_p'], ['decision_fun'], container)
@@ -132,12 +128,11 @@ def convert_quadratic_discriminant_analysis_classifier(
     apply_reducesum(scope, ['likelihood'], ['likelihood_sum'], container,
                     axes=[1], keepdims=1)
     apply_div(scope, ['likelihood', 'likelihood_sum'],
-              [operator.outputs[1].full_name], container)
+              [operator.outputs[1].full_name], container, )
 
 
 register_converter('SklearnQuadraticDiscriminantAnalysis',
                    convert_quadratic_discriminant_analysis_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
-                            'output_class_labels': [False, True],
-                            'raw_scores': [True, False]})
+                            'output_class_labels': [False, True]})
