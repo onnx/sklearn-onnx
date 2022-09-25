@@ -363,17 +363,24 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     existing = set()
     errors = []
     for w in words:
-        try:
-            spl = _intelligent_split(w, op, tokenizer, existing)
-        except RuntimeError as e:
-            errors.append(e)
-            continue
+        if isinstance(w, tuple):
+            # TraceableCountVectorizer, TraceableTfIdfVectorizer
+            spl = list(w)
+            w = ' '.join(w)
+        else:
+            # CountVectorizer, TfIdfVectorizer
+            try:
+                spl = _intelligent_split(w, op, tokenizer, existing)
+            except RuntimeError as e:
+                errors.append(e)
+                continue
         split_words.append((spl, w))
     if len(errors) > 0:
         err = "\n".join(map(str, errors))
         raise RuntimeError(
             f"There were ambiguities between n-grams and tokens. "
-            f"{len(errors)} errors occurred.\nYou can learn more at "
+            f"{len(errors)} errors occurred. You can fix it by using "
+            f"class Traceable{op.__class__.__name__}.\n"
             f"You can learn more at https://github.com/scikit-learn/"
             f"scikit-learn/issues/13733.\n{err}")
 
