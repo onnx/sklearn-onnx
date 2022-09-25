@@ -64,7 +64,10 @@ except ImportError:
     SGDOneClassSVM = None
 
 from sklearn.svm import LinearSVR
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import (
+    LinearDiscriminantAnalysis,
+    QuadraticDiscriminantAnalysis
+)
 
 # Mixture
 from sklearn.mixture import (
@@ -288,6 +291,7 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     OneVsRestClassifier,
     PassiveAggressiveClassifier,
     Perceptron,
+    QuadraticDiscriminantAnalysis,
     RandomForestClassifier,
     SGDClassifier,
     StackingClassifier,
@@ -383,6 +387,7 @@ def build_sklearn_operator_name_map():
         PoissonRegressor,
         PolynomialFeatures,
         PowerTransformer,
+        QuadraticDiscriminantAnalysis,
         RadiusNeighborsClassifier,
         RadiusNeighborsRegressor,
         RandomForestClassifier,

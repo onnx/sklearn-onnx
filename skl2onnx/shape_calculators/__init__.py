@@ -36,6 +36,7 @@ from . import ovr_decision_function
 from . import pipelines
 from . import polynomial_features
 from . import power_transformer
+from . import quadratic_discriminant_analysis
 from . import random_projection
 from . import random_trees_embedding
 from . import replace_op
@@ -84,6 +85,7 @@ __all__ = [
     pipelines,
     polynomial_features,
     power_transformer,
+    quadratic_discriminant_analysis,
     random_projection,
     random_trees_embedding,
     replace_op,
