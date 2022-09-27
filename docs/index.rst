@@ -16,7 +16,7 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
 
 
 *sklearn-onnx* enables you to convert models from
-`sklearn-learn <https://scikit-learn.org/stable/>`_
+`scikit-learn <https://scikit-learn.org/stable/>`_
 toolkits into `ONNX <https://onnx.ai>`_.
 
 .. toctree::
