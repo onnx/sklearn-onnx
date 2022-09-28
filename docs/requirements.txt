@@ -19,14 +19,13 @@ pydata_sphinx_theme
 pydot
 pyinstrument
 pyod
-pyquickhelper>=1.9.3359
+pyquickhelper>=1.11.3762
 pytest
 pytest-cov
 scikit-learn>=1.1
 skl2onnx
 sphinx
 sphinxcontrib-blockdiag
-sphinxcontrib.imagesvg
 sphinx-gallery
 tabulate
 tqdm
