@@ -100,6 +100,32 @@ class TestSklearnText(unittest.TestCase):
             for k in voc:
                 self.assertIsInstance(k, tuple)
 
+    def test_tfidf_vectorizer_english(self):
+
+        corpus = numpy.array([
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+            "",
+        ]).reshape((5, ))
+
+        for ng in [(1, 1), (1, 2), (2, 2), (1, 3)]:
+            mod1 = TfidfVectorizer(ngram_range=ng, stop_words="english")
+            mod1.fit(corpus)
+
+            mod2 = TraceableTfidfVectorizer(
+                ngram_range=ng, stop_words="english")
+            mod2.fit(corpus)
+
+            pred1 = mod1.transform(corpus)
+            pred2 = mod2.transform(corpus)
+            assert_almost_equal(pred1.todense(), pred2.todense())
+
+            voc = mod2.vocabulary_
+            for k in voc:
+                self.assertIsInstance(k, tuple)
+
     def test_tfidf_vectorizer_regex(self):
         corpus = numpy.array([
             "This is the first document.",

@@ -26,15 +26,22 @@ class NGramsMixin(VectorizerMixin):
     def _word_ngrams(self, tokens, stop_words=None):
         """Turn tokens into a sequence of n-grams after stop words filtering"""
         # handle stop words
+        if stop_words is not None:
+            tokens = [w for w in tokens if w not in stop_words]
+
         if tokens is not None:
             new_tokens = []
             for token in tokens:
-                new_tokens.append(
-                    (token,) if isinstance(token, str) else token)
+                val = (token,) if isinstance(token, str) else token
+                if not isinstance(val, tuple):
+                    raise TypeError(
+                        f"Unexpected type {type(val)}:{val!r} for a token.")
+                if any(map(lambda x: not isinstance(x, str), val)):
+                    raise TypeError(
+                        f"Unexpected type {val!r}, one part of a "
+                        f"token is not a string.")
+                new_tokens.append(val)
             tokens = new_tokens
-
-        if stop_words is not None:
-            tokens = [(w, ) for w in tokens if w not in stop_words]
 
         # handle token n-grams
         min_n, max_n = self.ngram_range
