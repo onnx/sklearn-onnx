@@ -78,6 +78,28 @@ class NGramsMixin(VectorizerMixin):
                     tokens_append(space_join(original_tokens[i: i + n]))
         return tokens
 
+    @staticmethod
+    def _fix_vocabulary(expected, new_voc):
+        update = {}
+        for w, wid in new_voc.items():
+            if not isinstance(w, tuple):
+                raise TypeError(
+                    f"Tuple is expected for a token not {type(w)}.")
+            s = " ".join(w)
+            if s in expected:
+                if expected[s] != wid:
+                    update[w] = wid
+        if update:
+            new_voc.update(update)
+        duplicates = {}
+        for w, wid in new_voc.items():
+            if wid not in duplicates:
+                duplicates[wid] = {w}
+            else:
+                duplicates[wid].add(w)
+        dups = {k: v for k, v in duplicates.items() if len(v) > 1}
+        return update, dups
+
 
 class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
     """
@@ -115,11 +137,33 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
 
     A weirder example with
     @see cl TraceableTfidfVectorizer shows more differences.
+
+    The class is training an instance of CountVectorizer on the
+    same data. This is used to update the vocabulary to match
+    the same columns as the one obtained with scikit-learn.
+    scikit-learn cannot distinguish between bi gram ("a b", "c") and
+    ("a", "b c"). Therefore, there are merged into the same
+    column by scikit-learn. This class, even if it is able to distinguish
+    between them, keeps the same ambiguity.
     """
 
     def _word_ngrams(self, tokens, stop_words=None):
         return NGramsMixin._word_ngrams(
             self, tokens=tokens, stop_words=stop_words)
+
+    def fit(self, X, y=None):
+        super().fit(X, y=y)
+        same = CountVectorizer(**self.get_params())
+        same.fit(X, y=y)
+        self.same_ = same
+        if self.stop_words != same.stop_words:
+            raise AssertionError(
+                f"Different stop_words {self.stop_words} "
+                f"!= {same.stop_words}.")
+        update, dups = self._fix_vocabulary(same.vocabulary_, self.vocabulary_)
+        self.updated_vocabulary_ = update
+        self.duplicated_vocabulary_ = dups
+        return self
 
 
 class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
@@ -157,8 +201,29 @@ class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
         mod2.fit(corpus)
         print(mod2.transform(corpus).todense()[:2])
         print(pformat(mod2.vocabulary_)[:100])
-    """
+
+    The class is training an instance of TfidfVectorizer on the
+    same data. This is used to update the vocabulary to match
+    the same columns as the one obtained with scikit-learn.
+    scikit-learn cannot distinguish between bi gram ("a b", "c") and
+    ("a", "b c"). Therefore, there are merged into the same
+    column by scikit-learn. This class, even if it is able to distinguish
+    between them, keeps the same ambiguity.    """
 
     def _word_ngrams(self, tokens, stop_words=None):
         return NGramsMixin._word_ngrams(
             self, tokens=tokens, stop_words=stop_words)
+
+    def fit(self, X, y=None):
+        super().fit(X, y=y)
+        same = TfidfVectorizer(**self.get_params())
+        same.fit(X, y=y)
+        self.same_ = same
+        if self.stop_words != same.stop_words:
+            raise AssertionError(
+                f"Different stop_words {self.stop_words} "
+                f"!= {same.stop_words}.")
+        update, dups = self._fix_vocabulary(same.vocabulary_, self.vocabulary_)
+        self.updated_vocabulary_ = update
+        self.duplicated_vocabulary_ = dups
+        return self
