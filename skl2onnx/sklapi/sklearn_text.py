@@ -165,6 +165,10 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
         self.duplicated_vocabulary_ = dups
         return self
 
+    def fit_transformat(self, X, y=None):
+        self.fit(X, y)
+        return self.transform(X)
+
 
 class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
     """
@@ -227,3 +231,7 @@ class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
         self.updated_vocabulary_ = update
         self.duplicated_vocabulary_ = dups
         return self
+
+    def fit_transformat(self, X, y=None):
+        self.fit(X, y)
+        return self.transform(X)
