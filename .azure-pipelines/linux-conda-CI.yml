@@ -17,7 +17,7 @@ jobs:
       Py310-Onnx120-Rt1130-Skl11:
         do.bench: '0'
         python.version: '3.10'
-        numpy.version: '>=1.21.0'
+        numpy.version: '>=1.21.6'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.12.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
         onnx.target_opset: ''
