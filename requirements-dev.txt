@@ -1,4 +1,4 @@
-flatbuffers
+flatbuffers==2.0
 humanfriendly
 mpmath
 nose

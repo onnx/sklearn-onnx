@@ -5,4 +5,3 @@ onnx>=1.2.1
 scikit-learn>=0.19
 scikit-learn<=1.1.1
 onnxconverter-common>=1.7.0
-scikit-learn<=1.1.1
