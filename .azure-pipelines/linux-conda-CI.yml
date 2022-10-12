@@ -128,6 +128,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
+      pip install coloredlogs
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
