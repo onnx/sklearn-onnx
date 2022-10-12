@@ -15,6 +15,7 @@ pyreadline3
 pytest
 pytest-cov
 scipy
+sympy
 wheel
 
 # docs
