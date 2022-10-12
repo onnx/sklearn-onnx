@@ -66,6 +66,11 @@ jobs:
     displayName: 'Install libstdc++6'
 
   - script: |
+      pip install -r requirements.txt
+      pip install -r requirements-dev.txt
+    displayName: 'install requirements'
+
+  - script: |
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
@@ -134,11 +139,6 @@ jobs:
         pip install onnxconverter-common$(onnxcc.version)
       fi
     displayName: 'install onnxconverter-common'
-
-  - script: |
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
-    displayName: 'install requirements'
 
   - script: |
       pip install -e .

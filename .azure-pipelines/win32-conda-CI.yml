@@ -65,6 +65,12 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
+      pip install -r requirements.txt
+      pip install -r requirements-dev.txt
+    displayName: 'install requirements'
+
+  - script: |
+      call activate skl2onnxEnvironment
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
     displayName: 'Install protobuf'
@@ -110,12 +116,6 @@ jobs:
       call activate skl2onnxEnvironment
       pip install $(onnxcc.version)
     displayName: 'install onnxconverter-common'
-
-  - script: |
-      call activate skl2onnxEnvironment
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
-    displayName: 'install requirements'
 
   - script: |
       call activate skl2onnxEnvironment

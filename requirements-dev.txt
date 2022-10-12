@@ -1,11 +1,17 @@
 flatbuffers
+humanfriendly
+mpmath
 nose
 numpy
 protobuf
 codecov
+coloredlogs
+packaging
 pandas
 py-cpuinfo
 pybind11
+pyparsing
+pyreadline3
 pytest
 pytest-cov
 scipy
