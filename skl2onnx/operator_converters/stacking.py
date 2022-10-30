@@ -40,7 +40,7 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
     return new_name
 
 
-def _add_passthrough_connection(operator, predictions): 
+def _add_passthrough_connection(operator, predictions):
     if operator.raw_operator.passthrough:
         predictions.append(operator.inputs[0].onnx_name)
 
@@ -56,7 +56,7 @@ def _transform_regressor(scope, operator, container, model):
     ]
 
     _add_passthrough_connection(operator, predictions)
-        
+
     apply_concat(
         scope, predictions, merged_prob_tensor, container, axis=1)
     return merged_prob_tensor
