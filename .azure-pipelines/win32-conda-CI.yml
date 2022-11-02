@@ -81,7 +81,7 @@ jobs:
         onnx.version: 'onnx==1.10.1'  # -i https://test.pypi.org/simple/ onnx'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
+        scipy.version: 'scipy<1.9'
         onnxrt.version: 'onnxruntime==1.9.0'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.2'
@@ -108,7 +108,7 @@ jobs:
         onnx.version: 'onnx==1.9.0'  # '-i https://test.pypi.org/simple/ onnx'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
+        scipy.version: 'scipy<1.9'
         onnxrt.version: 'onnxruntime==1.7.0'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'onnxconverter-common==1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.2'
@@ -117,7 +117,7 @@ jobs:
         onnx.version: 'onnx==1.8.1'  # '-i https://test.pypi.org/simple/ onnx'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
+        scipy.version: 'scipy<1.9'
         onnxrt.version: 'onnxruntime==1.7.0'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'onnxconverter-common==1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.1'
@@ -200,6 +200,9 @@ jobs:
       call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
       cd tests
+      python -c "from numpy import __version__;print('numpy', __version__)"
+      python -c "from scipy import __version__;print('scipy', __version__)"
+      python -c "from sklearn import __version__;print('sklearn', __version__)"
       python -c "from onnxruntime import __version__;print('onnxruntime', __version__)"
       python -c "from onnx import __version__;print('onnx', __version__)"
       python -c "from skl2onnx import __max_supported_opset__;print('__max_supported_opset__', __max_supported_opset__)"
