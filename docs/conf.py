@@ -109,14 +109,14 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['auto_examples', 'auto_tutorial'],
     'capture_repr': ('_repr_html_', '__repr__'),
     'ignore_repr_types': r'matplotlib.text|matplotlib.axes',
-    'binder': {
-        'org': 'onnx',
-        'repo': 'onnx.ai/sklearn-onnx/',
-        'notebooks_dir': 'auto_examples',
-        'binderhub_url': 'https://mybinder.org',
-        'branch': 'master',
-        'dependencies': './requirements.txt'
-    },
+    # 'binder': {
+    #     'org': 'onnx',
+    #     'repo': 'onnx.ai/sklearn-onnx/',
+    #     'notebooks_dir': 'auto_examples',
+    #     'binderhub_url': 'https://mybinder.org',
+    #     'branch': 'main',
+    #     'dependencies': './requirements.txt'
+    # },
 }
 
 epkg_dictionary = {
