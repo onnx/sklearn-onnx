@@ -129,7 +129,7 @@ jobs:
   - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
     displayName: Add conda to PATH
 
-  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) $(scipy.version) pandas python=$(python.version) pytest
+  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) "$(scipy.version)" pandas python=$(python.version) pytest
     displayName: Create Anaconda environment
 
   - script: |
