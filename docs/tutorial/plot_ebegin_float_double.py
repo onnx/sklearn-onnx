@@ -279,8 +279,8 @@ model_onx.fit(Xi_train, yi_train)
 
 #############################################
 # By using opset 17 and opset 3 for domain ai.onnx.ml, the tree thresholds
-# can be stored as double and not float anymore. That lower the discrepancies
-# even if the outputs are still float32.
+# can be stored as double and not float anymore. That lowerss the discrepancies
+# even if the outputs are still float.
 
 onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32),
                target_opset=17)
