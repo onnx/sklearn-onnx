@@ -12,7 +12,7 @@ def convert_sklearn_concat(scope: Scope, operator: Operator,
     exptype = operator.outputs[0].type
     new_inputs = []
     for inp in operator.inputs:
-        if inp.type == exptype:
+        if inp.type.__class__ is exptype.__class__:
             new_inputs.append(inp.full_name)
             continue
         name = scope.get_unique_variable_name("{}_cast".format(inp.full_name))
