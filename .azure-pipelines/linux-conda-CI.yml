@@ -250,6 +250,9 @@ jobs:
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
       cd tests
+      python -c "from numpy import __version__;print('numpy', __version__)"
+      python -c "from scipy import __version__;print('scipy', __version__)"
+      python -c "from sklearn import __version__;print('sklearn', __version__)"
       python -c "from onnxruntime import __version__;print('onnxruntime', __version__)"
       python -c "from onnx import __version__;print('onnx', __version__)"
       python -c "from skl2onnx import __max_supported_opset__;print('__max_supported_opset__', __max_supported_opset__)"
