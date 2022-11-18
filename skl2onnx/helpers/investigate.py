@@ -5,7 +5,10 @@ import warnings
 from types import MethodType
 import numpy
 from numpy.testing import assert_almost_equal
-from scipy.sparse.csr import csr_matrix
+try:
+    from scipy.sparse import csr_matrix
+except ImportError:
+    from scipy.sparse.csr import csr_matrix
 from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.base import RegressorMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
