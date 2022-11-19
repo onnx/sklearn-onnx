@@ -11,11 +11,11 @@ import pandas as pd
 from numpy.testing import assert_almost_equal
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
-from sklearn.datasets import load_iris, make_regression
+from sklearn.datasets import load_iris, make_regression, make_friedman2
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import (
     Sum, DotProduct, ExpSineSquared, RationalQuadratic,
-    RBF, ConstantKernel as C, PairwiseKernel)
+    RBF, ConstantKernel as C, PairwiseKernel, WhiteKernel)
 from sklearn.model_selection import train_test_split
 try:
     # scikit-learn >= 0.22
@@ -1107,11 +1107,63 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(pipe.predict(vx1.astype(np.float64)).ravel(),
                             pred[0].ravel())
 
+    def test_white_kernel_float(self):
+        X, y = make_friedman2(n_samples=500, noise=0, random_state=0)
+        tx1, vx1, ty1, vy1 = train_test_split(X, y)
+        kernel = DotProduct() + WhiteKernel(noise_level=0.5)
+        gpr = GaussianProcessRegressor(
+            kernel=kernel, random_state=0).fit(tx1, ty1)
+        initial_type = [('data_in', FloatTensorType([None, X.shape[1]]))]
+        onx = to_onnx(gpr, initial_types=initial_type,
+                      target_opset=_TARGET_OPSET_)
+        sess = InferenceSession(onx.SerializeToString())
+        pred = sess.run(None, {'data_in': vx1.astype(np.float32)})
+        assert_almost_equal(gpr.predict(vx1.astype(np.float32)).ravel(),
+                            pred[0].ravel())
+
+    def test_white_kernel_double(self):
+        X, y = make_friedman2(n_samples=500, noise=0, random_state=0)
+        tx1, vx1, ty1, vy1 = train_test_split(X, y)
+        kernel = DotProduct() + WhiteKernel(noise_level=0.5)
+        gpr = GaussianProcessRegressor(
+            kernel=kernel, random_state=0).fit(tx1, ty1)
+        initial_type = [('data_in', DoubleTensorType([None, X.shape[1]]))]
+        onx = to_onnx(gpr, initial_types=initial_type,
+                      target_opset=_TARGET_OPSET_)
+        sess = InferenceSession(onx.SerializeToString())
+        pred = sess.run(None, {'data_in': vx1.astype(np.float64)})
+        assert_almost_equal(gpr.predict(vx1.astype(np.float64)).ravel(),
+                            pred[0].ravel())
+
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_kernel_white_kernel(self):
+        ker = WhiteKernel()
+
+        # X, X
+        onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+        with open("debug.onnx", "wb") as f:
+            f.write(model_onnx.SerializeToString())
+
+        x = np.random.randn(4, 3)
+        x[0, 0] = x[1, 1] = x[2, 2] = 10.
+        x[3, 2] = 5.
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': x.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(x)
+        assert_almost_equal(m1, m2, decimal=5)
+
 
 if __name__ == "__main__":
     # import logging
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestSklearnGaussianProcessRegressor().test_kernel_rbf1_anisotropic()
-    unittest.main()
+    TestSklearnGaussianProcessRegressor().test_white_kernel_float()
+    TestSklearnGaussianProcessRegressor().test_white_kernel_double()
+    unittest.main(verbosity=2)

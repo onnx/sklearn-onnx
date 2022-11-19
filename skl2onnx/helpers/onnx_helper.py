@@ -265,9 +265,10 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
             used.add(name)
     shapes = [shape for shape in all_shapes if shape.onnx_name not in used]
     if len(shapes) == 0:
-        raise RuntimeError("Shape inference fails.\n"
-                           "*Inputs*\n{}\n*Model*\n{}'".format(
-                               onnx_inputs, original_model))
+        raise RuntimeError(
+            f"Shape inference fails.\n*Inputs*\n{onnx_inputs}\n"
+            f"*all_shapes*\n{all_shapes}'\n"
+            f"*Model*\n{original_model}'")
     logger.debug('[infer_outputs] shapes=%r', shapes)
     return shapes
 
