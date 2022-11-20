@@ -1180,7 +1180,5 @@ if __name__ == "__main__":
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    TestSklearnGaussianProcessRegressor().test_kernel_white_kernel()
-    TestSklearnGaussianProcessRegressor().test_white_kernel_double()
-    TestSklearnGaussianProcessRegressor().test_white_kernel_float()
+    # TestSklearnGaussianProcessRegressor().test_kernel_white_kernel()
     unittest.main(verbosity=2)
