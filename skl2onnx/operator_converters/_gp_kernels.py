@@ -220,13 +220,11 @@ def convert_kernel(kernel, X, output_names=None,
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
+        onnx_zeros_x = _zero_vector_of_size(
+            X, keepdims=1, dtype=dtype, op_version=op_version)
         if x_train is None:
-            onnx_zeros_x = _zero_vector_of_size(
-                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = onnx_zeros_x
         else:
-            onnx_zeros_x = _zero_vector_of_size(
-                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = _zero_vector_of_size(
                 x_train, keepdims=1, dtype=dtype, op_version=op_version)
 
@@ -350,18 +348,20 @@ def convert_kernel(kernel, X, output_names=None,
         # X and x_train should have the same number of features.
         onnx_zeros_x = _zero_vector_of_size(
             X, keepdims=1, dtype=dtype, op_version=op_version)
-        Y = X if x_train is None else X
-        onnx_zeros_y = _zero_vector_of_size(
-            Y, keepdims=1, dtype=dtype, op_version=op_version)
+        if x_train is None:
+            onnx_zeros_y = onnx_zeros_x
+        else:
+            onnx_zeros_y = _zero_vector_of_size(
+                x_train, keepdims=1, dtype=dtype, op_version=op_version)
         tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0], op_version=op_version)
-        zero = OnnxMatMul(onnx_zeros_x, tr, op_version=op_version)
+        mat = OnnxMatMul(onnx_zeros_x, tr, op_version=op_version)
 
         if x_train is not None:
-            return OnnxIdentity(zero, op_version=op_version,
+            return OnnxIdentity(mat, op_version=op_version,
                                 output_names=output_names)
 
         return OnnxMul(
-            OnnxEyeLike(zero, op_version=op_version),
+            OnnxEyeLike(mat, op_version=op_version),
             OnnxIdentity(np.array([kernel.noise_level], dtype=dtype),
                                   op_version=op_version),
             op_version=op_version,

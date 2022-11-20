@@ -8,7 +8,7 @@ from io import StringIO
 import packaging.version as pv
 import numpy as np
 import pandas as pd
-from numpy.testing import assert_almost_equal
+from numpy.testing import assert_almost_equal, assert_allclose
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.datasets import load_iris, make_regression, make_friedman2
@@ -1118,8 +1118,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                       target_opset=_TARGET_OPSET_)
         sess = InferenceSession(onx.SerializeToString())
         pred = sess.run(None, {'data_in': vx1.astype(np.float32)})
-        assert_almost_equal(gpr.predict(vx1.astype(np.float32)).ravel(),
-                            pred[0].ravel())
+        assert_almost_equal(gpr.predict(vx1.astype(np.float32)).shape[0],
+                            pred[0].shape[0])
+        assert_allclose(gpr.predict(vx1.astype(np.float32)).ravel(),
+                        pred[0].ravel(), rtol=1e-3)
 
     def test_white_kernel_double(self):
         X, y = make_friedman2(n_samples=500, noise=0, random_state=0)
@@ -1156,7 +1158,21 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         res = sess.run(None, {'X': x.astype(np.float32)})[0]
         m1 = res
         m2 = ker(x)
-        assert_almost_equal(m1, m2, decimal=5)
+        assert_almost_equal(m2, m1, decimal=5)
+
+        # X, x
+        onx = convert_kernel(ker, 'X', x_train=x,
+                             output_names=['Y'], dtype=np.float32,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        res = sess.run(None, {'X': x.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(x, x)
+        assert_almost_equal(m2, m1, decimal=5)
 
 
 if __name__ == "__main__":
@@ -1164,6 +1180,7 @@ if __name__ == "__main__":
     # log = logging.getLogger('skl2onnx')
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    TestSklearnGaussianProcessRegressor().test_white_kernel_float()
+    TestSklearnGaussianProcessRegressor().test_kernel_white_kernel()
     TestSklearnGaussianProcessRegressor().test_white_kernel_double()
+    TestSklearnGaussianProcessRegressor().test_white_kernel_float()
     unittest.main(verbosity=2)
