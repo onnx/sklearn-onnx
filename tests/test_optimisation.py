@@ -14,7 +14,7 @@ from test_utils import TARGET_OPSET
 
 class TestOptimisation(unittest.TestCase):
 
-    @skipif.unittest(TARGET_OPSET <= 14,
+    @unittest.skipIf(TARGET_OPSET <= 14,
                      reason="only verified with opset 15+")
     def test_coptimisation_identity_removal(self):
         # investigation issue #854
