@@ -16,7 +16,6 @@ from ..algebra.onnx_ops import (
     OnnxReduceSumApi11, OnnxSqueezeApi11,
     OnnxIdentity, OnnxReduceSumSquare,
     OnnxReduceL2_typed, OnnxEyeLike,
-    OnnxGather,
 )
 from ..algebra.custom_ops import OnnxCDist
 from ..proto.onnx_helper_modified import from_array
@@ -363,10 +362,9 @@ def convert_kernel(kernel, X, output_names=None,
         return OnnxMul(
             OnnxEyeLike(mat, op_version=op_version),
             OnnxIdentity(np.array([kernel.noise_level], dtype=dtype),
-                                  op_version=op_version),
+                         op_version=op_version),
             op_version=op_version,
             output_names=output_names)
-
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
