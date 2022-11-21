@@ -6,7 +6,10 @@ Place holder for all ONNX operators.
 import sys
 import os
 import numpy as np
-from scipy.sparse.coo import coo_matrix
+try:
+    from scipy.sparse import coo_matrix
+except ImportError:
+    from scipy.sparse.coo import coo_matrix
 import onnx
 from ..common.data_types import DataType
 from ..common._topology import Variable
