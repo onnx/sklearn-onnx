@@ -56,7 +56,31 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                 idnodes.append((i, exnode, input, output))
         return idnodes
 
+    def retrieve_local_variables_subgraphs(graph):
+        local = set()
+        existing = set(i.name for i in graph.input)
+        for node in graph.node:
+            for i in node.input:
+                if i not in existing:
+                    local.add(i)
+            for o in node.output:
+                existing.add(o)
+            res = retrieve_local_variables_nodes([node])
+            for r in res:
+                if r not in existing:
+                    local.add(r)
+        return local
+
+    def retrieve_local_variables_nodes(nodes):
+        names = set()
+        for node in nodes:
+            for att in node.attribute:
+                if att.g:
+                    names |= retrieve_local_variables_subgraphs(att.g)
+        return names
+
     nodes = list(graph.node)
+    local_variables = retrieve_local_variables_nodes(nodes)
     rem = 1
     while rem > 0:
         rem = 0
@@ -70,6 +94,9 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                 continue
             if inp in inputs and out in outputs:
                 # Cannot be removed.
+                continue
+            if out in local_variables:
+                # out is used a local variable, this case is not implemented
                 continue
             if not restart and out not in outputs:
                 # We cannot change an output name.

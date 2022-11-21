@@ -18,7 +18,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     custom_parsers=None, options=None,
                     intermediate=False,
                     white_op=None, black_op=None, final_types=None,
-                    dtype=None, naming=None, verbose=0):
+                    dtype=None, naming=None, model_optim=True,
+                    verbose=0):
     """
     This function produces an equivalent
     ONNX model of the given scikit-learn model.
@@ -79,6 +80,9 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         function, which signature is the following:
         `get_name(name, existing_names)`, the library will then
         check this name is unique and modify it if not
+    :param model_optim: enable or disable model optimisation
+        after the model was converted into onnx, it reduces the number
+        of identity nodes
     :param verbose: display progress while converting a model
     :return: An ONNX model (type: ModelProto) which is
         equivalent to the input scikit-learn model
@@ -183,7 +187,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         print("[convert_sklearn] convert_topology")
     onnx_model = convert_topology(
         topology, name, doc_string, target_opset, options=options,
-        remove_identity=not intermediate, verbose=verbose)
+        remove_identity=model_optim and not intermediate, verbose=verbose)
     if verbose >= 1:
         print("[convert_sklearn] end")
         if verbose >= 2:
@@ -209,7 +213,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 def to_onnx(model, X=None, name=None, initial_types=None,
             target_opset=None, options=None,
             white_op=None, black_op=None, final_types=None,
-            dtype=None, naming=None, verbose=0):
+            dtype=None, naming=None, model_optim=True, verbose=0):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -237,6 +241,9 @@ def to_onnx(model, X=None, name=None, initial_types=None,
         function, which signature is the following:
         `get_name(name, existing_names)`, the library will then
         check this name is unique and modify it if not
+    :param model_optim: enable or disable model optimisation
+        after the model was converted into onnx, it reduces the number
+        of identity nodes
     :param verbose: display progress while converting a model
     :return: converted model
 
@@ -265,7 +272,8 @@ def to_onnx(model, X=None, name=None, initial_types=None,
                            name=name, options=options,
                            white_op=white_op, black_op=black_op,
                            final_types=final_types, dtype=dtype,
-                           verbose=verbose, naming=naming)
+                           verbose=verbose, naming=naming,
+                           model_optim=model_optim)
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):
