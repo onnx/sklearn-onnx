@@ -152,7 +152,13 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
             self, tokens=tokens, stop_words=stop_words)
 
     def fit(self, X, y=None):
-        super().fit(X, y=y)
+        # scikit-learn implements fit_transform and fit calls it.
+        new_self = CountVectorizer(**self.get_params())
+        new_self._word_ngrams = self._word_ngrams
+        new_self.fit(X, y=y)
+        for k, v in new_self.__dict__.items():
+            if k.endswith("_") and not k.endswith("__"):
+                setattr(self, k, v)
         same = CountVectorizer(**self.get_params())
         same.fit(X, y=y)
         self.same_ = same
