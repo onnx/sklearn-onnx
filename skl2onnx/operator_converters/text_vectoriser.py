@@ -262,6 +262,11 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             set(op.stop_words) if op.stop_words else set())
     else:
         stop_words = set()
+    for w in stop_words:
+        if not isinstance(w, str):
+            raise TypeError(
+                f"One stop word is not a string {w!r} "
+                f"in stop_words={stop_words}.")
 
     if op.lowercase or stop_words:
         if len(operator.input_full_names) != 1:
