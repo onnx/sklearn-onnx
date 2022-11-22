@@ -106,7 +106,7 @@ def get_column_index(i, inputs):
             end += rel_end
     else:
         for ind, inp in enumerate(inputs):
-            if inp.onnx_name == i:
+            if inp.raw_name == i:
                 return ind, 0
         raise RuntimeError(
             "Unable to find column name %r among names %r. "
@@ -115,7 +115,7 @@ def get_column_index(i, inputs):
             "pipeline to convert. This may happen because a "
             "ColumnTransformer follows a transformer without "
             "any mapped converter in a pipeline." % (
-                i, [n.onnx_name for n in inputs]))
+                i, [n.raw_name for n in inputs]))
 
 
 def get_column_indices(indices, inputs, multiple):
