@@ -35,21 +35,23 @@ from test_utils import (
     fit_classification_model, TARGET_OPSET)
 
 
-def model_to_test_reg():
+def model_to_test_reg(passthrough=False):
     estimators = [
         ('dt', DecisionTreeRegressor()),
         ('las', LinearRegression())]
     stacking_regressor = StackingRegressor(
-        estimators=estimators, final_estimator=LinearRegression())
+        estimators=estimators, final_estimator=LinearRegression(),
+        passthrough=passthrough)
     return stacking_regressor
 
 
-def model_to_test_cl():
+def model_to_test_cl(passthrough=False):
     estimators = [
         ('dt', DecisionTreeClassifier()),
         ('las', LogisticRegression())]
     stacking_regressor = StackingClassifier(
-        estimators=estimators, final_estimator=LogisticRegression())
+        estimators=estimators, final_estimator=LogisticRegression(),
+        passthrough=passthrough)
     return stacking_regressor
 
 
@@ -68,6 +70,22 @@ class TestStackingConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnStackingRegressor-Dec4",
+            comparable_outputs=[0])
+
+    @unittest.skipIf(StackingRegressor is None,
+                     reason="new in 0.22")
+    @ignore_warnings(category=FutureWarning)
+    def test_model_stacking_regression_passthrough(self):
+        model, X = fit_regression_model(model_to_test_reg(passthrough=True),
+                                        factor=0.1)
+        model_onnx = convert_sklearn(
+            model, "stacking regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnStackingRegressorPassthrough",
             comparable_outputs=[0])
 
     @unittest.skipIf(StackingClassifier is None,
@@ -89,6 +107,22 @@ class TestStackingConverter(unittest.TestCase):
     @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
     @ignore_warnings(category=FutureWarning)
+    def test_model_stacking_classifier_passthrough(self):
+        model, X = fit_classification_model(
+            model_to_test_cl(passthrough=True), n_classes=2)
+        model_onnx = convert_sklearn(
+            model, "stacking classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnStackingClassifierPassthrough",
+            comparable_outputs=[0])
+
+    @unittest.skipIf(StackingClassifier is None,
+                     reason="new in 0.22")
+    @ignore_warnings(category=FutureWarning)
     def test_model_stacking_classifier_nozipmap(self):
         model, X = fit_classification_model(
             model_to_test_cl(), n_classes=2)
@@ -101,6 +135,23 @@ class TestStackingConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx,
             basename="SklearnStackingClassifierNoZipMap",
+            comparable_outputs=[0])
+
+    @unittest.skipIf(StackingClassifier is None,
+                     reason="new in 0.22")
+    @ignore_warnings(category=FutureWarning)
+    def test_model_stacking_classifier_nozipmap_passthrough(self):
+        model, X = fit_classification_model(
+            model_to_test_cl(passthrough=True), n_classes=2)
+        model_onnx = convert_sklearn(
+            model, "stacking classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {'zipmap': False}})
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnStackingClassifierNoZipMapPassthrough",
             comparable_outputs=[0])
 
     @unittest.skipIf(StackingClassifier is None,
@@ -196,6 +247,36 @@ class TestStackingConverter(unittest.TestCase):
     @unittest.skipIf(StackingClassifier is None,
                      reason="new in 0.22")
     @ignore_warnings(category=FutureWarning)
+    def test_model_stacking_classifier_column_transformer_passthrough(self):
+        classifiers = {
+            'A': RandomForestClassifier(n_estimators=5, random_state=42),
+            'B': GradientBoostingClassifier(n_estimators=5, random_state=42)
+        }
+        model_to_test = Pipeline(steps=[
+            ('cbe', ColumnTransformer([
+                ("norm1", Normalizer(norm='l1'), [0, 1]),
+                ("norm2", Normalizer(norm='l2'), [2, 3])])),
+            ('sc',  StackingClassifier(
+                estimators=list(map(tuple, classifiers.items())),
+                stack_method='predict_proba',
+                passthrough=True
+            ))
+        ])
+        model, X = fit_classification_model(
+            model_to_test, n_classes=2)
+        model_onnx = convert_sklearn(
+            model, "stacking classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx,
+            basename="SklearnStackingClassifierPipePassthrough",
+            comparable_outputs=[0])
+
+    @unittest.skipIf(StackingClassifier is None,
+                     reason="new in 0.22")
+    @ignore_warnings(category=FutureWarning)
     def test_concat_stacking(self):
 
         class CustomTransformer:
@@ -254,6 +335,83 @@ class TestStackingConverter(unittest.TestCase):
                 estimators=list(map(tuple, classifiers.items())),
                 n_jobs=1, stack_method='predict_proba',
                 passthrough=False)
+
+        pipe = Pipeline(steps=[
+            ('ct', CustomTransformer()), ('sc', stacking_ensemble)])
+        x = numpy.random.randn(20, 4).astype(numpy.float32)
+        y = numpy.random.randint(2, size=20).astype(numpy.int64)
+        pipe.fit(x, y)
+
+        input_types = [("X", FloatTensorType([None, x.shape[1]]))]
+        model_onnx = convert_sklearn(
+            pipe, 'bug', input_types, target_opset=TARGET_OPSET,
+            verbose=0, options={'zipmap': False})
+
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'X': x})[0]
+        self.assertEqual(got.shape[0], x.shape[0])
+
+    @unittest.skipIf(StackingClassifier is None,
+                     reason="new in 0.22")
+    @ignore_warnings(category=FutureWarning)
+    def test_concat_stacking_passthrough(self):
+
+        class CustomTransformer:
+
+            def fit(self, X, y=None):
+                return self
+
+            def transform(self, X):
+                return X
+
+        def shape_calculator(operator):
+            pass
+
+        def parser(scope, model, inputs, custom_parsers=None):
+            alias = get_model_alias(type(model))
+            op = scope.declare_local_operator(alias, model)
+            op.inputs = inputs
+            n_features = sum(
+                list(map(lambda x: x.type.shape[1], op.inputs)))
+            variable = scope.declare_local_variable(
+                "c_outputs", FloatTensorType([None, n_features]))
+            op.outputs.append(variable)
+            return op.outputs
+
+        def converter(scope, operator, container):
+            output_cols = []
+
+            for index in range(operator.inputs[0].type.shape[1]):
+                index_name = scope.get_unique_variable_name("ind%d" % index)
+                container.add_initializer(
+                    index_name, TensorProto.INT64, [], [index])
+                feature_column_name = scope.get_unique_variable_name(
+                    "fc%d" % index)
+                container.add_node(
+                    "ArrayFeatureExtractor",
+                    [operator.inputs[0].full_name, index_name],
+                    feature_column_name, op_domain="ai.onnx.ml",
+                    name=scope.get_unique_operator_name("AFE%d" % index))
+                output_cols.append(feature_column_name)
+
+            container.add_node(
+                "Concat", output_cols,
+                operator.outputs[0].full_name,
+                name=scope.get_unique_operator_name("CUSTOMCONCAT"),
+                axis=-1)
+
+        update_registered_converter(
+            CustomTransformer, "CustomTransformerUT",
+            shape_calculator, converter, parser=parser, overwrite=True)
+
+        clf1 = RandomForestClassifier(n_estimators=5)
+        clf2 = RandomForestClassifier(n_estimators=5)
+        classifiers = {'clf1': clf1, 'clf2': clf2}
+
+        stacking_ensemble = StackingClassifier(
+                estimators=list(map(tuple, classifiers.items())),
+                n_jobs=1, stack_method='predict_proba',
+                passthrough=True)
 
         pipe = Pipeline(steps=[
             ('ct', CustomTransformer()), ('sc', stacking_ensemble)])
