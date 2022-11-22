@@ -40,6 +40,11 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
     return new_name
 
 
+def _add_passthrough_connection(operator, predictions):
+    if operator.raw_operator.passthrough:
+        predictions.append(operator.inputs[0].onnx_name)
+
+
 def _transform_regressor(scope, operator, container, model):
     merged_prob_tensor = scope.get_unique_variable_name(
         'merged_probability_tensor')
@@ -49,6 +54,8 @@ def _transform_regressor(scope, operator, container, model):
             scope, container, est, operator.inputs[0], is_regressor=True)
         for est in model.estimators_
     ]
+
+    _add_passthrough_connection(operator, predictions)
 
     apply_concat(
         scope, predictions, merged_prob_tensor, container, axis=1)
@@ -84,6 +91,8 @@ def _transform(scope, operator, container, model):
                 op_domain='ai.onnx.ml')
             new_predictions.append(prob1)
         predictions = new_predictions
+
+    _add_passthrough_connection(operator, predictions)
 
     apply_concat(
         scope, predictions, merged_prob_tensor, container, axis=1)
