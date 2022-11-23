@@ -19,7 +19,7 @@ from test_utils import TARGET_OPSET
 
 class TestSklearnFeatureHasher(unittest.TestCase):
 
-    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.10.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.12.0"),
                      reason="no murmurhash3 in ort")
     def test_ort_murmurhash3_int(self):
         X = make_tensor_value_info('X', TensorProto.UINT32, [None])
@@ -37,7 +37,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         self.assertEqual(got[0].shape, feeds["X"].shape)
         self.assertEqual(got[0].dtype, feeds["X"].dtype)
 
-    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.10.0"),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.12.0"),
                      reason="no murmurhash3 in ort")
     def test_ort_murmurhash3_string(self):
         X = make_tensor_value_info('X', TensorProto.STRING, [None])
