@@ -46,7 +46,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         check_model(onnx_model)
         sess = InferenceSession(onnx_model.SerializeToString())
 
-        input_strings = ['q4444', 'z0', 'o11', 'd222', 't333', 'c5555']
+        input_strings = ['z0', 'o11', 'd222', 'q4444', 't333', 'c5555']
         as_bytes = [s.encode("utf-8") for s in input_strings]
         feeds = {'X': np.array(as_bytes)}
         got = sess.run(None, feeds)
@@ -68,7 +68,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         skl = FeatureHasher(n_features, input_type='string', dtype=np.uint32)
         expected = skl.transform(feeds["X"].reshape((-1, 1)))
         dense = expected.todense()
-        self.assertEqual(dense.tolist(), mat.tolist())
+        for i, (a, b) in enumerate(zip(dense.tolist(), mat.tolist())):
+            if a != b:
+                raise AssertionError(f"Discrepancies at line {i}: {a} != {b}")
 
     #def test_generic_univariate_select_int(self):
     #    model = GenericUnivariateSelect()
