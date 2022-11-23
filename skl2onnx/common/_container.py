@@ -626,7 +626,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
 
         if upd:
             attrs.update(upd)
-        if 'dtype' in attrs:
+        if 'dtype' in attrs and op_type != 'EyeLike':
             raise RuntimeError("dtype should not be a parameter.")
         if len(dtypes) == 0:
             dtype = None

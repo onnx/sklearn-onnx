@@ -5,7 +5,8 @@ import numpy as np
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
     RBF, DotProduct, ExpSineSquared,
-    RationalQuadratic, PairwiseKernel
+    RationalQuadratic, PairwiseKernel,
+    WhiteKernel,
 )
 from ..algebra.complex_functions import onnx_squareform_pdist, onnx_cdist
 from ..algebra.onnx_ops import (
@@ -14,7 +15,7 @@ from ..algebra.onnx_ops import (
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSumApi11, OnnxSqueezeApi11,
     OnnxIdentity, OnnxReduceSumSquare,
-    OnnxReduceL2_typed
+    OnnxReduceL2_typed, OnnxEyeLike,
 )
 from ..algebra.custom_ops import OnnxCDist
 from ..proto.onnx_helper_modified import from_array
@@ -218,13 +219,11 @@ def convert_kernel(kernel, X, output_names=None,
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
+        onnx_zeros_x = _zero_vector_of_size(
+            X, keepdims=1, dtype=dtype, op_version=op_version)
         if x_train is None:
-            onnx_zeros_x = _zero_vector_of_size(
-                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = onnx_zeros_x
         else:
-            onnx_zeros_x = _zero_vector_of_size(
-                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = _zero_vector_of_size(
                 x_train, keepdims=1, dtype=dtype, op_version=op_version)
 
@@ -343,6 +342,29 @@ def convert_kernel(kernel, X, output_names=None,
                 X, x_train, metric=kernel.metric,
                 dtype=dtype, output_names=output_names,
                 optim=optim, op_version=op_version)
+
+    if isinstance(kernel, WhiteKernel):
+        # X and x_train should have the same number of features.
+        onnx_zeros_x = _zero_vector_of_size(
+            X, keepdims=1, dtype=dtype, op_version=op_version)
+        if x_train is None:
+            onnx_zeros_y = onnx_zeros_x
+        else:
+            onnx_zeros_y = _zero_vector_of_size(
+                x_train, keepdims=1, dtype=dtype, op_version=op_version)
+        tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0], op_version=op_version)
+        mat = OnnxMatMul(onnx_zeros_x, tr, op_version=op_version)
+
+        if x_train is not None:
+            return OnnxIdentity(mat, op_version=op_version,
+                                output_names=output_names)
+
+        return OnnxMul(
+            OnnxEyeLike(mat, op_version=op_version),
+            OnnxIdentity(np.array([kernel.noise_level], dtype=dtype),
+                         op_version=op_version),
+            op_version=op_version,
+            output_names=output_names)
 
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
