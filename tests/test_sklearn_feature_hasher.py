@@ -7,14 +7,12 @@ import unittest
 import numpy as np
 from onnx import TensorProto
 from onnx.helper import (
-    make_model, make_node, set_model_props, make_tensor,
+    make_model, make_node,
     make_graph, make_tensor_value_info, make_opsetid)
 from onnx.checker import check_model
 from onnxruntime import InferenceSession
 from sklearn.feature_extraction import FeatureHasher
-from skl2onnx import to_onnx
-from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import TARGET_OPSET
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
@@ -71,22 +69,6 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         for i, (a, b) in enumerate(zip(dense.tolist(), mat.tolist())):
             if a != b:
                 raise AssertionError(f"Discrepancies at line {i}: {a} != {b}")
-
-    #def test_generic_univariate_select_int(self):
-    #    model = GenericUnivariateSelect()
-    #    X = np.array(
-    #        [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]],
-    #        dtype=np.int64)
-    #    y = np.array([0, 1, 0, 1])
-    #    model.fit(X, y)
-    #    model_onnx = convert_sklearn(
-    #        model, "generic univariate select",
-    #        [("input", Int64TensorType([None, X.shape[1]]))],
-    #        target_opset=TARGET_OPSET)
-    #    self.assertTrue(model_onnx is not None)
-    #    dump_data_and_model(
-    #        X, model, model_onnx,
-    #        basename="SklearnGenericUnivariateSelect")
 
 
 if __name__ == "__main__":
