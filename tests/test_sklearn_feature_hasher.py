@@ -4,18 +4,23 @@
 Tests scikit-learn's feature selection converters
 """
 import unittest
+import packaging.version as pv
 import numpy as np
 from onnx import TensorProto
 from onnx.helper import (
     make_model, make_node,
     make_graph, make_tensor_value_info, make_opsetid)
 from onnx.checker import check_model
+from onnxruntime import __version__ as ort_version
 from onnxruntime import InferenceSession
 from sklearn.feature_extraction import FeatureHasher
 from test_utils import TARGET_OPSET
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
+
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.10.0"),
+                     reason="no murmurhash3 in ort")
     def test_ort_murmurhash3_int(self):
         X = make_tensor_value_info('X', TensorProto.UINT32, [None])
         Y = make_tensor_value_info('Y', TensorProto.UINT32, [None])
@@ -32,6 +37,8 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         self.assertEqual(got[0].shape, feeds["X"].shape)
         self.assertEqual(got[0].dtype, feeds["X"].dtype)
 
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.10.0"),
+                     reason="no murmurhash3 in ort")
     def test_ort_murmurhash3_string(self):
         X = make_tensor_value_info('X', TensorProto.STRING, [None])
         Y = make_tensor_value_info('Y', TensorProto.INT32, [None])
