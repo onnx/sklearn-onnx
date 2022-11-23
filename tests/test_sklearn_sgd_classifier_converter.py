@@ -5,6 +5,7 @@
 import unittest
 import packaging.version as pv
 import numpy as np
+from sklearn import __version__ as skl_version
 from sklearn.linear_model import SGDClassifier
 from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
@@ -20,6 +21,9 @@ from test_utils import (
 )
 
 ort_version = ".".join(ort_version.split(".")[:2])
+
+LOG_LOSS = ("log_loss" if pv.Version(skl_version) >= pv.Version("1.1")
+            else "log")
 
 
 class TestSGDClassifierConverter(unittest.TestCase):
@@ -65,7 +69,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="duplicated test")
     def test_model_sgd_binary_class_log_sigmoid(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 2, n_features=2)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, n_features=2)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -87,7 +91,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_binary_class_log(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 2)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -99,7 +103,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_binary_class_log_decision_function(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 2)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
@@ -114,7 +118,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_multi_class_log(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 5)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 5)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -128,7 +132,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 13, reason="duplicated test")
     def test_model_sgd_multi_class_log_sigmoid(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 5)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 5)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -140,7 +144,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_multi_class_log_decision_function(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 3)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 3)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD multi-class classifier",
@@ -154,7 +158,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_binary_class_log_l1_no_intercept(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
+            SGDClassifier(loss=LOG_LOSS, penalty='l1', fit_intercept=False,
                           random_state=42), 2)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
@@ -169,7 +173,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
                      reason="discrepencies")
     def test_model_sgd_multi_class_log_l1_no_intercept(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', penalty='l1', fit_intercept=False,
+            SGDClassifier(loss=LOG_LOSS, penalty='l1', fit_intercept=False,
                           random_state=43), 3, n_features=7)
         X = np.array([X[4], X[4]])
         model_onnx = convert_sklearn(
@@ -282,7 +286,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_binary_class_log_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 2, is_int=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_int=True)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
@@ -294,7 +298,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_binary_class_log_bool(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 2, is_bool=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_bool=True)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD binary classifier",
             [("input", BooleanTensorType([None, X.shape[1]]))],
@@ -306,7 +310,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_multi_class_log_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42), 5, is_int=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 5, is_int=True)
         model_onnx = convert_sklearn(
             model, "scikit-learn SGD multi-class classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
@@ -319,7 +323,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='log', random_state=42),
+            SGDClassifier(loss=LOG_LOSS, random_state=42),
             2, label_string=True)
         model_onnx = convert_sklearn(
             model, "multi-class nocl",

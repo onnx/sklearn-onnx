@@ -119,8 +119,8 @@ def _normalise_proba(scope, operator, container, scores, proba, num_classes,
 
 def _predict_proba_log(scope, operator, container, scores, num_classes,
                        proto_type):
-    """Probability estimation for SGDClassifier with loss=log and
-    Logistic Regression.
+    """Probability estimation for SGDClassifier with loss=log (or log_loss)
+    and Logistic Regression.
     Positive class probabilities are computed as
         1. / (1. + exp(-scores))
         multiclass is handled by normalising that over all classes.
@@ -228,7 +228,7 @@ def convert_sklearn_sgd_classifier(scope: Scope, operator: Operator,
     scores = _decision_function(scope, operator, container, sgd_op, proto_type)
     options = container.get_options(sgd_op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
-    if sgd_op.loss == 'log' and not use_raw_scores:
+    if sgd_op.loss in ('log', 'log_loss') and not use_raw_scores:
         proba = _predict_proba_log(scope, operator, container, scores,
                                    len(classes), proto_type)
     elif sgd_op.loss == 'modified_huber' and not use_raw_scores:
