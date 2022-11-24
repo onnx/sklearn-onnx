@@ -14,6 +14,10 @@ from onnx.checker import check_model
 from onnxruntime import __version__ as ort_version
 from onnxruntime import InferenceSession
 from sklearn.feature_extraction import FeatureHasher
+from skl2onnx import to_onnx
+from skl2onnx.common.data_types import (
+    StringTensorType, Int64TensorType, FloatTensorType,
+    DoubleTensorType)
 from test_utils import TARGET_OPSET
 
 
@@ -77,6 +81,47 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             if a != b:
                 raise AssertionError(f"Discrepancies at line {i}: {a} != {b}")
 
+    def test_feature_hasher(self):
+        n_features = 5
+        input_strings = ['z0', 'o11', 'd222', 'q4444', 't333', 'c5555']
+        data = np.array(input_strings).reshape((-1, 1))
+        for alternate_sign, dtype in [(True, np.float32),
+                                      (True, np.float64),
+                                      (True, np.int64),
+                                      (False, np.float32)]:
+            if dtype == np.float32:
+                final_type = FloatTensorType
+            elif dtype == np.float64:
+                final_type = DoubleTensorType
+            elif dtype in (np.int32, np.uint32, np.int64):
+                final_type = Int64TensorType
+            else:
+                final_type = None
+            with self.subTest(alternate_sign=alternate_sign, dtype=dtype):
+                model = FeatureHasher(n_features=n_features,
+                                      alternate_sign=alternate_sign,
+                                      dtype=dtype,
+                                      input_type='string')
+                model.fit(data)
+                expected = model.transform(data).todense()
+
+                model_onnx = to_onnx(
+                    model, initial_types=[("X", StringTensorType([None, 1]))],
+                    target_opset=TARGET_OPSET,
+                    final_types=[('Y', final_type([None, 1]))])
+                with open("debug.onnx", "wb") as f:
+                    f.write(model_onnx.SerializeToString())
+                sess = InferenceSession(model_onnx.SerializeToString())
+                got = sess.run(None, {'X': data})
+                self.assertEqual(expected.shape, got[0].shape)
+                self.assertEqual(expected.dtype, got[0].dtype)
+                for i, (a, b) in enumerate(zip(expected.tolist(),
+                                               got[0].tolist())):
+                    if a != b:
+                        raise AssertionError(
+                            f"Discrepancies at line {i}: {a} != {b}")
+
 
 if __name__ == "__main__":
+    # TestSklearnFeatureHasher().test_feature_hasher()
     unittest.main()

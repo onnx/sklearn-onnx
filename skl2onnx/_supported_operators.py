@@ -167,7 +167,10 @@ from sklearn.decomposition import (
     PCA,
     TruncatedSVD,
 )
-from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction import (
+    DictVectorizer,
+    FeatureHasher,
+)
 from sklearn.feature_extraction.text import (
     CountVectorizer, TfidfTransformer, TfidfVectorizer
 )
@@ -335,6 +338,7 @@ def build_sklearn_operator_name_map():
         ExtraTreeRegressor,
         ExtraTreesClassifier,
         ExtraTreesRegressor,
+        FeatureHasher,
         FeatureUnion,
         FunctionTransformer,
         GammaRegressor,
