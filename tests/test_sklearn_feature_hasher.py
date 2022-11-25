@@ -57,8 +57,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         sess = InferenceSession(onnx_model.SerializeToString())
 
         input_strings = ['z0', 'o11', 'd222', 'q4444', 't333', 'c5555']
-        as_bytes = [s.encode("utf-8") for s in input_strings]
-        feeds = {'X': np.array(as_bytes)}
+        feeds = {'X': np.array(input_strings)}
         got = sess.run(None, feeds)
 
         n_features = 4
