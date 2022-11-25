@@ -475,8 +475,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @ignore_warnings(category=FutureWarning)
     def test_boston_pca_rf(self):
-        data = make_regression(100, n_features=10)
-        X, y = data.data, data.target
+        X, y = make_regression(100, n_features=10)
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, random_state=0)
         pipe = Pipeline([
