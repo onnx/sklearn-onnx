@@ -26,7 +26,7 @@ def get_label_classes(scope, op, node_names=False):
             zipcol = False
         if zipcol:
             clnames = op.classes_.ravel()
-            if np.issubdtype(clnames.dtype, np.integer):
+            if np.issubdtype(clnames.dtype, (np.integer, np.bool_)):
                 classes = np.array(['i%d' % c for c in clnames])
             else:
                 classes = np.array(['s%s' % c for c in clnames])
@@ -48,7 +48,7 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
     """
     See :func:`convert_voting_classifier`.
     """
-    if np.issubdtype(classes.dtype, np.floating):
+    if np.issubdtype(classes.dtype, (np.floating, np.bool_)):
         class_type = onnx_proto.TensorProto.INT32
         classes = np.array(list(map(lambda x: int(x), classes)))
     elif np.issubdtype(classes.dtype, np.signedinteger):

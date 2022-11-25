@@ -321,7 +321,7 @@ def convert_sklearn_decision_tree_classifier(
                 [], [k])
             container.add_initializer(
                 classes_name, onnx_proto.TensorProto.INT64,
-                op.classes_[k].shape, op.classes_[k])
+                op.classes_[k].shape, int(op.classes_[k]))
 
             container.add_node(
                 'ArrayFeatureExtractor', [transposed_result_name, k_name],

@@ -42,7 +42,8 @@ def convert_sklearn_label_binariser(scope: Scope, operator: Operator,
         where_result_name = scope.get_unique_variable_name('where_result')
 
         class_dtype = onnx_proto.TensorProto.STRING
-        if np.issubdtype(binariser_op.classes_.dtype, np.signedinteger):
+        if np.issubdtype(binariser_op.classes_.dtype, (np.signedinteger,
+                                                       np.bool_)):
             class_dtype = onnx_proto.TensorProto.INT64
         else:
             classes = np.array([s.encode('utf-8') for s in classes])

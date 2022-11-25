@@ -452,9 +452,9 @@ def _apply_zipmap(zipmap_options, scope, model, input_type,
                                "be integers or strings.")
         zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
-        zipmap_operator.classlabels_int64s = classes
-    elif np.issubdtype(classes.dtype, np.unsignedinteger):
-        zipmap_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = [int(i) for i in classes]
+    elif np.issubdtype(classes.dtype, (np.unsignedinteger, np.bool_)):
+        zipmap_operator.classlabels_int64s = [int(i) for i in classes]
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
         zipmap_operator.classlabels_strings = classes
@@ -499,7 +499,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
 
             clout = scope.declare_local_operator('SklearnClassLabels')
             clout.classes = get_label_classes(scope, model)
-            if model.classes_.dtype in (np.int32, np.int64):
+            if model.classes_.dtype in (np.int32, np.int64, np.bool_):
                 ctype = Int64TensorType
             else:
                 ctype = StringTensorType
@@ -542,7 +542,7 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs,
         raise RuntimeError(
             "Class labels may have only one type %r."
             "" % set(cl.dtype for cl in classes))
-    if classes[0].dtype in (np.int32, np.int64):
+    if classes[0].dtype in (np.int32, np.int64, np.bool_):
         ctype = Int64TensorType
     else:
         ctype = StringTensorType

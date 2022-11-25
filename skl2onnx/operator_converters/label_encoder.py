@@ -15,8 +15,8 @@ def convert_sklearn_label_encoder(scope: Scope, operator: Operator,
     classes = op.classes_
     if np.issubdtype(classes.dtype, np.floating):
         attrs['keys_floats'] = classes
-    elif np.issubdtype(classes.dtype, np.signedinteger):
-        attrs['keys_int64s'] = classes
+    elif np.issubdtype(classes.dtype, (np.signedinteger, np.bool_)):
+        attrs['keys_int64s'] = [int(i) for i in classes]
     else:
         attrs['keys_strings'] = np.array([s.encode('utf-8') for s in classes])
     attrs['values_int64s'] = np.arange(len(classes))
