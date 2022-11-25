@@ -21,11 +21,8 @@ except ImportError:
     SparseTensorProto = None
 
 from onnx.numpy_helper import from_array  # noqa
-from typing import (
-    Text, Sequence, Any, Optional,
-    List, cast
-)
-import numpy as np  # type: ignore
+from typing import List, cast
+import numpy as np
 
 
 def make_node(
