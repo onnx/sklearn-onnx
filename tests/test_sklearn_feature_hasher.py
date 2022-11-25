@@ -154,13 +154,13 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         data = DataFrame(data)
         data.columns = ["c1", "c2"]
         data_nx = data.values
-        
+
         # The code of the feature hasher produces this intermediate
         # representation very different if the input is a dataframe.
         # The unit test is valid if both expressions produces the same results
         # otherwise, numpy arrays must be used.
-        df = ([ [(f, 1) for f in x] for x in data ])
-        ar = ([ [(f, 1) for f in x] for x in data.values ])
+        df = [[(f, 1) for f in x] for x in data]
+        ar = [[(f, 1) for f in x] for x in data.values]
         if df != ar:
             return
 
