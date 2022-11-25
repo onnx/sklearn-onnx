@@ -48,7 +48,8 @@ def _finalize_converter_classes(scope, argmax_output_name, output_full_name,
     """
     See :func:`convert_voting_classifier`.
     """
-    if np.issubdtype(classes.dtype, (np.floating, np.bool_)):
+    if (np.issubdtype(classes.dtype, np.floating) or
+            isinstance(classes.dtype, np.bool_)):
         class_type = onnx_proto.TensorProto.INT32
         classes = np.array(list(map(lambda x: int(x), classes)))
     elif np.issubdtype(classes.dtype, np.signedinteger):
