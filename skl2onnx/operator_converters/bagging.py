@@ -133,7 +133,7 @@ def convert_sklearn_bagging_classifier(scope: Scope, operator: Operator,
     class_type = onnx_proto.TensorProto.STRING
 
     if (np.issubdtype(bagging_op.classes_.dtype, np.floating) or
-            isinstance(bagging_op.classes_.dtype, np.bool_)):
+            bagging_op.classes_.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(bagging_op.classes_.dtype, np.signedinteger):

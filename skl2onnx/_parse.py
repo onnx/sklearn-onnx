@@ -453,7 +453,8 @@ def _apply_zipmap(zipmap_options, scope, model, input_type,
         zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
         zipmap_operator.classlabels_int64s = [int(i) for i in classes]
-    elif np.issubdtype(classes.dtype, (np.unsignedinteger, np.bool_)):
+    elif (np.issubdtype(classes.dtype, np.unsignedinteger) or
+            classes.dtype == np.bool_):
         zipmap_operator.classlabels_int64s = [int(i) for i in classes]
     else:
         classes = np.array([s.encode('utf-8') for s in classes])

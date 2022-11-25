@@ -109,7 +109,7 @@ def convert_sklearn_mlp_classifier(scope: Scope, operator: Operator,
                       proto_dtype)
 
     if (np.issubdtype(mlp_op.classes_.dtype, np.floating) or
-            isinstance(mlp_op.classes_.dtype, np.bool_)):
+            mlp_op.classes_.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(mlp_op.classes_.dtype, np.integer):

@@ -457,7 +457,7 @@ def convert_nearest_neighbors_classifier(scope: Scope, operator: Operator,
     classes = get_label_classes(scope, op)
     if hasattr(classes, 'dtype') and (
             np.issubdtype(classes.dtype, np.floating) or
-            isinstance(classes.dtype, np.bool_)):
+            classes.dtype == np.bool_):
         classes = classes.astype(np.int32)
         is_integer = True
     elif isinstance(classes[0], (int, np.int32, np.int64)):

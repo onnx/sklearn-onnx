@@ -112,7 +112,7 @@ def convert_sklearn_stacking_classifier(scope: Scope, operator: Operator,
     use_raw_scores = options['raw_scores']
     class_type = onnx_proto.TensorProto.STRING
     if (np.issubdtype(stacking_op.classes_.dtype, np.floating) or
-            isinstance(stacking_op.classes_.dtype, np.bool_)):
+            stacking_op.classes_.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(stacking_op.classes_.dtype, np.signedinteger):

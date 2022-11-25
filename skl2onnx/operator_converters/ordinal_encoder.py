@@ -50,7 +50,7 @@ def convert_sklearn_ordinal_encoder(scope: Scope, operator: Operator,
         attrs = {'name': scope.get_unique_operator_name('LabelEncoder')}
         if len(categories) > 0:
             if (np.issubdtype(categories.dtype, np.floating) or
-                    isinstance(categories.dtype, np.bool_)):
+                    categories.dtype == np.bool_):
                 attrs['keys_floats'] = categories
             elif np.issubdtype(categories.dtype, np.signedinteger):
                 attrs['keys_int64s'] = categories

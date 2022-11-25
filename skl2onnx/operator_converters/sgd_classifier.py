@@ -210,7 +210,7 @@ def convert_sklearn_sgd_classifier(scope: Scope, operator: Operator,
         proto_type = onnx_proto.TensorProto.FLOAT
 
     if (np.issubdtype(classes.dtype, np.floating) or
-            isinstance(classes.dtype, np.bool_)):
+            classes.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(classes.dtype, np.signedinteger):

@@ -446,7 +446,8 @@ def convert_sklearn_calibrated_classifier_cv(
     if np.issubdtype(op.classes_.dtype, np.floating):
         class_type = TensorProto.INT32
         classes = classes.astype(np.int32)
-    elif np.issubdtype(op.classes_.dtype, (np.signedinteger, np.bool_)):
+    elif (np.issubdtype(op.classes_.dtype, np.signedinteger) or
+            op.classes_.dtype == np.bool_):
         class_type = TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])

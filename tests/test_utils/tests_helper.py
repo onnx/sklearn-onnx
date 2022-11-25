@@ -530,6 +530,7 @@ def dump_binary_classification(
         comparable_outputs=None,
         verbose=False,
         label_string=True,
+        label_bool=False,
         target_opset=None):
     """
     Trains and dumps a model for a binary classification problem.
@@ -541,7 +542,9 @@ def dump_binary_classification(
     """
     X = [[0, 1], [1, 1], [2, 0]]
     X = numpy.array(X, dtype=numpy.float32)
-    if label_string:
+    if label_bool:
+        y = [False, True, False]
+    elif label_string:
         y = ["A", "B", "A"]
     else:
         y = [0, 1, 0]

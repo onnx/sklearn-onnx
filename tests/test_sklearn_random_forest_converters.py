@@ -8,9 +8,7 @@ from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
 import sklearn
 from sklearn.datasets import (
-    load_iris, make_regression, make_classification,
-    load_boston
-)
+    load_iris, make_regression, make_classification)
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
@@ -48,7 +46,6 @@ from test_utils import (
     TARGET_OPSET,
 )
 try:
-    from sklearn.experimental import enable_hist_gradient_boosting  # noqa
     from sklearn.ensemble import (
         HistGradientBoostingClassifier,
         HistGradientBoostingRegressor
@@ -72,6 +69,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model = RandomForestClassifier(n_estimators=3)
         dump_one_class_classification(model)
         dump_binary_classification(model)
+        dump_binary_classification(model, label_string=False)
+        dump_binary_classification(
+            model, label_string=False, label_bool=True)
         dump_multiple_classification(model)
 
     @ignore_warnings(category=FutureWarning)
@@ -475,7 +475,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @ignore_warnings(category=FutureWarning)
     def test_boston_pca_rf(self):
-        data = load_boston()
+        data = make_regression(100, n_features=10)
         X, y = data.data, data.target
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, random_state=0)
