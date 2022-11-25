@@ -99,7 +99,7 @@ jobs:
         onnx.version: 'onnx==1.10.1'  # -i https://test.pypi.org/simple/ onnx'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
+        scipy.version: 'scipy<1.9'
         onnxrt.version: 'onnxruntime==1.8.1'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'onnxconverter-common==1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.2'
@@ -108,7 +108,7 @@ jobs:
         onnx.version: 'onnx==1.9.0'  # '-i https://test.pypi.org/simple/ onnx'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.18.1'
-        scipy.version: 'scipy'
+        scipy.version: 'scipy<1.9'
         onnxrt.version: 'onnxruntime==1.8.0'  # -i https://test.pypi.org/simple/ ort-nightly'
         onnxcc.version: 'onnxconverter-common==1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
         sklearn.version: '==0.24.2'
