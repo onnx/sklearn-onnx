@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-
+# coding: utf-8
 """
 Tests scikit-learn's feature selection converters
 """
 import unittest
 import packaging.version as pv
 import numpy as np
+from pandas import DataFrame
 from onnx import TensorProto
 from onnx.helper import (
     make_model, make_node,
@@ -109,8 +110,6 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                     model, initial_types=[("X", StringTensorType([None, 1]))],
                     target_opset=TARGET_OPSET,
                     final_types=[('Y', final_type([None, 1]))])
-                with open("debug.onnx", "wb") as f:
-                    f.write(model_onnx.SerializeToString())
                 sess = InferenceSession(model_onnx.SerializeToString())
                 got = sess.run(None, {'X': data})
                 self.assertEqual(expected.shape, got[0].shape)
@@ -121,7 +120,100 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                         raise AssertionError(
                             f"Discrepancies at line {i}: {a} != {b}")
 
+    def test_feature_hasher_two_columns(self):
+        n_features = 5
+        input_strings = ['z0', 'o11', 'd222', 'q4444', 't333', 'c5555']
+        data = np.array(input_strings).reshape((-1, 2))
+
+        model = FeatureHasher(n_features=n_features,
+                              alternate_sign=True,
+                              dtype=np.float32,
+                              input_type='string')
+        model.fit(data)
+        expected = model.transform(data).todense()
+
+        model_onnx = to_onnx(
+            model, initial_types=[
+                ("X", StringTensorType([None, data.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            final_types=[('Y', FloatTensorType([None, n_features]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'X': data})
+        self.assertEqual(expected.shape, got[0].shape)
+        self.assertEqual(expected.dtype, got[0].dtype)
+        for i, (a, b) in enumerate(zip(expected.tolist(),
+                                       got[0].tolist())):
+            if a != b:
+                raise AssertionError(
+                    f"Discrepancies at line {i}: {a} != {b}")
+
+    def test_feature_hasher_dataframe(self):
+        n_features = 5
+        input_strings = ['z0', 'o11', 'd222', 'q4444', 't333', 'c5555']
+        data = np.array(input_strings).reshape((-1, 2))
+        data = DataFrame(data)
+        data.columns = ["c1", "c2"]
+        data_nx = data.values
+        
+        # The code of the feature hasher produces this intermediate
+        # representation very different if the input is a dataframe.
+        # The unit test is valid if both expressions produces the same results
+        # otherwise, numpy arrays must be used.
+        df = ([ [(f, 1) for f in x] for x in data ])
+        ar = ([ [(f, 1) for f in x] for x in data.values ])
+        if df != ar:
+            return
+
+        model = FeatureHasher(n_features=n_features,
+                              alternate_sign=True,
+                              dtype=np.float32,
+                              input_type='string')
+        model.fit(data)
+        expected = model.transform(data).todense()
+        print(expected)
+
+        model_onnx = to_onnx(
+            model, initial_types=[
+                ("X", StringTensorType([None, data.shape[0]]))],
+            target_opset=TARGET_OPSET,
+            final_types=[('Y', FloatTensorType([None, n_features]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'X': data_nx})
+        self.assertEqual(expected.shape, got[0].shape)
+        self.assertEqual(expected.dtype, got[0].dtype)
+        for i, (a, b) in enumerate(zip(expected.tolist(),
+                                       got[0].tolist())):
+            if a != b:
+                raise AssertionError(
+                    f"Discrepancies at line {i}: {a} != {b}")
+
+    def test_feature_hasher_two_columns_unicode(self):
+        n_features = 5
+        input_strings = ['z0', 'o11', 'd222', '고리', 'é', 'ô']
+        data = np.array(input_strings).reshape((-1, 2))
+
+        model = FeatureHasher(n_features=n_features,
+                              alternate_sign=True,
+                              dtype=np.float32,
+                              input_type='string')
+        model.fit(data)
+        expected = model.transform(data).todense()
+
+        model_onnx = to_onnx(
+            model, initial_types=[
+                ("X", StringTensorType([None, data.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            final_types=[('Y', FloatTensorType([None, n_features]))])
+        sess = InferenceSession(model_onnx.SerializeToString())
+        got = sess.run(None, {'X': data})
+        self.assertEqual(expected.shape, got[0].shape)
+        self.assertEqual(expected.dtype, got[0].dtype)
+        for i, (a, b) in enumerate(zip(expected.tolist(),
+                                       got[0].tolist())):
+            if a != b:
+                raise AssertionError(
+                    f"Discrepancies at line {i}: {a} != {b}")
+
 
 if __name__ == "__main__":
-    # TestSklearnFeatureHasher().test_feature_hasher()
     unittest.main()
