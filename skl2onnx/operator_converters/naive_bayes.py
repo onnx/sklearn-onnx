@@ -387,7 +387,8 @@ def convert_sklearn_naive_bayes(scope: Scope, operator: Operator,
         'array_feature_extractor_result')
 
     class_type = onnx_proto.TensorProto.STRING
-    if np.issubdtype(classes.dtype, np.floating):
+    if (np.issubdtype(classes.dtype, np.floating) or
+            classes.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(classes.dtype, np.signedinteger):

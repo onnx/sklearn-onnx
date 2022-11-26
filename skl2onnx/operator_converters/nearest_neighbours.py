@@ -455,7 +455,9 @@ def convert_nearest_neighbors_classifier(scope: Scope, operator: Operator,
             "Binary classification not implemented in scikit-learn. "
             "Check this code is not reused for other libraries.")
     classes = get_label_classes(scope, op)
-    if hasattr(classes, 'dtype') and np.issubdtype(classes.dtype, np.floating):
+    if hasattr(classes, 'dtype') and (
+            np.issubdtype(classes.dtype, np.floating) or
+            classes.dtype == np.bool_):
         classes = classes.astype(np.int32)
         is_integer = True
     elif isinstance(classes[0], (int, np.int32, np.int64)):
