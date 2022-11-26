@@ -326,6 +326,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
             model, model_onnx, basename="SklearnMinMaxScalerDouble")
 
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(TARGET_OPSET < 15, reason="old signature for clip")
     @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.9.0"),
                      reason="Operator clip not fully implemented")
     def test_min_max_scaler_clip(self):
@@ -347,6 +348,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
             model, model_onnx, basename="SklearnMinMaxScalerClip")
 
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(TARGET_OPSET < 15, reason="old signature for clip")
     @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.9.0"),
                      reason="Operator clip not fully implemented")
     def test_min_max_scaler_double_clip(self):
