@@ -99,7 +99,8 @@ def _joint_log_likelihood_gaussian(
     """
     features = model.theta_.shape[1]
     jointi = np.log(model.class_prior_)
-    sigma_sum_log = - 0.5 * np.sum(np.log(2. * np.pi * model.sigma_), axis=1)
+    var_sigma = model.var_ if hasattr(model, 'var_') else model.sigma_
+    sigma_sum_log = - 0.5 * np.sum(np.log(2. * np.pi * var_sigma), axis=1)
     theta_name = scope.get_unique_variable_name('theta')
     sigma_name = scope.get_unique_variable_name('sigma')
     sigma_sum_log_name = scope.get_unique_variable_name('sigma_sum_log')
@@ -116,7 +117,7 @@ def _joint_log_likelihood_gaussian(
         'part_log_likelihood')
 
     theta = model.theta_.reshape((1, -1, features))
-    sigma = model.sigma_.reshape((1, -1, features))
+    sigma = var_sigma.reshape((1, -1, features))
 
     container.add_initializer(theta_name, proto_dtype, theta.shape,
                               theta.ravel())
@@ -172,7 +173,11 @@ def _joint_log_likelihood_categorical(
         class_log_prior_name, onnx_proto.TensorProto.FLOAT,
         model.class_log_prior_.shape, model.class_log_prior_)
 
-    for i in range(model.n_features_):
+    n_features = (model.n_features_in_
+                  if hasattr(model, 'n_features_in_')
+                  else model.n_features_)
+
+    for i in range(n_features):
         feature_index_name = scope.get_unique_variable_name('feature_index')
         indices_name = scope.get_unique_variable_name('indices')
         cast_indices_name = scope.get_unique_variable_name('cast_indices')

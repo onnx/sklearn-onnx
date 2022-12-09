@@ -500,9 +500,12 @@ class TestGLMRegressorConverter(unittest.TestCase):
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_bayesian_ridge_return_std_normalize(self):
-        model, X = fit_regression_model(
-            linear_model.BayesianRidge(normalize=True),
-            n_features=2, n_samples=50)
+        try:
+            model = linear_model.BayesianRidge(normalize=True)
+        except TypeError:
+            # normalize not supported anymore
+            return
+        model, X = fit_regression_model(model, n_features=2, n_samples=50)
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -520,9 +523,12 @@ class TestGLMRegressorConverter(unittest.TestCase):
                      reason="output type")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_bayesian_ridge_return_std_normalize_double(self):
-        model, X = fit_regression_model(
-            linear_model.BayesianRidge(normalize=True),
-            n_features=2, n_samples=50)
+        try:
+            model = linear_model.BayesianRidge(normalize=True)
+        except TypeError:
+            # normalize not supported anymore
+            return
+        model, X = fit_regression_model(model, n_features=2, n_samples=50)
         model_onnx = convert_sklearn(
             model, "bayesian ridge",
             [("input", DoubleTensorType([None, X.shape[1]]))],
@@ -631,7 +637,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_ransac_regressor_mlp(self):
         model, X = fit_regression_model(
             linear_model.RANSACRegressor(
-                base_estimator=MLPRegressor(solver='sgd', max_iter=20)))
+                base_estimator=MLPRegressor(solver='sgd', max_iter=20),
+                min_samples=5))
         model_onnx = convert_sklearn(
             model, "ransac regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -645,7 +652,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_ransac_regressor_tree(self):
         model, X = fit_regression_model(
             linear_model.RANSACRegressor(
-                base_estimator=GradientBoostingRegressor()))
+                base_estimator=GradientBoostingRegressor(),
+                min_samples=5))
         model_onnx = convert_sklearn(
             model, "ransac regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],

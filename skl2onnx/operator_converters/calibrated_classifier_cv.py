@@ -293,7 +293,8 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     if dtype != np.float64:
         dtype = np.float32
 
-    base_model = model.base_estimator
+    base_model = (model.estimator if hasattr(model, 'estimator')
+                  else model.base_estimator)
     op_type = sklearn_operator_name_map[type(base_model)]
     n_classes = (len(model.classes_) if hasattr(model, 'classes_') else
                  len(base_model.classes_))

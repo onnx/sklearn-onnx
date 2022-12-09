@@ -16,7 +16,9 @@ def calculate_sklearn_kernel_pca_output_shapes(operator):
         operator, good_input_types=[FloatTensorType, DoubleTensorType],
         good_output_types=[FloatTensorType, DoubleTensorType])
     N = operator.inputs[0].get_first_dimension()
-    C = operator.raw_operator.lambdas_.shape[0]
+    op = operator.raw_operator
+    lbd = op.eigenvalues_ if hasattr(op, 'eigenvalues_') else op.lambdas_
+    C = lbd.shape[0]
     operator.outputs[0].type.shape = [N, C]
 
 

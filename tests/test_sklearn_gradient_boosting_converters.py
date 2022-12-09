@@ -5,6 +5,7 @@ import packaging.version as pv
 import unittest
 import numpy as np
 from pandas import DataFrame
+from sklearn import __version__ as skl_version
 from sklearn.datasets import make_classification
 from sklearn.ensemble import (
     GradientBoostingClassifier,
@@ -25,6 +26,7 @@ from test_utils import (
 
 
 ort_version = ort_version.split('+')[0]
+skl_version = skl_version.split('+')[0]
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
@@ -155,9 +157,12 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingMultiClassClassifierInitZero")
 
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.0"),
+        reason="Loss name was removed.")
     def test_gradient_boosting_regressor_ls_loss(self):
         model, X = fit_regression_model(
-            GradientBoostingRegressor(n_estimators=3, loss="ls"))
+            GradientBoostingRegressor(n_estimators=3, loss="squared_error"))
         model_onnx = convert_sklearn(
             model, "gradient boosting regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -167,9 +172,12 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnGradientBoostingRegressionLsLoss")
 
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.0"),
+        reason="Loss name was removed.")
     def test_gradient_boosting_regressor_lad_loss(self):
         model, X = fit_regression_model(
-            GradientBoostingRegressor(n_estimators=3, loss="lad"))
+            GradientBoostingRegressor(n_estimators=3, loss="absolute_error"))
         model_onnx = convert_sklearn(
             model, "gradient boosting regression",
             [("input", FloatTensorType([None, X.shape[1]]))],

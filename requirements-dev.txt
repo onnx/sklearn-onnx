@@ -1,14 +1,11 @@
-flatbuffers
-nose
-numpy
-protobuf
+# tests
 codecov
+flatbuffers
 pandas
 py-cpuinfo
 pybind11
 pytest
 pytest-cov
-scipy
 wheel
 
 # docs

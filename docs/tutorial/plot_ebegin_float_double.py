@@ -53,10 +53,8 @@ different results is not null. The following graph shows
 the discord areas.
 """
 from mlprodict.sklapi import OnnxPipeline
-from skl2onnx.sklapi import CastTransformer, CastRegressor
+from skl2onnx.sklapi import CastTransformer
 from skl2onnx import to_onnx
-from mlprodict.onnx_conv import to_onnx as to_onnx_extended
-from mlprodict.onnxrt import OnnxInference
 from onnxruntime import InferenceSession
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
@@ -291,4 +289,3 @@ skl4 = model_onx.predict(X32)
 ort4 = sess4.run(None, {'X': X32})[0]
 
 print(diff(skl4, ort4))
-

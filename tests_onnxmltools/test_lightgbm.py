@@ -102,7 +102,8 @@ class WrappedLightGbmBoosterClassifier(ClassifierMixin):
     def __init__(self, wrapped):  # pylint: disable=W0231
         for k in {'boosting_type', '_model_dict', '_model_dict_info',
                   'operator_name', 'classes_', 'booster_', 'n_features_',
-                  'objective_', 'boosting_type', 'n_features_'}:
+                  'objective_', 'boosting_type', 'n_features_in_',
+                  'n_features_out_'}:
             if hasattr(wrapped, k):
                 setattr(self, k, getattr(wrapped, k))
 
