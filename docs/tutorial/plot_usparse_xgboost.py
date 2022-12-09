@@ -149,6 +149,7 @@ def make_pipelines(df_train, y_train, models=None,
         except TypeError as e:
             obs = dict(model=model.__name__, pipe=pipe, error=e,
                        model_onnx=None)
+            pipes.append(obs)
             continue
 
         options = {model: {'zipmap': False}}
