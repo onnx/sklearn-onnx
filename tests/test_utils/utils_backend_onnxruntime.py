@@ -548,7 +548,7 @@ def _compare_expected(expected,
                 "output must be an array for onnx '{0}' not {1}".format(
                     onnx, type(output)))
         if (classes is not None and (
-                expected.dtype == numpy.str or expected.dtype.char == 'U')):
+                expected.dtype == numpy.str_ or expected.dtype.char == 'U')):
             try:
                 output = numpy.array([classes[cl] for cl in output])
             except IndexError as e:

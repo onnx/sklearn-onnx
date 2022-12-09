@@ -157,7 +157,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_regressor_ls_loss(self):
         model, X = fit_regression_model(
-            GradientBoostingRegressor(n_estimators=3, loss="ls"))
+            GradientBoostingRegressor(n_estimators=3, loss="squared_error"))
         model_onnx = convert_sklearn(
             model, "gradient boosting regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -169,7 +169,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_regressor_lad_loss(self):
         model, X = fit_regression_model(
-            GradientBoostingRegressor(n_estimators=3, loss="lad"))
+            GradientBoostingRegressor(n_estimators=3, loss="absolute_error"))
         model_onnx = convert_sklearn(
             model, "gradient boosting regression",
             [("input", FloatTensorType([None, X.shape[1]]))],

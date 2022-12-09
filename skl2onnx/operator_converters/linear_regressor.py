@@ -84,7 +84,7 @@ def convert_sklearn_bayesian_ridge(scope: Scope, operator: Operator,
         return
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
-    if op.normalize:
+    if hasattr(op, 'normalize') and op.normalize:
         # if self.normalize:
         #     X = (X - self.X_offset_) / self.X_scale_
         offset = scope.get_unique_variable_name('offset')

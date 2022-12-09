@@ -24,7 +24,7 @@ class TestSklearnTfidfTransformerConverter(unittest.TestCase):
         ]).reshape((5, 1))
         data = (CountVectorizer(ngram_range=(1, 1)).fit_transform(
             corpus.ravel()).todense())
-        data = data.astype(numpy.float32)
+        data = numpy.array(data.astype(numpy.float32))
 
         for sublinear_tf in (False, True):
             if sublinear_tf:

@@ -54,7 +54,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
     def test_way1_convert_sklearn(self):
 
         X = np.arange(20).reshape(10, 2)
-        tr = KMeans(n_clusters=2)
+        tr = KMeans(n_clusters=2, n_init=10)
         tr.fit(X)
 
         onx = convert_sklearn(
@@ -72,7 +72,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
     def test_way2_to_onnx(self):
 
         X = np.arange(20).reshape(10, 2)
-        tr = KMeans(n_clusters=2)
+        tr = KMeans(n_clusters=2, n_init=10)
         tr.fit(X)
 
         onx = to_onnx(tr, X.astype(np.float32),
@@ -94,7 +94,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         # and avoid a small discrepancy due to double/float
         # conversion to change a label.
         X[:10] += 100
-        tr = KMeans(n_clusters=2)
+        tr = KMeans(n_clusters=2, n_init=10)
         tr.fit(X)
 
         try:
@@ -142,7 +142,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         X = np.arange(20).reshape(10, 2)
         tr = make_pipeline(
             CustomOpTransformer(op_version=TARGET_OPSET),
-            KMeans(n_clusters=2))
+            KMeans(n_clusters=2, n_init=10))
         tr.fit(X)
 
         onx = convert_sklearn(
@@ -162,7 +162,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         X = np.arange(20).reshape(10, 2)
         tr = make_pipeline(
             CustomOpTransformer(op_version=TARGET_OPSET),
-            KMeans(n_clusters=2))
+            KMeans(n_clusters=2, n_init=10))
         tr.fit(X)
 
         onx = to_onnx(tr, X.astype(np.float32), target_opset=TARGET_OPSET)
@@ -181,7 +181,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         X = np.arange(20).reshape(10, 2)
         tr = make_pipeline(
             CustomOpTransformer(op_version=TARGET_OPSET),
-            KMeans(n_clusters=2))
+            KMeans(n_clusters=2, n_init=10))
         tr.fit(X)
 
         try:
@@ -211,7 +211,8 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         X = np.arange(20).reshape(10, 2)
         try:
             tr = wrap_as_onnx_mixin(
-                make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)),
+                make_pipeline(CustomOpTransformer(),
+                              KMeans(n_clusters=2, n_init=10)),
                 target_opset=TARGET_OPSET)
         except KeyError as e:
             assert ("SklearnGaussianProcessRegressor" in str(e) or

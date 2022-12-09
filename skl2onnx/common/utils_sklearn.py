@@ -2,6 +2,7 @@
 
 import copy
 from collections import OrderedDict
+import warnings
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 
@@ -48,7 +49,9 @@ def enumerate_model_names(model, prefix="", short=True):
                     (key.endswith("_") and not key.endswith("__") and
                      not key.startswith('_'))):
                 try:
-                    obj = getattr(model, key)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", FutureWarning)
+                        obj = getattr(model, key)
                 except AttributeError:
                     continue
                 if (hasattr(obj, 'get_params') and
