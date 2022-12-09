@@ -33,7 +33,12 @@ def convert_sklearn_gradient_boosting_classifier(
     if op.init == 'zero':
         base_values = np.zeros(op.loss_.K)
     elif op.init is None:
-        x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
+        if hasattr(op.estimators_[0, 0], 'n_features_in_'):
+            # sklearn >= 1.2
+            x0 = np.zeros((1, op.estimators_[0, 0].n_features_in_))
+        else:
+            # sklearn < 1.2
+            x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
         if hasattr(op, '_raw_predict_init'):
             # sklearn >= 0.21
             base_values = op._raw_predict_init(x0).ravel()
