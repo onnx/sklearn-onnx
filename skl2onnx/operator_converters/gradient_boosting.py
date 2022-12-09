@@ -39,7 +39,7 @@ def convert_sklearn_gradient_boosting_classifier(
         else:
             # sklearn < 1.2
             n_features = op.estimators_[0, 0].n_features_
-        x0 = np.zeros((1, n_features))            
+        x0 = np.zeros((1, n_features))
         if hasattr(op, '_raw_predict_init'):
             # sklearn >= 0.21
             base_values = op._raw_predict_init(x0).ravel()
