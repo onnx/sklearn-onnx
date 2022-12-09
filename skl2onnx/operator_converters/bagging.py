@@ -40,8 +40,10 @@ def _calculate_proba(scope, operator, container, model):
             'proba_%d' % index, operator.inputs[0].type.__class__())
 
         features = model.estimators_features_[index]
-        if (len(features) == model.n_features_ and
-                list(features) == list(range(model.n_features_))):
+        n_features = getattr(model, 'n_features_in_',
+                             getattr(model, 'n_features_'))
+        if (len(features) == n_features and
+                list(features) == list(range(n_features))):
             this_operator.inputs = operator.inputs
         else:
             # subset of features
@@ -181,8 +183,10 @@ def convert_sklearn_bagging_regressor(scope: Scope, operator: Operator,
         this_operator = scope.declare_local_operator(op_type, estimator)
 
         features = bagging_op.estimators_features_[index]
-        if (len(features) == bagging_op.n_features_ and
-                list(features) == list(range(bagging_op.n_features_))):
+        n_features = getattr(bagging_op, 'n_features_in_',
+                             getattr(bagging_op, 'n_features_'))
+        if (len(features) == n_features and
+                list(features) == list(range(n_features))):
             this_operator.inputs = operator.inputs
         else:
             # subset of features

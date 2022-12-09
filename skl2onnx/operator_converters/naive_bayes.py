@@ -172,7 +172,8 @@ def _joint_log_likelihood_categorical(
         class_log_prior_name, onnx_proto.TensorProto.FLOAT,
         model.class_log_prior_.shape, model.class_log_prior_)
 
-    for i in range(model.n_features_):
+    for i in range(getattr(model, 'n_features_in_',
+                           getattr(model, 'n_features_'))):
         feature_index_name = scope.get_unique_variable_name('feature_index')
         indices_name = scope.get_unique_variable_name('indices')
         cast_indices_name = scope.get_unique_variable_name('cast_indices')
