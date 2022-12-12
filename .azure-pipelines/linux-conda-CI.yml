@@ -14,12 +14,12 @@ jobs:
   strategy:
     matrix:
 
-      Py310-OnnxTest-Rt131-Skl12:
+      Py310-Onnx130-Rt131-Skl12:
         do.bench: '0'
         python.version: '3.10'
         numpy.version: '>=1.21.0'
         scipy.version: '>=1.7.0'
-        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.13.0rc1'
+        onnx.version: 'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.13.0rc1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.13.1' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
         sklearn.version: '>=1.2'
