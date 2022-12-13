@@ -46,7 +46,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxMatMul,
     OnnxMul,
     OnnxPow,
-    OnnxReduceMean,
+    OnnxReduceMean_13,
     OnnxShape,
     OnnxSub,
     OnnxTranspose,
@@ -234,7 +234,7 @@ def live_decorrelate_transformer_converter(scope, operator, container):
     # Lines in comment specify the numpy computation
     # the ONNX code implements.
     # mean_ = numpy.mean(X, axis=0, keepdims=True)
-    mean = OnnxReduceMean(X, axes=[0], keepdims=1, op_version=opv)
+    mean = OnnxReduceMean_13(X, axes=[0], keepdims=1, op_version=opv)
 
     # This is trick I often use. The converter automatically
     # chooses a name for every output. In big graph,
@@ -359,7 +359,7 @@ X = data.data
 dec = LiveDecorrelateTransformer()
 dec.fit(X)
 
-onx = to_onnx(dec, X.astype(numpy.float32))
+onx = to_onnx(dec, X.astype(numpy.float32), target_opset=17)
 
 register_operator(OpEig, name='Eig', overwrite=False)
 
