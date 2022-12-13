@@ -286,15 +286,14 @@ def OnnxReduceAnyApi18(cl18, cl13, cl11, cl1, *x, axes=None, keepdims=1,
                op_version=op_version, output_names=output_names)
 
 
-
 def OnnxReduceSumSquareApi18(*x, axes=None, keepdims=1, op_version=None,
                              output_names=None):
     """
     Adds operator ReduceSumSquare with opset>=18 following API from opset 17.
     """
     return OnnxReduceAnyApi18(
-        OnnxReduceSumSquare, OnnxReduceSumSquare_13,
-        OnnxReduceSumSquare_11, OnnxReduceSumSquare_1,
+        OnnxReduceSumSquare, OnnxReduceSumSquare_13,  # noqa
+        OnnxReduceSumSquare_11, OnnxReduceSumSquare_1,  # noqa
         *x, axes=axes, keepdims=keepdims, op_version=op_version,
         output_names=output_names)
 
@@ -305,8 +304,8 @@ def OnnxReduceMeanApi18(*x, axes=None, keepdims=1, op_version=None,
     Adds operator ReduceMean with opset>=18 following API from opset 17.
     """
     return OnnxReduceAnyApi18(
-        OnnxReduceMean, OnnxReduceMean_13,
-        OnnxReduceMean_11, OnnxReduceMean_1,
+        OnnxReduceMean, OnnxReduceMean_13,  # noqa
+        OnnxReduceMean_11, OnnxReduceMean_1,  # noqa
         *x, axes=axes, keepdims=keepdims, op_version=op_version,
         output_names=output_names)
 
