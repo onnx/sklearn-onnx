@@ -20,7 +20,7 @@ from ..algebra.onnx_ops import (
     OnnxNeg,
     OnnxNot,
     OnnxReciprocal,
-    OnnxReduceMean,
+    OnnxReduceMeanApi18,
     OnnxReduceSumApi11,
     OnnxReshapeApi13,
     OnnxShape,
@@ -396,8 +396,8 @@ def convert_nearest_neighbors_regressor(scope: Scope, operator: Operator,
             keepdims = 0
         else:
             keepdims = 0
-        res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
-                             keepdims=keepdims, output_names=out)
+        res = OnnxReduceMeanApi18(reshaped_cast, axes=[axis], op_version=opv,
+                                  keepdims=keepdims, output_names=out)
     res.add_to(scope, container)
 
 
