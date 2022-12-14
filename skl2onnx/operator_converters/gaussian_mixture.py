@@ -14,9 +14,9 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
-    OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquare,
-    OnnxReduceLogSumExp, OnnxExp, OnnxArgMax, OnnxConcat,
-    OnnxReduceSumApi11, OnnxLog, OnnxReduceMax, OnnxEqual, OnnxCast
+    OnnxAdd, OnnxSub, OnnxMul, OnnxGemm, OnnxReduceSumSquareApi18,
+    OnnxReduceLogSumExpApi18, OnnxExp, OnnxArgMax, OnnxConcat,
+    OnnxReduceSumApi11, OnnxLog, OnnxReduceMaxApi18, OnnxEqual, OnnxCast
 )
 from ..proto import onnx_proto
 
@@ -58,7 +58,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                 y2s = OnnxReduceSumApi11(OnnxMul(y, y, op_version=opv),
                                          axes=[1], op_version=opv)
             else:
-                y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
+                y2s = OnnxReduceSumSquareApi18(y, axes=[1], op_version=opv)
             ys.append(y2s)
         log_prob = OnnxConcat(*ys, axis=1, op_version=opv)
 
@@ -82,7 +82,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
                 y2s = OnnxReduceSumApi11(OnnxMul(y, y, op_version=opv),
                                          axes=[1], op_version=opv)
             else:
-                y2s = OnnxReduceSumSquare(y, axes=[1], op_version=opv)
+                y2s = OnnxReduceSumSquareApi18(y, axes=[1], op_version=opv)
             ys.append(y2s)
         log_prob = OnnxConcat(*ys, axis=1, op_version=opv)
 
@@ -124,7 +124,7 @@ def _estimate_log_gaussian_prob(X, means, precisions_chol,
             normX = OnnxReduceSumApi11(OnnxMul(X, X, op_version=opv),
                                        axes=[1], op_version=opv)
         else:
-            normX = OnnxReduceSumSquare(X, axes=[1], op_version=opv)
+            normX = OnnxReduceSumSquareApi18(X, axes=[1], op_version=opv)
         outer = OnnxGemm(
             normX, precisions[np.newaxis, :].astype(dtype),
             zeros.astype(dtype), alpha=1., beta=1., op_version=opv)
@@ -219,7 +219,8 @@ def convert_sklearn_gaussian_mixture(scope: Scope, operator: Operator,
         labels = OnnxArgMax(weighted_log_prob, axis=1,
                             output_names=out[:1], op_version=opv)
     else:
-        mxlabels = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
+        mxlabels = OnnxReduceMaxApi18(
+            weighted_log_prob, axes=[1], op_version=opv)
         zeros = OnnxEqual(
             OnnxSub(weighted_log_prob, mxlabels, op_version=opv),
             np.array([0], dtype=dtype),
@@ -229,8 +230,8 @@ def convert_sklearn_gaussian_mixture(scope: Scope, operator: Operator,
         mulind = OnnxMul(toint,
                          np.arange(n_components).astype(np.int64),
                          op_version=opv)
-        labels = OnnxReduceMax(mulind, axes=[1], output_names=out[:1],
-                               op_version=opv)
+        labels = OnnxReduceMaxApi18(
+            mulind, axes=[1], output_names=out[:1], op_version=opv)
 
     # def _estimate_log_prob_resp():
     # np.exp(log_resp)
@@ -244,7 +245,8 @@ def convert_sklearn_gaussian_mixture(scope: Scope, operator: Operator,
         outnames = None
 
     if combined_reducesum:
-        max_weight = OnnxReduceMax(weighted_log_prob, axes=[1], op_version=opv)
+        max_weight = OnnxReduceMaxApi18(
+            weighted_log_prob, axes=[1], op_version=opv)
         log_prob_norm_demax = OnnxLog(
             OnnxReduceSumApi11(
                 OnnxExp(
@@ -255,7 +257,7 @@ def convert_sklearn_gaussian_mixture(scope: Scope, operator: Operator,
         log_prob_norm = OnnxAdd(log_prob_norm_demax, max_weight,
                                 op_version=opv, output_names=outnames)
     else:
-        log_prob_norm = OnnxReduceLogSumExp(
+        log_prob_norm = OnnxReduceLogSumExpApi18(
             weighted_log_prob, axes=[1], op_version=opv,
             output_names=outnames)
     log_resp = OnnxSub(weighted_log_prob, log_prob_norm, op_version=opv)

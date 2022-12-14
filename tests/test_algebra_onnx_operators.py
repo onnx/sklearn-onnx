@@ -20,7 +20,7 @@ from skl2onnx.common.data_types import (
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshapeApi13,
-    OnnxReduceSumSquare, OnnxGemm,
+    OnnxReduceSumSquareApi18, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul,
     OnnxPad, OnnxBatchNormalization,
@@ -149,7 +149,7 @@ class TestOnnxOperators(unittest.TestCase):
             C2 = row_norms(C, squared=True).astype(dtype)
             C = C.astype(dtype)
 
-            rs = OnnxReduceSumSquare(
+            rs = OnnxReduceSumSquareApi18(
                 X, axes=[1], keepdims=1,
                 op_version=container.target_opset)
 

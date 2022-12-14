@@ -19,7 +19,7 @@ except ImportError:
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
-    OnnxSub, OnnxReduceSumSquare,
+    OnnxSub, OnnxReduceSumSquareApi18,
     OnnxSqueezeApi11, OnnxShape)
 from skl2onnx.algebra.custom_ops import OnnxCDist
 try:
@@ -170,7 +170,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         id_next = OnnxIdentity(
             'next_in', output_names=['next_out'],
             op_version=opv)
-        norm = OnnxReduceSumSquare(
+        norm = OnnxReduceSumSquareApi18(
             diff, output_names=['norm'], axes=[1],
             op_version=opv)
         flat = OnnxSqueezeApi11(

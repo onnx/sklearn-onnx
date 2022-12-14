@@ -73,10 +73,21 @@ def _calculate_proba(scope, operator, container, model):
     apply_concat(scope, proba_list,
                  merged_proba_name, container, axis=0)
     if has_proba:
-        container.add_node('ReduceMean', merged_proba_name,
-                           final_proba_name,
-                           name=scope.get_unique_operator_name('ReduceMean'),
-                           axes=[0], keepdims=0)
+        if container.target_opset >= 18:
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [0])
+            container.add_node(
+                'ReduceMean', [merged_proba_name, axis_name],
+                final_proba_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                keepdims=0)
+        else:
+            container.add_node(
+                'ReduceMean', merged_proba_name,
+                final_proba_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                axes=[0], keepdims=0)
     else:
         n_estimators_name = scope.get_unique_variable_name('n_estimators')
         class_labels_name = scope.get_unique_variable_name('class_labels')
@@ -214,10 +225,21 @@ def convert_sklearn_bagging_regressor(scope: Scope, operator: Operator,
     merged_proba_name = scope.get_unique_variable_name('merged_proba')
     apply_concat(scope, proba_list,
                  merged_proba_name, container, axis=0)
-    container.add_node('ReduceMean', merged_proba_name,
-                       operator.outputs[0].full_name,
-                       name=scope.get_unique_operator_name('ReduceMean'),
-                       axes=[0], keepdims=0)
+    if container.target_opset >= 18:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [0])
+        container.add_node(
+            'ReduceMean', [merged_proba_name, axis_name],
+            operator.outputs[0].full_name,
+            name=scope.get_unique_operator_name('ReduceMean'),
+            keepdims=0)
+    else:
+        container.add_node(
+            'ReduceMean', merged_proba_name,
+            operator.outputs[0].full_name,
+            name=scope.get_unique_operator_name('ReduceMean'),
+            axes=[0], keepdims=0)
 
 
 register_converter('SklearnBaggingClassifier',

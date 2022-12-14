@@ -9,7 +9,7 @@ from ..common.data_types import (
     guess_numpy_type, guess_proto_type)
 from ..algebra.onnx_ops import (
     OnnxCast, OnnxLess, OnnxMul, OnnxAdd, OnnxDiv,
-    OnnxGather, OnnxReduceMean, OnnxMax, OnnxSqueezeApi11)
+    OnnxGather, OnnxReduceMeanApi18, OnnxMax, OnnxSqueezeApi11)
 from .nearest_neighbours import onnx_nearest_neighbors_indices_k
 
 
@@ -69,8 +69,8 @@ def convert_sklearn_local_outlier_factor(
     X_lrd = OnnxDiv(
         np.array([1], dtype=dtype),
         OnnxAdd(
-            OnnxReduceMean(reach_dist_array, axes=[1],
-                           op_version=opv, keepdims=1),
+            OnnxReduceMeanApi18(reach_dist_array, axes=[1],
+                                op_version=opv, keepdims=1),
             np.array([1e-10], dtype=dtype), op_version=opv),
         op_version=opv)
     X_lrd.set_onnx_name_prefix('X_lrd')
@@ -86,7 +86,7 @@ def convert_sklearn_local_outlier_factor(
         output_names_score_samples = [outputs[2]]
     else:
         output_names_score_samples = None
-    score_samples = OnnxReduceMean(
+    score_samples = OnnxReduceMeanApi18(
         lrd_ratios_array, axes=[1], op_version=opv)
     score_samples.set_onnx_name_prefix('score_samples')
     score_samples_neg = OnnxMul(

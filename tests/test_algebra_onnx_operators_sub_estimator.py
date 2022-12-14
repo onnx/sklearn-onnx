@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler
 from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx.algebra.onnx_ops import (
-    OnnxIdentity, OnnxCast, OnnxReduceMax, OnnxGreater,
+    OnnxIdentity, OnnxCast, OnnxReduceMaxApi18, OnnxGreater,
     OnnxExp)
 from skl2onnx import update_registered_converter
 from skl2onnx import to_onnx, get_model_alias
@@ -83,7 +83,7 @@ def validator_classifier_converter(scope, operator, container):
     onnx_op = OnnxSubEstimator(model, input, op_version=opv,
                                options={'zipmap': False})
 
-    rmax = OnnxReduceMax(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
+    rmax = OnnxReduceMaxApi18(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
     great = OnnxGreater(rmax, np.array([op.threshold], dtype=np.float32),
                         op_version=opv)
     valid = OnnxCast(great, to=onnx_proto.TensorProto.INT64,

@@ -7,7 +7,7 @@ from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import (
-    OnnxReduceSumSquare, OnnxGemm, OnnxMatMul,
+    OnnxReduceSumSquareApi18, OnnxGemm, OnnxMatMul,
     OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul)
 
 
@@ -81,7 +81,8 @@ def convert_sklearn_kmeans(scope: Scope, operator: Operator,
 
     C2 = row_norms(C, squared=True).astype(dtype)
     C = C.astype(dtype)
-    rs = OnnxReduceSumSquare(input_name, axes=[1], keepdims=1, op_version=opv)
+    rs = OnnxReduceSumSquareApi18(
+        input_name, axes=[1], keepdims=1, op_version=opv)
 
     if options['gemm']:
         N = X.get_first_dimension()
