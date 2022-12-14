@@ -26,6 +26,7 @@ if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
     from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
     from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
+    from .onnx_ops import ZipMap
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
@@ -162,13 +163,13 @@ if onnx_opset_version() >= 18:
                 if post_transform == 'NONE':
                     pass
                 elif post_transform == 'LOGISTIC':
-                    expit(scores, out=scores)
+                    scores = expit(scores)
                 elif post_transform == 'SOFTMAX':
                     numpy.subtract(scores, scores.max(axis=1)[
                                    :, numpy.newaxis], out=scores)
-                    numpy.exp(scores, out=scores)
-                    numpy.divide(scores, scores.sum(axis=1)[
-                                 :, numpy.newaxis], out=scores)
+                    scores = numpy.exp(scores)
+                    scores = numpy.divide(
+                        scores, scores.sum(axis=1)[:, numpy.newaxis])
                 else:
                     raise NotImplementedError(  # pragma: no cover
                         f"Unknown post_transform: '{post_transform}'.")
@@ -267,7 +268,8 @@ if onnx_opset_version() >= 18:
                                 res[a, i, j] = 1.
                 else:
                     raise RuntimeError(  # pragma: no cover
-                        f"This operator is not implemented for shape {x.shape}.")
+                        f"This operator is not implemented for "
+                        f"shape {x.shape}.")
 
                 if not self.zeros:
                     red = res.sum(axis=len(res.shape) - 1)
@@ -292,6 +294,7 @@ if onnx_opset_version() >= 18:
             ArgMax, ArgMin, Scaler, ArrayFeatureExtractor,
             LinearClassifier, LinearRegressor,
             Normalizer, OneHotEncoder,
+            ZipMap,
         ])
 
 
@@ -647,6 +650,8 @@ def compare_runtime(test,
                 opset_version = imp.version
         if opset_version is None or opset_version < 15:
             return None, None
+        if "support for domain ai.onnx is till opset 17" in str(de):
+            return None, None
         raise de
     except ExpectedAssertionError as expe:
         raise expe
@@ -822,6 +827,8 @@ def _compare_expected(expected,
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
+            if "support for domain ai.onnx is till opset 17." in str(msg):
+                return
             raise OnnxRuntimeAssertionError(
                 f"Unexpected output in model {onnx}\n{msg}")
         tested += 1

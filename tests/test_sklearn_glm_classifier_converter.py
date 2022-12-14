@@ -15,7 +15,8 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import (
+    InferenceSession as _InferenceSession, __version__ as ort_version)
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -30,6 +31,15 @@ from test_utils import (
 
 
 ort_version = ort_version.split('+')[0]
+
+
+def InferenceSession(*args, **kwargs):
+    try:
+        return _InferenceSession(*args, **kwargs)
+    except Exception as e:
+        if "support for domain ai.onnx is till opset 17" in str(e):
+            return None
+        raise e
 
 
 def _sklearn_version():
@@ -634,6 +644,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
+        if sess is None:
+            return
         names = [_.name for _ in sess.get_outputs()]
         self.assertEqual(['output_label', 'scl0', 'scl1', 'scl2'], names)
         xt = X[:10].astype(np.float32)
@@ -655,6 +667,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
+        if sess is None:
+            return
         names = [_.name for _ in sess.get_outputs()]
         self.assertEqual(['output_label', 'i0', 'i1', 'i2'], names)
         xt = X[:10].astype(np.float32)
