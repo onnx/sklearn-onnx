@@ -4,6 +4,7 @@
 Helpers to test runtimes.
 """
 import numpy
+from scipy.special import expit  # noqa
 import pandas
 import onnx as onnx_package
 from onnx.defs import onnx_opset_version
@@ -24,6 +25,7 @@ from .utils_backend import (
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
     from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
+    from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
@@ -47,7 +49,250 @@ if onnx_opset_version() >= 18:
                     res = (numpy.argmin(data, axis=axis, keepdims=keepdims), )
                 return res
 
-        additional_implementations.extend([ArgMin])
+        class ArgMax(_ArgMax):
+            # A bug in the implementation.
+            def _run(self, data, axis=None, keepdims=None,
+                     select_last_index=None):
+                res = _ArgMax._run(
+                    self, data, axis=axis, keepdims=keepdims,
+                    select_last_index=select_last_index)
+                if len(res[0].shape) == 0 and axis is not None:
+                    res = (numpy.argmax(data, axis=axis, keepdims=keepdims), )
+                return res
+
+        class Scaler(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            def _run(self, x, offset=None, scale=None):
+                dx = x - offset
+                return (dx * scale, )
+
+        def _array_feature_extrator(data, indices):
+            """
+            Implementation of operator *ArrayFeatureExtractor*
+            with :epkg:`numpy`.
+            """
+            if len(indices.shape) == 2 and indices.shape[0] == 1:
+                index = indices.ravel().tolist()
+                add = len(index)
+            elif len(indices.shape) == 1:
+                index = indices.tolist()
+                add = len(index)
+            else:
+                add = 1
+                for s in indices.shape:
+                    add *= s
+                index = indices.ravel().tolist()
+            if len(data.shape) == 1:
+                new_shape = (1, add)
+            else:
+                new_shape = list(data.shape[:-1]) + [add]
+            tem = data[..., index]
+            res = tem.reshape(new_shape)
+            return res
+
+        class ArrayFeatureExtractor(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            def _run(self, data, indices):
+                """
+                Runtime for operator *ArrayFeatureExtractor*.
+
+                .. warning::
+                    ONNX specifications may be imprecise in some cases.
+                    When the input data is a vector (one dimension),
+                    the output has still two like a matrix with one row.
+                    The implementation follows what :epkg:`onnxruntime` does in
+                    `array_feature_extractor.cc
+                    <https://github.com/microsoft/onnxruntime/blob/master/
+                    onnxruntime/core/providers/cpu/ml/array_feature_extractor.cc#L84>`_.
+                """
+                res = _array_feature_extrator(data, indices)
+                return (res, )
+
+        class LinearClassifier(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            @staticmethod
+            def _post_process_label_attributes(classlabels_ints,
+                                               classlabels_strings):
+                """
+                Replaces string labels by int64 labels.
+                It creates attributes *_classlabels_ints_string*.
+                """
+                if classlabels_strings is not None:
+                    classlabels_ints_string = classlabels_strings
+                    classlabels_strings = numpy.empty(
+                        shape=(0, ), dtype=numpy.str_)
+                else:
+                    classlabels_ints_string = None
+                return classlabels_ints_string
+
+            @staticmethod
+            def _post_process_predicted_label(
+                    label, scores, classlabels_ints_string):
+                """
+                Replaces int64 predicted labels by the corresponding
+                strings.
+                """
+                if classlabels_ints_string is not None:
+                    label = numpy.array(
+                        [classlabels_ints_string[i] for i in label])
+                return label, scores
+
+            def _run(self, x, classlabels_ints=None, classlabels_strings=None,
+                     coefficients=None, intercepts=None, multi_class=None,
+                     post_transform=None):
+                coefficients = numpy.array(coefficients).astype(x.dtype)
+                intercepts = numpy.array(intercepts).astype(x.dtype)
+                n_class = max(len(classlabels_ints or []),
+                              len(classlabels_strings or []))
+                classlabels_ints_string = (
+                    self._post_process_label_attributes(
+                        classlabels_ints, classlabels_strings))
+                n = coefficients.shape[0] // n_class
+                coefficients = coefficients.reshape(n_class, n).T
+                scores = numpy.dot(x, coefficients)
+                if intercepts is not None:
+                    scores += intercepts
+
+                if post_transform == 'NONE':
+                    pass
+                elif post_transform == 'LOGISTIC':
+                    expit(scores, out=scores)
+                elif post_transform == 'SOFTMAX':
+                    numpy.subtract(scores, scores.max(axis=1)[
+                                   :, numpy.newaxis], out=scores)
+                    numpy.exp(scores, out=scores)
+                    numpy.divide(scores, scores.sum(axis=1)[
+                                 :, numpy.newaxis], out=scores)
+                else:
+                    raise NotImplementedError(  # pragma: no cover
+                        f"Unknown post_transform: '{post_transform}'.")
+
+                if coefficients.shape[1] == 1:
+                    label = numpy.zeros((scores.shape[0],), dtype=x.dtype)
+                    label[scores > 0] = 1
+                else:
+                    label = numpy.argmax(scores, axis=1)
+                return self._post_process_predicted_label(
+                    label, scores, classlabels_ints_string)
+
+        class LinearRegressor(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            def _run(self, x, coefficients=None, intercepts=None, targets=1,
+                     post_transform=None):
+                coefficients = numpy.array(coefficients).astype(x.dtype)
+                intercepts = numpy.array(intercepts).astype(x.dtype)
+                n = coefficients.shape[0] // targets
+                coefficients = coefficients.reshape(targets, n).T
+                score = numpy.dot(x, coefficients)
+                if self.intercepts is not None:
+                    score += intercepts
+                if post_transform == 'NONE':
+                    pass
+                else:
+                    raise NotImplementedError(  # pragma: no cover
+                        f"Unknown post_transform: '{self.post_transform}'.")
+                return (score, )
+
+        class Normalizer(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            @staticmethod
+            def norm_max(x):
+                "max normalization"
+                div = numpy.abs(x).max(axis=1).reshape((x.shape[0], -1))
+                return x / numpy.maximum(div, 1e-30)
+
+            @staticmethod
+            def norm_l1(x):
+                "L1 normalization"
+                div = numpy.abs(x).sum(axis=1).reshape((x.shape[0], -1))
+                return x / numpy.maximum(div, 1e-30)
+
+            @staticmethod
+            def norm_l2(x):
+                "L2 normalization"
+                xn = numpy.square(x).sum(axis=1)
+                numpy.sqrt(xn, out=xn)
+                norm = numpy.maximum(xn.reshape((x.shape[0], -1)), 1e-30)
+                return x / norm
+
+            def _run(self, x, norm=None):
+                if norm == 'MAX':
+                    _norm = Normalizer.norm_max
+                elif self.norm == 'L1':
+                    _norm = Normalizer.norm_l1
+                elif self.norm == 'L2':
+                    _norm = Normalizer.norm_l2
+                else:
+                    raise ValueError(  # pragma: no cover
+                        f"Unexpected value for norm='{norm}'.")
+                return (_norm(x), )
+
+        class OneHotEncoder(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            def _run(self, x, cats_int64s=None, cats_strings=None,
+                     zeros=None):
+                if len(cats_int64s) > 0:
+                    classes_ = {v: i for i, v in enumerate(cats_int64s)}
+                elif len(cats_strings) > 0:
+                    classes_ = {v.decode('utf-8'): i for i,
+                                v in enumerate(cats_strings)}
+                else:
+                    raise RuntimeError("No encoding was defined.")
+
+                shape = x.shape
+                new_shape = shape + (len(classes_), )
+                res = numpy.zeros(new_shape, dtype=numpy.float32)
+                if len(x.shape) == 1:
+                    for i, v in enumerate(x):
+                        j = classes_.get(v, -1)
+                        if j >= 0:
+                            res[i, j] = 1.
+                elif len(x.shape) == 2:
+                    for a, row in enumerate(x):
+                        for i, v in enumerate(row):
+                            j = classes_.get(v, -1)
+                            if j >= 0:
+                                res[a, i, j] = 1.
+                else:
+                    raise RuntimeError(  # pragma: no cover
+                        f"This operator is not implemented for shape {x.shape}.")
+
+                if not self.zeros:
+                    red = res.sum(axis=len(res.shape) - 1)
+                    if numpy.min(red) == 0:
+                        rows = []
+                        for i, val in enumerate(red):
+                            if val == 0:
+                                rows.append(dict(row=i, value=x[i]))
+                                if len(rows) > 5:
+                                    break
+                        raise RuntimeError(  # pragma no cover
+                            "One observation did not have any "
+                            "defined category.\n"
+                            "classes: {}\nfirst rows:\n{}\nres:\n{}\nx:"
+                            "\n{}".format(
+                                self.classes_, "\n".join(str(_) for _ in rows),
+                                res[:5], x[:5]))
+
+                return (res, )
+
+        additional_implementations.extend([
+            ArgMax, ArgMin, Scaler, ArrayFeatureExtractor,
+            LinearClassifier, LinearRegressor,
+            Normalizer, OneHotEncoder,
+        ])
 
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
@@ -578,7 +823,7 @@ def _compare_expected(expected,
             raise msg
         if msg:
             raise OnnxRuntimeAssertionError(
-                "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
+                f"Unexpected output in model {onnx}\n{msg}")
         tested += 1
     else:
         from scipy.sparse import csr_matrix

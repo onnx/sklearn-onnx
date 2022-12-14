@@ -694,6 +694,8 @@ class TestGLMRegressorConverter(unittest.TestCase):
         try:
             sess = InferenceSession(model.SerializeToString())
         except Exception as e:
+            if "support for domain ai.onnx is till opset 17" in str(e):
+                return None
             raise AssertionError(
                 "Unable to load model\n%s" % str(model)) from e
         try:
