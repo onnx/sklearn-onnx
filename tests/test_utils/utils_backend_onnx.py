@@ -7,8 +7,6 @@ import numpy
 import pandas
 import onnx as onnx_package
 from onnx.defs import onnx_opset_version
-from onnx.reference.op_run import OpRun
-from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
 from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs, enumerate_model_node_outputs,
     enumerate_model_initializers)
@@ -24,6 +22,8 @@ from .utils_backend import (
 
 
 if onnx_opset_version() >= 18:
+    from onnx.reference.op_run import OpRun
+    from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
