@@ -5,13 +5,15 @@ Helpers to test runtimes.
 """
 import numpy
 import pandas
-import warnings
 import onnx as onnx_package
+from onnx.defs import onnx_opset_version
+from onnx.reference.op_run import OpRun
+from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
 from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs, enumerate_model_node_outputs,
     enumerate_model_initializers)
 from skl2onnx.algebra.type_helper import _guess_type
-
+from scipy.spatial.distance import cdist
 from .utils_backend import (
     load_data_and_model,
     extract_options,
@@ -21,8 +23,35 @@ from .utils_backend import (
     compare_outputs)
 
 
+if onnx_opset_version() >= 18:
+
+    class CDist(OpRun):
+        op_domain = "com.microsoft"
+
+        def _run(self, x, y, metric="euclidean"):
+            return (cdist(x, y, metric=metric).astype(x.dtype),)
+
+    additional_implementations = [CDist]
+
+    if onnx_opset_version() == 18:
+        # bugs in reference implementation not covered by a backend test
+
+        class ArgMin(_ArgMin):
+            # A bug in the implementation.
+            def _run(self, data, axis=None, keepdims=None,
+                     select_last_index=None):
+                res = _ArgMin._run(
+                    self, data, axis=axis, keepdims=keepdims,
+                    select_last_index=select_last_index)
+                if len(res[0].shape) == 0 and axis is not None:
+                    res = (numpy.argmin(data, axis=axis, keepdims=keepdims), )
+                return res
+
+        additional_implementations.extend([ArgMin])
+
+
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
-    import onnxruntime
+    import onnx.reference
     print("[_display_intermediate_steps] BEGIN")
     if isinstance(model_onnx, str):
         import onnx
@@ -35,19 +64,12 @@ def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
         print('-')
         print("OUTPUT: {} from {}".format(out, node.name))
         step = select_model_inputs_outputs(model_onnx, out)
-        if (disable_optimisation and
-                hasattr(onnxruntime, 'GraphOptimizationLevel')):
-            opts = onnxruntime.SessionOptions()
-            opts.graph_optimization_level = (
-                onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL)
-        else:
-            opts = None
         try:
-            step_sess = onnxruntime.InferenceSession(
-                step.SerializeToString(), sess_options=opts)
+            step_sess = onnx.reference.ReferenceEvaluator(step)
         except Exception as e:
-            raise RuntimeError("Unable to load ONNX model with onnxruntime. "
-                               "Last added node is:\n{}".format(node)) from e
+            raise RuntimeError(
+                "Unable to load ONNX model with ReferenceEvaluator. "
+                "Last added node is:\n{}".format(node)) from e
         for o in step_sess.get_inputs():
             print("IN :", o)
         for o in step_sess.get_outputs():
@@ -56,6 +78,15 @@ def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
             res = step_sess.run(inputs)
             print(res)
     print("[_display_intermediate_steps] END")
+
+
+class InputDef:
+    def __init__(self, name):
+        self.name = name
+
+
+def get_inputs(sess):
+    return [InputDef(n) for n in sess.input_names]
 
 
 def compare_runtime(test,
@@ -110,59 +141,40 @@ def compare_runtime(test,
     elif not isinstance(options, dict):
         raise TypeError("options must be a dictionary.")
 
-    try:
-        import onnxruntime
-    except ImportError:
-        warnings.warn("Unable to import onnxruntime.")
-        return None
+    import onnx.reference
 
     if verbose:
         print("[compare_runtime] InferenceSession('{}')".format(onx))
 
-    if (disable_optimisation and
-            hasattr(onnxruntime, 'GraphOptimizationLevel')):
-        opts = onnxruntime.SessionOptions()
-        opts.graph_optimization_level = (
-            onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL)
-    else:
-        opts = None
-
     try:
-        sess = onnxruntime.InferenceSession(onx, sess_options=opts)
+        sess = onnx.reference.ReferenceEvaluator(
+            onx, new_ops=additional_implementations)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
-        if "CannotLoad" in options:
-            raise ExpectedAssertionError(
-                "Unable to load onnx '{0}' due to\n{1}".format(onx, e))
+        if intermediate_steps:
+            _display_intermediate_steps(onx, None, disable_optimisation)
+        if verbose:
+            import onnx
+            model = onnx.load(onx)
+            smodel = "\nJSON ONNX\n" + str(model)
         else:
-            if intermediate_steps:
-                _display_intermediate_steps(onx, None, disable_optimisation)
-            if verbose:
-                import onnx
-                model = onnx.load(onx)
-                smodel = "\nJSON ONNX\n" + str(model)
-            else:
-                smodel = ""
-            if ("NOT_IMPLEMENTED : Could not find an implementation "
-                    "for the node" in str(e)):
-                # onnxruntime does not implement a specific node yet.
-                raise OnnxRuntimeMissingNewOnnxOperatorException(
-                    "onnxruntime does not implement a new operator "
-                    "'{0}'\n{1}\nONNX\n{2}".format(
-                        onx, e, smodel))
-            if "is not a registered function/op" in str(e):
-                content = onnx_package.load(onx)
-                raise OnnxRuntimeAssertionError(
-                    "Missing op? '{0}'\nONNX\n{1}\n{2}\n---\n{3}".format(
-                        onx, smodel, e, content))
-            msg = "Current official support for domain ai.onnx is till opset"
-            if msg in str(e):
-                # ReferenceEvaluator must work on this one.
-                return None, None
+            smodel = ""
+        if ("NOT_IMPLEMENTED : Could not find an implementation "
+                "for the node" in str(e)):
+            # onnxruntime does not implement a specific node yet.
+            raise OnnxRuntimeMissingNewOnnxOperatorException(
+                "ReferenceEvaluator does not implement a new operator "
+                "'{0}'\n{1}\nONNX\n{2}".format(
+                    onx, e, smodel))
+        if "is not a registered function/op" in str(e):
+            content = onnx_package.load(onx)
             raise OnnxRuntimeAssertionError(
-                "Unable to load onnx '{0}'\nONNX\n{1}\n{2}".format(
-                    onx, smodel, e))
+                "Missing op? '{0}'\nONNX\n{1}\n{2}\n---\n{3}".format(
+                    onx, smodel, e, content))
+        raise OnnxRuntimeAssertionError(
+            "Unable to load onnx '{0}'\nONNX\n{1}\n{2}".format(
+                onx, smodel, e))
 
     input = load["data"]
     DF = options.pop('DF', False)
@@ -176,7 +188,7 @@ def compare_runtime(test,
         if isinstance(input, dict):
             inputs = input
         elif isinstance(input, (list, numpy.ndarray, pandas.DataFrame)):
-            inp = sess.get_inputs()
+            inp = get_inputs(sess)
             if len(inp) == len(input):
                 inputs = {i.name: v for i, v in zip(inp, input)}
             elif len(inp) == 1:
@@ -331,16 +343,8 @@ def compare_runtime(test,
         if verbose:
             print("[compare_runtime] type(inputs)={} len={} names={}".format(
                 type(input), len(inputs), list(sorted(inputs))))
-        if verbose:
-            run_options = onnxruntime.RunOptions()
-            if hasattr(run_options, 'run_log_verbosity_level'):
-                run_options.run_log_verbosity_level = 5
-            else:
-                run_options.log_verbosity_level = 5
-        else:
-            run_options = None
         try:
-            output = sess.run(None, inputs, run_options)
+            output = sess.run(None, inputs)
             def lambda_onnx(): return sess.run(None, inputs)  # noqa
             if verbose:
                 import pprint
@@ -362,7 +366,7 @@ def compare_runtime(test,
                 else:
                     smodel = ""
                 raise OnnxRuntimeAssertionError(
-                    "onnxruntime cannot compute the prediction"
+                    "ReferenceEvaluator cannot compute the prediction"
                     " for '{0}' due to {1}{2}"
                     .format(onx, e, smodel))
         except Exception as e:
@@ -389,6 +393,16 @@ def compare_runtime(test,
                           verbose=verbose,
                           classes=classes,
                           **options)
+    except OnnxRuntimeAssertionError as de:
+        import onnx
+        model = onnx.load(onx)
+        opset_version = None
+        for imp in model.opset_import:
+            if imp.domain == '':
+                opset_version = imp.version
+        if opset_version is None or opset_version < 15:
+            return None, None
+        raise de
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
@@ -399,7 +413,8 @@ def compare_runtime(test,
         else:
             smodel = ""
         raise OnnxRuntimeAssertionError(
-            "Model '{0}' has discrepencies.\n{1}: {2}{3}".format(
+            "Model '{0}' has discrepencies with backend="
+            "'onnx'.\n{1}: {2}{3}".format(
                 onx, type(e), e, smodel))
 
     return output0, lambda_onnx
@@ -413,44 +428,40 @@ def _post_process_output(res):
     if isinstance(res, list):
         if len(res) == 0:
             return res
-        elif len(res) == 1:
+        if len(res) == 1:
             return _post_process_output(res[0])
-        elif isinstance(res[0], numpy.ndarray):
+        if isinstance(res[0], numpy.ndarray):
             return numpy.array(res)
-        elif isinstance(res[0], dict):
+        if isinstance(res[0], dict):
             import pandas
             return pandas.DataFrame(res).values
-        else:
-            ls = [len(r) for r in res]
-            mi = min(ls)
-            if mi != max(ls):
-                raise NotImplementedError(
-                    "Unable to postprocess various number of "
-                    "outputs in [{0}, {1}]"
-                    .format(min(ls), max(ls)))
-            if mi > 1:
-                output = []
-                for i in range(mi):
-                    output.append(_post_process_output([r[i] for r in res]))
-                return output
-            elif isinstance(res[0], list):
-                # list of lists
-                if isinstance(res[0][0], list):
-                    return numpy.array(res)
-                elif len(res[0]) == 1 and isinstance(res[0][0], dict):
-                    return _post_process_output([r[0] for r in res])
-                elif len(res) == 1:
-                    return res
-                else:
-                    if len(res[0]) != 1:
-                        raise NotImplementedError(
-                            "Not conversion implemented for {0}".format(res))
-                    st = [r[0] for r in res]
-                    return numpy.vstack(st)
-            else:
+        ls = [len(r) for r in res]
+        mi = min(ls)
+        if mi != max(ls):
+            raise NotImplementedError(
+                "Unable to postprocess various number of "
+                "outputs in [{0}, {1}]"
+                .format(min(ls), max(ls)))
+        if mi > 1:
+            output = []
+            for i in range(mi):
+                output.append(_post_process_output([r[i] for r in res]))
+            return output
+        if isinstance(res[0], list):
+            # list of lists
+            if isinstance(res[0][0], list):
+                return numpy.array(res)
+            if len(res[0]) == 1 and isinstance(res[0][0], dict):
+                return _post_process_output([r[0] for r in res])
+            if len(res) == 1:
                 return res
-    else:
+            if len(res[0]) != 1:
+                raise NotImplementedError(
+                    "Not conversion implemented for {0}".format(res))
+            st = [r[0] for r in res]
+            return numpy.vstack(st)
         return res
+    return res
 
 
 def _create_column(values, dtype):
@@ -475,8 +486,8 @@ def _compare_expected(expected,
                       **kwargs):
     """
     Compares the expected output against the runtime outputs.
-    This is specific to *onnxruntime* due to variable *sess*
-    of type *onnxruntime.InferenceSession*.
+    This is specific to *ReferenceEvaluator* due to variable *sess*
+    of type *onnx.reference.ReferenceEvaluator*.
     """
     tested = 0
     if isinstance(expected, list):

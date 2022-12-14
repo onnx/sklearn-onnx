@@ -322,6 +322,18 @@ def OnnxReduceMaxApi18(*x, axes=None, keepdims=1, op_version=None,
         output_names=output_names)
 
 
+def OnnxReduceLogSumExpApi18(*x, axes=None, keepdims=1, op_version=None,
+                             output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceLogSumExp, OnnxReduceLogSumExp_13,  # noqa
+        OnnxReduceLogSumExp_11, OnnxReduceLogSumExp_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
 def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
                    output_names=None):
     """

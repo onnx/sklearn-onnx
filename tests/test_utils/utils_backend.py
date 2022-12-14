@@ -4,13 +4,13 @@
 Helpers to test runtimes.
 """
 import os
-import sys
 import glob
 import pickle
 import packaging.version as pv  # noqa
 import numpy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 import onnx
+from onnx.defs import onnx_opset_version
 import onnxruntime
 
 
@@ -50,10 +50,9 @@ def evaluate_condition(backend, condition):
         import onnxruntime  # noqa
         import onnx  # noqa
         return eval(condition)
-    else:
-        raise NotImplementedError(
-            "Not implemented for backend '{0}' and "
-            "condition '{1}'.".format(backend, condition))
+    raise NotImplementedError(
+        "Not implemented for backend '{0}' and "
+        "condition '{1}'.".format(backend, condition))
 
 
 def is_backend_enabled(backend):
@@ -68,9 +67,10 @@ def is_backend_enabled(backend):
             return True
         except ImportError:
             return False
-    else:
-        raise NotImplementedError(
-            "Not implemented for backend '{0}'".format(backend))
+    if backend == 'onnx':
+        return onnx_opset_version() >= 18
+    raise NotImplementedError(
+        "Not implemented for backend '{0}'".format(backend))
 
 
 def compare_backend(backend,
@@ -111,9 +111,6 @@ def compare_backend(backend,
     :return: tuple (output, lambda function to call onnx predictions)
     """
     if backend == "onnxruntime":
-        if sys.version_info[0] == 2:
-            # onnxruntime is not available on Python 2.
-            return
         from .utils_backend_onnxruntime import compare_runtime
         return compare_runtime(test,
                                decimal,
@@ -123,8 +120,17 @@ def compare_backend(backend,
                                intermediate_steps=intermediate_steps,
                                classes=classes,
                                disable_optimisation=disable_optimisation)
-    else:
-        raise ValueError("Does not support backend '{0}'.".format(backend))
+    if backend == "onnx":
+        from .utils_backend_onnx import compare_runtime
+        return compare_runtime(test,
+                               decimal,
+                               options=options,
+                               verbose=verbose,
+                               comparable_outputs=comparable_outputs,
+                               intermediate_steps=intermediate_steps,
+                               classes=classes,
+                               disable_optimisation=disable_optimisation)
+    raise ValueError("Does not support backend '{0}'.".format(backend))
 
 
 def search_converted_models(root=None):

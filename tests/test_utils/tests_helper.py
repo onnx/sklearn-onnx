@@ -148,7 +148,7 @@ def dump_data_and_model(
         basename="model",
         folder=None,
         inputs=None,
-        backend="onnxruntime",
+        backend="onnx;onnxruntime",
         context=None,
         allow_failure=None,
         methods=None,
@@ -241,6 +241,9 @@ def dump_data_and_model(
     if the comparison between the expected outputs and the backend outputs
     fails or it saves the backend output and adds it to the results.
     """
+    if ";" in backend:
+        backend = backend.split(";")
+
     runtime_test = dict(model=model, data=data)
 
     if folder is None:
