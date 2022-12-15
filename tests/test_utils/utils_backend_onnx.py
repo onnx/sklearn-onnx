@@ -24,9 +24,6 @@ from .utils_backend import (
 
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
-    from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
-    from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
-    from .onnx_ops import ZipMap
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
@@ -38,6 +35,10 @@ if onnx_opset_version() >= 18:
 
     if onnx_opset_version() == 18:
         # bugs in reference implementation not covered by a backend test
+        from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
+        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
+        from .reference_implementation_zipmap import ZipMap
+        from .reference_implementation_tree import TreeEnsembleRegressor
 
         class ArgMin(_ArgMin):
             # A bug in the implementation.
@@ -294,7 +295,7 @@ if onnx_opset_version() >= 18:
             ArgMax, ArgMin, Scaler, ArrayFeatureExtractor,
             LinearClassifier, LinearRegressor,
             Normalizer, OneHotEncoder,
-            ZipMap,
+            ZipMap, TreeEnsembleRegressor,
         ])
 
 
@@ -523,7 +524,7 @@ def compare_runtime(test,
                 try:
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
-                        def lambda_onnx(): return sess.run(None, {name: input})  # noqa
+                        lambda_onnx = lambda: sess.run(None, {name: input})  # noqa
                     if verbose:
                         import pprint
                         pprint.pprint(one)
@@ -545,8 +546,7 @@ def compare_runtime(test,
                 if isinstance(
                         vv, (numpy.ndarray, numpy.int64, numpy.float32, str)):
                     return numpy.array([vv])
-                else:
-                    return numpy.array([vv], dtype=numpy.float32)
+                return numpy.array([vv], dtype=numpy.float32)
 
             t = list(inputs.items())[0]
             res = []
