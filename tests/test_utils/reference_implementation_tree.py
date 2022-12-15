@@ -41,6 +41,12 @@ class TreeEnsembleAttributes:
     def add(self, name, value):
         if not name.endswith("_as_tensor"):
             self._names.append(name)
+        if isinstance(value, list):
+            if name in {'base_values', 'class_weights',
+                        'nodes_values', 'nodes_hitrates'}:
+                value = numpy.array(value, dtype=numpy.float32)
+            elif name.endswith("as_tensor"):
+                value = numpy.array(value)
         setattr(self, name, value)
 
     def __str__(self):
@@ -174,7 +180,7 @@ if onnx_opset_version() >= 18:
             if base_values is None:
                 res[:, :] = 0
             else:
-                res[:, :] = base_values.reshape((1, -1))
+                res[:, :] = numpy.array(base_values).reshape((1, -1))
             target_index = {(tid, nid): i for i, (tid, nid) in enumerate(
                 zip(target_treeids, target_nodeids))}
             for i in range(res.shape[0]):
@@ -246,20 +252,25 @@ if onnx_opset_version() >= 18:
             if base_values is None:
                 res[:, :] = 0
             else:
-                res[:, :] = base_values.reshape((1, -1))
-            class_index = {(tid, nid): i for i, (tid, nid) in enumerate(
-                zip(class_treeids, class_nodeids))}
+                res[:, :] = numpy.array(base_values).reshape((1, -1))
+            class_index = {}
+            for i, (tid, nid) in enumerate(zip(class_treeids, class_nodeids)):
+                if (tid, nid) not in class_index:
+                    class_index[tid, nid] = []
+                class_index[tid, nid].append(i)
             for i in range(res.shape[0]):
                 indices = leaves_index[i]
                 t_index = [class_index[nodes_treeids[i],
                                        nodes_nodeids[i]]
                            for i in indices]
-                for it in t_index:
-                    res[i, class_ids[it]] += tr.atts.class_weights[it]
+                for its in t_index:
+                    for it in its:
+                        res[i, class_ids[it]] += tr.atts.class_weights[it]
             binary = len(set(class_ids)) == 1
             if binary:
                 res[:, 1] = res[:, 0]
                 res[:, 0] = 1 - res[:, 1]
+            res /= res.sum(axis=1, keepdims=1)
             labels = numpy.argmax(res, axis=1).astype(numpy.int64)
             if classlabels_int64s is not None:
                 labels = numpy.array(
@@ -275,15 +286,40 @@ if onnx_opset_version() >= 18:
 
     if __name__ == "__main__":
         from onnx.reference import ReferenceEvaluator
+        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
         from sklearn.datasets import (
             make_regression, make_classification)
         from sklearn.ensemble import (
-            RandomForestRegressor, RandomForestClassifier)
+            RandomForestRegressor, RandomForestClassifier,
+            BaggingClassifier)
         from skl2onnx import to_onnx
+        from reference_implementation_afe import ArrayFeatureExtractor
 
-        # classification
-        X, y = make_classification(100, n_features=3,
+        class ArgMax(_ArgMax):
+            def _run(self, data, axis=None, keepdims=None,
+                     select_last_index=None):
+                if select_last_index == 0:  # type: ignore
+                    return _ArgMax._run(
+                        self, data, axis=axis, keepdims=keepdims)
+                raise NotImplementedError("Unused in sklearn-onnx.")
+
+        # classification 1
+        X, y = make_classification(100, n_features=6, n_classes=3,
                                    n_informative=3, n_redundant=0)
+        model = BaggingClassifier().fit(X, y)
+        onx = to_onnx(model, X.astype(numpy.float32),
+                      options={'zipmap': False})
+        tr = ReferenceEvaluator(onx, new_ops=[
+            TreeEnsembleClassifier, ArrayFeatureExtractor,
+            ArgMax])
+        print("-----------------------")
+        print(tr.run(None, {'X': X[:10].astype(numpy.float32)}))
+        print("--")
+        print(model.predict(X[:10].astype(numpy.float32)))
+        print(model.predict_proba(X[:10].astype(numpy.float32)))
+        print("-----------------------")
+
+        # classification 2
         model = RandomForestClassifier(max_depth=3, n_estimators=2).fit(X, y)
         onx = to_onnx(model, X.astype(numpy.float32),
                       options={'zipmap': False})

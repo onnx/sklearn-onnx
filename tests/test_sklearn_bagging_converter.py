@@ -74,7 +74,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         dump_data_and_model(
             X,
             model,
-            model_onnx,
+            model_onnx, verbose=False,
             basename="SklearnBaggingClassifierDefaultBinary")
 
     @ignore_warnings(category=FutureWarning)
@@ -120,7 +120,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_default_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(), 4)
+            BaggingClassifier(), 3)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -129,7 +129,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:10],
             model,
             model_onnx,
             basename="SklearnBaggingClassifierDefaultMulticlass")
@@ -336,4 +336,5 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    # TestSklearnBaggingConverter().test_bagging_classifier_bootstrap_features()
+    unittest.main(verbosity=2)

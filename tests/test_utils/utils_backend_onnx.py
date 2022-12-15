@@ -38,30 +38,25 @@ if onnx_opset_version() >= 18:
         from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
         from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
         from .reference_implementation_zipmap import ZipMap
+        from .reference_implementation_afe import ArrayFeatureExtractor
         from .reference_implementation_tree import (
             TreeEnsembleRegressor, TreeEnsembleClassifier)
 
         class ArgMin(_ArgMin):
-            # A bug in the implementation.
             def _run(self, data, axis=None, keepdims=None,
                      select_last_index=None):
-                res = _ArgMin._run(
-                    self, data, axis=axis, keepdims=keepdims,
-                    select_last_index=select_last_index)
-                if len(res[0].shape) == 0 and axis is not None:
-                    res = (numpy.argmin(data, axis=axis, keepdims=keepdims), )
-                return res
+                if select_last_index == 0:  # type: ignore
+                    return _ArgMin._run(
+                        self, data, axis=axis, keepdims=keepdims)
+                raise NotImplementedError("Unused in sklearn-onnx.")
 
         class ArgMax(_ArgMax):
-            # A bug in the implementation.
             def _run(self, data, axis=None, keepdims=None,
                      select_last_index=None):
-                res = _ArgMax._run(
-                    self, data, axis=axis, keepdims=keepdims,
-                    select_last_index=select_last_index)
-                if len(res[0].shape) == 0 and axis is not None:
-                    res = (numpy.argmax(data, axis=axis, keepdims=keepdims), )
-                return res
+                if select_last_index == 0:  # type: ignore
+                    return _ArgMax._run(
+                        self, data, axis=axis, keepdims=keepdims)
+                raise NotImplementedError("Unused in sklearn-onnx.")
 
         class Scaler(OpRun):
 
@@ -70,50 +65,6 @@ if onnx_opset_version() >= 18:
             def _run(self, x, offset=None, scale=None):
                 dx = x - offset
                 return (dx * scale, )
-
-        def _array_feature_extrator(data, indices):
-            """
-            Implementation of operator *ArrayFeatureExtractor*
-            with :epkg:`numpy`.
-            """
-            if len(indices.shape) == 2 and indices.shape[0] == 1:
-                index = indices.ravel().tolist()
-                add = len(index)
-            elif len(indices.shape) == 1:
-                index = indices.tolist()
-                add = len(index)
-            else:
-                add = 1
-                for s in indices.shape:
-                    add *= s
-                index = indices.ravel().tolist()
-            if len(data.shape) == 1:
-                new_shape = (1, add)
-            else:
-                new_shape = list(data.shape[:-1]) + [add]
-            tem = data[..., index]
-            res = tem.reshape(new_shape)
-            return res
-
-        class ArrayFeatureExtractor(OpRun):
-
-            op_domain = "ai.onnx.ml"
-
-            def _run(self, data, indices):
-                """
-                Runtime for operator *ArrayFeatureExtractor*.
-
-                .. warning::
-                    ONNX specifications may be imprecise in some cases.
-                    When the input data is a vector (one dimension),
-                    the output has still two like a matrix with one row.
-                    The implementation follows what :epkg:`onnxruntime` does in
-                    `array_feature_extractor.cc
-                    <https://github.com/microsoft/onnxruntime/blob/master/
-                    onnxruntime/core/providers/cpu/ml/array_feature_extractor.cc#L84>`_.
-                """
-                res = _array_feature_extrator(data, indices)
-                return (res, )
 
         class LinearClassifier(OpRun):
 
@@ -829,8 +780,6 @@ def _compare_expected(expected,
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
-            if "support for domain ai.onnx is till opset 17." in str(msg):
-                return
             raise OnnxRuntimeAssertionError(
                 f"Unexpected output in model {onnx}\n{msg}")
         tested += 1
