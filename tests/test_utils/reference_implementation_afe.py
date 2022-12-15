@@ -3,7 +3,6 @@
 """
 Helpers to test runtimes.
 """
-from onnx import AttributeProto, numpy_helper  # noqa
 from onnx.defs import onnx_opset_version
 
 
