@@ -269,4 +269,5 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    # TestSklearnAdaBoostModels().test_ada_boost_classifier_lr()
+    unittest.main(verbosity=2)

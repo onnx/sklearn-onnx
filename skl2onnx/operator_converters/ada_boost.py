@@ -279,6 +279,8 @@ def convert_sklearn_ada_boost_classifier(scope: Scope, operator: Operator,
     classes_ind_name = None
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
+    proba_type = operator.inputs[0].type.__class__
+    add_cast = proto_dtype == onnx_proto.TensorProto.INT64
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
     dtype = guess_numpy_type(operator.inputs[0].type)
@@ -289,13 +291,20 @@ def convert_sklearn_ada_boost_classifier(scope: Scope, operator: Operator,
         label_name = scope.declare_local_variable(
             'elab_name_%d' % i_est, Int64TensorType())
         proba_name = scope.declare_local_variable(
-            'eprob_name_%d' % i_est, operator.inputs[0].type.__class__())
+            'eprob_name_%d' % i_est, proba_type())
 
         op_type = sklearn_operator_name_map[type(estimator)]
 
         this_operator = scope.declare_local_operator(op_type, estimator)
         this_operator.inputs = operator.inputs
         this_operator.outputs.extend([label_name, proba_name])
+
+        if add_cast:
+            this_operator = scope.declare_local_operator('SklearnCast')
+            this_operator.inputs.append(proba_name)
+            var_name = scope.declare_local_variable('cast', FloatTensorType())
+            this_operator.outputs.append(var_name)
+            proba_name = var_name
 
         if op.algorithm == 'SAMME.R':
             cur_proba_name = _samme_r_proba(

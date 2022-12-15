@@ -38,7 +38,8 @@ if onnx_opset_version() >= 18:
         from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
         from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
         from .reference_implementation_zipmap import ZipMap
-        from .reference_implementation_tree import TreeEnsembleRegressor
+        from .reference_implementation_tree import (
+            TreeEnsembleRegressor, TreeEnsembleClassifier)
 
         class ArgMin(_ArgMin):
             # A bug in the implementation.
@@ -296,6 +297,7 @@ if onnx_opset_version() >= 18:
             LinearClassifier, LinearRegressor,
             Normalizer, OneHotEncoder,
             ZipMap, TreeEnsembleRegressor,
+            TreeEnsembleClassifier,
         ])
 
 

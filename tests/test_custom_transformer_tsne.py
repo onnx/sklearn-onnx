@@ -4,7 +4,6 @@
 Tests scikit-learn's binarizer converter.
 """
 import unittest
-import packaging.version as pv
 import inspect
 import numpy
 from sklearn.base import BaseEstimator, TransformerMixin, clone
@@ -144,8 +143,6 @@ def predictable_tsne_converter(scope, operator, container):
 
 class TestCustomTransformerTSNE(unittest.TestCase):
 
-    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.3.0"),
-                     reason="TopK is failing.")
     def test_custom_pipeline_scaler(self):
 
         digits = datasets.load_digits(n_class=6)
