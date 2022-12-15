@@ -4,7 +4,7 @@
 Helpers to test runtimes.
 """
 import numpy
-from onnx import AttributeProto, numpy_helper  # noqa
+from onnx import numpy_helper  # noqa
 from onnx.defs import onnx_opset_version
 
 

@@ -71,21 +71,6 @@ if onnx_opset_version() >= 18:
             op_domain = "ai.onnx.ml"
 
             @staticmethod
-            def _post_process_label_attributes(classlabels_ints,
-                                               classlabels_strings):
-                """
-                Replaces string labels by int64 labels.
-                It creates attributes *_classlabels_ints_string*.
-                """
-                if classlabels_strings is not None:
-                    classlabels_ints_string = classlabels_strings
-                    classlabels_strings = numpy.empty(
-                        shape=(0, ), dtype=numpy.str_)
-                else:
-                    classlabels_ints_string = None
-                return classlabels_ints_string
-
-            @staticmethod
             def _post_process_predicted_label(
                     label, scores, classlabels_ints_string):
                 """
@@ -104,9 +89,6 @@ if onnx_opset_version() >= 18:
                 intercepts = numpy.array(intercepts).astype(x.dtype)
                 n_class = max(len(classlabels_ints or []),
                               len(classlabels_strings or []))
-                classlabels_ints_string = (
-                    self._post_process_label_attributes(
-                        classlabels_ints, classlabels_strings))
                 n = coefficients.shape[0] // n_class
                 coefficients = coefficients.reshape(n_class, n).T
                 scores = numpy.dot(x, coefficients)
@@ -128,12 +110,18 @@ if onnx_opset_version() >= 18:
                         f"Unknown post_transform: '{post_transform}'.")
 
                 if coefficients.shape[1] == 1:
-                    label = numpy.zeros((scores.shape[0],), dtype=x.dtype)
-                    label[scores > 0] = 1
+                    labels = numpy.zeros((scores.shape[0],), dtype=x.dtype)
+                    labels[scores > 0] = 1
                 else:
-                    label = numpy.argmax(scores, axis=1)
-                return self._post_process_predicted_label(
-                    label, scores, classlabels_ints_string)
+                    labels = numpy.argmax(scores, axis=1)
+                if classlabels_ints is not None:
+                    labels = numpy.array(
+                        [classlabels_ints[i] for i in labels],
+                        dtype=numpy.int64)
+                elif classlabels_strings is not None:
+                    labels = numpy.array(
+                        [classlabels_strings[i] for i in labels])
+                return (labels, scores)
 
         class LinearRegressor(OpRun):
 
@@ -243,12 +231,24 @@ if onnx_opset_version() >= 18:
 
                 return (res, )
 
+        class Binarizer(OpRun):
+
+            op_domain = "ai.onnx.ml"
+
+            def _run(self, x, threshold=None):
+                X = x.copy()
+                cond = X > self.threshold
+                not_cond = numpy.logical_not(cond)
+                X[cond] = 1
+                X[not_cond] = 0
+                return (X, )
+
         additional_implementations.extend([
             ArgMax, ArgMin, Scaler, ArrayFeatureExtractor,
             LinearClassifier, LinearRegressor,
             Normalizer, OneHotEncoder,
             ZipMap, TreeEnsembleRegressor,
-            TreeEnsembleClassifier,
+            TreeEnsembleClassifier, Binarizer,
         ])
 
 
@@ -508,7 +508,8 @@ def compare_runtime(test,
                 try:
                     one = sess.run(None, iii)
                     if lambda_onnx is None:
-                        def lambda_onnx(): return sess.run(None, iii)  # noqa
+                        lambda_onnx = (  # noqa
+                            lambda sess=sess, iii=iii: sess.run(None, iii))
                     if verbose:
                         import pprint
                         pprint.pprint(one)

@@ -146,6 +146,10 @@ if onnx_opset_version() >= 18:
             self._rev_keys = rev_keys
             self._mat = mat
 
+        def __eq__(self, o):
+            raise NotImplementedError(
+                "__eq__ not available for ArrayZipMapDictionary.")
+
         @property
         def dtype(self):
             return self._mat.dtype
@@ -161,7 +165,7 @@ if onnx_opset_version() >= 18:
             return ZipMapDictionary(self._rev_keys, i, self._mat)
 
         def __setitem__(self, pos, value):
-            raise RuntimeError(
+            raise LookupError(
                 f"Changing an element is not supported (pos=[{pos}]).")
 
         @property
