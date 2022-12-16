@@ -230,9 +230,15 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         x[0, 0] = x[1, 1] = x[2, 2] = 10.
         x[3, 2] = 5.
 
-        sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+        try:
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except NotImplemented as e:
+            if "NOT IMPLEMENTED" in str(e):
+                # Failed to find kernel for FusedMatMul(1).
+                return
+            raise e
         res = sess.run(None, {'X': x.astype(np.float64)})[0]
         m1 = res
         m2 = ker(x)

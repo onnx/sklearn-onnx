@@ -53,8 +53,9 @@ from skl2onnx.common.data_types import (
 )
 from sklearn.multioutput import MultiOutputClassifier
 from test_utils import (
-    dump_data_and_model, fit_classification_model, TARGET_OPSET)
-from onnxruntime import __version__ as ort_version, InferenceSession
+    dump_data_and_model, fit_classification_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
+from onnxruntime import __version__ as ort_version
 
 
 # pv.Version does not work with development versions
@@ -1040,4 +1041,4 @@ if __name__ == "__main__":
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    unittest.main()
+    unittest.main(verbosity=2)

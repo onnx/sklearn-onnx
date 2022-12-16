@@ -46,7 +46,7 @@ if onnx_opset_version() >= 18:
             else:
                 _meth = (FusedMatMul._fmatmul01 if transB
                          else FusedMatMul._fmatmul00)
-            _meth = lambda a, b: _meth(a, b, alpha)
+            _meth = lambda a, b: _meth(a, b, alpha)  # noqa
             # more recent versions of the operator
             if transBatchA is None:
                 transBatchA = 0
@@ -223,12 +223,10 @@ if onnx_opset_version() >= 18:
         op_domain = "ai.onnx.ml"
 
         def _run(self, x, cats_int64s=None, cats_strings=None, zeros=None):
-            if len(cats_int64s) > 0:
+            if cats_int64s is not None and len(cats_int64s) > 0:
                 classes_ = {v: i for i, v in enumerate(cats_int64s)}
             elif len(cats_strings) > 0:
-                classes_ = {
-                    v.decode("utf-8"): i for i, v in enumerate(cats_strings)
-                }
+                classes_ = {v: i for i, v in enumerate(cats_strings)}
             else:
                 raise RuntimeError("No encoding was defined.")
 
@@ -285,3 +283,96 @@ if onnx_opset_version() >= 18:
             X[cond] = 1
             X[not_cond] = 0
             return (X,)
+
+    class FeatureVectorizer(OpRun):
+
+        op_domain = "ai.onnx.ml"
+
+        def _preprocess(self, a, axis):
+            if axis >= len(a.shape):
+                new_shape = a.shape + (1, ) * (axis + 1 - len(a.shape))
+                return a.reshape(new_shape)
+            return a
+
+        def _run(self, *args, inputdimensions=None):
+            args = [self._preprocess(a, axis)
+                    for a, axis in zip(args, inputdimensions)]
+            res = np.concatenate(args, inputdimensions)
+            return (res, )
+
+    class Imputer(OpRun):
+
+        op_domain = "ai.onnx.ml"
+
+        def _run(self, x,
+                 imputed_value_floats=None,
+                 imputed_value_int64s=None,
+                 replaced_value_float=None,
+                 replaced_value_int64=None):
+            if (imputed_value_floats is not None and
+                    len(imputed_value_floats) > 0):
+                values = imputed_value_floats
+                replace = replaced_value_float
+            elif (imputed_value_int64s is not None and
+                    len(imputed_value_int64s) > 0):
+                values = imputed_value_int64s
+                replace = replaced_value_int64
+            else:
+                raise ValueError("Missing are not defined.")
+
+            if isinstance(values, list):
+                values = np.array(values)
+            if len(x.shape) != 2:
+                raise TypeError(
+                    f"x must be a matrix but shape is {x.shape}")
+            if values.shape[0] not in (x.shape[1], 1):
+                raise TypeError(  # pragma: no cover
+                    f"Dimension mismatch {values.shape[0]} != {x.shape[1]}")
+            x = x.copy()
+            if np.isnan(replace):
+                for i in range(0, x.shape[1]):
+                    val = values[min(i, values.shape[0] - 1)]
+                    x[np.isnan(x[:, i]), i] = val
+            else:
+                for i in range(0, x.shape[1]):
+                    val = values[min(i, values.shape[0] - 1)]
+                    x[x[:, i] == replace, i] = val
+
+            return (x, )
+
+    class LabelEncoder(OpRun):
+
+        op_domain = "ai.onnx.ml"
+
+        def _run(self, x,
+                 default_float=None,
+                 default_int64=None,
+                 default_string=None,
+                 keys_floats=None,
+                 keys_int64s=None,
+                 keys_strings=None,
+                 values_floats=None,
+                 values_int64s=None,
+                 values_strings=None):
+            keys = keys_floats or keys_int64s or keys_strings
+            values = values_floats or values_int64s or values_strings
+            classes = {k: v for k, v in zip(keys, values)}
+            if id(values) == id(values_floats):
+                defval = default_float
+                dtype = np.float32
+            elif id(values) == id(values_int64s):
+                defval = default_int64
+                dtype = np.int64
+            else:
+                defval = default_string
+                if not isinstance(defval, str):
+                    defval = ''
+                dtype = np.str_
+            shape = x.shape
+            if len(x.shape) > 1:
+                x = np.squeeze(x)
+            res = []
+            for i in range(0, x.shape[0]):
+                v = classes.get(x[i], defval)
+                res.append(v)
+            return (np.array(res, dtype=dtype).reshape(shape), )

@@ -35,7 +35,7 @@ except ImportError:
             "Update to onnx>=1.13.0.")
 
 
-def InferenceSessionEx(onx, *args, **kwargs):
+def InferenceSessionEx(onx, *args, verbose=0, **kwargs):
     from onnxruntime import InferenceSession
     if "providers" not in kwargs:
         kwargs["providers"] = ["CPUExecutionProvider"]
@@ -43,7 +43,7 @@ def InferenceSessionEx(onx, *args, **kwargs):
         return InferenceSession(onx, *args, **kwargs)
     except Exception as e:
         if "support for domain ai.onnx is till opset 17." in str(e):
-            return ReferenceEvaluatorEx(onx)
+            return ReferenceEvaluatorEx(onx, verbose=verbose)
         raise e
 
 

@@ -3,7 +3,7 @@
 """
 Helpers to test runtimes.
 """
-import numpy
+import numpy as np
 from scipy.special import expit  # noqa
 import pandas
 import onnx as onnx_package
@@ -52,7 +52,10 @@ if onnx_opset_version() >= 18:
             compute_log_sum_exp)
         from .reference_implementation_ml import (
             Binarizer,
+            FeatureVectorizer,
             FusedMatMul,
+            Imputer,
+            LabelEncoder,
             LinearClassifier,
             LinearRegressor,
             Normalizer,
@@ -97,36 +100,47 @@ if onnx_opset_version() >= 18:
                 axes = self.handle_axes(axes)
                 keepdims = keepdims != 0  # type: ignore
                 return (
-                    numpy.sqrt(numpy.sum(numpy.square(data), axis=axes,
-                               keepdims=keepdims)).astype(
+                    np.sqrt(np.sum(np.square(data), axis=axes,
+                            keepdims=keepdims)).astype(
                             dtype=data.dtype))
 
         class ConstantOfShape(OpRun):
             def __init__(self, onnx_node, run_params):  # type: ignore
                 OpRun.__init__(self, onnx_node, run_params)
                 self.cst = (
-                    self.value[0] if isinstance(self.value, numpy.ndarray)
+                    self.value[0] if isinstance(self.value, np.ndarray)
                     else self.value)
                 if isinstance(self.cst, int):
-                    self.cst = numpy.int64(self.cst)
+                    self.cst = np.int64(self.cst)
                 elif isinstance(self.cst, float):
-                    self.cst = numpy.float64(self.cst)
+                    self.cst = np.float64(self.cst)
                 elif self.cst is None:
-                    self.cst = numpy.float32(0)
+                    self.cst = np.float32(0)
                 if not isinstance(
-                    self.cst, (numpy.float32, numpy.float64, numpy.int64,
-                               numpy.int32, numpy.bool_, numpy.float16)):
+                    self.cst, (np.float32, np.float64, np.int64,
+                               np.int32, np.bool_, np.float16)):
                     raise TypeError(f"cst must be a real not {type(self.cst)}")
 
             def _run(self, data, value=None):
                 try:
-                    res = numpy.full(tuple(data), self.cst)
+                    res = np.full(tuple(data), self.cst)
                 except TypeError as e:
                     raise RuntimeError(
                         f"Unable to create a constant of shape {data!r} "
                         f"with value {self.cst!r} "
                         f"(raw value={value!r}).") from e
                 return (res,)
+
+        class Where(OpRun):
+            def _run(self, condition, x, y):  # type: ignore
+                if (x.dtype != y.dtype and
+                    x.dtype not in (np.object_,) and
+                    not (x.dtype.type is np.str_ and
+                         y.dtype.type is np.str_)):
+                    raise RuntimeError(
+                        f"x and y should share the same dtype "
+                        f"{x.dtype} != {y.dtype}")
+                return (np.where(condition, x, y).astype(x.dtype),)
 
         additional_implementations.extend([
             # ai.onnx
@@ -135,10 +149,14 @@ if onnx_opset_version() >= 18:
             ConstantOfShape,
             ReduceL2_18,
             ReduceLogSumExp_1,
+            Where,
             # ai.onnx.ml
             ArrayFeatureExtractor,
             Binarizer,
+            FeatureVectorizer,
             FusedMatMul,
+            Imputer,
+            LabelEncoder,
             LinearClassifier,
             LinearRegressor,
             Normalizer,
@@ -211,16 +229,15 @@ def get_inputs(sess):
 
 
 def compare_runtime(
-    test,
-    decimal=5,
-    options=None,
-    verbose=0,
-    context=None,
-    comparable_outputs=None,
-    intermediate_steps=False,
-    classes=None,
-    disable_optimisation=False,
-):
+        test,
+        decimal=5,
+        options=None,
+        verbose=0,
+        context=None,
+        comparable_outputs=None,
+        intermediate_steps=False,
+        classes=None,
+        disable_optimisation=False):
     """
     The function compares the expected output (computed with
     the model before being converted to ONNX) and the ONNX output
@@ -301,19 +318,19 @@ def compare_runtime(
     if DF:
         inputs = {c: input[c].values for c in input.columns}
         for k in inputs:
-            if inputs[k].dtype == numpy.float64:
-                inputs[k] = inputs[k].astype(numpy.float32)
+            if inputs[k].dtype == np.float64:
+                inputs[k] = inputs[k].astype(np.float32)
             inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
     else:
         if isinstance(input, dict):
             inputs = input
-        elif isinstance(input, (list, numpy.ndarray, pandas.DataFrame)):
+        elif isinstance(input, (list, np.ndarray, pandas.DataFrame)):
             inp = get_inputs(sess)
             if len(inp) == len(input):
                 inputs = {i.name: v for i, v in zip(inp, input)}
             elif len(inp) == 1:
                 inputs = {inp[0].name: input}
-            elif isinstance(input, numpy.ndarray):
+            elif isinstance(input, np.ndarray):
                 shape = sum(
                     i.shape[1] if len(i.shape) == 2
                     else i.shape[0] for i in inp)
@@ -326,7 +343,7 @@ def compare_runtime(
                             len(inp), input.shape, onx))
             elif isinstance(input, list):
                 try:
-                    array_input = numpy.array(input)
+                    array_input = np.array(input)
                 except Exception:
                     raise OnnxRuntimeAssertionError(
                         "Wrong number of inputs onnx {0} != "
@@ -348,7 +365,7 @@ def compare_runtime(
                             len(inp), array_input.shape, onx))
             elif isinstance(input, pandas.DataFrame):
                 try:
-                    array_input = numpy.array(input)
+                    array_input = np.array(input)
                 except Exception:
                     raise OnnxRuntimeAssertionError(
                         "Wrong number of inputs onnx {0} != "
@@ -381,7 +398,7 @@ def compare_runtime(
 
         for k in inputs:
             if isinstance(inputs[k], list):
-                inputs[k] = numpy.array(inputs[k])
+                inputs[k] = np.array(inputs[k])
 
     OneOff = options.pop("OneOff", False)
     OneOffArray = options.pop("OneOffArray", False)
@@ -421,9 +438,9 @@ def compare_runtime(
 
             def to_array(vv):
                 if isinstance(
-                        vv, (numpy.ndarray, numpy.int64, numpy.float32, str)):
-                    return numpy.array([vv])
-                return numpy.array([vv], dtype=numpy.float32)
+                        vv, (np.ndarray, np.int64, np.float32, str)):
+                    return np.array([vv])
+                return np.array([vv], dtype=np.float32)
 
             t = list(inputs.items())[0]
             res = []
@@ -462,7 +479,7 @@ def compare_runtime(
             if OneOffArray:
                 if isinstance(output, list):
                     pass
-                elif not isinstance(output, numpy.ndarray):
+                elif not isinstance(output, np.ndarray):
                     raise TypeError(
                         "output must be an array, not {}".format(type(output)))
                 else:
@@ -568,8 +585,8 @@ def _post_process_output(res):
             return res
         if len(res) == 1:
             return _post_process_output(res[0])
-        if isinstance(res[0], numpy.ndarray):
-            return numpy.array(res)
+        if isinstance(res[0], np.ndarray):
+            return np.array(res)
         if isinstance(res[0], dict):
             import pandas
 
@@ -588,7 +605,7 @@ def _post_process_output(res):
         if isinstance(res[0], list):
             # list of lists
             if isinstance(res[0][0], list):
-                return numpy.array(res)
+                return np.array(res)
             if len(res[0]) == 1 and isinstance(res[0][0], dict):
                 return _post_process_output([r[0] for r in res])
             if len(res) == 1:
@@ -597,7 +614,7 @@ def _post_process_output(res):
                 raise NotImplementedError(
                     "Not conversion implemented for {0}".format(res))
             st = [r[0] for r in res]
-            return numpy.vstack(st)
+            return np.vstack(st)
         return res
     return res
 
@@ -605,11 +622,11 @@ def _post_process_output(res):
 def _create_column(values, dtype):
     "Creates a column from values with dtype"
     if str(dtype) == "tensor(int64)":
-        return numpy.array(values, dtype=numpy.int64)
+        return np.array(values, dtype=np.int64)
     if str(dtype) == "tensor(float)":
-        return numpy.array(values, dtype=numpy.float32)
+        return np.array(values, dtype=np.float32)
     if str(dtype) == "tensor(string)":
-        return numpy.array(values, dtype=numpy.str_)
+        return np.array(values, dtype=np.str_)
     raise OnnxRuntimeAssertionError(
         "Unable to create one column from dtype '{0}'".format(dtype))
 
@@ -630,7 +647,7 @@ def _compare_expected(
     """
     tested = 0
     if isinstance(expected, list):
-        if isinstance(output, (list, numpy.ndarray)):
+        if isinstance(output, (list, np.ndarray)):
             if "Out0" in kwargs:
                 expected = expected[:1]
                 output = output[:1]
@@ -641,7 +658,7 @@ def _compare_expected(
                 del kwargs["Out1"]
             if "Reshape" in kwargs:
                 del kwargs["Reshape"]
-                output = numpy.hstack(output).ravel()
+                output = np.hstack(output).ravel()
                 output = output.reshape(
                     (len(expected), len(output.ravel()) // len(expected)))
             if len(expected) != len(output):
@@ -679,7 +696,7 @@ def _compare_expected(
                     "Unexpected output '{0}' in model '{1}'\n{2}".format(
                         k, onnx, msg))
             tested += 1
-    elif isinstance(expected, numpy.ndarray):
+    elif isinstance(expected, np.ndarray):
         if isinstance(output, list):
             if (expected.shape[0] == len(output) and
                     isinstance(output[0], dict)):
@@ -697,15 +714,15 @@ def _compare_expected(
                     "More than one output when 1 is expected "
                     "for onnx '{0}'\n{1}".format(onnx, ex))
             output = output[-1]
-        if not isinstance(output, numpy.ndarray):
+        if not isinstance(output, np.ndarray):
             raise OnnxRuntimeAssertionError(
                 "output must be an array for onnx '{0}' not {1}".format(
                     onnx, type(output)))
         if (classes is not None and (
-                expected.dtype == numpy.str_ or
+                expected.dtype == np.str_ or
                 expected.dtype.char == "U")):
             try:
-                output = numpy.array([classes[cl] for cl in output])
+                output = np.array([classes[cl] for cl in output])
             except IndexError as e:
                 raise RuntimeError(
                     "Unable to handle\n{}\n{}\n{}".format(
@@ -723,8 +740,8 @@ def _compare_expected(
 
         if isinstance(expected, csr_matrix):
             # DictVectorizer
-            one_array = numpy.array(output)
-            dense = numpy.asarray(expected.todense())
+            one_array = np.array(output)
+            dense = np.asarray(expected.todense())
             msg = compare_outputs(
                 dense, one_array, decimal=decimal, verbose=verbose, **kwargs)
             if msg:

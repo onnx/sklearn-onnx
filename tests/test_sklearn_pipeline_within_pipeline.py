@@ -77,10 +77,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMax",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMax")
 
     def test_pipeline_pca_pipeline_none_lin(self):
         model = Pipeline(
@@ -131,10 +128,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMaxLogReg",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMaxLogReg")
 
     def test_pipeline_pca_pipeline_multinomial(self):
         model = Pipeline(
@@ -195,10 +189,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMaxNB2",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMaxNB2")
 
     def test_pipeline_pca_pipeline_multinomial_none(self):
         model = Pipeline(
@@ -256,10 +247,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMaxNBNone",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMaxNBNone")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -303,10 +291,7 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnPipelineCTPipelineImputerScalerLR",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.2.1')",
-        )
+            basename="SklearnPipelineCTPipelineImputerScalerLR")
 
     @unittest.skipIf(
         ColumnTransformer is None,
