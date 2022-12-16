@@ -178,12 +178,28 @@ if onnx_opset_version() >= 18:
             self.ngram_indexes_ = self.ngram_indexes  # type: ignore
             self.output_size_ = max(self.ngram_indexes_) + 1
             self.weights_ = self.weights  # type: ignore
-            self.pool_int64s_ = self.pool_int64s  # type: ignore
 
+            if len(self.pool_strings) != 0:
+                pool_strings_ = np.array(self.pool_strings)
+                mapping = {}
+                pool_int64s = []
+                for i, w in enumerate(pool_strings_):
+                    if w not in mapping:
+                        # 1-gram are processed first.
+                        mapping[w] = i
+                    pool_int64s.append(mapping[w])
+            else:
+                mapping = None
+                pool_int64s = self.pool_int64s
+                pool_strings_ = None
+
+            self.mapping_ = mapping
+            self.pool_int64s_ = pool_int64s
+            self.pool_strings_ = pool_strings_
             self.int64_map_ = NgramPart(-10)
             self.int64_map_.init()
 
-            total_items = len(self.pool_int64s_ or [])
+            total_items = len(self.pool_int64s_)
             ngram_id = 1  # start with 1, 0 - means no n-gram
             # Load into dictionary only required gram sizes
             ngram_size = 1
@@ -349,16 +365,27 @@ if onnx_opset_version() >= 18:
             pool_strings=None,
             weights=None,
         ):
+            if self.mapping_ is not None:
+                xi = np.empty(X.shape, dtype=np.int64)
+                for i in range(0, X.shape[0]):
+                    for j in range(0, X.shape[1]):
+                        try:
+                            xi[i, j] = self.mapping_[X[i, j]]
+                        except KeyError:
+                            xi[i, j] = -1
+            else:
+                xi = X
+
             # weights should be identical to self.weights as well as
             # pool_strings, pool_int64s, ngram_indexes, ngram_counts, mode.
             # This means none of those attributes can be used in one function.
 
-            total_items = np.prod(X.shape)
+            total_items = np.prod(xi.shape)
 
             num_rows = 0
             B = 0
             C = 0
-            input_dims = X.shape
+            input_dims = xi.shape
             if len(input_dims) == 0:
                 num_rows = 1
                 C = 1
@@ -397,7 +424,7 @@ if onnx_opset_version() >= 18:
 
             def fn(row_num):
                 self.compute_impl(
-                    X,
+                    xi,
                     row_num,
                     C,
                     frequencies,

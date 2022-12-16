@@ -115,4 +115,5 @@ class TestSklearnCountVectorizer(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    TestSklearnCountVectorizer().test_model_count_vectorizer12()
+    unittest.main(verbosity=2)
