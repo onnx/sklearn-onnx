@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: Apache-2.0
-
 """
 Helpers to test runtimes.
 """
@@ -52,4 +51,4 @@ if onnx_opset_version() >= 18:
                 onnxruntime/core/providers/cpu/ml/array_feature_extractor.cc#L84>`_.
             """
             res = _array_feature_extrator(data, indices)
-            return (res, )
+            return (res,)

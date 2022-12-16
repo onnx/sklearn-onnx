@@ -1,5 +1,4 @@
 # SPDX-License-Identifier: Apache-2.0
-
 """
 Helpers to test runtimes.
 """
@@ -15,7 +14,8 @@ if onnx_opset_version() >= 18:
         Custom dictionary class much faster for this runtime,
         it implements a subset of the same methods.
         """
-        __slots__ = ['_rev_keys', '_values', '_mat']
+
+        __slots__ = ["_rev_keys", "_values", "_mat"]
 
         @staticmethod
         def build_rev_keys(keys):
@@ -34,28 +34,25 @@ if onnx_opset_version() >= 18:
             """
             if mat is not None:
                 if not isinstance(mat, numpy.ndarray):
-                    raise TypeError(
-                        f'matrix is expected, got {type(mat)}.')
+                    raise TypeError(f"matrix is expected, got {type(mat)}.")
                 if len(mat.shape) not in (2, 3):
                     raise ValueError(
                         f"matrix must have two or three dimensions "
-                        f"but got {mat.shape}.")
+                        f"but got {mat.shape}."
+                    )
             dict.__init__(self)
             self._rev_keys = rev_keys
             self._values = values
             self._mat = mat
 
         def __eq__(self, o):
-            raise NotImplementedError(
-                "__eq__ not available for ZipMapDictionary.")
+            raise NotImplementedError("__eq__ not available for ZipMapDictionary.")
 
         def __getstate__(self):
             """
             For pickle.
             """
-            return dict(_rev_keys=self._rev_keys,
-                        _values=self._values,
-                        _mat=self._mat)
+            return dict(_rev_keys=self._rev_keys, _values=self._values, _mat=self._mat)
 
         def __setstate__(self, state):
             """
@@ -63,9 +60,9 @@ if onnx_opset_version() >= 18:
             """
             if isinstance(state, tuple):
                 state = state[1]
-            self._rev_keys = state['_rev_keys']
-            self._values = state['_values']
-            self._mat = state['_mat']
+            self._rev_keys = state["_rev_keys"]
+            self._values = state["_values"]
+            self._mat = state["_mat"]
 
         def __getitem__(self, key):
             """
@@ -83,8 +80,7 @@ if onnx_opset_version() >= 18:
             """
             Returns the number of items.
             """
-            return (len(self._values) if self._mat is None
-                    else self._mat.shape[1])
+            return len(self._values) if self._mat is None else self._mat.shape[1]
 
         def __iter__(self):
             for k in self._rev_keys:
@@ -140,19 +136,18 @@ if onnx_opset_version() >= 18:
             """
             if mat is not None:
                 if not isinstance(mat, numpy.ndarray):
-                    raise TypeError(
-                        f'matrix is expected, got {type(mat)}.')
+                    raise TypeError(f"matrix is expected, got {type(mat)}.")
                 if len(mat.shape) not in (2, 3):
                     raise ValueError(
                         f"matrix must have two or three "
-                        f"dimensions but got {mat.shape}.")
+                        f"dimensions but got {mat.shape}."
+                    )
             list.__init__(self)
             self._rev_keys = rev_keys
             self._mat = mat
 
         def __eq__(self, o):
-            raise NotImplementedError(
-                "__eq__ not available for ArrayZipMapDictionary.")
+            raise NotImplementedError("__eq__ not available for ArrayZipMapDictionary.")
 
         @property
         def dtype(self):
@@ -169,8 +164,7 @@ if onnx_opset_version() >= 18:
             return ZipMapDictionary(self._rev_keys, i, self._mat)
 
         def __setitem__(self, pos, value):
-            raise LookupError(
-                f"Changing an element is not supported (pos=[{pos}]).")
+            raise LookupError(f"Changing an element is not supported (pos=[{pos}]).")
 
         @property
         def values(self):
@@ -189,16 +183,18 @@ if onnx_opset_version() >= 18:
             res = [(v, k) for k, v in self._rev_keys.items()]
             if len(res) == 0:
                 if len(self._mat.shape) == 2:
-                    res = [(i, 'c%d' % i) for i in range(self._mat.shape[1])]
+                    res = [(i, "c%d" % i) for i in range(self._mat.shape[1])]
                 elif len(self._mat.shape) == 3:
                     # multiclass
-                    res = [(i, 'c%d' % i)
-                           for i in range(
-                            self._mat.shape[0] * self._mat.shape[2])]
+                    res = [
+                        (i, "c%d" % i)
+                        for i in range(self._mat.shape[0] * self._mat.shape[2])
+                    ]
                 else:
                     raise RuntimeError(
                         "Unable to guess the right number of columns for "
-                        "shapes: {}".format(self._mat.shape))
+                        "shapes: {}".format(self._mat.shape)
+                    )
             else:
                 res.sort()
             return [_[1] for _ in res]
@@ -216,12 +212,10 @@ if onnx_opset_version() >= 18:
 
         def _run(self, x, classlabels_int64s=None, classlabels_strings=None):
             if classlabels_int64s:
-                rev_keys_ = ZipMapDictionary.build_rev_keys(
-                    classlabels_int64s)
+                rev_keys_ = ZipMapDictionary.build_rev_keys(classlabels_int64s)
             elif classlabels_strings:
-                rev_keys_ = ZipMapDictionary.build_rev_keys(
-                    classlabels_strings)
+                rev_keys_ = ZipMapDictionary.build_rev_keys(classlabels_strings)
             else:
                 rev_keys_ = {}
             res = ArrayZipMapDictionary(rev_keys_, x)
-            return (res, )
+            return (res,)

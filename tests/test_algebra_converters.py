@@ -37,7 +37,7 @@ class TestAlgebraConverters(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         X = numpy.array([[0, 1], [-1, -2]])
         try:
             Y = sess.run(None, {'X': X.astype(numpy.float32)})[0]

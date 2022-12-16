@@ -523,7 +523,7 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
 
 
 if __name__ == "__main__":

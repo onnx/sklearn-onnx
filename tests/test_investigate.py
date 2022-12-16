@@ -67,7 +67,7 @@ class TestInvestigate(unittest.TestCase):
                 except Exception as xe:
                     if "for domain ai.onnx is till opset 17." in str(xe):
                         continue
-                    raise e
+                    raise xe
                 onnx_outputs = sess.run(None, {'input': data})
                 onnx_output = onnx_outputs[0]
                 skl_outputs = step['model']._debug.outputs['transform']
@@ -120,7 +120,7 @@ class TestInvestigate(unittest.TestCase):
             except Exception as xe:
                 if "for domain ai.onnx is till opset 17." in str(xe):
                     continue
-                raise e
+                raise xe
             onnx_outputs = sess.run(None, {'input': data_in})
             onnx_output = onnx_outputs[0]
             skl_outputs = step_model._debug.outputs['transform']

@@ -12,7 +12,8 @@ from .tests_helper import (  # noqa
     dump_one_class_classification,
     dump_binary_classification,
     dump_multilabel_classification,
-    dump_multiple_classification)
+    dump_multiple_classification,
+)
 from .tests_helper import (  # noqa
     dump_multiple_regression,
     dump_single_regression,
@@ -23,7 +24,7 @@ from .tests_helper import (  # noqa
     fit_clustering_model,
     fit_regression_model,
     binary_array_to_string,
-    path_to_leaf
+    path_to_leaf,
 )
 
 
@@ -33,7 +34,7 @@ def create_tensor(N, C, H=None, W=None):
     elif H is not None and W is not None:
         return np.random.rand(N, C, H, W).astype(np.float32, copy=False)
     else:
-        raise ValueError('This function only produce 2-D or 4-D tensor.')
+        raise ValueError("This function only produce 2-D or 4-D tensor.")
 
 
 def _get_ir_version(opv):
@@ -58,7 +59,7 @@ def max_onnxruntime_opset():
     <https://github.com/microsoft/onnxruntime/blob/
     master/docs/Versioning.md>`_.
     """
-    vi = pv.Version(ort_version.split('+')[0])
+    vi = pv.Version(ort_version.split("+")[0])
     if vi >= pv.Version("1.14.0"):
         return 18
     if vi >= pv.Version("1.12.0"):
@@ -86,10 +87,10 @@ def max_onnxruntime_opset():
 
 TARGET_OPSET = int(
     os.environ.get(
-        'TEST_TARGET_OPSET',
-        min(max_onnxruntime_opset(),
-            min(max_opset,
-                onnx.defs.onnx_opset_version()))))
+        "TEST_TARGET_OPSET",
+        min(max_onnxruntime_opset(), min(max_opset, onnx.defs.onnx_opset_version())),
+    )
+)
 
 value_ml = 3
 if TARGET_OPSET <= 16:
@@ -99,10 +100,11 @@ if TARGET_OPSET <= 16:
 if TARGET_OPSET <= 11:
     value_ml = 1
 
-TARGET_OPSET_ML = int(os.environ.get('TEST_TARGET_OPSET_ML', value_ml))
+TARGET_OPSET_ML = int(os.environ.get("TEST_TARGET_OPSET_ML", value_ml))
 
 TARGET_IR = int(
     os.environ.get(
-        'TEST_TARGET_IR',
-        min(OPSET_TO_IR_VERSION[TARGET_OPSET],
-            _get_ir_version(TARGET_OPSET))))
+        "TEST_TARGET_IR",
+        min(OPSET_TO_IR_VERSION[TARGET_OPSET], _get_ir_version(TARGET_OPSET)),
+    )
+)

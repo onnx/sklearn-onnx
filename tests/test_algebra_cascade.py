@@ -184,7 +184,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 except Exception as xe:
                     if "for domain ai.onnx is till opset 17." in str(xe):
                         continue
-                    raise e
+                    raise xe
                 res_out = ort.run(None, {'X': X.astype(np.float32)})
                 assert len(res_out) == 1
                 res = res_out[0]
@@ -208,7 +208,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 except Exception as xe:
                     if "for domain ai.onnx is till opset 17." in str(xe):
                         continue
-                    raise e
+                    raise xe
                 res_out = ort.run(None, {'X': X.astype(np.float32)})
                 assert len(res_out) == 1
                 res = res_out[0]

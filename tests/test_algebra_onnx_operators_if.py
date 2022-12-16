@@ -76,7 +76,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'cond': cond})
         assert_almost_equal(expected, res[0])
 
@@ -131,7 +131,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'cond': cond, 'Y': y})
         assert_almost_equal(expected, res[0])
 
@@ -173,7 +173,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x2, res[0])
 
@@ -218,7 +218,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 
@@ -262,7 +262,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 
@@ -305,7 +305,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 
@@ -360,7 +360,7 @@ class TestOnnxOperatorsIf(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 

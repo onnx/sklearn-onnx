@@ -338,7 +338,7 @@ class TestOnnxOperators(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(X.reshape((1, -1)), got)
         inits = [row for row in str(model_def).split('\n')
@@ -387,7 +387,7 @@ class TestOnnxOperators(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
@@ -434,7 +434,7 @@ class TestOnnxOperators(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 

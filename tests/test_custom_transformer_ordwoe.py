@@ -99,7 +99,7 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 
@@ -129,7 +129,7 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 

@@ -158,7 +158,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'initial': initial, 'x': x})
 
         y = np.array([9, 12]).astype(np.float32).reshape((2,))
@@ -199,7 +199,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'next_in': x, 'next': x[:1]})
         assert_almost_equal(x, res[0])
         exp = np.array([0., 18., 20.], dtype=np.float32)
@@ -227,7 +227,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'x': x})
 
         exp = squareform(pdist(x, metric="sqeuclidean"))
@@ -261,7 +261,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
@@ -274,7 +274,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
@@ -323,7 +323,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
@@ -355,7 +355,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -385,7 +385,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
@@ -420,7 +420,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="minkowski")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -452,7 +452,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
@@ -515,7 +515,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)

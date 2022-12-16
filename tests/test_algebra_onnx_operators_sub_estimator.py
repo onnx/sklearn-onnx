@@ -279,7 +279,7 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         res = sess.run(None, {'X': X32})
         assert_almost_equal(model.predict(X32), res[0])
         assert_almost_equal(model.predict_proba(X32), res[1], decimal=4)

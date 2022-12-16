@@ -176,7 +176,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         X = numpy.arange(6)
         exp = [numpy.array([0, 1, 2]), numpy.array([3, 4, 5])]
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})

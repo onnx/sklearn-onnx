@@ -38,7 +38,7 @@ class TestShapes(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
         shape1 = sess.get_inputs()[0].shape
@@ -71,7 +71,7 @@ class TestShapes(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
         shape1 = sess.get_inputs()[0].shape

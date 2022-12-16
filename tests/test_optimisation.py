@@ -69,7 +69,7 @@ class TestOptimisation(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e
+            raise xe
 
         optimized_model = onnx_remove_node_identity(m)
         sess_opt = InferenceSession(

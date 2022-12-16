@@ -31,10 +31,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnCountVectorizer11-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.3.0')",
-        )
+            basename="SklearnCountVectorizer11-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer22(self):
@@ -54,10 +51,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnCountVectorizer22-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.3.0')",
-        )
+            basename="SklearnCountVectorizer22-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer12(self):
@@ -77,10 +71,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnCountVectorizer12-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.3.0')",
-        )
+            basename="SklearnCountVectorizer12-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer13(self):
@@ -100,10 +91,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnCountVectorizer13-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.3.0')",
-        )
+            basename="SklearnCountVectorizer13-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_binary(self):
@@ -123,10 +111,7 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnCountVectorizerBinary-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__)"
-                          " <= pv.Version('0.3.0')",
-        )
+            basename="SklearnCountVectorizerBinary-OneOff-SklCol")
 
 
 if __name__ == "__main__":

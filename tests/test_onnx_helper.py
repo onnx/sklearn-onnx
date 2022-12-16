@@ -63,7 +63,7 @@ class TestOnnxHelper(unittest.TestCase):
         except Exception as xe:
             if "for domain ai.onnx is till opset 17." in str(xe):
                 return
-            raise e        
+            raise xe        
         tr2 = self.get_model(new_model)
         X = X.astype(numpy.float32)
         X1 = tr1(X)

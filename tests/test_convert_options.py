@@ -128,7 +128,7 @@ class TestConvertOptions(unittest.TestCase):
                     except Exception as xe:
                         if "for domain ai.onnx is till opset 17." in str(xe):
                             continue
-                        raise e
+                        raise xe
                     got = sess.run(None, {'X': X_test})
                     if addcl:
                         TestConvertOptions.almost_equal_class_labels(
@@ -256,7 +256,7 @@ class TestConvertOptions(unittest.TestCase):
                     except Exception as xe:
                         if "for domain ai.onnx is till opset 17." in str(xe):
                             return
-                        raise e
+                        raise xe
                     got = sess.run(None, {'X': X_test})
                     TestConvertOptions.almost_equal_multi(
                         expected_label, expected_proba, *got, zipmap=zipmap)
@@ -328,7 +328,7 @@ class TestConvertOptions(unittest.TestCase):
                 except Exception as xe:
                     if "for domain ai.onnx is till opset 17." in str(xe):
                         continue
-                    raise e
+                    raise xe
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -393,7 +393,7 @@ class TestConvertOptions(unittest.TestCase):
                 except Exception as xe:
                     if "for domain ai.onnx is till opset 17." in str(xe):
                         return
-                    raise e
+                    raise xe
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
