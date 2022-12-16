@@ -10,7 +10,7 @@ import functools
 import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from pandas import DataFrame
 try:
     from sklearn.utils._testing import ignore_warnings
@@ -53,7 +53,8 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
-    TARGET_OPSET)
+    TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 def dont_test_radius():

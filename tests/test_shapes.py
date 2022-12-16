@@ -40,10 +40,10 @@ class TestShapes(unittest.TestCase):
         ishape = onnx.shape_inference.infer_shapes(onx)
         dims = ishape.graph.output[0].type.tensor_type.shape.dim
         oshape = [d.dim_value for d in dims]
-        assert shape1 == [None, 4]
-        assert shape2 == [None, 1]
-        assert oshape == [0, 1]
-        assert pred_onx[0].shape[1] == shape2[1]
+        self.assertEqual(shape1, [None, 4])
+        self.assertEqual(shape2, [None, 1])
+        self.assertEqual(oshape, [0, 1])
+        self.assertEqual(pred_onx[0].shape[1], shape2[1])
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     @unittest.skipIf(pv.Version(ort_version) <= pv.Version("1.0.0"),
@@ -65,10 +65,10 @@ class TestShapes(unittest.TestCase):
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
         shape1 = sess.get_inputs()[0].shape
         shape2 = sess.get_outputs()[0].shape
-        assert shape1 == [None, 4]
-        assert shape2 in ([None, 1], [1], [None])
+        self.assertEqual(shape1, [None, 4])
+        self.assertIn(shape2, ([None, 1], [1], [None]))
         if len(pred_onx[0].shape) > 1:
-            assert pred_onx[0].shape[1] == shape2[1]
+            self.assertEqual(pred_onx[0].shape[1], shape2[1])
 
         try:
             ishape = onnx.shape_inference.infer_shapes(onx)

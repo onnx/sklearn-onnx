@@ -188,14 +188,17 @@ if onnx_opset_version() >= 18:
                     new_ops = new_ops + additional_implementations
                 super().__init__(*args, new_ops=new_ops, **kwargs)
 
+            def get_inputs(self):
+                res = [InputDef(n, list(get_shape(t, True)), get_type(t))
+                       for n, t in zip(self.input_names,
+                                       self.input_types)]
+                return res
+
             def get_outputs(self):
-
-                class T:
-
-                    def __init__(self, name):
-                        self.name = name
-
-                return [T(n) for n in self.output_names]
+                res = [InputDef(n, list(get_shape(t, True)), get_type(t))
+                       for n, t in zip(self.output_names,
+                                       self.output_types)]
+                return res
 
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
@@ -238,10 +241,12 @@ class InputDef:
         self.type = dtype
 
 
-def get_shape(t):
+def get_shape(t, use_none=False):
     if t.tensor_type:
         dims = [getattr(d, 'dim_value', None)
                 for d in t.tensor_type.shape.dim]
+        if use_none:
+            return tuple(r if r != 0 else None for r in dims)
         return tuple(dims)
     return None
 
