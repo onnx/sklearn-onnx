@@ -127,6 +127,8 @@ def compare_runtime(test,
     else:
         opts = None
 
+    if isinstance(onx, onnx_package.ModelProto):
+        onx = onx.SerializeToString()
     try:
         sess = onnxruntime.InferenceSession(onx, sess_options=opts)
     except ExpectedAssertionError as expe:

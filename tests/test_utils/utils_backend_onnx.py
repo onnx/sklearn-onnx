@@ -597,8 +597,11 @@ def compare_runtime(test,
                           classes=classes,
                           **options)
     except OnnxRuntimeAssertionError as de:
-        import onnx
-        model = onnx.load(onx)
+        if isinstance(onx, str):
+            import onnx
+            model = onnx.load(onx)
+        else:
+            model = onx
         opset_version = None
         for imp in model.opset_import:
             if imp.domain == '':

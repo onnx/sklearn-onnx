@@ -405,6 +405,8 @@ def dump_data_and_model(
             print("[dump_data_and_model] created '{}'.".format(dest))
 
         runtime_test["onnx"] = dest
+    else:
+        runtime_test["onnx"] = onnx
 
     # backend
     if backend is not None:
