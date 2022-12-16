@@ -138,8 +138,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
 
     @unittest.skipIf(
         KBinsDiscretizer is None,
-        reason="KBinsDiscretizer available since 0.20",
-    )
+        reason="KBinsDiscretizer available since 0.20")
     def test_model_k_bins_discretiser_onehot_dense_kmeans(self):
         X = np.array([
             [1.2, 3.2, 1.3, -5.6], [4.3, -3.2, 5.7, 1.0],
@@ -159,7 +158,7 @@ class TestSklearnKBinsDiscretiser(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
+            X.astype(np.float32), model, model_onnx, verbose=0,
             basename="SklearnKBinsDiscretiserOneHotDenseKMeans")
 
     @unittest.skipIf(

@@ -294,7 +294,7 @@ def get_inputs(sess):
 def compare_runtime(test,
                     decimal=5,
                     options=None,
-                    verbose=False,
+                    verbose=0,
                     context=None,
                     comparable_outputs=None,
                     intermediate_steps=False,
@@ -338,8 +338,6 @@ def compare_runtime(test,
             options = extract_options(onx)
         else:
             options = {}
-    elif options is None:
-        options = {}
     elif not isinstance(options, dict):
         raise TypeError("options must be a dictionary.")
 
@@ -350,7 +348,8 @@ def compare_runtime(test,
 
     try:
         sess = onnx.reference.ReferenceEvaluator(
-            onx, new_ops=additional_implementations)
+            onx, new_ops=additional_implementations,
+            verbose=verbose)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
@@ -477,7 +476,9 @@ def compare_runtime(test,
                 try:
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
-                        lambda_onnx = lambda: sess.run(None, {name: input})  # noqa
+                        lambda_onnx = (  # noqa
+                            lambda sess=sess, input=input:
+                                sess.run(None, {name: input}))
                     if verbose:
                         import pprint
                         pprint.pprint(one)

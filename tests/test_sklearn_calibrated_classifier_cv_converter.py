@@ -341,10 +341,17 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                     target_opset=TARGET_OPSET,
                     options={id(model): {'zipmap': False}})
 
-                sess = InferenceSession(model_onnx.SerializeToString())
-                res = sess.run(None, {'input': X[:5].astype(np.float32)})
-                assert_almost_equal(model.predict_proba(X[:5]), res[1])
-                assert_almost_equal(model.predict(X[:5]), res[0])
+                try:
+                    sess = InferenceSession(model_onnx.SerializeToString())
+                except Exception as e:
+                    if "support for domain ai.onnx is till opset 17." in str(e):
+                        sess = None
+                    else:
+                        raise e
+                if sess is not None:
+                    res = sess.run(None, {'input': X[:5].astype(np.float32)})
+                    assert_almost_equal(model.predict_proba(X[:5]), res[1])
+                    assert_almost_equal(model.predict(X[:5]), res[0])
 
                 dump_data_and_model(
                     X.astype(np.float32)[:10], model, model_onnx,

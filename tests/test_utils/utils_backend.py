@@ -48,7 +48,6 @@ def evaluate_condition(backend, condition):
     """
     if backend == "onnxruntime":
         import onnxruntime  # noqa
-        import onnx  # noqa
         return eval(condition)
     raise NotImplementedError(
         "Not implemented for backend '{0}' and "

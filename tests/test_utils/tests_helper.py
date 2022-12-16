@@ -42,6 +42,9 @@ def _has_decision_function(model):
     return hasattr(model, "decision_function")
 
 
+disable_dump = os.environ.get('AZURE_HTTP_USER_AGENT', 'undefined') != 'undefined'
+        
+
 def _has_transform_model(model):
     if hasattr(model, "voting"):
         return False
@@ -157,7 +160,7 @@ def dump_data_and_model(
         comparable_outputs=None,
         intermediate_steps=False,
         fail_evenif_notimplemented=False,
-        verbose=False,
+        verbose=0,
         classes=None,
         disable_optimisation=False):
     """
@@ -241,6 +244,8 @@ def dump_data_and_model(
     if the comparison between the expected outputs and the backend outputs
     fails or it saves the backend output and adds it to the results.
     """
+    if disable_dump:
+        dump_error_log = None
     if ";" in backend:
         backend = backend.split(";")
 
@@ -356,30 +361,31 @@ def dump_data_and_model(
     runtime_test["expected"] = prediction
 
     names = []
-    dest = os.path.join(folder, basename + ".expected.pkl")
-    names.append(dest)
-    with open(dest, "wb") as f:
-        pickle.dump(prediction, f)
+    if not disable_dump:
+        dest = os.path.join(folder, basename + ".expected.pkl")
+        names.append(dest)
+        with open(dest, "wb") as f:
+            pickle.dump(prediction, f)
 
-    dest = os.path.join(folder, basename + ".data.pkl")
-    names.append(dest)
-    with open(dest, "wb") as f:
-        pickle.dump(data, f)
+        dest = os.path.join(folder, basename + ".data.pkl")
+        names.append(dest)
+        with open(dest, "wb") as f:
+            pickle.dump(data, f)
 
-    dest = os.path.join(folder, basename + ".model.pkl")
-    names.append(dest)
-    load_pickle = True
-    with open(dest, "wb") as f:
-        try:
-            pickle.dump(model, f)
-        except AttributeError as e:
-            print("[dump_data_and_model] cannot pickle model '{}'"
-                  " due to {}.".format(dest, e))
-            load_pickle = False
-    if load_pickle and os.path.exists(dest):
-        # Test unpickle works.
-        with open(dest, "rb") as f:
-            pickle.load(f)
+        dest = os.path.join(folder, basename + ".model.pkl")
+        names.append(dest)
+        load_pickle = True
+        with open(dest, "wb") as f:
+            try:
+                pickle.dump(model, f)
+            except AttributeError as e:
+                print("[dump_data_and_model] cannot pickle model '{}'"
+                      " due to {}.".format(dest, e))
+                load_pickle = False
+        if load_pickle and os.path.exists(dest):
+            # Test unpickle works.
+            with open(dest, "rb") as f:
+                pickle.load(f)
 
     if dump_error_log:
         error_dump = os.path.join(folder, basename + ".err")
@@ -390,14 +396,15 @@ def dump_data_and_model(
             inputs = [("input", FloatTensorType(list(array.shape)))]
         onnx, _ = convert_model(model, basename, inputs)
 
-    dest = os.path.join(folder, basename + ".model.onnx")
-    names.append(dest)
-    with open(dest, "wb") as f:
-        f.write(onnx.SerializeToString())
-    if verbose:
-        print("[dump_data_and_model] created '{}'.".format(dest))
+    if not disable_dump:
+        dest = os.path.join(folder, basename + ".model.onnx")
+        names.append(dest)
+        with open(dest, "wb") as f:
+            f.write(onnx.SerializeToString())
+        if verbose:
+            print("[dump_data_and_model] created '{}'.".format(dest))
 
-    runtime_test["onnx"] = dest
+        runtime_test["onnx"] = dest
 
     # backend
     if backend is not None:
@@ -449,22 +456,23 @@ def dump_data_and_model(
                     raise e
 
             if output is not None:
-                dest = os.path.join(folder,
-                                    basename + ".backend.{0}.pkl".format(b))
-                names.append(dest)
-                with open(dest, "wb") as f:
-                    pickle.dump(output, f)
-                if (benchmark and lambda_onnx is not None
-                        and lambda_original is not None):
-                    # run a benchmark
-                    obs = compute_benchmark({
-                        "onnxrt": lambda_onnx,
-                        "original": lambda_original
-                    })
-                    df = pandas.DataFrame(obs)
-                    df["input_size"] = sys.getsizeof(dataone)
-                    dest = os.path.join(folder, basename + ".bench")
-                    df.to_csv(dest, index=False)
+                if not disable_dump:
+                    dest = os.path.join(folder,
+                                        basename + ".backend.{0}.pkl".format(b))
+                    names.append(dest)                
+                    with open(dest, "wb") as f:
+                        pickle.dump(output, f)
+                    if (benchmark and lambda_onnx is not None
+                            and lambda_original is not None):
+                        # run a benchmark
+                        obs = compute_benchmark({
+                            "onnxrt": lambda_onnx,
+                            "original": lambda_original
+                        })
+                        df = pandas.DataFrame(obs)
+                        df["input_size"] = sys.getsizeof(dataone)
+                        dest = os.path.join(folder, basename + ".bench")
+                        df.to_csv(dest, index=False)
 
     return names
 

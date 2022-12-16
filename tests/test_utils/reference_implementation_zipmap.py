@@ -45,6 +45,10 @@ if onnx_opset_version() >= 18:
             self._values = values
             self._mat = mat
 
+        def __eq__(self, o):
+            raise NotImplementedError(
+                "__eq__ not available for ZipMapDictionary.")
+
         def __getstate__(self):
             """
             For pickle.
