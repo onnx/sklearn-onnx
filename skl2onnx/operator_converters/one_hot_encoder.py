@@ -40,7 +40,7 @@ def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
         index_inputs = 0
 
         for index, cats in enumerate(ohe_op.categories_):
-            while sum(all_shapes[:index_inputs+1]) <= index:
+            while sum(all_shapes[:index_inputs + 1]) <= index:
                 index_inputs += 1
             index_in_input = index - sum(all_shapes[:index_inputs])
 

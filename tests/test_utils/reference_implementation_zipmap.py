@@ -224,7 +224,8 @@ if onnx_opset_version() >= 18:
             if classlabels_int64s:
                 rev_keys_ = ZipMapDictionary.build_rev_keys(classlabels_int64s)
             elif classlabels_strings:
-                rev_keys_ = ZipMapDictionary.build_rev_keys(classlabels_strings)
+                rev_keys_ = ZipMapDictionary.build_rev_keys(
+                    classlabels_strings)
             else:
                 rev_keys_ = {}
             res = ArrayZipMapDictionary(rev_keys_, x)

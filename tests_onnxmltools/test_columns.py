@@ -76,7 +76,7 @@ class TestOptionColumns(unittest.TestCase):
         got = sess.run(None, {'input': xt})
         prob = model.predict_proba(xt)
         for i in range(prob.shape[1]):
-            assert_almost_equal(prob[:, i], got[i+1])
+            assert_almost_equal(prob[:, i], got[i + 1])
 
     def test_random_forest(self):
         self.c_test_model(RandomForestClassifier(n_estimators=3))

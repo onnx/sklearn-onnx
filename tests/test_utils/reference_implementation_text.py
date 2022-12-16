@@ -38,16 +38,16 @@ if onnx_opset_version() >= 18:
             try:
                 str_separators_ = set(_ for _ in (separators or ""))
             except AttributeError as e:  # pragma: no cover
-                raise RuntimeTypeError(
-                    f"Unable to interpret separators {separators}."
-                ) from e
+                raise TypeError(
+                    f"Unable to interpret separators {separators!r}.") from e
             if tokenexp not in (None, ""):
                 tokenexp_ = re.compile(tokenexp)
 
             if char_tokenization_:
                 return self._run_char_tokenization(text, stops_)
             if str_separators_ is not None and len(str_separators_) > 0:
-                return self._run_sep_tokenization(text, stops_, str_separators_)
+                return self._run_sep_tokenization(
+                    text, stops_, str_separators_)
             if tokenexp not in (None, ""):
                 return self._run_regex_tokenization(
                     text, stops_, tokenexp_, tokenexpsplit, mark, pad_value
@@ -102,8 +102,8 @@ if onnx_opset_version() >= 18:
                 res = res[:, :, :max_pos]
             else:
                 raise RuntimeError(  # pragma: no cover
-                    f"Only vector or matrices are supported not shape {text.shape}."
-                )
+                    f"Only vector or matrices are supported "
+                    f"not shape {text.shape}.")
             return (res,)
 
         @staticmethod
@@ -130,10 +130,8 @@ if onnx_opset_version() >= 18:
                 pos = 0
                 while pos < len(t):
                     for sep in separators:
-                        if (
-                            pos + len(sep) <= len(t)
-                            and sep == t[pos : pos + len(sep)]
-                        ):
+                        if (pos + len(sep) <= len(t) and
+                                sep == t[pos: pos + len(sep)]):
                             word = t[begin:pos]
                             yield word
                             begin = pos + len(sep)
@@ -146,9 +144,8 @@ if onnx_opset_version() >= 18:
             return Tokenizer._run_tokenization(text, stops, split)
 
         @staticmethod
-        def _run_regex_tokenization(
-            text, stops, exp, tokenexpsplit, mark, pad_value
-        ):
+        def _run_regex_tokenization(text, stops, exp, tokenexpsplit,
+                                    mark, pad_value):
             """
             Tokenizes using separators.
             The function should use a trie to find text.
@@ -218,35 +215,29 @@ if onnx_opset_version() >= 18:
                 end_idx = (
                     self.ngram_counts_[i + 1]
                     if (i + 1) < len(self.ngram_counts_)
-                    else total_items
-                )
+                    else total_items)
                 items = end_idx - start_idx
                 if items > 0:
                     ngrams = items // ngram_size
-                    if (
-                        ngram_size >= self.min_gram_length_
-                        and ngram_size <= self.max_gram_length_
-                    ):
+                    if (ngram_size >= self.min_gram_length_ and
+                            ngram_size <= self.max_gram_length_):
                         ngram_id = populate_grams(
                             self.pool_int64s_,
                             start_idx,
                             ngrams,
                             ngram_size,
                             ngram_id,
-                            self.int64_map_,
-                        )
+                            self.int64_map_)
                     else:
                         ngram_id += ngrams
                 ngram_size += 1
 
-        def increment_count(
-            self, ngram_id: int, row_num: int, frequencies: List[int]
-        ) -> None:
+        def increment_count(self, ngram_id: int, row_num: int,
+                            frequencies: List[int]) -> None:
             ngram_id -= 1
             # assert(ngram_id < ngram_indexes_.size());
             output_idx = (
-                row_num * self.output_size_ + self.ngram_indexes_[ngram_id]
-            )
+                row_num * self.output_size_ + self.ngram_indexes_[ngram_id])
             # assert(static_cast<size_t>(output_idx) < frequencies.size());
             frequencies[output_idx] += 1
 
@@ -300,21 +291,20 @@ if onnx_opset_version() >= 18:
             return Y.reshape(output_dims)
 
         def compute_impl(  # type: ignore
-            self,
-            X: np.ndarray,
-            row_num: int,
-            row_size: int,
-            frequencies: List[int],
-            max_gram_length=None,
-            max_skip_count=None,
-            min_gram_length=None,
-            mode=None,
-            ngram_counts=None,
-            ngram_indexes=None,
-            pool_int64s=None,
-            pool_strings=None,
-            weights=None,
-        ) -> None:
+                self,
+                X: np.ndarray,
+                row_num: int,
+                row_size: int,
+                frequencies: List[int],
+                max_gram_length=None,
+                max_skip_count=None,
+                min_gram_length=None,
+                mode=None,
+                ngram_counts=None,
+                ngram_indexes=None,
+                pool_int64s=None,
+                pool_strings=None,
+                weights=None) -> None:
 
             if len(X.shape) > 1:
                 X_flat = X[row_num]
@@ -331,21 +321,19 @@ if onnx_opset_version() >= 18:
                 ngram_row_end = row_end
 
                 while ngram_start < ngram_row_end:
-                    # We went far enough so no n-grams of any size can be gathered
+                    # We went far enough so no n-grams of any size can be
+                    # gathered
                     at_least_this = ngram_start + skip_distance * (
-                        start_ngram_size - 1
-                    )
+                        start_ngram_size - 1)
                     if at_least_this >= ngram_row_end:
                         break
 
                     ngram_item = ngram_start
                     int_map = self.int64_map_
                     ngram_size = 1
-                    while (
-                        int_map.has_leaves()
-                        and ngram_size <= max_gram_length
-                        and ngram_item < ngram_row_end
-                    ):
+                    while (int_map.has_leaves() and
+                            ngram_size <= max_gram_length and
+                            ngram_item < ngram_row_end):
                         val = X_flat[ngram_item]
                         hit = int_map.find(val)
                         if hit is None:
@@ -359,25 +347,25 @@ if onnx_opset_version() >= 18:
 
                     ngram_start += 1
 
-                # We count UniGrams only once since they are not affected by skip_distance
+                # We count UniGrams only once since they are not affected by
+                # skip_distance
                 if start_ngram_size == 1:
                     start_ngram_size += 1
                     if start_ngram_size > max_gram_length:
                         break
 
         def _run(  # type: ignore
-            self,
-            X,
-            max_gram_length=None,
-            max_skip_count=None,
-            min_gram_length=None,
-            mode=None,
-            ngram_counts=None,
-            ngram_indexes=None,
-            pool_int64s=None,
-            pool_strings=None,
-            weights=None,
-        ):
+                self,
+                X,
+                max_gram_length=None,
+                max_skip_count=None,
+                min_gram_length=None,
+                mode=None,
+                ngram_counts=None,
+                ngram_indexes=None,
+                pool_int64s=None,
+                pool_strings=None,
+                weights=None):
             if self.mapping_ is not None:
                 xi = np.empty(X.shape, dtype=np.int64)
                 for i in range(0, X.shape[0]):
@@ -404,8 +392,7 @@ if onnx_opset_version() >= 18:
                 C = 1
                 if total_items != 1:
                     raise ValueError(
-                        f"Unexpected total of items {total_items}."
-                    )
+                        f"Unexpected total of items {total_items}.")
             elif len(input_dims) == 1:
                 num_rows = 1
                 C = input_dims[0]
@@ -415,28 +402,22 @@ if onnx_opset_version() >= 18:
                 num_rows = B
                 if B < 1:
                     raise ValueError(
-                        f"Input shape must have either [C] or [B,C] dimensions with B > 0, B={B}, C={C}."
-                    )
+                        f"Input shape must have either [C] or [B,C] "
+                        f"dimensions with B > 0, B={B}, C={C}.")
             else:
                 raise ValueError(
-                    f"Input shape must have either [C] or [B,C] dimensions with B > 0, B={B}, C={C}."
-                )
+                    f"Input shape must have either [C] or [B,C] "
+                    f"dimensions with B > 0, B={B}, C={C}.")
 
             if num_rows * C != total_items:
                 raise ValueError(
-                    f"Unexpected total of items, num_rows * C = {num_rows * C} != total_items = {total_items}."
-                )
+                    f"Unexpected total of items, num_rows * C = "
+                    f"{num_rows * C} != total_items = {total_items}.")
             # Frequency holder allocate [B..output_size_] and init all to zero
             frequencies = np.zeros(
-                (num_rows * self.output_size_,), dtype=np.int64
-            )
+                (num_rows * self.output_size_,), dtype=np.int64)
 
             if total_items == 0 or self.int64_map_.empty():
-                # TfidfVectorizer may receive an empty input when it follows a Tokenizer
-                # (for example for a string containing only stopwords).
-                # TfidfVectorizer returns a zero tensor of shape
-                # {b_dim, output_size} when b_dim is the number of received observations
-                # and output_size the is the maximum value in ngram_indexes attribute plus 1.
                 return self.output_result(B, frequencies)
 
             def fn(row_num):
@@ -453,8 +434,7 @@ if onnx_opset_version() >= 18:
                     ngram_indexes=ngram_indexes,
                     pool_int64s=pool_int64s,
                     pool_strings=pool_strings,
-                    weights=weights,
-                )
+                    weights=weights)
 
             # can be parallelized.
             for i in range(num_rows):

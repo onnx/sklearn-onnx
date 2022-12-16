@@ -107,7 +107,7 @@ def predict(model, scope, operator, container,
         values_name, proto_dtype, value.shape, value.ravel())
 
     input_name = operator.input_full_names
-    if type(operator.inputs[0].type) == BooleanTensorType:
+    if isinstance(operator.inputs[0].type, BooleanTensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, input_name, cast_input_name,
@@ -263,7 +263,7 @@ def convert_sklearn_decision_tree_classifier(
         add_tree_to_attribute_pairs(attrs, True, op.tree_, 0, 1., 0, True,
                                     True, dtype=dtype)
         input_name = operator.input_full_names
-        if type(operator.inputs[0].type) == BooleanTensorType:
+        if isinstance(operator.inputs[0].type, BooleanTensorType):
             cast_input_name = scope.get_unique_variable_name('cast_input')
 
             apply_cast(scope, input_name, cast_input_name,

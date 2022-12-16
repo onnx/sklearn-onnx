@@ -30,7 +30,7 @@ class OrdinalWOETransformer(BaseEstimator, TransformerMixin):
         self.encoder_ = OrdinalEncoder().fit(X)
         tr = self.encoder_.transform(X)
         maxi = (tr.max(axis=1) + 1).astype(np.int64)
-        intervals = [[(i-1, i, False, True) for i in range(0, m)]
+        intervals = [[(i - 1, i, False, True) for i in range(0, m)]
                      for m in maxi]
         weights = [[10 * j + i for i in range(len(inter))]
                    for j, inter in enumerate(intervals)]

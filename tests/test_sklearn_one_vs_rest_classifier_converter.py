@@ -501,7 +501,7 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             [('input', FloatTensorType([None, X_test.shape[1]]))],
             options=options, target_opset=TARGET_OPSET)
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
+            onnx_model.SerializeToString(),
             providers=["CPUExecutionProvider"])
         res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
         exp = model.predict(X_test)

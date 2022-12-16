@@ -36,12 +36,12 @@ class TestOptimisation(unittest.TestCase):
         nodes = [
             helper.make_node('Constant', inputs=[], outputs=["one"],
                              value=helper.make_tensor(
-                                name='', data_type=tp.INT64, dims=[1],
-                                vals=[1])),
+                name='', data_type=tp.INT64, dims=[1],
+                vals=[1])),
             helper.make_node('Constant', inputs=[], outputs=["zero"],
                              value=helper.make_tensor(
-                                name='', data_type=tp.INT64, dims=[1],
-                                vals=[0])),
+                name='', data_type=tp.INT64, dims=[1],
+                vals=[0])),
 
             helper.make_node('Identity', inputs=["one"],
                              outputs=["identity_one"]),

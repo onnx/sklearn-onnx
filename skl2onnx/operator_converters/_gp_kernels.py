@@ -383,14 +383,14 @@ def _zero_vector_of_size(X, output_names=None, axis=0,
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version),
                 op_version=op_version),
-            axes=[1-axis], keepdims=keepdims,
+            axes=[1 - axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     elif dtype in (np.float64, np.int32, np.int64):
         res = OnnxReduceSumApi11(
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version), value=py_make_float_array(
                     0, dtype=dtype, as_tensor=True), op_version=op_version),
-            axes=[1-axis], keepdims=keepdims,
+            axes=[1 - axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     else:
         raise NotImplementedError(

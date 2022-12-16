@@ -399,8 +399,8 @@ def add_output_initializer(model_onnx, name, value, suffix='_init'):
         nodes.append(make_node('Identity', [name_init], [name_output]))
 
     graph = make_graph(
-            nodes, model_onnx.graph.name, model_onnx.graph.input,
-            outputs, inits)
+        nodes, model_onnx.graph.name, model_onnx.graph.input,
+        outputs, inits)
 
     onnx_model = make_model(graph)
     onnx_model.ir_version = model_onnx.ir_version

@@ -953,7 +953,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
         y = iris.target.astype(numpy.int64)
-        y = numpy.vstack([y % 2, y % 2, (y+1) % 2]).T
+        y = numpy.vstack([y % 2, y % 2, (y + 1) % 2]).T
         model = KNeighborsClassifier(
             algorithm='brute', weights='distance',
             n_neighbors=7)

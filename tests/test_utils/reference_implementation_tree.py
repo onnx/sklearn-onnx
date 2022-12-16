@@ -86,7 +86,8 @@ class TreeEnsemble:
         }
 
     def __str__(self):
-        rows = ["TreeEnsemble", f"root_index={self.root_index}", str(self.atts)]
+        rows = ["TreeEnsemble",
+                f"root_index={self.root_index}", str(self.atts)]
         return "\n".join(rows)
 
     def leaf_index_tree(self, X, tree_id):
@@ -189,7 +190,8 @@ if onnx_opset_version() >= 18:
             )
             self._tree = tr
             leaves_index = tr.leave_index_tree(X)
-            res = numpy.empty((leaves_index.shape[0], n_targets), dtype=X.dtype)
+            res = numpy.empty(
+                (leaves_index.shape[0], n_targets), dtype=X.dtype)
             if base_values is None:
                 res[:, :] = 0
             else:
@@ -270,7 +272,8 @@ if onnx_opset_version() >= 18:
             n_classes = max(
                 len(classlabels_int64s or []), len(classlabels_strings or [])
             )
-            res = numpy.empty((leaves_index.shape[0], n_classes), dtype=X.dtype)
+            res = numpy.empty(
+                (leaves_index.shape[0], n_classes), dtype=X.dtype)
             if base_values is None:
                 res[:, :] = 0
             else:
@@ -334,9 +337,11 @@ if onnx_opset_version() >= 18:
             100, n_features=6, n_classes=3, n_informative=3, n_redundant=0
         )
         model = BaggingClassifier().fit(X, y)
-        onx = to_onnx(model, X.astype(numpy.float32), options={"zipmap": False})
+        onx = to_onnx(model, X.astype(numpy.float32),
+                      options={"zipmap": False})
         tr = ReferenceEvaluator(
-            onx, new_ops=[TreeEnsembleClassifier, ArrayFeatureExtractor, ArgMax]
+            onx, new_ops=[TreeEnsembleClassifier,
+                          ArrayFeatureExtractor, ArgMax]
         )
         print("-----------------------")
         print(tr.run(None, {"X": X[:10].astype(numpy.float32)}))
@@ -347,7 +352,8 @@ if onnx_opset_version() >= 18:
 
         # classification 2
         model = RandomForestClassifier(max_depth=3, n_estimators=2).fit(X, y)
-        onx = to_onnx(model, X.astype(numpy.float32), options={"zipmap": False})
+        onx = to_onnx(model, X.astype(numpy.float32),
+                      options={"zipmap": False})
         tr = ReferenceEvaluator(onx, new_ops=[TreeEnsembleClassifier])
         print(tr.run(None, {"X": X[:5].astype(numpy.float32)}))
         print(model.predict(X[:5].astype(numpy.float32)))

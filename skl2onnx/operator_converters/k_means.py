@@ -75,7 +75,7 @@ def convert_sklearn_kmeans(scope: Scope, operator: Operator,
     if dtype != np.float64:
         dtype = np.float32
 
-    if type(X.type) == Int64TensorType:
+    if isinstance(X.type, Int64TensorType):
         x_cast = OnnxCast(X, to=np.float32, op_version=opv)
         input_name = x_cast
 

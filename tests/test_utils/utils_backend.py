@@ -288,7 +288,8 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
             expected = expected.reshape(
                 tuple([d for d in expected.shape if d > 1])
             )
-            output = output.reshape(tuple([d for d in expected.shape if d > 1]))
+            output = output.reshape(
+                tuple([d for d in expected.shape if d > 1]))
         if NoProb or NoProbOpp:
             # One vector is (N,) with scores, negative for class 0
             # positive for class 1

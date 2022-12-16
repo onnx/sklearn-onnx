@@ -177,7 +177,7 @@ class TestXGBoostModels(unittest.TestCase):
             ('cbe', ColumnTransformer([
                 ("norm1", Normalizer(norm='l1'), [0, 1]),
                 ("norm2", Normalizer(norm='l2'), [2, 3])])),
-            ('sc',  StackingClassifier(
+            ('sc', StackingClassifier(
                 estimators=list(map(tuple, classifiers.items())),
                 stack_method='predict_proba',
                 passthrough=False
@@ -211,7 +211,7 @@ class TestXGBoostModels(unittest.TestCase):
             ('cbe', ColumnTransformer([
                 ("norm1", Normalizer(norm='l1'), [0, 1]),
                 ("norm2", Normalizer(norm='l2'), [2, 3])])),
-            ('sc',  StackingClassifier(
+            ('sc', StackingClassifier(
                 estimators=list(map(tuple, classifiers.items())),
                 stack_method='predict_proba',
                 passthrough=False

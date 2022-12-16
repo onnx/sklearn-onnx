@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import numpy as np
+from scipy.special import expit
 from onnx.defs import onnx_opset_version
 
 
@@ -27,7 +28,7 @@ if onnx_opset_version() >= 18:
             strings.
             """
             if classlabels_ints_string is not None:
-                label = numpy.array([classlabels_ints_string[i] for i in label])
+                label = np.array([classlabels_ints_string[i] for i in label])
             return label, scores
 
         def _run(
@@ -40,14 +41,14 @@ if onnx_opset_version() >= 18:
             multi_class=None,
             post_transform=None,
         ):
-            coefficients = numpy.array(coefficients).astype(x.dtype)
-            intercepts = numpy.array(intercepts).astype(x.dtype)
+            coefficients = np.array(coefficients).astype(x.dtype)
+            intercepts = np.array(intercepts).astype(x.dtype)
             n_class = max(
                 len(classlabels_ints or []), len(classlabels_strings or [])
             )
             n = coefficients.shape[0] // n_class
             coefficients = coefficients.reshape(n_class, n).T
-            scores = numpy.dot(x, coefficients)
+            scores = np.dot(x, coefficients)
             if intercepts is not None:
                 scores += intercepts
 
@@ -56,12 +57,12 @@ if onnx_opset_version() >= 18:
             elif post_transform == "LOGISTIC":
                 scores = expit(scores)
             elif post_transform == "SOFTMAX":
-                numpy.subtract(
-                    scores, scores.max(axis=1)[:, numpy.newaxis], out=scores
+                np.subtract(
+                    scores, scores.max(axis=1)[:, np.newaxis], out=scores
                 )
-                scores = numpy.exp(scores)
-                scores = numpy.divide(
-                    scores, scores.sum(axis=1)[:, numpy.newaxis]
+                scores = np.exp(scores)
+                scores = np.divide(
+                    scores, scores.sum(axis=1)[:, np.newaxis]
                 )
             else:
                 raise NotImplementedError(  # pragma: no cover
@@ -69,16 +70,16 @@ if onnx_opset_version() >= 18:
                 )
 
             if coefficients.shape[1] == 1:
-                labels = numpy.zeros((scores.shape[0],), dtype=x.dtype)
+                labels = np.zeros((scores.shape[0],), dtype=x.dtype)
                 labels[scores > 0] = 1
             else:
-                labels = numpy.argmax(scores, axis=1)
+                labels = np.argmax(scores, axis=1)
             if classlabels_ints is not None:
-                labels = numpy.array(
-                    [classlabels_ints[i] for i in labels], dtype=numpy.int64
+                labels = np.array(
+                    [classlabels_ints[i] for i in labels], dtype=np.int64
                 )
             elif classlabels_strings is not None:
-                labels = numpy.array([classlabels_strings[i] for i in labels])
+                labels = np.array([classlabels_strings[i] for i in labels])
             return (labels, scores)
 
     class LinearRegressor(OpRun):
@@ -93,11 +94,11 @@ if onnx_opset_version() >= 18:
             targets=1,
             post_transform=None,
         ):
-            coefficients = numpy.array(coefficients).astype(x.dtype)
-            intercepts = numpy.array(intercepts).astype(x.dtype)
+            coefficients = np.array(coefficients).astype(x.dtype)
+            intercepts = np.array(intercepts).astype(x.dtype)
             n = coefficients.shape[0] // targets
             coefficients = coefficients.reshape(targets, n).T
-            score = numpy.dot(x, coefficients)
+            score = np.dot(x, coefficients)
             if self.intercepts is not None:
                 score += intercepts
             if post_transform == "NONE":
@@ -115,21 +116,21 @@ if onnx_opset_version() >= 18:
         @staticmethod
         def norm_max(x):
             "max normalization"
-            div = numpy.abs(x).max(axis=1).reshape((x.shape[0], -1))
-            return x / numpy.maximum(div, 1e-30)
+            div = np.abs(x).max(axis=1).reshape((x.shape[0], -1))
+            return x / np.maximum(div, 1e-30)
 
         @staticmethod
         def norm_l1(x):
             "L1 normalization"
-            div = numpy.abs(x).sum(axis=1).reshape((x.shape[0], -1))
-            return x / numpy.maximum(div, 1e-30)
+            div = np.abs(x).sum(axis=1).reshape((x.shape[0], -1))
+            return x / np.maximum(div, 1e-30)
 
         @staticmethod
         def norm_l2(x):
             "L2 normalization"
-            xn = numpy.square(x).sum(axis=1)
-            numpy.sqrt(xn, out=xn)
-            norm = numpy.maximum(xn.reshape((x.shape[0], -1)), 1e-30)
+            xn = np.square(x).sum(axis=1)
+            np.sqrt(xn, out=xn)
+            norm = np.maximum(xn.reshape((x.shape[0], -1)), 1e-30)
             return x / norm
 
         def _run(self, x, norm=None):
@@ -161,7 +162,7 @@ if onnx_opset_version() >= 18:
 
             shape = x.shape
             new_shape = shape + (len(classes_),)
-            res = numpy.zeros(new_shape, dtype=numpy.float32)
+            res = np.zeros(new_shape, dtype=np.float32)
             if len(x.shape) == 1:
                 for i, v in enumerate(x):
                     j = classes_.get(v, -1)
@@ -174,13 +175,13 @@ if onnx_opset_version() >= 18:
                         if j >= 0:
                             res[a, i, j] = 1.0
             else:
-                raise RuntimeError(  # pragma: no cover
-                    f"This operator is not implemented for " f"shape {x.shape}."
-                )
+                raise RuntimeError(
+                    f"This operator is not implemented "
+                    f"for " f"shape {x.shape}.")
 
             if not self.zeros:
                 red = res.sum(axis=len(res.shape) - 1)
-                if numpy.min(red) == 0:
+                if np.min(red) == 0:
                     rows = []
                     for i, val in enumerate(red):
                         if val == 0:
@@ -208,7 +209,7 @@ if onnx_opset_version() >= 18:
         def _run(self, x, threshold=None):
             X = x.copy()
             cond = X > self.threshold
-            not_cond = numpy.logical_not(cond)
+            not_cond = np.logical_not(cond)
             X[cond] = 1
             X[not_cond] = 0
             return (X,)

@@ -59,7 +59,7 @@ def convert_sklearn_zipmap_columns(scope: Scope, operator: Operator,
         out = operator.outputs[i].full_name
         flat = scope.get_unique_variable_name(out)
         apply_slice(
-            scope, probs, flat, container, starts=[i-1], ends=[i], axes=[1],
+            scope, probs, flat, container, starts=[i - 1], ends=[i], axes=[1],
             operator_name=scope.get_unique_operator_name('Slice'))
         apply_reshape(
             scope, flat, out, container, desired_shape=(-1, ),

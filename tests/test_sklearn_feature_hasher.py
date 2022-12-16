@@ -114,7 +114,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                     target_opset=TARGET_OPSET,
                     final_types=[('Y', final_type([None, 1]))])
                 sess = InferenceSession(
-                    onnx_model.SerializeToString(),
+                    model_onnx.SerializeToString(),
                     providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': data})
                 self.assertEqual(expected.shape, got[0].shape)
@@ -143,7 +143,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             target_opset=TARGET_OPSET,
             final_types=[('Y', FloatTensorType([None, n_features]))])
         sess = InferenceSession(
-            onnx_model.SerializeToString(),
+            model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': data})
         self.assertEqual(expected.shape, got[0].shape)
@@ -185,7 +185,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             target_opset=TARGET_OPSET,
             final_types=[('Y', FloatTensorType([None, n_features]))])
         sess = InferenceSession(
-            onnx_model.SerializeToString(),
+            model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': data_nx})
         self.assertEqual(expected.shape, got[0].shape)
@@ -214,7 +214,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             target_opset=TARGET_OPSET,
             final_types=[('Y', FloatTensorType([None, n_features]))])
         sess = InferenceSession(
-            onnx_model.SerializeToString(),
+            model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': data})
         self.assertEqual(expected.shape, got[0].shape)

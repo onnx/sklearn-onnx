@@ -209,8 +209,8 @@ def compare_runtime(
                 inputs = {inp[0].name: input}
             elif isinstance(input, numpy.ndarray):
                 shape = sum(
-                    i.shape[1] if len(i.shape) == 2 else i.shape[0] for i in inp
-                )
+                    i.shape[1] if len(i.shape) == 2
+                    else i.shape[0] for i in inp)
                 if shape == input.shape[1]:
                     inputs = {n.name: input[:, i] for i, n in enumerate(inp)}
                 else:
@@ -419,10 +419,8 @@ def compare_runtime(
                 _display_intermediate_steps(onx, inputs, disable_optimisation)
             if "-Fail" in onx:
                 raise ExpectedAssertionError(
-                    "onnxruntime cannot compute the prediction for '{0}'".format(
-                        onx
-                    )
-                )
+                    "onnxruntime cannot compute the "
+                    "prediction for '{0}'".format(onx))
             else:
                 if verbose:
                     import onnx
@@ -433,8 +431,7 @@ def compare_runtime(
                     smodel = ""
                 raise OnnxRuntimeAssertionError(
                     "onnxruntime cannot compute the prediction"
-                    " for '{0}' due to {1}{2}".format(onx, e, smodel)
-                )
+                    " for '{0}' due to {1}{2}".format(onx, e, smodel))
         except Exception as e:
             raise OnnxRuntimeAssertionError(
                 "Unable to run onnx '{0}' due to {1}".format(onx, e)
@@ -578,10 +575,9 @@ def _compare_expected(
                 )
             if len(expected) != len(output):
                 raise OnnxRuntimeAssertionError(
-                    "Unexpected number of outputs '{0}', expected={1}, got={2}".format(
-                        onnx, len(expected), len(output)
-                    )
-                )
+                    "Unexpected number of outputs '{0}', "
+                    "expected={1}, got={2}".format(
+                        onnx, len(expected), len(output)))
             for exp, out in zip(expected, output):
                 _compare_expected(
                     exp,
@@ -620,7 +616,8 @@ def _compare_expected(
             tested += 1
     elif isinstance(expected, numpy.ndarray):
         if isinstance(output, list):
-            if expected.shape[0] == len(output) and isinstance(output[0], dict):
+            if (expected.shape[0] == len(output) and
+                    isinstance(output[0], dict)):
                 import pandas
 
                 output = pandas.DataFrame(output)
@@ -680,9 +677,7 @@ def _compare_expected(
             tested += 1
         else:
             raise OnnxRuntimeAssertionError(
-                "Unexpected type for expected output ({1}) and onnx '{0}'".format(
-                    onnx, type(expected)
-                )
-            )
+                "Unexpected type for expected output ({1}) "
+                "and onnx '{0}'".format(onnx, type(expected)))
     if tested == 0:
         raise OnnxRuntimeAssertionError("No test for onnx '{0}'".format(onnx))

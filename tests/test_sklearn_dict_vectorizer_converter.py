@@ -81,10 +81,10 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model.fit(data)
         expected = model.transform(data)
         model_onnx = convert_sklearn(
-                model, 'dv',
-                [("input", DictionaryType(StringTensorType([1]),
-                  FloatTensorType([1])))],
-                target_opset=TARGET_OPSET)
+            model, 'dv',
+            [("input", DictionaryType(StringTensorType([1]),
+                                      FloatTensorType([1])))],
+            target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
         sess = InferenceSession(
             model_onnx.SerializeToString(),
@@ -105,10 +105,10 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model.fit(data)
         # expected = model.transform(data)
         model_onnx = convert_sklearn(
-                model, 'dv',
-                [("input", DictionaryType(StringTensorType([1]),
-                  Int64TensorType([1])))],
-                target_opset=TARGET_OPSET)
+            model, 'dv',
+            [("input", DictionaryType(StringTensorType([1]),
+                                      Int64TensorType([1])))],
+            target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
         sess = InferenceSession(
             model_onnx.SerializeToString(),
@@ -132,10 +132,10 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
         model.fit(data)
         model_onnx = convert_sklearn(
-                model, 'dv',
-                [("input", DictionaryType(StringTensorType([1]),
-                  BooleanTensorType([1])))],
-                target_opset=TARGET_OPSET)
+            model, 'dv',
+            [("input", DictionaryType(StringTensorType([1]),
+                                      BooleanTensorType([1])))],
+            target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
         with self.assertRaises(InvalidGraph):
             InferenceSession(

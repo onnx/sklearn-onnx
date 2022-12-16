@@ -654,7 +654,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         got = sess.run(None, {'input': xt})
         prob = model.predict_proba(xt)
         for i in range(prob.shape[1]):
-            assert_almost_equal(prob[:, i], got[i+1])
+            assert_almost_equal(prob[:, i], got[i + 1])
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
@@ -677,7 +677,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         got = sess.run(None, {'input': xt})
         prob = model.predict_proba(xt)
         for i in range(prob.shape[1]):
-            assert_almost_equal(prob[:, i], got[i+1])
+            assert_almost_equal(prob[:, i], got[i + 1])
 
 
 if __name__ == "__main__":

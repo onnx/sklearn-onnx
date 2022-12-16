@@ -220,8 +220,8 @@ def convert_sklearn_min_max_scaler(
         for i in range(op.data_min_.shape[0]):
             gather = OnnxGather(offset, np.array([i], dtype=np.int64),
                                 axis=1, op_version=opv)
-            clipped = OnnxClip(gather, op.data_min_[i:i+1].astype(dtype),
-                               op.data_max_[i:i+1].astype(dtype),
+            clipped = OnnxClip(gather, op.data_min_[i:i + 1].astype(dtype),
+                               op.data_max_[i:i + 1].astype(dtype),
                                op_version=opv)
             collect.append(clipped)
         concat = OnnxConcat(*collect, op_version=opv, axis=1,

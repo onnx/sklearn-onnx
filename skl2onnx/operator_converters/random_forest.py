@@ -197,7 +197,7 @@ def convert_sklearn_random_forest_classifier(
                 "'{}' and loss '{}'.".format(type(op), loss))
 
         input_name = operator.input_full_names
-        if type(operator.inputs[0].type) == BooleanTensorType:
+        if isinstance(operator.inputs[0].type, BooleanTensorType):
             cast_input_name = scope.get_unique_variable_name('cast_input')
 
             apply_cast(scope, input_name, cast_input_name,

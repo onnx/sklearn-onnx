@@ -199,7 +199,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
 
-    elif type(model) == NearestNeighbors:
+    elif isinstance(model, NearestNeighbors):
         # For Nearest Neighbours, we have two outputs, one for nearest
         # neighbours' indices and the other one for distances
         index_variable = scope.declare_local_variable(

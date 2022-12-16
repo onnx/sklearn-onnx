@@ -365,7 +365,7 @@ class Variable:
             if other_type is None:
                 return
         elif other_type is not None:
-            if type(self.type) == type(other_type):
+            if isinstance(self.type, type(other_type)):
                 if self.type.shape == other_type.shape:
                     return
                 if empty_shape(other_type.shape):
@@ -1238,7 +1238,7 @@ class Topology:
             if verbose > 0:
                 print("[convert_operators] iteration %d - n_vars=%d "
                       "n_ops=%d" % (
-                        n_iter, len(fed_variables), len(ops)))
+                          n_iter, len(fed_variables), len(ops)))
             for operator in ops:
                 _check_operator_(operator)
                 for var in operator.inputs:

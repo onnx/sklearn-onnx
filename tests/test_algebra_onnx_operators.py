@@ -486,8 +486,8 @@ class TestOnnxOperators(unittest.TestCase):
         intercept = np.random.randn(1).astype(np.float32)
 
         node = OnnxAdd(
-                OnnxMatMul('X', weight, op_version=TARGET_OPSET),
-                intercept, op_version=TARGET_OPSET)
+            OnnxMatMul('X', weight, op_version=TARGET_OPSET),
+            intercept, op_version=TARGET_OPSET)
         nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
         with open("debug_ort_add.onnx", "wb") as f:
             f.write(nn_onnx.SerializeToString())

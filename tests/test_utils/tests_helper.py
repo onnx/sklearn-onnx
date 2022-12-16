@@ -351,14 +351,15 @@ def dump_data_and_model(
                     call = getattr(model, method)
                 except AttributeError as e:
                     if method == "decision_function_binary":
-                        call = lambda X, model=model: _raw_score_binary_classification(
-                            model, X
-                        )
+                        def call(X, model=model):
+                            return _raw_score_binary_classification(
+                                model, X)
                     else:
                         raise e
             if callable(call):
                 prediction.append(call(data))
                 # we only take the last one for benchmark
+
                 def lambda_original():
                     return call(dataone)  # noqa
 
@@ -381,7 +382,8 @@ def dump_data_and_model(
                     model.predict(data),
                     model.decision_function(data),
                 ]
-                lambda_original = lambda: model.decision_function(
+
+                def lambda_original(): return model.decision_function(
                     dataone
                 )  # noqa
             elif _has_transform_model(model):
@@ -558,8 +560,8 @@ def dump_data_and_model(
                     ):
                         # run a benchmark
                         obs = compute_benchmark(
-                            {"onnxrt": lambda_onnx, "original": lambda_original}
-                        )
+                            {"onnxrt": lambda_onnx,
+                             "original": lambda_original})
                         df = pandas.DataFrame(obs)
                         df["input_size"] = sys.getsizeof(dataone)
                         dest = os.path.join(folder, basename + ".bench")
@@ -860,7 +862,8 @@ def dump_multilabel_classification(
             )
         )
     model_onnx, prefix = convert_model(
-        model, "multi-class classifier", [("input", FloatTensorType([None, 2]))]
+        model, "multi-class classifier", [("input",
+                                           FloatTensorType([None, 2]))]
     )
     if verbose:
         print("[make_multilabel_classification] model was converted")
@@ -1176,7 +1179,8 @@ def make_report_backend(folder, as_df=False, verbose=0):
                 # execution failed
                 pass
             try:
-                row["ratio_nodes"] = row["nb_onnx_nodes"] / row["nb_estimators"]
+                row["ratio_nodes"] = (
+                    row["nb_onnx_nodes"] / row["nb_estimators"])
             except KeyError:
                 # execution failed
                 pass
@@ -1217,7 +1221,7 @@ def path_to_leaf(tree, mat, tree_indices=None):
 
     leaves = []
     for i in range(0, len(tree)):
-        mm = mat[:, tree_indices[i] : tree_indices[i + 1]]
+        mm = mat[:, tree_indices[i]: tree_indices[i + 1]]
         tt = tree[i].tree_ if hasattr(tree[i], "tree_") else tree[i]
         res = path_to_leaf(tt, mm)
         leaves.append(numpy.array(res, dtype=numpy.int64))

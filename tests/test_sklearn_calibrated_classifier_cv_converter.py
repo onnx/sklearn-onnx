@@ -346,7 +346,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                         model_onnx.SerializeToString(),
                         providers=["CPUExecutionProvider"])
                 except Exception as e:
-                    if "support for domain ai.onnx is till opset 17." in str(e):
+                    if "for domain ai.onnx is till opset 17." in str(e):
                         sess = None
                     else:
                         raise e

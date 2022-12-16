@@ -83,7 +83,7 @@ class TestVariableNames(unittest.TestCase):
         self.assertIn('Identity', str(model_onnx))
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
         sess = InferenceSession(
-            onnx_object.SerializeToString(),
+            model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         name = sess.get_inputs()[0].name
         got = sess.run(None, {name: x})
@@ -99,7 +99,7 @@ class TestVariableNames(unittest.TestCase):
                                      verbose=0)
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
         sess = InferenceSession(
-            onnx_object.SerializeToString(),
+            model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         got = sess.run(None, {'INPUTA': x})
         assert_almost_equal(x, got[0])
@@ -120,7 +120,7 @@ class TestVariableNames(unittest.TestCase):
             initial_types=[("年齢", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         sess = InferenceSession(
-            onnx_object.SerializeToString(),
+            model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         # Invalid Feed Input Name:\u5e74\u9f62
         # sess.run(None, {'年齢': X})
