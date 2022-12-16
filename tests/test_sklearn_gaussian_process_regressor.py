@@ -235,7 +235,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                 model_onnx.SerializeToString(),
                 providers=["CPUExecutionProvider"])
         except NotImplemented as e:
-            if "NOT IMPLEMENTED" in str(e):
+            if "NOT_IMPLEMENTED" in str(e):
                 # Failed to find kernel for FusedMatMul(1).
                 return
             raise e

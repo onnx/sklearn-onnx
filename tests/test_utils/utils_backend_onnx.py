@@ -8,6 +8,10 @@ from scipy.special import expit  # noqa
 import pandas
 import onnx as onnx_package
 from onnx.defs import onnx_opset_version
+try:
+    from onnx.helper import tensor_dtype_to_string
+except ImportError:
+    tensor_dtype_to_string = None
 from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs,
     enumerate_model_node_outputs,
@@ -220,12 +224,41 @@ def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
 
 
 class InputDef:
-    def __init__(self, name):
+    def __init__(self, name, shape, dtype):
         self.name = name
+        self.shape = shape
+        self.type = dtype
+
+
+def get_shape(t):
+    if t.tensor_type:
+        dims = [getattr(d, 'dim_value', None)
+                for d in t.tensor_type.shape.dim]
+        return tuple(dims)
+    return None
+
+
+def get_type(t):
+    if t.tensor_type:
+        if tensor_dtype_to_string is None:
+            res = ""
+        else:
+            res = tensor_dtype_to_string(t.tensor_type.elem_type)
+        maps = {
+            'TensorProto.STRING': 'tensor(string)',
+            'TensorProto.INT64': 'tensor(int64)',
+            'TensorProto.INT32': 'tensor(int32)',
+            'TensorProto.DOUBLE': 'tensor(double)',
+            'TensorProto.FLOAT': 'tensor(float)',
+        }
+        return maps[res]
+    return None
 
 
 def get_inputs(sess):
-    return [InputDef(n) for n in sess.input_names]
+    return [InputDef(n, get_shape(t), get_type(t))
+            for n, t in zip(sess.input_names,
+                            sess.input_types)]
 
 
 def compare_runtime(
@@ -349,20 +382,24 @@ def compare_runtime(
                         "Wrong number of inputs onnx {0} != "
                         "original {1}, onnx='{2}'".format(
                             len(inp), len(input), onx))
-                shape = sum(i.shape[1] for i in inp)
-                if shape == array_input.shape[1]:
-                    inputs = {}
-                    c = 0
-                    for i, n in enumerate(inp):
-                        d = c + n.shape[1]
-                        inputs[n.name] = _create_column(
-                            [row[c:d] for row in input], n.type)
-                        c = d
+                if hasattr(inp[0], 'shape'):
+                    shape = sum(i.shape[1] for i in inp)
+                    if shape == array_input.shape[1]:
+                        inputs = {}
+                        c = 0
+                        for i, n in enumerate(inp):
+                            d = c + n.shape[1]
+                            inputs[n.name] = _create_column(
+                                [row[c:d] for row in input], n.type)
+                            c = d
+                    else:
+                        raise OnnxRuntimeAssertionError(
+                            "Wrong number of inputs onnx {0} != "
+                            "original shape {1}, onnx='{2}'*".format(
+                                len(inp), array_input.shape, onx))
                 else:
-                    raise OnnxRuntimeAssertionError(
-                        "Wrong number of inputs onnx {0} != "
-                        "original shape {1}, onnx='{2}'*".format(
-                            len(inp), array_input.shape, onx))
+                    array_input = array_input.reshape((-1, len(inp)))
+                    inputs = {i.name: r for i, r in zip(inp, array_input.T)}
             elif isinstance(input, pandas.DataFrame):
                 try:
                     array_input = np.array(input)
@@ -373,21 +410,25 @@ def compare_runtime(
                             len(inp), len(input), onx
                         )
                     )
-                shape = sum(i.shape[1] for i in inp)
-                if shape == array_input.shape[1]:
-                    inputs = {}
-                    c = 0
-                    for i, n in enumerate(inp):
-                        d = c + n.shape[1]
-                        inputs[n.name] = _create_column(
-                            input.iloc[:, c:d], n.type
-                        )
-                        c = d
+                if hasattr(inp[0], 'shape'):
+                    shape = sum(i.shape[1] for i in inp)
+                    if shape == array_input.shape[1]:
+                        inputs = {}
+                        c = 0
+                        for i, n in enumerate(inp):
+                            d = c + n.shape[1]
+                            inputs[n.name] = _create_column(
+                                input.iloc[:, c:d], n.type
+                            )
+                            c = d
+                    else:
+                        raise OnnxRuntimeAssertionError(
+                            "Wrong number of inputs onnx {0}={1} columns != "
+                            "original shape {2}, onnx='{3}'*".format(
+                                len(inp), shape, array_input.shape, onx))
                 else:
-                    raise OnnxRuntimeAssertionError(
-                        "Wrong number of inputs onnx {0}={1} columns != "
-                        "original shape {2}, onnx='{3}'*".format(
-                            len(inp), shape, array_input.shape, onx))
+                    array_input = array_input.reshape((-1, len(inp)))
+                    inputs = {i.name: r for i, r in zip(inp, array_input.T)}
             else:
                 raise OnnxRuntimeAssertionError(
                     "Wrong type of inputs onnx {0}, onnx='{1}'".format(
