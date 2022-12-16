@@ -71,11 +71,12 @@ class TestPerceptronClassifierConverter(unittest.TestCase):
             model,
             "scikit-learn Perceptron multi-class classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
+            options={'zipmap': False},
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.int64),
+            X.astype(np.int64)[:10],
             model,
             model_onnx,
             basename="SklearnPerceptronClassifierMultiInt-Out0")

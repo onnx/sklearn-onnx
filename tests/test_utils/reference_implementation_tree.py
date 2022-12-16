@@ -2,7 +2,7 @@
 """
 Helpers to test runtimes.
 """
-import numpy
+import numpy as np
 from onnx import numpy_helper  # noqa
 from onnx.defs import onnx_opset_version
 
@@ -29,8 +29,7 @@ def _attribute_value(attr):
     if attr.strings:
         return list(map(_to_str, attr.strings))
     raise NotImplementedError(
-        "Unable to return a value for attribute %r." % attr
-    )
+        "Unable to return a value for attribute %r." % attr)
 
 
 class TreeEnsembleAttributes:
@@ -42,14 +41,13 @@ class TreeEnsembleAttributes:
             self._names.append(name)
         if isinstance(value, list):
             if name in {
-                "base_values",
-                "class_weights",
-                "nodes_values",
-                "nodes_hitrates",
-            }:
-                value = numpy.array(value, dtype=numpy.float32)
+                    "base_values",
+                    "class_weights",
+                    "nodes_values",
+                    "nodes_hitrates"}:
+                value = np.array(value, dtype=np.float32)
             elif name.endswith("as_tensor"):
-                value = numpy.array(value)
+                value = np.array(value)
         setattr(self, name, value)
 
     def __str__(self):
@@ -73,17 +71,14 @@ class TreeEnsemble:
             self.atts.add(name, value)
 
         self.tree_ids = list(sorted(set(self.atts.nodes_treeids)))
-        self.root_index = {
-            tid: len(self.atts.nodes_treeids) for tid in self.tree_ids
-        }
+        self.root_index = {tid: len(self.atts.nodes_treeids)
+                           for tid in self.tree_ids}
         for index, tree_id in enumerate(self.atts.nodes_treeids):
             self.root_index[tree_id] = min(self.root_index[tree_id], index)
         self.node_index = {
             (tid, nid): i
             for i, (tid, nid) in enumerate(
-                zip(self.atts.nodes_treeids, self.atts.nodes_nodeids)
-            )
-        }
+                zip(self.atts.nodes_treeids, self.atts.nodes_nodeids))}
 
     def __str__(self):
         rows = ["TreeEnsemble",
@@ -113,13 +108,11 @@ class TreeEnsemble:
                 r = x != th
             else:
                 raise ValueError(
-                    f"Unexpected rule {rule!r} for node index {index}."
-                )
+                    f"Unexpected rule {rule!r} for node index {index}.")
             nid = (
                 self.atts.nodes_truenodeids[index]
                 if r
-                else self.atts.nodes_falsenodeids[index]
-            )
+                else self.atts.nodes_falsenodeids[index])
             index = self.node_index[tree_id, nid]
         return index
 
@@ -135,7 +128,7 @@ class TreeEnsemble:
             for tree_id in self.tree_ids:
                 outs.append(self.leaf_index_tree(row, tree_id))
             outputs.append(outs)
-        return numpy.array(outputs)
+        return np.array(outputs)
 
 
 if onnx_opset_version() >= 18:
@@ -146,30 +139,29 @@ if onnx_opset_version() >= 18:
         op_domain = "ai.onnx.ml"
 
         def _run(
-            self,
-            X,
-            aggregate_function=None,
-            base_values=None,
-            base_values_as_tensor=None,
-            n_targets=None,
-            nodes_falsenodeids=None,
-            nodes_featureids=None,
-            nodes_hitrates=None,
-            nodes_hitrates_as_tensor=None,
-            nodes_missing_value_tracks_true=None,
-            nodes_modes=None,
-            nodes_nodeids=None,
-            nodes_treeids=None,
-            nodes_truenodeids=None,
-            nodes_values=None,
-            nodes_values_as_tensor=None,
-            post_transform=None,
-            target_ids=None,
-            target_nodeids=None,
-            target_treeids=None,
-            target_weights=None,
-            target_weights_as_tensor=None,
-        ):
+                self,
+                X,
+                aggregate_function=None,
+                base_values=None,
+                base_values_as_tensor=None,
+                n_targets=None,
+                nodes_falsenodeids=None,
+                nodes_featureids=None,
+                nodes_hitrates=None,
+                nodes_hitrates_as_tensor=None,
+                nodes_missing_value_tracks_true=None,
+                nodes_modes=None,
+                nodes_nodeids=None,
+                nodes_treeids=None,
+                nodes_truenodeids=None,
+                nodes_values=None,
+                nodes_values_as_tensor=None,
+                post_transform=None,
+                target_ids=None,
+                target_nodeids=None,
+                target_treeids=None,
+                target_weights=None,
+                target_weights_as_tensor=None):
             nmv = nodes_missing_value_tracks_true
             tr = TreeEnsemble(
                 base_values=base_values,
@@ -186,71 +178,69 @@ if onnx_opset_version() >= 18:
                 nodes_values=nodes_values,
                 nodes_values_as_tensor=nodes_values_as_tensor,
                 target_weights=target_weights,
-                target_weights_as_tensor=target_weights_as_tensor,
-            )
+                target_weights_as_tensor=target_weights_as_tensor)
             self._tree = tr
             leaves_index = tr.leave_index_tree(X)
-            res = numpy.empty(
+            res = np.empty(
                 (leaves_index.shape[0], n_targets), dtype=X.dtype)
             if base_values is None:
                 res[:, :] = 0
             else:
-                res[:, :] = numpy.array(base_values).reshape((1, -1))
-            target_index = {
-                (tid, nid): i
-                for i, (tid, nid) in enumerate(
-                    zip(target_treeids, target_nodeids)
-                )
-            }
+                res[:, :] = np.array(base_values).reshape((1, -1))
+
+            target_index = {}
+            for i, (tid, nid) in enumerate(
+                    zip(target_treeids, target_nodeids)):
+                if (tid, nid) not in target_index:
+                    target_index[tid, nid] = []
+                target_index[tid, nid].append(i)
             for i in range(res.shape[0]):
                 indices = leaves_index[i]
-                t_index = [
-                    target_index[nodes_treeids[i], nodes_nodeids[i]]
-                    for i in indices
-                ]
+                t_index = [target_index[nodes_treeids[i], nodes_nodeids[i]]
+                           for i in indices]
                 if aggregate_function == "SUM":
-                    for it in t_index:
-                        res[i, target_ids[it]] += tr.atts.target_weights[it]
+                    for its in t_index:
+                        for it in its:
+                            res[i, target_ids[it]] += (
+                                tr.atts.target_weights[it])
                 else:
                     raise NotImplementedError(
                         f"aggregate_transform={aggregate_function!r} "
-                        f"not supported yet."
-                    )
+                        f"not supported yet.")
+
             if post_transform in (None, "NONE"):
                 return (res,)
             raise NotImplementedError(
-                f"post_transform={post_transform!r} not implemented."
-            )
+                f"post_transform={post_transform!r} not implemented.")
 
     class TreeEnsembleClassifier(OpRun):
 
         op_domain = "ai.onnx.ml"
 
         def _run(
-            self,
-            X,
-            base_values=None,
-            base_values_as_tensor=None,
-            class_ids=None,
-            class_nodeids=None,
-            class_treeids=None,
-            class_weights=None,
-            class_weights_as_tensor=None,
-            classlabels_int64s=None,
-            classlabels_strings=None,
-            nodes_falsenodeids=None,
-            nodes_featureids=None,
-            nodes_hitrates=None,
-            nodes_hitrates_as_tensor=None,
-            nodes_missing_value_tracks_true=None,
-            nodes_modes=None,
-            nodes_nodeids=None,
-            nodes_treeids=None,
-            nodes_truenodeids=None,
-            nodes_values=None,
-            nodes_values_as_tensor=None,
-            post_transform=None,
-        ):
+                self,
+                X,
+                base_values=None,
+                base_values_as_tensor=None,
+                class_ids=None,
+                class_nodeids=None,
+                class_treeids=None,
+                class_weights=None,
+                class_weights_as_tensor=None,
+                classlabels_int64s=None,
+                classlabels_strings=None,
+                nodes_falsenodeids=None,
+                nodes_featureids=None,
+                nodes_hitrates=None,
+                nodes_hitrates_as_tensor=None,
+                nodes_missing_value_tracks_true=None,
+                nodes_modes=None,
+                nodes_nodeids=None,
+                nodes_treeids=None,
+                nodes_truenodeids=None,
+                nodes_values=None,
+                nodes_values_as_tensor=None,
+                post_transform=None):
             nmv = nodes_missing_value_tracks_true
             tr = TreeEnsemble(
                 nodes_falsenodeids=nodes_falsenodeids,
@@ -265,19 +255,17 @@ if onnx_opset_version() >= 18:
                 nodes_values=nodes_values,
                 nodes_values_as_tensor=nodes_values_as_tensor,
                 class_weights=class_weights,
-                class_weights_as_tensor=class_weights_as_tensor,
-            )
+                class_weights_as_tensor=class_weights_as_tensor)
             self._tree = tr
             leaves_index = tr.leave_index_tree(X)
             n_classes = max(
-                len(classlabels_int64s or []), len(classlabels_strings or [])
-            )
-            res = numpy.empty(
+                len(classlabels_int64s or []), len(classlabels_strings or []))
+            res = np.empty(
                 (leaves_index.shape[0], n_classes), dtype=X.dtype)
             if base_values is None:
                 res[:, :] = 0
             else:
-                res[:, :] = numpy.array(base_values).reshape((1, -1))
+                res[:, :] = np.array(base_values).reshape((1, -1))
             class_index = {}
             for i, (tid, nid) in enumerate(zip(class_treeids, class_nodeids)):
                 if (tid, nid) not in class_index:
@@ -285,30 +273,48 @@ if onnx_opset_version() >= 18:
                 class_index[tid, nid].append(i)
             for i in range(res.shape[0]):
                 indices = leaves_index[i]
-                t_index = [
-                    class_index[nodes_treeids[i], nodes_nodeids[i]]
-                    for i in indices
-                ]
+                t_index = [class_index[nodes_treeids[i], nodes_nodeids[i]]
+                           for i in indices]
                 for its in t_index:
                     for it in its:
                         res[i, class_ids[it]] += tr.atts.class_weights[it]
             binary = len(set(class_ids)) == 1
             if binary:
-                res[:, 1] = res[:, 0]
-                res[:, 0] = 1 - res[:, 1]
+                classes = classlabels_int64s or classlabels_strings
+                if res.shape[1] == 1 and len(classes) == 1:
+                    new_res = np.zeros((res.shape[0], 2), res.dtype)
+                    new_res[:, 1] = res[:, 0]
+                    new_res[:, 0] = 1 - new_res[:, 1]
+                    res = new_res
+                else:
+                    res[:, 1] = res[:, 0]
+                    res[:, 0] = 1 - res[:, 1]
             res /= res.sum(axis=1, keepdims=1)
-            labels = numpy.argmax(res, axis=1).astype(numpy.int64)
+            labels = np.argmax(res, axis=1).astype(np.int64)
             if classlabels_int64s is not None:
-                labels = numpy.array(
-                    [classlabels_int64s[i] for i in labels], dtype=numpy.int64
-                )
+                if len(classlabels_int64s) == 1:
+                    if classlabels_int64s[0] == 1:
+                        d = {1: 1}
+                        labels = np.array(
+                            [d.get(i, 0) for i in labels], dtype=np.int64)
+                    else:
+                        raise NotImplementedError(
+                            f"classlabels_int64s={classlabels_int64s}, "
+                            f"not supported.")
+                else:
+                    labels = np.array(
+                        [classlabels_int64s[i] for i in labels],
+                        dtype=np.int64)
             elif classlabels_strings is not None:
-                labels = numpy.array([classlabels_strings[i] for i in labels])
+                if len(classlabels_strings) == 1:
+                    raise NotImplementedError(
+                        f"classlabels_strings={classlabels_strings}, "
+                        f"not supported.")
+                labels = np.array([classlabels_strings[i] for i in labels])
             if post_transform in (None, "NONE"):
                 return (labels, res)
             raise NotImplementedError(
-                f"post_transform={post_transform!r} not implemented."
-            )
+                f"post_transform={post_transform!r} not implemented.")
 
     if __name__ == "__main__":
         from onnx.reference import ReferenceEvaluator
@@ -337,32 +343,32 @@ if onnx_opset_version() >= 18:
             100, n_features=6, n_classes=3, n_informative=3, n_redundant=0
         )
         model = BaggingClassifier().fit(X, y)
-        onx = to_onnx(model, X.astype(numpy.float32),
+        onx = to_onnx(model, X.astype(np.float32),
                       options={"zipmap": False})
         tr = ReferenceEvaluator(
             onx, new_ops=[TreeEnsembleClassifier,
                           ArrayFeatureExtractor, ArgMax]
         )
         print("-----------------------")
-        print(tr.run(None, {"X": X[:10].astype(numpy.float32)}))
+        print(tr.run(None, {"X": X[:10].astype(np.float32)}))
         print("--")
-        print(model.predict(X[:10].astype(numpy.float32)))
-        print(model.predict_proba(X[:10].astype(numpy.float32)))
+        print(model.predict(X[:10].astype(np.float32)))
+        print(model.predict_proba(X[:10].astype(np.float32)))
         print("-----------------------")
 
         # classification 2
         model = RandomForestClassifier(max_depth=3, n_estimators=2).fit(X, y)
-        onx = to_onnx(model, X.astype(numpy.float32),
+        onx = to_onnx(model, X.astype(np.float32),
                       options={"zipmap": False})
         tr = ReferenceEvaluator(onx, new_ops=[TreeEnsembleClassifier])
-        print(tr.run(None, {"X": X[:5].astype(numpy.float32)}))
-        print(model.predict(X[:5].astype(numpy.float32)))
-        print(model.predict_proba(X[:5].astype(numpy.float32)))
+        print(tr.run(None, {"X": X[:5].astype(np.float32)}))
+        print(model.predict(X[:5].astype(np.float32)))
+        print(model.predict_proba(X[:5].astype(np.float32)))
 
         # regression
         X, y = make_regression(100, n_features=3)
         model = RandomForestRegressor(max_depth=3, n_estimators=2).fit(X, y)
-        onx = to_onnx(model, X.astype(numpy.float32))
+        onx = to_onnx(model, X.astype(np.float32))
         tr = ReferenceEvaluator(onx, new_ops=[TreeEnsembleRegressor])
-        print(tr.run(None, {"X": X[:5].astype(numpy.float32)}))
-        print(model.predict(X[:5].astype(numpy.float32)))
+        print(tr.run(None, {"X": X[:5].astype(np.float32)}))
+        print(model.predict(X[:5].astype(np.float32)))

@@ -17,7 +17,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from skl2onnx import convert_sklearn
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from test_utils import (
     binary_array_to_string,
     dump_one_class_classification,
@@ -31,6 +31,7 @@ from test_utils import (
     fit_regression_model,
     path_to_leaf,
     TARGET_OPSET,
+    InferenceSessionEx as InferenceSession,
 )
 
 

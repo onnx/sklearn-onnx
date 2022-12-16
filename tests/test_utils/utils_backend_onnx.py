@@ -50,12 +50,13 @@ if onnx_opset_version() >= 18:
 
     if add_ops:
         # bugs in reference implementation not covered by a backend test
-        from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
-        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
+        from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin, _argmin
+        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax, _argmax
         from onnx.reference.ops.op_reduce_log_sum_exp import (
             compute_log_sum_exp)
         from .reference_implementation_ml import (
             Binarizer,
+            DictVectorizer,
             FeatureVectorizer,
             FusedMatMul,
             Imputer,
@@ -77,17 +78,23 @@ if onnx_opset_version() >= 18:
         class ArgMin(_ArgMin):
             def _run(self, data, axis=None, keepdims=None,
                      select_last_index=None):
-                if select_last_index == 0:  # type: ignore
-                    return _ArgMin._run(
-                        self, data, axis=axis, keepdims=keepdims)
+                if select_last_index == 0:
+                    if keepdims == 0:
+                        return _ArgMin._run(
+                            self, data, axis=axis, keepdims=keepdims,
+                            select_last_index=0)
+                    return (_argmin(data, axis=axis, keepdims=keepdims),)
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         class ArgMax(_ArgMax):
             def _run(self, data, axis=None, keepdims=None,
                      select_last_index=None):
-                if select_last_index == 0:  # type: ignore
-                    return _ArgMax._run(
-                        self, data, axis=axis, keepdims=keepdims)
+                if select_last_index == 0:
+                    if keepdims == 0:
+                        return _ArgMax._run(
+                            self, data, axis=axis, keepdims=keepdims,
+                            select_last_index=0)
+                    return (_argmax(data, axis=axis, keepdims=keepdims),)
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         class ReduceLogSumExp_1(OpRunReduceNumpy):
@@ -157,6 +164,7 @@ if onnx_opset_version() >= 18:
             # ai.onnx.ml
             ArrayFeatureExtractor,
             Binarizer,
+            DictVectorizer,
             FeatureVectorizer,
             FusedMatMul,
             Imputer,
@@ -239,7 +247,7 @@ def get_shape(t):
 
 
 def get_type(t):
-    if t.tensor_type:
+    if t.tensor_type and str(t).startswith("tensor_type"):
         if tensor_dtype_to_string is None:
             res = ""
         else:
@@ -250,6 +258,7 @@ def get_type(t):
             'TensorProto.INT32': 'tensor(int32)',
             'TensorProto.DOUBLE': 'tensor(double)',
             'TensorProto.FLOAT': 'tensor(float)',
+            'TensorProto.BOOL': 'tensor(bool)',
         }
         return maps[res]
     return None

@@ -880,14 +880,13 @@ def dump_multilabel_classification(
 
 
 def dump_multiple_regression(
-    model,
-    suffix="",
-    folder=None,
-    allow_failure=None,
-    comparable_outputs=None,
-    verbose=False,
-    target_opset=None,
-):
+        model,
+        suffix="",
+        folder=None,
+        allow_failure=None,
+        comparable_outputs=None,
+        verbose=False,
+        target_opset=None):
     """
     Trains and dumps a model for a multi regression problem.
     The function trains a model and calls
@@ -904,8 +903,7 @@ def dump_multiple_regression(
         model,
         "multi-regressor",
         [("input", FloatTensorType([None, 2]))],
-        target_opset=target_opset,
-    )
+        target_opset=target_opset)
     dump_data_and_model(
         X,
         model,
@@ -914,18 +912,16 @@ def dump_multiple_regression(
         allow_failure=allow_failure,
         basename=prefix + "MRg" + model.__class__.__name__ + suffix,
         verbose=verbose,
-        comparable_outputs=comparable_outputs,
-    )
+        comparable_outputs=comparable_outputs)
 
 
 def dump_single_regression(
-    model,
-    suffix="",
-    folder=None,
-    allow_failure=None,
-    comparable_outputs=None,
-    target_opset=None,
-):
+        model,
+        suffix="",
+        folder=None,
+        allow_failure=None,
+        comparable_outputs=None,
+        target_opset=None):
     """
     Trains and dumps a model for a regression problem.
     The function trains a model and calls
@@ -942,8 +938,7 @@ def dump_single_regression(
         model,
         "single regressor",
         [("input", FloatTensorType([None, 2]))],
-        target_opset=target_opset,
-    )
+        target_opset=target_opset)
     dump_data_and_model(
         X,
         model,
@@ -951,8 +946,7 @@ def dump_single_regression(
         folder=folder,
         allow_failure=allow_failure,
         basename=prefix + "Reg" + model.__class__.__name__ + suffix,
-        comparable_outputs=comparable_outputs,
-    )
+        comparable_outputs=comparable_outputs)
 
 
 def timeit_repeat(fct, number, repeat):
@@ -1000,8 +994,7 @@ def timeexec(fct, number, repeat):
         repeat=repeat,
         min5=mini,
         max5=maxi,
-        run=number,
-    )
+        run=number)
 
 
 def compute_benchmark(fcts, number=10, repeat=100):
@@ -1133,9 +1126,7 @@ def make_report_backend(folder, as_df=False, verbose=0):
     if benched == 0:
         raise RuntimeError(
             "No benchmark files in '{0}', found:\n{1}".format(
-                folder, "\n".join(files)
-            )
-        )
+                folder, "\n".join(files)))
 
     def dict_update(d, u):
         d.update(u)
@@ -1204,9 +1195,8 @@ def binary_array_to_string(mat):
 def path_to_leaf(tree, mat, tree_indices=None):
     if tree_indices is None:
         # single tree
-        leave = set(
-            [i for i in range(tree.node_count) if tree.children_left[i] <= i]
-        )
+        leave = set([i for i in range(tree.node_count)
+                     if tree.children_left[i] <= i])
         res = []
         for row in range(mat.shape[0]):
             leaf = None
