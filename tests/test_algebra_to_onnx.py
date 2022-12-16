@@ -71,7 +71,9 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                                         opv, onx))
                     as_string = onx.SerializeToString()
                     try:
-                        ort = InferenceSession(as_string)
+                        ort = InferenceSession(
+                            as_string,
+                            providers=["CPUExecutionProvider"])
                     except (InvalidGraph, InvalidArgument) as e:
                         if (isinstance(opv, dict) and
                                 opv[''] >= onnx_opset_version()):
@@ -148,7 +150,9 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
                     self.assertNotIn('zipmap', str(onx).lower())
                     as_string = onx.SerializeToString()
                     try:
-                        ort = InferenceSession(as_string)
+                        ort = InferenceSession(
+                            as_string,
+                            providers=["CPUExecutionProvider"])
                     except (InvalidGraph, InvalidArgument, Fail,
                             NotImplemented) as e:
                         if (isinstance(opv, dict) and

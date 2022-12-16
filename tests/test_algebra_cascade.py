@@ -66,7 +66,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                                         opv, onx))
                     as_string = onx.SerializeToString()
                     try:
-                        ort = InferenceSession(as_string)
+                        ort = InferenceSession(
+                            as_string, providers=["CPUExecutionProvider"])
                     except (InvalidGraph, InvalidArgument) as e:
                         if (isinstance(opv, dict) and
                                 opv[''] >= onnx_opset_version()):
@@ -87,7 +88,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             dim = 10
             onx = generate_onnx_graph(dim, 300, opv=11)
             as_string = onx.SerializeToString()
-            ort = InferenceSession(as_string)
+            ort = InferenceSession(
+                as_string, providers=["CPUExecutionProvider"])
             X = (np.ones((1, dim)) * nbnode).astype(np.float32)
             res_out = ort.run(None, {'X1': X})
             assert len(res_out) == 1
@@ -124,7 +126,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except InvalidGraph as e:
                     if opv in (3, ):
                         continue
@@ -142,7 +145,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         dim = 10
         onx = generate_onnx_graph(dim, 300)
         as_string = onx.SerializeToString()
-        ort = InferenceSession(as_string)
+        ort = InferenceSession(
+            as_string, providers=["CPUExecutionProvider"])
         X = (np.ones((1, dim)) * nbnode).astype(np.float32)
         res_out = ort.run(None, {'X1': X})
         assert len(res_out) == 1
@@ -169,13 +173,18 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     raise e
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except InvalidGraph as e:
                     if opv > onnx_opset_version():
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
                             opv, onx)) from e
+                except Exception as xe:
+                    if "for domain ai.onnx is till opset 17." in str(xe):
+                        continue
+                    raise e
                 res_out = ort.run(None, {'X': X.astype(np.float32)})
                 assert len(res_out) == 1
                 res = res_out[0]
@@ -188,13 +197,18 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                                             '': TARGET_OPSET})
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except InvalidGraph as e:
                     if opv > onnx_opset_version():
                         continue
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
                             opv, onx)) from e
+                except Exception as xe:
+                    if "for domain ai.onnx is till opset 17." in str(xe):
+                        continue
+                    raise e
                 res_out = ort.run(None, {'X': X.astype(np.float32)})
                 assert len(res_out) == 1
                 res = res_out[0]
@@ -221,7 +235,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     raise e
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except (RuntimeError, InvalidGraph, Fail) as e:
                     if opv in (None, 1, 2):
                         continue

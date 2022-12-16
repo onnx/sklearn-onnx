@@ -122,7 +122,9 @@ class TestSklearnPipeline(unittest.TestCase):
         onx = convert_sklearn(model, initial_types=initial_types,
                               target_opset=TARGET_OPSET)
 
-        session = rt.InferenceSession(onx.SerializeToString())
+        session = rt.InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         pred_skl = model.predict(test_df)
         pred_onx = _predict(session, test_df)

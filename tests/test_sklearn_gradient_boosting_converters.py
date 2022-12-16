@@ -48,7 +48,9 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                                          target_opset=TARGET_OPSET)
             if "Regressor" in str(model_onnx):
                 raise AssertionError(str(model_onnx))
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             res = sess.run(None, {'input': X.astype(np.float32)})
             pred = model.predict_proba(X)
             delta = abs(res[1][0][0] - pred[0, 0])
@@ -248,7 +250,9 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         onnx_model = convert_sklearn(
             model, 'lr2', [('input', FloatTensorType(X_test.shape))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
         r1 = np.mean(
             np.isclose(model.predict_proba(X_test),

@@ -44,7 +44,8 @@ def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
             opts = None
         try:
             step_sess = onnxruntime.InferenceSession(
-                step.SerializeToString(), sess_options=opts)
+                step.SerializeToString(), sess_options=opts,
+                providers=["CPUExecutionProvider"])
         except Exception as e:
             raise RuntimeError("Unable to load ONNX model with onnxruntime. "
                                "Last added node is:\n{}".format(node)) from e
@@ -130,7 +131,9 @@ def compare_runtime(test,
     if isinstance(onx, onnx_package.ModelProto):
         onx = onx.SerializeToString()
     try:
-        sess = onnxruntime.InferenceSession(onx, sess_options=opts)
+        sess = onnxruntime.InferenceSession(
+            onx, sess_options=opts,
+            providers=["CPUExecutionProvider"])
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:

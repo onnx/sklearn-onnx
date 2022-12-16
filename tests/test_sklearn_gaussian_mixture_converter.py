@@ -45,7 +45,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             options={id(model): {'score_samples': True}},
             black_op=black_op)
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtFail as e:
             raise RuntimeError('Issue {}\n{}'.format(e, str(onx)))
         got = sess.run(None, {'X': X})
@@ -269,11 +271,15 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             black_op={'ReduceLogSumExp', 'ArgMax'})
         self.assertNotIn('ArgMax', str(model_onnx2))
 
-        sess1 = InferenceSession(model_onnx1.SerializeToString())
+        sess1 = InferenceSession(
+            model_onnx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a1, b1, c1 = res1
 
-        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        sess2 = InferenceSession(
+            model_onnx2.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a2, b2, c2 = res2
 

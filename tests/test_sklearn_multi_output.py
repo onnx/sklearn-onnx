@@ -52,7 +52,9 @@ class TestMultiOutputConverter(unittest.TestCase):
                       options={'zipmap': False})
         self.assertNotIn("ZipMap", str(onx))
 
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
         exp_prb = clf.predict_proba(X)
@@ -66,7 +68,9 @@ class TestMultiOutputConverter(unittest.TestCase):
                       options={id(clf): {'nocl': True, 'zipmap': False}})
         self.assertNotIn("ZipMap", str(onx))
 
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
         exp_prb = clf.predict_proba(X)
@@ -80,7 +84,9 @@ class TestMultiOutputConverter(unittest.TestCase):
                       options={id(clf): {'nocl': False, 'zipmap': False}})
         self.assertNotIn("ZipMap", str(onx))
 
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
         exp_prb = clf.predict_proba(X)
@@ -117,7 +123,9 @@ class TestMultiOutputConverter(unittest.TestCase):
         del clf.classes_
         onx = to_onnx(clf, X[:1], target_opset=TARGET_OPSET,
                       options={'zipmap': False, 'output_class_labels': True})
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X})
         exp_lab = clf.predict(X)
         exp_prb = clf.predict_proba(X)

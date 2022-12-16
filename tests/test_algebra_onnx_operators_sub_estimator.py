@@ -273,7 +273,13 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         X32 = X_test[:5].astype(np.float32)
         model_onnx = to_onnx(
             model, X32, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        try:
+            sess = InferenceSession(model_onnx.SerializeToString(),
+                                    providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'X': X32})
         assert_almost_equal(model.predict(X32), res[0])
         assert_almost_equal(model.predict_proba(X32), res[1], decimal=4)
@@ -299,7 +305,8 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         X32 = X_test[:5].astype(np.float32)
         model_onnx = to_onnx(
             model, X32, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(model_onnx.SerializeToString(),
+                                providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X32})
         assert_almost_equal(model.transform(X32), res[0], decimal=5)
 

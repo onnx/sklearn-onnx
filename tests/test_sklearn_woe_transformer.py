@@ -78,7 +78,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         woe.fit(x)
         expected = woe.transform(x)
         onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
@@ -94,7 +96,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
                 expected = woe.transform(x)
                 onnx_model = to_onnx(
                     woe, x, target_opset=TARGET_OPSET, verbose=0)
-                sess = InferenceSession(onnx_model.SerializeToString())
+                sess = InferenceSession(
+                    onnx_model.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': x})[0]
                 assert_almost_equal(expected, got)
 
@@ -113,7 +117,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         woe.fit(x)
         expected = woe.transform(x)
         onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
@@ -135,7 +141,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         with open("debug.onnx", "wb") as f:
             f.write(onnx_model.SerializeToString())
 
-        sess = InferenceSession(onnx_model.SerializeToString())
+            sess = InferenceSession(
+                onnx_model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
@@ -154,7 +162,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         expected = woe.transform(x)
 
         onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': x})[0]
         assert_almost_equal(expected, got)
 
@@ -175,7 +185,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         expected = woe.transform(x)
         onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
         try:
-            sess = InferenceSession(onnx_model.SerializeToString())
+            sess = InferenceSession(
+                onnx_model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Cannot load model:\n%s" % str(onnx_model)) from e
@@ -204,13 +216,17 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
 
         with self.subTest(way='skl2onnx'):
             onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET, verbose=0)
-            sess = InferenceSession(onnx_model.SerializeToString())
+            sess = InferenceSession(
+                onnx_model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             got = sess.run(None, {'X': x})[0]
             assert_almost_equal(expected, got)
         with self.subTest(way='onnx'):
             onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
             try:
-                sess = InferenceSession(onnx_model.SerializeToString())
+                sess = InferenceSession(
+                    onnx_model.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
             except InvalidArgument as e:
                 raise AssertionError(
                     "Cannot load model:\n%s" % str(onnx_model)) from e
@@ -233,7 +249,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
 
         onnx_model = to_onnx(woe, x, target_opset=TARGET_OPSET)
         try:
-            sess = InferenceSession(onnx_model.SerializeToString())
+            sess = InferenceSession(
+                onnx_model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Cannot load model:\n%s" % str(onnx_model)) from e
@@ -242,7 +260,9 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
 
         onnx_model = woe_transformer_to_onnx(woe, TARGET_OPSET)
         try:
-            sess = InferenceSession(onnx_model.SerializeToString())
+            sess = InferenceSession(
+                onnx_model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Cannot load model:\n%s" % str(onnx_model)) from e

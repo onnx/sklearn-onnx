@@ -471,7 +471,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         outputs = sess.run(None, {'input': X})
         pred, std = model.predict(X, return_std=True)
         assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
@@ -492,7 +494,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
 
         X = X.astype(numpy.float64)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         outputs = sess.run(None, {'input': X})
         pred, std = model.predict(X, return_std=True)
         assert_almost_equal(pred, outputs[0].ravel())
@@ -513,7 +517,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         outputs = sess.run(None, {'input': X})
         pred, std = model.predict(X, return_std=True)
         assert_almost_equal(pred, outputs[0].ravel(), decimal=4)
@@ -537,7 +543,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
 
         X = X.astype(numpy.float64)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         outputs = sess.run(None, {'input': X})
         pred, std = model.predict(X, return_std=True)
         assert_almost_equal(pred, outputs[0].ravel())
@@ -692,7 +700,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
 
     def check_model(self, model, X, name='input'):
         try:
-            sess = InferenceSession(model.SerializeToString())
+            sess = InferenceSession(
+                model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except Exception as e:
             if "support for domain ai.onnx is till opset 17" in str(e):
                 return None

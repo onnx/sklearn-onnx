@@ -124,9 +124,12 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             opts.graph_optimization_level = (
                 GraphOptimizationLevel.ORT_DISABLE_ALL)
             sess = InferenceSession(
-                model_onnx.SerializeToString(), sess_options=opts)
+                model_onnx.SerializeToString(), sess_options=opts,
+                providers=["CPUExecutionProvider"])
         else:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': Xtest})
         if isinstance(exp, tuple):
             if len(exp) != len(got):
@@ -159,7 +162,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -183,7 +188,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         x[0, 0] = x[1, 1] = x[2, 2] = 10.
         x[3, 2] = 5.
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': x.astype(np.float32)})[0]
         m1 = res
         m2 = ker(x)
@@ -197,7 +204,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': x.astype(np.float32)})[0]
         m1 = res
         m2 = ker(x)
@@ -220,7 +229,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         x[3, 2] = 5.
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except NotImplemented:
             # Failed to find kernel for FusedMatMul(1).
             return
@@ -239,7 +250,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                              op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -257,7 +270,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                              op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -273,7 +288,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                              op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -289,7 +306,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                              op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -307,7 +326,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -325,7 +346,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -343,7 +366,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -365,7 +390,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -383,7 +410,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             inputs=[('X', FloatTensorType())],
             outputs=[('Y', FloatTensorType())],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         x = np.array([[1, 2], [3, 4], [5, 6]], dtype=np.float32)
         res = sess.run(None, {'X': x})
@@ -407,7 +436,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -419,7 +450,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_, Xtest_ * 2)
@@ -437,7 +470,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker.diag(Xtest_)
@@ -455,7 +490,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker.diag(Xtest_)
@@ -473,7 +510,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker.diag(Xtest_)
@@ -490,7 +529,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -502,7 +543,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_, Xtest_ * 2)
@@ -519,7 +562,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_)
@@ -530,7 +575,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                              dtype=np.float32, op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
             inputs=[('X', FloatTensorType([None, None]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker(Xtest_, Xtest_ * 2)
@@ -1085,7 +1132,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         initial_type = [('data_in', DoubleTensorType([None, X.shape[1]]))]
         onx = to_onnx(pipe, initial_types=initial_type,
                       target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         pred = sess.run(None, {'data_in': vx1.astype(np.float64)})
         assert_almost_equal(pipe.predict(vx1.astype(np.float64)).ravel(),
                             pred[0].ravel())
@@ -1102,7 +1151,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                       target_opset=_TARGET_OPSET_,
                       options={GaussianProcessRegressor: {'optim': 'cdist'}})
         self.assertIn('op_type: "CDist"', str(onx))
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         pred = sess.run(None, {'data_in': vx1.astype(np.float64)})
         assert_almost_equal(pipe.predict(vx1.astype(np.float64)).ravel(),
                             pred[0].ravel())
@@ -1116,7 +1167,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         initial_type = [('data_in', FloatTensorType([None, X.shape[1]]))]
         onx = to_onnx(gpr, initial_types=initial_type,
                       target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         pred = sess.run(None, {'data_in': vx1.astype(np.float32)})
         assert_almost_equal(gpr.predict(vx1.astype(np.float32)).shape[0],
                             pred[0].shape[0])
@@ -1132,7 +1185,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         initial_type = [('data_in', DoubleTensorType([None, X.shape[1]]))]
         onx = to_onnx(gpr, initial_types=initial_type,
                       target_opset=_TARGET_OPSET_)
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         pred = sess.run(None, {'data_in': vx1.astype(np.float64)})
         assert_almost_equal(gpr.predict(vx1.astype(np.float64)).ravel(),
                             pred[0].ravel())
@@ -1154,7 +1209,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         x[0, 0] = x[1, 1] = x[2, 2] = 10.
         x[3, 2] = 5.
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': x.astype(np.float32)})[0]
         m1 = res
         m2 = ker(x)
@@ -1168,7 +1225,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             inputs=[('X', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': x.astype(np.float32)})[0]
         m1 = res
         m2 = ker(x, x)

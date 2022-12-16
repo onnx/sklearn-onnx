@@ -33,7 +33,9 @@ skl_ver = '.'.join(sklearn.__version__.split('.')[:2])
 class TestSklearnImputerConverter(unittest.TestCase):
 
     def _check_outputs_ints(self, model, model_onnx, data):
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         idata = {'input': np.array(data).astype(np.int64)}
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
@@ -41,7 +43,9 @@ class TestSklearnImputerConverter(unittest.TestCase):
 
     def _check_outputs_strings(self, model, model_onnx, data):
         idata = {'input': np.array(data).astype(np.str_)}
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
         if list(exp.ravel()) != list(res.ravel()):

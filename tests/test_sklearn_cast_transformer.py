@@ -96,7 +96,9 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         exp1 = model1.predict(Xi_test)
         onx1 = to_onnx(model1, X_train[:1].astype(numpy.float32),
                        target_opset=TARGET_OPSET)
-        sess1 = InferenceSession(onx1.SerializeToString())
+        sess1 = InferenceSession(
+            onx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got1 = sess1.run(None, {'X': Xi_test})[0]
         md1 = maxdiff(exp1, got1)
 
@@ -112,7 +114,9 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         onx = to_onnx(model2, X_train[:1].astype(numpy.float32),
                       options={StandardScaler: {'div': 'div_cast'}},
                       target_opset=TARGET_OPSET)
-        sess2 = InferenceSession(onx.SerializeToString())
+        sess2 = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got2 = sess2.run(None, {'X': Xi_test})[0]
         md2 = maxdiff(exp2, got2)
         assert md2 <= md1

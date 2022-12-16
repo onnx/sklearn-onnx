@@ -59,7 +59,9 @@ class TestSklearnCustomNMF(unittest.TestCase):
 
         model_onnx = nmf_to_onnx(W.astype(np.float32),
                                  H.astype(np.float32))
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         def predict_onnx(sess, row_indices, col_indices):
             res = sess.run(None,

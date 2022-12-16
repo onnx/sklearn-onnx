@@ -75,7 +75,7 @@ for this machine learning model.
 ::
 
     import onnxruntime as rt
-    sess = rt.InferenceSession("logreg_iris.onnx")
+    sess = rt.InferenceSession("logreg_iris.onnx", providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
 

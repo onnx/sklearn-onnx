@@ -98,7 +98,9 @@ class TestTopologyPrune(unittest.TestCase):
             {'input': FloatTensorType([None, None])},
             outputs=[('cdist', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         self.assertEqual(len(res), 1)
 
@@ -123,7 +125,9 @@ class TestTopologyPrune(unittest.TestCase):
             {'input': FloatTensorType([None, None])},
             outputs=[('cdist', FloatTensorType([None, None]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         self.assertEqual(len(res), 1)
 

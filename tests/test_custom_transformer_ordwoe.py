@@ -92,7 +92,14 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         pipe.fit(X)
         expected = pipe.transform(X)
         onx = to_onnx(pipe, X, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onx.SerializeToString())
+        try:
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 
@@ -115,7 +122,14 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         expected = ordwoe.transform(X)
 
         onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onx.SerializeToString())
+        try:
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 

@@ -40,7 +40,9 @@ class TestOnnxHelper(unittest.TestCase):
 
         from onnxruntime import InferenceSession
 
-        session = InferenceSession(save_onnx_model(model))
+        session = InferenceSession(
+            save_onnx_model(model),
+            providers=["CPUExecutionProvider"])
         return lambda X: session.run(None, {"input": X})[0]
 
     def test_onnx_helper_load_save(self):
@@ -56,7 +58,12 @@ class TestOnnxHelper(unittest.TestCase):
         new_model = select_model_inputs_outputs(model, "variable")
         assert new_model.graph is not None
 
-        tr1 = self.get_model(model)
+        try:
+            tr1 = self.get_model(model)
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e        
         tr2 = self.get_model(new_model)
         X = X.astype(numpy.float32)
         X1 = tr1(X)
@@ -133,7 +140,9 @@ class TestOnnxHelper(unittest.TestCase):
         new_model_onnx = add_output_initializer(
             model_onnx, "new_output", cst)
 
-        sess = InferenceSession(new_model_onnx.SerializeToString())
+        sess = InferenceSession(
+            new_model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         self.assertEqual(len(res), 2)
         assert_almost_equal(cst, res[1])
@@ -144,7 +153,9 @@ class TestOnnxHelper(unittest.TestCase):
         new_model_onnx = add_output_initializer(
             model_onnx, ["new_output1", "new_output2"], [cst, cst + 1])
 
-        sess = InferenceSession(new_model_onnx.SerializeToString())
+        sess = InferenceSession(
+            new_model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         self.assertEqual(len(res), 3)
         assert_almost_equal(cst, res[1])

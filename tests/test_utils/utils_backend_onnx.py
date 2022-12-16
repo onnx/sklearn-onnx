@@ -24,6 +24,7 @@ from .utils_backend import (
 
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
+    from onnx.reference.ops import load_op
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
@@ -33,7 +34,14 @@ if onnx_opset_version() >= 18:
 
     additional_implementations = [CDist]
 
-    if onnx_opset_version() == 18:
+    try:
+        load_op('ai.onnx.ml', 'Scaler')
+        add_ops = False
+    except Exception as e:
+        print(type(e))
+        add_ops = True
+
+    if add_ops:
         # bugs in reference implementation not covered by a backend test
         from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
         from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax

@@ -467,7 +467,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.decision_function(X)
@@ -480,7 +482,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.decision_function(X)
@@ -493,7 +497,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.decision_function(X)
@@ -507,7 +513,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.decision_function(X)
@@ -521,7 +529,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={'zipmap': False}, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.predict_proba(X)
@@ -535,7 +545,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={'zipmap': False}, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.predict_proba(X)
@@ -548,7 +560,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.decision_function(X)
@@ -563,7 +577,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.decision_function(X)
@@ -577,7 +593,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={'zipmap': False}, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.predict_proba(X)
@@ -591,7 +609,9 @@ class TestSklearnSVM(unittest.TestCase):
             model, "linear SVC",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={'zipmap': False}, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         label = model.predict(X)
         proba = model.predict_proba(X)

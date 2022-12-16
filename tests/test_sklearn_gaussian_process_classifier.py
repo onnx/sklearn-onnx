@@ -83,7 +83,9 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtFail:
             if not hasattr(self, 'path'):
                 return
@@ -93,7 +95,9 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
                 model_onnx, {'Solve': ('Solve%s' % suffix, 'ai.onnx.contrib')})
             so = SessionOptions()
             so.register_custom_ops_library(self.path)
-            sess = InferenceSession(model_onnx.SerializeToString(), so)
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), so,
+                providers=["CPUExecutionProvider"])
 
             res = sess.run(None, {'X': X.astype(dtype)})
             assert_almost_equal(res[0].ravel(), gp.predict(X).ravel())

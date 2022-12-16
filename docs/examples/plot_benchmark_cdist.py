@@ -56,7 +56,8 @@ print(onx)
 # We compute the output of CDist operator
 # with onnxruntime.
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
 res = sess.run(None, {'X': X, 'Y': Y})
 print(res)
 

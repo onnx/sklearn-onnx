@@ -35,7 +35,7 @@ def fcts_model(X, y, max_depth, n_estimators):
     f = BytesIO()
     f.write(onx.SerializeToString())
     content = f.getvalue()
-    sess = InferenceSession(content)
+    sess = InferenceSession(content, providers=["CPUExecutionProvider"])
     outputs = [o.name for o in sess.get_outputs()]
 
     def predict_skl_predict(X, model=rf):

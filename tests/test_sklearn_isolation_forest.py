@@ -54,7 +54,9 @@ class TestSklearnIsolationForest(unittest.TestCase):
         model_onnx = to_onnx(
             model, data, options={'score_samples': True},
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores', 'score_samples'])
         got = sess.run(None, {'X': data})

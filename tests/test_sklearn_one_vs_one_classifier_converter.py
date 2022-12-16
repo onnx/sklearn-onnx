@@ -41,7 +41,9 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
 
         XI = X_test[:10].astype(np.float32)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': XI})
         assert_almost_equal(exp_label.ravel(), got[0].ravel())
         assert_almost_equal(exp_prob, got[1])
@@ -62,7 +64,9 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
 
         XI = X_test[:10].astype(np.float32)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': XI})
         assert_almost_equal(exp_label.ravel(), got[0].ravel())
         assert_almost_equal(exp_prob, got[1])
@@ -83,7 +87,9 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
 
         XI = X_test[:10].astype(np.float64)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': XI})
         assert_almost_equal(exp_label.ravel(), got[0].ravel())
         assert_almost_equal(exp_prob, got[1])
@@ -105,7 +111,9 @@ class TestOneVsOneClassifierConverter(unittest.TestCase):
 
         XI = X_test[:limit].astype(np.float32)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': XI})
         assert_almost_equal(exp_label.ravel(), got[0].ravel())
         assert_almost_equal(exp_prob, got[1])

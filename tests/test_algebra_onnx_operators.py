@@ -83,7 +83,9 @@ class TestOnnxOperators(unittest.TestCase):
             custom_conversion_functions={CustomOpTransformer: conv},
             target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
         assert_almost_equal(z, z2)
 
@@ -130,7 +132,9 @@ class TestOnnxOperators(unittest.TestCase):
             target_opset=TARGET_OPSET)
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             raise AssertionError(
                 "Cannot load model\n---\n{}\n---".format(model_onnx)) from e
@@ -220,7 +224,9 @@ class TestOnnxOperators(unittest.TestCase):
                     onx = cst.to_onnx(
                         {'X': shape}, target_opset=opset,
                         outputs=[('Y', FloatTensorType())])
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     res = sess.run(None, {'X': shape})
                     assert_almost_equal(
                         res[0], np.full(tuple(shape), 5, dtype=np.float32))
@@ -232,7 +238,9 @@ class TestOnnxOperators(unittest.TestCase):
                     onx = cst.to_onnx(
                         {'X': shape}, target_opset=opset,
                         outputs=[('Y', FloatTensorType())])
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     res = sess.run(None, {'X': shape})
                     assert_almost_equal(
                         res[0], np.full(tuple(shape), 5, dtype=np.float32))
@@ -305,7 +313,9 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([2]))],
                                 target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': X})[0]
         self.assertEqual(got.shape, (2, 1))
         assert_almost_equal(X[:, 1:2], got)
@@ -321,7 +331,14 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([None, 2]))],
                                 target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(X.reshape((1, -1)), got)
         inits = [row for row in str(model_def).split('\n')
@@ -363,7 +380,14 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': x.astype(np.float32)},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        try:
+            oinf = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
@@ -383,7 +407,9 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': x.astype(np.float32)},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
@@ -401,7 +427,14 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        try:
+            oinf = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 
@@ -417,7 +450,9 @@ class TestOnnxOperators(unittest.TestCase):
             mode='reflect', op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'data': data, 'pads': pads})
         try:
             assert_almost_equal(exp, got[0])
@@ -436,7 +471,9 @@ class TestOnnxOperators(unittest.TestCase):
             mode='edge', op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 

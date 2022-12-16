@@ -109,7 +109,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except Exception as e:
             if "Current official support for domain ai.onnx" in str(e):
                 return
@@ -149,7 +151,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             outputs=[('y', FloatTensorType()),
                      ('z', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'initial': initial, 'x': x})
 
         y = np.array([9, 12]).astype(np.float32).reshape((2,))
@@ -183,7 +192,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             other_outputs=[flat],
             target_opset=opv)
 
-        sess = InferenceSession(scan_body.SerializeToString())
+        try:
+            sess = InferenceSession(
+                scan_body.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'next_in': x, 'next': x[:1]})
         assert_almost_equal(x, res[0])
         exp = np.array([0., 18., 20.], dtype=np.float32)
@@ -204,7 +220,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             else:
                 raise e
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'x': x})
 
         exp = squareform(pdist(x, metric="sqeuclidean"))
@@ -231,20 +254,36 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('pdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
         x = np.array([1, 2, 4, 5]).astype(np.float32).reshape((2, 2))
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
         x = np.array([1, 2, 4, 5, 5, 6]).astype(np.float32).reshape((2, 3))
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((2, 3))
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
@@ -262,7 +301,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             output_names=['mat'], op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = np.zeros((3, 2), dtype=np.float32)
         assert_almost_equal(exp, res[0])
@@ -275,7 +316,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
@@ -300,7 +348,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -323,7 +378,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
@@ -351,7 +413,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="minkowski")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -376,7 +445,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
@@ -402,7 +478,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             outputs=[('cdist', FloatTensorType())])
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             if "CDist is not a registered" in str(e):
                 return
@@ -430,7 +508,14 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
+        except Exception as xe:
+            if "for domain ai.onnx is till opset 17." in str(xe):
+                return
+            raise e
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)

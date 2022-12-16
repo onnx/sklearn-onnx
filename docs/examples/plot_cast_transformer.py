@@ -79,7 +79,8 @@ exp1 = model1.predict(Xi_test)
 # Conversion into ONNX.
 onx1 = to_onnx(model1, X_train[:1].astype(np.float32),
                target_opset=15)
-sess1 = InferenceSession(onx1.SerializeToString())
+sess1 = InferenceSession(onx1.SerializeToString(),
+                         providers=["CPUExecutionProvider"])
 
 ###################################
 # And the maximum difference.
@@ -140,7 +141,8 @@ onx2 = to_onnx(model2, X_train[:1].astype(np.float32),
                options={StandardScaler: {'div': 'div_cast'}},
                target_opset=15)
 
-sess2 = InferenceSession(onx2.SerializeToString())
+sess2 = InferenceSession(onx2.SerializeToString(),
+                         providers=["CPUExecutionProvider"])
 got2 = sess2.run(None, {'X': Xi_test})[0]
 md2 = maxdiff(exp2, got2)
 

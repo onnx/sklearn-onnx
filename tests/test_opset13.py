@@ -26,15 +26,19 @@ class TestOpset13(unittest.TestCase):
                     'X', output_names=['Y'], keepdims=0, op_version=opset)
                 model_def = onx.to_onnx(
                     {'X': X.astype(numpy.float32)}, target_opset=opset)
-                got = InferenceSession(model_def.SerializeToString()).run(
-                    None, {'X': X})
+                got = InferenceSession(
+                    model_def.SerializeToString(),
+                    providers=["CPUExecutionProvider"]).run(
+                        None, {'X': X})
                 assert_almost_equal(numpy.sum(X), got[0], decimal=6)
                 onx = OnnxReduceSumApi11(
                     'X', output_names=['Y'], axes=[1], op_version=opset)
                 model_def = onx.to_onnx(
                     {'X': X.astype(numpy.float32)}, target_opset=opset)
-                got = InferenceSession(model_def.SerializeToString()).run(
-                    None, {'X': X})
+                got = InferenceSession(
+                    model_def.SerializeToString(),
+                    providers=["CPUExecutionProvider"]).run(
+                        None, {'X': X})
                 assert_almost_equal(
                     numpy.sum(X, axis=1, keepdims=True), got[0], decimal=6)
 
@@ -53,8 +57,10 @@ class TestOpset13(unittest.TestCase):
                     output_names=['Y1', 'Y2', 'Y3'], op_version=opset)
                 model_def = onx.to_onnx(
                     {'X': x.astype(numpy.float32)}, target_opset=opset)
-                got = InferenceSession(model_def.SerializeToString()).run(
-                    None, {'X': x})
+                got = InferenceSession(
+                    model_def.SerializeToString(),
+                    providers=["CPUExecutionProvider"]).run(
+                        None, {'X': x})
                 assert_almost_equal(y[0], got[0])
                 assert_almost_equal(y[1], got[1])
                 assert_almost_equal(y[2], got[2])
@@ -70,8 +76,10 @@ class TestOpset13(unittest.TestCase):
                     'X', axes=[1], output_names=['Y'], op_version=opset)
                 model_def = onx.to_onnx(
                     {'X': x.astype(numpy.float32)}, target_opset=opset)
-                got = InferenceSession(model_def.SerializeToString()).run(
-                    None, {'X': x})
+                got = InferenceSession(
+                    model_def.SerializeToString(),
+                    providers=["CPUExecutionProvider"]).run(
+                        None, {'X': x})
                 assert_almost_equal(y, got[0])
 
     @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.0.0'),
@@ -87,8 +95,10 @@ class TestOpset13(unittest.TestCase):
                     'X', axes=[-2], output_names=['Y'], op_version=opset)
                 model_def = onx.to_onnx(
                     {'X': x.astype(numpy.float32)}, target_opset=opset)
-                got = InferenceSession(model_def.SerializeToString()).run(
-                    None, {'X': x})
+                got = InferenceSession(
+                    model_def.SerializeToString(),
+                    providers=["CPUExecutionProvider"]).run(
+                        None, {'X': x})
                 assert_almost_equal(y, got[0])
 
 

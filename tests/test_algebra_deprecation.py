@@ -99,7 +99,9 @@ class TestOnnxDeprecation(unittest.TestCase):
         self.assertTrue(mes is not None)
         self.assertIn('will be removed', str(mes))
 
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         exp = dec.transform(X.astype(np.float32))
         got = sess.run(None, {'X': X.astype(np.float32)})[0]

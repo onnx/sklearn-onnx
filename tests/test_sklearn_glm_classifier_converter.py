@@ -35,7 +35,9 @@ ort_version = ort_version.split('+')[0]
 
 def InferenceSession(*args, **kwargs):
     try:
-        return _InferenceSession(*args, **kwargs)
+        return _InferenceSession(
+            *args, providers=["CPUExecutionProvider"],
+            **kwargs)
     except Exception as e:
         if "support for domain ai.onnx is till opset 17" in str(e):
             return None

@@ -130,7 +130,9 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
                   'CAT2': dfx_test['CAT2'].values.reshape((-1, 1)),
                   'TEXT': dfx_test['TEXT'].values.reshape((-1, 1))}
         onx = to_onnx(pipe, dfx_test, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         expected_dense = expected.todense()
         for i in range(dfx_test.shape[0]):
@@ -168,7 +170,9 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
                       options={CountVectorizer: {'keep_empty_string': True}})
         with open("debug.onnx", "wb") as f:
             f.write(onx.SerializeToString())
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         expected_dense = expected.todense()
         for i in range(dfx_test.shape[0]):

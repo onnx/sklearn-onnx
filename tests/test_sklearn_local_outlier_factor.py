@@ -42,7 +42,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         data = data.copy()
         data[:, 0] += 0.1
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores'])
         got = sess.run(None, {'X': data})
@@ -64,7 +66,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         data = data.copy()
         data[:, 0] += 0.1
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores'])
         got = sess.run(None, {'X': data})
@@ -89,7 +93,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         data = data.copy()
         data[:, 0] += 0.1
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores'])
         got = sess.run(None, {'X': data})
@@ -113,7 +119,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         data = data.copy()
         data[:, 0] += 0.1
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores'])
         got = sess.run(None, {'X': data})
@@ -139,7 +147,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         data[:, 0] += 0.1
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidGraph as e:
             if "Unrecognized attribute: p for operator CDist" in str(e):
                 return
@@ -168,7 +178,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
                 data = data.copy()
                 data[:, 0] += 0.1
 
-                sess = InferenceSession(model_onnx.SerializeToString())
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 names = [o.name for o in sess.get_outputs()]
                 self.assertEqual(names, ['label', 'scores'])
                 got = sess.run(None, {'X': data})
@@ -195,7 +207,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
                 data = data.copy()
                 data[:, 0] += 0.1
 
-                sess = InferenceSession(model_onnx.SerializeToString())
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 names = [o.name for o in sess.get_outputs()]
                 self.assertEqual(names, ['label', 'scores'])
                 got = sess.run(None, {'X': data})
@@ -216,7 +230,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         model = lof.fit(data)
         model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores'])
         got = sess.run(None, {'X': data})
@@ -234,7 +250,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         model = lof.fit(data)
         model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET,
                              options={'score_samples': True})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores', 'score_samples'])
         got = sess.run(None, {'X': data})
@@ -256,7 +274,9 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         model = lof.fit(data)
         model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [o.name for o in sess.get_outputs()]
         self.assertEqual(names, ['label', 'scores'])
         got = sess.run(None, {'X': data})

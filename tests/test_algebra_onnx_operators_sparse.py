@@ -39,7 +39,9 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
         model_def = node.to_onnx({'X': X},
                                  outputs=[('Y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X})[0]
 
         assert_almost_equal(X + X, res)
@@ -62,7 +64,9 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
             {'X': X}, outputs=[('Y', FloatTensorType())])
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except (RuntimeError, OrtInvalidArgument):
             # Sparse tensor is not supported for constant.
             return

@@ -86,7 +86,9 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
                   FloatTensorType([1])))],
                 target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         inp = {'ALL_LOWER': numpy.array([1], dtype=numpy.float32),
                'NEXT_ALL_LOWER': numpy.array([1], dtype=numpy.float32)}
         res = sess.run(None, {'input': inp})
@@ -108,7 +110,9 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
                   Int64TensorType([1])))],
                 target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         inp = {'ALL_LOWER': numpy.array([1], dtype=numpy.int64),
                'NEXT_ALL_LOWER': numpy.array([1], dtype=numpy.int64)}
         with self.assertRaises(InvalidArgument):
@@ -134,7 +138,9 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
                 target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
         with self.assertRaises(InvalidGraph):
-            InferenceSession(model_onnx.SerializeToString())
+            InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
 
 
 if __name__ == "__main__":

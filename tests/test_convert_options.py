@@ -121,7 +121,14 @@ class TestConvertOptions(unittest.TestCase):
                         cls, X[:1], options={
                             'zipmap': zipmap, 'output_class_labels': addcl},
                         target_opset=TARGET_OPSET)
-                    sess = InferenceSession(onx.SerializeToString())
+                    try:
+                        sess = InferenceSession(
+                            onx.SerializeToString(),
+                            providers=["CPUExecutionProvider"])
+                    except Exception as xe:
+                        if "for domain ai.onnx is till opset 17." in str(xe):
+                            continue
+                        raise e
                     got = sess.run(None, {'X': X_test})
                     if addcl:
                         TestConvertOptions.almost_equal_class_labels(
@@ -137,7 +144,9 @@ class TestConvertOptions(unittest.TestCase):
                         options={cls.__class__: {
                             'zipmap': zipmap, 'output_class_labels': addcl}},
                         target_opset=TARGET_OPSET)
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, {'X': X_test})
                     if addcl:
                         TestConvertOptions.almost_equal_class_labels(
@@ -153,7 +162,9 @@ class TestConvertOptions(unittest.TestCase):
                         options={id(cls): {
                             'zipmap': zipmap, 'output_class_labels': addcl}},
                         target_opset=TARGET_OPSET)
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, {'X': X_test})
                     if addcl:
                         TestConvertOptions.almost_equal_class_labels(
@@ -238,7 +249,14 @@ class TestConvertOptions(unittest.TestCase):
                         # does not support Sequence of Maps.
                         continue
 
-                    sess = InferenceSession(onx.SerializeToString())
+                    try:
+                        sess = InferenceSession(
+                            onx.SerializeToString(),
+                            providers=["CPUExecutionProvider"])
+                    except Exception as xe:
+                        if "for domain ai.onnx is till opset 17." in str(xe):
+                            return
+                        raise e
                     got = sess.run(None, {'X': X_test})
                     TestConvertOptions.almost_equal_multi(
                         expected_label, expected_proba, *got, zipmap=zipmap)
@@ -247,7 +265,9 @@ class TestConvertOptions(unittest.TestCase):
                         cls, X[:1],
                         options={cls.__class__: {'zipmap': zipmap}},
                         target_opset=TARGET_OPSET)
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, {'X': X_test})
                     assert_almost_equal(expected_label, got[0])
 
@@ -255,7 +275,9 @@ class TestConvertOptions(unittest.TestCase):
                         cls, X[:1],
                         options={id(cls): {'zipmap': zipmap}},
                         target_opset=TARGET_OPSET)
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, {'X': X_test})
                     assert_almost_equal(expected_label, got[0])
 
@@ -299,7 +321,14 @@ class TestConvertOptions(unittest.TestCase):
                 onx = to_onnx(cls, X[:1], options=opts,
                               target_opset=TARGET_OPSET)
 
-                sess = InferenceSession(onx.SerializeToString())
+                try:
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
+                except Exception as xe:
+                    if "for domain ai.onnx is till opset 17." in str(xe):
+                        continue
+                    raise e
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -309,7 +338,9 @@ class TestConvertOptions(unittest.TestCase):
                 onx = to_onnx(
                     cls, X[:1], options={cls.__class__: opts},
                     target_opset=TARGET_OPSET)
-                sess = InferenceSession(onx.SerializeToString())
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -319,7 +350,9 @@ class TestConvertOptions(unittest.TestCase):
                 onx = to_onnx(
                     cls, X[:1], options={id(cls): opts},
                     target_opset=TARGET_OPSET)
-                sess = InferenceSession(onx.SerializeToString())
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -353,7 +386,14 @@ class TestConvertOptions(unittest.TestCase):
                               target_opset=TARGET_OPSET)
                 # with open("debugmo2.onnx", "wb") as f:
                 #     f.write(onx.SerializeToString())
-                sess = InferenceSession(onx.SerializeToString())
+                try:
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
+                except Exception as xe:
+                    if "for domain ai.onnx is till opset 17." in str(xe):
+                        return
+                    raise e
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -363,7 +403,9 @@ class TestConvertOptions(unittest.TestCase):
                 onx = to_onnx(
                     cls, X[:1], options={cls.__class__: opts},
                     target_opset=TARGET_OPSET)
-                sess = InferenceSession(onx.SerializeToString())
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -373,7 +415,9 @@ class TestConvertOptions(unittest.TestCase):
                 onx = to_onnx(
                     cls, X[:1], options={id(cls): opts},
                     target_opset=TARGET_OPSET)
-                sess = InferenceSession(onx.SerializeToString())
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(

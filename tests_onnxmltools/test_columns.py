@@ -67,7 +67,9 @@ class TestOptionColumns(unittest.TestCase):
             options={id(model): {'zipmap': 'columns'}},
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertIsNotNone(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [_.name for _ in sess.get_outputs()]
         self.assertEqual(['output_label', 'i0', 'i1', 'i2'], names)
         xt = X[:10].astype(np.float32)

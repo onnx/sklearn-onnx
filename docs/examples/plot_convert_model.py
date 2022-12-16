@@ -56,7 +56,7 @@ with open("rf_iris.onnx", "wb") as f:
 ###################################
 # Compute the prediction with ONNX Runtime
 # ++++++++++++++++++++++++++++++++++++++++
-sess = rt.InferenceSession("rf_iris.onnx")
+sess = rt.InferenceSession("rf_iris.onnx", providers=["CPUExecutionProvider"])
 input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
 pred_onx = sess.run(

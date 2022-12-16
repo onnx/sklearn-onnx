@@ -342,7 +342,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                     options={id(model): {'zipmap': False}})
 
                 try:
-                    sess = InferenceSession(model_onnx.SerializeToString())
+                    sess = InferenceSession(
+                        model_onnx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                 except Exception as e:
                     if "support for domain ai.onnx is till opset 17." in str(e):
                         sess = None

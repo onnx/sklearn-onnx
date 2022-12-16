@@ -38,7 +38,9 @@ class TestAlgebraComplex(unittest.TestCase):
                     self.assertIn('elem_type: %d' % pr, str(onx))
 
                     try:
-                        ort = InferenceSession(onx.SerializeToString())
+                        ort = InferenceSession(
+                            onx.SerializeToString(),
+                            providers=["CPUExecutionProvider"])
                     except InvalidGraph as e:
                         if "Type Error: Type 'tensor(complex" in str(e):
                             continue
