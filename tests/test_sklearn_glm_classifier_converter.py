@@ -15,8 +15,7 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-from onnxruntime import (
-    InferenceSession as _InferenceSession, __version__ as ort_version)
+from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -27,21 +26,11 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
-    TARGET_OPSET)
+    TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = ort_version.split('+')[0]
-
-
-def InferenceSession(*args, **kwargs):
-    try:
-        return _InferenceSession(
-            *args, providers=["CPUExecutionProvider"],
-            **kwargs)
-    except Exception as e:
-        if "support for domain ai.onnx is till opset 17" in str(e):
-            return None
-        raise e
 
 
 def _sklearn_version():
@@ -103,7 +92,9 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinaryBlackList")
         if pv.Version(ort_version) >= pv.Version("1.0.0"):
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             out = sess.get_outputs()
             lb = out[0].type
             sh = out[0].shape

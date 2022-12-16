@@ -6,7 +6,7 @@ import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 import scipy
-from onnxruntime import InferenceSession, SessionOptions
+from onnxruntime import SessionOptions
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 except ImportError:
@@ -21,7 +21,9 @@ except ImportError:
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx import to_onnx
 from skl2onnx.helpers.onnx_helper import change_onnx_domain
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 sklver_ = ".".join(sklver.split('.')[:2])

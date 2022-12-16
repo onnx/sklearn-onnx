@@ -8,7 +8,6 @@ import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
-from onnxruntime import InferenceSession
 from sklearn import __version__ as sklearn_version
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Binarizer, StandardScaler, OneHotEncoder
@@ -22,7 +21,7 @@ from skl2onnx.helpers.onnx_helper import (
     add_output_initializer,
     get_initializers,
     update_onnx_initializers)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 def one_hot_encoder_supports_string():
@@ -58,12 +57,7 @@ class TestOnnxHelper(unittest.TestCase):
         new_model = select_model_inputs_outputs(model, "variable")
         assert new_model.graph is not None
 
-        try:
-            tr1 = self.get_model(model)
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        tr1 = self.get_model(model)
         tr2 = self.get_model(new_model)
         X = X.astype(numpy.float32)
         X1 = tr1(X)

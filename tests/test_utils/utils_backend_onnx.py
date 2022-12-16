@@ -11,8 +11,7 @@ from onnx.defs import onnx_opset_version
 from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs,
     enumerate_model_node_outputs,
-    enumerate_model_initializers,
-)
+    enumerate_model_initializers)
 from skl2onnx.algebra.type_helper import _guess_type
 from scipy.spatial.distance import cdist
 from .utils_backend import (
@@ -21,12 +20,13 @@ from .utils_backend import (
     ExpectedAssertionError,
     OnnxRuntimeAssertionError,
     OnnxRuntimeMissingNewOnnxOperatorException,
-    compare_outputs,
-)
+    compare_outputs)
 
 
 if onnx_opset_version() >= 18:
+    from onnx.reference import ReferenceEvaluator
     from onnx.reference.op_run import OpRun
+    from onnx.reference.ops._op import OpRunReduceNumpy
     from onnx.reference.ops import load_op
     from .reference_implementation_text import Tokenizer
 
@@ -49,18 +49,19 @@ if onnx_opset_version() >= 18:
         from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
         from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
         from .reference_implementation_ml import (
-            Scaler,
+            Binarizer,
+            FusedMatMul,
             LinearClassifier,
             LinearRegressor,
             Normalizer,
             OneHotEncoder,
-            Binarizer,
+            Scaler,
         )
         from .reference_implementation_zipmap import ZipMap
         from .reference_implementation_afe import ArrayFeatureExtractor
         from .reference_implementation_tree import (
-            TreeEnsembleRegressor,
             TreeEnsembleClassifier,
+            TreeEnsembleRegressor,
         )
         from .reference_implementation_text import TfIdfVectorizer
 
@@ -80,21 +81,79 @@ if onnx_opset_version() >= 18:
                         self, data, axis=axis, keepdims=keepdims)
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
+        class ReduceLogSumExp_1(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=None):  # type: ignore
+                tax = tuple(axes) if axes else None
+                return compute_log_sum_exp(data, tax, keepdims)
+
+        class ReduceL2_18(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=1, noop_with_empty_axes=0):  # type: ignore
+                if self.is_axes_empty(axes) and noop_with_empty_axes:  # type: ignore
+                    return (data,)
+
+                axes = self.handle_axes(axes)
+                keepdims = keepdims != 0  # type: ignore
+                return (
+                    numpy.sqrt(numpy.sum(numpy.square(data), axis=axes,
+                                   keepdims=keepdims)).astype(
+                            dtype=data.dtype))
+
+        class ConstantOfShape(OpRun):
+            def __init__(self, onnx_node, run_params):  # type: ignore
+                OpRun.__init__(self, onnx_node, run_params)
+                self.cst = (
+                    self.value[0] if isinstance(self.value, numpy.ndarray)
+                    else self.value)
+                if isinstance(self.cst, int):
+                    self.cst = numpy.int64(self.cst)
+                elif isinstance(self.cst, float):
+                    self.cst = numpy.float64(self.cst)
+                elif self.cst is None:
+                    self.cst = numpy.float32(0)
+                if not isinstance(
+                    self.cst, (numpy.float32, numpy.float64, numpy.int64,
+                               numpy.int32, numpy.bool_, numpy.float16)):
+                    raise TypeError(f"cst must be a real not {type(self.cst)}")
+
+            def _run(self, data, value=None):
+                try:
+                    res = numpy.full(tuple(data), self.cst)
+                except TypeError as e:
+                    raise RuntimeError(
+                        f"Unable to create a constant of shape {data!r} "
+                        f"with value {self.cst!r} "
+                        f"(raw value={value!r}).") from e
+                return (res,)
+
         additional_implementations.extend([
+            # ai.onnx
             ArgMax,
             ArgMin,
-            Scaler,
+            ConstantOfShape,
+            ReduceL2_18,
+            ReduceLogSumExp_1,
+            # ai.onnx.ml
             ArrayFeatureExtractor,
+            Binarizer,
+            FusedMatMul,
             LinearClassifier,
             LinearRegressor,
             Normalizer,
             OneHotEncoder,
-            ZipMap,
-            TreeEnsembleRegressor,
-            TreeEnsembleClassifier,
-            Binarizer,
             TfIdfVectorizer,
+            TreeEnsembleClassifier,
+            TreeEnsembleRegressor,
+            Scaler,
+            ZipMap,
         ])
+
+        class ReferenceEvaluatorEx(ReferenceEvaluator):
+            def __init__(self, *args, new_ops=None, **kwargs):
+                if new_ops is None:
+                    new_ops = additional_implementations
+                else:
+                    new_ops = new_ops + additional_implementations
+                super().__init__(*args, new_ops=new_ops, **kwargs)
 
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):

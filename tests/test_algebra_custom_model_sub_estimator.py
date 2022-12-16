@@ -8,7 +8,6 @@ import logging
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
@@ -37,7 +36,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity,
     OnnxReshape,
     OnnxSoftmax)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class CustomOpTransformer1(BaseEstimator, TransformerMixin,
@@ -518,12 +517,7 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         X = X.astype(np.float32)
         cls = CustomOpClassifier()
         cls.fit(X, y)
-        try:
-            self.check_classifier(cls, X)
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        self.check_classifier(cls, X)
 
 
 if __name__ == "__main__":

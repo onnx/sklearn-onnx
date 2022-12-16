@@ -5,7 +5,6 @@ import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
-from onnxruntime import InferenceSession
 from sklearn import __version__ as sklver
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
@@ -19,7 +18,7 @@ try:
 except ImportError:
     from sklearn.utils.testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 sklver = '.'.join(sklver.split('.')[:2])
@@ -121,14 +120,9 @@ class TestConvertOptions(unittest.TestCase):
                         cls, X[:1], options={
                             'zipmap': zipmap, 'output_class_labels': addcl},
                         target_opset=TARGET_OPSET)
-                    try:
-                        sess = InferenceSession(
-                            onx.SerializeToString(),
-                            providers=["CPUExecutionProvider"])
-                    except Exception as xe:
-                        if "for domain ai.onnx is till opset 17." in str(xe):
-                            continue
-                        raise xe
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, {'X': X_test})
                     if addcl:
                         TestConvertOptions.almost_equal_class_labels(
@@ -249,14 +243,9 @@ class TestConvertOptions(unittest.TestCase):
                         # does not support Sequence of Maps.
                         continue
 
-                    try:
-                        sess = InferenceSession(
-                            onx.SerializeToString(),
-                            providers=["CPUExecutionProvider"])
-                    except Exception as xe:
-                        if "for domain ai.onnx is till opset 17." in str(xe):
-                            return
-                        raise xe
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, {'X': X_test})
                     TestConvertOptions.almost_equal_multi(
                         expected_label, expected_proba, *got, zipmap=zipmap)
@@ -321,14 +310,9 @@ class TestConvertOptions(unittest.TestCase):
                 onx = to_onnx(cls, X[:1], options=opts,
                               target_opset=TARGET_OPSET)
 
-                try:
-                    sess = InferenceSession(
-                        onx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
-                except Exception as xe:
-                    if "for domain ai.onnx is till opset 17." in str(xe):
-                        continue
-                    raise xe
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(
@@ -386,14 +370,9 @@ class TestConvertOptions(unittest.TestCase):
                               target_opset=TARGET_OPSET)
                 # with open("debugmo2.onnx", "wb") as f:
                 #     f.write(onx.SerializeToString())
-                try:
-                    sess = InferenceSession(
-                        onx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
-                except Exception as xe:
-                    if "for domain ai.onnx is till opset 17." in str(xe):
-                        return
-                    raise xe
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': X_test})
                 self.assertEqual(len(got), 3)
                 TestConvertOptions.almost_equal_multi_labels(

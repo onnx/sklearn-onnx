@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 ort_version = ort_version.split('+')[0]
@@ -31,14 +31,9 @@ class TestShapes(unittest.TestCase):
         initial_type = [('float_input', FloatTensorType([None, 4]))]
         onx = convert_sklearn(clr, initial_types=initial_type,
                               target_opset=TARGET_OPSET)
-        try:
-            sess = rt.InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
         shape1 = sess.get_inputs()[0].shape
@@ -64,14 +59,9 @@ class TestShapes(unittest.TestCase):
         onx = convert_sklearn(clr, initial_types=initial_type,
                               options={id(clr): {'zipmap': False}},
                               target_opset=TARGET_OPSET)
-        try:
-            sess = rt.InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         pred_onx = sess.run(None, {input_name: X_test.astype(numpy.float32)})
         shape1 = sess.get_inputs()[0].shape

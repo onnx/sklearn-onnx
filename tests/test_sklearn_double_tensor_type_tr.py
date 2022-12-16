@@ -13,7 +13,6 @@ from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from sklearn.preprocessing import Binarizer
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
     from onnxruntime.capi.onnxruntime_pybind11_state import (
@@ -25,7 +24,9 @@ from sklearn.preprocessing import StandardScaler
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 warnings_to_skip = (
     DeprecationWarning, FutureWarning, ConvergenceWarning, UserWarning)

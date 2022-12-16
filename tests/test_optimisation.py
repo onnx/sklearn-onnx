@@ -6,10 +6,9 @@ from numpy.testing import assert_almost_equal
 from onnx import checker
 from onnx import helper
 from onnx import TensorProto as tp
-from onnxruntime import InferenceSession
 from skl2onnx.common.onnx_optimisation_identity import (
     onnx_remove_node_identity)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestOptimisation(unittest.TestCase):
@@ -62,14 +61,9 @@ class TestOptimisation(unittest.TestCase):
             g, opset_imports=[helper.make_opsetid('', TARGET_OPSET)])
         checker.check_model(m)
 
-        try:
-            sess = InferenceSession(
-                m.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            m.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         optimized_model = onnx_remove_node_identity(m)
         sess_opt = InferenceSession(

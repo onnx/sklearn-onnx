@@ -30,7 +30,7 @@ from skl2onnx.proto import get_latest_tested_opset_version
 from skl2onnx.operator_converters.gaussian_process import (
     convert_kernel, convert_kernel_diag
 )
-from onnxruntime import InferenceSession, SessionOptions
+from onnxruntime import SessionOptions
 try:
     from onnxruntime import GraphOptimizationLevel
 except ImportError:
@@ -40,7 +40,9 @@ try:
 except ImportError:
     NotImplemented = RuntimeError
 from onnxruntime import __version__ as ort_version
-from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, fit_regression_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 _TARGET_OPSET_ = min(get_latest_tested_opset_version(), TARGET_OPSET)
 ort_version = ".".join(ort_version.split('.')[:2])
@@ -228,13 +230,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         x[0, 0] = x[1, 1] = x[2, 2] = 10.
         x[3, 2] = 5.
 
-        try:
-            sess = InferenceSession(
-                model_onnx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except NotImplemented:
-            # Failed to find kernel for FusedMatMul(1).
-            return
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': x.astype(np.float64)})[0]
         m1 = res
         m2 = ker(x)
@@ -383,8 +381,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             C(0.1, (1e-3, 1e3)) * RBF(length_scale=10,
                                       length_scale_bounds=(1e-3, 1e3)),
             C(0.1, (1e-3, 1e3)) * RBF(length_scale=1,
-                                      length_scale_bounds=(1e-3, 1e3))
-        )
+                                      length_scale_bounds=(1e-3, 1e3)))
         onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
                              op_version=_TARGET_OPSET_)
         model_onnx = onx.to_onnx(
@@ -1122,7 +1119,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
-    def test_issue_789(self):
+    def test_x_issue_789(self):
         n_samples, n_features = 10000, 10
         X, y = make_regression(n_samples, n_features)
         tx1, vx1, ty1, vy1 = train_test_split(X, y)
@@ -1139,7 +1136,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         assert_almost_equal(pipe.predict(vx1.astype(np.float64)).ravel(),
                             pred[0].ravel())
 
-    def test_issue_789_cdist(self):
+    def test_x_issue_789_cdist(self):
         n_samples, n_features = 10000, 10
         X, y = make_regression(n_samples, n_features)
         tx1, vx1, ty1, vy1 = train_test_split(X, y)

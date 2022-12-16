@@ -43,9 +43,7 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer11CustomTokenizer-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__) <= "
-                          "pv.Version('0.4.0')")
+            basename="SklearnTfidfVectorizer11CustomTokenizer-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_wrong_ngram(self):
@@ -67,9 +65,7 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer12Wngram-OneOff-SklCol",
-            allow_failure="pv.Version(onnxruntime.__version__) <= "
-                          "pv.Version('0.3.0')")
+            basename="SklearnTfidfVectorizer12Wngram-OneOff-SklCol")
 
 
 if __name__ == "__main__":

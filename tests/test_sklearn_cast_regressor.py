@@ -7,7 +7,7 @@ import unittest
 import math
 import packaging.version as pv
 import numpy
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -21,7 +21,9 @@ from skl2onnx.sklapi import CastRegressor, CastTransformer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     FloatTensorType, DoubleTensorType)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestSklearnCastRegressorConverter(unittest.TestCase):
@@ -91,14 +93,9 @@ class TestSklearnCastRegressorConverter(unittest.TestCase):
         exp1 = model1.predict(Xi_test)
         onx1 = to_onnx(model1, X_train[:1].astype(numpy.float32),
                        target_opset=TARGET_OPSET)
-        try:
-            sess1 = InferenceSession(
-                onx1.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as e:
-            if "support for domain ai.onnx is till opset 17" in str(e):
-                return None
-            raise e
+        sess1 = InferenceSession(
+            onx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got1 = sess1.run(None, {'X': Xi_test})[0]
         md1 = maxdiff(exp1, got1)
 

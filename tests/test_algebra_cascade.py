@@ -4,7 +4,6 @@ import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnx.defs import onnx_opset_version
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
         InvalidGraph, Fail, InvalidArgument)
@@ -18,7 +17,9 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxScaler
 from skl2onnx import to_onnx, convert_sklearn
 from skl2onnx.proto import get_latest_tested_opset_version
-from test_utils import fit_regression_model, TARGET_OPSET
+from test_utils import (
+    fit_regression_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestOnnxOperatorsCascade(unittest.TestCase):
@@ -181,10 +182,6 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
                             opv, onx)) from e
-                except Exception as xe:
-                    if "for domain ai.onnx is till opset 17." in str(xe):
-                        continue
-                    raise xe
                 res_out = ort.run(None, {'X': X.astype(np.float32)})
                 assert len(res_out) == 1
                 res = res_out[0]
@@ -205,10 +202,6 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     raise AssertionError(
                         "Unable to load opv={}\n---\n{}\n---".format(
                             opv, onx)) from e
-                except Exception as xe:
-                    if "for domain ai.onnx is till opset 17." in str(xe):
-                        continue
-                    raise xe
                 res_out = ort.run(None, {'X': X.astype(np.float32)})
                 assert len(res_out) == 1
                 res = res_out[0]

@@ -6,7 +6,6 @@ Tests scikit-learn's binarizer converter.
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import load_iris
 from sklearn.pipeline import make_pipeline
@@ -18,7 +17,7 @@ from skl2onnx.algebra.onnx_ops import OnnxCast, OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.sklapi import WOETransformer
 import skl2onnx.sklapi.register  # noqa
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class OrdinalWOETransformer(BaseEstimator, TransformerMixin):
@@ -92,14 +91,9 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         pipe.fit(X)
         expected = pipe.transform(X)
         onx = to_onnx(pipe, X, target_opset=TARGET_OPSET)
-        try:
-            sess = InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 
@@ -122,14 +116,9 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         expected = ordwoe.transform(X)
 
         onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET)
-        try:
-            sess = InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(expected, got)
 

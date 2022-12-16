@@ -8,7 +8,7 @@ import unittest
 import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import (
@@ -37,7 +37,9 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, onnx_built_with_ml)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = ort_version.split('+')[0]
@@ -341,15 +343,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                     target_opset=TARGET_OPSET,
                     options={id(model): {'zipmap': False}})
 
-                try:
-                    sess = InferenceSession(
-                        model_onnx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
-                except Exception as e:
-                    if "for domain ai.onnx is till opset 17." in str(e):
-                        sess = None
-                    else:
-                        raise e
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 if sess is not None:
                     res = sess.run(None, {'input': X[:5].astype(np.float32)})
                     assert_almost_equal(model.predict_proba(X[:5]), res[1])

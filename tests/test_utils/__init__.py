@@ -26,6 +26,25 @@ from .tests_helper import (  # noqa
     binary_array_to_string,
     path_to_leaf,
 )
+try:
+    from .utils_backend_onnx import ReferenceEvaluatorEx
+except ImportError:
+    def ReferenceEvaluatorEx(*args, **kwargs):
+        raise NotImplementedError(
+            "onnx package does not implement class ReferenceEvaluator. "
+            "Update to onnx>=1.13.0.")
+
+
+def InferenceSessionEx(onx, *args, **kwargs):
+    from onnxruntime import InferenceSession
+    if "providers" not in kwargs:
+        kwargs["providers"] = ["CPUExecutionProvider"]
+    try:
+        return InferenceSession(onx, *args, **kwargs)
+    except Exception as e:
+        if "support for domain ai.onnx is till opset 17." in str(e):
+            return ReferenceEvaluatorEx(onx)
+        raise e
 
 
 def create_tensor(N, C, H=None, W=None):

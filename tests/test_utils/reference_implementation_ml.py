@@ -7,6 +7,77 @@ from onnx.defs import onnx_opset_version
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
 
+    class FusedMatMul(OpRun):
+
+        @staticmethod
+        def _fmatmul00(a, b, alpha):
+            return numpy.matmul(a, b) * alpha
+
+        @staticmethod
+        def _fmatmul01(a, b, alpha):
+            return numpy.matmul(a, b.T) * alpha
+
+        @staticmethod
+        def _fmatmul10(a, b, alpha):
+            return numpy.matmul(a.T, b) * alpha
+
+        @staticmethod
+        def _fmatmul11(a, b, alpha):
+            return numpy.matmul(a.T, b.T) * alpha
+
+        @staticmethod
+        def _transpose(x, trans, transBatch):
+            if trans:
+                n = len(x.shape)
+                perm = list(range(n - 2)) + [n - 2, n - 1]
+                x = numpy.transpose(x, perm)
+            if transBatch:
+                n = len(x.shape)
+                perm = list(range(1, n - 2)) + [0, n - 1]
+                x = numpy.transpose(x, perm)
+            return x
+
+        def _run(self, a, b, alpha=None, transA=None, transB=None,
+                 transBatchA=None, transBatchB=None):
+
+            if transA:
+                _meth = (FusedMatMul._fmatmul11 if transB
+                        else FusedMatMul._fmatmul10)
+            else:
+                _meth = (FusedMatMul._fmatmul01 if transB
+                        else FusedMatMul._fmatmul00)
+            _meth = lambda a, b: _meth(a, b, alpha)
+            # more recent versions of the operator
+            if transBatchA is None:
+                transBatchA = 0
+            if transBatchB is None:
+                transBatchB = 0
+
+            if transBatchA or transBatchB or len(a.shape) != 2 or len(b.shape) != 2:
+                ta = self._transpose(a, transA, transBatchA)
+                tb = self._transpose(b, transB, transBatchB)
+                try:
+                    return (np.matmul(ta, tb) * alpha, )
+                except ValueError as e:
+                    raise ValueError(
+                        f"Unable to multiply shape {a.shape}x{b.shape} "
+                        f"({ta.shape}x{tb.shape}) "
+                        f"with transA={transA}, "
+                        f"transB={transB}, "
+                        f"transBatchA={transBatchA}, "
+                        f"transBatchB={transBatchB}, "
+                        f"meth={_meth_}.") from e
+            try:
+                return (_meth(a, b), )
+            except ValueError as e:
+                raise ValueError(
+                    f"Unable to multiply shape {a.shape}x{b.shape} "
+                    f"with transA={transA}, "
+                    f"transB={transB}, "
+                    f"transBatchA={transBatchA}, "
+                    f"transBatchB={transBatchB}, "
+                    f"meth={_meth_}.") from e
+
     class Scaler(OpRun):
 
         op_domain = "ai.onnx.ml"

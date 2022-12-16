@@ -3,7 +3,6 @@
 import unittest
 import numpy
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 from sklearn.preprocessing import StandardScaler
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxExp, OnnxAdd, OnnxDiv
 try:
@@ -11,7 +10,7 @@ try:
     from skl2onnx import wrap_as_onnx_mixin
 except (ImportError, KeyError):
     OnnxSklearnStandardScaler = None
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestAlgebraConverters(unittest.TestCase):
@@ -27,17 +26,12 @@ class TestAlgebraConverters(unittest.TestCase):
         onx = op.to_onnx(X.astype(numpy.float32), target_opset=TARGET_OPSET)
         assert onx is not None
 
-        import onnxruntime as ort
         try:
-            sess = ort.InferenceSession(
+            sess = InferenceSession(
                 onx.SerializeToString(),
                 providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             raise RuntimeError("Unable to read\n{}".format(onx)) from e
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
         X = numpy.array([[0, 1], [-1, -2]])
         try:
             Y = sess.run(None, {'X': X.astype(numpy.float32)})[0]
@@ -56,7 +50,7 @@ class TestAlgebraConverters(unittest.TestCase):
         assert 'domain: "ai.onnx.ml"' in onx2
 
         try:
-            sess = ort.InferenceSession(
+            sess = InferenceSession(
                 onx.SerializeToString(),
                 providers=["CPUExecutionProvider"])
         except RuntimeError as e:

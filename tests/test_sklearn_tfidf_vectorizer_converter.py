@@ -23,8 +23,9 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType, FloatTensorType
 from onnxruntime import __version__ as ort_version
-from onnxruntime import InferenceSession
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = '.'.join(ort_version.split('.')[:2])
@@ -117,14 +118,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [("input", StringTensorType([4, 2]))],
                                      options=self.get_options(),
                                      target_opset=TARGET_OPSET)
-        try:
-            sess = InferenceSession(
-                model_onnx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': corpus})[0]
         exp = model.transform(corpus)
         assert_almost_equal(res, exp)
@@ -505,16 +501,10 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
         options = copy.deepcopy(self.get_options())
         options[TfidfVectorizer]['nan'] = True
-        try:
-            model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                         [("input", StringTensorType())],
-                                         options=options,
-                                         target_opset=TARGET_OPSET)
-
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
+                                        [("input", StringTensorType())],
+                                        options=options,
+                                        target_opset=TARGET_OPSET)
         sess = InferenceSession(
             model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])

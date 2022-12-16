@@ -13,27 +13,24 @@ if onnx_opset_version() >= 18:
     from onnx.reference.ops.op_tfidf_vectorizer import (
         WeightingCriteria,
         NgramPart,
-        populate_grams,
-    )
+        populate_grams)
 
     class Tokenizer(OpRun):
 
         op_domain = "com.microsoft"
 
         def _run(
-            self,
-            text,
-            mark=None,
-            mincharnum=None,
-            pad_value=None,
-            separators=None,
-            tokenexp=None,
-            tokenexpsplit=None,
-            stopwords=None,
-        ):
-            char_tokenization_ = tokenexp == "." or list(separators or []) == [
-                ""
-            ]
+                self,
+                text,
+                mark=None,
+                mincharnum=None,
+                pad_value=None,
+                separators=None,
+                tokenexp=None,
+                tokenexpsplit=None,
+                stopwords=None):
+            char_tokenization_ = (
+                tokenexp == "." or list(separators or []) == [""])
             stops_ = set(stopwords or [])
             try:
                 str_separators_ = set(_ for _ in (separators or ""))
@@ -50,12 +47,10 @@ if onnx_opset_version() >= 18:
                     text, stops_, str_separators_)
             if tokenexp not in (None, ""):
                 return self._run_regex_tokenization(
-                    text, stops_, tokenexp_, tokenexpsplit, mark, pad_value
-                )
+                    text, stops_, tokenexp_, tokenexpsplit, mark, pad_value)
             raise RuntimeError(  # pragma: no cover
                 "Unable to guess which tokenization to use, sep={}, "
-                "tokenexp='{}'.".format(separators, tokenexp)
-            )
+                "tokenexp='{}'.".format(separators, tokenexp))
 
         @staticmethod
         def _run_tokenization(text, stops, split, mark, pad_value):
@@ -161,8 +156,7 @@ if onnx_opset_version() >= 18:
                     return filter(lambda x: x, exp.findall(t))
 
             return Tokenizer._run_tokenization(
-                text, stops, split, mark, pad_value
-            )
+                text, stops, split, mark, pad_value)
 
     class TfIdfVectorizer(OpRun):
         def __init__(self, onnx_node, run_params):  # type: ignore

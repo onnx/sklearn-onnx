@@ -23,7 +23,7 @@ from skl2onnx.helpers.investigate import _alter_model_for_debugging
 from skl2onnx.common import MissingShapeCalculator
 from skl2onnx.common.data_types import (
     FloatTensorType, guess_data_type)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class MyScaler(StandardScaler):
@@ -60,14 +60,9 @@ class TestInvestigate(unittest.TestCase):
                     raise AssertionError(
                         "Unable to find '{}'\n'{}'\n".format(
                             expected, text))
-                try:
-                    sess = onnxruntime.InferenceSession(
-                        onnx_step.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
-                except Exception as xe:
-                    if "for domain ai.onnx is till opset 17." in str(xe):
-                        continue
-                    raise xe
+                sess = InferenceSession(
+                    onnx_step.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 onnx_outputs = sess.run(None, {'input': data})
                 onnx_output = onnx_outputs[0]
                 skl_outputs = step['model']._debug.outputs['transform']
@@ -113,14 +108,9 @@ class TestInvestigate(unittest.TestCase):
                 if "MyScaler" in str(e):
                     continue
                 raise
-            try:
-                sess = onnxruntime.InferenceSession(
-                    onnx_step.SerializeToString(),
-                    providers=["CPUExecutionProvider"])
-            except Exception as xe:
-                if "for domain ai.onnx is till opset 17." in str(xe):
-                    continue
-                raise xe
+            sess = InferenceSession(
+                onnx_step.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': data_in})
             onnx_output = onnx_outputs[0]
             skl_outputs = step_model._debug.outputs['transform']
@@ -148,7 +138,7 @@ class TestInvestigate(unittest.TestCase):
         model.transform(data)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(
+            sess = InferenceSession(
                 onnx_step.SerializeToString(),
                 providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': data})
@@ -175,7 +165,7 @@ class TestInvestigate(unittest.TestCase):
         model.transform(data)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(
+            sess = InferenceSession(
                 onnx_step.SerializeToString(),
                 providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': data})
@@ -203,7 +193,7 @@ class TestInvestigate(unittest.TestCase):
         model.predict(X)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(
+            sess = InferenceSession(
                 onnx_step.SerializeToString(),
                 providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': X.astype(numpy.float32)})
@@ -233,7 +223,7 @@ class TestInvestigate(unittest.TestCase):
         model.predict_proba(X)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(
+            sess = InferenceSession(
                 onnx_step.SerializeToString(),
                 providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': X.astype(numpy.float32)})

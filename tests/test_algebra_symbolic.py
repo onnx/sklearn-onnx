@@ -18,7 +18,7 @@ except ImportError:
     warnings.warn(
         'Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.')
     OnnxAbs = None
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestAlgebraSymbolic(unittest.TestCase):
@@ -32,9 +32,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
         onx = op.to_onnx({'I0': numpy.empty((1, 2), dtype=numpy.float32)})
         assert onx is not None
 
-        import onnxruntime as ort
         try:
-            sess = ort.InferenceSession(
+            sess = InferenceSession(
                 onx.SerializeToString(),
                 providers=["CPUExecutionProvider"])
         except RuntimeError as e:
@@ -60,8 +59,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         assert "ai.onnx.ml" in sonx
         assert "version: 1" in sonx
 
-        import onnxruntime as ort
-        sess = ort.InferenceSession(
+        sess = InferenceSession(
             onx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         X = numpy.array([[0, 2], [0, -2]])
@@ -82,8 +80,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         assert "ai.onnx.ml" in sonx
         assert "version: 1" in sonx
 
-        import onnxruntime as ort
-        sess = ort.InferenceSession(
+        sess = InferenceSession(
             onx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         X = numpy.array([[0, 2], [0, -2]])
@@ -102,8 +99,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         sonx = str(onx)
         assert len(sonx) > 0
 
-        import onnxruntime as ort
-        sess = ort.InferenceSession(
+        sess = InferenceSession(
             onx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         X = numpy.array([[0, 2], [0, -2]])
@@ -124,8 +120,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         sonx = str(onx)
         assert len(sonx) > 0
 
-        import onnxruntime as ort
-        sess = ort.InferenceSession(
+        sess = InferenceSession(
             onx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         X = numpy.array([[0, 2], [0, -2]])
@@ -147,8 +142,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
         sonx = str(onx)
         assert len(sonx) > 0
 
-        import onnxruntime as ort
-        sess = ort.InferenceSession(
+        sess = InferenceSession(
             onx.SerializeToString(),
             providers=["CPUExecutionProvider"])
         X = numpy.array([[0, 2], [0, -2]])
@@ -168,15 +162,9 @@ class TestAlgebraSymbolic(unittest.TestCase):
         sonx = str(onx)
         assert len(sonx) > 0
 
-        import onnxruntime as ort
-        try:
-            sess = ort.InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         X = numpy.arange(6)
         exp = [numpy.array([0, 1, 2]), numpy.array([3, 4, 5])]
         Y = sess.run(None, {'I0': X.astype(numpy.float32)})

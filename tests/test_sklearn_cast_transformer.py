@@ -8,7 +8,7 @@ import math
 import packaging.version as pv
 import numpy
 from pandas import DataFrame
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -22,7 +22,9 @@ from skl2onnx.sklapi import CastTransformer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     Int64TensorType, FloatTensorType, DoubleTensorType)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestSklearnCastTransformerConverter(unittest.TestCase):

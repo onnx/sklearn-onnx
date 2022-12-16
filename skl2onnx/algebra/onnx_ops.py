@@ -334,6 +334,18 @@ def OnnxReduceLogSumExpApi18(*x, axes=None, keepdims=1, op_version=None,
         output_names=output_names)
 
 
+def OnnxReduceL2Api18(*x, axes=None, keepdims=1, op_version=None,
+                      output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceL2, OnnxReduceL2_13,  # noqa
+        OnnxReduceL2_11, OnnxReduceL2_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
 def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
                    output_names=None):
     """
@@ -408,7 +420,7 @@ def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
     Adds operator ReduceL2 for float or double.
     """
     if dtype == np.float32:
-        return OnnxReduceL2(  # noqa
+        return OnnxReduceL2Api18(  # noqa
             x, axes=axes, keepdims=keepdims,
             op_version=op_version, output_names=output_names)
     x2 = OnnxMul(x, x, op_version=op_version)  # noqa

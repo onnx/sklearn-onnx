@@ -12,7 +12,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
-from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common._topology import Variable
 from skl2onnx.common.data_types import (
@@ -25,7 +24,9 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxArrayFeatureExtractor, OnnxMul,
     OnnxPad, OnnxBatchNormalization,
     OnnxConstantOfShape, OnnxMatMul, OnnxSoftmax)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestOnnxOperators(unittest.TestCase):
@@ -331,14 +332,9 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([None, 2]))],
                                 target_opset=TARGET_OPSET)
-        try:
-            sess = InferenceSession(
-                model_def.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(X.reshape((1, -1)), got)
         inits = [row for row in str(model_def).split('\n')
@@ -380,14 +376,9 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': x.astype(np.float32)},
                                 target_opset=TARGET_OPSET)
-        try:
-            oinf = InferenceSession(
-                model_def.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
@@ -427,14 +418,9 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        try:
-            oinf = InferenceSession(
-                model_def.SerializeToString(),
-                providers=["CPUExecutionProvider"])
-        except Exception as xe:
-            if "for domain ai.onnx is till opset 17." in str(xe):
-                return
-            raise xe
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 

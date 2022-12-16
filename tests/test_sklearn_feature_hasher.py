@@ -13,13 +13,12 @@ from onnx.helper import (
     make_graph, make_tensor_value_info, make_opsetid)
 from onnx.checker import check_model
 from onnxruntime import __version__ as ort_version
-from onnxruntime import InferenceSession
 from sklearn.feature_extraction import FeatureHasher
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import (
     StringTensorType, Int64TensorType, FloatTensorType,
     DoubleTensorType)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
