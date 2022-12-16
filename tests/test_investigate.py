@@ -14,7 +14,6 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import RobustScaler, StandardScaler
-import onnxruntime
 from skl2onnx import convert_sklearn
 from skl2onnx.helpers import (
     collect_intermediate_steps, compare_objects,

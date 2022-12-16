@@ -11,30 +11,30 @@ if onnx_opset_version() >= 18:
 
         @staticmethod
         def _fmatmul00(a, b, alpha):
-            return numpy.matmul(a, b) * alpha
+            return np.matmul(a, b) * alpha
 
         @staticmethod
         def _fmatmul01(a, b, alpha):
-            return numpy.matmul(a, b.T) * alpha
+            return np.matmul(a, b.T) * alpha
 
         @staticmethod
         def _fmatmul10(a, b, alpha):
-            return numpy.matmul(a.T, b) * alpha
+            return np.matmul(a.T, b) * alpha
 
         @staticmethod
         def _fmatmul11(a, b, alpha):
-            return numpy.matmul(a.T, b.T) * alpha
+            return np.matmul(a.T, b.T) * alpha
 
         @staticmethod
         def _transpose(x, trans, transBatch):
             if trans:
                 n = len(x.shape)
                 perm = list(range(n - 2)) + [n - 2, n - 1]
-                x = numpy.transpose(x, perm)
+                x = np.transpose(x, perm)
             if transBatch:
                 n = len(x.shape)
                 perm = list(range(1, n - 2)) + [0, n - 1]
-                x = numpy.transpose(x, perm)
+                x = np.transpose(x, perm)
             return x
 
         def _run(self, a, b, alpha=None, transA=None, transB=None,
@@ -42,10 +42,10 @@ if onnx_opset_version() >= 18:
 
             if transA:
                 _meth = (FusedMatMul._fmatmul11 if transB
-                        else FusedMatMul._fmatmul10)
+                         else FusedMatMul._fmatmul10)
             else:
                 _meth = (FusedMatMul._fmatmul01 if transB
-                        else FusedMatMul._fmatmul00)
+                         else FusedMatMul._fmatmul00)
             _meth = lambda a, b: _meth(a, b, alpha)
             # more recent versions of the operator
             if transBatchA is None:
@@ -53,7 +53,8 @@ if onnx_opset_version() >= 18:
             if transBatchB is None:
                 transBatchB = 0
 
-            if transBatchA or transBatchB or len(a.shape) != 2 or len(b.shape) != 2:
+            if (transBatchA or transBatchB or
+                    len(a.shape) != 2 or len(b.shape) != 2):
                 ta = self._transpose(a, transA, transBatchA)
                 tb = self._transpose(b, transB, transBatchB)
                 try:
@@ -66,7 +67,7 @@ if onnx_opset_version() >= 18:
                         f"transB={transB}, "
                         f"transBatchA={transBatchA}, "
                         f"transBatchB={transBatchB}, "
-                        f"meth={_meth_}.") from e
+                        f"meth={_meth}.") from e
             try:
                 return (_meth(a, b), )
             except ValueError as e:
@@ -76,7 +77,7 @@ if onnx_opset_version() >= 18:
                     f"transB={transB}, "
                     f"transBatchA={transBatchA}, "
                     f"transBatchB={transBatchB}, "
-                    f"meth={_meth_}.") from e
+                    f"meth={_meth}.") from e
 
     class Scaler(OpRun):
 

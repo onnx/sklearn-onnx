@@ -4,7 +4,6 @@ import unittest
 import packaging.version as pv
 import numpy
 import onnx
-import onnxruntime as rt
 from onnxruntime import __version__ as ort_version
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
