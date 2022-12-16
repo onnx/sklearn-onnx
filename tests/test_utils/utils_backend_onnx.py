@@ -155,6 +155,15 @@ if onnx_opset_version() >= 18:
                     new_ops = new_ops + additional_implementations
                 super().__init__(*args, new_ops=new_ops, **kwargs)
 
+            def get_outputs(self):
+
+                class T:
+
+                    def __init__(self, name):
+                        self.name = name
+
+                return [T(n) for n in self.output_names]
+
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
     import onnx.reference
