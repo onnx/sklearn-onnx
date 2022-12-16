@@ -42,7 +42,9 @@ def _has_decision_function(model):
     return hasattr(model, "decision_function")
 
 
-disable_dump = os.environ.get("AZURE_HTTP_USER_AGENT", "undefined") != "undefined"
+disable_dump = (
+    os.environ.get("AZURE_HTTP_USER_AGENT", "undefined") != "undefined"
+)
 
 
 def _has_transform_model(model):
@@ -84,7 +86,9 @@ def fit_classification_model(
         X = numpy.abs(X)
     if is_bool:
         X = X.astype(bool)
-    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5, random_state=42)
+    X_train, X_test, y_train, _ = train_test_split(
+        X, y, test_size=0.5, random_state=42
+    )
     model.fit(X_train, y_train)
     return model, X_test
 
@@ -133,16 +137,25 @@ def fit_multilabel_classification_model(
         random_state=42,
     )
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
-    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5, random_state=42)
+    X_train, X_test, y_train, _ = train_test_split(
+        X, y, test_size=0.5, random_state=42
+    )
     model.fit(X_train, y_train)
     return model, X_test
 
 
 def fit_multi_output_classification_model(
-    model, n_classes=3, n_samples=100, n_features=4, n_informative=5, n_outputs=2
+    model,
+    n_classes=3,
+    n_samples=100,
+    n_features=4,
+    n_informative=5,
+    n_outputs=2,
 ):
     numpy.random.seed(0)
-    X_train = numpy.random.randint(0, n_informative, size=(n_samples, n_features))
+    X_train = numpy.random.randint(
+        0, n_informative, size=(n_samples, n_features)
+    )
     y_train = numpy.random.randint(0, n_classes, size=(n_samples, n_outputs))
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
@@ -171,7 +184,9 @@ def fit_regression_model(
     X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
     if is_bool:
         X = X.astype(bool)
-    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5, random_state=42)
+    X_train, X_test, y_train, _ = train_test_split(
+        X, y, test_size=0.5, random_state=42
+    )
     model.fit(X_train, y_train)
     return model, X_test
 
@@ -317,7 +332,9 @@ def dump_data_and_model(
             scores = scores.reshape(-1, 1)
         if len(scores.shape) != 2 or scores.shape[1] != 1:
             raise RuntimeError(
-                "Unexpected shape {} for a binary classifiation".format(scores.shape)
+                "Unexpected shape {} for a binary classifiation".format(
+                    scores.shape
+                )
             )
         return numpy.hstack([-scores, scores])
 
@@ -346,7 +363,9 @@ def dump_data_and_model(
                     return call(dataone)  # noqa
 
             else:
-                raise RuntimeError("Method '{0}' is not callable.".format(method))
+                raise RuntimeError(
+                    "Method '{0}' is not callable.".format(method)
+                )
     else:
         if hasattr(model, "predict"):
             if _has_predict_proba(model):
@@ -362,7 +381,9 @@ def dump_data_and_model(
                     model.predict(data),
                     model.decision_function(data),
                 ]
-                lambda_original = lambda: model.decision_function(dataone)  # noqa
+                lambda_original = lambda: model.decision_function(
+                    dataone
+                )  # noqa
             elif _has_transform_model(model):
                 # clustering
                 try:
@@ -375,7 +396,10 @@ def dump_data_and_model(
                     if "Buffer dtype mismatch" in str(e):
                         # scikit-learn does not cast anymore
                         data64 = data.astype(numpy.float64)
-                        prediction = [model.predict(data64), model.transform(data64)]
+                        prediction = [
+                            model.predict(data64),
+                            model.transform(data64),
+                        ]
                         dataone64 = dataone.astype(numpy.float64)
 
                         def lambda_original():
@@ -407,7 +431,9 @@ def dump_data_and_model(
 
         else:
             raise TypeError(
-                "Model has no predict or transform method: {0}".format(type(model))
+                "Model has no predict or transform method: {0}".format(
+                    type(model)
+                )
             )
 
     runtime_test["expected"] = prediction
@@ -519,7 +545,9 @@ def dump_data_and_model(
 
             if output is not None:
                 if not disable_dump:
-                    dest = os.path.join(folder, basename + ".backend.{0}.pkl".format(b))
+                    dest = os.path.join(
+                        folder, basename + ".backend.{0}.pkl".format(b)
+                    )
                     names.append(dest)
                     with open(dest, "wb") as f:
                         pickle.dump(output, f)
@@ -559,7 +587,9 @@ def convert_model(model, name, input_types, target_opset=None):
         "Sklearn",
     )
     if model is None:
-        raise RuntimeError("Unable to convert model of type '{0}'.".format(type(model)))
+        raise RuntimeError(
+            "Unable to convert model of type '{0}'.".format(type(model))
+        )
     return model, prefix
 
 
@@ -694,7 +724,9 @@ def dump_multiple_classification(
     y = [i + first_class for i in y]
     if label_string:
         if label_uint8:
-            raise AssertionError("label_string and label_uint8 cannot be both True")
+            raise AssertionError(
+                "label_string and label_uint8 cannot be both True"
+            )
         y = ["l%d" % i for i in y]
         suffix += "String"
     elif label_uint8:
@@ -703,7 +735,9 @@ def dump_multiple_classification(
     model.fit(X, y)
     if verbose:
         print(
-            "[dump_multiple_classification] model '{}'".format(model.__class__.__name__)
+            "[dump_multiple_classification] model '{}'".format(
+                model.__class__.__name__
+            )
         )
     model_onnx, prefix = convert_model(
         model,
@@ -731,7 +765,9 @@ def dump_multiple_classification(
     model.fit(X, y)
     if verbose:
         print(
-            "[dump_multiple_classification] model '{}'".format(model.__class__.__name__)
+            "[dump_multiple_classification] model '{}'".format(
+                model.__class__.__name__
+            )
         )
     model_onnx, prefix = convert_model(
         model,
@@ -1093,7 +1129,9 @@ def make_report_backend(folder, as_df=False, verbose=0):
 
     if benched == 0:
         raise RuntimeError(
-            "No benchmark files in '{0}', found:\n{1}".format(folder, "\n".join(files))
+            "No benchmark files in '{0}', found:\n{1}".format(
+                folder, "\n".join(files)
+            )
         )
 
     def dict_update(d, u):
@@ -1162,7 +1200,9 @@ def binary_array_to_string(mat):
 def path_to_leaf(tree, mat, tree_indices=None):
     if tree_indices is None:
         # single tree
-        leave = set([i for i in range(tree.node_count) if tree.children_left[i] <= i])
+        leave = set(
+            [i for i in range(tree.node_count) if tree.children_left[i] <= i]
+        )
         res = []
         for row in range(mat.shape[0]):
             leaf = None

@@ -46,13 +46,17 @@ if onnx_opset_version() >= 18:
             self._mat = mat
 
         def __eq__(self, o):
-            raise NotImplementedError("__eq__ not available for ZipMapDictionary.")
+            raise NotImplementedError(
+                "__eq__ not available for ZipMapDictionary."
+            )
 
         def __getstate__(self):
             """
             For pickle.
             """
-            return dict(_rev_keys=self._rev_keys, _values=self._values, _mat=self._mat)
+            return dict(
+                _rev_keys=self._rev_keys, _values=self._values, _mat=self._mat
+            )
 
         def __setstate__(self, state):
             """
@@ -80,7 +84,9 @@ if onnx_opset_version() >= 18:
             """
             Returns the number of items.
             """
-            return len(self._values) if self._mat is None else self._mat.shape[1]
+            return (
+                len(self._values) if self._mat is None else self._mat.shape[1]
+            )
 
         def __iter__(self):
             for k in self._rev_keys:
@@ -147,7 +153,9 @@ if onnx_opset_version() >= 18:
             self._mat = mat
 
         def __eq__(self, o):
-            raise NotImplementedError("__eq__ not available for ArrayZipMapDictionary.")
+            raise NotImplementedError(
+                "__eq__ not available for ArrayZipMapDictionary."
+            )
 
         @property
         def dtype(self):
@@ -164,7 +172,9 @@ if onnx_opset_version() >= 18:
             return ZipMapDictionary(self._rev_keys, i, self._mat)
 
         def __setitem__(self, pos, value):
-            raise LookupError(f"Changing an element is not supported (pos=[{pos}]).")
+            raise LookupError(
+                f"Changing an element is not supported (pos=[{pos}])."
+            )
 
         @property
         def values(self):

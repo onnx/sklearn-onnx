@@ -19,7 +19,9 @@ if onnx_opset_version() >= 18:
         op_domain = "ai.onnx.ml"
 
         @staticmethod
-        def _post_process_predicted_label(label, scores, classlabels_ints_string):
+        def _post_process_predicted_label(
+            label, scores, classlabels_ints_string
+        ):
             """
             Replaces int64 predicted labels by the corresponding
             strings.
@@ -40,7 +42,9 @@ if onnx_opset_version() >= 18:
         ):
             coefficients = numpy.array(coefficients).astype(x.dtype)
             intercepts = numpy.array(intercepts).astype(x.dtype)
-            n_class = max(len(classlabels_ints or []), len(classlabels_strings or []))
+            n_class = max(
+                len(classlabels_ints or []), len(classlabels_strings or [])
+            )
             n = coefficients.shape[0] // n_class
             coefficients = coefficients.reshape(n_class, n).T
             scores = numpy.dot(x, coefficients)
@@ -52,9 +56,13 @@ if onnx_opset_version() >= 18:
             elif post_transform == "LOGISTIC":
                 scores = expit(scores)
             elif post_transform == "SOFTMAX":
-                numpy.subtract(scores, scores.max(axis=1)[:, numpy.newaxis], out=scores)
+                numpy.subtract(
+                    scores, scores.max(axis=1)[:, numpy.newaxis], out=scores
+                )
                 scores = numpy.exp(scores)
-                scores = numpy.divide(scores, scores.sum(axis=1)[:, numpy.newaxis])
+                scores = numpy.divide(
+                    scores, scores.sum(axis=1)[:, numpy.newaxis]
+                )
             else:
                 raise NotImplementedError(  # pragma: no cover
                     f"Unknown post_transform: '{post_transform}'."
@@ -78,7 +86,12 @@ if onnx_opset_version() >= 18:
         op_domain = "ai.onnx.ml"
 
         def _run(
-            self, x, coefficients=None, intercepts=None, targets=1, post_transform=None
+            self,
+            x,
+            coefficients=None,
+            intercepts=None,
+            targets=1,
+            post_transform=None,
         ):
             coefficients = numpy.array(coefficients).astype(x.dtype)
             intercepts = numpy.array(intercepts).astype(x.dtype)
@@ -140,7 +153,9 @@ if onnx_opset_version() >= 18:
             if len(cats_int64s) > 0:
                 classes_ = {v: i for i, v in enumerate(cats_int64s)}
             elif len(cats_strings) > 0:
-                classes_ = {v.decode("utf-8"): i for i, v in enumerate(cats_strings)}
+                classes_ = {
+                    v.decode("utf-8"): i for i, v in enumerate(cats_strings)
+                }
             else:
                 raise RuntimeError("No encoding was defined.")
 

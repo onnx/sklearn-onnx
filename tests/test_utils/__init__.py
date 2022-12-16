@@ -88,7 +88,10 @@ def max_onnxruntime_opset():
 TARGET_OPSET = int(
     os.environ.get(
         "TEST_TARGET_OPSET",
-        min(max_onnxruntime_opset(), min(max_opset, onnx.defs.onnx_opset_version())),
+        min(
+            max_onnxruntime_opset(),
+            min(max_opset, onnx.defs.onnx_opset_version()),
+        ),
     )
 )
 

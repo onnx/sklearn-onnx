@@ -28,7 +28,9 @@ def _attribute_value(attr):
         return list(attr.ints)
     if attr.strings:
         return list(map(_to_str, attr.strings))
-    raise NotImplementedError("Unable to return a value for attribute %r." % attr)
+    raise NotImplementedError(
+        "Unable to return a value for attribute %r." % attr
+    )
 
 
 class TreeEnsembleAttributes:
@@ -71,7 +73,9 @@ class TreeEnsemble:
             self.atts.add(name, value)
 
         self.tree_ids = list(sorted(set(self.atts.nodes_treeids)))
-        self.root_index = {tid: len(self.atts.nodes_treeids) for tid in self.tree_ids}
+        self.root_index = {
+            tid: len(self.atts.nodes_treeids) for tid in self.tree_ids
+        }
         for index, tree_id in enumerate(self.atts.nodes_treeids):
             self.root_index[tree_id] = min(self.root_index[tree_id], index)
         self.node_index = {
@@ -107,7 +111,9 @@ class TreeEnsemble:
             elif rule == "BRANCH_NEQ":
                 r = x != th
             else:
-                raise ValueError(f"Unexpected rule {rule!r} for node index {index}.")
+                raise ValueError(
+                    f"Unexpected rule {rule!r} for node index {index}."
+                )
             nid = (
                 self.atts.nodes_truenodeids[index]
                 if r
@@ -190,12 +196,15 @@ if onnx_opset_version() >= 18:
                 res[:, :] = numpy.array(base_values).reshape((1, -1))
             target_index = {
                 (tid, nid): i
-                for i, (tid, nid) in enumerate(zip(target_treeids, target_nodeids))
+                for i, (tid, nid) in enumerate(
+                    zip(target_treeids, target_nodeids)
+                )
             }
             for i in range(res.shape[0]):
                 indices = leaves_index[i]
                 t_index = [
-                    target_index[nodes_treeids[i], nodes_nodeids[i]] for i in indices
+                    target_index[nodes_treeids[i], nodes_nodeids[i]]
+                    for i in indices
                 ]
                 if aggregate_function == "SUM":
                     for it in t_index:
@@ -274,7 +283,8 @@ if onnx_opset_version() >= 18:
             for i in range(res.shape[0]):
                 indices = leaves_index[i]
                 t_index = [
-                    class_index[nodes_treeids[i], nodes_nodeids[i]] for i in indices
+                    class_index[nodes_treeids[i], nodes_nodeids[i]]
+                    for i in indices
                 ]
                 for its in t_index:
                     for it in its:
@@ -310,9 +320,13 @@ if onnx_opset_version() >= 18:
         from reference_implementation_afe import ArrayFeatureExtractor
 
         class ArgMax(_ArgMax):
-            def _run(self, data, axis=None, keepdims=None, select_last_index=None):
+            def _run(
+                self, data, axis=None, keepdims=None, select_last_index=None
+            ):
                 if select_last_index == 0:  # type: ignore
-                    return _ArgMax._run(self, data, axis=axis, keepdims=keepdims)
+                    return _ArgMax._run(
+                        self, data, axis=axis, keepdims=keepdims
+                    )
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         # classification 1

@@ -31,7 +31,9 @@ if onnx_opset_version() >= 18:
             tokenexpsplit=None,
             stopwords=None,
         ):
-            char_tokenization_ = tokenexp == "." or list(separators or []) == [""]
+            char_tokenization_ = tokenexp == "." or list(separators or []) == [
+                ""
+            ]
             stops_ = set(stopwords or [])
             try:
                 str_separators_ = set(_ for _ in (separators or ""))
@@ -128,7 +130,10 @@ if onnx_opset_version() >= 18:
                 pos = 0
                 while pos < len(t):
                     for sep in separators:
-                        if pos + len(sep) <= len(t) and sep == t[pos : pos + len(sep)]:
+                        if (
+                            pos + len(sep) <= len(t)
+                            and sep == t[pos : pos + len(sep)]
+                        ):
                             word = t[begin:pos]
                             yield word
                             begin = pos + len(sep)
@@ -141,7 +146,9 @@ if onnx_opset_version() >= 18:
             return Tokenizer._run_tokenization(text, stops, split)
 
         @staticmethod
-        def _run_regex_tokenization(text, stops, exp, tokenexpsplit, mark, pad_value):
+        def _run_regex_tokenization(
+            text, stops, exp, tokenexpsplit, mark, pad_value
+        ):
             """
             Tokenizes using separators.
             The function should use a trie to find text.
@@ -156,7 +163,9 @@ if onnx_opset_version() >= 18:
                 def split(t):
                     return filter(lambda x: x, exp.findall(t))
 
-            return Tokenizer._run_tokenization(text, stops, split, mark, pad_value)
+            return Tokenizer._run_tokenization(
+                text, stops, split, mark, pad_value
+            )
 
     class TfIdfVectorizer(OpRun):
         def __init__(self, onnx_node, run_params):  # type: ignore
@@ -235,7 +244,9 @@ if onnx_opset_version() >= 18:
         ) -> None:
             ngram_id -= 1
             # assert(ngram_id < ngram_indexes_.size());
-            output_idx = row_num * self.output_size_ + self.ngram_indexes_[ngram_id]
+            output_idx = (
+                row_num * self.output_size_ + self.ngram_indexes_[ngram_id]
+            )
             # assert(static_cast<size_t>(output_idx) < frequencies.size());
             frequencies[output_idx] += 1
 
@@ -321,7 +332,9 @@ if onnx_opset_version() >= 18:
 
                 while ngram_start < ngram_row_end:
                     # We went far enough so no n-grams of any size can be gathered
-                    at_least_this = ngram_start + skip_distance * (start_ngram_size - 1)
+                    at_least_this = ngram_start + skip_distance * (
+                        start_ngram_size - 1
+                    )
                     if at_least_this >= ngram_row_end:
                         break
 
@@ -390,7 +403,9 @@ if onnx_opset_version() >= 18:
                 num_rows = 1
                 C = 1
                 if total_items != 1:
-                    raise ValueError(f"Unexpected total of items {total_items}.")
+                    raise ValueError(
+                        f"Unexpected total of items {total_items}."
+                    )
             elif len(input_dims) == 1:
                 num_rows = 1
                 C = input_dims[0]
@@ -412,7 +427,9 @@ if onnx_opset_version() >= 18:
                     f"Unexpected total of items, num_rows * C = {num_rows * C} != total_items = {total_items}."
                 )
             # Frequency holder allocate [B..output_size_] and init all to zero
-            frequencies = np.zeros((num_rows * self.output_size_,), dtype=np.int64)
+            frequencies = np.zeros(
+                (num_rows * self.output_size_,), dtype=np.int64
+            )
 
             if total_items == 0 or self.int64_map_.empty():
                 # TfidfVectorizer may receive an empty input when it follows a Tokenizer
