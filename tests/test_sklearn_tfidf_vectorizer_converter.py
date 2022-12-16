@@ -502,9 +502,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         options = copy.deepcopy(self.get_options())
         options[TfidfVectorizer]['nan'] = True
         model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                        [("input", StringTensorType())],
-                                        options=options,
-                                        target_opset=TARGET_OPSET)
+                                     [("input", StringTensorType())],
+                                     options=options,
+                                     target_opset=TARGET_OPSET)
         sess = InferenceSession(
             model_onnx.SerializeToString(),
             providers=["CPUExecutionProvider"])

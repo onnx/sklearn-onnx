@@ -48,6 +48,8 @@ if onnx_opset_version() >= 18:
         # bugs in reference implementation not covered by a backend test
         from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin
         from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
+        from onnx.reference.ops.op_reduce_log_sum_exp import (
+            compute_log_sum_exp)
         from .reference_implementation_ml import (
             Binarizer,
             FusedMatMul,
@@ -87,15 +89,16 @@ if onnx_opset_version() >= 18:
                 return compute_log_sum_exp(data, tax, keepdims)
 
         class ReduceL2_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1, noop_with_empty_axes=0):  # type: ignore
-                if self.is_axes_empty(axes) and noop_with_empty_axes:  # type: ignore
+            def _run(self, data, axes=None, keepdims=1,
+                     noop_with_empty_axes=0):
+                if self.is_axes_empty(axes) and noop_with_empty_axes:
                     return (data,)
 
                 axes = self.handle_axes(axes)
                 keepdims = keepdims != 0  # type: ignore
                 return (
                     numpy.sqrt(numpy.sum(numpy.square(data), axis=axes,
-                                   keepdims=keepdims)).astype(
+                               keepdims=keepdims)).astype(
                             dtype=data.dtype))
 
         class ConstantOfShape(OpRun):
