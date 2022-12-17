@@ -273,7 +273,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      pytest tests --maxfail=10 --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
@@ -290,7 +290,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest tests_onnxmltools --durations=0 --basetemp=temp
+      pytest tests_onnxmltools --durations=0 --basetemp=temp --maxfail=5
     displayName: 'pytest-onnxmltools'
 
   # Check flake8 after the tests to get more feedback.
@@ -327,7 +327,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules -v -v
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules -v -v --maxfail=5
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
 

@@ -329,26 +329,22 @@ if onnx_opset_version() >= 18:
         from reference_implementation_afe import ArrayFeatureExtractor
 
         class ArgMax(_ArgMax):
-            def _run(
-                self, data, axis=None, keepdims=None, select_last_index=None
-            ):
+            def _run(self, data, axis=None, keepdims=None,
+                     select_last_index=None):
                 if select_last_index == 0:  # type: ignore
                     return _ArgMax._run(
-                        self, data, axis=axis, keepdims=keepdims
-                    )
+                        self, data, axis=axis, keepdims=keepdims)
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         # classification 1
         X, y = make_classification(
-            100, n_features=6, n_classes=3, n_informative=3, n_redundant=0
-        )
+            100, n_features=6, n_classes=3, n_informative=3, n_redundant=0)
         model = BaggingClassifier().fit(X, y)
         onx = to_onnx(model, X.astype(np.float32),
                       options={"zipmap": False})
         tr = ReferenceEvaluator(
             onx, new_ops=[TreeEnsembleClassifier,
-                          ArrayFeatureExtractor, ArgMax]
-        )
+                          ArrayFeatureExtractor, ArgMax])
         print("-----------------------")
         print(tr.run(None, {"X": X[:10].astype(np.float32)}))
         print("--")

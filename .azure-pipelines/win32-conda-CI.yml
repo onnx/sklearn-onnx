@@ -224,7 +224,7 @@ jobs:
   - script: |
       call activate skl2onnxEnvironment
       if "$(onnx.target_opset)" neq "" set TEST_TARGET_OPSET=$(onnx.target_opset)
-      python -m pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      python -m pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml --maxfail=10
     displayName: 'pytest'
 
   - task: PublishTestResults@2
