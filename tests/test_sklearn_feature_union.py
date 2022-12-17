@@ -41,6 +41,30 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
+    def test_feature_union_nested(self):
+        data = load_iris()
+        X, y = data.data, data.target
+        X = X.astype(np.float32)
+        X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=0.5, random_state=42)
+        model = FeatureUnion([
+            ('features', FeatureUnion([
+                ('standard', StandardScaler()),
+                ])
+             ),
+            ]).fit(X_train)
+
+        model_onnx = convert_sklearn(
+            model, 'feature union',
+            [('input', FloatTensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X_test, model, model_onnx,
+                            basename="SklearnFeatureUnionNested")
+
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
+        reason="onnxruntime too old")
     def test_feature_union_transformer_weights_0(self):
         data = load_iris()
         X, y = data.data, data.target
