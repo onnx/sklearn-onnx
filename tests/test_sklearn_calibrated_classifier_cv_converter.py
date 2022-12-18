@@ -331,7 +331,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         y = y[:90]
         self.assertEqual(len(set(y)), 2)
 
-        for model_sub in [LogisticRegression(), SVC(probability=False)]:
+        for model_sub in [SVC(probability=False), LogisticRegression()]:
             model_sub.fit(X, y)
             with self.subTest(model=model_sub):
                 model = CalibratedClassifierCV(
@@ -345,15 +345,20 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
                 sess = InferenceSession(
                     model_onnx.SerializeToString(),
-                    providers=["CPUExecutionProvider"])
+                    providers=["CPUExecutionProvider"], verbose=10)
                 if sess is not None:
-                    res = sess.run(None, {'input': X[:5].astype(np.float32)})
+                    try:
+                        res = sess.run(
+                            None, {'input': X[:5].astype(np.float32)})
+                    except RuntimeError as e:
+                        raise AssertionError("runtime failed") from e
                     assert_almost_equal(model.predict_proba(X[:5]), res[1])
                     assert_almost_equal(model.predict(X[:5]), res[0])
 
+                name = model_sub.__class__.__name__
                 dump_data_and_model(
                     X.astype(np.float32)[:10], model, model_onnx,
-                    basename="SklearnCalibratedClassifierSVC2")
+                    basename=f"SklearnCalibratedClassifierBinary{name}SVC2")
 
 
 if __name__ == "__main__":

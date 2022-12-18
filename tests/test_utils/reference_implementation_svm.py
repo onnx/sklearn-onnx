@@ -127,9 +127,14 @@ class SVMCommon:
 
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
-    from .reference_implementation_helper import (
-        write_scores, set_score_svm, multiclass_probability,
-        sigmoid_probability)
+    try:
+        from .reference_implementation_helper import (
+            write_scores, set_score_svm, multiclass_probability,
+            sigmoid_probability)
+    except ImportError:
+        from reference_implementation_helper import (
+            write_scores, set_score_svm, multiclass_probability,
+            sigmoid_probability)
 
     class SVMRegressor(OpRun):
 
@@ -250,7 +255,7 @@ if onnx_opset_version() >= 18:
             else:
                 label = max_class
 
-            new_scores = write_scores(votes.size, scores,
+            new_scores = write_scores(scores.size, scores,
                                       self._svm.atts.post_transform,
                                       write_additional_scores)
             return label, new_scores
@@ -331,20 +336,21 @@ if onnx_opset_version() >= 18:
                 for n in range(scores.shape[0]):
                     s = self._probabilities(res[n], class_count_)
                     scores[n, :] = s
-                nc = class_count_
                 has_proba = True
             else:
                 scores = res
-                nc = class_count_ * (class_count_ - 1) // 2
                 has_proba = False
 
             # finalization
-            final_scores = np.empty((X.shape[0], nc), dtype=X.dtype)
+            final_scores = None
             labels = []
             for n in range(scores.shape[0]):
                 label, new_scores = self._compute_final_scores(
                     votes[n], scores[n], weights_are_all_positive_,
                     has_proba, classlabels_ints)
+                if final_scores is None:
+                    final_scores = np.empty((X.shape[0], new_scores.size),
+                                            dtype=X.dtype)
                 final_scores[n, :] = new_scores
                 labels.append(label)
 
@@ -375,22 +381,24 @@ if onnx_opset_version() >= 18:
         # classification 1
         X, y = make_classification(
             100, n_features=6, n_classes=4, n_informative=3, n_redundant=0)
-        model = SVC(probability=True).fit(X, y)
+        y[:50] = 0
+        y[50:] = 1
+        model = SVC(probability=False).fit(X, y)
         onx = to_onnx(model, X.astype(np.float32),
                       options={"zipmap": False})
         tr = ReferenceEvaluator(
             onx, new_ops=[SVMClassifier,
                           ArrayFeatureExtractor, ArgMax])
         print("-----------------------")
-        print(tr.run(None, {"X": X[:2].astype(np.float32)}))
+        print(tr.run(None, {"X": X[:4].astype(np.float32)}))
         print("--")
         from mlprodict.onnxrt import OnnxInference
         oinf = OnnxInference(onx)
-        print(oinf.run({"X": X[:2].astype(np.float32)}))
+        print(oinf.run({"X": X[:4].astype(np.float32)}))
         print("--")
-        print(model.predict(X[:2].astype(np.float32)))
-        print(model.decision_function(X[:2].astype(np.float32)))
-        print(model.predict_proba(X[:2].astype(np.float32)))
+        print(model.predict(X[:4].astype(np.float32)))
+        print(model.decision_function(X[:4].astype(np.float32)))
+        print(model.predict_proba(X[:4].astype(np.float32)))
         print("-----------------------")
 
         # regression
