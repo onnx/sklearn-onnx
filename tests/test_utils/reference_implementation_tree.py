@@ -133,6 +133,8 @@ class TreeEnsemble:
 
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
+    from .reference_implementation_helper import (
+        ComputeProbit, write_scores)
 
     class TreeEnsembleRegressor(OpRun):
 
@@ -260,8 +262,10 @@ if onnx_opset_version() >= 18:
             leaves_index = tr.leave_index_tree(X)
             n_classes = max(
                 len(classlabels_int64s or []), len(classlabels_strings or []))
+            if X.dtype not in (np.float32, np.float64):
+                X = X.astype(np.float)
             res = np.empty(
-                (leaves_index.shape[0], n_classes), dtype=X.dtype)
+                (leaves_index.shape[0], n_classes), dtype=np.float32)
             if base_values is None:
                 res[:, :] = 0
             else:
@@ -312,9 +316,17 @@ if onnx_opset_version() >= 18:
                         f"not supported.")
                 labels = np.array([classlabels_strings[i] for i in labels])
             if post_transform in (None, "NONE"):
-                return (labels, res)
-            raise NotImplementedError(
-                f"post_transform={post_transform!r} not implemented.")
+                return labels, res
+            if post_transform == "PROBIT" and n_classes == 1:
+                assert res.shape[1] == 1
+                res[:, 0] = [ComputeProbit(x) for x in res[:, 0]]
+                return labels, res
+
+            new_scores = np.empty(res.shape, dtype=res.dtype)
+            for i in range(res.shape[0]):
+                new_scores[i, :] = write_scores(
+                    n_classes, res[i], post_transform, -1)
+            return labels, new_scores
 
     if __name__ == "__main__":
         from onnx.reference import ReferenceEvaluator
@@ -323,8 +335,7 @@ if onnx_opset_version() >= 18:
         from sklearn.ensemble import (
             RandomForestRegressor,
             RandomForestClassifier,
-            BaggingClassifier,
-        )
+            BaggingClassifier)
         from skl2onnx import to_onnx
         from reference_implementation_afe import ArrayFeatureExtractor
 

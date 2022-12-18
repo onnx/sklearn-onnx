@@ -134,7 +134,7 @@ def convert_quadratic_discriminant_analysis_classifier(
         container.add_initializer(
             axis_name, onnx_proto.TensorProto.INT64, [1], [1])
         container.add_node(
-            'ReduceMax', [decision_fun, axis_name], [df_max], axes=[1])
+            'ReduceMax', [decision_fun, axis_name], [df_max])
     else:
         container.add_node(
             'ReduceMax', [decision_fun], [df_max], axes=[1])

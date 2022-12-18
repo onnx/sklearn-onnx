@@ -25,7 +25,11 @@ def _array_feature_extrator(data, indices):
         new_shape = (1, add)
     else:
         new_shape = list(data.shape[:-1]) + [add]
-    tem = data[..., index]
+    try:
+        tem = data[..., index]
+    except IndexError as e:
+        raise RuntimeError(
+            f"data.shape={data.shape}, indices={indices}") from e
     res = tem.reshape(new_shape)
     return res
 

@@ -29,7 +29,7 @@ from test_utils import (
 
 
 class TestSklearnBaggingConverter(unittest.TestCase):
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_default_binary_int(self):
         model, X = fit_classification_model(
             BaggingClassifier(), 2, is_int=True)
@@ -43,7 +43,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnBaggingClassifierDefaultBinary")
 
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_default_multiclass_int(self):
         model, X = fit_classification_model(
             BaggingClassifier(), 4, is_int=True)
@@ -134,7 +134,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnBaggingClassifierDefaultMulticlass")
 
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_sgd_binary(self):
         model, X = fit_classification_model(
             BaggingClassifier(
@@ -175,7 +175,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     @unittest.skipIf(pv.Version(onnxruntime.__version__)
                      <= pv.Version("0.4.0"),
                      reason="Not implemented.")
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
             BaggingClassifier(
