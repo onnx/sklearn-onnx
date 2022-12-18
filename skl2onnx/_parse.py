@@ -287,7 +287,7 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
     # Encode each transform as our IR object
     for name, transform in model.transformer_list:
         transformed_result_names.append(
-            _parse_sklearn_simple_model(
+            _parse_sklearn(
                 scope, transform, inputs,
                 custom_parsers=custom_parsers)[0])
         if (model.transformer_weights is not None and name in
