@@ -345,7 +345,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
                 sess = InferenceSession(
                     model_onnx.SerializeToString(),
-                    providers=["CPUExecutionProvider"], verbose=10)
+                    providers=["CPUExecutionProvider"])
                 if sess is not None:
                     try:
                         res = sess.run(

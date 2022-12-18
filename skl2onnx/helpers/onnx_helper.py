@@ -140,7 +140,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
                 nb += 1
 
     # All nodes verifies mark_op[node.name] == 1
-    keep_nodes = [node for node in nodes if mark_op[node.name] == 1]
+    keep_nodes = [node for node in nodes[::-1] if mark_op[node.name] == 1]
 
     var_out = []
     for out in outputs:

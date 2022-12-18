@@ -46,8 +46,8 @@ class TestInvestigate(unittest.TestCase):
                 model, "pipeline", [("input", FloatTensorType([None, 2]))],
                 target_opset=opset)
 
-            assert len(steps) == 2
-            assert len(all_models) == 3
+            self.assertEqual(len(steps), 2)
+            self.assertEqual(len(all_models), 3)
 
             expected = 'version:%d}' % opset
             expected1 = 'version:1}'
@@ -249,6 +249,26 @@ class TestInvestigate(unittest.TestCase):
                 verbose=1)
         self.assertIn("[convert_sklearn] convert_topology", st.getvalue())
 
+    @unittest.skipIf(TARGET_OPSET < 18,
+                     reason="ReferenceEvaluator not implemented")
+    def test_replay_run(self):
+        try:
+            from .test_utils.utils_backend_onnx import ReferenceEvaluatorEx
+        except ImportError:
+            from test_utils.utils_backend_onnx import ReferenceEvaluatorEx
+        data = load_iris()
+        X, y = data.data, data.target
+        model = Pipeline([("scaler1", StandardScaler()),
+                          ("lr", LogisticRegression())])
+        model.fit(X, y)
+        onx = convert_sklearn(
+            model, initial_types=[('X', FloatTensorType())],
+            options={'zipmap': False})
+        sess = ReferenceEvaluatorEx(onx)
+        sess.run(None, {"X": X})
+        repl = sess.replay_run()
+        self.assertIn('probability_tensor', repl)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

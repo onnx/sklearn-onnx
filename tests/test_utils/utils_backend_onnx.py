@@ -3,6 +3,8 @@
 """
 Helpers to test runtimes.
 """
+import io
+import contextlib
 import numpy as np
 from scipy.special import expit  # noqa
 import pandas
@@ -203,6 +205,20 @@ if onnx_opset_version() >= 18:
                        for n, t in zip(self.output_names,
                                        self.output_types)]
                 return res
+
+            def run(self, *args, **kwargs):
+                self.last_inputs = (args, kwargs)
+                return super().run(*args, **kwargs)
+
+            def replay_run(self, verbose=10):
+                if not hasattr(self, "last_inputs"):
+                    raise RuntimeError("No previous run to be executed.")
+                self.verbose = verbose
+                st = io.StringIO()
+                args, kwargs = self.last_inputs
+                with contextlib.redirect_stdout(st):
+                    self.run(*args, **kwargs)
+                return st.getvalue()
 
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
@@ -748,12 +764,18 @@ def _compare_expected(
             if k not in expected:
                 continue
             msg = compare_outputs(
-                expected[k], v, decimal=decimal, verbose=verbose, **kwargs
-            )
+                expected[k], v, decimal=decimal, verbose=verbose, **kwargs)
             if msg:
+                if hasattr(sess, 'replay_run'):
+                    # ReferenceEvaluator
+                    res = sess.replay_run()
+                    raise OnnxRuntimeAssertionError(
+                        f"Unexpected output '{k}'\n---\n{res}\n----\n{msg}")
+                elif verbose:
+                    raise OnnxRuntimeAssertionError(
+                        f"Unexpected output {k!r} in model {onnx}\n{msg}")
                 raise OnnxRuntimeAssertionError(
-                    "Unexpected output '{0}' in model '{1}'\n{2}".format(
-                        k, onnx, msg))
+                    f"Unexpected output {k!r}\n{msg}")
             tested += 1
     elif isinstance(expected, np.ndarray):
         if isinstance(output, list):
@@ -791,8 +813,16 @@ def _compare_expected(
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
+            if hasattr(sess, 'replay_run'):
+                # ReferenceEvaluator
+                res = sess.replay_run()
+                raise OnnxRuntimeAssertionError(
+                    f"Unexpected output {k!r}\n---\n{res}\n----\n{msg}")
+            elif verbose:
+                raise OnnxRuntimeAssertionError(
+                    f"Unexpected output in model {onnx}\n{msg}")
             raise OnnxRuntimeAssertionError(
-                f"Unexpected output in model {onnx}\n{msg}")
+                f"Unexpected output {k!r}\n{msg}")
         tested += 1
     else:
         from scipy.sparse import csr_matrix
@@ -804,8 +834,15 @@ def _compare_expected(
             msg = compare_outputs(
                 dense, one_array, decimal=decimal, verbose=verbose, **kwargs)
             if msg:
-                raise OnnxRuntimeAssertionError(
-                    "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
+                if hasattr(sess, 'replay_run'):
+                    # ReferenceEvaluator
+                    res = sess.replay_run()
+                    raise OnnxRuntimeAssertionError(
+                        f"Unexpected output\n---\n{res}\n----\n{msg}")
+                elif verbose:
+                    raise OnnxRuntimeAssertionError(
+                        f"Unexpected output in model '{onnx}'\n{msg}")
+                raise OnnxRuntimeAssertionError(f"Unexpected output\n{msg}")
             tested += 1
         else:
             raise OnnxRuntimeAssertionError(

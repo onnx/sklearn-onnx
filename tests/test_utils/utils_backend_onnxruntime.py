@@ -563,9 +563,11 @@ def _compare_expected(
             msg = compare_outputs(
                 expected[k], v, decimal=decimal, verbose=verbose, **kwargs)
             if msg:
+                if verbose:
+                    raise OnnxRuntimeAssertionError(
+                        f"Unexpected output {k!r} in model {onnx}\n{msg}")
                 raise OnnxRuntimeAssertionError(
-                    "Unexpected output '{0}' in model '{1}'\n{2}".format(
-                        k, onnx, msg))
+                    f"Unexpected output {k!r}\n{msg}")
             tested += 1
     elif isinstance(expected, numpy.ndarray):
         if isinstance(output, list):
@@ -603,8 +605,11 @@ def _compare_expected(
         if isinstance(msg, ExpectedAssertionError):
             raise msg
         if msg:
+            if verbose:
+                raise OnnxRuntimeAssertionError(
+                    f"Unexpected output in model {onnx}\n{msg}")
             raise OnnxRuntimeAssertionError(
-                "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
+                f"Unexpected output\n{msg}")
         tested += 1
     else:
         from scipy.sparse import csr_matrix
@@ -616,8 +621,11 @@ def _compare_expected(
             msg = compare_outputs(
                 dense, one_array, decimal=decimal, verbose=verbose, **kwargs)
             if msg:
+                if verbose:
+                    raise OnnxRuntimeAssertionError(
+                        f"Unexpected output in model {onnx}\n{msg}")
                 raise OnnxRuntimeAssertionError(
-                    "Unexpected output in model '{0}'\n{1}".format(onnx, msg))
+                    f"Unexpected output\n{msg}")
             tested += 1
         else:
             raise OnnxRuntimeAssertionError(
