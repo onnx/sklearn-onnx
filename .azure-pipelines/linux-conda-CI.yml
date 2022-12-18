@@ -273,7 +273,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest tests --maxfail=10 --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      pytest tests --maxfail=20 --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |

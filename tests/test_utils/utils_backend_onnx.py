@@ -817,12 +817,12 @@ def _compare_expected(
                 # ReferenceEvaluator
                 res = sess.replay_run()
                 raise OnnxRuntimeAssertionError(
-                    f"Unexpected output {k!r}\n---\n{res}\n----\n{msg}")
+                    f"Unexpected output\n---\n{res}\n----\n{msg}")
             elif verbose:
                 raise OnnxRuntimeAssertionError(
                     f"Unexpected output in model {onnx}\n{msg}")
             raise OnnxRuntimeAssertionError(
-                f"Unexpected output {k!r}\n{msg}")
+                f"Unexpected output\n{msg}")
         tested += 1
     else:
         from scipy.sparse import csr_matrix
