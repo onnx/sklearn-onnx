@@ -71,8 +71,10 @@ if onnx_opset_version() >= 18:
         from .reference_implementation_afe import ArrayFeatureExtractor
         from .reference_implementation_tree import (
             TreeEnsembleClassifier,
-            TreeEnsembleRegressor,
-        )
+            TreeEnsembleRegressor)
+        from .reference_implementation_svm import (
+            SVMClassifier,
+            SVMRegressor)
         from .reference_implementation_text import TfIdfVectorizer
 
         class ArgMin(_ArgMin):
@@ -177,6 +179,8 @@ if onnx_opset_version() >= 18:
             TreeEnsembleClassifier,
             TreeEnsembleRegressor,
             Scaler,
+            SVMClassifier,
+            SVMRegressor,
             ZipMap,
         ])
 

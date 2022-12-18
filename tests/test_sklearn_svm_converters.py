@@ -7,7 +7,6 @@ import unittest
 import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM, LinearSVC
 try:
@@ -24,7 +23,8 @@ from skl2onnx.common.data_types import (
 from skl2onnx.operator_converters.ada_boost import _scikit_learn_before_022
 from onnxruntime import __version__ as ort_version
 from test_utils import (
-    dump_data_and_model, fit_regression_model, TARGET_OPSET)
+    dump_data_and_model, fit_regression_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = ort_version.split('+')[0]
@@ -620,4 +620,4 @@ class TestSklearnSVM(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
