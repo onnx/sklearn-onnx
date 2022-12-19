@@ -100,16 +100,21 @@ if onnx_opset_version() >= 18:
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         class ReduceLogSumExp_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None):  # type: ignore
+            def _run(self, data, axes=None, keepdims=None):
                 tax = tuple(axes) if axes else None
                 return compute_log_sum_exp(data, tax, keepdims)
 
-        class ReduceL2_18(OpRunReduceNumpy):
+        class ReduceLogSumExp_18(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=None,
+                     noop_with_empty_axes=None):
+                assert noop_with_empty_axes != 1
+                tax = tuple(axes) if axes else None
+                return compute_log_sum_exp(data, tax, keepdims)
+
+        class ReduceL2_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
-                if self.is_axes_empty(axes) and noop_with_empty_axes:
-                    return (data,)
-
+                assert noop_with_empty_axes != 1
                 axes = self.handle_axes(axes)
                 keepdims = keepdims != 0  # type: ignore
                 return (
@@ -117,23 +122,46 @@ if onnx_opset_version() >= 18:
                             keepdims=keepdims)).astype(
                             dtype=data.dtype))
 
-        class ReduceMean_18(OpRunReduceNumpy):
+        class ReduceL2_18(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
-                if self.is_axes_empty(axes) and noop_with_empty_axes:
-                    return (data,)
+                assert noop_with_empty_axes != 1
+                axes = self.handle_axes(axes)
+                keepdims = keepdims != 0  # type: ignore
+                return (
+                    np.sqrt(np.sum(np.square(data), axis=axes,
+                            keepdims=keepdims)).astype(
+                            dtype=data.dtype))
 
+        class ReduceMean_1(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=1):
                 axes = self.handle_axes(axes)
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
                                 keepdims=keepdims).astype(data.dtype),)
 
+        class ReduceMean_18(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=1,
+                     noop_with_empty_axes=0):
+                assert noop_with_empty_axes != 1
+                axes = self.handle_axes(axes)
+                keepdims = keepdims != 0  # type: ignore
+                return (np.mean(data, axis=axes,
+                                keepdims=keepdims).astype(data.dtype),)
+
+        class ReduceSumSquare_1(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=1,
+                     noop_with_empty_axes=0):
+                assert noop_with_empty_axes != 1
+                axes = self.handle_axes(axes)
+                keepdims = keepdims != 0  # type: ignore
+                return (np.sum(np.square(data), axis=axes,
+                               keepdims=keepdims).astype(data.dtype),)
+
         class ReduceSumSquare_18(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
-                if self.is_axes_empty(axes) and noop_with_empty_axes:
-                    return (data,)
-
+                assert noop_with_empty_axes != 1
                 axes = self.handle_axes(axes)
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
@@ -182,10 +210,10 @@ if onnx_opset_version() >= 18:
             ArgMax,
             ArgMin,
             ConstantOfShape,
-            ReduceL2_18,
-            ReduceLogSumExp_1,
-            ReduceMean_18,
-            ReduceSumSquare_18,
+            ReduceL2_1, ReduceL2_18,
+            ReduceLogSumExp_1, ReduceLogSumExp_18,
+            ReduceMean_1, ReduceMean_18,
+            ReduceSumSquare_1, ReduceSumSquare_18,
             Where,
             # ai.onnx.ml
             ArrayFeatureExtractor,
