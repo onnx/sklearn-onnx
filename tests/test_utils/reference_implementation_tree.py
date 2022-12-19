@@ -133,8 +133,12 @@ class TreeEnsemble:
 
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
-    from .reference_implementation_helper import (
-        ComputeProbit, write_scores)
+    try:
+        from .reference_implementation_helper import (
+            ComputeProbit, write_scores)
+    except ImportError:
+        from reference_implementation_helper import (
+            ComputeProbit, write_scores)
 
     class TreeEnsembleRegressor(OpRun):
 
@@ -263,7 +267,7 @@ if onnx_opset_version() >= 18:
             n_classes = max(
                 len(classlabels_int64s or []), len(classlabels_strings or []))
             if X.dtype not in (np.float32, np.float64):
-                X = X.astype(np.float)
+                X = X.astype(np.float32)
             res = np.empty(
                 (leaves_index.shape[0], n_classes), dtype=np.float32)
             if base_values is None:
@@ -330,7 +334,7 @@ if onnx_opset_version() >= 18:
 
     if __name__ == "__main__":
         from onnx.reference import ReferenceEvaluator
-        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
+        from onnx.reference.ops.op_argmax import _ArgMax
         from sklearn.datasets import make_regression, make_classification
         from sklearn.ensemble import (
             RandomForestRegressor,

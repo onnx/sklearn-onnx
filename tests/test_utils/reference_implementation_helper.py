@@ -27,6 +27,7 @@ def ComputeSoftmax(values):
     values[:] = np.exp(values - v_max)
     this_sum = values.sum()
     values /= this_sum
+    return values
 
 
 def ComputeSoftmaxZero(values):
@@ -41,6 +42,7 @@ def ComputeSoftmaxZero(values):
         else:
             values[i] *= exp_neg_v_max
     values[i] /= s
+    return values
 
 
 def sigmoid_probability(score, proba, probb):
@@ -125,8 +127,7 @@ def write_scores(n_classes, scores, post_transform, add_second_class):
                                  ComputeLogistic(-scores[0])],
                                 dtype=scores.dtype)
             return np.array([-scores[0], scores[0]], dtype=scores.dtype)
-        else:
-            return np.array([scores[0]], dtype=scores.dtype)
+        return np.array([scores[0]], dtype=scores.dtype)
     raise NotImplementedError(f"n_classes={n_classes} not supported.")
 
 

@@ -52,8 +52,8 @@ if onnx_opset_version() >= 18:
 
     if add_ops:
         # bugs in reference implementation not covered by a backend test
-        from onnx.reference.ops.op_argmin import ArgMin_12 as _ArgMin, _argmin
-        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax, _argmax
+        from onnx.reference.ops.op_argmin import _ArgMin, _argmin
+        from onnx.reference.ops.op_argmax import _ArgMax, _argmax
         from onnx.reference.ops.op_reduce_log_sum_exp import (
             compute_log_sum_exp)
         from .reference_implementation_ml import (
@@ -85,8 +85,7 @@ if onnx_opset_version() >= 18:
                 if select_last_index == 0:
                     if keepdims == 0:
                         return _ArgMin._run(
-                            self, data, axis=axis, keepdims=keepdims,
-                            select_last_index=0)
+                            self, data, axis=axis, keepdims=keepdims)
                     return (_argmin(data, axis=axis, keepdims=keepdims),)
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
@@ -96,8 +95,7 @@ if onnx_opset_version() >= 18:
                 if select_last_index == 0:
                     if keepdims == 0:
                         return _ArgMax._run(
-                            self, data, axis=axis, keepdims=keepdims,
-                            select_last_index=0)
+                            self, data, axis=axis, keepdims=keepdims)
                     return (_argmax(data, axis=axis, keepdims=keepdims),)
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
@@ -193,6 +191,25 @@ if onnx_opset_version() >= 18:
                 else:
                     new_ops = new_ops + additional_implementations
                 super().__init__(*args, new_ops=new_ops, **kwargs)
+
+            def _log_arg(self, a):
+                if isinstance(a, (str, int, float)):
+                    return a
+                if a.__class__.__name__ == "ZipMapDictionary":
+                    return str(a)
+                if isinstance(a, np.ndarray):
+                    if self.verbose < 4:
+                        return f"{a.dtype}:{a.shape} in [{a.min()}, {a.max()}]"
+                    elements = a.ravel().tolist()
+                    if len(elements) > 5:
+                        elements = elements[:5]
+                        return (
+                            f"{a.dtype}:{a.shape}:"
+                            f"{','.join(map(str, elements))}...")
+                    return f"{a.dtype}:{a.shape}:{elements}"
+                if hasattr(a, "append"):
+                    return ", ".join(map(self._log_arg, a))
+                return a
 
             def get_inputs(self):
                 res = [InputDef(n, list(get_shape(t, True)), get_type(t))
@@ -349,11 +366,10 @@ def compare_runtime(
     import onnx.reference
 
     if verbose:
-        print("[compare_runtime] InferenceSession('{}')".format(onx))
+        print("[compare_runtime] ReferenceEvaluator('{}')".format(onx))
 
     try:
-        sess = onnx.reference.ReferenceEvaluator(
-            onx, new_ops=additional_implementations, verbose=verbose)
+        sess = ReferenceEvaluatorEx(onx, verbose=verbose)
     except ExpectedAssertionError as expe:
         raise expe
     except Exception as e:
@@ -822,7 +838,7 @@ def _compare_expected(
                 raise OnnxRuntimeAssertionError(
                     f"Unexpected output in model {onnx}\n{msg}")
             raise OnnxRuntimeAssertionError(
-                f"Unexpected output\n{msg}")
+                f"Unexpected output ({type(sess)} - {dir(sess)})\n{msg}")
         tested += 1
     else:
         from scipy.sparse import csr_matrix

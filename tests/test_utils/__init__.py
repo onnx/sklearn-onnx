@@ -42,7 +42,8 @@ def InferenceSessionEx(onx, *args, verbose=0, **kwargs):
     try:
         return InferenceSession(onx, *args, **kwargs)
     except Exception as e:
-        if "support for domain ai.onnx is till opset 17." in str(e):
+        if (TARGET_OPSET >= 18 and
+                "support for domain ai.onnx is till opset" in str(e)):
             return ReferenceEvaluatorEx(onx, verbose=verbose)
         raise e
 

@@ -198,7 +198,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             BaggingClassifier(
                 GradientBoostingClassifier(random_state=42, n_estimators=4),
                 random_state=42), 4, n_features=10)
-        options = {id(model): {'raw_scores': True}}
+        options = {id(model): {'raw_scores': True, "zipmap": False}}
         model_onnx = convert_sklearn(
             model, "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -219,8 +219,8 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False})
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -234,16 +234,12 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             BaggingClassifier(
                 GradientBoostingClassifier(n_estimators=10)), 3)
         model_onnx = convert_sklearn(
-            model,
-            "bagging classifier",
+            model, "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
-        self.assertIsNotNone(model_onnx)
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False})
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
             basename="SklearnBaggingClassifierGradientBoostingMulticlass")
 
     @ignore_warnings(category=FutureWarning)
@@ -336,5 +332,4 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnBaggingConverter().test_bagging_classifier_bootstrap_features()
     unittest.main(verbosity=2)
