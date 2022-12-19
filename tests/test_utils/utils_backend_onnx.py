@@ -280,6 +280,10 @@ if onnx_opset_version() >= 18:
             for v in many.values():
                 new_new_ops.append(v[0])
 
+            self._main_domain = main_domain
+            self._new_ops = new_new_ops
+            self._opset_import = model.opset_import
+
             # calls the constructor
             super().__init__(*args, new_ops=new_new_ops, **kwargs)
 
@@ -324,7 +328,8 @@ if onnx_opset_version() >= 18:
             args, kwargs = self.last_inputs
             with contextlib.redirect_stdout(st):
                 self.run(*args, **kwargs)
-            classes = [st.getvalue()]
+            classes = [st.getvalue(), f"main_domain={self._main_domain}",
+                       str(self._new_ops), str(self._opset_import)]
             for rt in self.rt_nodes_:
                 classes.append(str(type(rt)))
             return "\n".join(classes)
