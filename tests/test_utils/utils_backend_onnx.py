@@ -117,7 +117,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
                 assert noop_with_empty_axes != 1
-                axes = self.handle_axes(axes)
+                axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (
                     np.sqrt(np.sum(np.square(data), axis=axes,
@@ -128,7 +128,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
                 assert noop_with_empty_axes != 1
-                axes = self.handle_axes(axes)
+                axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (
                     np.sqrt(np.sum(np.square(data), axis=axes,
@@ -137,7 +137,7 @@ if onnx_opset_version() >= 18:
 
         class ReduceMean_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=1):
-                axes = self.handle_axes(axes)
+                axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
                                 keepdims=keepdims).astype(data.dtype),)
@@ -146,7 +146,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
                 assert noop_with_empty_axes != 1
-                axes = self.handle_axes(axes)
+                axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
                                 keepdims=keepdims).astype(data.dtype),)
@@ -155,7 +155,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
                 assert noop_with_empty_axes != 1
-                axes = self.handle_axes(axes)
+                axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
                                keepdims=keepdims).astype(data.dtype),)
@@ -164,7 +164,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
                 assert noop_with_empty_axes != 1
-                axes = self.handle_axes(axes)
+                axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
                                keepdims=keepdims).astype(data.dtype),)

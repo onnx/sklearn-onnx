@@ -291,6 +291,8 @@ def OnnxReduceSumSquareApi18(*x, axes=None, keepdims=1, op_version=None,
     """
     Adds operator ReduceSumSquare with opset>=18 following API from opset 17.
     """
+    if axes is None or not isinstance(axes, (list, np.ndarray)):
+        raise TypeError(f"axes must be a list or an array not {type(axes)}.")
     return OnnxReduceAnyApi18(
         OnnxReduceSumSquare, OnnxReduceSumSquare_13,  # noqa
         OnnxReduceSumSquare_11, OnnxReduceSumSquare_1,  # noqa
