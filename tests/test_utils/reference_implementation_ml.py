@@ -291,8 +291,12 @@ if onnx_opset_version() >= 18:
         def _run(self, *args, inputdimensions=None):
             args = [self._preprocess(a, axis)
                     for a, axis in zip(args, inputdimensions)]
-            res = np.concatenate(args, inputdimensions)
-            return (res, )
+            dimensions = set(inputdimensions)
+            if len(set(dimensions)) == 1:
+                res = np.concatenate(args, axis=inputdimensions[0])
+                return (res, )
+            raise RuntimeError(
+                f"inputdimensions={inputdimensions} is not supported yet.")
 
     class Imputer(OpRun):
 
@@ -364,7 +368,7 @@ if onnx_opset_version() >= 18:
                 dtype = np.str_
             shape = x.shape
             if len(x.shape) > 1:
-                x = np.squeeze(x)
+                x = x.flatten()
             res = []
             for i in range(0, x.shape[0]):
                 v = classes.get(x[i], defval)
