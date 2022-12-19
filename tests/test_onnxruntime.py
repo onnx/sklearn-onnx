@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 try:
+    import onnx.reference  # noqa
     from test_utils import ReferenceEvaluatorEx
 except ImportError:
     ReferenceEvaluatorEx = None

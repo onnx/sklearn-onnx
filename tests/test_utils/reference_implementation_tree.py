@@ -263,11 +263,11 @@ if onnx_opset_version() >= 18:
                 class_weights=class_weights,
                 class_weights_as_tensor=class_weights_as_tensor)
             self._tree = tr
+            if X.dtype not in (np.float32, np.float64):
+                X = X.astype(np.float32)
             leaves_index = tr.leave_index_tree(X)
             n_classes = max(
                 len(classlabels_int64s or []), len(classlabels_strings or []))
-            if X.dtype not in (np.float32, np.float64):
-                X = X.astype(np.float32)
             res = np.empty(
                 (leaves_index.shape[0], n_classes), dtype=np.float32)
             if base_values is None:

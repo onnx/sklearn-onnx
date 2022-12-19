@@ -363,8 +363,6 @@ def compare_runtime(
     elif not isinstance(options, dict):
         raise TypeError("options must be a dictionary.")
 
-    import onnx.reference
-
     if verbose:
         print("[compare_runtime] ReferenceEvaluator('{}')".format(onx))
 
