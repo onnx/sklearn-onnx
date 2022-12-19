@@ -109,10 +109,8 @@ class TreeEnsemble:
             else:
                 raise ValueError(
                     f"Unexpected rule {rule!r} for node index {index}.")
-            nid = (
-                self.atts.nodes_truenodeids[index]
-                if r
-                else self.atts.nodes_falsenodeids[index])
+            nid = (self.atts.nodes_truenodeids[index]
+                   if r else self.atts.nodes_falsenodeids[index])
             index = self.node_index[tree_id, nid]
         return index
 
@@ -274,6 +272,7 @@ if onnx_opset_version() >= 18:
                 res[:, :] = 0
             else:
                 res[:, :] = np.array(base_values).reshape((1, -1))
+
             class_index = {}
             for i, (tid, nid) in enumerate(zip(class_treeids, class_nodeids)):
                 if (tid, nid) not in class_index:
@@ -286,19 +285,41 @@ if onnx_opset_version() >= 18:
                 for its in t_index:
                     for it in its:
                         res[i, class_ids[it]] += tr.atts.class_weights[it]
-            binary = len(set(class_ids)) == 1
-            if binary:
-                classes = classlabels_int64s or classlabels_strings
-                if res.shape[1] == 1 and len(classes) == 1:
-                    new_res = np.zeros((res.shape[0], 2), res.dtype)
-                    new_res[:, 1] = res[:, 0]
-                    new_res[:, 0] = 1 - new_res[:, 1]
-                    res = new_res
-                else:
-                    res[:, 1] = res[:, 0]
-                    res[:, 0] = 1 - res[:, 1]
 
-            labels = np.argmax(res, axis=1).astype(np.int64)
+            # post_transform
+            binary = len(set(class_ids)) == 1
+            if post_transform in (None, "NONE"):
+                if binary:
+                    classes = classlabels_int64s or classlabels_strings
+                    if res.shape[1] == 1 and len(classes) == 1:
+                        new_res = np.zeros((res.shape[0], 2), res.dtype)
+                        new_res[:, 1] = res[:, 0]
+                        new_res[:, 0] = 1 - new_res[:, 1]
+                        res = new_res
+                    else:
+                        res[:, 1] = res[:, 0]
+                        res[:, 0] = 1 - res[:, 1]
+                res /= res.sum(axis=1, keepdims=1)
+                new_scores = res
+            elif post_transform == "PROBIT" and n_classes == 1:
+                assert res.shape[1] == 1
+                res[:, 0] = [ComputeProbit(x) for x in res[:, 0]]
+                new_scores = res
+            else:
+                nc = res.shape[1]
+                add_second_class = -1
+                if binary and res.shape[1] == 2:
+                    res = res[:, :1]
+                    if post_transform == "LOGISTIC":
+                        add_second_class = 2
+                new_scores = np.empty((res.shape[0], nc), dtype=res.dtype)
+                for i in range(res.shape[0]):
+                    new_scores[i, :] = write_scores(
+                        res.shape[1], res[i], post_transform,
+                        add_second_class)
+
+            # labels
+            labels = np.argmax(new_scores, axis=1).astype(np.int64)
             if classlabels_int64s is not None:
                 if len(classlabels_int64s) == 1:
                     if classlabels_int64s[0] == 1:
@@ -320,18 +341,6 @@ if onnx_opset_version() >= 18:
                         f"not supported.")
                 labels = np.array([classlabels_strings[i] for i in labels])
 
-            if post_transform in (None, "NONE"):
-                res /= res.sum(axis=1, keepdims=1)
-                return labels, res
-            if post_transform == "PROBIT" and n_classes == 1:
-                assert res.shape[1] == 1
-                res[:, 0] = [ComputeProbit(x) for x in res[:, 0]]
-                return labels, res
-
-            new_scores = np.empty(res.shape, dtype=res.dtype)
-            for i in range(res.shape[0]):
-                new_scores[i, :] = write_scores(
-                    n_classes, res[i], post_transform, -1)
             return labels, new_scores
 
     if __name__ == "__main__":

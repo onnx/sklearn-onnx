@@ -123,8 +123,8 @@ def write_scores(n_classes, scores, post_transform, add_second_class):
             res = np.array([1 - scores[0], scores[0]], dtype=scores.dtype)
         elif add_second_class in (2, 3):
             if post_transform == "LOGISTIC":
-                return np.array([ComputeLogistic(scores[0]),
-                                 ComputeLogistic(-scores[0])],
+                return np.array([ComputeLogistic(-scores[0]),
+                                 ComputeLogistic(scores[0])],
                                 dtype=scores.dtype)
             return np.array([-scores[0], scores[0]], dtype=scores.dtype)
         return np.array([scores[0]], dtype=scores.dtype)

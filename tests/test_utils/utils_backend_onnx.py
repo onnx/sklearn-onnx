@@ -117,6 +117,17 @@ if onnx_opset_version() >= 18:
                             keepdims=keepdims)).astype(
                             dtype=data.dtype))
 
+        class ReduceSumSquare(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=1,
+                     noop_with_empty_axes=0):
+                if self.is_axes_empty(axes) and noop_with_empty_axes:
+                    return (data,)
+
+                axes = self.handle_axes(axes)
+                keepdims = keepdims != 0  # type: ignore
+                return (np.sum(np.square(data), axis=axes,
+                               keepdims=keepdims).astype(data.dtype),)
+
         class ConstantOfShape(OpRun):
             def __init__(self, onnx_node, run_params):  # type: ignore
                 OpRun.__init__(self, onnx_node, run_params)
@@ -162,6 +173,7 @@ if onnx_opset_version() >= 18:
             ConstantOfShape,
             ReduceL2_18,
             ReduceLogSumExp_1,
+            ReduceSumSquare,
             Where,
             # ai.onnx.ml
             ArrayFeatureExtractor,

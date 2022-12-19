@@ -221,6 +221,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
             options={"zipmap": False})
+
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
@@ -332,4 +333,6 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    # TestSklearnBaggingConverter().
+    # test_bagging_classifier_sgd_multiclass_decision_function()
     unittest.main(verbosity=2)
