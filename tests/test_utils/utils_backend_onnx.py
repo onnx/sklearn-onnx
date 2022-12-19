@@ -287,7 +287,10 @@ if onnx_opset_version() >= 18:
                 args, kwargs = self.last_inputs
                 with contextlib.redirect_stdout(st):
                     self.run(*args, **kwargs)
-                return st.getvalue()
+                classes = [st.getvalue()]
+                for rt in self.rt_nodes_:
+                    classes.append(str(type(rt)))
+                return "\n".join(classes)
 
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):

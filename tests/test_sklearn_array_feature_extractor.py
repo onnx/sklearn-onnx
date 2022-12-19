@@ -18,8 +18,7 @@ from skl2onnx.common.data_types import FloatTensorType
 from sklearn.pipeline import Pipeline
 from test_utils import (
     dump_data_and_model,
-    TARGET_OPSET
-)
+    TARGET_OPSET)
 
 
 class TestSklearnArrayFeatureExtractor(unittest.TestCase):
