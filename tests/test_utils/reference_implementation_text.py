@@ -43,8 +43,9 @@ if onnx_opset_version() >= 18:
             if char_tokenization_:
                 return self._run_char_tokenization(text, stops_)
             if str_separators_ is not None and len(str_separators_) > 0:
+                str_separators = [re.compile(s) for s in str_separators_]
                 return self._run_sep_tokenization(
-                    text, stops_, str_separators_, mark, pad_value)
+                    text, stops_, str_separators, mark, pad_value)
             if tokenexp not in (None, ""):
                 return self._run_regex_tokenization(
                     text, stops_, tokenexp_, tokenexpsplit, mark, pad_value)
@@ -125,12 +126,21 @@ if onnx_opset_version() >= 18:
                 pos = 0
                 while pos < len(t):
                     for sep in separators:
-                        if (pos + len(sep) <= len(t) and
-                                sep == t[pos: pos + len(sep)]):
-                            word = t[begin:pos]
-                            yield word
-                            begin = pos + len(sep)
-                            break
+                        if isinstance(sep, str):
+                            if (pos + len(sep) <= len(t) and
+                                    sep == t[pos: pos + len(sep)]):
+                                word = t[begin:pos]
+                                yield word
+                                begin = pos + len(sep)
+                                break
+                        else:
+                            se = sep.match(t[pos:])
+                            if se:
+                                sep = se.group(0)
+                                word = t[begin:pos]
+                                yield word
+                                begin = pos + len(sep)
+                                break
                     pos += 1
                 if begin < pos:
                     word = t[begin:pos]
@@ -413,7 +423,7 @@ if onnx_opset_version() >= 18:
                 (num_rows * self.output_size_,), dtype=np.int64)
 
             if total_items == 0 or self.int64_map_.empty():
-                return self.output_result(B, frequencies)
+                return (self.output_result(B, frequencies), )
 
             def fn(row_num):
                 self.compute_impl(

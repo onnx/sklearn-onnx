@@ -71,7 +71,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             model, "ordinal encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            test, model, model_onnx, verbose=10,
+            test, model, model_onnx,
             basename="SklearnOrdinalEncoderMixedStringIntDrop")
 
     @unittest.skipIf(

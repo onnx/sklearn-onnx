@@ -355,6 +355,12 @@ if onnx_opset_version() >= 18:
             keys = keys_floats or keys_int64s or keys_strings
             values = values_floats or values_int64s or values_strings
             classes = {k: v for k, v in zip(keys, values)}
+            if id(keys) == id(keys_floats):
+                cast = float
+            elif id(keys) == id(keys_int64s):
+                cast = int
+            else:
+                cast = str
             if id(values) == id(values_floats):
                 defval = default_float
                 dtype = np.float32
@@ -371,7 +377,7 @@ if onnx_opset_version() >= 18:
                 x = x.flatten()
             res = []
             for i in range(0, x.shape[0]):
-                v = classes.get(x[i], defval)
+                v = classes.get(cast(x[i]), defval)
                 res.append(v)
             return (np.array(res, dtype=dtype).reshape(shape), )
 

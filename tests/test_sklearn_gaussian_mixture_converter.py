@@ -46,10 +46,13 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model, X[:1], target_opset=tg,
             options={id(model): {'score_samples': True}},
             black_op=black_op)
-        try:
-            sess = ReferenceEvaluatorEx(onx)
-        except NotImplementedError:
+        if ReferenceEvaluatorEx is None:
             sess = None
+        else:
+            try:
+                sess = ReferenceEvaluatorEx(onx)
+            except NotImplementedError:
+                sess = None
         if sess is not None:
             got = sess.run(None, {'X': X})
             self.assertEqual(len(got), 3)

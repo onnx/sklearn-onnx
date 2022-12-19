@@ -173,6 +173,22 @@ if onnx_opset_version() >= 18:
                 return (np.max(data, axis=axes,
                                keepdims=keepdims).astype(data.dtype),)
 
+        class ReduceProd_1(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=None, **kwargs):
+                axes = tuple(axes) if axes is not None else None
+                keepdims = keepdims != 0  # type: ignore
+                return (np.prod(data, axis=axes,
+                                keepdims=keepdims).astype(data.dtype),)
+
+        class ReduceProd_18(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=None,
+                     noop_with_empty_axes=None):
+                assert noop_with_empty_axes != 1
+                axes = tuple(axes) if axes is not None else None
+                keepdims = keepdims != 0  # type: ignore
+                return (np.prod(data, axis=axes,
+                                keepdims=keepdims).astype(data.dtype),)
+
         class ReduceSumSquare_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=None, **kwargs):
                 axes = tuple(axes) if axes is not None else None
@@ -247,6 +263,7 @@ if onnx_opset_version() >= 18:
             ReduceLogSumExp_1, ReduceLogSumExp_18,
             ReduceMax_1, ReduceMax_18,
             ReduceMean_1, ReduceMean_18,
+            ReduceProd_1, ReduceProd_18,
             ReduceSumSquare_1, ReduceSumSquare_18,
             Where,
             # ai.onnx.ml

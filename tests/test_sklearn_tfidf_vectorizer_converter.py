@@ -362,17 +362,14 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
 
         extra = {
-            id(vect): {
-                "sep2": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]
-            }
+            id(vect): {"sep2": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]}
         }
         try:
             convert_sklearn(
                 vect,
                 "TfidfVectorizer",
                 [("input", StringTensorType([None, 1]))],
-                options=extra, target_opset=TARGET_OPSET
-            )
+                options=extra, target_opset=TARGET_OPSET)
         except (RuntimeError, NameError):
             pass
 
@@ -387,15 +384,10 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             "TfidfVectorizer",
             [("input", StringTensorType([1]))],
-            options=extra, target_opset=TARGET_OPSET
-        )
+            options=extra, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
-        # This test depends on this issue:
-        # https://github.com/Microsoft/onnxruntime/issues/957.
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
+            corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")

@@ -577,7 +577,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test, model, model_onnx,
+            X_test[:10], model, model_onnx,
             basename="SklearnKNNClassifierMultiLabel-Out0")
 
     @unittest.skipIf(
@@ -970,4 +970,5 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestNearestNeighbourConverter().test_model_knn_classifier_multilabel()
     unittest.main()
