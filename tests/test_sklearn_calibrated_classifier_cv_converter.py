@@ -41,7 +41,6 @@ from test_utils import (
     dump_data_and_model, TARGET_OPSET,
     InferenceSessionEx as InferenceSession)
 
-
 ort_version = ort_version.split('+')[0]
 
 
@@ -150,6 +149,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model, "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
+
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx,
@@ -362,4 +362,4 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

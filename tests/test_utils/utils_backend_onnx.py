@@ -10,6 +10,7 @@ import numpy as np
 from scipy.special import expit  # noqa
 import pandas
 import onnx
+from onnx import AttributeProto, numpy_helper
 import onnx as onnx_package
 from onnx.defs import onnx_opset_version
 try:
@@ -54,10 +55,12 @@ if onnx_opset_version() >= 18:
 
     if add_ops:
         # bugs in reference implementation not covered by a backend test
+        from onnx.reference.op_run import RuntimeContextError
         from onnx.reference.ops.op_argmin import _ArgMin, _argmin
         from onnx.reference.ops.op_argmax import _ArgMax, _argmax
         from onnx.reference.ops.op_reduce_log_sum_exp import (
             compute_log_sum_exp)
+        from onnx.reference.ops.op_scan import Scan as _Scan
         from .reference_implementation_ml import (
             Binarizer,
             DictVectorizer,
@@ -123,8 +126,8 @@ if onnx_opset_version() >= 18:
                             dtype=data.dtype))
 
         class ReduceL2_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1,
-                     noop_with_empty_axes=0):
+            def _run(self, data, axes=None, keepdims=None,
+                     noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
@@ -134,15 +137,15 @@ if onnx_opset_version() >= 18:
                             dtype=data.dtype))
 
         class ReduceMean_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1, **kwargs):
+            def _run(self, data, axes=None, keepdims=None, **kwargs):
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
                                 keepdims=keepdims).astype(data.dtype),)
 
         class ReduceMean_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1,
-                     noop_with_empty_axes=0):
+            def _run(self, data, axes=None, keepdims=None,
+                     noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
@@ -150,15 +153,15 @@ if onnx_opset_version() >= 18:
                                 keepdims=keepdims).astype(data.dtype),)
 
         class ReduceSumSquare_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1, **kwargs):
+            def _run(self, data, axes=None, keepdims=None, **kwargs):
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
                                keepdims=keepdims).astype(data.dtype),)
 
         class ReduceSumSquare_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1,
-                     noop_with_empty_axes=0):
+            def _run(self, data, axes=None, keepdims=None,
+                     noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
@@ -203,6 +206,17 @@ if onnx_opset_version() >= 18:
                         f"{x.dtype} != {y.dtype}")
                 return (np.where(condition, x, y).astype(x.dtype),)
 
+        class Scan(_Scan):
+            def _extract_attribute_value(self, att, ref_att=None):
+                if att.type == AttributeProto.GRAPH:
+                    new_ops = self.run_params.get("new_ops", None)
+                    return ReferenceEvaluator(
+                        att.g,
+                        opsets=self.run_params["opsets"],
+                        verbose=max(0, self.run_params.get("verbose", 0) - 2),
+                        new_ops=None if new_ops is None else new_ops.values())
+                return super()._extract_attribute_value(att, ref_att)
+
         additional_implementations.extend([
             # ai.onnx
             ArgMax,
@@ -229,6 +243,7 @@ if onnx_opset_version() >= 18:
             TreeEnsembleClassifier,
             TreeEnsembleRegressor,
             Scaler,
+            Scan,
             SVMClassifier,
             SVMRegressor,
             ZipMap,
@@ -285,6 +300,57 @@ if onnx_opset_version() >= 18:
             # calls the constructor
             super().__init__(*args, new_ops=new_new_ops, **kwargs)
 
+        def _init(self):
+            """
+            Loads the implementation for every node in the graph.
+            """
+            self.rt_inits_ = {}
+            self.rt_nodes_ = []
+            for init in self.inits_:
+                self.rt_inits_[init.name] = numpy_helper.to_array(init)
+            run_params = {
+                "log": lambda pattern, *args: self._log(10, pattern, *args),
+                "opsets": self.opsets,
+                "verbose": self.verbose,
+                "new_ops": self.new_ops_,
+            }
+            if self.input_types_:
+                all_types = {i.name: i.type for i in self.onnx_graph_.input}
+                if hasattr(self.proto_, "value_info"):
+                    for shape_type in self.proto_.value_info:
+                        all_types[shape_type.name] = shape_type.type
+                self.all_types_ = all_types
+            else:
+                self.all_types_ = None  # type: ignore
+
+            for node in self.nodes_:
+                try:
+                    cl = self._load_impl(node)
+                except RuntimeContextError as e:
+                    # A node has a context dependent implementation.
+                    # Shape inference must be run to get the input types.
+                    if self.all_types_:
+                        it = [self.get_result_types(i) for i in node.input]
+                        cl = self._load_impl(node, it)  # type: ignore
+                    else:
+                        raise RuntimeContextError(
+                            f"No implementation was found for node "
+                            f"type {node.op_type!r} from domain "
+                            f"{node.domain!r}. "
+                            f"If this node has a context dependent "
+                            f"implementation, you should run "
+                            f"function infer_shapes "
+                            f"before calling ReferenceEvaluator."
+                        ) from e
+                try:
+                    inst = cl(node, run_params)
+                except TypeError as e:
+                    raise TypeError(
+                        f"Unable to instantiate class {cl!r} with "
+                        f"run_params={run_params} and node={node}."
+                    ) from e
+                self.rt_nodes_.append(inst)
+
         def _log_arg(self, a):
             if isinstance(a, (str, int, float)):
                 return a
@@ -336,6 +402,9 @@ if onnx_opset_version() >= 18:
                        "--"]
             for rt in self.rt_nodes_:
                 classes.append(str(type(rt)))
+                if hasattr(rt, "body"):
+                    for rt2 in rt.body.rt_nodes_:
+                        classes.append(f"  {str(type(rt2))}")
             return "\n".join(classes)
 else:
     ReferenceEvaluatorEx = None
