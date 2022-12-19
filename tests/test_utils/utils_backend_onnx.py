@@ -8,6 +8,7 @@ import contextlib
 import numpy as np
 from scipy.special import expit  # noqa
 import pandas
+import onnx
 import onnx as onnx_package
 from onnx.defs import onnx_opset_version
 try:
@@ -238,11 +239,47 @@ if onnx_opset_version() >= 18:
 
         class ReferenceEvaluatorEx(ReferenceEvaluator):
             def __init__(self, *args, new_ops=None, **kwargs):
+                # filter out new_ops
+                onx = args[0]
+                if isinstance(onx, bytes):
+                    model = onx
+                elif isinstance(onx, str):
+                    with open(onx, "rb") as f:
+                        model = onnx.load(f)
+                else:
+                    raise TypeError(f"Not implemented for {type(args[0])}.")
+                main_domain = None
+                for dom in model.opset_import:
+                    if dom.domain == '':
+                        main_domain = dom.version
+                if main_domain is None:
+                    main_domain = 1
+
                 if new_ops is None:
                     new_ops = additional_implementations
                 else:
                     new_ops = new_ops + additional_implementations
-                super().__init__(*args, new_ops=new_ops, **kwargs)
+
+                new_new_ops = []
+                many = {}
+                for op in new_ops:
+                    if op.op_domain != '':
+                        new_new_ops.append(op)
+                        continue
+                    name = op.__class__.__name__
+                    if "_" not in name:
+                        new_new_ops.append(op)
+                        continue
+                    op_type, vers = name.split("_")
+                    vers = int(vers)
+                    if vers <= main_domain:
+                        if op_type not in many or vers > many[name][-1]:
+                            many[name] = (op, vers)
+                for v in many.values():
+                    new_new_ops.append(v[0])
+
+                # calls the constructor
+                super().__init__(*args, new_ops=new_new_ops, **kwargs)
 
             def _log_arg(self, a):
                 if isinstance(a, (str, int, float)):
