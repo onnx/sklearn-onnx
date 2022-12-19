@@ -298,8 +298,11 @@ def compare_runtime(
                     if intermediate_steps:
                         _display_intermediate_steps(
                             onx, {name: input}, disable_optimisation)
+                    if verbose:
+                        raise OnnxRuntimeAssertionError(
+                            f"Unable to run model due to {e}\n{onx}")
                     raise OnnxRuntimeAssertionError(
-                        "Unable to run onnx '{0}' due to {1}".format(onx, e))
+                        f"Unable to run model due to {e}")
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output1")
@@ -342,9 +345,11 @@ def compare_runtime(
                         smodel = "\nJSON ONNX\n" + str(model)
                     else:
                         smodel = ""
+                    if verbose:
+                        raise OnnxRuntimeAssertionError(
+                            f"Unable to run onnx due to {e}{smodel}\n{onx}")
                     raise OnnxRuntimeAssertionError(
-                        "Unable to run onnx '{0}' due to {1}{2}".format(
-                            onx, e, smodel))
+                        f"Unable to run onnx due to {e}{smodel}")
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output2")
@@ -402,8 +407,11 @@ def compare_runtime(
                     "onnxruntime cannot compute the prediction"
                     " for '{0}' due to {1}{2}".format(onx, e, smodel))
         except Exception as e:
+            if verbose:
+                raise OnnxRuntimeAssertionError(
+                    f"Unable to run onnx due to {e}\n{onx}")
             raise OnnxRuntimeAssertionError(
-                "Unable to run onnx '{0}' due to {1}".format(onx, e))
+                f"Unable to run onnx due to {e}")
         if verbose:
             print("[compare_runtime] done type={}".format(type(output)))
 

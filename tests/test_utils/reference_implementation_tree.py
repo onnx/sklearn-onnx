@@ -299,7 +299,6 @@ if onnx_opset_version() >= 18:
                     else:
                         res[:, 1] = res[:, 0]
                         res[:, 0] = 1 - res[:, 1]
-                res /= res.sum(axis=1, keepdims=1)
                 new_scores = res
             elif post_transform == "PROBIT" and n_classes == 1:
                 assert res.shape[1] == 1

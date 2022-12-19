@@ -117,7 +117,18 @@ if onnx_opset_version() >= 18:
                             keepdims=keepdims)).astype(
                             dtype=data.dtype))
 
-        class ReduceSumSquare(OpRunReduceNumpy):
+        class ReduceMean_18(OpRunReduceNumpy):
+            def _run(self, data, axes=None, keepdims=1,
+                     noop_with_empty_axes=0):
+                if self.is_axes_empty(axes) and noop_with_empty_axes:
+                    return (data,)
+
+                axes = self.handle_axes(axes)
+                keepdims = keepdims != 0  # type: ignore
+                return (np.mean(data, axis=axes,
+                                keepdims=keepdims).astype(data.dtype),)
+
+        class ReduceSumSquare_18(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=1,
                      noop_with_empty_axes=0):
                 if self.is_axes_empty(axes) and noop_with_empty_axes:
@@ -173,7 +184,8 @@ if onnx_opset_version() >= 18:
             ConstantOfShape,
             ReduceL2_18,
             ReduceLogSumExp_1,
-            ReduceSumSquare,
+            ReduceMean_18,
+            ReduceSumSquare_18,
             Where,
             # ai.onnx.ml
             ArrayFeatureExtractor,
@@ -529,8 +541,17 @@ def compare_runtime(
                     if intermediate_steps:
                         _display_intermediate_steps(
                             onx, {name: input}, disable_optimisation)
+                    if hasattr(sess, 'replay_run'):
+                        # ReferenceEvaluator
+                        res = sess.replay_run()
+                        raise OnnxRuntimeAssertionError(
+                            f"Unable to run model\n---\n{res}\n----\n{e}")
+                    if verbose:
+                        raise OnnxRuntimeAssertionError(
+                            f"Unable to run model due to {e}{smodel}\n{onx}")
                     raise OnnxRuntimeAssertionError(
-                        "Unable to run onnx '{0}' due to {1}".format(onx, e))
+                        f"Unable to run onnx model {e}")
+
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output1")
@@ -569,9 +590,16 @@ def compare_runtime(
                         smodel = "\nJSON ONNX\n" + str(model)
                     else:
                         smodel = ""
+                    if hasattr(sess, 'replay_run'):
+                        # ReferenceEvaluator
+                        res = sess.replay_run()
+                        raise OnnxRuntimeAssertionError(
+                            f"Unable to run\n---\n{res}\n----\n{e}")
+                    if verbose:
+                        raise OnnxRuntimeAssertionError(
+                            f"Unable to run model due to {e}{smodel}")
                     raise OnnxRuntimeAssertionError(
-                        "Unable to run onnx '{0}' due to {1}{2}".format(
-                            onx, e, smodel))
+                        f"Unable to run model due to {e}")
                 res.append(one)
             if verbose:
                 print("[compare_runtime] OneOff: _post_process_output2")
@@ -619,8 +647,16 @@ def compare_runtime(
                     "ReferenceEvaluator cannot compute the prediction"
                     " for '{0}' due to {1}{2}".format(onx, e, smodel))
         except Exception as e:
+            if hasattr(sess, 'replay_run'):
+                # ReferenceEvaluator
+                res = sess.replay_run()
+                raise OnnxRuntimeAssertionError(
+                    f"Unable to run model\n---\n{res}\n----\n{e}")
+            if verbose:
+                raise OnnxRuntimeAssertionError(
+                    f"Unable to run model due to {e}{smodel}\n{onx}")
             raise OnnxRuntimeAssertionError(
-                "Unable to run onnx '{0}' due to {1}".format(onx, e))
+                f"Unable to run model due to {e}")
         if verbose:
             print("[compare_runtime] done type={}".format(type(output)))
 

@@ -154,7 +154,7 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
                 raise AssertionError("Issue with TARGET_OPSET: {}\n{}".format(
                     TARGET_OPSET, sonx))
         dump_data_and_model(
-            X.astype(np.float32), tr, onx, verbose=10,
+            X.astype(np.float32), tr, onx,
             basename="MixinPipeWay1ConvertSklearn")
 
     def test_pipe_way2_to_onnx(self):
@@ -292,4 +292,5 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestOnnxOperatorMixinSyntax().test_pipe_way1_convert_sklearn()
     unittest.main(verbosity=2)

@@ -96,5 +96,4 @@ class TestOnnxruntime(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestOnnxruntime().test_tree_ensemble_classifier_3()
     unittest.main(verbosity=2)
