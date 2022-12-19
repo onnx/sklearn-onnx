@@ -2,10 +2,6 @@
 
 import unittest
 import numpy as np
-try:
-    from onnx.reference import ReferenceEvaluator
-except ImportError:
-    ReferenceEvaluator = None
 from sklearn.datasets import load_iris
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 try:
@@ -22,7 +18,8 @@ from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import (
     dump_data_and_model, TARGET_OPSET,
-    InferenceSessionEx as InferenceSession)
+    InferenceSessionEx as InferenceSession,
+    ReferenceEvaluatorEx)
 
 
 class TestGaussianMixtureConverter(unittest.TestCase):
@@ -49,8 +46,11 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model, X[:1], target_opset=tg,
             options={id(model): {'score_samples': True}},
             black_op=black_op)
-        if ReferenceEvaluator is not None:
-            sess = ReferenceEvaluator(onx)
+        try:
+            sess = ReferenceEvaluatorEx(onx)
+        except NotImplementedError:
+            sess = None
+        if sess is not None:
             got = sess.run(None, {'X': X})
             self.assertEqual(len(got), 3)
             np.testing.assert_almost_equal(
