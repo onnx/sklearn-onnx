@@ -5,6 +5,7 @@ Helpers to test runtimes.
 """
 import io
 import contextlib
+import types
 import numpy as np
 from scipy.special import expit  # noqa
 import pandas
@@ -277,8 +278,9 @@ if onnx_opset_version() >= 18:
                 if vers <= main_domain:
                     if op_type not in many or vers > many[op_type][-1]:
                         many[op_type] = (op, vers)
-            for v in many.values():
-                new_new_ops.append(v[0])
+            for op_type, v in many.items():
+                new_cl = types.new_class(op_type, (v[0],))
+                new_new_ops.append(new_cl)
 
             self._main_domain = main_domain
             self._new_ops = new_new_ops
@@ -332,7 +334,7 @@ if onnx_opset_version() >= 18:
                        "--",
                        f"main_domain={self._main_domain}",
                        "--",
-                       str(self._new_ops),
+                       "\n".join(sorted(map(str, self._new_ops))),
                        "--",
                        "\n".join(map(str, self._opset_import)),
                        "--"]
