@@ -102,7 +102,7 @@ if onnx_opset_version() >= 18:
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         class ReduceLogSumExp_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None):
+            def _run(self, data, axes=None, keepdims=None, **kwargs):
                 tax = tuple(axes) if axes else None
                 return compute_log_sum_exp(data, tax, keepdims)
 
@@ -114,9 +114,7 @@ if onnx_opset_version() >= 18:
                 return compute_log_sum_exp(data, tax, keepdims)
 
         class ReduceL2_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1,
-                     noop_with_empty_axes=0):
-                assert noop_with_empty_axes != 1
+            def _run(self, data, axes=None, keepdims=1, **kwargs):
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (
@@ -136,7 +134,7 @@ if onnx_opset_version() >= 18:
                             dtype=data.dtype))
 
         class ReduceMean_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1):
+            def _run(self, data, axes=None, keepdims=1, **kwargs):
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
@@ -152,9 +150,7 @@ if onnx_opset_version() >= 18:
                                 keepdims=keepdims).astype(data.dtype),)
 
         class ReduceSumSquare_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1,
-                     noop_with_empty_axes=0):
-                assert noop_with_empty_axes != 1
+            def _run(self, data, axes=None, keepdims=1, **kwargs):
                 axes = tuple(axes) if axes else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
