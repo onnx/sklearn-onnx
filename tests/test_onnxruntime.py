@@ -65,11 +65,8 @@ class TestOnnxruntime(unittest.TestCase):
         label, proba = sess.run(None, {'input': X})
         sesso = InferenceSession(name, providers=["CPUExecutionProvider"])
         labelo, probao = sesso.run(None, {'input': X})
-        assert_allclose(probao, proba)
+        assert_allclose(probao, proba, atol=1e-8)
         assert_allclose(labelo, label)
-        # from mlprodict.onnxrt import OnnxInference
-        # oinf = OnnxInference("tests/datasets/treecl.onnx")
-        # print(oinf.run({'input': X}))
 
 
 if __name__ == "__main__":

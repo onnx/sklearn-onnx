@@ -297,7 +297,7 @@ if onnx_opset_version() >= 18:
                 else:
                     res[:, 1] = res[:, 0]
                     res[:, 0] = 1 - res[:, 1]
-            res /= res.sum(axis=1, keepdims=1)
+
             labels = np.argmax(res, axis=1).astype(np.int64)
             if classlabels_int64s is not None:
                 if len(classlabels_int64s) == 1:
@@ -319,7 +319,9 @@ if onnx_opset_version() >= 18:
                         f"classlabels_strings={classlabels_strings}, "
                         f"not supported.")
                 labels = np.array([classlabels_strings[i] for i in labels])
+
             if post_transform in (None, "NONE"):
+                res /= res.sum(axis=1, keepdims=1)
                 return labels, res
             if post_transform == "PROBIT" and n_classes == 1:
                 assert res.shape[1] == 1
