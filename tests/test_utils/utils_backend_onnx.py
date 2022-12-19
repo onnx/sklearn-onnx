@@ -507,9 +507,7 @@ def compare_runtime(
                     raise OnnxRuntimeAssertionError(
                         "Wrong number of inputs onnx {0} != "
                         "original {1}, onnx='{2}'".format(
-                            len(inp), len(input), onx
-                        )
-                    )
+                            len(inp), len(input), onx))
                 if hasattr(inp[0], 'shape'):
                     shape = sum(i.shape[1] for i in inp)
                     if shape == array_input.shape[1]:
@@ -518,8 +516,7 @@ def compare_runtime(
                         for i, n in enumerate(inp):
                             d = c + n.shape[1]
                             inputs[n.name] = _create_column(
-                                input.iloc[:, c:d], n.type
-                            )
+                                input.iloc[:, c:d], n.type)
                             c = d
                     else:
                         raise OnnxRuntimeAssertionError(
@@ -576,7 +573,7 @@ def compare_runtime(
                             f"Unable to run model\n---\n{res}\n----\n{e}")
                     if verbose:
                         raise OnnxRuntimeAssertionError(
-                            f"Unable to run model due to {e}{smodel}\n{onx}")
+                            f"Unable to run model due to {e}\n{onx}")
                     raise OnnxRuntimeAssertionError(
                         f"Unable to run onnx model {e}")
 
@@ -682,7 +679,7 @@ def compare_runtime(
                     f"Unable to run model\n---\n{res}\n----\n{e}")
             if verbose:
                 raise OnnxRuntimeAssertionError(
-                    f"Unable to run model due to {e}{smodel}\n{onx}")
+                    f"Unable to run model due to {e}\n{onx}")
             raise OnnxRuntimeAssertionError(
                 f"Unable to run model due to {e}")
         if verbose:
