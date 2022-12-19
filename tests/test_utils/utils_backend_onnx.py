@@ -46,7 +46,7 @@ if onnx_opset_version() >= 18:
     additional_implementations = [CDist, Tokenizer]
 
     try:
-        load_op("ai.onnx.ml", "Scaler")
+        load_op("ai.onnx.ml", "OneHotEncoder")
         add_ops = False
     except Exception:
         add_ops = True
@@ -237,97 +237,99 @@ if onnx_opset_version() >= 18:
             ZipMap,
         ])
 
-        class ReferenceEvaluatorEx(ReferenceEvaluator):
-            def __init__(self, *args, new_ops=None, **kwargs):
-                # filter out new_ops
-                onx = args[0]
-                if isinstance(onx, bytes):
-                    model = onx
-                elif isinstance(onx, str):
-                    with open(onx, "rb") as f:
-                        model = onnx.load(f)
-                else:
-                    raise TypeError(f"Not implemented for {type(args[0])}.")
-                main_domain = None
-                for dom in model.opset_import:
-                    if dom.domain == '':
-                        main_domain = dom.version
-                if main_domain is None:
-                    main_domain = 1
+    class ReferenceEvaluatorEx(ReferenceEvaluator):
+        def __init__(self, *args, new_ops=None, **kwargs):
+            # filter out new_ops
+            onx = args[0]
+            if isinstance(onx, onnx.ModelProto):
+                model = onx
+            elif isinstance(onx, bytes):
+                model = onnx.load(io.BytesIO(onx))
+            elif isinstance(onx, str):
+                with open(onx, "rb") as f:
+                    model = onnx.load(f)
+            else:
+                raise TypeError(f"Not implemented for {type(args[0])}.")
+            main_domain = None
+            for dom in model.opset_import:
+                if dom.domain == '':
+                    main_domain = dom.version
+            if main_domain is None:
+                main_domain = 1
 
-                if new_ops is None:
-                    new_ops = additional_implementations
-                else:
-                    new_ops = new_ops + additional_implementations
+            if new_ops is None:
+                new_ops = additional_implementations
+            else:
+                new_ops = new_ops + additional_implementations
 
-                new_new_ops = []
-                many = {}
-                for op in new_ops:
-                    if op.op_domain != '':
-                        new_new_ops.append(op)
-                        continue
-                    name = op.__class__.__name__
-                    if "_" not in name:
-                        new_new_ops.append(op)
-                        continue
-                    op_type, vers = name.split("_")
-                    vers = int(vers)
-                    if vers <= main_domain:
-                        if op_type not in many or vers > many[name][-1]:
-                            many[name] = (op, vers)
-                for v in many.values():
-                    new_new_ops.append(v[0])
+            new_new_ops = []
+            many = {}
+            for op in new_ops:
+                if op.op_domain != '':
+                    new_new_ops.append(op)
+                    continue
+                name = op.__class__.__name__
+                if "_" not in name:
+                    new_new_ops.append(op)
+                    continue
+                op_type, vers = name.split("_")
+                vers = int(vers)
+                if vers <= main_domain:
+                    if op_type not in many or vers > many[name][-1]:
+                        many[name] = (op, vers)
+            for v in many.values():
+                new_new_ops.append(v[0])
 
-                # calls the constructor
-                super().__init__(*args, new_ops=new_new_ops, **kwargs)
+            # calls the constructor
+            super().__init__(*args, new_ops=new_new_ops, **kwargs)
 
-            def _log_arg(self, a):
-                if isinstance(a, (str, int, float)):
-                    return a
-                if a.__class__.__name__ == "ZipMapDictionary":
-                    return str(a)
-                if isinstance(a, np.ndarray):
-                    if self.verbose < 4:
-                        return f"{a.dtype}:{a.shape} in [{a.min()}, {a.max()}]"
-                    elements = a.ravel().tolist()
-                    if len(elements) > 5:
-                        elements = elements[:5]
-                        return (
-                            f"{a.dtype}:{a.shape}:"
-                            f"{','.join(map(str, elements))}...")
-                    return f"{a.dtype}:{a.shape}:{elements}"
-                if hasattr(a, "append"):
-                    return ", ".join(map(self._log_arg, a))
+        def _log_arg(self, a):
+            if isinstance(a, (str, int, float)):
                 return a
+            if a.__class__.__name__ == "ZipMapDictionary":
+                return str(a)
+            if isinstance(a, np.ndarray):
+                if self.verbose < 4:
+                    return f"{a.dtype}:{a.shape} in [{a.min()}, {a.max()}]"
+                elements = a.ravel().tolist()
+                if len(elements) > 5:
+                    elements = elements[:5]
+                    return (
+                        f"{a.dtype}:{a.shape}:"
+                        f"{','.join(map(str, elements))}...")
+                return f"{a.dtype}:{a.shape}:{elements}"
+            if hasattr(a, "append"):
+                return ", ".join(map(self._log_arg, a))
+            return a
 
-            def get_inputs(self):
-                res = [InputDef(n, list(get_shape(t, True)), get_type(t))
-                       for n, t in zip(self.input_names,
-                                       self.input_types)]
-                return res
+        def get_inputs(self):
+            res = [InputDef(n, list(get_shape(t, True)), get_type(t))
+                   for n, t in zip(self.input_names, self.input_types)]
+            return res
 
-            def get_outputs(self):
-                res = [InputDef(n, list(get_shape(t, True)), get_type(t))
-                       for n, t in zip(self.output_names,
-                                       self.output_types)]
-                return res
+        def get_outputs(self):
+            res = [InputDef(n, list(get_shape(t, True)), get_type(t))
+                   for n, t in zip(self.output_names, self.output_types)]
+            return res
 
-            def run(self, *args, **kwargs):
-                self.last_inputs = (args, kwargs)
-                return super().run(*args, **kwargs)
+        def run(self, *args, **kwargs):
+            self.last_inputs = (args, kwargs)
+            return super().run(*args, **kwargs)
 
-            def replay_run(self, verbose=10):
-                if not hasattr(self, "last_inputs"):
-                    raise RuntimeError("No previous run to be executed.")
-                self.verbose = verbose
-                st = io.StringIO()
-                args, kwargs = self.last_inputs
-                with contextlib.redirect_stdout(st):
-                    self.run(*args, **kwargs)
-                classes = [st.getvalue()]
-                for rt in self.rt_nodes_:
-                    classes.append(str(type(rt)))
-                return "\n".join(classes)
+        def replay_run(self, verbose=10):
+            if not hasattr(self, "last_inputs"):
+                raise RuntimeError("No previous run to be executed.")
+            self.verbose = verbose
+            st = io.StringIO()
+            args, kwargs = self.last_inputs
+            with contextlib.redirect_stdout(st):
+                self.run(*args, **kwargs)
+            classes = [st.getvalue()]
+            for rt in self.rt_nodes_:
+                classes.append(str(type(rt)))
+            return "\n".join(classes)
+else:
+    ReferenceEvaluatorEx = None
 
 
 def _display_intermediate_steps(model_onnx, inputs, disable_optimisation):
