@@ -101,24 +101,29 @@ if onnx_opset_version() >= 18:
                     if keepdims == 0:
                         return _ArgMax._run(
                             self, data, axis=axis, keepdims=keepdims)
-                    return (_argmax(data, axis=axis, keepdims=keepdims),)
+                    try:
+                        return (_argmax(data, axis=axis, keepdims=keepdims),)
+                    except Exception as e:
+                        raise RuntimeError(
+                            f"Issue with shape={data.shape} "
+                            f"and axis={axis}.") from e
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
         class ReduceLogSumExp_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=None, **kwargs):
-                tax = tuple(axes) if axes else None
+                tax = tuple(axes) if axes is not None else None
                 return compute_log_sum_exp(data, tax, keepdims)
 
         class ReduceLogSumExp_18(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=None,
                      noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
-                tax = tuple(axes) if axes else None
+                tax = tuple(axes) if axes is not None else None
                 return compute_log_sum_exp(data, tax, keepdims)
 
         class ReduceL2_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=1, **kwargs):
-                axes = tuple(axes) if axes else None
+                axes = tuple(axes) if axes is not None else None
                 keepdims = keepdims != 0  # type: ignore
                 return (
                     np.sqrt(np.sum(np.square(data), axis=axes,
@@ -129,7 +134,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=None,
                      noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes else None
+                axes = tuple(axes) if axes is not None else None
                 keepdims = keepdims != 0  # type: ignore
                 return (
                     np.sqrt(np.sum(np.square(data), axis=axes,
@@ -138,7 +143,7 @@ if onnx_opset_version() >= 18:
 
         class ReduceMean_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=None, **kwargs):
-                axes = tuple(axes) if axes else None
+                axes = tuple(axes) if axes is not None else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
                                 keepdims=keepdims).astype(data.dtype),)
@@ -147,14 +152,14 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=None,
                      noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes else None
+                axes = tuple(axes) if axes is not None else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.mean(data, axis=axes,
                                 keepdims=keepdims).astype(data.dtype),)
 
         class ReduceSumSquare_1(OpRunReduceNumpy):
             def _run(self, data, axes=None, keepdims=None, **kwargs):
-                axes = tuple(axes) if axes else None
+                axes = tuple(axes) if axes is not None else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
                                keepdims=keepdims).astype(data.dtype),)
@@ -163,7 +168,7 @@ if onnx_opset_version() >= 18:
             def _run(self, data, axes=None, keepdims=None,
                      noop_with_empty_axes=None):
                 assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes else None
+                axes = tuple(axes) if axes is not None else None
                 keepdims = keepdims != 0  # type: ignore
                 return (np.sum(np.square(data), axis=axes,
                                keepdims=keepdims).astype(data.dtype),)
@@ -788,9 +793,11 @@ def compare_runtime(
                     smodel = "\nJSON ONNX\n" + str(model)
                 else:
                     smodel = ""
+                ops = "\n".join(map(lambda x: str(x.__class__),
+                                sess.rt_nodes_))
                 raise OnnxRuntimeAssertionError(
-                    "ReferenceEvaluator cannot compute the prediction"
-                    " for '{0}' due to {1}{2}".format(onx, e, smodel))
+                    f"ReferenceEvaluator cannot compute the prediction"
+                    f" for {onx!r} due to {e}\nops={ops}\n{smodel}")
         except Exception as e:
             if hasattr(sess, 'replay_run'):
                 # ReferenceEvaluator

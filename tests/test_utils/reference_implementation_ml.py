@@ -93,9 +93,8 @@ if onnx_opset_version() >= 18:
         op_domain = "ai.onnx.ml"
 
         @staticmethod
-        def _post_process_predicted_label(
-            label, scores, classlabels_ints_string
-        ):
+        def _post_process_predicted_label(label, scores,
+                                          classlabels_ints_string):
             """
             Replaces int64 predicted labels by the corresponding
             strings.
@@ -105,20 +104,21 @@ if onnx_opset_version() >= 18:
             return label, scores
 
         def _run(
-            self,
-            x,
-            classlabels_ints=None,
-            classlabels_strings=None,
-            coefficients=None,
-            intercepts=None,
-            multi_class=None,
-            post_transform=None,
-        ):
+                self,
+                x,
+                classlabels_ints=None,
+                classlabels_strings=None,
+                coefficients=None,
+                intercepts=None,
+                multi_class=None,
+                post_transform=None):
+            dtype = x.dtype
+            if dtype != np.float64:
+                x = x.astype(np.float32)
             coefficients = np.array(coefficients).astype(x.dtype)
             intercepts = np.array(intercepts).astype(x.dtype)
             n_class = max(
-                len(classlabels_ints or []), len(classlabels_strings or [])
-            )
+                len(classlabels_ints or []), len(classlabels_strings or []))
             n = coefficients.shape[0] // n_class
             coefficients = coefficients.reshape(n_class, n).T
             scores = np.dot(x, coefficients)
@@ -131,16 +131,12 @@ if onnx_opset_version() >= 18:
                 scores = expit(scores)
             elif post_transform == "SOFTMAX":
                 np.subtract(
-                    scores, scores.max(axis=1)[:, np.newaxis], out=scores
-                )
+                    scores, scores.max(axis=1)[:, np.newaxis], out=scores)
                 scores = np.exp(scores)
-                scores = np.divide(
-                    scores, scores.sum(axis=1)[:, np.newaxis]
-                )
+                scores = np.divide(scores, scores.sum(axis=1)[:, np.newaxis])
             else:
                 raise NotImplementedError(  # pragma: no cover
-                    f"Unknown post_transform: '{post_transform}'."
-                )
+                    f"Unknown post_transform: '{post_transform}'.")
 
             if coefficients.shape[1] == 1:
                 labels = np.zeros((scores.shape[0],), dtype=x.dtype)
@@ -149,8 +145,7 @@ if onnx_opset_version() >= 18:
                 labels = np.argmax(scores, axis=1)
             if classlabels_ints is not None:
                 labels = np.array(
-                    [classlabels_ints[i] for i in labels], dtype=np.int64
-                )
+                    [classlabels_ints[i] for i in labels], dtype=np.int64)
             elif classlabels_strings is not None:
                 labels = np.array([classlabels_strings[i] for i in labels])
             return (labels, scores)
@@ -160,13 +155,12 @@ if onnx_opset_version() >= 18:
         op_domain = "ai.onnx.ml"
 
         def _run(
-            self,
-            x,
-            coefficients=None,
-            intercepts=None,
-            targets=1,
-            post_transform=None,
-        ):
+                self,
+                x,
+                coefficients=None,
+                intercepts=None,
+                targets=1,
+                post_transform=None):
             coefficients = np.array(coefficients).astype(x.dtype)
             intercepts = np.array(intercepts).astype(x.dtype)
             n = coefficients.shape[0] // targets
@@ -177,9 +171,8 @@ if onnx_opset_version() >= 18:
             if post_transform == "NONE":
                 pass
             else:
-                raise NotImplementedError(  # pragma: no cover
-                    f"Unknown post_transform: '{self.post_transform}'."
-                )
+                raise NotImplementedError(
+                    f"Unknown post_transform: '{self.post_transform}'.")
             return (score,)
 
     class Normalizer(OpRun):

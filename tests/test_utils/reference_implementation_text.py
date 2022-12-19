@@ -44,7 +44,7 @@ if onnx_opset_version() >= 18:
                 return self._run_char_tokenization(text, stops_)
             if str_separators_ is not None and len(str_separators_) > 0:
                 return self._run_sep_tokenization(
-                    text, stops_, str_separators_)
+                    text, stops_, str_separators_, mark, pad_value)
             if tokenexp not in (None, ""):
                 return self._run_regex_tokenization(
                     text, stops_, tokenexp_, tokenexpsplit, mark, pad_value)
@@ -114,7 +114,7 @@ if onnx_opset_version() >= 18:
             return Tokenizer._run_tokenization(text, stops, split)
 
         @staticmethod
-        def _run_sep_tokenization(text, stops, separators):
+        def _run_sep_tokenization(text, stops, separators, mark, pad_value):
             """
             Tokenizes using separators.
             The function should use a trie to find text.
@@ -136,7 +136,8 @@ if onnx_opset_version() >= 18:
                     word = t[begin:pos]
                     yield word
 
-            return Tokenizer._run_tokenization(text, stops, split)
+            return Tokenizer._run_tokenization(
+                text, stops, split, mark, pad_value)
 
         @staticmethod
         def _run_regex_tokenization(text, stops, exp, tokenexpsplit,

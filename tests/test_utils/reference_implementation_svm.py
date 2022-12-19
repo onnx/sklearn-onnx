@@ -85,7 +85,7 @@ class SVMCommon:
         if k == "sigmoid":
             s = np.dot(pA, pB)
             s = s * self.gamma_ + self.coef0_
-            return np.tanh(sum)
+            return np.tanh(s)
         if k == "rbf":
             diff = pA - pB
             s = (diff * diff).sum()
