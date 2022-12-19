@@ -268,15 +268,15 @@ if onnx_opset_version() >= 18:
                 if op.op_domain != '':
                     new_new_ops.append(op)
                     continue
-                name = op.__class__.__name__
+                name = op.__name__
                 if "_" not in name:
                     new_new_ops.append(op)
                     continue
                 op_type, vers = name.split("_")
                 vers = int(vers)
                 if vers <= main_domain:
-                    if op_type not in many or vers > many[name][-1]:
-                        many[name] = (op, vers)
+                    if op_type not in many or vers > many[op_type][-1]:
+                        many[op_type] = (op, vers)
             for v in many.values():
                 new_new_ops.append(v[0])
 
@@ -328,8 +328,14 @@ if onnx_opset_version() >= 18:
             args, kwargs = self.last_inputs
             with contextlib.redirect_stdout(st):
                 self.run(*args, **kwargs)
-            classes = [st.getvalue(), f"main_domain={self._main_domain}",
-                       str(self._new_ops), str(self._opset_import)]
+            classes = [st.getvalue(),
+                       "--",
+                       f"main_domain={self._main_domain}",
+                       "--",
+                       str(self._new_ops),
+                       "--",
+                       "\n".join(map(str, self._opset_import)),
+                       "--"]
             for rt in self.rt_nodes_:
                 classes.append(str(type(rt)))
             return "\n".join(classes)
