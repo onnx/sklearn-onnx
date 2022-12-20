@@ -41,7 +41,8 @@ if onnx_opset_version() >= 18:
                 tokenexp_ = re.compile(tokenexp)
 
             if char_tokenization_:
-                return self._run_char_tokenization(text, stops_)
+                return self._run_char_tokenization(
+                    text, stops_, mark, pad_value)
             if str_separators_ is not None and len(str_separators_) > 0:
                 str_separators = [re.compile(s) for s in str_separators_]
                 return self._run_sep_tokenization(
@@ -58,44 +59,41 @@ if onnx_opset_version() >= 18:
             """
             Tokenizes a char level.
             """
-            max_len = max(map(len, text.flatten()))
-            if mark:
-                max_len += 2
-                begin = 1
-            else:
-                begin = 0
-            shape = text.shape + (max_len,)
-            max_pos = 0
-            res = np.empty(shape, dtype=text.dtype)
+            begin = 1 if mark else 0
+            res = []
             if len(text.shape) == 1:
-                res[:] = pad_value
                 for i in range(text.shape[0]):
-                    pos = begin
+                    row = [pad_value for _ in range(begin)]
                     for c in split(text[i]):
                         if c not in stops:
-                            res[i, pos] = c
-                            pos += 1
+                            row.append(c)
                     if mark:
-                        res[i, 0] = pad_value
-                        max_pos = max(pos + 1, max_pos)
-                    else:
-                        max_pos = max(pos, max_pos)
-                res = res[:, :max_pos]
+                        row.append(pad_value)
+                    res.append(row)
+                max_pos = max(map(len, res))
+                for row in res:
+                    while len(row) < max_pos:
+                        row.append(pad_value)
+                res = np.array(res)
             elif len(text.shape) == 2:
-                res[:, :] = pad_value
+                max_pos = 0
                 for i in range(text.shape[0]):
+                    row2 = []
                     for ii in range(text.shape[1]):
-                        pos = begin
+                        row = [pad_value for _ in range(begin)]
                         for c in split(text[i, ii]):
                             if c not in stops:
-                                res[i, ii, pos] = c
-                                pos += 1
+                                row.append(c)
                         if mark:
-                            res[i, ii, 0] = pad_value
-                            max_pos = max(pos + 1, max_pos)
-                        else:
-                            max_pos = max(pos, max_pos)
-                res = res[:, :, :max_pos]
+                            row.append(pad_value)
+                        max_pos = max(max_pos, len(row))
+                        row2.append(row)
+                    res.append(row2)
+                for row2 in res:
+                    for row in row2:
+                        while len(row) < max_pos:
+                            row.append(pad_value)
+                res = np.array(res)
             else:
                 raise RuntimeError(  # pragma: no cover
                     f"Only vector or matrices are supported "
@@ -103,21 +101,22 @@ if onnx_opset_version() >= 18:
             return (res,)
 
         @staticmethod
-        def _run_char_tokenization(text, stops):
+        def _run_char_tokenization(text, stops, mark, pad_value):
             """
-            Tokenizes y charaters.
+            Tokenizes by charaters.
             """
 
             def split(t):
                 for c in t:
                     yield c
 
-            return Tokenizer._run_tokenization(text, stops, split)
+            return Tokenizer._run_tokenization(
+                text, stops, split, mark, pad_value)
 
         @staticmethod
         def _run_sep_tokenization(text, stops, separators, mark, pad_value):
             """
-            Tokenizes using separators.
+            Tokenizes using separators (as regular expressions).
             The function should use a trie to find text.
             """
 
@@ -153,8 +152,7 @@ if onnx_opset_version() >= 18:
         def _run_regex_tokenization(text, stops, exp, tokenexpsplit,
                                     mark, pad_value):
             """
-            Tokenizes using separators.
-            The function should use a trie to find text.
+            Tokenizes using a regular expression.
             """
             if tokenexpsplit:
 
