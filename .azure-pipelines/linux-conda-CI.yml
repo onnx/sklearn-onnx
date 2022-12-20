@@ -284,6 +284,7 @@ jobs:
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
       pip install onnxmltools
     displayName: 'install onnxmltools'
+    condition: eq(variables['run.example'], '1')
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
@@ -292,6 +293,7 @@ jobs:
       fi
       pytest tests_onnxmltools --durations=0 --basetemp=temp --maxfail=5
     displayName: 'pytest-onnxmltools'
+    condition: eq(variables['run.example'], '1')
 
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
