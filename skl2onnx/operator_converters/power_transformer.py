@@ -72,10 +72,10 @@ def convert_powertransformer(scope: Scope, operator: Operator,
         y_gr0 = OnnxMul(y_gr0, greater_mask, op_version=opv)
 
         # negative input, lambda != 2
-        y_le0_l_ne2 = OnnxPow(y1, 2-lambdas, op_version=opv)
+        y_le0_l_ne2 = OnnxPow(y1, 2 - lambdas, op_version=opv)
         y_le0_l_ne2 = OnnxSub(ones_, y_le0_l_ne2, op_version=opv)
         y_le0_l_ne2 = OnnxDiv(
-            y_le0_l_ne2, (2-lambdas).astype(dtype), op_version=opv)
+            y_le0_l_ne2, (2 - lambdas).astype(dtype), op_version=opv)
         y_le0_l_ne2 = OnnxImputer(
             y_le0_l_ne2, imputed_value_floats=[0.0],
             replaced_value_float=np.inf, op_version=opv)

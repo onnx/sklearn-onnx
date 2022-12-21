@@ -482,7 +482,6 @@ def woe_converter(scope: Scope, operator: Operator,
 
 
 def woe_transformer_to_onnx(op, opset=None):
-
     """
     ONNX Converter for WOETransformer.
     It uses ONNX API.

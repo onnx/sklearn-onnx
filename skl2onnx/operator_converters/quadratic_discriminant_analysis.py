@@ -35,8 +35,10 @@ def convert_quadratic_discriminant_analysis_classifier(
     norm_array_name = []
     sum_array_name = []
 
-    container.add_initializer('const_n05', proto_dtype, [], [-0.5])
-    container.add_initializer('const_p2', proto_dtype, [], [2])
+    const_n05 = scope.get_unique_variable_name('const_n05')
+    const_p2 = scope.get_unique_variable_name('const_p2')
+    container.add_initializer(const_n05, proto_dtype, [], [-0.5])
+    container.add_initializer(const_p2, proto_dtype, [], [2])
 
     for i in range(n_classes):
         R = model.rotations_[i]
@@ -57,7 +59,7 @@ def convert_quadratic_discriminant_analysis_classifier(
         apply_sub(scope, [input_name, mean_name], [Xm_name], container)
 
         s_pow_name = scope.get_unique_variable_name('s_pow_n05')
-        apply_pow(scope, [scaling_name, 'const_n05'], [s_pow_name], container)
+        apply_pow(scope, [scaling_name, const_n05], [s_pow_name], container)
 
         mul_name = scope.get_unique_variable_name('mul')
         apply_mul(scope, [rotation_name, s_pow_name], [mul_name], container)
@@ -66,7 +68,7 @@ def convert_quadratic_discriminant_analysis_classifier(
         apply_matmul(scope, [Xm_name, mul_name], [x2_name], container)
 
         pow_x2_name = scope.get_unique_variable_name('pow_x2')
-        apply_pow(scope, [x2_name, 'const_p2'], [pow_x2_name], container)
+        apply_pow(scope, [x2_name, const_p2], [pow_x2_name], container)
 
         sum_name = scope.get_unique_variable_name('sum')
         apply_reducesum(scope, [pow_x2_name], [sum_name],
@@ -92,42 +94,58 @@ def convert_quadratic_discriminant_analysis_classifier(
     apply_transpose(scope, [reshape_norm_name], [transpose_norm_name],
                     container, perm=(1, 0))
 
-    apply_concat(scope, sum_array_name, ['concat_logsum'], container)
+    concat_logsum = scope.get_unique_variable_name('concat_logsum')
+    apply_concat(scope, sum_array_name, [concat_logsum], container)
 
     add_norm2_u_name = scope.get_unique_variable_name('add_norm2_u')
-    apply_add(scope, [transpose_norm_name, 'concat_logsum'],
+    apply_add(scope, [transpose_norm_name, concat_logsum],
               [add_norm2_u_name], container)
 
     norm2_u_n05_name = scope.get_unique_variable_name('norm2_u_n05')
     apply_mul(
-        scope, ['const_n05', add_norm2_u_name], [norm2_u_n05_name], container)
+        scope, [const_n05, add_norm2_u_name], [norm2_u_n05_name], container)
 
+    priors = scope.get_unique_variable_name('priors')
     container.add_initializer(
-        'priors', proto_dtype, [n_classes, ], model.priors_)
-    apply_log(scope, ['priors'], ['log_p'], container)
+        priors, proto_dtype, [n_classes, ], model.priors_)
+    log_p = scope.get_unique_variable_name('log_p')
+    apply_log(scope, [priors], [log_p], container)
 
-    apply_add(scope, [norm2_u_n05_name, 'log_p'], ['decision_fun'], container)
+    decision_fun = scope.get_unique_variable_name('decision_fun')
+    apply_add(scope, [norm2_u_n05_name, log_p], [decision_fun], container)
 
-    apply_argmax(scope, ['decision_fun'], ['argmax_out'], container, axis=1)
+    argmax_out = scope.get_unique_variable_name('argmax_out')
+    apply_argmax(scope, [decision_fun], [argmax_out], container, axis=1)
 
+    classes = scope.get_unique_variable_name('classes')
     container.add_initializer(
-        'classes', onnx_proto.TensorProto.INT64, [n_classes], model.classes_)
+        classes, onnx_proto.TensorProto.INT64, [n_classes], model.classes_)
 
     container.add_node(
         'ArrayFeatureExtractor',
-        ['classes', 'argmax_out'],
+        [classes, argmax_out],
         [operator.outputs[0].full_name],
         op_domain='ai.onnx.ml'
     )
 
-    attr = {'axes': [1]}
-    container.add_node(
-        'ReduceMax', ['decision_fun'], ['df_max'], **attr)
-    apply_sub(scope, ['decision_fun', 'df_max'], ['df_sub_max'], container)
-    apply_exp(scope, ['df_sub_max'], ['likelihood'], container)
-    apply_reducesum(scope, ['likelihood'], ['likelihood_sum'], container,
+    df_max = scope.get_unique_variable_name('df_max')
+    if container.target_opset >= 18:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceMax', [decision_fun, axis_name], [df_max])
+    else:
+        container.add_node(
+            'ReduceMax', [decision_fun], [df_max], axes=[1])
+    df_sub_max = scope.get_unique_variable_name('df_sub_max')
+    apply_sub(scope, [decision_fun, df_max], [df_sub_max], container)
+    likelihood = scope.get_unique_variable_name('likelihood')
+    apply_exp(scope, [df_sub_max], [likelihood], container)
+    likelihood_sum = scope.get_unique_variable_name('likelihood_sum')
+    apply_reducesum(scope, [likelihood], [likelihood_sum], container,
                     axes=[1], keepdims=1)
-    apply_div(scope, ['likelihood', 'likelihood_sum'],
+    apply_div(scope, [likelihood, likelihood_sum],
               [operator.outputs[1].full_name], container, )
 
 

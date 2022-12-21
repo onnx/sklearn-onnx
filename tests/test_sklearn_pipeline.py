@@ -53,8 +53,9 @@ from skl2onnx.common.data_types import (
 )
 from sklearn.multioutput import MultiOutputClassifier
 from test_utils import (
-    dump_data_and_model, fit_classification_model, TARGET_OPSET)
-from onnxruntime import __version__ as ort_version, InferenceSession
+    dump_data_and_model, fit_classification_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
+from onnxruntime import __version__ as ort_version
 
 
 # pv.Version does not work with development versions
@@ -384,7 +385,9 @@ class TestSklearnPipeline(unittest.TestCase):
         }
         inputs = {k: data[k].values.astype(data_types[k]).reshape(-1, 1)
                   for k in data.columns}
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         run = sess.run(None, inputs)
         got = run[-1]
         assert_almost_equal(pred, got, decimal=5)
@@ -398,7 +401,9 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(clf, "pipeline_titanic", initial_inputs,
                                      target_opset=TARGET_OPSET,
                                      options={id(clf): {'zipmap': False}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         run = sess.run(None, inputs)
         got = run[-1]
         assert_almost_equal(pred, got, decimal=5)
@@ -532,7 +537,9 @@ class TestSklearnPipeline(unittest.TestCase):
         pipe.fit(X_train)
         model_onnx = convert_sklearn(
             pipe, initial_types=init_types, target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_onnx.SerializeToString())
+        oinf = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         pred = pipe.transform(X_train)
         inputs = {c: X_train[c].values for c in X_train.columns}
@@ -561,7 +568,9 @@ class TestSklearnPipeline(unittest.TestCase):
             pipe, initial_types=[('text', StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
             options={id(pipe): {'zipmap': False}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
@@ -573,7 +582,9 @@ class TestSklearnPipeline(unittest.TestCase):
             pipe, initial_types=[('text', StringTensorType([None]))],
             target_opset=TARGET_OPSET,
             options={id(pipe): {'zipmap': False}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data})
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
@@ -612,7 +623,9 @@ class TestSklearnPipeline(unittest.TestCase):
             options={id(voting): {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1], decimal=5)
         assert_almost_equal(expected_label, got[0])
@@ -652,7 +665,9 @@ class TestSklearnPipeline(unittest.TestCase):
             options={id(voting): {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
@@ -701,7 +716,9 @@ class TestSklearnPipeline(unittest.TestCase):
             options={MultiOutputClassifier: {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'A': data[:, :1], 'B': data[:, 1:2],
                               'TEXT': data[:, 2:]})
         self.assertEqual(len(expected_proba), len(got[1]))
@@ -747,7 +764,9 @@ class TestSklearnPipeline(unittest.TestCase):
                   'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
         onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
                       options={MultiOutputClassifier: {'zipmap': False}})
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         got = sess.run(None, inputs)
         assert_almost_equal(expected_label, got[0])
@@ -808,7 +827,9 @@ class TestSklearnPipeline(unittest.TestCase):
                     onx = to_onnx(
                         rf_clf, dfx, target_opset=TARGET_OPSET,
                         options={MultiOutputClassifier: {'zipmap': False}})
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, inputs)
                     assert_almost_equal(expected_label, got[0])
                     self.assertEqual(len(expected_proba), len(got[1]))
@@ -868,7 +889,9 @@ class TestSklearnPipeline(unittest.TestCase):
                               'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
                     onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
                                   options={'zipmap': False})
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, inputs)
                     assert_almost_equal(expected_label, got[0])
                     assert_almost_equal(expected_proba, got[1], decimal=5)
@@ -922,7 +945,9 @@ class TestSklearnPipeline(unittest.TestCase):
                               'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
                     onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
                                   options={'zipmap': False})
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     got = sess.run(None, inputs)
                     assert_almost_equal(expected_label, got[0])
                     if method == "isotonic":
@@ -950,7 +975,9 @@ class TestSklearnPipeline(unittest.TestCase):
                 dtype_include=object)))
         expected = ct.fit_transform(X)
         onx = to_onnx(ct, X, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [i.name for i in sess.get_inputs()]
         got = sess.run(None, {names[0]: X[names[0]].values.reshape((-1, 1)),
                               names[1]: X[names[1]].values.reshape((-1, 1))})
@@ -1014,4 +1041,4 @@ if __name__ == "__main__":
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    unittest.main()
+    unittest.main(verbosity=2)

@@ -10,7 +10,7 @@ import functools
 import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from pandas import DataFrame
 try:
     from sklearn.utils._testing import ignore_warnings
@@ -53,7 +53,8 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
-    TARGET_OPSET)
+    TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 def dont_test_radius():
@@ -141,7 +142,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                                      [("input", FloatTensorType([None, 4]))],
                                      target_opset=TARGET_OPSET,
                                      options={id(model): {'optim': 'cdist'}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         X = X[:5]
         got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
         exp = model.predict(X.astype(numpy.float32))
@@ -153,7 +156,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             for out in enumerate_model_node_outputs(
                     model_onnx, add_node=False):
                 onx = select_model_inputs_outputs(model_onnx, out)
-                sess = InferenceSession(onx.SerializeToString())
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 res = sess.run(
                     None, {'input': X.astype(numpy.float32)})
                 rows.append('--{}--'.format(out))
@@ -178,7 +183,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             options={id(model): {'optim': 'cdist'}})
         self.assertIsNotNone(model_onnx)
         try:
-            InferenceSession(model_onnx.SerializeToString())
+            InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtImpl as e:
             if ("Could not find an implementation for the node "
                     "To_TopK:TopK(11)") in str(e):
@@ -270,7 +277,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
         exp = model.predict(X.astype(numpy.float32))
         if any(numpy.isnan(got.ravel())):
@@ -286,7 +295,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             for out in enumerate_model_node_outputs(
                     model_onnx, add_node=False):
                 onx = select_model_inputs_outputs(model_onnx, out)
-                sess = InferenceSession(onx.SerializeToString())
+                sess = InferenceSession(
+                    onx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 res = sess.run(
                     None, {'input': X.astype(numpy.float32)})
                 rows.append('--{}--'.format(out))
@@ -397,7 +408,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     [("input", FloatTensorType([None, X.shape[1]]))],
                     target_opset=op)
                 self.assertIsNotNone(model_onnx)
-                sess = InferenceSession(model_onnx.SerializeToString())
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'input': X.astype(numpy.float32)})[0]
                 exp = model.predict(X.astype(numpy.float32))
                 assert_almost_equal(exp, got.ravel(), decimal=3)
@@ -564,7 +577,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test, model, model_onnx,
+            X_test[:10], model, model_onnx,
             basename="SklearnKNNClassifierMultiLabel-Out0")
 
     @unittest.skipIf(
@@ -605,7 +618,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         exp = model.predict(X_test)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': numpy.array(X_test)})[0].ravel()
 
         # The conversion has discrepencies when
@@ -677,7 +692,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 break
             model_def = to_onnx(clr, X_train.astype(numpy.float32),
                                 target_opset=to)
-            oinf = InferenceSession(model_def.SerializeToString())
+            oinf = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
 
             X_test = X_test[:3]
             y = oinf.run(None, {'X': X_test.astype(numpy.float32)})
@@ -937,7 +954,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         iris = datasets.load_iris()
         X = iris.data.astype(numpy.float32)
         y = iris.target.astype(numpy.int64)
-        y = numpy.vstack([y % 2, y % 2, (y+1) % 2]).T
+        y = numpy.vstack([y % 2, y % 2, (y + 1) % 2]).T
         model = KNeighborsClassifier(
             algorithm='brute', weights='distance',
             n_neighbors=7)
@@ -953,4 +970,5 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    TestNearestNeighbourConverter().test_model_knn_classifier_multilabel()
     unittest.main()

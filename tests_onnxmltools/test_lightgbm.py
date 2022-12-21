@@ -197,7 +197,9 @@ class TestLightGbmTreeEnsembleModels(unittest.TestCase):
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Cannot load model\n%r" % str(model_onnx)) from e

@@ -389,14 +389,14 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             f"You can learn more at https://github.com/scikit-learn/"
             f"scikit-learn/issues/13733.\n{err}")
 
-    ng_split_words = [(len(a[0]), a[0], i) for i, a in enumerate(split_words)]
-    ng_split_words.sort()
+    ng_split_words = sorted([(len(a[0]), a[0], i)
+                            for i, a in enumerate(split_words)])
     key_indices = [a[2] for a in ng_split_words]
     ngcounts = [0 for i in range(op.ngram_range[0])]
 
     words = list(ng_split_words[0][1])
     for i in range(1, len(ng_split_words)):
-        if ng_split_words[i-1][0] != ng_split_words[i][0]:
+        if ng_split_words[i - 1][0] != ng_split_words[i][0]:
             ngcounts.append(len(words))
         words.extend(ng_split_words[i][1])
 

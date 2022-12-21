@@ -23,7 +23,7 @@ def convert_pls_regression(scope: Scope, operator: Operator,
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
-    if type(X.type) == Int64TensorType:
+    if isinstance(X.type, Int64TensorType):
         X = OnnxCast(X, to=proto_dtype, op_version=opv)
 
     coefs = op.x_mean_ if hasattr(op, 'x_mean_') else op._x_mean

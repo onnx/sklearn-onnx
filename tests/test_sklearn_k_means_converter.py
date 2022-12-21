@@ -14,7 +14,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_kmeans_clustering(self):
         data = load_iris()
         X = data.data
-        model = KMeans(n_clusters=3)
+        model = KMeans(n_clusters=3, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", FloatTensorType([None, 4]))],
@@ -28,7 +28,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_kmeans_clustering_noshape(self):
         data = load_iris()
         X = data.data
-        model = KMeans(n_clusters=3)
+        model = KMeans(n_clusters=3, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", FloatTensorType([]))],
@@ -42,7 +42,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_batchkmeans_clustering(self):
         data = load_iris()
         X = data.data
-        model = MiniBatchKMeans(n_clusters=3)
+        model = MiniBatchKMeans(n_clusters=3, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", FloatTensorType([None, 4]))],
@@ -58,7 +58,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_batchkmeans_clustering_opset9(self):
         data = load_iris()
         X = data.data
-        model = MiniBatchKMeans(n_clusters=3)
+        model = MiniBatchKMeans(n_clusters=3, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", FloatTensorType([None, 4]))],
@@ -74,7 +74,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_batchkmeans_clustering_opset11(self):
         data = load_iris()
         X = data.data
-        model = MiniBatchKMeans(n_clusters=3)
+        model = MiniBatchKMeans(n_clusters=3, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", FloatTensorType([None, 4]))],
@@ -89,7 +89,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_batchkmeans_clustering_opset1(self):
         data = load_iris()
         X = data.data
-        model = MiniBatchKMeans(n_clusters=3)
+        model = MiniBatchKMeans(n_clusters=3, n_init=3)
         model.fit(X)
         try:
             convert_sklearn(model, "kmeans",
@@ -101,7 +101,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_kmeans_clustering_int(self):
         data = load_digits()
         X = data.data
-        model = KMeans(n_clusters=4)
+        model = KMeans(n_clusters=4, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", Int64TensorType([None,
@@ -117,7 +117,7 @@ class TestSklearnKMeansModel(unittest.TestCase):
     def test_batchkmeans_clustering_int(self):
         data = load_digits()
         X = data.data
-        model = MiniBatchKMeans(n_clusters=4)
+        model = MiniBatchKMeans(n_clusters=4, n_init=3)
         model.fit(X)
         model_onnx = convert_sklearn(model, "kmeans",
                                      [("input", Int64TensorType([None,
@@ -132,4 +132,4 @@ class TestSklearnKMeansModel(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

@@ -147,7 +147,7 @@ def convert_sklearn_linear_classifier(scope: Scope, operator: Operator,
 
     label_name = operator.outputs[0].full_name
     input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) == BooleanTensorType:
+    if isinstance(operator.inputs[0].type, BooleanTensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, input_name, cast_input_name,

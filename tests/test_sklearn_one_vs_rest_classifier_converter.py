@@ -65,7 +65,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET,
             options={id(model): {'zipmap': False}})
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         XI = X.astype(np.int64)
         got = sess.run(None, {'input': XI})
         exp_label = model.predict(XI)
@@ -232,7 +234,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model, "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': X})[1]
         dec = model.decision_function(X)
         assert_almost_equal(got, dec, decimal=4)
@@ -263,7 +267,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model, "ovr classification",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': X})[1]
         dec = model.decision_function(X)
         assert_almost_equal(got[:, 1], dec, decimal=4)
@@ -494,7 +500,9 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
             model, 'lr',
             [('input', FloatTensorType([None, X_test.shape[1]]))],
             options=options, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
         exp = model.predict(X_test)
         assert_almost_equal(exp, res[0])

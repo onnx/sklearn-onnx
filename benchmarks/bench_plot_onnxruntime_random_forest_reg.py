@@ -36,7 +36,7 @@ def fcts_model(X, y, max_depth, n_estimators, n_jobs):
     f = BytesIO()
     f.write(onx.SerializeToString())
     content = f.getvalue()
-    sess = InferenceSession(content)
+    sess = InferenceSession(content, providers=["CPUExecutionProvider"])
     outputs = [o.name for o in sess.get_outputs()]
 
     if False:

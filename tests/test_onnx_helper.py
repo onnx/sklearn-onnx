@@ -8,7 +8,6 @@ import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx
-from onnxruntime import InferenceSession
 from sklearn import __version__ as sklearn_version
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import Binarizer, StandardScaler, OneHotEncoder
@@ -22,7 +21,7 @@ from skl2onnx.helpers.onnx_helper import (
     add_output_initializer,
     get_initializers,
     update_onnx_initializers)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 def one_hot_encoder_supports_string():
@@ -40,7 +39,9 @@ class TestOnnxHelper(unittest.TestCase):
 
         from onnxruntime import InferenceSession
 
-        session = InferenceSession(save_onnx_model(model))
+        session = InferenceSession(
+            save_onnx_model(model),
+            providers=["CPUExecutionProvider"])
         return lambda X: session.run(None, {"input": X})[0]
 
     def test_onnx_helper_load_save(self):
@@ -133,7 +134,9 @@ class TestOnnxHelper(unittest.TestCase):
         new_model_onnx = add_output_initializer(
             model_onnx, "new_output", cst)
 
-        sess = InferenceSession(new_model_onnx.SerializeToString())
+        sess = InferenceSession(
+            new_model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         self.assertEqual(len(res), 2)
         assert_almost_equal(cst, res[1])
@@ -144,7 +147,9 @@ class TestOnnxHelper(unittest.TestCase):
         new_model_onnx = add_output_initializer(
             model_onnx, ["new_output1", "new_output2"], [cst, cst + 1])
 
-        sess = InferenceSession(new_model_onnx.SerializeToString())
+        sess = InferenceSession(
+            new_model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X})
         self.assertEqual(len(res), 3)
         assert_almost_equal(cst, res[1])

@@ -23,8 +23,9 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType, FloatTensorType
 from onnxruntime import __version__ as ort_version
-from onnxruntime import InferenceSession
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = '.'.join(ort_version.split('.')[:2])
@@ -59,7 +60,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11-OneOff-SklCol")
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 9)
 
@@ -87,7 +90,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11NoL-OneOff-SklCol")
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 11)
 
@@ -113,7 +118,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [("input", StringTensorType([4, 2]))],
                                      options=self.get_options(),
                                      target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': corpus})[0]
         exp = model.transform(corpus)
         assert_almost_equal(res, exp)
@@ -355,17 +362,14 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         vect.fit(corpus.ravel())
 
         extra = {
-            id(vect): {
-                "sep2": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]
-            }
+            id(vect): {"sep2": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]}
         }
         try:
             convert_sklearn(
                 vect,
                 "TfidfVectorizer",
                 [("input", StringTensorType([None, 1]))],
-                options=extra, target_opset=TARGET_OPSET
-            )
+                options=extra, target_opset=TARGET_OPSET)
         except (RuntimeError, NameError):
             pass
 
@@ -380,15 +384,10 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             "TfidfVectorizer",
             [("input", StringTensorType([1]))],
-            options=extra, target_opset=TARGET_OPSET
-        )
+            options=extra, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
-        # This test depends on this issue:
-        # https://github.com/Microsoft/onnxruntime/issues/957.
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
+            corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol")
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -436,7 +435,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer1164-OneOff-SklCol")
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 9)
 
@@ -471,7 +472,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         initial_type = [('input', FloatTensorType([None, dim]))]
         model_onnx = convert_sklearn(clf, initial_types=initial_type,
                                      target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': embeddings})[0]
         assert_almost_equal(exp, res)
 
@@ -494,8 +497,9 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                                      [("input", StringTensorType())],
                                      options=options,
                                      target_opset=TARGET_OPSET)
-
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': corpus.ravel()})[0]
         assert res.shape == (4, 9)
         assert numpy.isnan(res[0, 0])

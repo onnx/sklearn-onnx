@@ -42,17 +42,17 @@ def _default_OPSET_TO_IR_VERSION():
     return {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
-        13: 7, 14: 7, 15: 8, 16: 8, 17: 8
+        13: 7, 14: 7, 15: 8, 16: 8, 17: 8, 18: 8
     }
 
 
 try:
     from onnxconverter_common.topology import OPSET_TO_IR_VERSION
-    assert OPSET_TO_IR_VERSION[17] is not None
+    assert OPSET_TO_IR_VERSION[18] is not None
 except (ImportError, KeyError):
     OPSET_TO_IR_VERSION = _default_OPSET_TO_IR_VERSION()
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 15, 3: 17}
+OPSET_ML_TO_OPSET = {1: 11, 2: 15, 3: 18}
 
 logger = getLogger('skl2onnx')
 
@@ -365,7 +365,7 @@ class Variable:
             if other_type is None:
                 return
         elif other_type is not None:
-            if type(self.type) == type(other_type):
+            if isinstance(self.type, type(other_type)):
                 if self.type.shape == other_type.shape:
                     return
                 if empty_shape(other_type.shape):
@@ -1238,7 +1238,7 @@ class Topology:
             if verbose > 0:
                 print("[convert_operators] iteration %d - n_vars=%d "
                       "n_ops=%d" % (
-                        n_iter, len(fed_variables), len(ops)))
+                          n_iter, len(fed_variables), len(ops)))
             for operator in ops:
                 _check_operator_(operator)
                 for var in operator.inputs:

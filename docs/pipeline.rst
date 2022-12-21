@@ -269,7 +269,8 @@ a pipeline and each of its components independently.
         onnx_step = op['onnx_step']
 
         # Use onnxruntime to compute ONNX outputs
-        sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+        sess = onnxruntime.InferenceSession(onnx_step.SerializeToString(),
+                                            providers=["CPUExecutionProvider"])
 
         # Let's use the initial data as the ONNX model
         # contains all nodes from the first inputs to this node.
@@ -354,7 +355,8 @@ them.
 
         # If it does not fail, let's compare the ONNX outputs with
         # the original operator.
-        sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+        sess = onnxruntime.InferenceSession(onnx_step.SerializeToString(),
+                                            providers=["CPUExecutionProvider"])
         onnx_outputs = sess.run(None, {'input': data_in})
         onnx_output = onnx_outputs[0]
         skl_outputs = op._debug.outputs['transform']

@@ -570,6 +570,12 @@ class ModelComponentContainer(_WhiteBlackContainer):
                       attributes' names and attributes' values,
                       respectively.
         """
+        if ("axes" in attrs and
+            (attrs["axes"] is None or
+             not isinstance(attrs["axes"], (list, np.ndarray)))):
+            raise TypeError(
+                f"axes must be a list or an array not "
+                f"{type(attrs['axes'])}.")
         if name is None or not isinstance(
                 name, str) or name == '':
             name = "N%d" % len(self.nodes)
@@ -857,7 +863,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                     "\n".join(rows)))
 
         # Update order
-        topo = [(order[id(node)], str(id(node))) for node in self.nodes]
-        topo.sort()
+        topo = sorted([(order[id(node)], str(id(node)))
+                      for node in self.nodes])
         map_nodes = {str(id(node)): node for node in self.nodes}
         self.nodes = [map_nodes[_[1]] for _ in topo]

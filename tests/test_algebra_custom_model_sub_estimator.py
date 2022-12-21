@@ -8,7 +8,6 @@ import logging
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
@@ -37,7 +36,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity,
     OnnxReshape,
     OnnxSoftmax)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class CustomOpTransformer1(BaseEstimator, TransformerMixin,
@@ -381,7 +380,9 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         expected = obj.transform(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET)
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Issue %r with\n%s" % (e, str(onx))) from e
@@ -395,7 +396,9 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET,
                       options={id(obj): {'zipmap': False}})
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Issue %r with\n%s" % (e, str(onx))) from e

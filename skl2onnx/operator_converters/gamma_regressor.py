@@ -21,7 +21,7 @@ def convert_sklearn_gamma_regressor(scope: Scope, operator: Operator,
     if dtype != np.float64:
         dtype = np.float32
 
-    if type(X.type) == Int64TensorType:
+    if isinstance(X.type, Int64TensorType):
         input_var = OnnxCast(X, to=np.float32, op_version=opv)
     else:
         input_var = X

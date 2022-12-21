@@ -23,8 +23,8 @@ def kernel_centerer_converter(scope: Scope, operator: Operator,
 
     N = np.array([op.K_fit_rows_.shape[0]], dtype=dtype)
     K_pred_cols = OnnxDiv(
-            OnnxReduceSumApi11(X, axes=[1], op_version=op_version),
-            N, op_version=op_version)
+        OnnxReduceSumApi11(X, axes=[1], op_version=op_version),
+        N, op_version=op_version)
 
     # K -= self.K_fit_rows_
     # K -= K_pred_cols

@@ -100,7 +100,9 @@ class TestXGBoostModels(unittest.TestCase):
                 ('input', FloatTensorType(shape=[None, X.shape[1]]))],
             options={id(xgb): {'zipmap': False}},
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
-        sess = InferenceSession(conv_model.SerializeToString())
+        sess = InferenceSession(
+            conv_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(xgb.predict_proba(X), res[1])
         assert_almost_equal(xgb.predict(X), res[0])
@@ -157,7 +159,9 @@ class TestXGBoostModels(unittest.TestCase):
             options={id(xgb): {'zipmap': False}},
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertTrue(conv_model is not None)
-        sess = InferenceSession(conv_model.SerializeToString())
+        sess = InferenceSession(
+            conv_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(xgb.predict_proba(X), res[1])
         assert_almost_equal(xgb.predict(X), res[0])
@@ -173,7 +177,7 @@ class TestXGBoostModels(unittest.TestCase):
             ('cbe', ColumnTransformer([
                 ("norm1", Normalizer(norm='l1'), [0, 1]),
                 ("norm2", Normalizer(norm='l2'), [2, 3])])),
-            ('sc',  StackingClassifier(
+            ('sc', StackingClassifier(
                 estimators=list(map(tuple, classifiers.items())),
                 stack_method='predict_proba',
                 passthrough=False
@@ -188,7 +192,9 @@ class TestXGBoostModels(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML},
             options={'zipmap': False})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(model_to_test.predict_proba(X), res[1])
         assert_almost_equal(model_to_test.predict(X), res[0])
@@ -205,7 +211,7 @@ class TestXGBoostModels(unittest.TestCase):
             ('cbe', ColumnTransformer([
                 ("norm1", Normalizer(norm='l1'), [0, 1]),
                 ("norm2", Normalizer(norm='l2'), [2, 3])])),
-            ('sc',  StackingClassifier(
+            ('sc', StackingClassifier(
                 estimators=list(map(tuple, classifiers.items())),
                 stack_method='predict_proba',
                 passthrough=False
@@ -226,7 +232,9 @@ class TestXGBoostModels(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML},
             options={'zipmap': False})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         assert_almost_equal(model_to_test.predict_proba(df), res[1])
         assert_almost_equal(model_to_test.predict(df), res[0])

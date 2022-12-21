@@ -12,7 +12,7 @@ from sklearn.ensemble import (
     GradientBoostingRegressor
 )
 from sklearn.model_selection import train_test_split
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -22,7 +22,7 @@ from skl2onnx.common.data_types import (
 from test_utils import (
     dump_binary_classification, dump_multiple_classification,
     fit_classification_model, dump_data_and_model, fit_regression_model,
-    TARGET_OPSET)
+    TARGET_OPSET, InferenceSessionEx as InferenceSession)
 
 
 ort_version = ort_version.split('+')[0]
@@ -48,7 +48,9 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
                                          target_opset=TARGET_OPSET)
             if "Regressor" in str(model_onnx):
                 raise AssertionError(str(model_onnx))
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             res = sess.run(None, {'input': X.astype(np.float32)})
             pred = model.predict_proba(X)
             delta = abs(res[1][0][0] - pred[0, 0])
@@ -209,7 +211,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnGradientBoostingRegressionQuantileLoss")
+            basename="SklearnGradientBoostingRegressionQuantileLoss-Dec4")
 
     def test_gradient_boosting_regressor_int(self):
         model, X = fit_regression_model(
@@ -248,7 +250,9 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         onnx_model = convert_sklearn(
             model, 'lr2', [('input', FloatTensorType(X_test.shape))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, input_feed={'input': X_test.astype(np.float32)})
         r1 = np.mean(
             np.isclose(model.predict_proba(X_test),

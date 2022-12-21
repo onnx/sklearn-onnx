@@ -9,7 +9,7 @@ from numpy.testing import assert_almost_equal
 from scipy.spatial.distance import pdist, squareform, cdist as scipy_cdist
 import onnx
 from onnx.onnx_cpp2py_export.checker import ValidationError
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -19,7 +19,7 @@ except ImportError:
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
-    OnnxSub, OnnxReduceSumSquare,
+    OnnxSub, OnnxReduceSumSquareApi18,
     OnnxSqueezeApi11, OnnxShape)
 from skl2onnx.algebra.custom_ops import OnnxCDist
 try:
@@ -32,7 +32,9 @@ from onnx import (
 from skl2onnx.algebra.complex_functions import (
     onnx_squareform_pdist, onnx_cdist)
 from skl2onnx.proto import get_latest_tested_opset_version
-from test_utils import TARGET_OPSET, TARGET_IR
+from test_utils import (
+    TARGET_OPSET, TARGET_IR,
+    InferenceSessionEx as InferenceSession)
 
 _TARGET_OPSET_ = min(get_latest_tested_opset_version(), TARGET_OPSET)
 
@@ -109,7 +111,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except Exception as e:
             if "Current official support for domain ai.onnx" in str(e):
                 return
@@ -149,7 +153,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             outputs=[('y', FloatTensorType()),
                      ('z', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'initial': initial, 'x': x})
 
         y = np.array([9, 12]).astype(np.float32).reshape((2,))
@@ -170,7 +176,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         id_next = OnnxIdentity(
             'next_in', output_names=['next_out'],
             op_version=opv)
-        norm = OnnxReduceSumSquare(
+        norm = OnnxReduceSumSquareApi18(
             diff, output_names=['norm'], axes=[1],
             op_version=opv)
         flat = OnnxSqueezeApi11(
@@ -183,7 +189,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             other_outputs=[flat],
             target_opset=opv)
 
-        sess = InferenceSession(scan_body.SerializeToString())
+        sess = InferenceSession(
+            scan_body.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'next_in': x, 'next': x[:1]})
         assert_almost_equal(x, res[0])
         exp = np.array([0., 18., 20.], dtype=np.float32)
@@ -204,7 +212,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             else:
                 raise e
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x': x})
 
         exp = squareform(pdist(x, metric="sqeuclidean"))
@@ -231,20 +241,26 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('pdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
         x = np.array([1, 2, 4, 5]).astype(np.float32).reshape((2, 2))
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
         x = np.array([1, 2, 4, 5, 5, 6]).astype(np.float32).reshape((2, 3))
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((2, 3))
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
@@ -262,7 +278,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             output_names=['mat'], op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = np.zeros((3, 2), dtype=np.float32)
         assert_almost_equal(exp, res[0])
@@ -275,7 +293,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
@@ -300,7 +320,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -323,7 +345,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
@@ -351,7 +375,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="minkowski")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -376,7 +402,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
@@ -402,7 +430,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             outputs=[('cdist', FloatTensorType())])
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             if "CDist is not a registered" in str(e):
                 return
@@ -430,7 +460,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)

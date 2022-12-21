@@ -83,7 +83,7 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
         ls = numpy.random.randint(1, length, n)
         text = []
         for size in ls:
-            sentance = [words[random.randint(0, len(words)-1)]
+            sentance = [words[random.randint(0, len(words) - 1)]
                         for i in range(size)]
             text.append(" ".join(sentance))
         return numpy.array(text)
@@ -130,11 +130,13 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
                   'CAT2': dfx_test['CAT2'].values.reshape((-1, 1)),
                   'TEXT': dfx_test['TEXT'].values.reshape((-1, 1))}
         onx = to_onnx(pipe, dfx_test, target_opset=TARGET_OPSET)
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         expected_dense = expected.todense()
         for i in range(dfx_test.shape[0]):
-            row_inputs = {k: v[i: i+1] for k, v in inputs.items()}
+            row_inputs = {k: v[i: i + 1] for k, v in inputs.items()}
             got = sess.run(None, row_inputs)
             assert_almost_equal(expected_dense[i], got[0])
 
@@ -168,11 +170,13 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
                       options={CountVectorizer: {'keep_empty_string': True}})
         with open("debug.onnx", "wb") as f:
             f.write(onx.SerializeToString())
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         expected_dense = expected.todense()
         for i in range(dfx_test.shape[0]):
-            row_inputs = {k: v[i: i+1] for k, v in inputs.items()}
+            row_inputs = {k: v[i: i + 1] for k, v in inputs.items()}
             got = sess.run(None, row_inputs)
             assert_almost_equal(expected_dense[i], got[0])
 

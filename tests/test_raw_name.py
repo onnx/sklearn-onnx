@@ -34,7 +34,9 @@ class RawNameTest(unittest.TestCase):
 
     @staticmethod
     def _predict(clr_onnx, X):
-        sess = rt.InferenceSession(clr_onnx.SerializeToString())
+        sess = rt.InferenceSession(
+            clr_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         label_name = sess.get_outputs()[0].name
         return sess.run([label_name], {input_name: X.astype(numpy.float32)})[0]

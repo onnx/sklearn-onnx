@@ -363,8 +363,8 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
             [lambda: CalibratedClassifierCV(
                 base_estimator=LogisticRegression(), method='isotonic')],
             "CalibratedClassifierCV",
-            raw_scores=False, verbose=False)
+            raw_scores=False)
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

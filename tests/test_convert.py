@@ -30,7 +30,7 @@ class TestConvert(unittest.TestCase):
         X = data.data
         model = KMeans(n_clusters=3)
         model.fit(X)
-        for i in range(1, TARGET_OPSET+1):
+        for i in range(1, TARGET_OPSET + 1):
             model_onnx = to_onnx(model, X[:1].astype(numpy.float32),
                                  target_opset=i)
             dom = get_domain_opset(model_onnx)
@@ -42,7 +42,7 @@ class TestConvert(unittest.TestCase):
         X = data.data
         model = KMeans(n_clusters=3)
         model.fit(X)
-        for i in range(1, TARGET_OPSET+1):
+        for i in range(1, TARGET_OPSET + 1):
             for j in (1, 2):
                 tops = {'': i, 'ai.onnx.ml': j}
                 model_onnx = to_onnx(model, X[:1].astype(numpy.float32),
@@ -57,7 +57,7 @@ class TestConvert(unittest.TestCase):
         X = data.data
         model = KBinsDiscretizer(encode="ordinal")
         model.fit(X)
-        for i in range(9, TARGET_OPSET+1):
+        for i in range(9, TARGET_OPSET + 1):
             for j in (1, 2):
                 tops = {'': i, 'ai.onnx.ml': j}
                 model_onnx = to_onnx(model, X[:1].astype(numpy.float32),
@@ -75,14 +75,14 @@ class TestConvert(unittest.TestCase):
         y = data.target
         model = GaussianProcessRegressor()
         model.fit(X, y)
-        for i in range(9, TARGET_OPSET+1):
+        for i in range(9, TARGET_OPSET + 1):
             for j in (1, 2):
                 tops = {'': i, 'ai.onnx.ml': j}
                 model_onnx = to_onnx(model, X[:1].astype(numpy.float32),
                                      target_opset=tops)
                 dom = get_domain_opset(model_onnx)
                 self.assertEqual(len(dom), 1)
-                self.assertIn(dom[''], (i, i-1))
+                self.assertIn(dom[''], (i, i - 1))
 
     def test_onehot(self):
         try:
@@ -93,14 +93,14 @@ class TestConvert(unittest.TestCase):
         data = numpy.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
                            dtype=numpy.int64)
         model.fit(data)
-        for i in range(9, TARGET_OPSET+1):
+        for i in range(9, TARGET_OPSET + 1):
             for j in (1, 2):
                 tops = {'': i, 'ai.onnx.ml': j}
                 model_onnx = to_onnx(model, data[:1],
                                      target_opset=tops)
                 dom = get_domain_opset(model_onnx)
                 self.assertEqual(len(dom), 2)
-                self.assertIn(dom[''], list(range(9, TARGET_OPSET+1)))
+                self.assertIn(dom[''], list(range(9, TARGET_OPSET + 1)))
                 self.assertEqual(dom['ai.onnx.ml'], 1)
 
     def test_label_encoder(self):
@@ -108,7 +108,7 @@ class TestConvert(unittest.TestCase):
         data = numpy.array([1.2, 3.4, 5.4, 1.2],
                            dtype=numpy.float32)
         model.fit(data)
-        for i in range(9, TARGET_OPSET+1):
+        for i in range(9, TARGET_OPSET + 1):
             for j in (1, 2):
                 tops = {'': i, 'ai.onnx.ml': j}
                 try:

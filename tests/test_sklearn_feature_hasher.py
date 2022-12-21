@@ -13,13 +13,12 @@ from onnx.helper import (
     make_graph, make_tensor_value_info, make_opsetid)
 from onnx.checker import check_model
 from onnxruntime import __version__ as ort_version
-from onnxruntime import InferenceSession
 from sklearn.feature_extraction import FeatureHasher
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import (
     StringTensorType, Int64TensorType, FloatTensorType,
     DoubleTensorType)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
@@ -36,7 +35,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             make_opsetid('', TARGET_OPSET),
             make_opsetid('com.microsoft', 1)])
         check_model(onnx_model)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         feeds = {'X': np.array([0, 1, 2, 3, 4, 5], dtype=np.uint32)}
         got = sess.run(None, feeds)
         self.assertEqual(got[0].shape, feeds["X"].shape)
@@ -54,7 +55,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             make_opsetid('', TARGET_OPSET),
             make_opsetid('com.microsoft', 1)])
         check_model(onnx_model)
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         input_strings = ['z0', 'o11', 'd222', 'q4444', 't333', 'c5555']
         feeds = {'X': np.array(input_strings)}
@@ -109,7 +112,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                     model, initial_types=[("X", StringTensorType([None, 1]))],
                     target_opset=TARGET_OPSET,
                     final_types=[('Y', final_type([None, 1]))])
-                sess = InferenceSession(model_onnx.SerializeToString())
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 got = sess.run(None, {'X': data})
                 self.assertEqual(expected.shape, got[0].shape)
                 self.assertEqual(expected.dtype, got[0].dtype)
@@ -136,7 +141,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                 ("X", StringTensorType([None, data.shape[1]]))],
             target_opset=TARGET_OPSET,
             final_types=[('Y', FloatTensorType([None, n_features]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': data})
         self.assertEqual(expected.shape, got[0].shape)
         self.assertEqual(expected.dtype, got[0].dtype)
@@ -176,7 +183,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                 ("X", StringTensorType([None, data.shape[0]]))],
             target_opset=TARGET_OPSET,
             final_types=[('Y', FloatTensorType([None, n_features]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': data_nx})
         self.assertEqual(expected.shape, got[0].shape)
         self.assertEqual(expected.dtype, got[0].dtype)
@@ -203,7 +212,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                 ("X", StringTensorType([None, data.shape[1]]))],
             target_opset=TARGET_OPSET,
             final_types=[('Y', FloatTensorType([None, n_features]))])
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': data})
         self.assertEqual(expected.shape, got[0].shape)
         self.assertEqual(expected.dtype, got[0].dtype)

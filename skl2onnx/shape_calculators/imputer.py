@@ -23,7 +23,7 @@ def calculate_sklearn_imputer_output_shapes(operator):
         operator, good_input_types=[
             FloatTensorType, Int64TensorType, DoubleTensorType,
             StringTensorType])
-    if type(operator.inputs[0].type) != type(operator.outputs[0].type):  # noqa
+    if not isinstance(operator.inputs[0].type, type(operator.outputs[0].type)):  # noqa
         raise RuntimeError(
             "Inputs and outputs should have the same type "
             "%r != %r." % (

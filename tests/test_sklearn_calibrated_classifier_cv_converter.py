@@ -8,7 +8,7 @@ import unittest
 import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import (
@@ -37,8 +37,9 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, onnx_built_with_ml)
-from test_utils import dump_data_and_model, TARGET_OPSET
-
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 ort_version = ort_version.split('+')[0]
 
@@ -148,6 +149,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model, "scikit-learn CalibratedClassifierCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
+
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32), model, model_onnx,
@@ -329,7 +331,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         y = y[:90]
         self.assertEqual(len(set(y)), 2)
 
-        for model_sub in [LogisticRegression(), SVC(probability=False)]:
+        for model_sub in [SVC(probability=False), LogisticRegression()]:
             model_sub.fit(X, y)
             with self.subTest(model=model_sub):
                 model = CalibratedClassifierCV(
@@ -341,15 +343,23 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                     target_opset=TARGET_OPSET,
                     options={id(model): {'zipmap': False}})
 
-                sess = InferenceSession(model_onnx.SerializeToString())
-                res = sess.run(None, {'input': X[:5].astype(np.float32)})
-                assert_almost_equal(model.predict_proba(X[:5]), res[1])
-                assert_almost_equal(model.predict(X[:5]), res[0])
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
+                if sess is not None:
+                    try:
+                        res = sess.run(
+                            None, {'input': X[:5].astype(np.float32)})
+                    except RuntimeError as e:
+                        raise AssertionError("runtime failed") from e
+                    assert_almost_equal(model.predict_proba(X[:5]), res[1])
+                    assert_almost_equal(model.predict(X[:5]), res[0])
 
+                name = model_sub.__class__.__name__
                 dump_data_and_model(
                     X.astype(np.float32)[:10], model, model_onnx,
-                    basename="SklearnCalibratedClassifierSVC2")
+                    basename=f"SklearnCalibratedClassifierBinary{name}SVC2")
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

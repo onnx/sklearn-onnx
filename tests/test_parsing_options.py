@@ -10,8 +10,7 @@ from sklearn.datasets import make_regression
 from skl2onnx.common.data_types import (
     FloatTensorType, DoubleTensorType)
 from skl2onnx import convert_sklearn
-from onnxruntime import InferenceSession
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestParsingOptions(unittest.TestCase):
@@ -29,20 +28,26 @@ class TestParsingOptions(unittest.TestCase):
             model, initial_types=initial_types,
             final_types=[('output', None)],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         assert sess.get_outputs()[0].name == 'output'
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
             final_types=[('output4', None)],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         assert sess.get_outputs()[0].name == 'output4'
         model_onnx = convert_sklearn(
             model, initial_types=initial_types,
             final_types=[('output4', DoubleTensorType())],
             target_opset=TARGET_OPSET)
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             if "Cast(9)" in str(e):
                 return
@@ -59,7 +64,9 @@ class TestParsingOptions(unittest.TestCase):
                                      final_types=[('output4', None)],
                                      target_opset=TARGET_OPSET)
         assert model_onnx is not None
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         assert sess.get_outputs()[0].name == 'output4'
 
     def test_kmeans(self):
@@ -80,7 +87,9 @@ class TestParsingOptions(unittest.TestCase):
             final_types=[('output4', None), ('output5', None)],
             target_opset=TARGET_OPSET)
         assert model_onnx is not None
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         assert sess.get_outputs()[0].name == 'output4'
         assert sess.get_outputs()[1].name == 'output5'
 

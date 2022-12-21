@@ -297,7 +297,9 @@ class TestSklearnMLPConverters(unittest.TestCase):
             model, 'mlp',
             [('input', FloatTensorType([None, X_test.shape[1]]))],
             options=options, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, input_feed={'input': X_test})
         assert_almost_equal(res[1], model.predict_proba(X_test), decimal=5)
         assert_almost_equal(res[0], model.predict(X_test), decimal=5)

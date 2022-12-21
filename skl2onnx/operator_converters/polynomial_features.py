@@ -55,9 +55,18 @@ def convert_sklearn_polynomial_features(scope: Scope, operator: Operator,
                            to=onnx_proto.TensorProto.FLOAT)
                 reduce_prod_input = float_col_name
 
-            container.add_node(
-                'ReduceProd', reduce_prod_input, prod_name,
-                axes=[1], name=scope.get_unique_operator_name('ReduceProd'))
+            if container.target_opset >= 18:
+                axis_name = scope.get_unique_variable_name('axis')
+                container.add_initializer(
+                    axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+                container.add_node(
+                    'ReduceProd', [reduce_prod_input, axis_name], prod_name,
+                    name=scope.get_unique_operator_name('ReduceProd'))
+            else:
+                container.add_node(
+                    'ReduceProd', reduce_prod_input, prod_name,
+                    axes=[1],
+                    name=scope.get_unique_operator_name('ReduceProd'))
             transformed_columns[i] = prod_name
             last_feat = prod_name
 

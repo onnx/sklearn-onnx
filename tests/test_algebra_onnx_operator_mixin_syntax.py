@@ -241,7 +241,9 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
         if debug:
             print(model_def)
         try:
-            oinf = InferenceSession(model_def.SerializeToString())
+            oinf = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             if ("Could not find an implementation for the node "
                     "Cl_Clip:Clip(11)" in str(e)):
@@ -290,4 +292,5 @@ class TestOnnxOperatorMixinSyntax(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    TestOnnxOperatorMixinSyntax().test_pipe_way1_convert_sklearn()
+    unittest.main(verbosity=2)

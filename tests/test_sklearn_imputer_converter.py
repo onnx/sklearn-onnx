@@ -8,7 +8,6 @@ import packaging.version as pv
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 import sklearn
 try:
     from sklearn.preprocessing import Imputer
@@ -24,7 +23,9 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, StringTensorType)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 skl_ver = '.'.join(sklearn.__version__.split('.')[:2])
@@ -33,15 +34,21 @@ skl_ver = '.'.join(sklearn.__version__.split('.')[:2])
 class TestSklearnImputerConverter(unittest.TestCase):
 
     def _check_outputs_ints(self, model, model_onnx, data):
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         idata = {'input': np.array(data).astype(np.int64)}
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
         assert_almost_equal(res, exp)
 
-    def _check_outputs_strings(self, model, model_onnx, data):
+    def _check_outputs_strings(self, model, model_onnx, data,
+                               verbose=0):
         idata = {'input': np.array(data).astype(np.str_)}
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"],
+            verbose=verbose)
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
         if list(exp.ravel()) != list(res.ravel()):

@@ -10,14 +10,16 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 except ImportError:
     OrtFail = RuntimeError
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession,
+    ReferenceEvaluatorEx)
 
 
 class TestGaussianMixtureConverter(unittest.TestCase):
@@ -44,8 +46,25 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model, X[:1], target_opset=tg,
             options={id(model): {'score_samples': True}},
             black_op=black_op)
+        if ReferenceEvaluatorEx is None:
+            sess = None
+        else:
+            try:
+                sess = ReferenceEvaluatorEx(onx)
+            except NotImplementedError:
+                sess = None
+        if sess is not None:
+            got = sess.run(None, {'X': X})
+            self.assertEqual(len(got), 3)
+            np.testing.assert_almost_equal(
+                expp.ravel(), got[1].ravel(), decimal=decimal)
+            np.testing.assert_almost_equal(
+                exp.ravel(), got[2].ravel(), decimal=decimal)
+
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtFail as e:
             raise RuntimeError('Issue {}\n{}'.format(e, str(onx)))
         got = sess.run(None, {'X': X})
@@ -269,11 +288,15 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             black_op={'ReduceLogSumExp', 'ArgMax'})
         self.assertNotIn('ArgMax', str(model_onnx2))
 
-        sess1 = InferenceSession(model_onnx1.SerializeToString())
+        sess1 = InferenceSession(
+            model_onnx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a1, b1, c1 = res1
 
-        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        sess2 = InferenceSession(
+            model_onnx2.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a2, b2, c2 = res2
 
@@ -288,4 +311,4 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

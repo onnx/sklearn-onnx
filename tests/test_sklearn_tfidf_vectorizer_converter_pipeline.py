@@ -85,7 +85,9 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
         elif kind == 'reg':
             exp = [model_pipeline.predict(X_train.ravel()).reshape((-1, 1))]
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': X_train})
         if verbose:
             voc = model_pipeline.steps[0][-1].vocabulary_

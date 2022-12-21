@@ -13,7 +13,6 @@ from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from sklearn.preprocessing import Binarizer
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
     from onnxruntime.capi.onnxruntime_pybind11_state import (
@@ -25,7 +24,9 @@ from sklearn.preprocessing import StandardScaler
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import DoubleTensorType
 from onnxruntime import __version__ as ort_version
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 warnings_to_skip = (
     DeprecationWarning, FutureWarning, ConvergenceWarning, UserWarning)
@@ -98,7 +99,9 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             options={id(model): {'score_samples': True}},
             black_op=black_op)
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtFail as e:
             raise RuntimeError('Issue {}\n{}'.format(e, str(onx)))
         got = sess.run(None, {'X': X})
@@ -368,11 +371,15 @@ class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
             options={id(model): {'score_samples': True}},
             black_op={'ReduceLogSumExp', 'ArgMax'})
         self.assertNotIn('ArgMax', str(model_onnx2))
-        sess1 = InferenceSession(model_onnx1.SerializeToString())
+        sess1 = InferenceSession(
+            model_onnx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float64)})
         a1, b1, c1 = res1
 
-        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        sess2 = InferenceSession(
+            model_onnx2.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float64)})
         a2, b2, c2 = res2
 

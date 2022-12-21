@@ -95,7 +95,7 @@ def _process_options(model, options):
             continue
         try:
             ri = k.rindex('__')
-            m2, k2 = k[:ri], k[ri+2:]
+            m2, k2 = k[:ri], k[ri + 2:]
         except ValueError:
             key = id(model)
             if key not in new_options:

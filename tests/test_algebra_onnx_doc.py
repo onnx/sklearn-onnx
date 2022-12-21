@@ -17,7 +17,9 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
 
     def predict_with_onnxruntime(self, model_def, *inputs):
         import onnxruntime as ort
-        sess = ort.InferenceSession(model_def.SerializeToString())
+        sess = ort.InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [i.name for i in sess.get_inputs()]
         input = {name: input for name, input in zip(names, inputs)}
         res = sess.run(None, input)

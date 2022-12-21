@@ -14,12 +14,12 @@ jobs:
   strategy:
     matrix:
 
-      Py310-OnnxTest-Rt131-Skl12:
+      Py310-Onnx130-Rt131-Skl12:
         do.bench: '0'
         python.version: '3.10'
         numpy.version: '>=1.21.0'
         scipy.version: '>=1.7.0'
-        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.13.0rc1'
+        onnx.version: 'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.13.0rc1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.13.1' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
         sklearn.version: '>=1.2'
@@ -152,13 +152,6 @@ jobs:
 
   steps:
   - script: |
-      sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-      sudo apt-get update
-      sudo apt-get install gcc-4.9
-      sudo apt-get upgrade libstdc++6
-    displayName: 'Install libstdc++6'
-
-  - script: |
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
@@ -280,7 +273,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest tests --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+      pytest tests --maxfail=10 --durations=0 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
     displayName: 'pytest'
 
   - script: |
@@ -291,14 +284,16 @@ jobs:
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
       pip install onnxmltools
     displayName: 'install onnxmltools'
+    condition: eq(variables['run.example'], '1')
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest tests_onnxmltools --durations=0 --basetemp=temp
+      pytest tests_onnxmltools --durations=0 --basetemp=temp --maxfail=5
     displayName: 'pytest-onnxmltools'
+    condition: eq(variables['run.example'], '1')
 
   # Check flake8 after the tests to get more feedback.
   # It is checked before the tests on the windows build.
@@ -334,7 +329,7 @@ jobs:
       then
         export TEST_TARGET_OPSET="$(onnx.target_opset)"
       fi
-      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules -v -v
+      pytest docs/tests --durations=0 --basetemp=temp --doctest-modules -v -v --maxfail=5
     displayName: 'run documentation examples'
     condition: eq(variables['run.example'], '1')
 

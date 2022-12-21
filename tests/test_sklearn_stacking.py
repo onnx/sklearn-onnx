@@ -187,12 +187,12 @@ class TestStackingConverter(unittest.TestCase):
         pipeline = make_pipeline(
             OneHotEncoder(handle_unknown='ignore', sparse=False),
             StackingClassifier(estimators=[
-                    ("rf", RandomForestClassifier(n_estimators=10,
+                ("rf", RandomForestClassifier(n_estimators=10,
+                                              random_state=42)),
+                ("gb", GradientBoostingClassifier(n_estimators=10,
                                                   random_state=42)),
-                    ("gb", GradientBoostingClassifier(n_estimators=10,
-                                                      random_state=42)),
-                    ("knn", KNeighborsClassifier(n_neighbors=2))
-                ], final_estimator=LogisticRegression(), cv=2))
+                ("knn", KNeighborsClassifier(n_neighbors=2))
+            ], final_estimator=LogisticRegression(), cv=2))
 
         X_train = pandas.DataFrame(
             dict(text=['A', 'B', 'A', 'B', 'AA', 'B',
@@ -208,7 +208,9 @@ class TestStackingConverter(unittest.TestCase):
                       target_opset=TARGET_OPSET)
         # with open("ohe_debug.onnx", "wb") as f:
         #     f.write(onx.SerializeToString())
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'text': X_train.text.values.reshape((-1, 1)),
                               'val': X_train.val.values.reshape((-1, 1))})
         assert_almost_equal(pipeline.predict(X_train), res[0])
@@ -226,7 +228,7 @@ class TestStackingConverter(unittest.TestCase):
             ('cbe', ColumnTransformer([
                 ("norm1", Normalizer(norm='l1'), [0, 1]),
                 ("norm2", Normalizer(norm='l2'), [2, 3])])),
-            ('sc',  StackingClassifier(
+            ('sc', StackingClassifier(
                 estimators=list(map(tuple, classifiers.items())),
                 stack_method='predict_proba',
                 passthrough=False
@@ -256,7 +258,7 @@ class TestStackingConverter(unittest.TestCase):
             ('cbe', ColumnTransformer([
                 ("norm1", Normalizer(norm='l1'), [0, 1]),
                 ("norm2", Normalizer(norm='l2'), [2, 3])])),
-            ('sc',  StackingClassifier(
+            ('sc', StackingClassifier(
                 estimators=list(map(tuple, classifiers.items())),
                 stack_method='predict_proba',
                 passthrough=True
@@ -332,9 +334,9 @@ class TestStackingConverter(unittest.TestCase):
         classifiers = {'clf1': clf1, 'clf2': clf2}
 
         stacking_ensemble = StackingClassifier(
-                estimators=list(map(tuple, classifiers.items())),
-                n_jobs=1, stack_method='predict_proba',
-                passthrough=False)
+            estimators=list(map(tuple, classifiers.items())),
+            n_jobs=1, stack_method='predict_proba',
+            passthrough=False)
 
         pipe = Pipeline(steps=[
             ('ct', CustomTransformer()), ('sc', stacking_ensemble)])
@@ -347,7 +349,9 @@ class TestStackingConverter(unittest.TestCase):
             pipe, 'bug', input_types, target_opset=TARGET_OPSET,
             verbose=0, options={'zipmap': False})
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': x})[0]
         self.assertEqual(got.shape[0], x.shape[0])
 
@@ -409,9 +413,9 @@ class TestStackingConverter(unittest.TestCase):
         classifiers = {'clf1': clf1, 'clf2': clf2}
 
         stacking_ensemble = StackingClassifier(
-                estimators=list(map(tuple, classifiers.items())),
-                n_jobs=1, stack_method='predict_proba',
-                passthrough=True)
+            estimators=list(map(tuple, classifiers.items())),
+            n_jobs=1, stack_method='predict_proba',
+            passthrough=True)
 
         pipe = Pipeline(steps=[
             ('ct', CustomTransformer()), ('sc', stacking_ensemble)])
@@ -424,7 +428,9 @@ class TestStackingConverter(unittest.TestCase):
             pipe, 'bug', input_types, target_opset=TARGET_OPSET,
             verbose=0, options={'zipmap': False})
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': x})[0]
         self.assertEqual(got.shape[0], x.shape[0])
 

@@ -6,10 +6,9 @@ from numpy.testing import assert_almost_equal
 from onnx import checker
 from onnx import helper
 from onnx import TensorProto as tp
-from onnxruntime import InferenceSession
 from skl2onnx.common.onnx_optimisation_identity import (
     onnx_remove_node_identity)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestOptimisation(unittest.TestCase):
@@ -36,12 +35,12 @@ class TestOptimisation(unittest.TestCase):
         nodes = [
             helper.make_node('Constant', inputs=[], outputs=["one"],
                              value=helper.make_tensor(
-                                name='', data_type=tp.INT64, dims=[1],
-                                vals=[1])),
+                name='', data_type=tp.INT64, dims=[1],
+                vals=[1])),
             helper.make_node('Constant', inputs=[], outputs=["zero"],
                              value=helper.make_tensor(
-                                name='', data_type=tp.INT64, dims=[1],
-                                vals=[0])),
+                name='', data_type=tp.INT64, dims=[1],
+                vals=[0])),
 
             helper.make_node('Identity', inputs=["one"],
                              outputs=["identity_one"]),
@@ -62,10 +61,14 @@ class TestOptimisation(unittest.TestCase):
             g, opset_imports=[helper.make_opsetid('', TARGET_OPSET)])
         checker.check_model(m)
 
-        sess = InferenceSession(m.SerializeToString())
+        sess = InferenceSession(
+            m.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         optimized_model = onnx_remove_node_identity(m)
-        sess_opt = InferenceSession(optimized_model.SerializeToString())
+        sess_opt = InferenceSession(
+            optimized_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         for v in [True, False]:
             x = np.array([v])

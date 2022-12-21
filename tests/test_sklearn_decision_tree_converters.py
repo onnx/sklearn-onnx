@@ -17,7 +17,7 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from skl2onnx import convert_sklearn
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from test_utils import (
     binary_array_to_string,
     dump_one_class_classification,
@@ -31,6 +31,7 @@ from test_utils import (
     fit_regression_model,
     path_to_leaf,
     TARGET_OPSET,
+    InferenceSessionEx as InferenceSession,
 )
 
 
@@ -50,7 +51,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(model, initial_types=initial_types,
                                      target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict_proba(X)
         if res[1][0][0] != pred[0, 0]:
@@ -64,7 +67,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         initial_types = [('input', FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(model, initial_types=initial_types,
                                      target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         if res[0][0, 0] != pred[0]:
@@ -81,7 +86,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -100,7 +107,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -120,7 +129,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             options={id(model): {'decision_leaf': True,
                                  'decision_path': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -141,7 +152,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True, 'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -162,7 +175,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True, 'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -184,7 +199,9 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
             options={id(model): {'decision_leaf': True, 'decision_path': True,
                                  'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())

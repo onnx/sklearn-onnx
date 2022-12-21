@@ -248,6 +248,106 @@ def OnnxReduceSumApi11(*x, axes=None, keepdims=1, op_version=None,
                            op_version=op_version, output_names=output_names)
 
 
+def OnnxReduceAnyApi18(cl18, cl13, cl11, cl1, *x, axes=None, keepdims=1,
+                       op_version=None, output_names=None):
+    """
+    Adds operator Reduce* with opset>=18 following API from opset 17.
+    """
+    if op_version is None:
+        raise RuntimeError("op_version must be specified.")
+    if op_version is None or op_version >= 18:
+        if axes is None:
+            return cl18(  # noqa
+                *x, keepdims=keepdims, op_version=op_version,
+                output_names=output_names)
+        return cl18(  # noqa
+            *x, np.array(axes, dtype=np.int64),
+            keepdims=keepdims, op_version=op_version,
+            output_names=output_names)
+    if op_version >= 13:
+        if axes is None:
+            return cl13(*x, keepdims=keepdims,  # noqa
+                        op_version=op_version,
+                        output_names=output_names)
+        return cl13(*x, axes=axes, keepdims=keepdims,  # noqa
+                    op_version=op_version, output_names=output_names)
+    if op_version >= 11:
+        if axes is None:
+            return cl11(*x, keepdims=keepdims,  # noqa
+                        op_version=op_version,
+                        output_names=output_names)
+        return cl11(*x, axes=axes, keepdims=keepdims,  # noqa
+                    op_version=op_version, output_names=output_names)
+    if axes is None:
+        return cl1(*x, keepdims=keepdims,  # noqa
+                   op_version=op_version,
+                   output_names=output_names)
+    return cl1(*x, axes=axes, keepdims=keepdims,  # noqa
+               op_version=op_version, output_names=output_names)
+
+
+def OnnxReduceSumSquareApi18(*x, axes=None, keepdims=1, op_version=None,
+                             output_names=None):
+    """
+    Adds operator ReduceSumSquare with opset>=18 following API from opset 17.
+    """
+    if axes is None or not isinstance(axes, (list, np.ndarray)):
+        raise TypeError(f"axes must be a list or an array not {type(axes)}.")
+    return OnnxReduceAnyApi18(
+        OnnxReduceSumSquare, OnnxReduceSumSquare_13,  # noqa
+        OnnxReduceSumSquare_11, OnnxReduceSumSquare_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceMeanApi18(*x, axes=None, keepdims=1, op_version=None,
+                        output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceMean, OnnxReduceMean_13,  # noqa
+        OnnxReduceMean_11, OnnxReduceMean_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceMaxApi18(*x, axes=None, keepdims=1, op_version=None,
+                       output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceMax, OnnxReduceMax_13,  # noqa
+        OnnxReduceMax_11, OnnxReduceMax_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceLogSumExpApi18(*x, axes=None, keepdims=1, op_version=None,
+                             output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceLogSumExp, OnnxReduceLogSumExp_13,  # noqa
+        OnnxReduceLogSumExp_11, OnnxReduceLogSumExp_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceL2Api18(*x, axes=None, keepdims=1, op_version=None,
+                      output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceL2, OnnxReduceL2_13,  # noqa
+        OnnxReduceL2_11, OnnxReduceL2_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
 def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
                    output_names=None):
     """
@@ -322,7 +422,7 @@ def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
     Adds operator ReduceL2 for float or double.
     """
     if dtype == np.float32:
-        return OnnxReduceL2(  # noqa
+        return OnnxReduceL2Api18(  # noqa
             x, axes=axes, keepdims=keepdims,
             op_version=op_version, output_names=output_names)
     x2 = OnnxMul(x, x, op_version=op_version)  # noqa

@@ -145,10 +145,10 @@ print("max discrepancies split node", disc_split, "ratio:", disc / disc_split)
 
 print("processing time no split",
       timeit.timeit(
-        lambda: sess.run(None, {'X': X32})[0], number=150))
+          lambda: sess.run(None, {'X': X32})[0], number=150))
 print("processing time split",
       timeit.timeit(
-        lambda: sess_split.run(None, {'X': X32})[0], number=150))
+          lambda: sess_split.run(None, {'X': X32})[0], number=150))
 
 #############################################
 # Split influence
@@ -173,8 +173,9 @@ print(df)
 
 ##########################################
 # Graph.
-
-ax = df.plot(title="Sum of discrepancies against split\n"
-                   "split = number of tree per node")
+_, ax = plt.subplots(1, 1)
+df.plot(title="Sum of discrepancies against split\n"
+              "split = number of tree per node",
+        ax=ax)
 
 # plt.show()

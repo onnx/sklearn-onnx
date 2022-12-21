@@ -102,7 +102,9 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model, 'lb',
             [('float_input', Int64TensorType([None, X1.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_fs.SerializeToString())
+        sess = InferenceSession(
+            onnx_fs.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         res = sess.run(None, input_feed={'float_input': X1})
         exp = model.transform(X1)

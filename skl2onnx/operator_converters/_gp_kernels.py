@@ -14,7 +14,7 @@ from ..algebra.onnx_ops import (
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSumApi11, OnnxSqueezeApi11,
-    OnnxIdentity, OnnxReduceSumSquare,
+    OnnxIdentity, OnnxReduceSumSquareApi18,
     OnnxReduceL2_typed, OnnxEyeLike,
 )
 from ..algebra.custom_ops import OnnxCDist
@@ -69,8 +69,10 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
     if isinstance(kernel, DotProduct):
         t_sigma_0 = py_make_float_array(kernel.sigma_0 ** 2, dtype=dtype)
         return OnnxSqueezeApi11(
-            OnnxAdd(OnnxReduceSumSquare(X, axes=[1], op_version=op_version),
-                    t_sigma_0, op_version=op_version),
+            OnnxAdd(
+                OnnxReduceSumSquareApi18(
+                    X, axes=[1], op_version=op_version),
+                t_sigma_0, op_version=op_version),
             output_names=output_names, axes=[1],
             op_version=op_version)
 
@@ -381,14 +383,14 @@ def _zero_vector_of_size(X, output_names=None, axis=0,
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version),
                 op_version=op_version),
-            axes=[1-axis], keepdims=keepdims,
+            axes=[1 - axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     elif dtype in (np.float64, np.int32, np.int64):
         res = OnnxReduceSumApi11(
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version), value=py_make_float_array(
                     0, dtype=dtype, as_tensor=True), op_version=op_version),
-            axes=[1-axis], keepdims=keepdims,
+            axes=[1 - axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     else:
         raise NotImplementedError(

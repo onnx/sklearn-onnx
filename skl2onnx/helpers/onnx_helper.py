@@ -140,7 +140,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
                 nb += 1
 
     # All nodes verifies mark_op[node.name] == 1
-    keep_nodes = [node for node in nodes if mark_op[node.name] == 1]
+    keep_nodes = [node for node in nodes[::-1] if mark_op[node.name] == 1]
 
     var_out = []
     for out in outputs:
@@ -399,8 +399,8 @@ def add_output_initializer(model_onnx, name, value, suffix='_init'):
         nodes.append(make_node('Identity', [name_init], [name_output]))
 
     graph = make_graph(
-            nodes, model_onnx.graph.name, model_onnx.graph.input,
-            outputs, inits)
+        nodes, model_onnx.graph.name, model_onnx.graph.input,
+        outputs, inits)
 
     onnx_model = make_model(graph)
     onnx_model.ir_version = model_onnx.ir_version

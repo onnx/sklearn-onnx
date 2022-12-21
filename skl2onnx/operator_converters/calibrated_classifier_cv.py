@@ -357,7 +357,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         apply_concat(scope, [zeroth_col_name, prob_name[0]],
                      merged_prob_name, container, axis=1,
                      operator_name=scope.get_unique_variable_name(
-                        'CaliConc%d' % model_index))
+            'CaliConc%d' % model_index))
         class_prob_tensor_name = merged_prob_name
     else:
         concatenated_prob_name = scope.get_unique_variable_name(
@@ -384,7 +384,7 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         apply_div(scope, [num, deno],
                   calc_prob_name, container, broadcast=1,
                   operator_name=scope.get_unique_variable_name(
-                    'CaliDiv%d' % model_index))
+            'CaliDiv%d' % model_index))
         class_prob_tensor_name = calc_prob_name
     return class_prob_tensor_name
 

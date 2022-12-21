@@ -82,7 +82,9 @@ class TestVariableNames(unittest.TestCase):
                                      verbose=0)
         self.assertIn('Identity', str(model_onnx))
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         name = sess.get_inputs()[0].name
         got = sess.run(None, {name: x})
         assert_almost_equal(x, got[0])
@@ -96,7 +98,9 @@ class TestVariableNames(unittest.TestCase):
                                      final_types=final_types,
                                      verbose=0)
         x = np.array([0, 1, 1, 0], dtype=np.float32).reshape((-1, 2))
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'INPUTA': x})
         assert_almost_equal(x, got[0])
 
@@ -115,7 +119,9 @@ class TestVariableNames(unittest.TestCase):
             model, name="linear regression",
             initial_types=[("年齢", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         # Invalid Feed Input Name:\u5e74\u9f62
         # sess.run(None, {'年齢': X})
         self.assertTrue(sess is not None)
@@ -174,7 +180,9 @@ class TestVariableNames(unittest.TestCase):
         onnx_object = convert_sklearn(
             preprocessor, initial_types=initial_type,
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_object.SerializeToString())
+        sess = InferenceSession(
+            onnx_object.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         self.assertTrue(sess is not None)
         # Invalid Feed Input Name:\u5e74\u9f62
         # onx_data = {}

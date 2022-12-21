@@ -197,7 +197,7 @@ def convert_sklearn_random_forest_classifier(
                 "'{}' and loss '{}'.".format(type(op), loss))
 
         input_name = operator.input_full_names
-        if type(operator.inputs[0].type) == BooleanTensorType:
+        if isinstance(operator.inputs[0].type, BooleanTensorType):
             cast_input_name = scope.get_unique_variable_name('cast_input')
 
             apply_cast(scope, input_name, cast_input_name,
@@ -309,10 +309,21 @@ def convert_sklearn_random_forest_classifier(
             proba.append(reshaped_est_proba_name)
         apply_concat(scope, proba, concatenated_proba_name,
                      container, axis=0)
-        container.add_node('ReduceMean', concatenated_proba_name,
-                           operator.outputs[1].full_name,
-                           name=scope.get_unique_operator_name('ReduceMean'),
-                           axes=[0], keepdims=0)
+        if container.target_opset >= 18:
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [0])
+            container.add_node(
+                'ReduceMean', [concatenated_proba_name, axis_name],
+                operator.outputs[1].full_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                keepdims=0)
+        else:
+            container.add_node(
+                'ReduceMean', concatenated_proba_name,
+                operator.outputs[1].full_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                axes=[0], keepdims=0)
         predictions = _calculate_labels(
             scope, container, op, operator.outputs[1].full_name)
         apply_concat(scope, predictions, operator.outputs[0].full_name,

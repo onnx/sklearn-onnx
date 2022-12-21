@@ -6,7 +6,6 @@ import unittest
 import numpy
 from numpy.testing import assert_almost_equal
 import onnx.checker
-from onnxruntime import InferenceSession
 from sklearn.pipeline import make_pipeline
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import StandardScaler
@@ -18,7 +17,9 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     BooleanTensorType)
 from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph
@@ -81,12 +82,14 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model.fit(data)
         expected = model.transform(data)
         model_onnx = convert_sklearn(
-                model, 'dv',
-                [("input", DictionaryType(StringTensorType([1]),
-                  FloatTensorType([1])))],
-                target_opset=TARGET_OPSET)
+            model, 'dv',
+            [("input", DictionaryType(StringTensorType([1]),
+                                      FloatTensorType([1])))],
+            target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         inp = {'ALL_LOWER': numpy.array([1], dtype=numpy.float32),
                'NEXT_ALL_LOWER': numpy.array([1], dtype=numpy.float32)}
         res = sess.run(None, {'input': inp})
@@ -103,16 +106,24 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model.fit(data)
         # expected = model.transform(data)
         model_onnx = convert_sklearn(
-                model, 'dv',
-                [("input", DictionaryType(StringTensorType([1]),
-                  Int64TensorType([1])))],
-                target_opset=TARGET_OPSET)
+            model, 'dv',
+            [("input", DictionaryType(StringTensorType([1]),
+                                      Int64TensorType([1])))],
+            target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
-        inp = {'ALL_LOWER': numpy.array([1], dtype=numpy.int64),
-               'NEXT_ALL_LOWER': numpy.array([1], dtype=numpy.int64)}
-        with self.assertRaises(InvalidArgument):
-            sess.run(None, {'input': inp})
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        inp = {'ALL_LOWER': numpy.array(1, dtype=numpy.int64),
+               'NEXT_ALL_LOWER': numpy.array(1, dtype=numpy.int64)}
+        try:
+            got = sess.run(None, {'input': inp})
+        except InvalidArgument:
+            return
+        self.assertTrue(got is not None)
+        res = numpy.array(got[0])
+        expected = model.transform(data)
+        assert_almost_equal(expected[0], res)
 
     @unittest.skipIf(not onnx_built_with_ml(),
                      reason="Requires ONNX-ML extension.")
@@ -128,13 +139,20 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         model = make_pipeline(DictVectorizer(sparse=False), StandardScaler())
         model.fit(data)
         model_onnx = convert_sklearn(
-                model, 'dv',
-                [("input", DictionaryType(StringTensorType([1]),
-                  BooleanTensorType([1])))],
-                target_opset=TARGET_OPSET)
+            model, 'dv',
+            [("input", DictionaryType(StringTensorType([1]),
+                                      BooleanTensorType([1])))],
+            target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
-        with self.assertRaises(InvalidGraph):
-            InferenceSession(model_onnx.SerializeToString())
+        try:
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"],
+                verbose=0)
+        except InvalidGraph:
+            return
+        got = sess.run(None, {'input': data})
+        self.assertTrue(got is not None)
 
 
 if __name__ == "__main__":

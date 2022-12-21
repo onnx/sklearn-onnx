@@ -15,7 +15,7 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -26,7 +26,8 @@ from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_multilabel_classification_model,
-    TARGET_OPSET)
+    TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = ort_version.split('+')[0]
@@ -91,7 +92,9 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnLogitisticRegressionBinaryBlackList")
         if pv.Version(ort_version) >= pv.Version("1.0.0"):
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             out = sess.get_outputs()
             lb = out[0].type
             sh = out[0].shape
@@ -634,13 +637,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
+        if sess is None:
+            return
         names = [_.name for _ in sess.get_outputs()]
         self.assertEqual(['output_label', 'scl0', 'scl1', 'scl2'], names)
         xt = X[:10].astype(np.float32)
         got = sess.run(None, {'input': xt})
         prob = model.predict_proba(xt)
         for i in range(prob.shape[1]):
-            assert_almost_equal(prob[:, i], got[i+1])
+            assert_almost_equal(prob[:, i], got[i + 1])
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
@@ -655,13 +660,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sess = InferenceSession(model_onnx.SerializeToString())
+        if sess is None:
+            return
         names = [_.name for _ in sess.get_outputs()]
         self.assertEqual(['output_label', 'i0', 'i1', 'i2'], names)
         xt = X[:10].astype(np.float32)
         got = sess.run(None, {'input': xt})
         prob = model.predict_proba(xt)
         for i in range(prob.shape[1]):
-            assert_almost_equal(prob[:, i], got[i+1])
+            assert_almost_equal(prob[:, i], got[i + 1])
 
 
 if __name__ == "__main__":

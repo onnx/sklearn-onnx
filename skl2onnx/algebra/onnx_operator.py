@@ -598,8 +598,8 @@ class OnnxOperator:
             res = self.output_names_[i]
             if not isinstance(res, (tuple, Variable)):
                 raise RuntimeError(
-                        "Unable to retrieve output %r from %r."
-                        "" % (i, self))
+                    "Unable to retrieve output %r from %r."
+                    "" % (i, self))
             return res
 
     def _set_output_names_(self, scope, operator):

@@ -21,7 +21,9 @@ class TestSklearnRandomTreeEmbeddings(unittest.TestCase):
 
     def check_model(self, model, X, name='X'):
         try:
-            sess = InferenceSession(model.SerializeToString())
+            sess = InferenceSession(
+                model.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except Exception as e:
             raise AssertionError(
                 "Unable to load model\n%s" % str(model)) from e

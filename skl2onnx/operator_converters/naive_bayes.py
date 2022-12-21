@@ -464,10 +464,21 @@ def convert_sklearn_naive_bayes(scope: Scope, operator: Operator,
     reshaped_log_prob_name = scope.get_unique_variable_name(
         'reshaped_log_prob')
 
-    container.add_node('ReduceLogSumExp', sum_result_name,
-                       reduce_log_sum_exp_result_name,
-                       name=scope.get_unique_operator_name('ReduceLogSumExp'),
-                       axes=[1], keepdims=0)
+    if container.target_opset >= 18:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceLogSumExp', [sum_result_name, axis_name],
+            reduce_log_sum_exp_result_name,
+            name=scope.get_unique_operator_name('ReduceLogSumExp'),
+            keepdims=0)
+    else:
+        container.add_node(
+            'ReduceLogSumExp', sum_result_name,
+            reduce_log_sum_exp_result_name,
+            name=scope.get_unique_operator_name('ReduceLogSumExp'),
+            axes=[1], keepdims=0)
     apply_reshape(scope, reduce_log_sum_exp_result_name,
                   reshaped_log_prob_name, container,
                   desired_shape=log_prob_shape)

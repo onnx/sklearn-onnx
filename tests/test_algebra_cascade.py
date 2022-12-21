@@ -4,7 +4,6 @@ import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnx.defs import onnx_opset_version
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import (
         InvalidGraph, Fail, InvalidArgument)
@@ -18,7 +17,9 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxScaler
 from skl2onnx import to_onnx, convert_sklearn
 from skl2onnx.proto import get_latest_tested_opset_version
-from test_utils import fit_regression_model, TARGET_OPSET
+from test_utils import (
+    fit_regression_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestOnnxOperatorsCascade(unittest.TestCase):
@@ -66,7 +67,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                                         opv, onx))
                     as_string = onx.SerializeToString()
                     try:
-                        ort = InferenceSession(as_string)
+                        ort = InferenceSession(
+                            as_string, providers=["CPUExecutionProvider"])
                     except (InvalidGraph, InvalidArgument) as e:
                         if (isinstance(opv, dict) and
                                 opv[''] >= onnx_opset_version()):
@@ -87,7 +89,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
             dim = 10
             onx = generate_onnx_graph(dim, 300, opv=11)
             as_string = onx.SerializeToString()
-            ort = InferenceSession(as_string)
+            ort = InferenceSession(
+                as_string, providers=["CPUExecutionProvider"])
             X = (np.ones((1, dim)) * nbnode).astype(np.float32)
             res_out = ort.run(None, {'X1': X})
             assert len(res_out) == 1
@@ -124,7 +127,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                 onx = generate_onnx_graph(5, nbnode, opv=opv)
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except InvalidGraph as e:
                     if opv in (3, ):
                         continue
@@ -142,7 +146,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         dim = 10
         onx = generate_onnx_graph(dim, 300)
         as_string = onx.SerializeToString()
-        ort = InferenceSession(as_string)
+        ort = InferenceSession(
+            as_string, providers=["CPUExecutionProvider"])
         X = (np.ones((1, dim)) * nbnode).astype(np.float32)
         res_out = ort.run(None, {'X1': X})
         assert len(res_out) == 1
@@ -169,7 +174,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     raise e
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except InvalidGraph as e:
                     if opv > onnx_opset_version():
                         continue
@@ -188,7 +194,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                                             '': TARGET_OPSET})
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except InvalidGraph as e:
                     if opv > onnx_opset_version():
                         continue
@@ -221,7 +228,8 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     raise e
                 as_string = onx.SerializeToString()
                 try:
-                    ort = InferenceSession(as_string)
+                    ort = InferenceSession(
+                        as_string, providers=["CPUExecutionProvider"])
                 except (RuntimeError, InvalidGraph, Fail) as e:
                     if opv in (None, 1, 2):
                         continue

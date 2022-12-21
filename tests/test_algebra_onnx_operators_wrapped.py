@@ -93,7 +93,9 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
 
         onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         exp = dec.transform(X.astype(np.float32))
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
@@ -114,7 +116,9 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
 
         onx = to_onnx(dec, X.astype(np.float64), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         exp = dec.transform(X.astype(np.float64))
         got = sess.run(None, {'X': X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)
@@ -135,7 +139,9 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
 
         onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         exp = dec.transform(X.astype(np.float32))
         got = sess.run(None, {'X': X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
@@ -156,7 +162,9 @@ class TestOnnxOperatorsWrapped(unittest.TestCase):
 
         onx = to_onnx(dec, X.astype(np.float64), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         exp = dec.transform(X.astype(np.float64))
         got = sess.run(None, {'X': X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)

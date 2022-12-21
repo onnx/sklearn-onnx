@@ -7,7 +7,7 @@ from ..common.data_types import FloatTensorType, DoubleTensorType
 from ..common.utils import get_unique_subgraph
 from .onnx_ops import (
     OnnxIdentity, OnnxScan, OnnxTranspose,
-    OnnxSub, OnnxReduceSumSquare,
+    OnnxSub, OnnxReduceSumSquareApi18,
     OnnxSqrt, OnnxPow, OnnxAbs, OnnxReduceSumApi11)
 
 logger = getLogger('skl2onnx')
@@ -41,8 +41,8 @@ def _onnx_squareform_pdist_sqeuclidean(X, dtype=None, op_version=None,
                    op_version=op_version)
     id_next = OnnxIdentity('next_in', output_names=['next_out'],
                            op_version=op_version)
-    flat = OnnxReduceSumSquare(diff, axes=[1], op_version=op_version,
-                               output_names=['scan_out'], keepdims=0)
+    flat = OnnxReduceSumSquareApi18(diff, axes=[1], op_version=op_version,
+                                    output_names=['scan_out'], keepdims=0)
     flat.set_onnx_name_prefix('cflat_%d' % unique)
     id_next.set_onnx_name_prefix('pdistsqe_%d' % unique)
     tensor_type = FloatTensorType if dtype == np.float32 else DoubleTensorType
@@ -148,7 +148,7 @@ def _onnx_cdist_sqeuclidean(XA, XB, dtype=None, op_version=None,
     ``cdist(X, metric='sqeuclidean')``.
     """
     diff, id_next = _onnx_cdist_begin(op_version)
-    norm = OnnxReduceSumSquare(
+    norm = OnnxReduceSumSquareApi18(
         diff, axes=[1], keepdims=0, op_version=op_version)
     flat = OnnxIdentity(norm, output_names=['scan_out'], op_version=op_version)
     return _onnx_cdist_end(XA, XB, id_next, flat, dtype, op_version,

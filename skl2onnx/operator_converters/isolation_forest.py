@@ -190,10 +190,10 @@ def convert_sklearn_isolation_forest(
     # decision_function
     output_names = outputs[2].full_name if options['score_samples'] else None
     score_samples = OnnxNeg(
-            OnnxPow(np.array([2], dtype=dtype),
-                    OnnxNeg(depths, op_version=opv),
-                    op_version=opv),
-            op_version=opv, output_names=output_names)
+        OnnxPow(np.array([2], dtype=dtype),
+                OnnxNeg(depths, op_version=opv),
+                op_version=opv),
+        op_version=opv, output_names=output_names)
 
     decision = OnnxAdd(
         score_samples, np.array([-op.offset_], dtype=dtype),

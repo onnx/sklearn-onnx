@@ -131,7 +131,7 @@ def convert_sklearn_stacking_classifier(scope: Scope, operator: Operator,
     merged_proba_tensor = _transform(
         scope, operator, container, stacking_op)
     merge_proba = scope.declare_local_variable(
-            'merged_stacked_proba', operator.inputs[0].type.__class__())
+        'merged_stacked_proba', operator.inputs[0].type.__class__())
     container.add_node(
         'Identity', [merged_proba_tensor], [merge_proba.onnx_name])
     prob = _fetch_scores(
@@ -171,7 +171,7 @@ def convert_sklearn_stacking_regressor(scope: Scope, operator: Operator,
     merged_proba_tensor = _transform_regressor(
         scope, operator, container, stacking_op)
     merge_proba = scope.declare_local_variable(
-            'merged_stacked_proba', operator.inputs[0].type.__class__())
+        'merged_stacked_proba', operator.inputs[0].type.__class__())
     container.add_node(
         'Identity', [merged_proba_tensor], [merge_proba.onnx_name])
     prob = _fetch_scores(

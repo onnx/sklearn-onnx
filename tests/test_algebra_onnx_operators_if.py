@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal
 import onnx
 import onnx.helper
 from onnx import TensorProto
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -18,7 +18,9 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxIf, OnnxGreater,
     OnnxReduceSum, OnnxMul, OnnxReduceMin)
-from test_utils import TARGET_OPSET, TARGET_IR
+from test_utils import (
+    TARGET_OPSET, TARGET_IR,
+    InferenceSessionEx as InferenceSession)
 
 
 ort_version = ".".join(ort_version.split('.')[:2])
@@ -69,7 +71,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
 
         cond = np.array(1).astype(bool)
         expected = x if cond else y
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'cond': cond})
         assert_almost_equal(expected, res[0])
 
@@ -117,7 +121,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
 
         cond = np.array(1).astype(bool)
         expected = x if cond else y
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'cond': cond, 'Y': y})
         assert_almost_equal(expected, res[0])
 
@@ -152,7 +158,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
             {'x1': x1, 'x2': x2}, target_opset=opv,
             outputs=[('y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x2, res[0])
 
@@ -190,7 +198,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
             {'x1': x1, 'x2': x2}, target_opset=opv,
             outputs=[('y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 
@@ -227,7 +237,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
             {'x1': x1, 'x2': x2}, target_opset=opv,
             outputs=[('y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 
@@ -263,7 +275,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
             {'x1': x1, 'x2': x2}, target_opset=opv,
             outputs=[('y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 
@@ -311,7 +325,9 @@ class TestOnnxOperatorsIf(unittest.TestCase):
             {'x1': x1, 'x2': x2}, target_opset=opv,
             outputs=[('y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x1': x1, 'x2': x2})
         assert_almost_equal(x1 + x1 * x2, res[0])
 

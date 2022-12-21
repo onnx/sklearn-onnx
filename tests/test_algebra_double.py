@@ -30,7 +30,9 @@ class TestAlgebraDouble(unittest.TestCase):
         onnx_model = onnx_fct.to_onnx(
             {'X': X_test}, target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         ort_pred = sess.run(None, {'X': X_test})[0]
         assert_almost_equal(ort_pred,
                             numpy.array([[-6., -7.], [-10., -11.]]))
