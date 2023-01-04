@@ -48,13 +48,18 @@ def concatenate_variables(scope, variables, container, main_type=None):
 
     # To combine all inputs, we need a FeatureVectorizer
     op_type = 'FeatureVectorizer'
-    attrs = {
-        'name': scope.get_unique_operator_name(op_type),
-        'inputdimensions': input_dims}
+    attrs = {'name': scope.get_unique_operator_name(op_type),
+             'inputdimensions': input_dims}
     # Create a variable name to capture feature vectorizer's output
-    concatenated_name = scope.get_unique_variable_name('concatenated')
     # Set up our FeatureVectorizer
+    concatenated_name = scope.get_unique_variable_name('concatenated')
     container.add_node(op_type, input_names, concatenated_name,
                        op_domain='ai.onnx.ml', **attrs)
+    if main_type == FloatTensorType:
+        return concatenated_name
+    # Cast output as FeatureVectorizer always produces float32.
+    concatenated_name_cast = scope.get_unique_variable_name('concatenated_cast')
+    container.add_node('CastLike', [concatenated_name, input_names[0]],
+                       concatenated_name_cast)
 
-    return concatenated_name
+    return concatenated_name_cast
