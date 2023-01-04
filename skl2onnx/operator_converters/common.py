@@ -58,7 +58,8 @@ def concatenate_variables(scope, variables, container, main_type=None):
     if main_type == FloatTensorType:
         return concatenated_name
     # Cast output as FeatureVectorizer always produces float32.
-    concatenated_name_cast = scope.get_unique_variable_name('concatenated_cast')
+    concatenated_name_cast = scope.get_unique_variable_name(
+            'concatenated_cast')
     container.add_node('CastLike', [concatenated_name, input_names[0]],
                        concatenated_name_cast)
 

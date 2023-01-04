@@ -13,7 +13,6 @@ from sklearn import datasets
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 
 try:
@@ -269,7 +268,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
         if __name__ == "__main__":
             try:
-                from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+                from onnx.tools.net_drawer import (
+                    GetPydotGraph, GetOpNodeProducer)
             except ImportError:
                 return
 
