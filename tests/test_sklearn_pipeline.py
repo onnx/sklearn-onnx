@@ -1047,7 +1047,7 @@ class TestSklearnPipeline(unittest.TestCase):
     def test_feature_vectorizer_double(self):
         dataset = datasets.load_diabetes(as_frame=True)
         X, y = dataset.data, dataset.target
-        X["sexi"] = X["sex"].astype(int)
+        X["sexi"] = X["sex"].astype(numpy.int64)
         X = X.drop("sex", axis=1)
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         regr = Pipeline([("std", StandardScaler()),
@@ -1076,4 +1076,5 @@ if __name__ == "__main__":
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
+    # TestSklearnPipeline().test_feature_vectorizer_double()
     unittest.main(verbosity=2)
