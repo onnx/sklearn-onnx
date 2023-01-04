@@ -29,7 +29,7 @@ from .utils import get_domain
 logger = getLogger('skl2onnx')
 
 
-def _get_operation_list():
+def _get_operation_list(use_shortlist=True):
     """
     Investigates this module to extract all ONNX functions
     which needs to be converted with these functions.
@@ -37,7 +37,12 @@ def _get_operation_list():
     # Reduce the scope of method _check_operator,
     # it retrieves the stack trace and it takes a
     # significant amount of time.
-    shortlist = {'Clip', 'Normalizer'}
+    # This was mostly used to catch errors difficult to catch
+    # otherwise.
+    if use_shortlist:
+        shortlist = {'Clip', 'Normalizer', 'Upsample'}
+    else:
+        shortlist = None
     regs = [re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
                        "\\[?input_name"),
             re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
@@ -58,7 +63,7 @@ def _get_operation_list():
                     break
             if found is None:
                 continue
-            if found not in shortlist:
+            if shortlist and found not in shortlist:
                 continue
             res[found] = v
     return res
