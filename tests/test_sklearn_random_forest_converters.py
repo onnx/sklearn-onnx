@@ -290,12 +290,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):
+        rng = numpy.random.default_rng(12345)
         model = HistGradientBoostingRegressor(max_iter=4, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
                                n_targets=1, random_state=42)
         if add_nan:
-            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
-            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            rows = rng.andint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
             X[rows, cols] = numpy.nan
 
         X = X.astype(numpy.float32)
