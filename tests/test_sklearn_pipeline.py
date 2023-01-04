@@ -173,7 +173,9 @@ class TestSklearnPipeline(unittest.TestCase):
         dump_data_and_model(
             data, PipeConcatenateInput(model),
             model_onnx, basename="SklearnPipelineScaler11Union")
+    TARGET_OPSET
 
+    @unittest.skipIf(TARGET_OPSET < 15, reason="uses CastLike")
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
@@ -1041,6 +1043,7 @@ class TestSklearnPipeline(unittest.TestCase):
             to_onnx(model, X_in)
             self.assertIn('ColumnTransformer', str(e))
 
+    @unittest.skipIf(TARGET_OPSET < 15, reason="use CastLike")
     def test_feature_vectorizer_double(self):
         dataset = datasets.load_diabetes(as_frame=True)
         X, y = dataset.data, dataset.target
