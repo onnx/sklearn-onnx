@@ -34,6 +34,10 @@ def _get_operation_list():
     Investigates this module to extract all ONNX functions
     which needs to be converted with these functions.
     """
+    # Reduce the scope of method _check_operator,
+    # it retrieves the stack trace and it takes a
+    # significant amount of time.
+    shortlist = {'Clip', 'Normalizer'}
     regs = [re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
                        "\\[?input_name"),
             re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
@@ -53,6 +57,8 @@ def _get_operation_list():
                     found = g.groups()[0]
                     break
             if found is None:
+                continue
+            if found not in shortlist:
                 continue
             res[found] = v
     return res
@@ -578,10 +584,10 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 f"{type(attrs['axes'])}.")
         if name is None or not isinstance(
                 name, str) or name == '':
-            name = "N%d" % len(self.nodes)
+            name = f"N{len(self.nodes)}"
         existing_names = set(n.name for n in self.nodes)
         if name in existing_names:
-            name += "-N%d" % len(self.nodes)
+            name += f"-N{len(self.nodes)}"
 
         if op_domain is None:
             op_domain = get_domain()
@@ -804,10 +810,12 @@ class ModelComponentContainer(_WhiteBlackContainer):
 
         n_iter = 0
         missing_ops = []
-        while n_iter < len(self.nodes) * 2:
+        cont = True
+        while cont and n_iter < len(self.nodes) * 2:
             n_iter += 1
             missing_names = set()
             missing_ops = []
+            cont = False
             for node in self.nodes:
                 maxi = 0
                 for name in node.input:
@@ -823,6 +831,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 key = id(node)
                 if key in order:
                     continue
+                cont = True
                 maxi += 1
                 order[key] = maxi
                 maxi += 1
