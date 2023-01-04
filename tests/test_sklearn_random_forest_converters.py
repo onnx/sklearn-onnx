@@ -298,6 +298,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
             X[rows, cols] = numpy.nan
 
+        X = X.astype(numpy.float32)
+        y = y.astype(numpy.float32)
         X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                        random_state=42)
         model.fit(X_train, y_train)
@@ -309,7 +311,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         X_test = X_test.astype(numpy.float32)[:5]
         dump_data_and_model(
             X_test, model, model_onnx,
-            basename="SklearnHGBRegressor", verbose=False)
+            basename=f"SklearnHGBRegressor{add_nan}", verbose=False)
 
     @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
@@ -482,7 +484,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X, y, random_state=0)
         pipe = Pipeline([
             ('acp', PCA(n_components=3)),
-            ('rf', RandomForestRegressor())])
+            ('rf', RandomForestRegressor(n_estimators=100))])
         pipe.fit(X_train, y_train)
         X32 = X_test.astype(numpy.float32)
         model_onnx = to_onnx(pipe, X32[:1], target_opset=TARGET_OPSET)
@@ -742,4 +744,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
