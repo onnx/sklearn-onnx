@@ -290,12 +290,12 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):
-        rng = numpy.random.default_rng(12345)
+        rng = numpy.random.RandomState(12345)
         model = HistGradientBoostingRegressor(max_iter=4, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
                                n_targets=1, random_state=42)
         if add_nan:
-            rows = rng.andint(0, X.shape[0] - 1, X.shape[0] // 3)
+            rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
             cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
             X[rows, cols] = numpy.nan
 
@@ -309,7 +309,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, "unused", [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        X_test = X_test.astype(numpy.float32)[:5]
+        X_test = X_test.astype(numpy.float32)[:10]
         dump_data_and_model(
             X_test, model, model_onnx,
             basename=f"SklearnHGBRegressor{add_nan}", verbose=False)
