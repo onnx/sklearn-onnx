@@ -12,6 +12,7 @@ from sklearn import __version__ as skl_version
 from sklearn import datasets
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.linear_model import LinearRegression
 from sklearn.tree import DecisionTreeClassifier
 
 try:
@@ -54,7 +55,8 @@ from skl2onnx.common.data_types import (
 from sklearn.multioutput import MultiOutputClassifier
 from test_utils import (
     dump_data_and_model, fit_classification_model, TARGET_OPSET,
-    InferenceSessionEx as InferenceSession)
+    InferenceSessionEx as InferenceSession,
+    ReferenceEvaluatorEx)
 from onnxruntime import __version__ as ort_version
 
 
@@ -171,7 +173,9 @@ class TestSklearnPipeline(unittest.TestCase):
         dump_data_and_model(
             data, PipeConcatenateInput(model),
             model_onnx, basename="SklearnPipelineScaler11Union")
+    TARGET_OPSET
 
+    @unittest.skipIf(TARGET_OPSET < 15, reason="uses CastLike")
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
@@ -265,7 +269,11 @@ class TestSklearnPipeline(unittest.TestCase):
             basename="SklearnPipelineColumnTransformerPipeliner")
 
         if __name__ == "__main__":
-            from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+            try:
+                from onnx.tools.net_drawer import (
+                    GetPydotGraph, GetOpNodeProducer)
+            except ImportError:
+                return
 
             pydot_graph = GetPydotGraph(
                 model_onnx.graph,
@@ -1035,10 +1043,38 @@ class TestSklearnPipeline(unittest.TestCase):
             to_onnx(model, X_in)
             self.assertIn('ColumnTransformer', str(e))
 
+    @unittest.skipIf(TARGET_OPSET < 15, reason="use CastLike")
+    def test_feature_vectorizer_double(self):
+        dataset = datasets.load_diabetes(as_frame=True)
+        X, y = dataset.data, dataset.target
+        X["sexi"] = X["sex"].astype(numpy.int64)
+        X = X.drop("sex", axis=1)
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        regr = Pipeline([("std", StandardScaler()),
+                         ("reg", LinearRegression())])
+        regr = regr.fit(X_train, y_train)
+        onnx_model = to_onnx(regr, X=X_train)
+
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        expected = regr.predict(X_test)
+        names = [i.name for i in sess.get_inputs()]
+        feeds = {n: X_test[c].values.reshape((-1, 1))
+                 for n, c in zip(names, X_test.columns)}
+        got = sess.run(None, feeds)
+        assert_almost_equal(expected.ravel(), got[0].ravel(), decimal=4)
+        if ReferenceEvaluatorEx is None:
+            return
+        ref = ReferenceEvaluatorEx(onnx_model)
+        got = ref.run(None, feeds)
+        assert_almost_equal(expected.ravel(), got[0].ravel(), decimal=4)
+
 
 if __name__ == "__main__":
     # import logging
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
+    # TestSklearnPipeline().test_feature_vectorizer_double()
     unittest.main(verbosity=2)

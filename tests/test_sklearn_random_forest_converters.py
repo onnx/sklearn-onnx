@@ -290,14 +290,17 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
     @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):
-        model = HistGradientBoostingRegressor(max_iter=5, max_depth=2)
+        rng = numpy.random.RandomState(12345)
+        model = HistGradientBoostingRegressor(max_iter=4, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
                                n_targets=1, random_state=42)
         if add_nan:
-            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
-            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
             X[rows, cols] = numpy.nan
 
+        X = X.astype(numpy.float32)
+        y = y.astype(numpy.float32)
         X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                        random_state=42)
         model.fit(X_train, y_train)
@@ -306,10 +309,10 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, "unused", [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        X_test = X_test.astype(numpy.float32)[:5]
+        X_test = X_test.astype(numpy.float32)[:10]
         dump_data_and_model(
             X_test, model, model_onnx,
-            basename="SklearnHGBRegressor", verbose=False)
+            basename=f"SklearnHGBRegressor{add_nan}", verbose=False)
 
     @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
@@ -482,7 +485,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X, y, random_state=0)
         pipe = Pipeline([
             ('acp', PCA(n_components=3)),
-            ('rf', RandomForestRegressor())])
+            ('rf', RandomForestRegressor(n_estimators=100))])
         pipe.fit(X_train, y_train)
         X32 = X_test.astype(numpy.float32)
         model_onnx = to_onnx(pipe, X32[:1], target_opset=TARGET_OPSET)
@@ -742,4 +745,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

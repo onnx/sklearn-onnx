@@ -1,7 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-from onnx.mapping import NP_TYPE_TO_TENSOR_TYPE
+try:
+    from onnx.helper import np_dtype_to_tensor_dtype
+except ImportError:
+    from onnx.mapping import NP_TYPE_TO_TENSOR_TYPE
+
+    def np_dtype_to_tensor_dtype(dtype):
+        return NP_TYPE_TO_TENSOR_TYPE[dtype]
+
 from onnxconverter_common.onnx_ops import *  # noqa
 from ..proto import onnx_proto
 
@@ -129,7 +136,7 @@ def apply_clip(scope, input_name, output_name, container,
                 else:
                     min = np.array(min)
                     container.add_initializer(
-                        min_name, NP_TYPE_TO_TENSOR_TYPE[min.dtype],
+                        min_name, np_dtype_to_tensor_dtype(min.dtype),
                         [], [min[0]])
                 min = min_name
             if isinstance(min, str):
@@ -169,7 +176,7 @@ def apply_clip(scope, input_name, output_name, container,
                 else:
                     max = np.array(max)
                     container.add_initializer(
-                        max_name, NP_TYPE_TO_TENSOR_TYPE[max.dtype],
+                        max_name, np_dtype_to_tensor_dtype(max.dtype),
                         [], [max[0]])
                 max = max_name
             if isinstance(max, str):
