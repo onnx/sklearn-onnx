@@ -224,6 +224,11 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
+      pip install -r requirements.txt
+      pip install -r requirements-dev.txt
+    displayName: 'install requirements'
+
+  - script: |
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
@@ -236,10 +241,7 @@ jobs:
       fi
     displayName: 'install onnxconverter-common'
 
-  - script: |
-      pip install -r requirements.txt
-      pip install -r requirements-dev.txt
-    displayName: 'install requirements'
+
 
   - script: |
       pip install -e .

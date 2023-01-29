@@ -1,11 +1,21 @@
-# tests
+flatbuffers==2.0
+humanfriendly
+mpmath
+nose
+numpy
+protobuf
 codecov
-flatbuffers
+coloredlogs
+packaging
 pandas
 py-cpuinfo
 pybind11
+pyparsing
+pyreadline3
 pytest
 pytest-cov
+scipy
+sympy
 wheel
 
 # docs
