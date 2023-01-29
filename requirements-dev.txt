@@ -2,7 +2,7 @@ flatbuffers==2.0
 humanfriendly
 mpmath
 nose
-numpy
+numpy>=1.21.6
 protobuf
 codecov
 coloredlogs
