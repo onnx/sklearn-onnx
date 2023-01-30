@@ -56,9 +56,17 @@ def apply_normalizer(scope, inputs, outputs, container,
         elif norm == 'L2':
             norm = scope.get_unique_variable_name('norm')
             norm2 = scope.get_unique_variable_name('norm2')
-            container.add_node(
-                'ReduceSumSquare', input, norm, axes=[1], keepdims=1,
-                name=scope.get_unique_operator_name('ReduceSumSquare'))
+            if container.target_opset < 18:
+                container.add_node(
+                    'ReduceSumSquare', input, norm, axes=[1], keepdims=1,
+                    name=scope.get_unique_operator_name('ReduceSumSquare'))
+            else:
+                axes_name = scope.get_unique_variable_name('axes')
+                container.add_initializer(
+                    axes_name, onnx_proto.TensorProto.INT64, [1], [1])
+                container.add_node(
+                    'ReduceSumSquare', [input, axes_name], norm, keepdims=1,
+                    name=scope.get_unique_operator_name('ReduceSumSquare'))
             container.add_node(
                 'Sqrt', [norm], norm2,
                 name=scope.get_unique_operator_name('Sqrt'))
