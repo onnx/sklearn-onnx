@@ -355,7 +355,7 @@ def OnnxSplitApi18(*x, axis=0, split=None, num_outputs=None,
     """
     if op_version is None:
         raise RuntimeError("op_version must be specified.")
-    if op_version is None or op_version >= 13:
+    if op_version is None or op_version >= 18:
         if split is None:
             if num_outputs is None:
                 if output_names is None:

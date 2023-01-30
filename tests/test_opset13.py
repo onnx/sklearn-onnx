@@ -48,7 +48,7 @@ class TestOpset13(unittest.TestCase):
              numpy.array([3., 4.]).astype(numpy.float32),
              numpy.array([5., 6.]).astype(numpy.float32)]
 
-        for opset in (10, 11, 12, 13):
+        for opset in (10, 11, 12, 13, 17, 18):
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
