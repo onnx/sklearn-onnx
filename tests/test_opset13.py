@@ -7,7 +7,7 @@ from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx.algebra.onnx_ops import (
     OnnxReduceSumApi11,
-    OnnxSplitApi11,
+    OnnxSplitApi18,
     OnnxSqueezeApi11,
     OnnxUnsqueezeApi11)
 from test_utils import TARGET_OPSET
@@ -52,7 +52,7 @@ class TestOpset13(unittest.TestCase):
             if opset > TARGET_OPSET:
                 continue
             with self.subTest(opset=opset):
-                onx = OnnxSplitApi11(
+                onx = OnnxSplitApi18(
                     'X', axis=0, split=[2, 2, 2],
                     output_names=['Y1', 'Y2', 'Y3'], op_version=opset)
                 model_def = onx.to_onnx(

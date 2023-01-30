@@ -348,8 +348,8 @@ def OnnxReduceL2Api18(*x, axes=None, keepdims=1, op_version=None,
         output_names=output_names)
 
 
-def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
-                   output_names=None):
+def OnnxSplitApi18(*x, axis=0, split=None, num_outputs=None,
+                   op_version=None, output_names=None):
     """
     Adds operator Split with opset>=13 following API from opset 11.
     """
@@ -357,10 +357,25 @@ def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
         raise RuntimeError("op_version must be specified.")
     if op_version is None or op_version >= 13:
         if split is None:
-            return OnnxSplit(  # noqa
+            if num_outputs is None:
+                if output_names is None:
+                    raise RuntimeError(
+                        "split or num_outputs or output_names "
+                        "must be specified since opset 18.")
+                num_outputs = len(output_names)
+            return OnnxSplit_18(  # noqa
+                *x, axis=axis, op_version=op_version,
+                num_outputs=num_outputs, output_names=output_names)
+        return OnnxSplit_18(  # noqa
+            *x, np.array(split, dtype=np.int64), axis=axis,
+            num_outputs=num_outputs, op_version=op_version,
+            output_names=output_names)
+    if op_version >= 13:
+        if split is None:
+            return OnnxSplit_13(  # noqa
                 *x, axis=axis, op_version=op_version,
                 output_names=output_names)
-        return OnnxSplit(  # noqa
+        return OnnxSplit_13(  # noqa
             *x, np.array(split, dtype=np.int64), axis=axis,
             op_version=op_version, output_names=output_names)
     if op_version >= 11:
