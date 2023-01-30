@@ -13,7 +13,7 @@ except ImportError:
 from skl2onnx.common.data_types import FloatTensorType
 try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
-    from skl2onnx.algebra.onnx_ops import OnnxSplit, OnnxScaler
+    from skl2onnx.algebra.onnx_ops import OnnxSplitApi18, OnnxScaler
 except ImportError:
     warnings.warn(
         'Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.')
@@ -155,8 +155,8 @@ class TestAlgebraSymbolic(unittest.TestCase):
                      reason="Cannot infer operators with current ONNX")
     def test_algebra_split(self):
 
-        op = OnnxSplit('I0', axis=0, output_names=['O1', 'O2'],
-                       op_version=TARGET_OPSET)
+        op = OnnxSplitApi18('I0', axis=0, output_names=['O1', 'O2'],
+                            op_version=TARGET_OPSET)
         onx = op.to_onnx({'I0': numpy.arange(6, dtype=numpy.float32)})
         assert onx is not None
         sonx = str(onx)
