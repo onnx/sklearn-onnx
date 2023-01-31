@@ -130,12 +130,11 @@ def predictable_tsne_converter(scope, operator, container):
     shape_calc = get_shape_calculator(alias)
     shape_calc(knn_op)
     name = scope.get_unique_operator_name("Scaler")
-    attrs = dict(
-        name=name,
-        scale=op.inv_std_.ravel().astype(numpy.float32),
-        offset=op.mean_.ravel().astype(numpy.float32),
-    )
-
+    scale = op.inv_std_.ravel().astype(numpy.float32)
+    offset = op.mean_.ravel().astype(numpy.float32)
+    if offset.shape[0] == 1 and offset.shape[0] != scale.shape[0]:
+        offset = np.array([offset[0]] * scale.shape[0])
+    attrs = dict(name=name, scale=scale, offset=offset)
     container.add_node("Scaler", [knn_output.onnx_name], [output.full_name],
                        op_domain="ai.onnx.ml",
                        **attrs)
@@ -165,6 +164,11 @@ class TestCustomTransformerTSNE(unittest.TestCase):
             "predictable_tsne",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
             target_opset=TARGET_OPSET)
+
+        from onnx.reference import ReferenceEvaluator
+        ref = ReferenceEvaluator(model_onnx, verbose=9)
+        ref.run(None, {"input": Xd.astype(numpy.float32)[:7]})
+
 
         dump_data_and_model(
             Xd.astype(numpy.float32)[:7],
