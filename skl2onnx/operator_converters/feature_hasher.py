@@ -59,8 +59,8 @@ def convert_sklearn_feature_hasher(scope: Scope, operator: Operator,
 
     new_shape = scope.get_unique_variable_name('new_shape')
     container.add_initializer(new_shape, TensorProto.INT64, [2], [-1, 1])
-    new_shape2 = scope.get_unique_variable_name('new_shape2')
-    container.add_initializer(new_shape2, TensorProto.INT64, [2], [1, -1])
+    # new_shape2 = scope.get_unique_variable_name('new_shape2')
+    # container.add_initializer(new_shape2, TensorProto.INT64, [2], [1, -1])
 
     # values
     if op.alternate_sign:
