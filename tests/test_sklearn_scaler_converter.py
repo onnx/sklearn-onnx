@@ -306,7 +306,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
             model, basename="SklearnMinMaxScaler")
-    
+
     @ignore_warnings(category=DeprecationWarning)
     def test_min_max_scaler_double(self):
         model = MinMaxScaler()
@@ -324,7 +324,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float64),
             model, model_onnx, basename="SklearnMinMaxScalerDouble")
-    
+
     @ignore_warnings(category=DeprecationWarning)
     @unittest.skipIf(TARGET_OPSET < 15, reason="old signature for clip")
     @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.9.0"),
