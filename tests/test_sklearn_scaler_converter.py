@@ -25,7 +25,7 @@ ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestSklearnScalerConverter(unittest.TestCase):
-    '''
+
     @ignore_warnings(category=DeprecationWarning)
     def test_standard_scaler_int(self):
         model = StandardScaler()
@@ -346,7 +346,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
             model, model_onnx, basename="SklearnMinMaxScalerClip")
-    '''
+
     @ignore_warnings(category=DeprecationWarning)
     @unittest.skipIf(TARGET_OPSET < 15, reason="old signature for clip")
     @unittest.skipIf(pv.Version(ort_version) < pv.Version("1.9.0"),
@@ -368,7 +368,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float64),
             model, model_onnx, basename="SklearnMinMaxScalerDouble")
-    '''
+
     @ignore_warnings(category=DeprecationWarning)
     def test_max_abs_scaler(self):
         model = MaxAbsScaler()
@@ -404,7 +404,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float64),
             model, model_onnx, basename="SklearnMaxAbsScalerDouble")
-    '''
+
 
 if __name__ == "__main__":
     unittest.main()
