@@ -57,6 +57,7 @@ class TestOpset13(unittest.TestCase):
                     output_names=['Y1', 'Y2', 'Y3'], op_version=opset)
                 model_def = onx.to_onnx(
                     {'X': x.astype(numpy.float32)}, target_opset=opset)
+                print(model_def)
                 got = InferenceSession(
                     model_def.SerializeToString(),
                     providers=["CPUExecutionProvider"]).run(
