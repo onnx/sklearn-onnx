@@ -1,4 +1,5 @@
 autopep8
+catboost
 category_encoders
 codecov
 coverage
