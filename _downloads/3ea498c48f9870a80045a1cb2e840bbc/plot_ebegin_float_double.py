@@ -30,9 +30,6 @@ even a small *dx* may introduce a huge discrepency. Let's look into
 an example which always produces discrepencies and some ways
 to overcome this situation.
 
-.. contents::
-    :local:
-
 More into the issue
 +++++++++++++++++++
 
@@ -53,10 +50,8 @@ different results is not null. The following graph shows
 the discord areas.
 """
 from mlprodict.sklapi import OnnxPipeline
-from skl2onnx.sklapi import CastTransformer, CastRegressor
+from skl2onnx.sklapi import CastTransformer
 from skl2onnx import to_onnx
-from mlprodict.onnx_conv import to_onnx as to_onnx_extended
-from mlprodict.onnxrt import OnnxInference
 from onnxruntime import InferenceSession
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
@@ -149,7 +144,8 @@ def diff(p1, p2):
     return d.max(), (d / numpy.abs(p1)).max()
 
 
-onx = to_onnx(model, Xi_train[:1].astype(numpy.float32))
+onx = to_onnx(model, Xi_train[:1].astype(numpy.float32),
+              target_opset=15)
 
 sess = InferenceSession(onx.SerializeToString())
 
@@ -207,7 +203,8 @@ model2.fit(Xi_train, yi_train)
 ##########################################
 # The discrepencies.
 
-onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32))
+onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32),
+               target_opset=15)
 
 sess2 = InferenceSession(onx2.SerializeToString())
 
@@ -232,7 +229,8 @@ model3 = Pipeline([
 
 model3.fit(Xi_train, yi_train)
 onx3 = to_onnx(model3, Xi_train[:1].astype(numpy.float32),
-               options={StandardScaler: {'div': 'div_cast'}})
+               options={StandardScaler: {'div': 'div_cast'}},
+               target_opset=15)
 
 sess3 = InferenceSession(onx3.SerializeToString())
 
@@ -275,14 +273,12 @@ model_onx = OnnxPipeline([
 model_onx.fit(Xi_train, yi_train)
 
 #############################################
-# The conversion.
+# By using opset 17 and opset 3 for domain ai.onnx.ml, the tree thresholds
+# can be stored as double and not float anymore. That lowerss the discrepancies
+# even if the outputs are still float.
 
-try:
-    onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32))
-except ValueError as e:
-    print("Failing due to %r.\nYou need to update mlprodict." % e)
-    import sys
-    sys.exit(0)
+onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32),
+               target_opset=17)
 
 sess4 = InferenceSession(onx4.SerializeToString())
 
@@ -290,76 +286,3 @@ skl4 = model_onx.predict(X32)
 ort4 = sess4.run(None, {'X': X32})[0]
 
 print(diff(skl4, ort4))
-
-#################################
-# It works too in a more simple way.
-
-########################################
-# No discrepencies at all?
-# ++++++++++++++++++++++++
-#
-# Is it possible to get no error at all?
-# There is one major obstacle: :epkg:`scikit-learn`
-# stores the predicted values in every leave with double
-# (`_tree.pyx - _get_value_ndarray
-# <https://github.com/scikit-learn/scikit-learn/blob/master/
-# sklearn/tree/_tree.pyx#L1096>`_), :epkg:`ONNX` defines the
-# the predicted values as floats: :epkg:`TreeEnsembleRegressor`.
-# What can we do to solve it?
-# What if we could extend ONNX specifications to support
-# double instead of floats.
-# We reuse what was developped in example
-# `Other way to convert <http://www.xavierdupre.fr/app/
-# mlprodict/helpsphinx/notebooks/onnx_discrepencies.html
-# ?highlight=treeensembleregressordouble#other-way-to-convert>`_
-# and a custom ONNX node `TreeEnsembleRegressorDouble
-# <http://www.xavierdupre.fr/app/mlprodict/helpsphinx/api/onnxrt_ops.html
-# ?highlight=treeensembleregressordouble#treeensembleregressordouble>`_.
-
-
-tree = DecisionTreeRegressor(max_depth=max_depth)
-tree.fit(Xi_train, yi_train)
-
-model_onx = to_onnx_extended(tree, Xi_train[:1].astype(numpy.float64),
-                             rewrite_ops=True)
-
-oinf5 = OnnxInference(model_onx, runtime='python_compiled')
-print(oinf5)
-
-##########################################
-# Let's measure the discrepencies.
-
-X64 = Xi_test.astype(numpy.float64)
-skl5 = tree.predict(X64)
-ort5 = oinf5.run({'X': X64})['variable']
-
-############################################
-# Perfect, no discrepencies at all.
-
-print(diff(skl5, ort5))
-
-##############################################
-# CastRegressor
-# +++++++++++++
-#
-# The previous example demonstrated the type difference for
-# the predicted values explains the small differences between
-# :epkg:`scikit-learn` and :epkg:`onnxruntime`. But it does not
-# with the current ONNX. Another option is to cast the
-# the predictions into floats in the :epkg:`scikit-learn` pipeline.
-
-
-ctree = CastRegressor(DecisionTreeRegressor(max_depth=max_depth))
-ctree.fit(Xi_train, yi_train)
-
-onx6 = to_onnx(ctree, Xi_train[:1].astype(numpy.float32))
-
-sess6 = InferenceSession(onx6.SerializeToString())
-
-skl6 = ctree.predict(X32)
-ort6 = sess6.run(None, {'X': X32})[0]
-
-print(diff(skl6, ort6))
-
-##############################
-# Success!

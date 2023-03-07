@@ -15,9 +15,6 @@ the method *decision_function*. Option ``'raw_scores'``
 is used to change the default behaviour. Let's see
 that on a simple example.
 
-.. contents::
-    :local:
-
 Train a model and convert it
 ++++++++++++++++++++++++++++
 
@@ -51,7 +48,8 @@ onx = convert_sklearn(clr, initial_types=initial_type,
 # Let's confirm the output type of the probabilities
 # is a list of dictionaries with onnxruntime.
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(),
+                           providers=["CPUExecutionProvider"])
 res = sess.run(None, {'float_input': X_test.astype(numpy.float32)})
 print("skl", clr.predict_proba(X_test[:1]))
 print("onnx", res[1][:2])
@@ -66,7 +64,8 @@ options = {id(clr): {'raw_scores': True}}
 onx2 = convert_sklearn(clr, initial_types=initial_type, options=options,
                        target_opset=12)
 
-sess2 = rt.InferenceSession(onx2.SerializeToString())
+sess2 = rt.InferenceSession(onx2.SerializeToString(),
+                            providers=["CPUExecutionProvider"])
 res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})
 print("skl", clr.decision_function(X_test[:1]))
 print("onnx", res2[1][:2])

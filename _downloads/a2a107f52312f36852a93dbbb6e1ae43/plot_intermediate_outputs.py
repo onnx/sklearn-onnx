@@ -12,9 +12,6 @@ converter which is not correctly implemented.
 One option is to look into the output of every node of the
 ONNX graph.
 
-.. contents::
-    :local:
-
 Create and train a complex pipeline
 +++++++++++++++++++++++++++++++++++
 

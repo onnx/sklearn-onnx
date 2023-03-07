@@ -16,9 +16,6 @@ column may be preprocessed with a different transformer.
 :ref:`l-complex-pipeline`.
 
 
-.. contents::
-    :local:
-
 Create and train a complex pipeline
 +++++++++++++++++++++++++++++++++++
 
@@ -199,7 +196,8 @@ for k in inputs:
 ################################
 # We are ready to run *onnxruntime*.
 
-sess = rt.InferenceSession("pipeline_titanic.onnx")
+sess = rt.InferenceSession("pipeline_titanic.onnx",
+                           providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
 print("predict_proba", pred_onx[1][:2])
@@ -215,7 +213,8 @@ model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
 with open("pipeline_titanic_nozipmap.onnx", "wb") as f:
     f.write(model_onnx.SerializeToString())
 
-sess = rt.InferenceSession("pipeline_titanic_nozipmap.onnx")
+sess = rt.InferenceSession("pipeline_titanic_nozipmap.onnx",
+                           providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
 print("predict_proba", pred_onx[1][:2])

@@ -28,9 +28,6 @@ This example considers an `IsolationForest
 <https://scikit-learn.org/stable/modules/generated/
 sklearn.ensemble.IsolationForest.html>`_ and digs into opsets.
 
-.. contents::
-    :local:
-
 Data
 ++++
 

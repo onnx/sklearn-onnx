@@ -17,9 +17,6 @@ due to a shape mismatch. Then it is useful the get the shape
 of every intermediate result. This example looks into two
 ways of doing it.
 
-.. contents::
-    :local:
-
 Look into pipeline steps
 ++++++++++++++++++++++++
 
@@ -50,7 +47,7 @@ X = data.data
 
 pipe = Pipeline(steps=[
     ('std', StandardScaler()),
-    ('km', KMeans(3))
+    ('km', KMeans(3, n_init=3))
 ])
 pipe.fit(X)
 
@@ -60,7 +57,8 @@ pipe.fit(X)
 # returns an ONNX graph for every step.
 steps = collect_intermediate_steps(
     pipe, "pipeline",
-    [("X", FloatTensorType([None, X.shape[1]]))])
+    [("X", FloatTensorType([None, X.shape[1]]))],
+    target_opset=17)
 
 #####################################
 # We call method transform to population the
@@ -75,7 +73,8 @@ for step in steps:
     print('----------------------------')
     print(step['model'])
     onnx_step = step['onnx_step']
-    sess = InferenceSession(onnx_step.SerializeToString())
+    sess = InferenceSession(onnx_step.SerializeToString(),
+                            providers=["CPUExecutionProvider"])
     onnx_outputs = sess.run(None, {'X': X.astype(numpy.float32)})
     onnx_output = onnx_outputs[-1]
     skl_outputs = step['model']._debug.outputs['transform']
@@ -100,7 +99,8 @@ for step in steps:
 # fails due to nan values or a dimension mismatch.
 
 
-onx = to_onnx(pipe, X[:1].astype(numpy.float32))
+onx = to_onnx(pipe, X[:1].astype(numpy.float32),
+              target_opset=17)
 
 oinf = OnnxInference(onx)
 oinf.run({'X': X[:2].astype(numpy.float32)},

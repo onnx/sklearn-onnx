@@ -14,9 +14,6 @@ to add a third result which tells if the probability is
 above a given threshold. That's implemented in method
 *validate*.
 
-.. contents::
-    :local:
-
 Iris and scoring
 ++++++++++++++++
 
@@ -156,9 +153,19 @@ def validator_classifier_converter(scope, operator, container):
 
     # We now handle the validation.
     val_max = scope.get_unique_variable_name('val_max')
-    container.add_node('ReduceMax', val_prob.full_name, val_max,
-                       name=scope.get_unique_operator_name('ReduceMax'),
-                       axes=[1], keepdims=0)
+    if container.target_opset >= 18:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceMax', [val_prob.full_name, axis_name], val_max,
+            name=scope.get_unique_operator_name('ReduceMax'),
+            keepdims=0)
+    else:
+        container.add_node(
+            'ReduceMax', val_prob.full_name, val_max,
+            name=scope.get_unique_operator_name('ReduceMax'),
+            axes=[1], keepdims=0)
 
     th_name = scope.get_unique_variable_name('threshold')
     container.add_initializer(

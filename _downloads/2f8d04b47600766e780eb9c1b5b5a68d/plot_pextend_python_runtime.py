@@ -26,16 +26,13 @@ The example changes the transformer from
 decorrelates the variables by computing the eigen
 values. Method *fit* does not do anything anymore.
 
-.. contents::
-    :local:
-
 A transformer which decorrelates variables
 ++++++++++++++++++++++++++++++++++++++++++
 
 This time, the eigen values are not estimated at
 training time but at prediction time.
 """
-from mlprodict.onnxrt.shape_object import ShapeObject
+
 from mlprodict.onnxrt.ops_cpu import OpRunCustom, register_operator
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd,
@@ -46,7 +43,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxMatMul,
     OnnxMul,
     OnnxPow,
-    OnnxReduceMean,
+    OnnxReduceMean_13,
     OnnxShape,
     OnnxSub,
     OnnxTranspose,
@@ -234,7 +231,7 @@ def live_decorrelate_transformer_converter(scope, operator, container):
     # Lines in comment specify the numpy computation
     # the ONNX code implements.
     # mean_ = numpy.mean(X, axis=0, keepdims=True)
-    mean = OnnxReduceMean(X, axes=[0], keepdims=1, op_version=opv)
+    mean = OnnxReduceMean_13(X, axes=[0], keepdims=1, op_version=opv)
 
     # This is trick I often use. The converter automatically
     # chooses a name for every output. In big graph,
@@ -337,19 +334,6 @@ class OpEig(OpRunCustom):
             return numpy.linalg.eig(x)
         return (numpy.linalg.eigvals(x), )
 
-    def infer_shapes(self, x):
-        # shape inference, if you don't know what to
-        # write, just return `ShapeObject(None)`
-        if self.eigv:
-            return (
-                ShapeObject(
-                    x.shape, dtype=x.dtype,
-                    name=self.__class__.__name__ + 'Values'),
-                ShapeObject(
-                    x.shape, dtype=x.dtype,
-                    name=self.__class__.__name__ + 'Vectors'))
-        return (ShapeObject(x.shape, dtype=x.dtype,
-                            name=self.__class__.__name__), )
 
 ########################################
 # Registration
@@ -372,7 +356,7 @@ X = data.data
 dec = LiveDecorrelateTransformer()
 dec.fit(X)
 
-onx = to_onnx(dec, X.astype(numpy.float32))
+onx = to_onnx(dec, X.astype(numpy.float32), target_opset=17)
 
 register_operator(OpEig, name='Eig', overwrite=False)
 

@@ -15,9 +15,6 @@ precisions. *sklearn-onnx* is using single floats by default
 but for this particular model, it is better to use double.
 Let's see how to create an ONNX file using doubles.
 
-.. contents::
-    :local:
-
 Train a model
 +++++++++++++
 
@@ -27,7 +24,7 @@ on the Boston dataset.
 import pprint
 import numpy
 import sklearn
-from sklearn.datasets import load_boston
+from sklearn.datasets import load_diabetes
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import DotProduct, RBF
 from sklearn.model_selection import train_test_split
@@ -37,8 +34,8 @@ import skl2onnx
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx import convert_sklearn
 
-bost = load_boston()
-X, y = bost.data, bost.target
+dataset = load_diabetes()
+X, y = dataset.data, dataset.target
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 gpr = GaussianProcessRegressor(DotProduct() + RBF(), alpha=1.)
 gpr.fit(X_train, y_train)

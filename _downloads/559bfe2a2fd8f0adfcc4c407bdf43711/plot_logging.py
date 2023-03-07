@@ -12,10 +12,6 @@ associated converter. It may also fails if one of the object is mapped
 by a custom converter. If the error message is not explicit enough,
 it is possible to enable logging.
 
-
-.. contents::
-    :local:
-
 Train a model
 +++++++++++++
 

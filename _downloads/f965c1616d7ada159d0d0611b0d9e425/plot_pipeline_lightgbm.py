@@ -16,9 +16,6 @@ a pipeline including a *LightGbm* model. *sklearn-onnx* can convert
 the whole pipeline as long as it knows the converter associated to
 a *LGBMClassifier*. Let's see how to do it.
 
-.. contents::
-    :local:
-
 Train a LightGBM classifier
 +++++++++++++++++++++++++++
 """

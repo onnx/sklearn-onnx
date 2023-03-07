@@ -1,432 +1,288 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Store arrays in one onnx graph" href="plot_gbegin_cst.html" /><link rel="prev" title="Issues when switching to float" href="plot_ebegin_float_double.html" />
 
-<!DOCTYPE html>
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>Intermediate results and investigation &#8212; sklearn-onnx 1.11.2 documentation</title>
-<script>
-  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
-</script>
-
-  <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
-
-
-  <link rel="stylesheet"
-    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
-    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
+        <title>Intermediate results and investigation - sklearn-onnx 1.14.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
 
-  <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
 
-    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/jquery.js"></script>
-    <script src="../_static/underscore.js"></script>
-    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Store arrays in one onnx graph" href="plot_gbegin_cst.html" />
-    <link rel="prev" title="Issues when switching to float" href="plot_ebegin_float_double.html" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="docsearch:language" content="en">
-  </head>
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
   
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
-    <div class="bd-header-announcement container-fluid" id="banner">
-      
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
 
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
     </div>
-
-    
-    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
-
-  <div id="navbar-start">
-    
-    
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.14.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
-
-
-<a class="navbar-brand logo" href="../index.html">
-  
-  
-  
-  
-    <img src="../_static/logo_main.png" class="logo__image only-light" alt="Logo image">
-    <img src="../_static/logo_main.png" class="logo__image only-dark" alt="Logo image">
-  
-  
-</a>
-    
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="fas fa-bars"></span>
-  </button>
-
   
-  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
-    <div id="navbar-center" class="mr-auto">
-      
-      <div class="navbar-center-item">
-        <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../introduction.html">
-  Introduction
- </a>
-</li>
-
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="../index_tutorial.html">
-  Tutorial
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../api_summary.html">
-  API Summary
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../auto_examples/index.html">
-  Gallery of examples
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../pipeline.html">
-  Convert a pipeline
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../parameterized.html">
-  Converters with options
- </a>
-</li>
-
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../supported.html">
-  Supported scikit-learn Models
- </a>
-</li>
-
-    
-</ul>
-      </div>
-      
-    </div>
-
-    <div id="navbar-end">
-      
-      <div class="navbar-end-item">
-        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
-    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
-    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
-    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
-</span>
-      </div>
-      
-      <div class="navbar-end-item">
-        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
-      </ul>
-      </div>
-      
-    </div>
-  </div>
-</div>
-    </nav>
-    
-
-    <div class="bd-container container-xl">
-      <div class="bd-container__inner row">
-          
-
-<!-- Only show if we have sidebars configured, else just a small margin  -->
-<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
-  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
-  <i class="icon fas fa-search"></i>
-  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
-</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
-  <div class="bd-toc-item active">
-    <ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="../tutorial_1_simple.html">
-   The easy case
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
+  <span class="sidebar-brand-text">sklearn-onnx 1.14.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_abegin_convert_pipeline.html">
-     Train and deploy a scikit-learn pipeline
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_bbegin_measure_time.html">
-     Benchmark ONNX conversion
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_cbegin_opset.html">
-     What is the opset number?
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_dbegin_options.html">
-     One model, many possible conversions with options
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_dbegin_options_zipmap.html">
-     Choose appropriate output of a classifier
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_dbegin_options_list.html">
-     Black list operators when converting
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_ebegin_float_double.html">
-     Issues when switching to float
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Intermediate results and investigation
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gbegin_cst.html">
-     Store arrays in one onnx graph
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gbegin_dataframe.html">
-     Dataframe as an input
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gconverting.html">
-     Modify the ONNX graph
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gbegin_transfer_learning.html">
-     Transfer Learning with ONNX
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../tutorial_1-5_external.html">
-   Using converters from other libraries
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gexternal_lightgbm.html">
-     Convert a pipeline with a LightGBM classifier
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gexternal_lightgbm_reg.html">
-     Convert a pipeline with a LightGBM regressor
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_gexternal_xgboost.html">
-     Convert a pipeline with a XGBoost model
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../tutorial_2_new_converter.html">
-   A custom converter for a custom model
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_icustom_converter.html">
-     Implement a new converter
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_jcustom_syntax.html">
-     Two ways to implement a converter
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_kcustom_converter_wrapper.html">
-     Implement a new converter using other converters
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_lcustom_options.html">
-     A new converter with options
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_mcustom_parser.html">
-     Change the number of outputs by adding a parser
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../tutorial_3_new_operator.html">
-   Extend ONNX, extend runtime
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_pextend_python_runtime.html">
-     Fast design with a python runtime
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_qextend_onnxruntime.html">
-     Fast runtime with onnxruntime
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../tutorial_4_advanced.html">
-   Advanced scenarios
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-  <label for="toctree-checkbox-5">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_usparse_xgboost.html">
-     TfIdf and sparse matrices
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_woe_transformer.html">
-     Converter for WOE
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../tutorial_2-5_extlib.html">
-   Write converters for other libraries
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/>
-  <label for="toctree-checkbox-6">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="plot_wext_pyod_forest.html">
-     Converter for pyod.models.iforest.IForest
-    </a>
-   </li>
-  </ul>
- </li>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_cbegin_opset.html">What is the opset number?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dbegin_options.html">One model, many possible conversions with options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dbegin_options_zipmap.html">Choose appropriate output of a classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_dbegin_options_list.html">Black list operators when converting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_ebegin_float_double.html">Issues when switching to float</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Intermediate results and investigation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gbegin_cst.html">Store arrays in one onnx graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gbegin_dataframe.html">Dataframe as an input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gconverting.html">Modify the ONNX graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gbegin_transfer_learning.html">Transfer Learning with ONNX</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_icustom_converter.html">Implement a new converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_lcustom_options.html">A new converter with options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_3_new_operator.html">Extend ONNX, extend runtime</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_pextend_python_runtime.html">Fast design with a python runtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_qextend_onnxruntime.html">Fast runtime with onnxruntime</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_woe_transformer.html">Converter for WOE</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api_summary.html">API Summary</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_metadata.html">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_logging.html">Logging, verbose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_convert_decision_function.html">Probabilities or raw scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_investigate_pipeline.html">Investigate a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_benchmark_cdist.html">Compare CDist with scipy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_convert_zipmap.html">Probabilities as a vector or as a ZipMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_black_op.html">Convert a model with a reduced list of operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_benchmark_pipeline.html">Benchmark a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_pipeline_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_nmf.html">Custom Operator for NMF Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_cast_transformer.html">Discrepencies with StandardScaler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_gpr.html">Discrepencies with GaussianProcessorRegressor: use of double</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_onnx_operators.html">Play with ONNX operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_convert_syntax.html">Different ways to convert a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_custom_parser_alternative.html">When a custom model is neither a classifier nor a regressor (alternative)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_custom_parser.html">When a custom model is neither a classifier nor a regressor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline.html">Convert a pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameterized.html">Converters with options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../supported.html">Supported scikit-learn Models</a></li>
 </ul>
 
-  </div>
-</nav>
-  </div>
-  <div class="sidebar-end-items">
-  </div>
+</div>
 </div>
 
-
-          
-
-
-<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
-  
-    
-    <div class="toc-item">
-      
-<div class="tocsection onthispage mt-5 pt-1 pb-3">
-    <i class="fas fa-list"></i> On this page
-</div>
-
-<nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#look-into-pipeline-steps">
-   Look into pipeline steps
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#python-runtime-to-look-into-every-node">
-   Python runtime to look into every node
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#final-graph">
-   Final graph
-  </a>
- </li>
-</ul>
-
-</nav>
-    </div>
-    
-    <div class="toc-item">
+      </div>
       
     </div>
-    
-  
-</div>
-
-
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
           
-          
-          <div class="bd-content col-12 col-md-9 col-xl-7">
-              
-              <article class="bd-article" role="main">
-                
-  <div class="sphx-glr-download-link-note admonition note">
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
 <p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorial-plot-fbegin-investigate-py"><span class="std std-ref">here</span></a>
-to download the full example code or to run this example in your browser via Binder</p>
+to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="intermediate-results-and-investigation">
 <span id="sphx-glr-auto-tutorial-plot-fbegin-investigate-py"></span><h1>Intermediate results and investigation<a class="headerlink" href="#intermediate-results-and-investigation" title="Permalink to this heading">#</a></h1>
@@ -440,15 +296,8 @@ It often happens that the runtime fails to compute the predictions
 due to a shape mismatch. Then it is useful the get the shape
 of every intermediate result. This example looks into two
 ways of doing it.</p>
-<div class="contents local topic" id="contents">
-<ul class="simple">
-<li><p><a class="reference internal" href="#look-into-pipeline-steps" id="id1">Look into pipeline steps</a></p></li>
-<li><p><a class="reference internal" href="#python-runtime-to-look-into-every-node" id="id2">Python runtime to look into every node</a></p></li>
-<li><p><a class="reference internal" href="#final-graph" id="id3">Final graph</a></p></li>
-</ul>
-</div>
 <section id="look-into-pipeline-steps">
-<h2><a class="toc-backref" href="#id1">Look into pipeline steps</a><a class="headerlink" href="#look-into-pipeline-steps" title="Permalink to this heading">#</a></h2>
+<h2>Look into pipeline steps<a class="headerlink" href="#look-into-pipeline-steps" title="Permalink to this heading">#</a></h2>
 <p>The first way is a tricky one: it overloads
 methods <em>transform</em>, <em>predict</em> and <em>predict_proba</em>
 to keep a copy of inputs and outputs. It then goes
@@ -459,194 +308,196 @@ then the pipeline with steps 1, 2, then 1, 2, 3…</p>
 <span class="kn">from</span> <span class="nn">mlprodict.onnxrt</span> <span class="kn">import</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler" title="sklearn.preprocessing.StandardScaler" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">StandardScaler</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="sklearn.cluster.KMeans" class="sphx-glr-backref-module-sklearn-cluster sphx-glr-backref-type-py-class"><span class="n">KMeans</span></a>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <a href="https://docs.python.org/3/library/abc.html#abc.ABC" title="abc.ABC" class="sphx-glr-backref-module-abc sphx-glr-backref-type-py-class"><span class="n">KMeans</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="kn">import</span> <span class="n">collect_intermediate_steps</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 </pre></div>
 </div>
 <p>The pipeline.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a>
 
-<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">steps</span></a><span class="o">=</span><span class="p">[</span>
-    <span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler" title="sklearn.preprocessing.StandardScaler" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">StandardScaler</span></a><span class="p">()),</span>
-    <span class="p">(</span><span class="s1">&#39;km&#39;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="sklearn.cluster.KMeans" class="sphx-glr-backref-module-sklearn-cluster sphx-glr-backref-type-py-class"><span class="n">KMeans</span></a><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">steps</span></a><span class="o">=</span><span class="p">[</span>
+    <span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+    <span class="p">(</span><span class="s1">&#39;km&#39;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/abc.html#abc.ABC" title="abc.ABC" class="sphx-glr-backref-module-abc sphx-glr-backref-type-py-class"><span class="n">KMeans</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
 <span class="p">])</span>
-<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.fit" title="sklearn.pipeline.Pipeline.fit" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-method"><span class="n">pipe</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
+<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
-<style>#sk-container-id-12 {color: black;background-color: white;}#sk-container-id-12 pre{padding: 0;}#sk-container-id-12 div.sk-toggleable {background-color: white;}#sk-container-id-12 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-12 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-12 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-12 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-12 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-12 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-12 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-12 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-12 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-12 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-12 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-12 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-12 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-12 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-12 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-12 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-12 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-12 div.sk-item {position: relative;z-index: 1;}#sk-container-id-12 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-12 div.sk-item::before, #sk-container-id-12 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-12 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-12 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-12 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-12 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-12 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-12 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-12 div.sk-label-container {text-align: center;}#sk-container-id-12 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-12 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-12" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()), (&#x27;km&#x27;, KMeans(n_clusters=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-42" type="checkbox" ><label for="sk-estimator-id-42" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()), (&#x27;km&#x27;, KMeans(n_clusters=3))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-43" type="checkbox" ><label for="sk-estimator-id-43" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label sk-toggleable__label-arrow">KMeans</label><div class="sk-toggleable__content"><pre>KMeans(n_clusters=3)</pre></div></div></div></div></div></div></div>
+<style>#sk-container-id-13 {color: black;background-color: white;}#sk-container-id-13 pre{padding: 0;}#sk-container-id-13 div.sk-toggleable {background-color: white;}#sk-container-id-13 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-13 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-13 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-13 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-13 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-13 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-13 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-13 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-13 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-13 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-13 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-13 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-13 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-13 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-13 div.sk-item {position: relative;z-index: 1;}#sk-container-id-13 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-13 div.sk-item::before, #sk-container-id-13 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-13 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-13 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-13 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-13 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-13 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-13 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-13 div.sk-label-container {text-align: center;}#sk-container-id-13 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-13 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-13" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-43" type="checkbox" ><label for="sk-estimator-id-43" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-45" type="checkbox" ><label for="sk-estimator-id-45" class="sk-toggleable__label sk-toggleable__label-arrow">KMeans</label><div class="sk-toggleable__content"><pre>KMeans(n_clusters=3, n_init=3)</pre></div></div></div></div></div></div></div>
 </div>
 <br />
 <br /><p>The function goes through every step,
 overloads the methods <em>transform</em> and
 returns an ONNX graph for every step.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">steps</span></a> <span class="o">=</span> <span class="n">collect_intermediate_steps</span><span class="p">(</span>
-    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">,</span>
-    <span class="p">[(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]]))])</span>
+    <span class="n">pipe</span><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">,</span>
+    <span class="p">[(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]]))],</span>
+    <span class="n">target_opset</span><span class="o">=</span><span class="mi">17</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We call method transform to population the
 cache the overloaded methods <em>transform</em> keeps.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.transform" title="sklearn.pipeline.Pipeline.transform" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-method"><span class="n">pipe</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array([[3.98940603, 0.21295824, 3.12119834],
-       [4.01793312, 0.99604549, 2.6755083 ],
-       [4.19343668, 0.65198444, 2.97416665],
-       [4.19784749, 0.9034561 , 2.88014429],
-       [4.11157152, 0.40215457, 3.30022609],
-       [3.89893116, 1.21154793, 3.50554424],
-       [4.21638048, 0.50244932, 3.14856384],
-       [3.97313411, 0.09132468, 2.99184826],
-       [4.40757189, 1.42174651, 2.92515933],
-       [4.05764261, 0.78993078, 2.79398956],
-       [3.92088109, 0.78999385, 3.32125333],
-       [4.07853631, 0.27618123, 3.0493632 ],
-       [4.16440431, 1.03497888, 2.80635045],
-       [4.63069748, 1.33482453, 3.21220972],
-       [4.14619343, 1.63865558, 3.88834965],
-       [4.49547518, 2.39898792, 4.4998303 ],
-       [4.02966144, 1.20748818, 3.60978017],
-       [3.91388548, 0.21618828, 3.05594182],
-       [3.72562039, 1.20986655, 3.34493953],
-       [4.10101938, 0.86706182, 3.50065397],
-       [3.66383713, 0.50401564, 2.80825681],
-       [3.94496718, 0.66826437, 3.27800809],
-       [4.51061335, 0.68658071, 3.58990876],
-       [3.57996434, 0.47945627, 2.55934697],
-       [3.98817445, 0.36345425, 2.96493153],
-       [3.88431906, 0.99023912, 2.55682739],
-       [3.79088782, 0.22683089, 2.8279719 ],
-       [3.89539875, 0.2947186 , 3.05970831],
-       [3.88085622, 0.25361098, 2.95425291],
-       [4.09851673, 0.65019824, 2.87745051],
-       [4.01796142, 0.80138328, 2.73238773],
-       [3.57350896, 0.52309257, 2.73361981],
-       [4.5037664 , 1.57658655, 4.11853014],
-       [4.4465301 , 1.87652483, 4.22845606],
-       [3.97906378, 0.76858489, 2.71452112],
-       [4.01986385, 0.54896332, 2.86508665],
-       [3.80064093, 0.63079314, 3.0573692 ],
-       [4.25136846, 0.45982568, 3.40284985],
-       [4.42052558, 1.2336976 , 3.00742655],
-       [3.90865188, 0.14580827, 2.95472117],
-       [4.01192633, 0.20261743, 3.12324651],
-       [4.64398605, 2.67055552, 2.90164193],
-       [4.42154566, 0.90927099, 3.15411688],
-       [3.70483773, 0.50081008, 2.8613548 ],
-       [3.9078554 , 0.92159916, 3.34606471],
-       [4.01421067, 1.01946042, 2.65231058],
-       [4.14238152, 0.86953764, 3.53206587],
-       [4.23577398, 0.72275914, 2.99813103],
-       [3.97409784, 0.72324305, 3.34116935],
-       [3.97223984, 0.30295342, 2.90222887],
-       [0.95288059, 3.43619989, 1.9003878 ],
-       [0.99352148, 2.97232682, 1.41851492],
-       [0.72661726, 3.51850037, 1.68457079],
-       [2.69898424, 3.33264308, 0.96940962],
-       [1.11074501, 3.35747592, 0.9112523 ],
-       [1.8143491 , 2.77550662, 0.35721918],
-       [1.00650285, 3.01808184, 1.59351202],
-       [3.31296552, 2.77360088, 1.50213315],
-       [1.14114175, 3.21148368, 1.11632078],
-       [2.42994048, 2.66294828, 0.77921299],
-       [3.73666782, 3.62389817, 1.97194958],
-       [1.45918639, 2.70011145, 0.77530513],
-       [2.74268279, 3.53658932, 1.25941769],
-       [1.28976474, 2.98813829, 0.66155141],
-       [2.05251547, 2.32311723, 0.73833453],
-       [0.98780965, 3.14311522, 1.46572707],
-       [1.67700171, 2.68234835, 0.80185102],
-       [2.12682734, 2.63954211, 0.568386  ],
-       [2.33743839, 3.97369206, 1.19987895],
-       [2.46667974, 2.87494798, 0.67881532],
-       [1.1880022 , 3.03853641, 1.34222961],
-       [1.63233668, 2.8022861 , 0.53061062],
-       [1.65142259, 3.68305664, 0.79234309],
-       [1.54593744, 2.96833851, 0.57371215],
-       [1.2933375 , 2.9760862 , 0.90589785],
-       [1.03085926, 3.13002382, 1.22490527],
-       [1.09304603, 3.56679427, 1.26783271],
-       [0.52050254, 3.5903606 , 1.42114042],
-       [1.34712856, 2.93839428, 0.58974672],
-       [2.44164622, 2.58203512, 0.76432091],
-       [2.69027665, 2.99796537, 0.89738242],
-       [2.76965187, 2.92597852, 0.98549851],
-       [2.02829879, 2.68907313, 0.3921368 ],
-       [1.4211892 , 3.42215998, 0.54223583],
-       [1.88799766, 2.62771445, 0.90567816],
-       [1.39853465, 2.75915071, 1.70872911],
-       [0.78009974, 3.30075052, 1.48190142],
-       [2.2083069 , 3.73017167, 1.06129323],
-       [1.87666989, 2.37943811, 0.81863359],
-       [2.41035271, 2.98789866, 0.599882  ],
-       [2.26782134, 2.89079656, 0.4914813 ],
-       [1.25085451, 2.86642713, 0.84409423],
-       [2.11791607, 2.86642575, 0.38941349],
-       [3.35089399, 2.96966239, 1.53271026],
-       [2.05312152, 2.77003779, 0.30831638],
-       [1.83091351, 2.38255534, 0.81726253],
-       [1.80454586, 2.55559903, 0.56428027],
-       [1.39825227, 2.8455521 , 0.72672271],
-       [3.06324547, 2.56987887, 1.28805849],
-       [1.89861511, 2.64007308, 0.38163798],
-       [1.0584579 , 4.24274589, 2.31271244],
-       [1.5185265 , 3.57067982, 0.76585766],
-       [0.52472   , 4.44150237, 2.14762671],
-       [0.77236486, 3.69480186, 1.17645413],
-       [0.53031563, 4.11613683, 1.73594932],
-       [1.2022172 , 5.03326801, 2.78128346],
-       [2.74462238, 3.3503222 , 1.22550604],
-       [0.92275933, 4.577021  , 2.2426558 ],
-       [1.40314162, 4.363498  , 1.50462864],
-       [1.48323372, 4.79334275, 3.22975724],
-       [0.4787491 , 3.62749566, 1.71837714],
-       [1.0325986 , 3.89360823, 1.10409694],
-       [0.27818948, 4.1132966 , 1.80475907],
-       [1.91870424, 3.82688169, 0.94858807],
-       [1.49910975, 3.91538879, 1.39433359],
-       [0.68622715, 3.89835633, 1.90677079],
-       [0.46463058, 3.70128288, 1.39713702],
-       [2.10127163, 5.18341242, 3.85224062],
-       [1.83092395, 5.58136629, 2.95786451],
-       [2.37017622, 4.02615768, 1.17790381],
-       [0.52540209, 4.31907679, 2.27442972],
-       [1.62249456, 3.4288432 , 0.91211061],
-       [1.47042293, 5.19031307, 2.77937737],
-       [1.15814207, 3.64273089, 0.84735471],
-       [0.520093  , 4.00723617, 2.15695444],
-       [0.66660166, 4.2637671 , 2.33581345],
-       [1.08324891, 3.45930032, 0.79774043],
-       [0.94925151, 3.27575645, 1.022307  ],
-       [0.84098317, 4.05342943, 1.3842265 ],
-       [0.75748198, 4.1585729 , 2.03854964],
-       [1.07124861, 4.71100584, 2.28297732],
-       [2.17345728, 5.12224641, 3.88774921],
-       [0.87682321, 4.13401784, 1.47357101],
-       [1.11534598, 3.39830644, 0.7964005 ],
-       [1.59782917, 3.63719075, 0.80521086],
-       [1.25982873, 5.08776655, 2.8607372 ],
-       [1.07214028, 4.00416552, 2.3101089 ],
-       [0.51434392, 3.58815834, 1.46990247],
-       [1.0762733 , 3.19454679, 0.97017134],
-       [0.23050145, 4.09907253, 1.97333575],
-       [0.57373487, 4.28416057, 2.07939567],
-       [0.51130902, 4.17402084, 2.06609741],
-       [1.5185265 , 3.57067982, 0.76585766],
-       [0.54141867, 4.32128686, 2.24723796],
-       [0.85128501, 4.3480018 , 2.42521977],
-       [0.52475835, 4.1240495 , 1.82594618],
-       [1.52100812, 3.97564407, 1.03093862],
-       [0.44371189, 3.7539635 , 1.44892686],
-       [1.08437101, 3.7969924 , 2.17585453],
-       [1.13739231, 3.25638099, 1.00508668]])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array([[3.97220157, 0.21295824, 3.12241924],
+       [3.99787307, 0.99604549, 2.67093263],
+       [4.17484361, 0.65198444, 2.97003927],
+       [4.1789179 , 0.9034561 , 2.87439521],
+       [4.09527298, 0.40215457, 3.30139711],
+       [3.88570212, 1.21154793, 3.51109541],
+       [4.19951064, 0.50244932, 3.14534167],
+       [3.95532767, 0.09132468, 2.99164562],
+       [4.38817034, 1.42174651, 2.91632391],
+       [4.03786574, 0.78993078, 2.79062164],
+       [3.90506362, 0.78999385, 3.3258656 ],
+       [4.06107053, 0.27618123, 3.04773291],
+       [4.14433414, 1.03497888, 2.80131879],
+       [4.61165831, 1.33482453, 3.20416659],
+       [4.13289816, 1.63865558, 3.89627182],
+       [4.48651213, 2.39898792, 4.50815311],
+       [4.01625262, 1.20748818, 3.61501306],
+       [3.89697041, 0.21618828, 3.05706539],
+       [3.71098466, 1.20986655, 3.35219798],
+       [4.086616  , 0.86706182, 3.50365186],
+       [3.64546316, 0.50401564, 2.81135074],
+       [3.93005961, 0.66826437, 3.28039115],
+       [4.49472411, 0.68658071, 3.58831498],
+       [3.56212928, 0.47945627, 2.55875855],
+       [3.97077425, 0.36345425, 2.96339957],
+       [3.86402575, 0.99023912, 2.5530338 ],
+       [3.77367018, 0.22683089, 2.82754129],
+       [3.87807792, 0.2947186 , 3.06173653],
+       [3.86275216, 0.25361098, 2.95552455],
+       [4.07994174, 0.65019824, 2.87333352],
+       [3.99861021, 0.80138328, 2.72803208],
+       [3.55568868, 0.52309257, 2.73641792],
+       [4.49114086, 1.57658655, 4.12348735],
+       [4.43501224, 1.87652483, 4.23530312],
+       [3.95950739, 0.76858489, 2.71091534],
+       [4.00072575, 0.54896332, 2.86311402],
+       [3.78300091, 0.63079314, 3.0615144 ],
+       [4.23490423, 0.45982568, 3.40343436],
+       [4.40153286, 1.2336976 , 2.99955514],
+       [3.89069251, 0.14580827, 2.95527858],
+       [3.9951345 , 0.20261743, 3.12357878],
+       [4.62328438, 2.67055552, 2.88854512],
+       [4.40353892, 0.90927099, 3.14807862],
+       [3.68912032, 0.50081008, 2.86147193],
+       [3.8939904 , 0.92159916, 3.34925913],
+       [3.99460105, 1.01946042, 2.64670109],
+       [4.12768297, 0.86953764, 3.53518427],
+       [4.21738173, 0.72275914, 2.99333175],
+       [3.95835329, 0.72324305, 3.34508059],
+       [3.95372786, 0.30295342, 2.90117552],
+       [0.93688791, 3.43619989, 1.92126695],
+       [0.97602613, 2.97232682, 1.43652719],
+       [0.70684331, 3.51850037, 1.70536445],
+       [2.68055347, 3.33264308, 0.9535028 ],
+       [1.0882743 , 3.35747592, 0.93174089],
+       [1.79517817, 2.77550662, 0.36129564],
+       [0.99454069, 3.01808184, 1.60954394],
+       [3.2941058 , 2.77360088, 1.4844702 ],
+       [1.11736796, 3.21148368, 1.13778849],
+       [2.41310146, 2.66294828, 0.76189431],
+       [3.71811095, 3.62389817, 1.95510958],
+       [1.44115032, 2.70011145, 0.78733906],
+       [2.72209616, 3.53658932, 1.25528011],
+       [1.26899484, 2.98813829, 0.68046933],
+       [2.03366801, 2.32311723, 0.7386478 ],
+       [0.96655433, 3.14311522, 1.48632293],
+       [1.66143984, 2.68234835, 0.80567208],
+       [2.1051166 , 2.63954211, 0.57184189],
+       [2.32028627, 3.97369206, 1.19832221],
+       [2.44625761, 2.87494798, 0.66720431],
+       [1.17881254, 3.03853641, 1.35243001],
+       [1.61047248, 2.8022861 , 0.54870182],
+       [1.63287534, 3.68305664, 0.80222733],
+       [1.52405623, 2.96833851, 0.59281379],
+       [1.27009395, 2.9760862 , 0.92691417],
+       [1.00782039, 3.13002382, 1.24582165],
+       [1.07063185, 3.56679427, 1.28841255],
+       [0.49696775, 3.5903606 , 1.44058261],
+       [1.32774484, 2.93839428, 0.60609916],
+       [2.42011876, 2.58203512, 0.75979573],
+       [2.67031866, 2.99796537, 0.88332283],
+       [2.74916442, 2.92597852, 0.97295414],
+       [2.00733004, 2.68907313, 0.39450078],
+       [1.40409915, 3.42215998, 0.55254609],
+       [1.87359817, 2.62771445, 0.90409172],
+       [1.38942931, 2.75915071, 1.72093827],
+       [0.75864765, 3.30075052, 1.50231003],
+       [2.18888648, 3.73017167, 1.06440319],
+       [1.85885082, 2.37943811, 0.82259848],
+       [2.39150476, 2.98789866, 0.58180763],
+       [2.24875062, 2.89079656, 0.47613928],
+       [1.23068597, 2.86642713, 0.86151719],
+       [2.0971052 , 2.86642575, 0.38623038],
+       [3.33176642, 2.96966239, 1.51536817],
+       [2.03396275, 2.77003779, 0.29666246],
+       [1.81194891, 2.38255534, 0.82460449],
+       [1.78545021, 2.55559903, 0.57017344],
+       [1.37597729, 2.8455521 , 0.74674716],
+       [3.04410524, 2.56987887, 1.27214703],
+       [1.8789993 , 2.64007308, 0.3839694 ],
+       [1.07518249, 4.24274589, 2.3231268 ],
+       [1.50664789, 3.57067982, 0.76586458],
+       [0.53503117, 4.44150237, 2.16460668],
+       [0.75898803, 3.69480186, 1.19079906],
+       [0.53772877, 4.11613683, 1.74890266],
+       [1.21258624, 5.03326801, 2.79880246],
+       [2.73154786, 3.3503222 , 1.20493915],
+       [0.92230348, 4.577021  , 2.26064879],
+       [1.39208869, 4.363498  , 1.51591765],
+       [1.50326811, 4.79334275, 3.24565892],
+       [0.4769421 , 3.62749566, 1.73398281],
+       [1.01951679, 3.89360823, 1.11653632],
+       [0.28300998, 4.1132966 , 1.8209098 ],
+       [1.90771307, 3.82688169, 0.94077286],
+       [1.49665868, 3.91538879, 1.39463942],
+       [0.69648261, 3.89835633, 1.91923245],
+       [0.44800197, 3.70128288, 1.41396325],
+       [2.11710726, 5.18341242, 3.87020286],
+       [1.8369882 , 5.58136629, 2.97188789],
+       [2.35409464, 4.02615768, 1.17309015],
+       [0.54832687, 4.31907679, 2.29006262],
+       [1.61278191, 3.4288432 , 0.90897245],
+       [1.47513288, 5.19031307, 2.79625003],
+       [1.14174615, 3.64273089, 0.86066075],
+       [0.53620233, 4.00723617, 2.1727675 ],
+       [0.67208548, 4.2637671 , 2.35489518],
+       [1.06663455, 3.45930032, 0.81175026],
+       [0.93494533, 3.27575645, 1.03569718],
+       [0.83553248, 4.05342943, 1.39558948],
+       [0.74854302, 4.1585729 , 2.05837295],
+       [1.07047627, 4.71100584, 2.30034327],
+       [2.18621697, 5.12224641, 3.90678521],
+       [0.87437682, 4.13401784, 1.48399598],
+       [1.0947599 , 3.39830644, 0.81512611],
+       [1.58049956, 3.63719075, 0.81393069],
+       [1.27157117, 5.08776655, 2.87804494],
+       [1.08615557, 4.00416552, 2.32144511],
+       [0.50258278, 3.58815834, 1.4859412 ],
+       [1.0625801 , 3.19454679, 0.98183333],
+       [0.24502791, 4.09907253, 1.9903383 ],
+       [0.59235157, 4.28416057, 2.0929821 ],
+       [0.52380862, 4.17402084, 2.08177428],
+       [1.50664789, 3.57067982, 0.76586458],
+       [0.56488438, 4.32128686, 2.26218919],
+       [0.87242105, 4.3480018 , 2.43867573],
+       [0.53197842, 4.1240495 , 1.84004429],
+       [1.50771114, 3.97564407, 1.03723854],
+       [0.43328422, 3.7539635 , 1.46435048],
+       [1.09439379, 3.7969924 , 2.186898  ],
+       [1.12558627, 3.25638099, 1.0145515 ]])
 </pre></div>
 </div>
 <p>We compute every step and compare
@@ -655,7 +506,8 @@ ONNX and scikit-learn outputs.</p>
     <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;----------------------------&#39;</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">])</span>
     <span class="n">onnx_step</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a><span class="p">[</span><span class="s1">&#39;onnx_step&#39;</span><span class="p">]</span>
-    <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">onnx_step</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">())</span>
+    <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">onnx_step</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span>
+                            <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_outputs</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.run" title="onnxruntime.InferenceSession.run" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_output</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_outputs</span></a><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl_outputs</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a><span class="p">[</span><span class="s1">&#39;model&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">_debug</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s1">&#39;transform&#39;</span><span class="p">]</span>
@@ -672,32 +524,31 @@ ONNX and scikit-learn outputs.</p>
 <span class="c1">#</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>----------------------------
 StandardScaler()
 difference 4.799262827148709e-07
 ----------------------------
-KMeans(n_clusters=3)
+KMeans(n_clusters=3, n_init=3)
 difference 1.095537650763756e-06
 </pre></div>
 </div>
 </section>
 <section id="python-runtime-to-look-into-every-node">
-<h2><a class="toc-backref" href="#id2">Python runtime to look into every node</a><a class="headerlink" href="#python-runtime-to-look-into-every-node" title="Permalink to this heading">#</a></h2>
+<h2>Python runtime to look into every node<a class="headerlink" href="#python-runtime-to-look-into-every-node" title="Permalink to this heading">#</a></h2>
 <p>The python runtime may be useful to easily look
 into every node of the ONNX graph.
 This option can be used to check when the computation
 fails due to nan values or a dimension mismatch.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span>
+              <span class="n">target_opset</span><span class="o">=</span><span class="mi">17</span><span class="p">)</span>
 
 <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class"><span class="n">OnnxInference</span></a><span class="p">(</span><span class="n">onx</span><span class="p">)</span>
 <a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference.run" title="mlprodict.onnxrt.onnx_inference.OnnxInference.run" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-method"><span class="n">oinf</span><span class="o">.</span><span class="n">run</span></a><span class="p">({</span><span class="s1">&#39;X&#39;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)},</span>
          <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fLOG</span><span class="o">=</span><span class="nb">print</span><span class="p">)</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>+ki=&#39;Ad_Addcst&#39;: (3,) (dtype=float32 min=0.9830552339553833 max=5.035177230834961)
-+ki=&#39;Ge_Gemmcst&#39;: (3, 4) (dtype=float32 min=-1.3049873113632202 max=1.1359702348709106)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>+ki=&#39;Ad_Addcst&#39;: (3,) (dtype=float32 min=1.0029560327529907 max=5.035177230834961)
++ki=&#39;Ge_Gemmcst&#39;: (3, 4) (dtype=float32 min=-1.3049873113632202 max=1.131404995918274)
 +ki=&#39;Mu_Mulcst&#39;: (1,) (dtype=float32 min=0.0 max=0.0)
 -- OnnxInference: run 8 nodes with 1 inputs
 Onnx-Scaler(X) -&gt; variable    (name=&#39;Scaler&#39;)
@@ -707,18 +558,18 @@ Onnx-ReduceSumSquare(variable) -&gt; Re_reduced0    (name=&#39;Re_ReduceSumSquar
 Onnx-Mul(Re_reduced0, Mu_Mulcst) -&gt; Mu_C0    (name=&#39;Mu_Mul&#39;)
 +kr=&#39;Mu_C0&#39;: (2, 1) (dtype=float32 min=0.0 max=0.0)
 Onnx-Gemm(variable, Ge_Gemmcst, Mu_C0) -&gt; Ge_Y0    (name=&#39;Ge_Gemm&#39;)
-+kr=&#39;Ge_Y0&#39;: (2, 3) (dtype=float32 min=-10.366023063659668 max=7.967348575592041)
++kr=&#39;Ge_Y0&#39;: (2, 3) (dtype=float32 min=-10.366023063659668 max=7.877023220062256)
 Onnx-Add(Re_reduced0, Ge_Y0) -&gt; Ad_C01    (name=&#39;Ad_Add&#39;)
-+kr=&#39;Ad_C01&#39;: (2, 3) (dtype=float32 min=-4.98982572555542 max=12.817853927612305)
++kr=&#39;Ad_C01&#39;: (2, 3) (dtype=float32 min=-4.98982572555542 max=12.727529525756836)
 Onnx-Add(Ad_Addcst, Ad_C01) -&gt; Ad_C0    (name=&#39;Ad_Add1&#39;)
-+kr=&#39;Ad_C0&#39;: (2, 3) (dtype=float32 min=0.045351505279541016 max=16.143783569335938)
-Onnx-Sqrt(Ad_C0) -&gt; scores    (name=&#39;Sq_Sqrt&#39;)
-+kr=&#39;scores&#39;: (2, 3) (dtype=float32 min=0.2129589319229126 max=4.017932891845703)
++kr=&#39;Ad_C0&#39;: (2, 3) (dtype=float32 min=0.045351505279541016 max=15.982987403869629)
 Onnx-ArgMin(Ad_C0) -&gt; label    (name=&#39;Ar_ArgMin&#39;)
 +kr=&#39;label&#39;: (2,) (dtype=int64 min=1 max=1)
+Onnx-Sqrt(Ad_C0) -&gt; scores    (name=&#39;Sq_Sqrt&#39;)
++kr=&#39;scores&#39;: (2, 3) (dtype=float32 min=0.2129589319229126 max=3.997872829437256)
 
-{&#39;label&#39;: array([1, 1], dtype=int64), &#39;scores&#39;: array([[3.9894059 , 0.21295893, 3.1211984 ],
-       [4.017933  , 0.99604493, 2.675508  ]], dtype=float32)}
+{&#39;label&#39;: array([1, 1]), &#39;scores&#39;: array([[3.9722016 , 0.21295893, 3.1224194 ],
+       [3.9978728 , 0.99604493, 2.6709325 ]], dtype=float32)}
 </pre></div>
 </div>
 <p>And to get a sense of the intermediate results.</p>
@@ -730,13 +581,12 @@ Onnx-ArgMin(Ad_C0) -&gt; label    (name=&#39;Ar_ArgMin&#39;)
 <span class="c1">#</span>
 </pre></div>
 </div>
-<p class="sphx-glr-script-out">Out:</p>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>+ki=&#39;Ad_Addcst&#39;: (3,) (dtype=float32 min=0.9830552339553833 max=5.035177230834961
-[3.32593    5.035177   0.98305523]
-+ki=&#39;Ge_Gemmcst&#39;: (3, 4) (dtype=float32 min=-1.3049873113632202 max=1.1359702348709106
-[[ 1.1359702   0.08842168  0.9961545   1.0175261 ]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>+ki=&#39;Ad_Addcst&#39;: (3,) (dtype=float32 min=1.0029560327529907 max=5.035177230834961
+[3.255458 5.035177 1.002956]
++ki=&#39;Ge_Gemmcst&#39;: (3, 4) (dtype=float32 min=-1.3049873113632202 max=1.131404995918274
+[[ 1.131405    0.07903422  0.98537153  0.9990883 ]
  [-1.0145789   0.85326266 -1.3049873  -1.2548935 ]
- [-0.05021989 -0.8833765   0.34773782  0.2815273 ]]
+ [-0.06881714 -0.89339954  0.3452218   0.284393  ]]
 +ki=&#39;Mu_Mulcst&#39;: (1,) (dtype=float32 min=0.0 max=0.0
 [0.]
 -kv=&#39;X&#39; shape=(2, 4) dtype=float32 min=0.20000000298023224 max=5.099999904632568
@@ -754,44 +604,41 @@ Onnx-Mul(Re_reduced0, Mu_Mulcst) -&gt; Mu_C0    (name=&#39;Mu_Mul&#39;)
 [[0.]
  [0.]]
 Onnx-Gemm(variable, Ge_Gemmcst, Mu_C0) -&gt; Ge_Y0    (name=&#39;Ge_Gemm&#39;)
-+kr=&#39;Ge_Y0&#39;: (2, 3) (dtype=float32 min=-10.366023063659668 max=7.967348575592041)
-[[  7.2132325 -10.366023    3.3826268]
- [  7.9673486  -8.893578    1.3247827]]
++kr=&#39;Ge_Y0&#39;: (2, 3) (dtype=float32 min=-10.366023063659668 max=7.877023220062256)
+[[  7.14673   -10.366023    3.370349 ]
+ [  7.877023   -8.893578    1.2804183]]
 Onnx-Add(Re_reduced0, Ge_Y0) -&gt; Ad_C01    (name=&#39;Ad_Add&#39;)
-+kr=&#39;Ad_C01&#39;: (2, 3) (dtype=float32 min=-4.98982572555542 max=12.817853927612305)
-[[12.58943   -4.9898257  8.758824 ]
- [12.817854  -4.0430717  6.1752887]]
++kr=&#39;Ad_C01&#39;: (2, 3) (dtype=float32 min=-4.98982572555542 max=12.727529525756836)
+[[12.522927  -4.9898257  8.746546 ]
+ [12.72753   -4.0430717  6.130924 ]]
 Onnx-Add(Ad_Addcst, Ad_C01) -&gt; Ad_C0    (name=&#39;Ad_Add1&#39;)
-+kr=&#39;Ad_C0&#39;: (2, 3) (dtype=float32 min=0.045351505279541016 max=16.143783569335938)
-[[15.9153595   0.04535151  9.741879  ]
- [16.143784    0.9921055   7.158344  ]]
-Onnx-Sqrt(Ad_C0) -&gt; scores    (name=&#39;Sq_Sqrt&#39;)
-+kr=&#39;scores&#39;: (2, 3) (dtype=float32 min=0.2129589319229126 max=4.017932891845703)
-[[3.9894059  0.21295893 3.1211984 ]
- [4.017933   0.99604493 2.675508  ]]
++kr=&#39;Ad_C0&#39;: (2, 3) (dtype=float32 min=0.045351505279541016 max=15.982987403869629)
+[[15.778385    0.04535151  9.749502  ]
+ [15.982987    0.9921055   7.13388   ]]
 Onnx-ArgMin(Ad_C0) -&gt; label    (name=&#39;Ar_ArgMin&#39;)
 +kr=&#39;label&#39;: (2,) (dtype=int64 min=1 max=1)
 [1 1]
+Onnx-Sqrt(Ad_C0) -&gt; scores    (name=&#39;Sq_Sqrt&#39;)
++kr=&#39;scores&#39;: (2, 3) (dtype=float32 min=0.2129589319229126 max=3.997872829437256)
+[[3.9722016  0.21295893 3.1224194 ]
+ [3.9978728  0.99604493 2.6709325 ]]
 [VALIDATE] type &lt;class &#39;onnx.onnx_ml_pb2.ModelProto&#39;&gt;
 [VALIDATE] mis={}
 
-{&#39;label&#39;: array([1, 1], dtype=int64), &#39;scores&#39;: array([[3.9894059 , 0.21295893, 3.1211984 ],
-       [4.017933  , 0.99604493, 2.675508  ]], dtype=float32)}
+{&#39;label&#39;: array([1, 1]), &#39;scores&#39;: array([[3.9722016 , 0.21295893, 3.1224194 ],
+       [3.9978728 , 0.99604493, 2.6709325 ]], dtype=float32)}
 </pre></div>
 </div>
 </section>
 <section id="final-graph">
-<h2><a class="toc-backref" href="#id3">Final graph</a><a class="headerlink" href="#final-graph" title="Permalink to this heading">#</a></h2>
+<h2>Final graph<a class="headerlink" href="#final-graph" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <a href="http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/pyquickhelper/helpgen/graphviz_helper.html#pyquickhelper.helpgen.graphviz_helper.plot_graphviz" title="pyquickhelper.helpgen.graphviz_helper.plot_graphviz" class="sphx-glr-backref-module-pyquickhelper-helpgen-graphviz_helper sphx-glr-backref-type-py-function"><span class="n">plot_graphviz</span></a><span class="p">(</span><a href="http://www.xavierdupre.fr/app/mlprodict/helpsphinx/mlprodict/onnxrt/onnx_inference.html#mlprodict.onnxrt.onnx_inference.OnnxInference" title="mlprodict.onnxrt.onnx_inference.OnnxInference" class="sphx-glr-backref-module-mlprodict-onnxrt-onnx_inference sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oinf</span></a><span class="o">.</span><span class="n">to_dot</span><span class="p">())</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_xaxis.html#matplotlib.axes.Axes.get_xaxis" title="matplotlib.axes.Axes.get_xaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_xaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.get_yaxis.html#matplotlib.axes.Axes.get_yaxis" title="matplotlib.axes.Axes.get_yaxis" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">get_yaxis</span></a><span class="p">()</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_fbegin_investigate_001.png" srcset="../_images/sphx_glr_plot_fbegin_investigate_001.png" alt="plot fbegin investigate" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.573 seconds)</p>
-<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-fbegin-investigate-py">
-<div class="binder-badge docutils container">
-<a class="reference external image-reference" href="https://mybinder.org/v2/gh/onnx/onnx.ai/sklearn-onnx//master?filepath=auto_examples/auto_tutorial/plot_fbegin_investigate.ipynb"><img alt="Launch binder" src="../_images/binder_badge_logo1.svg" width="150px" /></a>
-</div>
+<img src="../_images/sphx_glr_plot_fbegin_investigate_001.png" srcset="../_images/sphx_glr_plot_fbegin_investigate_001.png" alt="plot fbegin investigate" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.505 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-fbegin-investigate-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/d76acde21d34d0dcb6f54fb2fc4829be/plot_fbegin_investigate.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">plot_fbegin_investigate.py</span></code></a></p>
 </div>
@@ -803,56 +650,79 @@ Onnx-ArgMin(Ad_C0) -&gt; label    (name=&#39;Ar_ArgMin&#39;)
 </section>
 </section>
 
-
-              </article>
-              
-
-              
-              <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
-<div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="plot_ebegin_float_double.html" title="previous page">
-      <i class="fas fa-angle-left"></i>
-      <div class="prev-next-info">
-          <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Issues when switching to float</p>
+        </article>
       </div>
-  </a>
-  <a class='right-next' id="next-link" href="plot_gbegin_cst.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Store arrays in one onnx graph</p>
-  </div>
-  <i class="fas fa-angle-right"></i>
-  </a>
-</div>
-              </footer>
-              
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="plot_gbegin_cst.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Store arrays in one onnx graph</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="plot_ebegin_float_double.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Issues when switching to float</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2018-2022, Microsoft
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
           </div>
-          
-      </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
     </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Intermediate results and investigation</a><ul>
+<li><a class="reference internal" href="#look-into-pipeline-steps">Look into pipeline steps</a></li>
+<li><a class="reference internal" href="#python-runtime-to-look-into-every-node">Python runtime to look into every node</a></li>
+<li><a class="reference internal" href="#final-graph">Final graph</a></li>
+</ul>
+</li>
+</ul>
 
-  
-  
-  <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
-
-<footer class="bd-footer"><div class="bd-footer__inner container">
-  
-  <div class="footer-item">
-    <p class="copyright">
-    &copy; Copyright 2018-2022, Microsoft.<br>
-</p>
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
   </div>
-  
-  <div class="footer-item">
-    <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br>
-</p>
-  </div>
-  
-</div>
-</footer>
-  </body>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/scripts/furo.js"></script>
+    </body>
 </html>

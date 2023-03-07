@@ -19,9 +19,6 @@ requires work. ONNX reduces the number of platforms to
 support. Once the model is converted into ONNX,
 it can be inserted in any :epkg:`scikit-learn` pipeline.
 
-.. contents::
-    :local:
-
 Retrieve and load a model
 +++++++++++++++++++++++++
 

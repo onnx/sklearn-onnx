@@ -14,9 +14,6 @@ such as :class:`OnnxSklearnPipeline` does. They wrap existing
 which inherits from :class:`OnnxOperatorMixin` which
 implements *to_onnx* methods.
 
-.. contents::
-    :local:
-
 .. _l-converter-list:
 
 Covered Converters

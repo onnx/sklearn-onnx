@@ -24,10 +24,6 @@ graph: `PythonAPIOverview.md
 But it is quite verbose and makes it difficult to describe big graphs.
 *sklearn-onnx* implements a nicer way to test *ONNX* operators.
 
-
-.. contents::
-    :local:
-
 ONNX Python API
 +++++++++++++++
 

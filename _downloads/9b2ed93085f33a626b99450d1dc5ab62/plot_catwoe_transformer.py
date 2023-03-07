@@ -17,9 +17,6 @@ cases the original encoder can handle.
 
 .. index:: WOE, WOEEncoder
 
-.. contents::
-    :local:
-
 A simple example
 ++++++++++++++++
 
