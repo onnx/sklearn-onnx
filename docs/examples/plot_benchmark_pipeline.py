@@ -8,9 +8,6 @@ Benchmark a pipeline
 The following example checks up on every step in a pipeline,
 compares and benchmarks the predictions.
 
-.. contents::
-    :local:
-
 Create a pipeline
 +++++++++++++++++
 

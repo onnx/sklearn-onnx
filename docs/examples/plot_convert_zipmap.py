@@ -15,9 +15,6 @@ This conversion increases the prediction time and is not
 always needed. Let's see how to deactivate this behaviour
 on the Iris example.
 
-.. contents::
-    :local:
-
 Train a model and convert it
 ++++++++++++++++++++++++++++
 

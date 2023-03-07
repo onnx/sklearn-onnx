@@ -14,10 +14,6 @@ runtime has an implementation for it. What if two different
 users needs two different conversion for the same model?
 Let's see how this may be done.
 
-.. contents::
-    :local:
-
-
 Option *zipmap*
 +++++++++++++++
 

@@ -11,10 +11,6 @@ This example takes a similar example but on random data
 and compares the processing time required by each option
 to compute predictions.
 
-.. contents::
-    :local:
-
-
 Training a pipeline
 +++++++++++++++++++
 """

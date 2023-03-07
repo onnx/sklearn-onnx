@@ -14,9 +14,6 @@ three following steps:
 * convert it into *ONNX* with *sklearn-onnx*,
 * predict with *onnxruntime*.
 
-.. contents::
-    :local:
-
 Train a model
 +++++++++++++
 

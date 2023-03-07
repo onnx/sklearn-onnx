@@ -5,9 +5,6 @@
 Introduction
 ============
 
-.. contents::
-    :local:
-
 Quick start
 ===========
 

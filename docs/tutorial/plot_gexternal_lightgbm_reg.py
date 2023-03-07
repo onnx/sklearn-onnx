@@ -32,9 +32,6 @@ the discrepancies then become
 :math:`D'(x) = |\\sum_{k=1}^a \\left[\\sum\\right]_{i=1}^{F/a}
 float(T_{ak + i}(x)) - \\sum_{i=1}^F T_i(x)|`.
 
-.. contents::
-    :local:
-
 Train a LGBMRegressor
 +++++++++++++++++++++
 """

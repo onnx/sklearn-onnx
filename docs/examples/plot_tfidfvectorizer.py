@@ -13,9 +13,6 @@ This example is inspired from the following example:
 compose/plot_column_transformer.html>`_
 which builds a pipeline to classify text.
 
-.. contents::
-    :local:
-
 Train a pipeline with TfidfVectorizer
 +++++++++++++++++++++++++++++++++++++
 

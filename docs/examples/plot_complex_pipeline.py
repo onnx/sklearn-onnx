@@ -16,9 +16,6 @@ column may be preprocessed with a different transformer.
 :ref:`l-complex-pipeline`.
 
 
-.. contents::
-    :local:
-
 Create and train a complex pipeline
 +++++++++++++++++++++++++++++++++++
 

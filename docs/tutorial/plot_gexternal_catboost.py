@@ -15,9 +15,6 @@ a pipeline including a :epkg:`CatBoost` model. :epkg:`sklearn-onnx` can convert
 the whole pipeline as long as it knows the converter associated to
 a *CatBoostClassifier*. Let's see how to do it.
 
-.. contents::
-    :local:
-
 Train a CatBoostClassifier
 ++++++++++++++++++++++++++
 """

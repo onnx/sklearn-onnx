@@ -11,9 +11,6 @@ The following example focuses on one particular operator,
 CDist and compares its execution time between
 *onnxruntime* and *scipy*.
 
-.. contents::
-    :local:
-
 ONNX Graph with CDist
 +++++++++++++++++++++
 

@@ -10,9 +10,6 @@ Different ways to convert a model
 This example leverages some code added to implement custom converters
 in an easy way.
 
-.. contents::
-    :local:
-
 Predict with onnxruntime
 ++++++++++++++++++++++++
 
