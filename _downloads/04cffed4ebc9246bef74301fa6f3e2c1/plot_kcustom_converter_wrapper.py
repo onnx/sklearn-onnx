@@ -16,9 +16,6 @@ can be rewritten by using a `PCA <https://scikit-learn.org/
 stable/modules/generated/sklearn.decomposition.PCA.html>`_.
 We could then reuse the converter associated to this model.
 
-.. contents::
-    :local:
-
 Custom model
 ++++++++++++
 

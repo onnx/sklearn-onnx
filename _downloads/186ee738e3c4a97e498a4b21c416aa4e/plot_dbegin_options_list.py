@@ -13,9 +13,6 @@ the converters do not change their behaviour, they fail
 if they use a black listed operator, a couple of them
 produces a different ONNX graph.
 
-.. contents::
-    :local:
-
 GaussianMixture
 +++++++++++++++
 

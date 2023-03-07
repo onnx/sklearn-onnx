@@ -8,10 +8,6 @@ API Summary
 Summary of public functions and classes exposed
 in *scikit-onnx*.
 
-.. contents::
-    :local:
-
-
 Version
 =======
 

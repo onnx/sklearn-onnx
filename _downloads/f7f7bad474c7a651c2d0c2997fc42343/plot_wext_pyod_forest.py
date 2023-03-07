@@ -15,9 +15,6 @@ It implements a custom converter for model `pyod.models.iforest.IForest
 pyod.models.html#module-pyod.models.iforest>`_.
 This example uses :ref:`l-plot-custom-converter` as a start.
 
-.. contents::
-    :local:
-
 Trains a model
 ++++++++++++++
 
@@ -43,7 +40,7 @@ except (ValueError, ImportError) as e:
     IForest = None
 
 if IForest is not None:
-    data1 = {'First':  [500, 500, 400, 100, 200, 300, 100],
+    data1 = {'First': [500, 500, 400, 100, 200, 300, 100],
              'Second': ['a', 'b', 'a', 'b', 'a', 'b', 'c']}
 
     df1 = pd.DataFrame(data1, columns=['First', 'Second'])

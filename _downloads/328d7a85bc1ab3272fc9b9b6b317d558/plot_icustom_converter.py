@@ -22,9 +22,6 @@ in fact two functions:
 
 This example implements both components for a new model.
 
-.. contents::
-    :local:
-
 Custom model
 ++++++++++++
 
