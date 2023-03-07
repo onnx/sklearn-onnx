@@ -21,9 +21,6 @@ be a very efficient converter but that's just for the sake
 of using a parser. By default, a transformer only returns
 one output but both are needed.
 
-.. contents::
-    :local:
-
 A new transformer
 +++++++++++++++++
 """

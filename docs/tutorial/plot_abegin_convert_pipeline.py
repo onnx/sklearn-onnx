@@ -14,10 +14,6 @@ documentation: `Plot individual and voting regression predictions
 converts it into ONNX and finally computes the predictions
 a different runtime.
 
-.. contents::
-    :local:
-
-
 Training a pipeline
 +++++++++++++++++++
 """

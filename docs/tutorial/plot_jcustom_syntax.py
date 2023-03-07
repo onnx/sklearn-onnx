@@ -18,10 +18,6 @@ The first way is used in :ref:`l-plot-custom-converter`.
 This one demonstrates the second way which is usually the one
 used in other converter library. It is more verbose.
 
-.. contents::
-    :local:
-
-
 Custom model
 ++++++++++++
 

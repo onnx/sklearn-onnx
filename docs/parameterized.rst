@@ -16,9 +16,6 @@ or :func:`to_onnx <skl2onnx.to_onnx>`.
 Every option ends up creating a different ONNX graph.
 Below is the list of models which enable this mechanism.
 
-.. contents::
-    :local:
-
 GaussianProcessRegressor, NearestNeighbors
 ==========================================
 

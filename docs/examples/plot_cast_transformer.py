@@ -21,9 +21,6 @@ a decision tree. One small difference and the decision
 follows another path in the tree. Let's see how to solve
 that issue.
 
-.. contents::
-    :local:
-
 An example with fails
 +++++++++++++++++++++
 

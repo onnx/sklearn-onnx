@@ -15,9 +15,6 @@ the method *decision_function*. Option ``'raw_scores'``
 is used to change the default behaviour. Let's see
 that on a simple example.
 
-.. contents::
-    :local:
-
 Train a model and convert it
 ++++++++++++++++++++++++++++
 

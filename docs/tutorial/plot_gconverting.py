@@ -7,9 +7,6 @@ Modify the ONNX graph
 This example shows how to change the default ONNX graph such as
 renaming the inputs or outputs names.
 
-.. contents::
-    :local:
-
 Basic example
 +++++++++++++
 

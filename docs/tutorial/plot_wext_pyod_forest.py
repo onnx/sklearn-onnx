@@ -15,9 +15,6 @@ It implements a custom converter for model `pyod.models.iforest.IForest
 pyod.models.html#module-pyod.models.iforest>`_.
 This example uses :ref:`l-plot-custom-converter` as a start.
 
-.. contents::
-    :local:
-
 Trains a model
 ++++++++++++++
 

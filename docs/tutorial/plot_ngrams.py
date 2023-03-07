@@ -11,14 +11,8 @@ This issue is described at `scikit-learn/issues/13733
 If a CountVectorizer or a TfidfVectorizer produces a token with a space,
 skl2onnx cannot know if it a bi-grams or a unigram with a space.
 
-
-.. contents::
-    :local:
-
 A simple example impossible to convert
 ++++++++++++++++++++++++++++++++++++++
-
-
 """
 
 import pprint

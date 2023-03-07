@@ -12,9 +12,6 @@ The results is the label of every intervals containing the feature.
 
 .. index:: WOE, WOETransformer
 
-.. contents::
-    :local:
-
 A simple example
 ++++++++++++++++
 

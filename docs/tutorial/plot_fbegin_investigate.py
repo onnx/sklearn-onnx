@@ -17,9 +17,6 @@ due to a shape mismatch. Then it is useful the get the shape
 of every intermediate result. This example looks into two
 ways of doing it.
 
-.. contents::
-    :local:
-
 Look into pipeline steps
 ++++++++++++++++++++++++
 

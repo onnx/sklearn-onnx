@@ -30,9 +30,6 @@ even a small *dx* may introduce a huge discrepency. Let's look into
 an example which always produces discrepencies and some ways
 to overcome this situation.
 
-.. contents::
-    :local:
-
 More into the issue
 +++++++++++++++++++
 

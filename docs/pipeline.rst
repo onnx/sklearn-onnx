@@ -5,9 +5,6 @@
 Convert a pipeline
 ==================
 
-.. contents::
-    :local:
-
 *skl2onnx* converts any machine learning pipeline into
 *ONNX* pipelines. Every transformer or predictors is converted
 into one or multiple nodes into the *ONNX* graph.

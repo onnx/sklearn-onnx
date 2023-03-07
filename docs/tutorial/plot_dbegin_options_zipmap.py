@@ -13,9 +13,6 @@ into a list of dictionaries where each probabily is mapped
 to its class id or name. That mechanism retains the class names
 but is slower. Let's see what other options are available.
 
-.. contents::
-    :local:
-
 Train a model and convert it
 ++++++++++++++++++++++++++++
 
