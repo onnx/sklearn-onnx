@@ -13,9 +13,6 @@ is missing from the list of available operators.
 Some converters may convert a model in different ways
 if the users wants to blacklist some operators.
 
-.. contents::
-    :local:
-
 GaussianMixture
 +++++++++++++++
 

@@ -18,9 +18,6 @@ Example :ref:`l-plot-custom-converter` implements a converter
 which uses operator *MatMul*. Option *use_gemm* is used to
 replace *MatMul* by *Gemm*.
 
-.. contents::
-    :local:
-
 Custom model
 ++++++++++++
 

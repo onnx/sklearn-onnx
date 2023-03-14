@@ -26,9 +26,6 @@ The example changes the transformer from
 decorrelates the variables by computing the eigen
 values. Method *fit* does not do anything anymore.
 
-.. contents::
-    :local:
-
 A transformer which decorrelates variables
 ++++++++++++++++++++++++++++++++++++++++++
 

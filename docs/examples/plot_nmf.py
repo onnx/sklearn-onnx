@@ -18,9 +18,6 @@ The second case is more complex as it theoretically
 requires the estimation of a new matrix *W* with a
 gradient descent.
 
-.. contents::
-    :local:
-
 Building a simple model
 +++++++++++++++++++++++
 

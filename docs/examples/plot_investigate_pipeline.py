@@ -8,9 +8,6 @@ Investigate a pipeline
 The following example shows how to look into a converted
 models and easily find errors at every step of the pipeline.
 
-.. contents::
-    :local:
-
 Create a pipeline
 +++++++++++++++++
 

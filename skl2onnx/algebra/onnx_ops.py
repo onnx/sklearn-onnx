@@ -363,9 +363,16 @@ def OnnxSplitApi18(*x, axis=0, split=None, num_outputs=None,
                         "split or num_outputs or output_names "
                         "must be specified since opset 18.")
                 num_outputs = len(output_names)
+            if num_outputs is None:
+                raise AttributeError(
+                    "num_outputs cannot be None for Split-18.")
             return OnnxSplit_18(  # noqa
                 *x, axis=axis, op_version=op_version,
                 num_outputs=num_outputs, output_names=output_names)
+        if num_outputs is None:
+            return OnnxSplit_18(  # noqa
+                *x, np.array(split, dtype=np.int64), axis=axis,
+                op_version=op_version, output_names=output_names)
         return OnnxSplit_18(  # noqa
             *x, np.array(split, dtype=np.int64), axis=axis,
             num_outputs=num_outputs, op_version=op_version,

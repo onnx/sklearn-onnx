@@ -17,9 +17,6 @@ as they are not present in the datasets. Because some predictors
 do the difference, this ambiguity may introduces discrepencies
 when converter into ONNX. This example looks into several configurations.
 
-.. contents::
-    :local:
-
 Imports, setups
 +++++++++++++++
 

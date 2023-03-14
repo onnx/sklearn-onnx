@@ -13,9 +13,6 @@ may produce different results. The larger the vocabulary is,
 the higher the probability to get different result is.
 This example proposes a equivalent model with no discrepancies.
 
-.. contents::
-    :local:
-
 Imports, setups
 +++++++++++++++
 

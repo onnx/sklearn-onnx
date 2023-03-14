@@ -1,8 +1,10 @@
 autopep8
+catboost
 category_encoders
 codecov
 coverage
 flake8
+furo
 joblib
 lightgbm
 loky
@@ -15,7 +17,6 @@ onnxruntime
 pillow
 py-spy
 pandas
-pydata_sphinx_theme
 pydot
 pyinstrument
 pyod

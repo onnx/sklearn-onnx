@@ -19,9 +19,6 @@ to add a third result which tells if the probability is
 above a given threshold. That's implemented in method
 *validate*.
 
-.. contents::
-    :local:
-
 Iris and scoring
 ++++++++++++++++
 

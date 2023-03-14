@@ -1,6 +1,4 @@
 # SPDX-License-Identifier: Apache-2.0
-
-
 # -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
@@ -58,10 +56,8 @@ pygments_style = 'default'
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "sphinx_mo"
 html_static_path = ['_static']
-html_theme = "pydata_sphinx_theme"
-html_theme_path = ['_static']
+html_theme = "furo"
 html_logo = "logo_main.png"
 
 # -- Options for graphviz ----------------------------------------------------

@@ -15,9 +15,6 @@ precisions. *sklearn-onnx* is using single floats by default
 but for this particular model, it is better to use double.
 Let's see how to create an ONNX file using doubles.
 
-.. contents::
-    :local:
-
 Train a model
 +++++++++++++
 

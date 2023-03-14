@@ -11,9 +11,6 @@ or other informations like a vocabulary.
 Last sections shows how to remove an output or to promote
 an intermediate result to an output.
 
-.. contents::
-    :local:
-
 Train and convert a model
 +++++++++++++++++++++++++
 

@@ -17,9 +17,6 @@ model. :epkg:`sklearn-onnx` can convert the whole pipeline as long as
 it knows the converter associated to a *XGBClassifier*. Let's see
 how to do it.
 
-.. contents::
-    :local:
-
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
