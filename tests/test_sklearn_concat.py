@@ -174,7 +174,7 @@ class TestConcatOutputType(unittest.TestCase):
                               target_opset=TARGET_OPSET)
 
         # make sure that the output of the concat is a float
-        # we are concatenating an `int` with a `float`, and 
+        # we are concatenating an `int` with a `float`, and
         # thus the more generic typing is `float`
         out_type = onx.graph.output[0].type.tensor_type.elem_type
         right_type = FloatTensorType().to_onnx_type().tensor_type.elem_type
