@@ -136,16 +136,22 @@ class TestSklearnPipeline(unittest.TestCase):
                 "Discrepencies\nSKL\n{}\nORT\n{}".format(pred_skl, pred_onx))
 
 
-class TestConcatType(unittest.TestCase):
+class TestConcatOutputType(unittest.TestCase):
 
     @unittest.skipIf(ColumnTransformer is None, reason="too old scikit-learn")
     def test_concat_output_type(self):
+        # create sample dataset
         data_dict = {
             'a': [1, 2, 3],
             'b': [1.5, 2.6, 5.2]
         }
+
+        # load to dataframe
         data = pd.DataFrame.from_dict(data_dict)
         
+        # create a simple transformer:
+        #   - identity function for column `a`
+        #   - standard scaler for column `b`
         col_transformer = ColumnTransformer(
             transformers=[
                 ("a", FunctionTransformer(), ["a"]),
@@ -153,17 +159,21 @@ class TestConcatType(unittest.TestCase):
             ],
         )
         
+        # fit the transformer
         col_transformer.fit(data)
 
-
+        # infer initial types: `a` will be int and `b` float
         initial_types = _convert_dataframe_schema(data)
+
+        # convert to onnx
         onx = convert_sklearn(col_transformer, initial_types=initial_types,
                               target_opset=TARGET_OPSET)
 
+        # make sure that the output of the concat is a float
+        # we are concatenating an `int` with a `float`, and thus the more generic typing is `float`
         assert (
             onx.graph.output[0].type.tensor_type.elem_type == FloatTensorType().to_onnx_type().tensor_type.elem_type
         ), "The `concat` output does not have the expected output type."
-            
 
 
 if __name__ == "__main__":
