@@ -12,7 +12,11 @@ try:
 except ImportError:
     ColumnTransformer = None
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder, FunctionTransformer
+from sklearn.preprocessing import (
+    StandardScaler,
+    OneHotEncoder,
+    FunctionTransformer
+)
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType, FloatTensorType,
@@ -148,7 +152,7 @@ class TestConcatOutputType(unittest.TestCase):
 
         # load to dataframe
         data = pd.DataFrame.from_dict(data_dict)
-        
+
         # create a simple transformer:
         #   - identity function for column `a`
         #   - standard scaler for column `b`
@@ -158,7 +162,7 @@ class TestConcatOutputType(unittest.TestCase):
                 ("b", StandardScaler(), ["b"])
             ],
         )
-        
+
         # fit the transformer
         col_transformer.fit(data)
 
@@ -170,9 +174,12 @@ class TestConcatOutputType(unittest.TestCase):
                               target_opset=TARGET_OPSET)
 
         # make sure that the output of the concat is a float
-        # we are concatenating an `int` with a `float`, and thus the more generic typing is `float`
+        # we are concatenating an `int` with a `float`, and 
+        # thus the more generic typing is `float`
+        out_type = onx.graph.output[0].type.tensor_type.elem_type
+        right_type = FloatTensorType().to_onnx_type().tensor_type.elem_type
         assert (
-            onx.graph.output[0].type.tensor_type.elem_type == FloatTensorType().to_onnx_type().tensor_type.elem_type
+            out_type == right_type
         ), "The `concat` output does not have the expected output type."
 
 
