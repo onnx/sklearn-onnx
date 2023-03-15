@@ -13,9 +13,6 @@ This example is inspired from the following example:
 compose/plot_column_transformer.html>`_
 which builds a pipeline to classify text.
 
-.. contents::
-    :local:
-
 Train a pipeline with TfidfVectorizer
 +++++++++++++++++++++++++++++++++++++
 
@@ -107,7 +104,7 @@ test_data = SubjectBodyExtractor().fit_transform(test.data)
 pipeline = Pipeline([
     ('union', ColumnTransformer(
         [
-            ('subject', TfidfVectorizer(min_df=50), 0),
+            ('subject', TfidfVectorizer(min_df=50, max_features=500), 0),
 
             ('body_bow', Pipeline([
                 ('tfidf', TfidfVectorizer()),

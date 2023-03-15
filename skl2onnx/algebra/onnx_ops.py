@@ -4,12 +4,17 @@
 Place holder for all ONNX operators.
 """
 import sys
+import os
 import numpy as np
-from scipy.sparse.coo import coo_matrix
+try:
+    from scipy.sparse import coo_matrix
+except ImportError:
+    from scipy.sparse.coo import coo_matrix
 import onnx
 from ..common.data_types import DataType
 from ..common._topology import Variable
 from .automation import get_rst_doc
+from ._cache import cache_folder
 
 
 def ClassFactory(class_name, op_name, inputs, outputs,
@@ -73,7 +78,8 @@ def ClassFactory(class_name, op_name, inputs, outputs,
                 "op_version={} does not refer to the same opset as the class "
                 "name ('{}').".format(op_version, self.__class__.__name__))
         for key in kwargs:
-            if key in {'output_names', 'op_version', 'domain', 'ir_version'}:
+            if key in {'output_names', 'op_version', 'domain', 'ir_version',
+                       'global_context', 'clear_subgraph_inputs'}:
                 continue
             if key not in attr_names:
                 raise TypeError("Argument '%s' not valid for '%s' opset=%s."
@@ -122,7 +128,7 @@ def ClassFactory(class_name, op_name, inputs, outputs,
     return newclass
 
 
-def dynamic_class_creation():
+def dynamic_class_creation(cache=False):
     """
     Automatically generates classes for each of the operators
     module *onnx* defines and described at
@@ -132,6 +138,7 @@ def dynamic_class_creation():
     <https://github.com/onnx/onnx/blob/master/docs/
     Operators-ml.md>`_.
     """
+    cache_dir = cache_folder()
     res = {}
     for schema in onnx.defs.get_all_schemas_with_history():
         if schema.support_level == schema.SupportType.EXPERIMENTAL:
@@ -154,7 +161,6 @@ def dynamic_class_creation():
 
     for name in sorted(res):
         schema = res[name]
-        doc = get_rst_doc(schema)
         inputs = [_c(o, 'I', i) for i, o in enumerate(schema.inputs)]
         outputs = [_c(o, 'O', i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
@@ -163,6 +169,18 @@ def dynamic_class_creation():
             class_name = "Onnx" + name
         else:
             class_name = "Onnx" + schema.name
+
+        filename = os.path.join(
+            cache_dir,
+            schema.name + '_' + str(schema.since_version) + ".rst")
+        if not cache and os.path.exists(filename):
+            with open(filename, "r", encoding="utf-8") as f:
+                doc = f.read()
+        else:
+            doc = get_rst_doc(schema)
+            if cache:
+                with open(filename, 'w', encoding='utf-8') as f:
+                    f.write(doc)
 
         cl = ClassFactory(class_name, schema.name, inputs, outputs,
                           [schema.min_input, schema.max_input],
@@ -230,19 +248,141 @@ def OnnxReduceSumApi11(*x, axes=None, keepdims=1, op_version=None,
                            op_version=op_version, output_names=output_names)
 
 
-def OnnxSplitApi11(*x, axis=0, split=None, op_version=None,
-                   output_names=None):
+def OnnxReduceAnyApi18(cl18, cl13, cl11, cl1, *x, axes=None, keepdims=1,
+                       op_version=None, output_names=None):
+    """
+    Adds operator Reduce* with opset>=18 following API from opset 17.
+    """
+    if op_version is None:
+        raise RuntimeError("op_version must be specified.")
+    if op_version is None or op_version >= 18:
+        if axes is None:
+            return cl18(  # noqa
+                *x, keepdims=keepdims, op_version=op_version,
+                output_names=output_names)
+        return cl18(  # noqa
+            *x, np.array(axes, dtype=np.int64),
+            keepdims=keepdims, op_version=op_version,
+            output_names=output_names)
+    if op_version >= 13:
+        if axes is None:
+            return cl13(*x, keepdims=keepdims,  # noqa
+                        op_version=op_version,
+                        output_names=output_names)
+        return cl13(*x, axes=axes, keepdims=keepdims,  # noqa
+                    op_version=op_version, output_names=output_names)
+    if op_version >= 11:
+        if axes is None:
+            return cl11(*x, keepdims=keepdims,  # noqa
+                        op_version=op_version,
+                        output_names=output_names)
+        return cl11(*x, axes=axes, keepdims=keepdims,  # noqa
+                    op_version=op_version, output_names=output_names)
+    if axes is None:
+        return cl1(*x, keepdims=keepdims,  # noqa
+                   op_version=op_version,
+                   output_names=output_names)
+    return cl1(*x, axes=axes, keepdims=keepdims,  # noqa
+               op_version=op_version, output_names=output_names)
+
+
+def OnnxReduceSumSquareApi18(*x, axes=None, keepdims=1, op_version=None,
+                             output_names=None):
+    """
+    Adds operator ReduceSumSquare with opset>=18 following API from opset 17.
+    """
+    if axes is None or not isinstance(axes, (list, np.ndarray)):
+        raise TypeError(f"axes must be a list or an array not {type(axes)}.")
+    return OnnxReduceAnyApi18(
+        OnnxReduceSumSquare, OnnxReduceSumSquare_13,  # noqa
+        OnnxReduceSumSquare_11, OnnxReduceSumSquare_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceMeanApi18(*x, axes=None, keepdims=1, op_version=None,
+                        output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceMean, OnnxReduceMean_13,  # noqa
+        OnnxReduceMean_11, OnnxReduceMean_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceMaxApi18(*x, axes=None, keepdims=1, op_version=None,
+                       output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceMax, OnnxReduceMax_13,  # noqa
+        OnnxReduceMax_11, OnnxReduceMax_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceLogSumExpApi18(*x, axes=None, keepdims=1, op_version=None,
+                             output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceLogSumExp, OnnxReduceLogSumExp_13,  # noqa
+        OnnxReduceLogSumExp_11, OnnxReduceLogSumExp_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxReduceL2Api18(*x, axes=None, keepdims=1, op_version=None,
+                      output_names=None):
+    """
+    Adds operator ReduceMean with opset>=18 following API from opset 17.
+    """
+    return OnnxReduceAnyApi18(
+        OnnxReduceL2, OnnxReduceL2_13,  # noqa
+        OnnxReduceL2_11, OnnxReduceL2_1,  # noqa
+        *x, axes=axes, keepdims=keepdims, op_version=op_version,
+        output_names=output_names)
+
+
+def OnnxSplitApi18(*x, axis=0, split=None, num_outputs=None,
+                   op_version=None, output_names=None):
     """
     Adds operator Split with opset>=13 following API from opset 11.
     """
     if op_version is None:
         raise RuntimeError("op_version must be specified.")
-    if op_version is None or op_version >= 13:
+    if op_version is None or op_version >= 18:
         if split is None:
-            return OnnxSplit(  # noqa
+            if num_outputs is None:
+                if output_names is None:
+                    raise RuntimeError(
+                        "split or num_outputs or output_names "
+                        "must be specified since opset 18.")
+                num_outputs = len(output_names)
+            if num_outputs is None:
+                raise AttributeError(
+                    "num_outputs cannot be None for Split-18.")
+            return OnnxSplit_18(  # noqa
+                *x, axis=axis, op_version=op_version,
+                num_outputs=num_outputs, output_names=output_names)
+        if num_outputs is None:
+            return OnnxSplit_18(  # noqa
+                *x, np.array(split, dtype=np.int64), axis=axis,
+                op_version=op_version, output_names=output_names)
+        return OnnxSplit_18(  # noqa
+            *x, np.array(split, dtype=np.int64), axis=axis,
+            num_outputs=num_outputs, op_version=op_version,
+            output_names=output_names)
+    if op_version >= 13:
+        if split is None:
+            return OnnxSplit_13(  # noqa
                 *x, axis=axis, op_version=op_version,
                 output_names=output_names)
-        return OnnxSplit(  # noqa
+        return OnnxSplit_13(  # noqa
             *x, np.array(split, dtype=np.int64), axis=axis,
             op_version=op_version, output_names=output_names)
     if op_version >= 11:
@@ -304,7 +444,7 @@ def OnnxReduceL2_typed(dtype, x, axes=None, keepdims=1, op_version=None,
     Adds operator ReduceL2 for float or double.
     """
     if dtype == np.float32:
-        return OnnxReduceL2(  # noqa
+        return OnnxReduceL2Api18(  # noqa
             x, axes=axes, keepdims=keepdims,
             op_version=op_version, output_names=output_names)
     x2 = OnnxMul(x, x, op_version=op_version)  # noqa

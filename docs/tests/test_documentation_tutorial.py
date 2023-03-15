@@ -73,6 +73,11 @@ class TestDocumentationTutorial(unittest.TestCase):
                         elif "'str' object has no attribute 'decode'" in st:
                             # unstable bug in scikit-learn<0.24
                             pass
+                        elif ("This method should be overwritten for "
+                              "operator") in st:
+                            # raised by old version of packages
+                            # used in the documentation
+                            pass
                         else:
                             raise RuntimeError(
                                 "Example '{}' (cmd: {} - exec_prefix='{}') "

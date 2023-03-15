@@ -20,7 +20,7 @@ def convert_sklearn_gradient_boosting_classifier(
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
-    if op.loss != 'deviance':
+    if op.loss not in ('deviance', 'log_loss'):
         raise NotImplementedError(
             "Loss '{0}' is not supported yet. You "
             "may raise an issue at "
@@ -31,9 +31,16 @@ def convert_sklearn_gradient_boosting_classifier(
 
     transform = 'LOGISTIC' if op.n_classes_ == 2 else 'SOFTMAX'
     if op.init == 'zero':
-        base_values = np.zeros(op.loss_.K)
+        loss = op._loss if hasattr(op, "_loss") else op.loss_
+        base_values = np.zeros(loss.K)
     elif op.init is None:
-        x0 = np.zeros((1, op.estimators_[0, 0].n_features_))
+        if hasattr(op.estimators_[0, 0], 'n_features_in_'):
+            # sklearn >= 1.2
+            n_features = op.estimators_[0, 0].n_features_in_
+        else:
+            # sklearn < 1.2
+            n_features = op.estimators_[0, 0].n_features_
+        x0 = np.zeros((1, n_features))
         if hasattr(op, '_raw_predict_init'):
             # sklearn >= 0.21
             base_values = op._raw_predict_init(x0).ravel()
@@ -88,7 +95,7 @@ def convert_sklearn_gradient_boosting_classifier(
                 attrs[k] = np.array(attrs[k], dtype=dtype)
 
     input_name = operator.input_full_names
-    if type(operator.inputs[0].type) == BooleanTensorType:
+    if isinstance(operator.inputs[0].type, BooleanTensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, input_name, cast_input_name,
@@ -109,7 +116,8 @@ def convert_sklearn_gradient_boosting_regressor(
     attrs['n_targets'] = 1
 
     if op.init == 'zero':
-        cst = np.zeros(op.loss_.K)
+        loss = op._loss if hasattr(op, "_loss") else op.loss_
+        cst = np.zeros(loss.K)
     elif op.init is None:
         # constant_ was introduced in scikit-learn 0.21.
         if hasattr(op.init_, 'constant_'):
@@ -161,6 +169,7 @@ register_converter('SklearnGradientBoostingClassifier',
                    convert_sklearn_gradient_boosting_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnGradientBoostingRegressor',
                    convert_sklearn_gradient_boosting_regressor)

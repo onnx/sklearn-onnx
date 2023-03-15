@@ -6,10 +6,8 @@ Tests examples from scikit-learn documentation.
 import sys
 import unittest
 import urllib.error
-from distutils.version import StrictVersion
 import warnings
 import numpy as np
-import onnx
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import fetch_20newsgroups
@@ -70,7 +68,7 @@ class TestSklearnDocumentation(unittest.TestCase):
         sys.platform == "win32",
         reason="Too long on Windows")
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
+        TARGET_OPSET < 10,
         reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf(self):
         categories = ["alt.atheism", "talk.religion.misc"]
@@ -101,17 +99,14 @@ class TestSklearnDocumentation(unittest.TestCase):
             tdata[:5],
             tfi,
             model_onnx,
-            basename="SklearnDocumentationTfIdf-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
-        )
+            basename="SklearnDocumentationTfIdf-OneOff-SklCol")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer introduced in 0.20",
     )
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        TARGET_OPSET < 10,
         reason="Encoding issue fixed in a later version")
     def test_pipeline_tfidf_pipeline_minmax(self):
         categories = ["alt.atheism", "talk.religion.misc"]
@@ -170,11 +165,8 @@ class TestSklearnDocumentation(unittest.TestCase):
             pipeline,
             model_onnx,
             verbose=False,
-            basename="SklearnDocumentationTfIdfUnion1",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')",
-        )
+            basename="SklearnDocumentationTfIdfUnion1")
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

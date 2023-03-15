@@ -3,6 +3,7 @@
 
 import numbers
 import numpy as np
+from sklearn.ensemble import RandomTreesEmbedding
 from ..common._apply_operation import (
     apply_cast,
     apply_concat,
@@ -91,6 +92,7 @@ def convert_sklearn_random_forest_classifier(
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
+    attr_dtype = dtype if op_version >= 3 else np.float32
     op = operator.raw_operator
 
     if hasattr(op, 'n_outputs_'):
@@ -179,9 +181,11 @@ def convert_sklearn_random_forest_classifier(
         if loss is not None:
             if use_raw_scores:
                 attr_pairs['post_transform'] = "NONE"
-            elif loss.__class__.__name__ == "BinaryCrossEntropy":
+            elif loss.__class__.__name__ in (
+                    "BinaryCrossEntropy", "HalfBinomialLoss"):
                 attr_pairs['post_transform'] = "LOGISTIC"
-            elif loss.__class__.__name__ == "CategoricalCrossEntropy":
+            elif loss.__class__.__name__ in (
+                    "CategoricalCrossEntropy", "HalfMultinomialLoss"):
                 attr_pairs['post_transform'] = "SOFTMAX"
             else:
                 raise NotImplementedError(
@@ -190,10 +194,10 @@ def convert_sklearn_random_forest_classifier(
         elif use_raw_scores:
             raise RuntimeError(
                 "The converter cannot implement decision_function for "
-                "'{}'.".format(type(op)))
+                "'{}' and loss '{}'.".format(type(op), loss))
 
         input_name = operator.input_full_names
-        if type(operator.inputs[0].type) == BooleanTensorType:
+        if isinstance(operator.inputs[0].type, BooleanTensorType):
             cast_input_name = scope.get_unique_variable_name('cast_input')
 
             apply_cast(scope, input_name, cast_input_name,
@@ -205,7 +209,8 @@ def convert_sklearn_random_forest_classifier(
                 if k in ('nodes_values', 'class_weights',
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
-                    attr_pairs[k] = np.array(attr_pairs[k], dtype=dtype)
+                    attr_pairs[k] = np.array(
+                        attr_pairs[k], dtype=attr_dtype).ravel()
 
         container.add_node(
             op_type, input_name,
@@ -245,12 +250,7 @@ def convert_sklearn_random_forest_classifier(
                     if k in ('nodes_values', 'class_weights',
                              'target_weights', 'nodes_hitrates',
                              'base_values'):
-                        attrs[k] = np.array(attrs[k], dtype=dtype)
-
-            dpath = scope.get_unique_variable_name("dpath%d" % i)
-            container.add_node(
-                op_type.replace("Classifier", "Regressor"), input_name, dpath,
-                op_domain=op_domain, op_version=op_version, **attrs)
+                        attrs[k] = np.array(attrs[k], dtype=attr_dtype).ravel()
 
             if options['decision_path']:
                 # decision_path
@@ -309,10 +309,21 @@ def convert_sklearn_random_forest_classifier(
             proba.append(reshaped_est_proba_name)
         apply_concat(scope, proba, concatenated_proba_name,
                      container, axis=0)
-        container.add_node('ReduceMean', concatenated_proba_name,
-                           operator.outputs[1].full_name,
-                           name=scope.get_unique_operator_name('ReduceMean'),
-                           axes=[0], keepdims=0)
+        if container.target_opset >= 18:
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [0])
+            container.add_node(
+                'ReduceMean', [concatenated_proba_name, axis_name],
+                operator.outputs[1].full_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                keepdims=0)
+        else:
+            container.add_node(
+                'ReduceMean', concatenated_proba_name,
+                operator.outputs[1].full_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                axes=[0], keepdims=0)
         predictions = _calculate_labels(
             scope, container, op, operator.outputs[1].full_name)
         apply_concat(scope, predictions, operator.outputs[0].full_name,
@@ -393,7 +404,7 @@ def convert_sklearn_random_forest_regressor_converter(
             if k in ('nodes_values', 'class_weights',
                      'target_weights', 'nodes_hitrates',
                      'base_values'):
-                attrs[k] = np.array(attrs[k], dtype=dtype)
+                attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
     container.add_node(
         op_type, input_name,
@@ -403,8 +414,15 @@ def convert_sklearn_random_forest_regressor_converter(
     if hasattr(op, 'n_trees_per_iteration_'):
         # HistGradientBoostingRegressor does not implement decision_path.
         return
-    options = scope.get_options(
-        op, dict(decision_path=False, decision_leaf=False))
+    if isinstance(op, RandomTreesEmbedding):
+        options = scope.get_options(op)
+    else:
+        options = scope.get_options(
+            op, dict(decision_path=False, decision_leaf=False))
+
+    if (not options.get('decision_path', False) and
+            not options.get('decision_leaf', False)):
+        return
 
     # decision_path
     tree_paths = []
@@ -427,14 +445,9 @@ def convert_sklearn_random_forest_regressor_converter(
                 if k in ('nodes_values', 'class_weights',
                          'target_weights', 'nodes_hitrates',
                          'base_values'):
-                    attrs[k] = np.array(attrs[k], dtype=dtype)
+                    attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
-        dpath = scope.get_unique_variable_name("dpath%d" % i)
-        container.add_node(
-            op_type, input_name, dpath,
-            op_domain=op_domain, op_version=op_version, **attrs)
-
-        if options['decision_path']:
+        if options.get('decision_path', False):
             # decision_path
             tree_paths.append(
                 _append_decision_output(
@@ -443,7 +456,7 @@ def convert_sklearn_random_forest_regressor_converter(
                     op_type=op_type, op_domain=op_domain,
                     op_version=op_version, regression=True,
                     overwrite_tree=tree.tree_))
-        if options['decision_leaf']:
+        if options.get('decision_leaf', False):
             # decision_path
             tree_leaves.append(
                 _append_decision_output(
@@ -454,13 +467,13 @@ def convert_sklearn_random_forest_regressor_converter(
 
     # merges everything
     n_out = 1
-    if options['decision_path']:
+    if options.get('decision_path', False):
         apply_concat(
             scope, tree_paths, operator.outputs[n_out].full_name, container,
             axis=1, operator_name=scope.get_unique_operator_name('concat'))
         n_out += 1
 
-    if options['decision_leaf']:
+    if options.get('decision_leaf', False):
         # decision_path
         apply_concat(
             scope, tree_leaves, operator.outputs[n_out].full_name, container,
@@ -473,6 +486,7 @@ register_converter('SklearnRandomForestClassifier',
                    options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'decision_path': [True, False],
                             'decision_leaf': [True, False]})
 register_converter('SklearnRandomForestRegressor',
@@ -484,6 +498,7 @@ register_converter('SklearnExtraTreesClassifier',
                    options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'decision_path': [True, False],
                             'decision_leaf': [True, False]})
 register_converter('SklearnExtraTreesRegressor',
@@ -494,9 +509,11 @@ register_converter('SklearnHistGradientBoostingClassifier',
                    convert_sklearn_random_forest_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnHistGradientBoostingRegressor',
                    convert_sklearn_random_forest_regressor_converter,
                    options={'zipmap': [True, False, 'columns'],
                             'raw_scores': [True, False],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})

@@ -4,8 +4,8 @@
 """
 .. _example-lightgbm:
 
-Convert a pipeline with a LightGBM model
-========================================
+Convert a pipeline with a LightGBM classifier
+=============================================
 
 .. index:: LightGBM
 
@@ -15,9 +15,6 @@ can be included in a :epkg:`scikit-learn` pipeline. This example considers
 a pipeline including a :epkg:`LightGBM` model. :epkg:`sklearn-onnx` can convert
 the whole pipeline as long as it knows the converter associated to
 a *LGBMClassifier*. Let's see how to do it.
-
-.. contents::
-    :local:
 
 Train a LightGBM classifier
 +++++++++++++++++++++++++++
@@ -73,7 +70,7 @@ update_registered_converter(
 model_onnx = convert_sklearn(
     pipe, 'pipeline_lightgbm',
     [('input', FloatTensorType([None, 2]))],
-    target_opset=12)
+    target_opset={'': 12, 'ai.onnx.ml': 2})
 
 # And save.
 with open("pipeline_lightgbm.onnx", "wb") as f:

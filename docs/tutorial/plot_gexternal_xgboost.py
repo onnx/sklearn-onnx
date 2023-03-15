@@ -17,9 +17,6 @@ model. :epkg:`sklearn-onnx` can convert the whole pipeline as long as
 it knows the converter associated to a *XGBClassifier*. Let's see
 how to do it.
 
-.. contents::
-    :local:
-
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
@@ -60,7 +57,7 @@ pipe.fit(X, y)
 try:
     convert_sklearn(pipe, 'pipeline_xgboost',
                     [('input', FloatTensorType([None, 2]))],
-                    target_opset=12)
+                    target_opset={'': 12, 'ai.onnx.ml': 2})
 except Exception as e:
     print(e)
 
@@ -97,7 +94,7 @@ update_registered_converter(
 model_onnx = convert_sklearn(
     pipe, 'pipeline_xgboost',
     [('input', FloatTensorType([None, 2]))],
-    target_opset=12)
+    target_opset={'': 12, 'ai.onnx.ml': 2})
 
 # And save.
 with open("pipeline_xgboost.onnx", "wb") as f:
@@ -154,7 +151,8 @@ print("predict", pipe.predict(X_test[:5]))
 #############################
 # ONNX
 
-onx = to_onnx(pipe, X_train.astype(numpy.float32))
+onx = to_onnx(pipe, X_train.astype(numpy.float32),
+              target_opset={'': 12, 'ai.onnx.ml': 2})
 
 sess = rt.InferenceSession(onx.SerializeToString())
 pred_onx = sess.run(None, {"X": X_test[:5].astype(numpy.float32)})
@@ -184,11 +182,18 @@ param = {'objective': 'multi:softmax', 'num_class': 3}
 bst = train_xgb(param, dtrain, 10)
 
 initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
-onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)
 
-sess = rt.InferenceSession(onx.SerializeToString())
-input_name = sess.get_inputs()[0].name
-label_name = sess.get_outputs()[0].name
-pred_onx = sess.run(
-    [label_name], {input_name: X_test.astype(numpy.float32)})[0]
-print(pred_onx)
+try:
+    onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)
+    cont = True
+except AssertionError as e:
+    print("XGBoost is too recent or onnxmltools too old.", e)
+    cont = False
+
+if cont:
+    sess = rt.InferenceSession(onx.SerializeToString())
+    input_name = sess.get_inputs()[0].name
+    label_name = sess.get_outputs()[0].name
+    pred_onx = sess.run(
+        [label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    print(pred_onx)

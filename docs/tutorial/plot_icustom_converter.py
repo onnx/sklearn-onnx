@@ -22,9 +22,6 @@ in fact two functions:
 
 This example implements both components for a new model.
 
-.. contents::
-    :local:
-
 Custom model
 ++++++++++++
 
@@ -156,7 +153,10 @@ except Exception as e:
 def decorrelate_transformer_shape_calculator(operator):
     op = operator.raw_operator
     input_type = operator.inputs[0].type.__class__
-    input_dim = operator.inputs[0].type.shape[0]
+    # The shape may be unknown. *get_first_dimension*
+    # returns the appropriate value, None in most cases
+    # meaning the transformer can process any batch of observations.
+    input_dim = operator.inputs[0].get_first_dimension()
     output_type = input_type([input_dim, op.coef_.shape[1]])
     operator.outputs[0].type = output_type
 

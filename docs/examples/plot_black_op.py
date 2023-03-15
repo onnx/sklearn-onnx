@@ -13,9 +13,6 @@ is missing from the list of available operators.
 Some converters may convert a model in different ways
 if the users wants to blacklist some operators.
 
-.. contents::
-    :local:
-
 GaussianMixture
 +++++++++++++++
 
@@ -49,7 +46,8 @@ model_onnx = to_onnx(
     model, X_train[:1].astype(np.float32),
     options={id(model): {'score_samples': True}},
     target_opset=12)
-sess = InferenceSession(model_onnx.SerializeToString())
+sess = InferenceSession(model_onnx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
 
 xt = X_test[:5].astype(np.float32)
 print(model.score_samples(xt))
@@ -86,7 +84,8 @@ model_onnx2 = to_onnx(
     options={id(model): {'score_samples': True}},
     black_op={'ReduceLogSumExp'},
     target_opset=12)
-sess2 = InferenceSession(model_onnx2.SerializeToString())
+sess2 = InferenceSession(model_onnx2.SerializeToString(),
+                         providers=["CPUExecutionProvider"])
 
 xt = X_test[:5].astype(np.float32)
 print(model.score_samples(xt))

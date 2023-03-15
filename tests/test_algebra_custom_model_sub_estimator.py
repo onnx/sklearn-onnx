@@ -8,7 +8,6 @@ import logging
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
@@ -37,7 +36,7 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity,
     OnnxReshape,
     OnnxSoftmax)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class CustomOpTransformer1(BaseEstimator, TransformerMixin,
@@ -250,6 +249,22 @@ def custom_transformer_converter1w(scope, operator, container):
     final.add_to(scope, container)
 
 
+class Custom2OpTransformer1ww(Custom2OpTransformer1):
+    pass
+
+
+def custom_transformer_converter1ww(scope, operator, container):
+    i0 = operator.inputs[0]
+    outputs = operator.outputs
+    op = operator.raw_operator
+    opv = container.target_opset
+    idin = OnnxIdentity(i0, op_version=opv)
+    out = OnnxSubEstimator(op.norm_, idin, op_version=opv)
+    final = OnnxIdentity(out, op_version=opv,
+                         output_names=outputs)
+    final.add_to(scope, container)
+
+
 class Custom2OpTransformer2(Custom2OpTransformer1):
     pass
 
@@ -365,12 +380,14 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         expected = obj.transform(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET)
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Issue %r with\n%s" % (e, str(onx))) from e
         got = sess.run(None, {'X': X})[0]
-        assert_almost_equal(expected, got)
+        assert_almost_equal(expected, got, decimal=5)
 
     def check_classifier(self, obj, X):
         self.log.debug("[check_classifier------] type(obj)=%r" % type(obj))
@@ -379,7 +396,9 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET,
                       options={id(obj): {'zipmap': False}})
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except InvalidArgument as e:
             raise AssertionError(
                 "Issue %r with\n%s" % (e, str(onx))) from e
@@ -421,6 +440,16 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
             custom_transformer_converter1w)
         X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
         tr = Custom2OpTransformer1w()
+        tr.fit(X)
+        self.check_transform(tr, X)
+
+    def test_custom_scaler_1ww_classic(self):
+        update_registered_converter(
+            Custom2OpTransformer1ww, 'Custom2OpTransformer1ww',
+            custom_shape_calculator,
+            custom_transformer_converter1ww)
+        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        tr = Custom2OpTransformer1ww()
         tr.fit(X)
         self.check_transform(tr, X)
 

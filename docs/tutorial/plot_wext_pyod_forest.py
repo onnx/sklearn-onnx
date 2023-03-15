@@ -15,9 +15,6 @@ It implements a custom converter for model `pyod.models.iforest.IForest
 pyod.models.html#module-pyod.models.iforest>`_.
 This example uses :ref:`l-plot-custom-converter` as a start.
 
-.. contents::
-    :local:
-
 Trains a model
 ++++++++++++++
 
@@ -36,32 +33,38 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity, OnnxMul, OnnxLess, OnnxConcat, OnnxCast, OnnxAdd,
     OnnxClip)
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
-from pyod.models.iforest import IForest
+try:
+    from pyod.models.iforest import IForest
+except (ValueError, ImportError) as e:
+    print("Unable to import pyod:", e)
+    IForest = None
 
-data1 = {'First':  [500, 500, 400, 100, 200, 300, 100],
-         'Second': ['a', 'b', 'a', 'b', 'a', 'b', 'c']}
+if IForest is not None:
+    data1 = {'First': [500, 500, 400, 100, 200, 300, 100],
+             'Second': ['a', 'b', 'a', 'b', 'a', 'b', 'c']}
 
-df1 = pd.DataFrame(data1, columns=['First', 'Second'])
-dumdf1 = pd.get_dummies(df1)
-scaler = MinMaxScaler()
-scaler.partial_fit(dumdf1)
-sc_data = scaler.transform(dumdf1)
-model1 = IForest(n_estimators=10, bootstrap=True, behaviour='new',
-                 contamination=0.1, random_state=np.random.RandomState(42),
-                 verbose=1, n_jobs=-1).fit(sc_data)
-feature_names2 = dumdf1.columns
+    df1 = pd.DataFrame(data1, columns=['First', 'Second'])
+    dumdf1 = pd.get_dummies(df1)
+    scaler = MinMaxScaler()
+    scaler.partial_fit(dumdf1)
+    sc_data = scaler.transform(dumdf1)
+    model1 = IForest(n_estimators=10, bootstrap=True, behaviour='new',
+                     contamination=0.1, random_state=np.random.RandomState(42),
+                     verbose=1, n_jobs=-1).fit(sc_data)
+    feature_names2 = dumdf1.columns
 
-
-initial_type = [('float_input', FloatTensorType([None, len(feature_names2)]))]
+    initial_type = [('float_input',
+                     FloatTensorType([None, len(feature_names2)]))]
 
 
 #############################################
 # We check that the conversion fails as expected.
 
-try:
-    to_onnx(model1, initial_types=initial_type)
-except Exception as e:
-    print(e)
+if IForest is not None:
+    try:
+        to_onnx(model1, initial_types=initial_type)
+    except Exception as e:
+        print(e)
 
 
 ####################################################
@@ -154,36 +157,40 @@ def pyod_iforest_converter(scope, operator, container):
 # Finally the registration.
 
 
-update_registered_converter(
-    IForest, "PyodIForest",
-    pyod_iforest_shape_calculator,
-    pyod_iforest_converter,
-    parser=pyod_iforest_parser)
+if IForest is not None:
+    update_registered_converter(
+        IForest, "PyodIForest",
+        pyod_iforest_shape_calculator,
+        pyod_iforest_converter,
+        parser=pyod_iforest_parser)
 
 #############################################
 # And the conversion.
 
-onx = to_onnx(model1, initial_types=initial_type)
+if IForest is not None:
+    onx = to_onnx(model1, initial_types=initial_type,
+                  target_opset={'': 14, 'ai.onnx.ml': 2})
 
 ###############################################
 # Checking discrepencies
 # ++++++++++++++++++++++
 
-data = sc_data.astype(np.float32)
+if IForest is not None:
+    data = sc_data.astype(np.float32)
 
-expected_labels = model1.predict(data)
-expected_proba = model1.predict_proba(data)
+    expected_labels = model1.predict(data)
+    expected_proba = model1.predict_proba(data)
 
-sess = InferenceSession(onx.SerializeToString())
-res = sess.run(None, {'float_input': data})
+    sess = InferenceSession(onx.SerializeToString())
+    res = sess.run(None, {'float_input': data})
 
-onx_labels = res[0]
-onx_proba = res[1]
+    onx_labels = res[0]
+    onx_proba = res[1]
 
-diff_labels = np.abs(onx_labels.ravel() - expected_labels.ravel()).max()
-diff_proba = np.abs(onx_proba.ravel() - expected_proba.ravel()).max()
+    diff_labels = np.abs(onx_labels.ravel() - expected_labels.ravel()).max()
+    diff_proba = np.abs(onx_proba.ravel() - expected_proba.ravel()).max()
 
-print("dicrepencies:", diff_labels, diff_proba)
+    print("dicrepencies:", diff_labels, diff_proba)
 
-print("ONNX labels", onx_labels)
-print("ONNX probabilities", onx_proba)
+    print("ONNX labels", onx_labels)
+    print("ONNX probabilities", onx_proba)

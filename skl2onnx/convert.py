@@ -18,7 +18,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                     custom_parsers=None, options=None,
                     intermediate=False,
                     white_op=None, black_op=None, final_types=None,
-                    dtype=None, verbose=0):
+                    dtype=None, naming=None, model_optim=True,
+                    verbose=0):
     """
     This function produces an equivalent
     ONNX model of the given scikit-learn model.
@@ -59,7 +60,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
     :param options: specific options given to converters
         (see :ref:`l-conv-options`)
     :param intermediate: if True, the function returns the
-        converted model and , and :class:`Topology`,
+        converted model and the instance of :class:`Topology` used,
         it returns the converted model otherwise
     :param white_op: white list of ONNX nodes allowed
         while converting a pipeline,
@@ -74,6 +75,14 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         now inferred from input types,
         converters may add operators Cast to switch
         to double when it is necessary
+    :param naming: the user may want to change the way intermediate
+        are named, this parameter can be a string (a prefix) or a
+        function, which signature is the following:
+        `get_name(name, existing_names)`, the library will then
+        check this name is unique and modify it if not
+    :param model_optim: enable or disable model optimisation
+        after the model was converted into onnx, it reduces the number
+        of identity nodes
     :param verbose: display progress while converting a model
     :return: An ONNX model (type: ModelProto) which is
         equivalent to the input scikit-learn model
@@ -142,11 +151,8 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 
     It is used in example :ref:`l-example-tfidfvectorizer`.
 
-    .. versionchanged:: 1.7
-        Parameter `target_opset`, if not specified, is now set to
-        the latest tested opset returned by
-        :py:func:`skl2onnx.get_latest_tested_opset_version` and
-        not the version of the *onnx* package.
+    .. versionchanged:: 1.10.0
+        Parameter *naming* was added.
     """
     if initial_types is None:
         if hasattr(model, 'infer_initial_types'):
@@ -173,7 +179,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         model, initial_types, target_opset, custom_conversion_functions,
         custom_shape_calculators, custom_parsers, options=options,
         white_op=white_op, black_op=black_op,
-        final_types=final_types)
+        final_types=final_types, naming=naming)
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     options = _process_options(model, options)
@@ -181,7 +187,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         print("[convert_sklearn] convert_topology")
     onnx_model = convert_topology(
         topology, name, doc_string, target_opset, options=options,
-        remove_identity=not intermediate, verbose=verbose)
+        remove_identity=model_optim and not intermediate, verbose=verbose)
     if verbose >= 1:
         print("[convert_sklearn] end")
         if verbose >= 2:
@@ -192,7 +198,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
             print("---OUTPUTS---")
             for inp in scope.output_variables:
                 print("  %r" % inp)
-            print("---VARIABLESS---")
+            print("---VARIABLES---")
             for k, v in sorted(scope.variables.items()):
                 print("  %r: is.fed=%r is_leaf=%r - %r" % (
                     k, v.is_fed, v.is_leaf, v))
@@ -207,7 +213,7 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
 def to_onnx(model, X=None, name=None, initial_types=None,
             target_opset=None, options=None,
             white_op=None, black_op=None, final_types=None,
-            dtype=None, verbose=0):
+            dtype=None, naming=None, model_optim=True, verbose=0):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -230,12 +236,23 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     :param dtype: removed in version 1.7.5, dtype is now inferred from
         input types, converters may add operators Cast to switch to
         double when it is necessary
+    :param naming: the user may want to change the way intermediate
+        are named, this parameter can be a string (a prefix) or a
+        function, which signature is the following:
+        `get_name(name, existing_names)`, the library will then
+        check this name is unique and modify it if not
+    :param model_optim: enable or disable model optimisation
+        after the model was converted into onnx, it reduces the number
+        of identity nodes
     :param verbose: display progress while converting a model
     :return: converted model
 
     This function checks if the model inherits from class
     :class:`OnnxOperatorMixin`, it calls method *to_onnx*
     in that case otherwise it calls :func:`convert_sklearn`.
+
+    .. versionchanged:: 1.10.0
+        Parameter *naming* was added.
     """
     from .algebra.onnx_operator_mixin import OnnxOperatorMixin
     from .algebra.type_helper import guess_initial_types
@@ -248,12 +265,15 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
+    if verbose >= 1:
+        print("[to_onnx] initial_types=%r" % initial_types)
     return convert_sklearn(model, initial_types=initial_types,
                            target_opset=target_opset,
                            name=name, options=options,
                            white_op=white_op, black_op=black_op,
                            final_types=final_types, dtype=dtype,
-                           verbose=verbose)
+                           verbose=verbose, naming=naming,
+                           model_optim=model_optim)
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):

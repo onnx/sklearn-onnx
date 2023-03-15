@@ -5,7 +5,8 @@ import numpy as np
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
     RBF, DotProduct, ExpSineSquared,
-    RationalQuadratic, PairwiseKernel
+    RationalQuadratic, PairwiseKernel,
+    WhiteKernel,
 )
 from ..algebra.complex_functions import onnx_squareform_pdist, onnx_cdist
 from ..algebra.onnx_ops import (
@@ -13,8 +14,8 @@ from ..algebra.onnx_ops import (
     OnnxTranspose, OnnxDiv, OnnxExp,
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSumApi11, OnnxSqueezeApi11,
-    OnnxIdentity, OnnxReduceSumSquare,
-    OnnxReduceL2_typed
+    OnnxIdentity, OnnxReduceSumSquareApi18,
+    OnnxReduceL2_typed, OnnxEyeLike,
 )
 from ..algebra.custom_ops import OnnxCDist
 from ..proto.onnx_helper_modified import from_array
@@ -68,8 +69,10 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
     if isinstance(kernel, DotProduct):
         t_sigma_0 = py_make_float_array(kernel.sigma_0 ** 2, dtype=dtype)
         return OnnxSqueezeApi11(
-            OnnxAdd(OnnxReduceSumSquare(X, axes=[1], op_version=op_version),
-                    t_sigma_0, op_version=op_version),
+            OnnxAdd(
+                OnnxReduceSumSquareApi18(
+                    X, axes=[1], op_version=op_version),
+                t_sigma_0, op_version=op_version),
             output_names=output_names, axes=[1],
             op_version=op_version)
 
@@ -81,10 +84,13 @@ def py_make_float_array(cst, dtype, as_tensor=False):
     if dtype not in (np.float32, np.float64):
         raise TypeError("A float array must be of dtype "
                         "np.float32 or np.float64 ({}).".format(dtype))
-    if not isinstance(cst, (int, float, np.float32, np.float64,
-                            np.int32, np.int64)):
+    if isinstance(cst, np.ndarray):
+        res = cst.astype(dtype)
+    elif not isinstance(cst, (int, float, np.float32, np.float64,
+                              np.int32, np.int64)):
         raise TypeError("cst must be a number not {}".format(type(cst)))
-    res = np.array([cst], dtype=dtype)
+    else:
+        res = np.array([cst], dtype=dtype)
     return from_array(res) if as_tensor else res
 
 
@@ -215,13 +221,11 @@ def convert_kernel(kernel, X, output_names=None,
 
     if isinstance(kernel, ConstantKernel):
         # X and x_train should have the same number of features.
+        onnx_zeros_x = _zero_vector_of_size(
+            X, keepdims=1, dtype=dtype, op_version=op_version)
         if x_train is None:
-            onnx_zeros_x = _zero_vector_of_size(
-                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = onnx_zeros_x
         else:
-            onnx_zeros_x = _zero_vector_of_size(
-                X, keepdims=1, dtype=dtype, op_version=op_version)
             onnx_zeros_y = _zero_vector_of_size(
                 x_train, keepdims=1, dtype=dtype, op_version=op_version)
 
@@ -234,21 +238,21 @@ def convert_kernel(kernel, X, output_names=None,
                        op_version=op_version)
 
     if isinstance(kernel, RBF):
-        if not isinstance(kernel.length_scale, (float, int)):
-            raise NotImplementedError(
-                "length_scale should be float not {}.".format(
-                    type(kernel.length_scale)))
-
         # length_scale = np.squeeze(length_scale).astype(float)
         zeroh = _zero_vector_of_size(X, axis=1, keepdims=0, dtype=dtype,
                                      op_version=op_version)
         zerov = _zero_vector_of_size(X, axis=0, keepdims=1, dtype=dtype,
                                      op_version=op_version)
 
-        tensor_value = py_make_float_array(kernel.length_scale, dtype=dtype,
-                                           as_tensor=True)
-        const = OnnxConstantOfShape(OnnxShape(zeroh, op_version=op_version),
-                                    value=tensor_value, op_version=op_version)
+        if (isinstance(kernel.length_scale, np.ndarray) and
+                len(kernel.length_scale) > 0):
+            const = kernel.length_scale.astype(dtype)
+        else:
+            tensor_value = py_make_float_array(
+                kernel.length_scale, dtype=dtype, as_tensor=True)
+            const = OnnxConstantOfShape(
+                OnnxShape(zeroh, op_version=op_version),
+                value=tensor_value, op_version=op_version)
         X_scaled = OnnxDiv(X, const, op_version=op_version)
         if x_train is None:
             dist = onnx_squareform_pdist(
@@ -341,6 +345,29 @@ def convert_kernel(kernel, X, output_names=None,
                 dtype=dtype, output_names=output_names,
                 optim=optim, op_version=op_version)
 
+    if isinstance(kernel, WhiteKernel):
+        # X and x_train should have the same number of features.
+        onnx_zeros_x = _zero_vector_of_size(
+            X, keepdims=1, dtype=dtype, op_version=op_version)
+        if x_train is None:
+            onnx_zeros_y = onnx_zeros_x
+        else:
+            onnx_zeros_y = _zero_vector_of_size(
+                x_train, keepdims=1, dtype=dtype, op_version=op_version)
+        tr = OnnxTranspose(onnx_zeros_y, perm=[1, 0], op_version=op_version)
+        mat = OnnxMatMul(onnx_zeros_x, tr, op_version=op_version)
+
+        if x_train is not None:
+            return OnnxIdentity(mat, op_version=op_version,
+                                output_names=output_names)
+
+        return OnnxMul(
+            OnnxEyeLike(mat, op_version=op_version),
+            OnnxIdentity(np.array([kernel.noise_level], dtype=dtype),
+                         op_version=op_version),
+            op_version=op_version,
+            output_names=output_names)
+
     raise RuntimeError("Unable to convert __call__ method for "
                        "class {}.".format(type(kernel)))
 
@@ -356,14 +383,14 @@ def _zero_vector_of_size(X, output_names=None, axis=0,
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version),
                 op_version=op_version),
-            axes=[1-axis], keepdims=keepdims,
+            axes=[1 - axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     elif dtype in (np.float64, np.int32, np.int64):
         res = OnnxReduceSumApi11(
             OnnxConstantOfShape(
                 OnnxShape(X, op_version=op_version), value=py_make_float_array(
                     0, dtype=dtype, as_tensor=True), op_version=op_version),
-            axes=[1-axis], keepdims=keepdims,
+            axes=[1 - axis], keepdims=keepdims,
             output_names=output_names, op_version=op_version)
     else:
         raise NotImplementedError(

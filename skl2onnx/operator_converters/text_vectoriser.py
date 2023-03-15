@@ -2,14 +2,16 @@
 
 
 import warnings
+from collections import OrderedDict, Counter
 import numpy as np
 from ..common._apply_operation import (
     apply_cast, apply_reshape, apply_identity)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_proto_type
+from ..common.data_types import guess_proto_type, StringTensorType
 from ..proto import onnx_proto
+from ..algebra.onnx_ops import OnnxStringNormalizer
 
 
 def _intelligent_split(text, op, tokenizer, existing):
@@ -40,14 +42,54 @@ def _intelligent_split(text, op, tokenizer, existing):
             else:
                 spl[0] = " " * p1 + spl[0]
                 spl[-1] = spl[-1] + " " * p2_
-            if any(map(lambda g: g not in op.vocabulary_, spl)):
+            exc = None
+            if len(spl) == 1:
+                pass
+            elif len(spl) == 2:
+                if (spl[0] not in op.vocabulary_ or
+                        spl[1] not in op.vocabulary_):
+                    # This is neceassarily a single token.
+                    spl = [text]
+                elif spl[0] in op.vocabulary_ and spl[1] in op.vocabulary_:
+                    # ambiguity
+                    # w1, w2 can be either a 2-grams, either a token.
+                    # Usually, ' ' is not part of any token.
+                    pass
+            elif len(spl) == 3:
+                stok = (all([s in op.vocabulary_ for s in spl]), spl)
+                spl12 = (spl[2] in op.vocabulary_ and
+                         (spl[0] + ' ' + spl[1]) in op.vocabulary_,
+                         [spl[0] + ' ' + spl[1], spl[2]])
+                spl23 = (spl[0] in op.vocabulary_ and
+                         (spl[1] + ' ' + spl[2]) in op.vocabulary_,
+                         [spl[0], spl[1] + ' ' + spl[2]])
+                c = Counter(map(lambda t: t[0], [stok, spl12, spl23]))
+                if c.get(True, -1) == 0:
+                    spl = [text]
+                found = [el[1] for el in [stok, spl12, spl23] if el[0]]
+                if len(found) == 1:
+                    spl = found[0]
+                elif len(found) == 0:
+                    spl = [text]
+                elif stok[0]:
+                    # By default, we assume the token is just the sum of
+                    # single words.
+                    pass
+                else:
+                    exc = (
+                        "More than one decomposition in tokens: [" +
+                        ", ".join(map(lambda t: "-".join(t), found)) + "].")
+            elif any(map(lambda g: g in op.vocabulary_, spl)):
                 # TODO: handle this case with an algorithm
                 # which is able to break a string into
                 # known substrings.
-                raise RuntimeError("Unable to split n-grams '{}' "
-                                   "into tokens existing in the "
-                                   "vocabulary. This happens when "
-                                   "a token contain spaces.".format(text))
+                exc = "Unable to identify tokens in n-grams."
+            if exc:
+                raise RuntimeError(
+                    "Unable to split n-grams '{}' into tokens. "
+                    "{} This happens when a token contain "
+                    "spaces. Token '{}' may be a token or a n-gram '{}'."
+                    "".format(text, exc, text, spl))
         else:
             # We reuse the tokenizer hoping that will clear
             # ambiguities but this might be slow.
@@ -57,25 +99,20 @@ def _intelligent_split(text, op, tokenizer, existing):
 
     spl = tuple(spl)
     if spl in existing:
-        raise RuntimeError("The converter cannot guess how to "
-                           "split an expression into tokens. "
-                           "This happens when "
-                           "a token contain spaces.")
-    if op.ngram_range[0] == 1 and \
-            (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
+        raise RuntimeError(
+            f"The converter cannot guess how to split expression "
+            f"{text!r} into tokens. This case happens when tokens have "
+            f"spaces.")
+    if (op.ngram_range[0] == 1 and
+            (len(op.ngram_range) == 1 or op.ngram_range[1] > 1)):
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
-                nos = g.replace(" ", "")
-                couples = [(w, w.replace(" ", "")) for w in op.vocabulary_]
-                possible = ['{}'.format(w[0])
-                            for w in couples if w[1] == nos]
                 raise RuntimeError(
-                    "Unable to split n-grams '{}' due to '{}' "
-                    "into tokens existing in the "
-                    "vocabulary. This happens when "
-                    "a token contain spaces. Ambiguity found is '{}' "
-                    ".".format(text, g, possible))
+                    "Unable to split n-grams '{}' into tokens {} "
+                    "existing in the vocabulary. Token '{}' does not "
+                    "exist in the vocabulary."
+                    ".".format(text, spl, g))
     existing.add(spl)
     return spl
 
@@ -166,25 +203,22 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     if op.strip_accents is not None:
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
-            "only stip_accents=None is supported. "
+            "only strip_accents=None is supported. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
 
     options = container.get_options(
         op, dict(separators="DEFAULT",
                  tokenexp=None,
-                 nan=False))
-    if set(options) != {'separators', 'tokenexp', 'nan'}:
+                 nan=False,
+                 keep_empty_string=False))
+    if set(options) != {'separators', 'tokenexp', 'nan', 'keep_empty_string'}:
         raise RuntimeError("Unknown option {} for {}".format(
             set(options) - {'separators'}, type(op)))
 
     if op.analyzer == 'word':
         default_pattern = '(?u)\\b\\w\\w+\\b'
         if options['separators'] == "DEFAULT" and options['tokenexp'] is None:
-            warnings.warn("Converter for TfidfVectorizer will use "
-                          "scikit-learn regular expression by default "
-                          "in version 1.6.",
-                          UserWarning)
             regex = op.token_pattern
             if regex == default_pattern:
                 regex = '[a-zA-Z0-9_]+'
@@ -223,17 +257,21 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.")
 
-    stop_words = op.stop_words_ | (
-        set(op.stop_words) if op.stop_words else set())
+    if hasattr(op, "stop_words_"):
+        stop_words = op.stop_words_ | (
+            set(op.stop_words) if op.stop_words else set())
+    else:
+        stop_words = set()
+    for w in stop_words:
+        if not isinstance(w, str):
+            raise TypeError(
+                f"One stop word is not a string {w!r} "
+                f"in stop_words={stop_words}.")
 
     if op.lowercase or stop_words:
         if len(operator.input_full_names) != 1:
             raise RuntimeError("Only one input is allowed, found {}.".format(
                 operator.input_full_names))
-        flatten = scope.get_unique_variable_name('flattened')
-        apply_reshape(scope, operator.input_full_names[0],
-                      flatten, container,
-                      desired_shape=(-1, ))
 
         # StringNormalizer
         op_type = 'StringNormalizer'
@@ -253,13 +291,34 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             })
             op_version = 9
             domain = 'com.microsoft'
-
+        opvs = 1 if domain == 'com.microsoft' else op_version
         if stop_words:
             attrs['stopwords'] = list(sorted(stop_words))
-        opvs = 1 if domain == 'com.microsoft' else op_version
-        container.add_node(op_type, flatten,
-                           normalized, op_version=opvs,
-                           op_domain=domain, **attrs)
+
+        if options['keep_empty_string']:
+            del attrs['name']
+            op_norm = OnnxStringNormalizer(
+                'text_in', op_version=container.target_opset,
+                output_names=['text_out'], **attrs)
+            scan_body = op_norm.to_onnx(
+                OrderedDict([('text_in', StringTensorType())]),
+                outputs=[('text_out', StringTensorType())],
+                target_opset=op_version)
+
+            vector = scope.get_unique_variable_name('vector')
+            apply_reshape(scope, operator.input_full_names[0],
+                          vector, container,
+                          desired_shape=(-1, 1))
+            container.add_node('Scan', vector, normalized,
+                               body=scan_body.graph, num_scan_inputs=1)
+        else:
+            flatten = scope.get_unique_variable_name('flattened')
+            apply_reshape(scope, operator.input_full_names[0],
+                          flatten, container,
+                          desired_shape=(-1, ))
+            container.add_node(op_type, flatten,
+                               normalized, op_version=opvs,
+                               op_domain=domain, **attrs)
     else:
         normalized = operator.input_full_names
 
@@ -307,18 +366,37 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     tokenizer = op.build_tokenizer()
     split_words = []
     existing = set()
+    errors = []
     for w in words:
-        spl = _intelligent_split(w, op, tokenizer, existing)
+        if isinstance(w, tuple):
+            # TraceableCountVectorizer, TraceableTfIdfVectorizer
+            spl = list(w)
+            w = ' '.join(w)
+        else:
+            # CountVectorizer, TfIdfVectorizer
+            try:
+                spl = _intelligent_split(w, op, tokenizer, existing)
+            except RuntimeError as e:
+                errors.append(e)
+                continue
         split_words.append((spl, w))
+    if len(errors) > 0:
+        err = "\n".join(map(str, errors))
+        raise RuntimeError(
+            f"There were ambiguities between n-grams and tokens. "
+            f"{len(errors)} errors occurred. You can fix it by using "
+            f"class Traceable{op.__class__.__name__}.\n"
+            f"You can learn more at https://github.com/scikit-learn/"
+            f"scikit-learn/issues/13733.\n{err}")
 
-    ng_split_words = [(len(a[0]), a[0], i) for i, a in enumerate(split_words)]
-    ng_split_words.sort()
+    ng_split_words = sorted([(len(a[0]), a[0], i)
+                            for i, a in enumerate(split_words)])
     key_indices = [a[2] for a in ng_split_words]
     ngcounts = [0 for i in range(op.ngram_range[0])]
 
     words = list(ng_split_words[0][1])
     for i in range(1, len(ng_split_words)):
-        if ng_split_words[i-1][0] != ng_split_words[i][0]:
+        if ng_split_words[i - 1][0] != ng_split_words[i][0]:
             ngcounts.append(len(words))
         words.extend(ng_split_words[i][1])
 
@@ -398,4 +476,5 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
 
 register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer,
                    options={'tokenexp': None, 'separators': None,
-                            'nan': [True, False]})
+                            'nan': [True, False],
+                            'keep_empty_string': [True, False]})

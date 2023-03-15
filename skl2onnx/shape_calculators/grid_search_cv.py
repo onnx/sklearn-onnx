@@ -14,7 +14,7 @@ def convert_sklearn_grid_search_cv(operator):
     if name is None:
         logger = logging.getLogger('skl2onnx')
         logger.warn("[convert_sklearn_grid_search_cv] failed to find alias "
-                    "to model type %r." % type(best_estimator))
+                    "to model type %r.", type(best_estimator))
         return
     op = operator.new_raw_operator(best_estimator, name)
     shape_calc = get_shape_calculator(name)

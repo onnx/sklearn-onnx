@@ -23,17 +23,19 @@ def convert_pls_regression(scope: Scope, operator: Operator,
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
-    if type(X.type) == Int64TensorType:
+    if isinstance(X.type, Int64TensorType):
         X = OnnxCast(X, to=proto_dtype, op_version=opv)
 
+    coefs = op.x_mean_ if hasattr(op, 'x_mean_') else op._x_mean
+    std = op.x_std_ if hasattr(op, 'x_std_') else op._x_std
+    ym = op.y_mean_ if hasattr(op, 'x_mean_') else op._y_mean
+
     norm_x = OnnxDiv(
-        OnnxSub(X, op.x_mean_.astype(dtype),
-                op_version=opv),
-        op.x_std_.astype(dtype),
-        op_version=opv)
+        OnnxSub(X, coefs.astype(dtype), op_version=opv),
+        std.astype(dtype), op_version=opv)
     dot = OnnxMatMul(norm_x, op.coef_.astype(dtype),
                      op_version=opv)
-    pred = OnnxAdd(dot, op.y_mean_.astype(dtype),
+    pred = OnnxAdd(dot, ym.astype(dtype),
                    op_version=opv, output_names=operator.outputs)
     pred.add_to(scope, container)
 

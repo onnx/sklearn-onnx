@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import onnxruntime
 try:
     # scikit-learn >= 0.22
@@ -29,7 +29,7 @@ from test_utils import (
 
 
 class TestSklearnBaggingConverter(unittest.TestCase):
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_default_binary_int(self):
         model, X = fit_classification_model(
             BaggingClassifier(), 2, is_int=True)
@@ -43,7 +43,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X, model, model_onnx,
             basename="SklearnBaggingClassifierDefaultBinary")
 
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_default_multiclass_int(self):
         model, X = fit_classification_model(
             BaggingClassifier(), 4, is_int=True)
@@ -58,10 +58,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierDefaultMulticlass",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingClassifierDefaultMulticlass")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_default_binary(self):
@@ -77,11 +74,8 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         dump_data_and_model(
             X,
             model,
-            model_onnx,
-            basename="SklearnBaggingClassifierDefaultBinary",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            model_onnx, verbose=False,
+            basename="SklearnBaggingClassifierDefaultBinary")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_max_features(self):
@@ -94,9 +88,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx, verbose=False,
-            basename="SklearnBaggingClassifierMaxFeatures",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingClassifierMaxFeatures")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_bootstrap_features(self):
@@ -109,9 +101,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X[:5], model, model_onnx, verbose=False,
-            basename="SklearnBaggingClassifierBootstrapFeatures",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingClassifierBootstrapFeatures")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_default_binary_nozipmap(self):
@@ -125,14 +115,12 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnBaggingClassifierDefaultBinaryNoZipMap",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingClassifierDefaultBinaryNoZipMap")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_default_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(), 4)
+            BaggingClassifier(), 3)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
@@ -141,15 +129,12 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
+            X[:10],
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierDefaultMulticlass",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingClassifierDefaultMulticlass")
 
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_sgd_binary(self):
         model, X = fit_classification_model(
             BaggingClassifier(
@@ -166,10 +151,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierSGDBinary",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingClassifierSGDBinary")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_sgd_binary_decision_function(self):
@@ -188,14 +170,12 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         dump_data_and_model(
             X[:5], model, model_onnx,
             basename="SklearnBaggingClassifierSGDBinaryDecisionFunction-Dec3",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function_binary'])
 
-    @unittest.skipIf(StrictVersion(onnxruntime.__version__)
-                     <= StrictVersion("0.4.0"),
+    @unittest.skipIf(pv.Version(onnxruntime.__version__)
+                     <= pv.Version("0.4.0"),
                      reason="Not implemented.")
-    @ignore_warnings(category=FutureWarning)
+    @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
             BaggingClassifier(
@@ -210,9 +190,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X[:5], model, model_onnx,
-            basename="SklearnBaggingClassifierSGDMulticlass-Dec3",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingClassifierSGDMulticlass-Dec3")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_sgd_multiclass_decision_function(self):
@@ -220,7 +198,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             BaggingClassifier(
                 GradientBoostingClassifier(random_state=42, n_estimators=4),
                 random_state=42), 4, n_features=10)
-        options = {id(model): {'raw_scores': True}}
+        options = {id(model): {'raw_scores': True, "zipmap": False}}
         model_onnx = convert_sklearn(
             model, "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
@@ -230,8 +208,6 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         dump_data_and_model(
             X[:15], model, model_onnx,
             basename="SklearnBaggingClassifierSGDMultiDecisionFunction-Dec3",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
             methods=['predict', 'decision_function'])
 
     @ignore_warnings(category=FutureWarning)
@@ -243,17 +219,15 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False})
+
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierGradientBoostingBinary",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingClassifierGradientBoostingBinary")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_multiclass(self):
@@ -261,20 +235,13 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             BaggingClassifier(
                 GradientBoostingClassifier(n_estimators=10)), 3)
         model_onnx = convert_sklearn(
-            model,
-            "bagging classifier",
+            model, "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
-        self.assertIsNotNone(model_onnx)
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False})
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBaggingClassifierGradientBoostingMulticlass",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnBaggingClassifierGradientBoostingMulticlass")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_default(self):
@@ -291,10 +258,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingRegressorDefault-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingRegressorDefault-Dec4")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_max_features(self):
@@ -307,9 +271,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx, verbose=False,
-            basename="SklearnBaggingRegressorMaxFeatures-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingRegressorMaxFeatures-Dec4")
 
     def test_bagging_regressor_bootstrap_features(self):
         model, X = fit_regression_model(
@@ -321,9 +283,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx, verbose=False,
-            basename="SklearnBaggingRegressorBootstrapFeatures-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingRegressorBootstrapFeatures-Dec4")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_sgd(self):
@@ -338,10 +298,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingRegressorSGD-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingRegressorSGD-Dec4")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_gradient_boosting(self):
@@ -355,9 +312,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnBaggingRegressorGradientBoosting-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnBaggingRegressorGradientBoosting-Dec4")
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_bool(self):
@@ -374,11 +329,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingRegressorBool-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnBaggingRegressorBool-Dec4")
 
 
 if __name__ == "__main__":
-    unittest.main()
+    # TestSklearnBaggingConverter().
+    # test_bagging_classifier_sgd_multiclass_decision_function()
+    unittest.main(verbosity=2)

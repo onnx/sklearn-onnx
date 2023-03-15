@@ -14,10 +14,6 @@ documentation: `Plot individual and voting regression predictions
 converts it into ONNX and finally computes the predictions
 a different runtime.
 
-.. contents::
-    :local:
-
-
 Training a pipeline
 +++++++++++++++++++
 """
@@ -39,8 +35,8 @@ X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
 # Train classifiers
-reg1 = GradientBoostingRegressor(random_state=1)
-reg2 = RandomForestRegressor(random_state=1)
+reg1 = GradientBoostingRegressor(random_state=1, n_estimators=5)
+reg2 = RandomForestRegressor(random_state=1, n_estimators=5)
 reg3 = LinearRegression()
 
 ereg = Pipeline(steps=[
@@ -72,7 +68,8 @@ pred_ort = sess.run(None, {'X': X_test.astype(numpy.float32)})[0]
 
 pred_skl = ereg.predict(X_test.astype(numpy.float32))
 
-pred_ort[:5], pred_skl[:5]
+print("Onnx Runtime prediction:\n", pred_ort[:5])
+print("Sklearn rediction:\n", pred_skl[:5])
 
 ####################################
 # .. _l-diff-dicrepencies:
@@ -122,6 +119,7 @@ print(diff(pred_skl, pred_pyrt))
 
 #############################
 # Final graph
+# You may need to install graphviz from https://graphviz.org/download/
 # +++++++++++
 
 ax = plot_graphviz(oinf.to_dot())

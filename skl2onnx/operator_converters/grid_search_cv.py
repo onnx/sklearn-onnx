@@ -19,6 +19,7 @@ def convert_sklearn_grid_search_cv(scope: Scope, operator: Operator,
     grid_search_operator = scope.declare_local_operator(
         op_type, best_estimator)
     container.add_options(id(best_estimator), opts)
+    scope.add_options(id(best_estimator), opts)
     grid_search_operator.inputs = operator.inputs
 
     for i, o in enumerate(operator.outputs):

@@ -1,10 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-
-from onnxconverter_common import apply_identity
 from onnx import TensorProto
-
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -12,7 +9,7 @@ from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd, OnnxSub, OnnxPow, OnnxDiv, OnnxMul,
     OnnxCast, OnnxNot, OnnxLess, OnnxLog, OnnxNeg,
-    OnnxImputer)
+    OnnxImputer, OnnxIdentity, OnnxScaler)
 
 
 def convert_powertransformer(scope: Scope, operator: Operator,
@@ -75,10 +72,10 @@ def convert_powertransformer(scope: Scope, operator: Operator,
         y_gr0 = OnnxMul(y_gr0, greater_mask, op_version=opv)
 
         # negative input, lambda != 2
-        y_le0_l_ne2 = OnnxPow(y1, 2-lambdas, op_version=opv)
+        y_le0_l_ne2 = OnnxPow(y1, 2 - lambdas, op_version=opv)
         y_le0_l_ne2 = OnnxSub(ones_, y_le0_l_ne2, op_version=opv)
         y_le0_l_ne2 = OnnxDiv(
-            y_le0_l_ne2, (2-lambdas).astype(dtype), op_version=opv)
+            y_le0_l_ne2, (2 - lambdas).astype(dtype), op_version=opv)
         y_le0_l_ne2 = OnnxImputer(
             y_le0_l_ne2, imputed_value_floats=[0.0],
             replaced_value_float=np.inf, op_version=opv)
@@ -96,7 +93,7 @@ def convert_powertransformer(scope: Scope, operator: Operator,
         y_le0 = OnnxMul(y_le0, less_mask, op_version=opv)
 
         # Arbitrary input and lambda
-        y = OnnxAdd(y_gr0, y_le0, output_names='tmp', op_version=opv)
+        y = OnnxAdd(y_gr0, y_le0, op_version=opv)
 
     elif 'box-cox' in op.method:
         # positive input, lambda != 0
@@ -119,9 +116,7 @@ def convert_powertransformer(scope: Scope, operator: Operator,
         y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask, op_version=opv)
 
         # positive input, arbitrary lambda
-        y = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0,
-                    output_names='tmp',
-                    op_version=opv)
+        y = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0, op_version=opv)
 
         # negative input
         # PowerTransformer(method='box-cox').fit(negative_data)
@@ -132,17 +127,22 @@ def convert_powertransformer(scope: Scope, operator: Operator,
             'Method {} is not supported'.format(op.method))
 
     y.set_onnx_name_prefix('pref')
-    y.add_to(scope, container)
 
     if op.standardize:
-        name = scope.get_unique_operator_name('Scaler')
-        attrs = dict(name=name,
-                     offset=op._scaler.mean_.astype(np.float32),
-                     scale=(1.0 / op._scaler.scale_).astype(np.float32))
-        container.add_node('Scaler', 'tmp', op_out,
-                           op_domain='ai.onnx.ml', **attrs)
+        use_scaler_op = container.is_allowed({'Scaler'})
+        if not use_scaler_op or dtype != np.float32:
+            sub = OnnxSub(y, op._scaler.mean_.astype(dtype), op_version=opv)
+            final = OnnxDiv(sub, op._scaler.scale_.astype(dtype),
+                            op_version=opv, output_names=[op_out])
+        else:
+            final = OnnxScaler(
+                y, offset=op._scaler.mean_.astype(dtype),
+                scale=(1.0 / op._scaler.scale_).astype(dtype),
+                op_version=opv, output_names=[op_out])
     else:
-        apply_identity(scope, 'tmp', op_out, container)
+        final = OnnxIdentity(y, op_version=opv, output_names=[op_out])
+
+    final.add_to(scope, container)
 
 
 register_converter('SklearnPowerTransformer', convert_powertransformer)

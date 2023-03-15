@@ -1,6 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
+try:
+    from pandas import DataFrame
+except ImportError:
+    DataFrame = None
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto, ValueInfoProto
 from ..common._topology import Variable
@@ -79,6 +83,21 @@ def guess_initial_types(X, initial_types):
     if initial_types is None:
         if isinstance(X, np.ndarray):
             X = X[:1]
-        gt = _guess_type(X)
-        initial_types = [('X', gt)]
+            gt = _guess_type(X)
+            initial_types = [('X', gt)]
+        elif DataFrame is not None and isinstance(X, DataFrame):
+            X = X[:1]
+            initial_types = []
+            for c in X.columns:
+                if isinstance(X[c].values[0], (str, np.str_)):
+                    g = StringTensorType()
+                else:
+                    g = _guess_type(X[c].values)
+                g.shape = [None, 1]
+                initial_types.append((c, g))
+        elif isinstance(X, list):
+            initial_types = X
+        else:
+            raise TypeError(
+                "Unexpected type %r, unable to guess type." % type(X))
     return initial_types

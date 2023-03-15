@@ -32,6 +32,7 @@ def _calculate_proba(scope, operator, container, model):
         if container.has_options(estimator, 'raw_scores'):
             container.add_options(
                 id(estimator), {'raw_scores': use_raw_scores})
+            scope.add_options(id(estimator), {'raw_scores': use_raw_scores})
 
         label_name = scope.declare_local_variable(
             'label_%d' % index, Int64TensorType())
@@ -39,8 +40,10 @@ def _calculate_proba(scope, operator, container, model):
             'proba_%d' % index, operator.inputs[0].type.__class__())
 
         features = model.estimators_features_[index]
-        if (len(features) == model.n_features_ and
-                list(features) == list(range(model.n_features_))):
+        n_features = (model.n_features_in_ if hasattr(model, 'n_features_in_')
+                      else model.n_features_)
+        if (len(features) == n_features and
+                list(features) == list(range(n_features))):
             this_operator.inputs = operator.inputs
         else:
             # subset of features
@@ -70,10 +73,21 @@ def _calculate_proba(scope, operator, container, model):
     apply_concat(scope, proba_list,
                  merged_proba_name, container, axis=0)
     if has_proba:
-        container.add_node('ReduceMean', merged_proba_name,
-                           final_proba_name,
-                           name=scope.get_unique_operator_name('ReduceMean'),
-                           axes=[0], keepdims=0)
+        if container.target_opset >= 18:
+            axis_name = scope.get_unique_variable_name('axis')
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [0])
+            container.add_node(
+                'ReduceMean', [merged_proba_name, axis_name],
+                final_proba_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                keepdims=0)
+        else:
+            container.add_node(
+                'ReduceMean', merged_proba_name,
+                final_proba_name,
+                name=scope.get_unique_operator_name('ReduceMean'),
+                axes=[0], keepdims=0)
     else:
         n_estimators_name = scope.get_unique_variable_name('n_estimators')
         class_labels_name = scope.get_unique_variable_name('class_labels')
@@ -131,7 +145,8 @@ def convert_sklearn_bagging_classifier(scope: Scope, operator: Operator,
         'array_feature_extractor_result')
     class_type = onnx_proto.TensorProto.STRING
 
-    if np.issubdtype(bagging_op.classes_.dtype, np.floating):
+    if (np.issubdtype(bagging_op.classes_.dtype, np.floating) or
+            bagging_op.classes_.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(bagging_op.classes_.dtype, np.signedinteger):
@@ -179,8 +194,11 @@ def convert_sklearn_bagging_regressor(scope: Scope, operator: Operator,
         this_operator = scope.declare_local_operator(op_type, estimator)
 
         features = bagging_op.estimators_features_[index]
-        if (len(features) == bagging_op.n_features_ and
-                list(features) == list(range(bagging_op.n_features_))):
+        n_features = (bagging_op.n_features_in_
+                      if hasattr(bagging_op, 'n_features_in_')
+                      else bagging_op.n_features_)
+        if (len(features) == n_features and
+                list(features) == list(range(n_features))):
             this_operator.inputs = operator.inputs
         else:
             # subset of features
@@ -207,16 +225,28 @@ def convert_sklearn_bagging_regressor(scope: Scope, operator: Operator,
     merged_proba_name = scope.get_unique_variable_name('merged_proba')
     apply_concat(scope, proba_list,
                  merged_proba_name, container, axis=0)
-    container.add_node('ReduceMean', merged_proba_name,
-                       operator.outputs[0].full_name,
-                       name=scope.get_unique_operator_name('ReduceMean'),
-                       axes=[0], keepdims=0)
+    if container.target_opset >= 18:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [0])
+        container.add_node(
+            'ReduceMean', [merged_proba_name, axis_name],
+            operator.outputs[0].full_name,
+            name=scope.get_unique_operator_name('ReduceMean'),
+            keepdims=0)
+    else:
+        container.add_node(
+            'ReduceMean', merged_proba_name,
+            operator.outputs[0].full_name,
+            name=scope.get_unique_operator_name('ReduceMean'),
+            axes=[0], keepdims=0)
 
 
 register_converter('SklearnBaggingClassifier',
                    convert_sklearn_bagging_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnBaggingRegressor',
                    convert_sklearn_bagging_regressor)

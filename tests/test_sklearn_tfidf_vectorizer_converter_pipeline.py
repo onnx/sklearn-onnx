@@ -4,7 +4,7 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession, __version__ as ort_version
@@ -14,7 +14,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.feature_selection import SelectKBest
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-import onnx
 from test_utils import TARGET_OPSET
 
 
@@ -23,7 +22,7 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
     def common_test_model_tfidf_vectorizer_pipeline_cls(
             self, kind=None, verbose=False):
         if kind == 'stop':
-            if StrictVersion(ort_version) >= StrictVersion('1.4.0'):
+            if pv.Version(ort_version) >= pv.Version('1.4.0'):
                 # regression with stopwords in onnxruntime 1.4+
                 stopwords = ['theh']
             else:
@@ -86,7 +85,9 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
         elif kind == 'reg':
             exp = [model_pipeline.predict(X_train.ravel()).reshape((-1, 1))]
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': X_train})
         if verbose:
             voc = model_pipeline.steps[0][-1].vocabulary_
@@ -100,22 +101,18 @@ class TestSklearnTfidfVectorizerPipeline(unittest.TestCase):
                 print(b)
             assert_almost_equal(a, b)
 
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
-        reason="Requires opset 10.")
-    @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0.0"),
+        pv.Version(ort_version) < pv.Version("1.0.0"),
         reason="Too old")
     def test_model_tfidf_vectorizer_pipeline(self):
         for kind in [None, 'cls', 'reg']:
             with self.subTest(kind=kind):
                 self.common_test_model_tfidf_vectorizer_pipeline_cls(kind)
 
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.5.0"),
-        reason="Requires opset 10.")
-    @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.4.0"),
+        pv.Version(ort_version) < pv.Version("1.4.0"),
         reason="Wrong handling of stopwods and n-grams")
     def test_model_tfidf_vectorizer_pipeline_stop_words(self):
         for kind in ['stop']:

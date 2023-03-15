@@ -108,10 +108,11 @@ def convert_sklearn_mlp_classifier(scope: Scope, operator: Operator,
     y_pred = _predict(scope, operator.inputs[0].full_name, container, mlp_op,
                       proto_dtype)
 
-    if np.issubdtype(mlp_op.classes_.dtype, np.floating):
+    if (np.issubdtype(mlp_op.classes_.dtype, np.floating) or
+            mlp_op.classes_.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
-    elif np.issubdtype(mlp_op.classes_.dtype, np.signedinteger):
+    elif np.issubdtype(mlp_op.classes_.dtype, np.integer):
         class_type = onnx_proto.TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
@@ -188,6 +189,7 @@ def convert_sklearn_mlp_regressor(scope: Scope, operator: Operator,
 register_converter('SklearnMLPClassifier',
                    convert_sklearn_mlp_classifier,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnMLPRegressor',
                    convert_sklearn_mlp_regressor)

@@ -2,11 +2,11 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 import scipy
-from onnxruntime import InferenceSession, SessionOptions
+from onnxruntime import SessionOptions
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 except ImportError:
@@ -21,7 +21,9 @@ except ImportError:
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx import to_onnx
 from skl2onnx.helpers.onnx_helper import change_onnx_domain
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 sklver_ = ".".join(sklver.split('.')[:2])
@@ -83,7 +85,9 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtFail:
             if not hasattr(self, 'path'):
                 return
@@ -93,7 +97,9 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
                 model_onnx, {'Solve': ('Solve%s' % suffix, 'ai.onnx.contrib')})
             so = SessionOptions()
             so.register_custom_ops_library(self.path)
-            sess = InferenceSession(model_onnx.SerializeToString(), so)
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), so,
+                providers=["CPUExecutionProvider"])
 
             res = sess.run(None, {'X': X.astype(dtype)})
             assert_almost_equal(res[0].ravel(), gp.predict(X).ravel())
@@ -109,7 +115,7 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 12, reason="einsum")
     @unittest.skipIf(GaussianProcessClassifier is None,
                      reason="scikit-learn is too old")
-    @unittest.skipIf(StrictVersion(sklver_) < StrictVersion("0.22"),
+    @unittest.skipIf(pv.Version(sklver_) < pv.Version("0.22"),
                      reason="not available")
     def test_gpc_float_bin(self):
         self.common_test_gpc(dtype=np.float32)
@@ -117,7 +123,7 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 12, reason="einsum, reciprocal")
     @unittest.skipIf(GaussianProcessClassifier is None,
                      reason="scikit-learn is too old")
-    @unittest.skipIf(StrictVersion(sklver_) < StrictVersion("0.22"),
+    @unittest.skipIf(pv.Version(sklver_) < pv.Version("0.22"),
                      reason="not available")
     def test_gpc_double_bin(self):
         self.common_test_gpc(dtype=np.float64)

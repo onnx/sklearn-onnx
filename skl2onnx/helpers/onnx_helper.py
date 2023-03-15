@@ -1,9 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
+from logging import getLogger
 from io import BytesIO
+import numpy as np
 import onnx  # noqa
-from onnx import shape_inference
+from onnx import shape_inference, TensorProto
+from onnx.numpy_helper import from_array, to_array
+from onnx.helper import make_tensor
 from ..proto.onnx_helper_modified import (
     make_node, make_tensor_value_info, make_graph,
     make_model, ValueInfoProto
@@ -137,7 +140,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
                 nb += 1
 
     # All nodes verifies mark_op[node.name] == 1
-    keep_nodes = [node for node in nodes if mark_op[node.name] == 1]
+    keep_nodes = [node for node in nodes[::-1] if mark_op[node.name] == 1]
 
     var_out = []
     for out in outputs:
@@ -175,6 +178,10 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
     """
     Infers outputs type and shapes given an ONNX operator.
     """
+    logger = getLogger('skl2onnx')
+    logger.debug(
+        '[infer_outputs] op_type=%r inputs=%r outputs=%r',
+        op_type, [x.name for x in inputs], outputs)
     if isinstance(op_type, str):
         required_outputs = []
         if outputs:
@@ -251,11 +258,18 @@ def infer_outputs(op_type, inputs, outputs=None, initializer=None,
         raise RuntimeError(
             "Unable to infer shape of node '{}'\n{}".format(
                 op_type, original_model)) from e
-    shapes = Variable.from_pb(inferred_model.graph.value_info)
+    all_shapes = Variable.from_pb(inferred_model.graph.value_info)
+    used = set()
+    for node in graph.node:
+        for name in node.input:
+            used.add(name)
+    shapes = [shape for shape in all_shapes if shape.onnx_name not in used]
     if len(shapes) == 0:
-        raise RuntimeError("Shape inference fails.\n"
-                           "*Inputs*\n{}\n*Model*\n{}'".format(
-                               onnx_inputs, original_model))
+        raise RuntimeError(
+            f"Shape inference fails.\n*Inputs*\n{onnx_inputs}\n"
+            f"*all_shapes*\n{all_shapes}'\n"
+            f"*Model*\n{original_model}'")
+    logger.debug('[infer_outputs] shapes=%r', shapes)
     return shapes
 
 
@@ -311,3 +325,136 @@ def change_onnx_domain(model, ops):
             op_set.domain = v[1]
             op_set.version = 1
     return onnx_model
+
+
+def add_output_initializer(model_onnx, name, value, suffix='_init'):
+    """
+    Add a constant and link it to one output.
+    It allows the user to store arrays into the graph
+    and retrieve them when using it.
+    The initializer is named `name + suffix`, the output
+    is named `name`.
+
+    :param model_onnx: ONNX graph
+    :param name: initializer name (initializer name, output name)
+    :param value: array to store
+    :param suffix: name of the initializer
+    :return: new model
+
+    It is possible to add multiple constant by using list:
+    ``add_output_initializer(model_onnx, ['name1', 'name2'], [v1, v2])``.
+    """
+    if isinstance(name, str):
+        name_list = [name]
+        value_list = [value]
+    else:
+        name_list = name
+        value_list = value
+
+    if len(name_list) != len(value_list):
+        raise ValueError(
+            "Mismatched names and values. There are %d names and %d values."
+            "" % (len(name_list), len(value_list)))
+
+    nodes = list(model_onnx.graph.node)
+    inits = list(model_onnx.graph.initializer)
+    outputs = list(model_onnx.graph.output)
+
+    for name, value in zip(name_list, value_list):
+        name_output = name
+        name_init = name + suffix
+        names = set(i.name for i in model_onnx.graph.initializer)
+        if name_output in names or name_init in names:
+            raise ValueError(
+                "Names %r or %r is already taken by an initializer: %r." % (
+                    name_output, name_init, ", ".join(sorted(names))))
+        names = set(i.name for i in model_onnx.graph.output)
+        if name_output in names or name_init in names:
+            raise ValueError(
+                "Names %r or %r is already taken by an output: %r." % (
+                    name_output, name_init, ", ".join(sorted(names))))
+        names = set(i.name for i in model_onnx.graph.input)
+        if name_output in names or name_init in names:
+            raise ValueError(
+                "Names %r or %r is already taken by an output: %r." % (
+                    name_output, name_init, ", ".join(sorted(names))))
+
+        try:
+            cst = from_array(value, name=name_init)
+        except RuntimeError as e:
+            st = str(value.dtype).lower()
+            if st.startswith('u') or st.startswith("<u"):
+                cst_value = np.array([s.encode('utf-8') for s in value])
+                cst = make_tensor(
+                    name_init, data_type=TensorProto.STRING,
+                    dims=value.shape, vals=list(cst_value))
+            else:
+                raise e
+
+        inits.append(cst)
+
+        outputs.append(make_tensor_value_info(
+            name_output, cst.data_type, cst.dims))
+
+        nodes.append(make_node('Identity', [name_init], [name_output]))
+
+    graph = make_graph(
+        nodes, model_onnx.graph.name, model_onnx.graph.input,
+        outputs, inits)
+
+    onnx_model = make_model(graph)
+    onnx_model.ir_version = model_onnx.ir_version
+    onnx_model.producer_name = model_onnx.producer_name
+    onnx_model.producer_version = model_onnx.producer_version
+    onnx_model.domain = model_onnx.domain
+    onnx_model.model_version = model_onnx.model_version
+    onnx_model.doc_string = model_onnx.doc_string
+    if len(model_onnx.metadata_props) > 0:
+        values = {p.key: p.value for p in model_onnx.metadata_props}
+        onnx.helper.set_model_props(onnx_model, values)
+
+    if len(onnx_model.graph.input) != len(model_onnx.graph.input):
+        raise RuntimeError("Input mismatch {} != {}".format(
+            len(onnx_model.input), len(model_onnx.input)))
+
+    # fix opset import
+    del onnx_model.opset_import[:]
+    for oimp in model_onnx.opset_import:
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = oimp.domain
+        op_set.version = oimp.version
+    return onnx_model
+
+
+def get_initializers(model_onnx):
+    """
+    Retrieves the list of initializers in a model in a
+    dictionary `{ name: value }`.
+    """
+    res = {}
+    for init in model_onnx.graph.initializer:
+        res[init.name] = to_array(init)
+    return res
+
+
+def update_onnx_initializers(model_onnx, new_inits):
+    """
+    Updates initializer in a ONNX model.
+
+    :param model_onnx: ONNX model
+    :param new_inits: new initializers
+    :return: list of updated initializers
+    """
+    updated = []
+    replace_weights = []
+    replace_indices = []
+    for i, w in enumerate(model_onnx.graph.initializer):
+        if w.name in new_inits:
+            replace_weights.append(from_array(new_inits[w.name], w.name))
+            replace_indices.append(i)
+            updated.append(w.name)
+    replace_indices.sort(reverse=True)
+    for w_i in replace_indices:
+        del model_onnx.graph.initializer[w_i]
+    model_onnx.graph.initializer.extend(replace_weights)
+    return updated

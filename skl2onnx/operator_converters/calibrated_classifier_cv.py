@@ -2,19 +2,21 @@
 
 import pprint
 import numpy as np
-from ..proto import onnx_proto
+from onnx import TensorProto
 from ..common._apply_operation import (
     apply_abs, apply_add, apply_cast, apply_concat, apply_clip,
     apply_div, apply_exp, apply_mul, apply_reshape, apply_sub)
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_numpy_type, Int64TensorType
+from ..common.data_types import (
+    guess_numpy_type, Int64TensorType, guess_proto_type)
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
+from sklearn.ensemble import RandomForestClassifier
 
 
 def _handle_zeros(scope, container, concatenated_prob_name,
-                  reduced_prob_name, n_classes):
+                  reduced_prob_name, n_classes, proto_type):
     """
     This function replaces 0s in concatenated_prob_name with 1s and
     0s in reduced_prob_name with n_classes.
@@ -31,16 +33,20 @@ def _handle_zeros(scope, container, concatenated_prob_name,
     masked_reduced_prob_name = scope.get_unique_variable_name(
         'masked_reduced_prob')
 
-    container.add_initializer(n_classes_name, onnx_proto.TensorProto.FLOAT,
+    proto_type2 = proto_type
+    if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
+        proto_type2 = TensorProto.FLOAT
+
+    container.add_initializer(n_classes_name, proto_type2,
                               [], [n_classes])
 
     apply_cast(scope, reduced_prob_name, cast_prob_name, container,
-               to=onnx_proto.TensorProto.BOOL)
+               to=TensorProto.BOOL)
     container.add_node('Not', cast_prob_name,
                        bool_not_cast_prob_name,
                        name=scope.get_unique_operator_name('Not'))
     apply_cast(scope, bool_not_cast_prob_name, mask_name, container,
-               to=onnx_proto.TensorProto.FLOAT)
+               to=proto_type2)
     apply_add(scope, [concatenated_prob_name, mask_name],
               masked_concatenated_prob_name, container, broadcast=1)
     apply_mul(scope, [mask_name, n_classes_name], reduced_prob_mask_name,
@@ -50,7 +56,7 @@ def _handle_zeros(scope, container, concatenated_prob_name,
     return masked_concatenated_prob_name, masked_reduced_prob_name
 
 
-def _transform_sigmoid(scope, container, model, df_col_name, k):
+def _transform_sigmoid(scope, container, model, df_col_name, k, proto_type):
     """
     Sigmoid Calibration method
     """
@@ -65,12 +71,27 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
     sigmoid_predict_result_name = scope.get_unique_variable_name(
         'sigmoid_predict_result')
 
-    container.add_initializer(a_name, onnx_proto.TensorProto.FLOAT,
-                              [], [model.calibrators_[k].a_])
-    container.add_initializer(b_name, onnx_proto.TensorProto.FLOAT,
-                              [], [model.calibrators_[k].b_])
-    container.add_initializer(unity_name, onnx_proto.TensorProto.FLOAT,
-                              [], [1])
+    proto_type2 = proto_type
+    if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
+        proto_type2 = TensorProto.FLOAT
+
+    if hasattr(model, 'calibrators_'):
+        # scikit-learn<1.1
+        calibrators = model.calibrators_
+    elif hasattr(model, 'calibrators'):
+        # scikit-learn>=1.1
+        calibrators = model.calibrators
+    else:
+        raise AttributeError(
+            "Unable to find attribute calibrators_ or "
+            "calibrators, check the model was trained, "
+            "type=%r." % type(model))
+
+    container.add_initializer(a_name, proto_type2,
+                              [], [calibrators[k].a_])
+    container.add_initializer(b_name, proto_type2,
+                              [], [calibrators[k].b_])
+    container.add_initializer(unity_name, proto_type2, [], [1])
 
     apply_mul(scope, [a_name, df_col_name], a_df_prod_name, container,
               broadcast=0)
@@ -84,21 +105,31 @@ def _transform_sigmoid(scope, container, model, df_col_name, k):
     return sigmoid_predict_result_name
 
 
-def _transform_isotonic(scope, container, model, T, k, dtype):
+def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
     """
     Isotonic calibration method
     This function can only handle one instance at a time because
     ArrayFeatureExtractor can only extract based on the last axis,
     so we can't fetch different columns for different rows.
     """
-    if model.calibrators_[k].out_of_bounds == 'clip':
+    if hasattr(model, 'calibrators_'):
+        # scikit-learn<1.1
+        calibrators = model.calibrators_
+    elif hasattr(model, 'calibrators'):
+        # scikit-learn>=1.1
+        calibrators = model.calibrators
+    else:
+        raise AttributeError(
+            "Unable to find attribute calibrators_ or "
+            "calibrators, check the model was trained, "
+            "type=%r." % type(model))
+
+    if calibrators[k].out_of_bounds == 'clip':
         clipped_df_name = scope.get_unique_variable_name('clipped_df')
         apply_clip(scope, T, clipped_df_name, container,
                    operator_name=scope.get_unique_operator_name('Clip'),
-                   max=np.array(model.calibrators_[k].X_max_,
-                                dtype=dtype),
-                   min=np.array(model.calibrators_[k].X_min_,
-                                dtype=dtype))
+                   max=np.array(calibrators[k].X_max_, dtype=dtype),
+                   min=np.array(calibrators[k].X_min_, dtype=dtype))
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name('reshaped_df')
@@ -111,27 +142,31 @@ def _transform_isotonic(scope, container, model, T, k, dtype):
         'nearest_x_index')
     nearest_y_name = scope.get_unique_variable_name('nearest_y')
 
-    if hasattr(model.calibrators_[k], '_X_'):
+    if hasattr(calibrators[k], '_X_'):
         atX, atY = '_X_', '_y_'
-    elif hasattr(model.calibrators_[k], '_necessary_X_'):
+    elif hasattr(calibrators[k], '_necessary_X_'):
         atX, atY = '_necessary_X_', '_necessary_y_'
-    elif hasattr(model.calibrators_[k], 'X_thresholds_'):
+    elif hasattr(calibrators[k], 'X_thresholds_'):
         atX, atY = 'X_thresholds_', 'y_thresholds_'
     else:
         raise AttributeError(
             "Unable to find attribute '_X_' or '_necessary_X_' "
             "for type {}\n{}."
-            "".format(type(model.calibrators_[k]),
-                      pprint.pformat(dir(model.calibrators_[k]))))
+            "".format(type(calibrators[k]),
+                      pprint.pformat(dir(calibrators[k]))))
+
+    proto_type2 = proto_type
+    if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
+        proto_type2 = TensorProto.FLOAT
 
     container.add_initializer(
-        calibrator_x_name, onnx_proto.TensorProto.FLOAT,
-        [len(getattr(model.calibrators_[k], atX))],
-        getattr(model.calibrators_[k], atX))
+        calibrator_x_name, proto_type2,
+        [len(getattr(calibrators[k], atX))],
+        getattr(calibrators[k], atX))
     container.add_initializer(
-        calibrator_y_name, onnx_proto.TensorProto.FLOAT,
-        [len(getattr(model.calibrators_[k], atY))],
-        getattr(model.calibrators_[k], atY))
+        calibrator_y_name, proto_type2,
+        [len(getattr(calibrators[k], atY))],
+        getattr(calibrators[k], atY))
 
     apply_reshape(scope, T, reshaped_df_name, container,
                   desired_shape=(-1, 1))
@@ -156,7 +191,7 @@ def _transform_isotonic(scope, container, model, T, k, dtype):
 
 
 def convert_calibrated_classifier_base_estimator(scope, operator, container,
-                                                 model):
+                                                 model, model_index):
     # Computational graph:
     #
     # In the following graph, variable names are in lower case characters only
@@ -244,27 +279,36 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
     #                           |                        |
     #                           V                        |
     #                        class_prob_tensor [M, C] <--'
+    model_proba = {RandomForestClassifier}
+
     if scope.get_options(operator.raw_operator, dict(nocl=False))['nocl']:
         raise RuntimeError(
             "Option 'nocl' is not implemented for operator '{}'.".format(
                 operator.raw_operator.__class__.__name__))
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    proto_type2 = proto_type
+    if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
+        proto_type2 = TensorProto.FLOAT
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
 
-    base_model = model.base_estimator
+    base_model = (model.estimator if hasattr(model, 'estimator')
+                  else model.base_estimator)
     op_type = sklearn_operator_name_map[type(base_model)]
     n_classes = (len(model.classes_) if hasattr(model, 'classes_') else
                  len(base_model.classes_))
     prob_name = [None] * n_classes
 
     this_operator = scope.declare_local_operator(op_type, base_model)
-    if container.has_options(base_model, 'raw_scores'):
+    if (container.has_options(base_model, 'raw_scores') and
+            not type(base_model) in model_proba):
         container.add_options(id(base_model), {'raw_scores': True})
+        scope.add_options(id(base_model), {'raw_scores': True})
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable('label', Int64TensorType())
     df_name = scope.declare_local_variable(
-        'probability_tensor', operator.inputs[0].type.__class__())
+        'uncal_probability', operator.inputs[0].type.__class__())
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
     df_inp = df_name.full_name
@@ -273,53 +317,47 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
         cur_k = k
         if n_classes == 2:
             cur_k += 1
-            # In case of binary classification, SVMs only return
-            # scores for the positive class. We concat the same
-            # column twice as we just use the second column.
-            if op_type in ('SklearnLinearSVC', 'SklearnSVC'):
-                df_input_name = scope.get_unique_variable_name('df_input')
-                merged_input_name = scope.get_unique_variable_name(
-                    'merged_input')
-
-                apply_reshape(scope, df_inp,
-                              df_input_name, container,
-                              desired_shape=(-1, 1))
-                apply_concat(scope, [df_input_name, df_input_name],
-                             merged_input_name, container, axis=1)
-                df_inp = merged_input_name
         k_name = scope.get_unique_variable_name('k')
-        df_col_name = scope.get_unique_variable_name('transposed_df_col')
-        prob_name[k] = scope.get_unique_variable_name('prob_{}'.format(k))
+        df_col_name = scope.get_unique_variable_name(
+            'tdf_col_%d_c%d' % (model_index, k))
+        prob_name[k] = scope.get_unique_variable_name(
+            'prob_{}_c{}'.format(model_index, k))
 
-        container.add_initializer(k_name, onnx_proto.TensorProto.INT64,
-                                  [], [cur_k])
+        container.add_initializer(k_name, TensorProto.INT64, [], [cur_k])
 
         container.add_node(
             'ArrayFeatureExtractor', [df_inp, k_name], df_col_name,
-            name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
+            name=scope.get_unique_operator_name(
+                'CaliAFE_%d_c%d' % (model_index, k)),
             op_domain='ai.onnx.ml')
-        T = (_transform_sigmoid(scope, container, model, df_col_name, k)
-             if model.method == 'sigmoid' else
-             _transform_isotonic(
-            scope, container, model, df_col_name, k, dtype))
+        if model.method == 'sigmoid':
+            T = _transform_sigmoid(scope, container, model, df_col_name, k,
+                                   proto_type)
+        else:
+            T = _transform_isotonic(scope, container, model, df_col_name,
+                                    k, dtype, proto_type)
 
         prob_name[k] = T
         if n_classes == 2:
             break
 
     if n_classes == 2:
-        zeroth_col_name = scope.get_unique_variable_name('zeroth_col')
-        merged_prob_name = scope.get_unique_variable_name('merged_prob')
+        zeroth_col_name = scope.get_unique_variable_name(
+            'zeroth_col%d' % model_index)
+        merged_prob_name = scope.get_unique_variable_name(
+            'merged_prob%d' % model_index)
         unit_float_tensor_name = scope.get_unique_variable_name(
-            'unit_float_tensor')
+            'unit_float_tensor%d' % model_index)
 
         container.add_initializer(unit_float_tensor_name,
-                                  onnx_proto.TensorProto.FLOAT, [], [1.0])
+                                  proto_type2, [], [1.0])
 
         apply_sub(scope, [unit_float_tensor_name, prob_name[0]],
                   zeroth_col_name, container, broadcast=1)
         apply_concat(scope, [zeroth_col_name, prob_name[0]],
-                     merged_prob_name, container, axis=1)
+                     merged_prob_name, container, axis=1,
+                     operator_name=scope.get_unique_variable_name(
+            'CaliConc%d' % model_index))
         class_prob_tensor_name = merged_prob_name
     else:
         concatenated_prob_name = scope.get_unique_variable_name(
@@ -336,16 +374,17 @@ def convert_calibrated_classifier_base_estimator(scope, operator, container,
                 name=scope.get_unique_operator_name('ReduceSum'))
         else:
             axis_name = scope.get_unique_variable_name('axis')
-            container.add_initializer(
-                axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_initializer(axis_name, TensorProto.INT64, [1], [1])
             container.add_node(
                 'ReduceSum', [concatenated_prob_name, axis_name],
                 reduced_prob_name,
                 name=scope.get_unique_operator_name('ReduceSum'))
         num, deno = _handle_zeros(scope, container, concatenated_prob_name,
-                                  reduced_prob_name, n_classes)
+                                  reduced_prob_name, n_classes, proto_type)
         apply_div(scope, [num, deno],
-                  calc_prob_name, container, broadcast=1)
+                  calc_prob_name, container, broadcast=1,
+                  operator_name=scope.get_unique_variable_name(
+            'CaliDiv%d' % model_index))
         class_prob_tensor_name = calc_prob_name
     return class_prob_tensor_name
 
@@ -399,13 +438,18 @@ def convert_sklearn_calibrated_classifier_cv(
     op = operator.raw_operator
     classes = op.classes_
     output_shape = (-1,)
-    class_type = onnx_proto.TensorProto.STRING
+    class_type = TensorProto.STRING
+    proto_type = guess_proto_type(operator.inputs[0].type)
+    proto_type2 = proto_type
+    if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
+        proto_type2 = TensorProto.FLOAT
 
     if np.issubdtype(op.classes_.dtype, np.floating):
-        class_type = onnx_proto.TensorProto.INT32
+        class_type = TensorProto.INT32
         classes = classes.astype(np.int32)
-    elif np.issubdtype(op.classes_.dtype, np.signedinteger):
-        class_type = onnx_proto.TensorProto.INT32
+    elif (np.issubdtype(op.classes_.dtype, np.signedinteger) or
+            op.classes_.dtype == np.bool_):
+        class_type = TensorProto.INT32
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
 
@@ -421,12 +465,12 @@ def convert_sklearn_calibrated_classifier_cv(
     add_result_name = scope.get_unique_variable_name('add_result')
 
     container.add_initializer(classes_name, class_type, classes.shape, classes)
-    container.add_initializer(clf_length_name, onnx_proto.TensorProto.FLOAT,
+    container.add_initializer(clf_length_name, proto_type2,
                               [], [clf_length])
 
-    for clf in op.calibrated_classifiers_:
+    for clf_index, clf in enumerate(op.calibrated_classifiers_):
         prob_scores_name.append(convert_calibrated_classifier_base_estimator(
-            scope, operator, container, clf))
+            scope, operator, container, clf, clf_index))
 
     container.add_node('Sum', [s for s in prob_scores_name],
                        add_result_name, op_version=7,
@@ -442,12 +486,12 @@ def convert_sklearn_calibrated_classifier_cv(
         array_feature_extractor_result_name, op_domain='ai.onnx.ml',
         name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
 
-    if class_type == onnx_proto.TensorProto.INT32:
+    if class_type == TensorProto.INT32:
         apply_reshape(scope, array_feature_extractor_result_name,
                       reshaped_result_name, container,
                       desired_shape=output_shape)
         apply_cast(scope, reshaped_result_name, operator.outputs[0].full_name,
-                   container, to=onnx_proto.TensorProto.INT64)
+                   container, to=TensorProto.INT64)
     else:
         apply_reshape(scope, array_feature_extractor_result_name,
                       operator.outputs[0].full_name, container,
@@ -457,4 +501,5 @@ def convert_sklearn_calibrated_classifier_cv(
 register_converter('SklearnCalibratedClassifierCV',
                    convert_sklearn_calibrated_classifier_cv,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})

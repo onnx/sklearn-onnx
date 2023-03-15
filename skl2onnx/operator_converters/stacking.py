@@ -40,9 +40,14 @@ def _fetch_scores(scope, container, model, inputs, raw_scores=False,
     return new_name
 
 
+def _add_passthrough_connection(operator, predictions):
+    if operator.raw_operator.passthrough:
+        predictions.append(operator.inputs[0].onnx_name)
+
+
 def _transform_regressor(scope, operator, container, model):
-    merged_prob_tensor = scope.declare_local_variable(
-        'merged_probability_tensor', operator.inputs[0].type.__class__())
+    merged_prob_tensor = scope.get_unique_variable_name(
+        'merged_probability_tensor')
 
     predictions = [
         _fetch_scores(
@@ -50,14 +55,16 @@ def _transform_regressor(scope, operator, container, model):
         for est in model.estimators_
     ]
 
+    _add_passthrough_connection(operator, predictions)
+
     apply_concat(
-        scope, predictions, merged_prob_tensor.full_name, container, axis=1)
+        scope, predictions, merged_prob_tensor, container, axis=1)
     return merged_prob_tensor
 
 
 def _transform(scope, operator, container, model):
-    merged_prob_tensor = scope.declare_local_variable(
-        'merged_probability_tensor', operator.inputs[0].type.__class__())
+    merged_prob_tensor = scope.get_unique_variable_name(
+        'merged_probability_tensor')
 
     predictions = [
         _fetch_scores(scope, container, est, operator.inputs[0],
@@ -75,19 +82,20 @@ def _transform(scope, operator, container, model):
         container.add_initializer(column_index_name,
                                   onnx_proto.TensorProto.INT64, [], [1])
         new_predictions = []
-        for pred in predictions:
-            prob1 = scope.declare_local_variable(
-                'prob1', operator.inputs[0].type.__class__())
+        for ipred, pred in enumerate(predictions):
+            prob1 = scope.get_unique_variable_name('stack_prob%d' % ipred)
             container.add_node(
                 'ArrayFeatureExtractor',
-                [pred, column_index_name], prob1.onnx_name,
+                [pred, column_index_name], prob1,
                 name=scope.get_unique_operator_name('ArrayFeatureExtractor'),
                 op_domain='ai.onnx.ml')
-            new_predictions.append(prob1.onnx_name)
+            new_predictions.append(prob1)
         predictions = new_predictions
 
+    _add_passthrough_connection(operator, predictions)
+
     apply_concat(
-        scope, predictions, merged_prob_tensor.full_name, container, axis=1)
+        scope, predictions, merged_prob_tensor, container, axis=1)
     return merged_prob_tensor
 
 
@@ -103,7 +111,8 @@ def convert_sklearn_stacking_classifier(scope: Scope, operator: Operator,
     options = container.get_options(stacking_op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
     class_type = onnx_proto.TensorProto.STRING
-    if np.issubdtype(stacking_op.classes_.dtype, np.floating):
+    if (np.issubdtype(stacking_op.classes_.dtype, np.floating) or
+            stacking_op.classes_.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(stacking_op.classes_.dtype, np.signedinteger):
@@ -121,8 +130,12 @@ def convert_sklearn_stacking_classifier(scope: Scope, operator: Operator,
 
     merged_proba_tensor = _transform(
         scope, operator, container, stacking_op)
+    merge_proba = scope.declare_local_variable(
+        'merged_stacked_proba', operator.inputs[0].type.__class__())
+    container.add_node(
+        'Identity', [merged_proba_tensor], [merge_proba.onnx_name])
     prob = _fetch_scores(
-        scope, container, stacking_op.final_estimator_, merged_proba_tensor,
+        scope, container, stacking_op.final_estimator_, merge_proba,
         raw_scores=use_raw_scores)
     container.add_node('Identity', prob, operator.outputs[1].onnx_name,
                        name=scope.get_unique_operator_name('OpProb'))
@@ -157,8 +170,12 @@ def convert_sklearn_stacking_regressor(scope: Scope, operator: Operator,
 
     merged_proba_tensor = _transform_regressor(
         scope, operator, container, stacking_op)
+    merge_proba = scope.declare_local_variable(
+        'merged_stacked_proba', operator.inputs[0].type.__class__())
+    container.add_node(
+        'Identity', [merged_proba_tensor], [merge_proba.onnx_name])
     prob = _fetch_scores(
-        scope, container, stacking_op.final_estimator_, merged_proba_tensor,
+        scope, container, stacking_op.final_estimator_, merge_proba,
         is_regressor=True)
     container.add_node('Identity', prob, operator.outputs[0].full_name,
                        name=scope.get_unique_operator_name('Identity'))
@@ -168,6 +185,7 @@ register_converter('SklearnStackingClassifier',
                    convert_sklearn_stacking_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnStackingRegressor',
                    convert_sklearn_stacking_regressor)

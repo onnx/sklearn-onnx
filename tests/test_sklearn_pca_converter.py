@@ -8,7 +8,7 @@ from sklearn.decomposition import PCA, IncrementalPCA
 from sklearn.model_selection import train_test_split
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 def _fit_model_pca(model):
@@ -26,14 +26,11 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             initial_types=[("input",
                             FloatTensorType([None, X_test.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnPCADefault",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnPCADefault")
 
     def test_incrementalpca_default(self):
         model, X_test = _fit_model_pca(IncrementalPCA())
@@ -41,14 +38,11 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             initial_types=[("input",
                             FloatTensorType([None, X_test.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnIncrementalPCADefault",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnIncrementalPCADefault")
 
     def test_pca_parameters_auto(self):
         model, X_test = _fit_model_pca(PCA(
@@ -58,14 +52,11 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             initial_types=[("input",
                             FloatTensorType([None, X_test.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnPCAParametersAuto",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnPCAParametersAuto")
 
     def test_pca_parameters_arpack(self):
         model, X_test = _fit_model_pca(PCA(
@@ -74,14 +65,11 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             initial_types=[("input",
                             FloatTensorType([None, X_test.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnPCAParametersArpack",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnPCAParametersArpack")
 
     def test_pca_parameters_full(self):
         model, X_test = _fit_model_pca(PCA(
@@ -90,14 +78,11 @@ class TestSklearnPCAConverter(unittest.TestCase):
             model,
             initial_types=[("input",
                             FloatTensorType([None, X_test.shape[1]]))],
-        )
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnPCAParametersFull",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnPCAParametersFull")
 
     def test_pca_default_int_randomised(self):
         data = load_digits()
@@ -108,17 +93,12 @@ class TestSklearnPCAConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model,
             initial_types=[("input",
-                            Int64TensorType([None, X_test.shape[1]]))])
+                            Int64TensorType([None, X_test.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X_test.astype(np.int64),
-            model,
-            model_onnx,
-            basename="SklearnPCADefaultIntRandomised",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            X_test.astype(np.int64), model, model_onnx,
+            basename="SklearnPCADefaultIntRandomised")
 
 
 if __name__ == "__main__":

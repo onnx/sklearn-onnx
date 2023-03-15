@@ -21,9 +21,6 @@ be a very efficient converter but that's just for the sake
 of using a parser. By default, a transformer only returns
 one output but both are needed.
 
-.. contents::
-    :local:
-
 A new transformer
 +++++++++++++++++
 """
@@ -157,7 +154,8 @@ update_registered_converter(
 #############################################
 # And conversion.
 
-onx = to_onnx(dec, X.astype(numpy.float32))
+onx = to_onnx(dec, X.astype(numpy.float32),
+              target_opset=14)
 
 sess = InferenceSession(onx.SerializeToString())
 

@@ -35,8 +35,9 @@ def calculate_sklearn_scaler_output_shapes(operator):
     N = operator.inputs[0].get_first_dimension()
     C = 0
     for variable in operator.inputs:
-        if isinstance(variable.get_first_dimension(), numbers.Integral):
-            C += variable.get_first_dimension()
+        c = variable.get_second_dimension()
+        if isinstance(c, numbers.Integral):
+            C += c
         else:
             C = None
             break

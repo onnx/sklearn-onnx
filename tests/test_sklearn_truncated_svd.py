@@ -9,7 +9,7 @@ from sklearn.decomposition import TruncatedSVD
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from skl2onnx import convert_sklearn
 from test_utils import create_tensor
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestTruncatedSVD(unittest.TestCase):
@@ -26,7 +26,7 @@ class TestTruncatedSVD(unittest.TestCase):
                                      initial_types=[
                                          ("input",
                                           FloatTensorType(shape=[None, C]))
-                                     ])
+                                     ], target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(x, svd, model_onnx, basename="SklearnTruncatedSVD")
 
@@ -38,7 +38,7 @@ class TestTruncatedSVD(unittest.TestCase):
                                      initial_types=[
                                          ("input",
                                           FloatTensorType(shape=X.shape))
-                                     ])
+                                     ], target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(X, svd, model_onnx,
                             basename="SklearnTruncatedSVDArpack")
@@ -50,15 +50,11 @@ class TestTruncatedSVD(unittest.TestCase):
                                      initial_types=[
                                          ("input",
                                           Int64TensorType([None, X.shape[1]]))
-                                     ])
+                                     ], target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, svd, model_onnx,
-            basename="SklearnTruncatedSVDInt",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnTruncatedSVDInt")
 
 
 if __name__ == "__main__":

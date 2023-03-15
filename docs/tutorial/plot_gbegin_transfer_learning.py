@@ -19,9 +19,6 @@ requires work. ONNX reduces the number of platforms to
 support. Once the model is converted into ONNX,
 it can be inserted in any :epkg:`scikit-learn` pipeline.
 
-.. contents::
-    :local:
-
 Retrieve and load a model
 +++++++++++++++++++++++++
 
@@ -62,7 +59,7 @@ def download_file(url, name, min_size):
 
 
 model_name = "squeezenet1.1-7.onnx"
-url_name = ("https://github.com/onnx/models/raw/master/vision/"
+url_name = ("https://github.com/onnx/models/raw/main/vision/"
             "classification/squeezenet/model")
 url_name += "/" + model_name
 try:

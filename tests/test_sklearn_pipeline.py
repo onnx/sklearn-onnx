@@ -2,14 +2,18 @@
 
 import unittest
 import urllib.error as url_error
-from distutils.version import StrictVersion
+import packaging.version as pv
 from io import StringIO
 import warnings
 import numpy
 from numpy.testing import assert_almost_equal
 import pandas
-from sklearn import __version__ as sklearn_version
+from sklearn import __version__ as skl_version
 from sklearn import datasets
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.base import TransformerMixin, BaseEstimator
+from sklearn.linear_model import LinearRegression
+from sklearn.tree import DecisionTreeClassifier
 
 try:
     # scikit-learn >= 0.22
@@ -19,9 +23,13 @@ except ImportError:
     from sklearn.utils.testing import ignore_warnings
 try:
     from sklearn.compose import ColumnTransformer
+    from sklearn.compose import (
+        make_column_transformer, make_column_selector)
 except ImportError:
     # not available in 0.19
     ColumnTransformer = None
+    make_column_selector = None
+    make_column_transformer = None
 from sklearn.decomposition import PCA, TruncatedSVD
 
 try:
@@ -37,24 +45,28 @@ from sklearn.preprocessing import (
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.svm import SVC
-from skl2onnx import convert_sklearn
+from sklearn.svm import SVC, LinearSVC
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
     StringTensorType,
 )
 from sklearn.multioutput import MultiOutputClassifier
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
-    dump_data_and_model, fit_classification_model, TARGET_OPSET)
-from onnxruntime import __version__ as ort_version, InferenceSession
+    dump_data_and_model, fit_classification_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession,
+    ReferenceEvaluatorEx)
+from onnxruntime import __version__ as ort_version
+
+
+# pv.Version does not work with development versions
+ort_version = ".".join(ort_version.split('.')[:2])
+skl_version = ".".join(skl_version.split('.')[:2])
 
 
 def check_scikit_version():
-    # StrictVersion does not work with development versions
-    vers = '.'.join(sklearn_version.split('.')[:2])
-    return StrictVersion(vers) >= StrictVersion("0.21.0")
+    return pv.Version(skl_version) >= pv.Version("0.22")
 
 
 class PipeConcatenateInput:
@@ -122,7 +134,7 @@ class TestSklearnPipeline(unittest.TestCase):
             model_onnx, basename="SklearnPipelineScaler11")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=FutureWarning)
     def test_combine_inputs_union_in_pipeline(self):
@@ -161,9 +173,11 @@ class TestSklearnPipeline(unittest.TestCase):
         dump_data_and_model(
             data, PipeConcatenateInput(model),
             model_onnx, basename="SklearnPipelineScaler11Union")
+    TARGET_OPSET
 
+    @unittest.skipIf(TARGET_OPSET < 15, reason="uses CastLike")
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion('0.4.0'),
+        pv.Version(ort_version) <= pv.Version('0.4.0'),
         reason="onnxruntime too old")
     @ignore_warnings(category=FutureWarning)
     def test_combine_inputs_floats_ints(self):
@@ -193,11 +207,8 @@ class TestSklearnPipeline(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None,
-        reason="ColumnTransformer not available in 0.19",
-    )
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        reason="ColumnTransformer not available in 0.19")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("0.4.0"),
                      reason="issues with shapes")
     @ignore_warnings(category=(RuntimeWarning, FutureWarning))
     def test_pipeline_column_transformer(self):
@@ -255,14 +266,14 @@ class TestSklearnPipeline(unittest.TestCase):
 
         dump_data_and_model(
             X_train, model, model_onnx,
-            basename="SklearnPipelineColumnTransformerPipeliner",
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.3') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnPipelineColumnTransformerPipeliner")
 
         if __name__ == "__main__":
-            from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+            try:
+                from onnx.tools.net_drawer import (
+                    GetPydotGraph, GetOpNodeProducer)
+            except ImportError:
+                return
 
             pydot_graph = GetPydotGraph(
                 model_onnx.graph,
@@ -278,8 +289,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         not check_scikit_version(),
         reason="Scikit 0.20 causes some mismatches")
@@ -384,7 +393,9 @@ class TestSklearnPipeline(unittest.TestCase):
         }
         inputs = {k: data[k].values.astype(data_types[k]).reshape(-1, 1)
                   for k in data.columns}
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         run = sess.run(None, inputs)
         got = run[-1]
         assert_almost_equal(pred, got, decimal=5)
@@ -398,7 +409,9 @@ class TestSklearnPipeline(unittest.TestCase):
         model_onnx = convert_sklearn(clf, "pipeline_titanic", initial_inputs,
                                      target_opset=TARGET_OPSET,
                                      options={id(clf): {'zipmap': False}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         run = sess.run(None, inputs)
         got = run[-1]
         assert_almost_equal(pred, got, decimal=5)
@@ -406,8 +419,6 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_weights(self):
         model, X = fit_classification_model(
@@ -423,15 +434,11 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerWeights-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerWeights-Dec4")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_drop(self):
         model, X = fit_classification_model(
@@ -447,15 +454,11 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerDrop",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerDrop")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_passthrough(self):
         model, X = fit_classification_model(
@@ -472,15 +475,11 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerPassthrough",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerPassthrough")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=FutureWarning)
     def test_column_transformer_passthrough_no_weights(self):
         model, X = fit_classification_model(
@@ -496,9 +495,7 @@ class TestSklearnPipeline(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnColumnTransformerPassthroughNoWeights",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')")
+            basename="SklearnColumnTransformerPassthroughNoWeights")
 
     @unittest.skipIf(
         ColumnTransformer is None,
@@ -548,7 +545,9 @@ class TestSklearnPipeline(unittest.TestCase):
         pipe.fit(X_train)
         model_onnx = convert_sklearn(
             pipe, initial_types=init_types, target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_onnx.SerializeToString())
+        oinf = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         pred = pipe.transform(X_train)
         inputs = {c: X_train[c].values for c in X_train.columns}
@@ -577,7 +576,9 @@ class TestSklearnPipeline(unittest.TestCase):
             pipe, initial_types=[('text', StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
             options={id(pipe): {'zipmap': False}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
@@ -589,7 +590,9 @@ class TestSklearnPipeline(unittest.TestCase):
             pipe, initial_types=[('text', StringTensorType([None]))],
             target_opset=TARGET_OPSET,
             options={id(pipe): {'zipmap': False}})
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data})
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
@@ -628,7 +631,9 @@ class TestSklearnPipeline(unittest.TestCase):
             options={id(voting): {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1], decimal=5)
         assert_almost_equal(expected_label, got[0])
@@ -668,11 +673,18 @@ class TestSklearnPipeline(unittest.TestCase):
             options={id(voting): {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'text': data.reshape((-1, 1))})
         assert_almost_equal(expected_proba, got[1])
         assert_almost_equal(expected_label, got[0])
 
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_pipeline_rf(self):
         cat_feat = ['A', 'B']
@@ -708,15 +720,355 @@ class TestSklearnPipeline(unittest.TestCase):
                 ('A', StringTensorType([None, 1])),
                 ('B', StringTensorType([None, 1])),
                 ('TEXT', StringTensorType([None, 1]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+            options={MultiOutputClassifier: {'zipmap': False}})
         # with open("debug.onnx", "wb") as f:
         #     f.write(model_onnx.SerializeToString())
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'A': data[:, :1], 'B': data[:, 1:2],
                               'TEXT': data[:, 2:]})
-        assert_almost_equal(
-            numpy.transpose(expected_proba, (1, 0, 2)), got[1])
+        self.assertEqual(len(expected_proba), len(got[1]))
+        for e, g in zip(expected_proba, got[1]):
+            assert_almost_equal(e, g, decimal=5)
         assert_almost_equal(expected_label, got[0])
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_multio(self):
+        dfx = pandas.DataFrame(
+            {'CAT1': ['985332', '985333', '985334', '985335', '985336'],
+             'CAT2': ['1985332', '1985333', '1985334', '1985335', '1985336'],
+             'TEXT': ["abc abc", "abc def", "def ghj", "abcdef", "abc ii"]})
+        dfy = pandas.DataFrame(
+            {'REAL': [5, 6, 7, 6, 5],
+             'CATY': [0, 1, 0, 1, 0]})
+
+        cat_features = ['CAT1', 'CAT2']
+        categorical_transformer = OneHotEncoder(handle_unknown='ignore')
+        textual_feature = 'TEXT'
+        count_vect_transformer = Pipeline(steps=[
+            ('count_vect', CountVectorizer(
+                max_df=0.8, min_df=0.05, max_features=1000))])
+        preprocessor = ColumnTransformer(
+            transformers=[
+                ('cat_transform', categorical_transformer, cat_features),
+                ('count_vector', count_vect_transformer, textual_feature)])
+        model_RF = RandomForestClassifier(random_state=42, max_depth=50)
+        rf_clf = Pipeline(steps=[
+            ('preprocessor', preprocessor),
+            ('classifier', MultiOutputClassifier(estimator=model_RF))])
+        rf_clf.fit(dfx, dfy)
+        expected_label = rf_clf.predict(dfx)
+        expected_proba = rf_clf.predict_proba(dfx)
+
+        inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                  'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                  'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+        onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
+                      options={MultiOutputClassifier: {'zipmap': False}})
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+
+        got = sess.run(None, inputs)
+        assert_almost_equal(expected_label, got[0])
+        self.assertEqual(len(expected_proba), len(got[1]))
+        for e, g in zip(expected_proba, got[1]):
+            assert_almost_equal(e, g, decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_svc_multio(self):
+        for sub_model in [LinearSVC(), SVC()]:
+            for method in ["sigmoid", "isotonic"]:
+                with self.subTest(sub_model=sub_model, method=method):
+                    dfx = pandas.DataFrame(
+                        {'CAT1': ['985332', '985333', '985334', '985335',
+                                  '985336', '985332', '985333', '985334',
+                                  '985335', '985336', '985336'],
+                         'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                                  '1985336', '1985332', '1985333', '1985334',
+                                  '1985335', '1985336', '1985336'],
+                         'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                                  "abc ii", "abc abc", "abc def", "def ghj",
+                                  "abcdef", "abc ii", "abc abc"]})
+                    dfy = pandas.DataFrame(
+                        {'REAL': [5, 6, 7, 6, 5, 5, 6, 7, 5, 6, 7],
+                         'CATY': [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]})
+
+                    cat_features = ['CAT1', 'CAT2']
+                    categorical_transformer = OneHotEncoder(
+                        handle_unknown='ignore')
+                    textual_feature = 'TEXT'
+                    count_vect_transformer = Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))])
+                    preprocessor = ColumnTransformer(
+                        transformers=[
+                            ('cat_transform', categorical_transformer,
+                             cat_features),
+                            ('count_vector', count_vect_transformer,
+                             textual_feature)])
+                    model_SVC = CalibratedClassifierCV(
+                        sub_model, cv=2, method=method)
+                    rf_clf = Pipeline(steps=[
+                        ('preprocessor', preprocessor),
+                        ('classifier', MultiOutputClassifier(
+                            estimator=model_SVC))])
+                    rf_clf.fit(dfx, dfy)
+                    expected_label = rf_clf.predict(dfx)
+                    expected_proba = rf_clf.predict_proba(dfx)
+
+                    inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                              'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                              'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                    onx = to_onnx(
+                        rf_clf, dfx, target_opset=TARGET_OPSET,
+                        options={MultiOutputClassifier: {'zipmap': False}})
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
+                    got = sess.run(None, inputs)
+                    assert_almost_equal(expected_label, got[0])
+                    self.assertEqual(len(expected_proba), len(got[1]))
+                    for e, g in zip(expected_proba, got[1]):
+                        if method == "isotonic" and isinstance(sub_model, SVC):
+                            # float/double issues
+                            assert_almost_equal(e[2:4], g[2:4], decimal=3)
+                        else:
+                            assert_almost_equal(e, g, decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_svc_binary0(self):
+        for sub_model in [LinearSVC(), SVC()]:
+            for method in ["sigmoid", "isotonic"]:
+                with self.subTest(sub_model=sub_model, method=method):
+                    dfx = pandas.DataFrame(
+                        {'CAT1': ['985332', '985333', '985334', '985335',
+                                  '985336', '985332', '985333', '985334',
+                                  '985335', '985336', '985336'],
+                         'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                                  '1985336', '1985332', '1985333', '1985334',
+                                  '1985335', '1985336', '1985336'],
+                         'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                                  "abc ii", "abc abc", "abc def", "def ghj",
+                                  "abcdef", "abc ii", "abc abc"]})
+                    dfy = numpy.array([0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0])
+
+                    cat_features = ['CAT1', 'CAT2']
+                    categorical_transformer = OneHotEncoder(
+                        handle_unknown='ignore')
+                    textual_feature = 'TEXT'
+                    count_vect_transformer = Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))])
+                    preprocessor = ColumnTransformer(
+                        transformers=[
+                            ('cat_transform', categorical_transformer,
+                             cat_features),
+                            ('count_vector', count_vect_transformer,
+                             textual_feature)])
+                    model_SVC = CalibratedClassifierCV(
+                        sub_model, cv=2, method=method)
+                    rf_clf = Pipeline(steps=[
+                        ('preprocessor', preprocessor),
+                        ('classifier', model_SVC)])
+                    rf_clf.fit(dfx, dfy)
+                    expected_label = rf_clf.predict(dfx)
+                    expected_proba = rf_clf.predict_proba(dfx)
+
+                    inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                              'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                              'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                    onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
+                                  options={'zipmap': False})
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
+                    got = sess.run(None, inputs)
+                    assert_almost_equal(expected_label, got[0])
+                    assert_almost_equal(expected_proba, got[1], decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
+    @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    def test_issue_712_svc_multi(self):
+        for sub_model in [SVC(), LinearSVC()]:
+            for method in ["isotonic", "sigmoid"]:
+                with self.subTest(sub_model=sub_model, method=method):
+                    dfx = pandas.DataFrame(
+                        {'CAT1': ['985332', '985333', '985334', '985335',
+                                  '985336', '985332', '985333', '985334',
+                                  '985335', '985336', '985336'],
+                         'CAT2': ['1985332', '1985333', '1985334', '1985335',
+                                  '1985336', '1985332', '1985333', '1985334',
+                                  '1985335', '1985336', '1985336'],
+                         'TEXT': ["abc abc", "abc def", "def ghj", "abcdef",
+                                  "abc ii", "abc abc", "abc def", "def ghj",
+                                  "abcdef", "abc ii", "abc abc"]})
+                    dfy = numpy.array([5, 6, 7, 6, 5, 5, 8, 7, 5, 6, 8])
+
+                    cat_features = ['CAT1', 'CAT2']
+                    categorical_transformer = OneHotEncoder(
+                        handle_unknown='ignore')
+                    textual_feature = 'TEXT'
+                    count_vect_transformer = Pipeline(steps=[
+                        ('count_vect', CountVectorizer(
+                            max_df=0.8, min_df=0.05, max_features=1000))])
+                    preprocessor = ColumnTransformer(
+                        transformers=[
+                            ('cat_transform', categorical_transformer,
+                             cat_features),
+                            ('count_vector', count_vect_transformer,
+                             textual_feature)])
+                    model_SVC = CalibratedClassifierCV(
+                        sub_model, cv=2, method=method)
+                    rf_clf = Pipeline(steps=[
+                        ('preprocessor', preprocessor),
+                        ('classifier', model_SVC)])
+                    rf_clf.fit(dfx, dfy)
+                    expected_label = rf_clf.predict(dfx)
+                    expected_proba = rf_clf.predict_proba(dfx)
+
+                    inputs = {'CAT1': dfx['CAT1'].values.reshape((-1, 1)),
+                              'CAT2': dfx['CAT2'].values.reshape((-1, 1)),
+                              'TEXT': dfx['TEXT'].values.reshape((-1, 1))}
+                    onx = to_onnx(rf_clf, dfx, target_opset=TARGET_OPSET,
+                                  options={'zipmap': False})
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
+                    got = sess.run(None, inputs)
+                    assert_almost_equal(expected_label, got[0])
+                    if method == "isotonic":
+                        # float/double issues
+                        assert_almost_equal(
+                            expected_proba[2:4], got[1][2:4], decimal=3)
+                    else:
+                        assert_almost_equal(expected_proba, got[1], decimal=5)
+
+    @unittest.skipIf(TARGET_OPSET < 11,
+                     reason="SequenceConstruct not available")
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
+    @ignore_warnings(category=(FutureWarning, UserWarning))
+    def test_pipeline_make_column_selector(self):
+        X = pandas.DataFrame({
+            'city': ['London', 'London', 'Paris', 'Sallisaw'],
+            'rating': [5, 3, 4, 5]})
+        X['rating'] = X['rating'].astype(numpy.float32)
+        ct = make_column_transformer(
+            (StandardScaler(), make_column_selector(
+                dtype_include=numpy.number)),
+            (OneHotEncoder(), make_column_selector(
+                dtype_include=object)))
+        expected = ct.fit_transform(X)
+        onx = to_onnx(ct, X, target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        names = [i.name for i in sess.get_inputs()]
+        got = sess.run(None, {names[0]: X[names[0]].values.reshape((-1, 1)),
+                              names[1]: X[names[1]].values.reshape((-1, 1))})
+        assert_almost_equal(expected, got[0])
+
+    @unittest.skipIf(
+        not check_scikit_version(),
+        reason="Scikit 0.21 too old")
+    def test_feature_selector_no_converter(self):
+
+        class ColumnSelector(TransformerMixin, BaseEstimator):
+            def __init__(self, cols):
+                if not isinstance(cols, list):
+                    self.cols = [cols]
+                else:
+                    self.cols = cols
+
+            def fit(self, X, y):
+                return self
+
+            def transform(self, X):
+                X = X.copy()
+                return X[self.cols]
+
+        # Inspired from
+        # https://github.com/databricks/automl/blob/main/
+        # runtime/tests/automl_runtime/sklearn/column_selector_test.py
+        X_in = pandas.DataFrame(
+            numpy.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+                        dtype=numpy.float32),
+            columns=["a", "b", "c"])
+        y = pandas.DataFrame(numpy.array([[1], [0], [1]]),
+                             columns=["label"])
+        X_out_expected = numpy.array([1, 0, 1])
+
+        standardizer = StandardScaler()
+        selected_cols = ["a", "b"]
+        col_selector = ColumnSelector(selected_cols)
+        preprocessor = ColumnTransformer(
+            [("standardizer", standardizer, selected_cols)], remainder="drop")
+
+        model = Pipeline([
+            ("column_selector", col_selector),
+            ("preprocessor", preprocessor),
+            ("decision_tree", DecisionTreeClassifier())
+        ])
+        model.fit(X=X_in, y=y)
+        # Add one column so that the dataframe for prediction is
+        # different with the data for training
+        X_in["useless"] = 1
+        X_out = model.predict(X_in)
+        assert_almost_equal(X_out, X_out_expected)
+
+        with self.assertRaises(RuntimeError) as e:
+            to_onnx(model, X_in)
+            self.assertIn('ColumnTransformer', str(e))
+
+    @unittest.skipIf(TARGET_OPSET < 15, reason="use CastLike")
+    def test_feature_vectorizer_double(self):
+        dataset = datasets.load_diabetes(as_frame=True)
+        X, y = dataset.data, dataset.target
+        X["sexi"] = X["sex"].astype(numpy.int64)
+        X = X.drop("sex", axis=1)
+        X_train, X_test, y_train, y_test = train_test_split(X, y)
+        regr = Pipeline([("std", StandardScaler()),
+                         ("reg", LinearRegression())])
+        regr = regr.fit(X_train, y_train)
+        onnx_model = to_onnx(regr, X=X_train)
+
+        sess = InferenceSession(
+            onnx_model.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        expected = regr.predict(X_test)
+        names = [i.name for i in sess.get_inputs()]
+        feeds = {n: X_test[c].values.reshape((-1, 1))
+                 for n, c in zip(names, X_test.columns)}
+        got = sess.run(None, feeds)
+        assert_almost_equal(expected.ravel(), got[0].ravel(), decimal=4)
+        if ReferenceEvaluatorEx is None:
+            return
+        ref = ReferenceEvaluatorEx(onnx_model)
+        got = ref.run(None, feeds)
+        assert_almost_equal(expected.ravel(), got[0].ravel(), decimal=4)
 
 
 if __name__ == "__main__":
@@ -724,5 +1076,5 @@ if __name__ == "__main__":
     # logger = logging.getLogger('skl2onnx')
     # logger.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
-    # TestSklearnPipeline().test_pipeline_pipeline_rf()
-    unittest.main()
+    # TestSklearnPipeline().test_feature_vectorizer_double()
+    unittest.main(verbosity=2)

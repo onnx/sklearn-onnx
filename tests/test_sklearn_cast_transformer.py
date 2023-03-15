@@ -5,10 +5,10 @@ Tests scikit-learn's cast transformer converter.
 """
 import unittest
 import math
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from pandas import DataFrame
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -22,7 +22,9 @@ from skl2onnx.sklapi import CastTransformer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     Int64TensorType, FloatTensorType, DoubleTensorType)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestSklearnCastTransformerConverter(unittest.TestCase):
@@ -47,26 +49,26 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
             basename="SklearnCastTransformer{}".format(
                 input_type.__class__.__name__))
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_transformer_float(self):
         self.common_test_cast_transformer(
             numpy.float32, FloatTensorType)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_transformer_float64(self):
         self.common_test_cast_transformer(
             numpy.float64, DoubleTensorType)
 
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_cast_transformer_int64(self):
         self.common_test_cast_transformer(
             numpy.int64, Int64TensorType)
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not supported")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion('0.5.0'),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('0.5.0'),
                      reason="runtime too old")
     def test_pipeline(self):
 
@@ -96,7 +98,9 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         exp1 = model1.predict(Xi_test)
         onx1 = to_onnx(model1, X_train[:1].astype(numpy.float32),
                        target_opset=TARGET_OPSET)
-        sess1 = InferenceSession(onx1.SerializeToString())
+        sess1 = InferenceSession(
+            onx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got1 = sess1.run(None, {'X': Xi_test})[0]
         md1 = maxdiff(exp1, got1)
 
@@ -112,7 +116,9 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
         onx = to_onnx(model2, X_train[:1].astype(numpy.float32),
                       options={StandardScaler: {'div': 'div_cast'}},
                       target_opset=TARGET_OPSET)
-        sess2 = InferenceSession(onx.SerializeToString())
+        sess2 = InferenceSession(
+            onx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got2 = sess2.run(None, {'X': Xi_test})[0]
         md2 = maxdiff(exp2, got2)
         assert md2 <= md1

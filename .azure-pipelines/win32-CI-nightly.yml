@@ -10,44 +10,44 @@ jobs:
 
 - job: 'Test'
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   strategy:
     matrix:
-      Py39-Onnx1101-nightlyRT-Sk0242:
+      Py39-Onnx1102-nightlyRT-SkLatest:
         python.version: '3.9'
-        onnx.version: 'onnx==1.10.1'
+        onnx.version: 'onnx==1.10.2'
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.2'
-      Py38-Onnx170-nightlyRT-Sk0240:
+        sklearn.version: '>=1.0'
+      Py39-Onnx190-nightlyRT-SkLatest:
+        python.version: '3.9'
+        onnx.version: 'onnx==1.9.1'
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '>=1.0'
+      Py39-Onnx180-nightlyRT-SkLatest:
+        python.version: '3.9'
+        onnx.version: 'onnx==1.8.1'
+        numpy.version: 'numpy>=1.18.1'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '>=1.0'
+      Py38-Onnx170-nightlyRT-Sk0242:
         python.version: '3.8'
         onnx.version: 'onnx==1.7.0'
         numpy.version: 'numpy>=1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.0'
-      Py37-Onnx160-nightlyRT-Npy1180-Sk0230:
+        sklearn.version: '==0.24.2'
+      Py37-Onnx160-nightlyRT-Npy1180-Sk0232:
         python.version: '3.7'
         onnx.version: 'onnx==1.6.0'
         numpy.version: 'numpy==1.18.1'
         scipy.version: 'scipy'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.0'
-      Py37-Onnx160-nightlyRT-Npy1180-Sk0221:
-        python.version: '3.7'
-        onnx.version: 'onnx==1.6.0'
-        numpy.version: 'numpy==1.18.1'
-        scipy.version: 'scipy'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.22.1'
-      Py37-Onnx150-nightlyRT-Npy1180-Sk0213:
-        python.version: '3.7'
-        onnx.version: 'onnx==1.5.0'
-        numpy.version: 'numpy==1.18.1'
-        scipy.version: 'scipy'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
+        sklearn.version: '==0.23.2'
     maxParallel: 3
 
   steps:
@@ -65,8 +65,7 @@ jobs:
   - script: |
       call activate py$(python.version)
       python -m pip install --upgrade pip
-      pip install $(numpy.version)
-      conda install $(scipy.version)
+      conda install $(numpy.version) $(scipy.version)
       pip install $(onnx.version)
       pip install openpyxl cerberus
     displayName: 'Install numpy, scipy, onnx'
@@ -91,7 +90,7 @@ jobs:
 
   - script: |
       call activate py$(python.version)
-      pip install scikit-learn$(sklearn.version)
+      conda install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
   - script: |

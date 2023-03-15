@@ -15,6 +15,7 @@ def convert_pipeline(scope: Scope, operator: Operator,
         step_model = step[1]
         if is_classifier(step_model):
             scope.add_options(id(step_model), options={'zipmap': False})
+            container.add_options(id(step_model), options={'zipmap': False})
         outputs = _parse_sklearn(scope, step_model, inputs,
                                  custom_parsers=None)
         inputs = outputs

@@ -4,10 +4,10 @@
 Tests scikit-imputer converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
+import pandas as pd
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
 import sklearn
 try:
     from sklearn.preprocessing import Imputer
@@ -23,21 +23,32 @@ except ImportError:
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType, StringTensorType)
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
+
+
+skl_ver = '.'.join(sklearn.__version__.split('.')[:2])
 
 
 class TestSklearnImputerConverter(unittest.TestCase):
 
     def _check_outputs_ints(self, model, model_onnx, data):
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         idata = {'input': np.array(data).astype(np.int64)}
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
         assert_almost_equal(res, exp)
 
-    def _check_outputs_strings(self, model, model_onnx, data):
+    def _check_outputs_strings(self, model, model_onnx, data,
+                               verbose=0):
         idata = {'input': np.array(data).astype(np.str_)}
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"],
+            verbose=verbose)
         res = sess.run(None, idata)[0]
         exp = model.transform(data)
         if list(exp.ravel()) != list(res.ravel()):
@@ -138,12 +149,31 @@ class TestSklearnImputerConverter(unittest.TestCase):
     @unittest.skipIf(SimpleImputer is None,
                      reason="SimpleImputer changed in 0.20")
     @unittest.skipIf(
-        StrictVersion(sklearn.__version__) < StrictVersion('0.24'),
+        pv.Version(skl_ver) < pv.Version('0.24'),
         reason="SimpleImputer does not support strings")
     def test_simple_imputer_string_inputs_int_mostf(self):
         model = SimpleImputer(
             strategy="most_frequent", fill_value="nan", missing_values="")
         data = [["s1", "s2"], ["", "s3"], ["s7", "s6"], ["s8", ""]]
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model, "scikit-learn simple imputer",
+            [("input", StringTensorType([None, 2]))],
+            target_opset=TARGET_OPSET)
+        self.assertIn("ai.onnx.ml", str(model_onnx))
+        self.assertTrue(model_onnx.graph.node is not None)
+        self.assertEqual(len(model_onnx.graph.output), 1)
+        self._check_outputs_strings(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None,
+                     reason="SimpleImputer changed in 0.20")
+    @unittest.skipIf(
+        pv.Version(skl_ver) < pv.Version('0.24'),
+        reason="SimpleImputer does not support strings")
+    def test_simple_imputer_string_inputs_int_mostf_default(self):
+        model = SimpleImputer(strategy="most_frequent", missing_values='')
+        data = pd.DataFrame([["s1", "s2"], ["s1", "s2"], ["", "s3"],
+                             ["s7", "s6"], ["s8", ""]])
         model.fit(data)
         model_onnx = convert_sklearn(
             model, "scikit-learn simple imputer",

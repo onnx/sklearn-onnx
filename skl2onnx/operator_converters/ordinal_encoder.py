@@ -42,10 +42,15 @@ def convert_sklearn_ordinal_encoder(scope: Scope, operator: Operator,
 
         apply_concat(scope, input_names,
                      concatenated_input_name, container, axis=1)
+    if len(ordinal_op.categories_) == 0:
+        raise RuntimeError(
+            "No categories found in type=%r, encoder=%r." % (
+                type(ordinal_op), ordinal_op))
     for index, categories in enumerate(ordinal_op.categories_):
         attrs = {'name': scope.get_unique_operator_name('LabelEncoder')}
         if len(categories) > 0:
-            if np.issubdtype(categories.dtype, np.floating):
+            if (np.issubdtype(categories.dtype, np.floating) or
+                    categories.dtype == np.bool_):
                 attrs['keys_floats'] = categories
             elif np.issubdtype(categories.dtype, np.signedinteger):
                 attrs['keys_int64s'] = categories
@@ -78,8 +83,9 @@ def convert_sklearn_ordinal_encoder(scope: Scope, operator: Operator,
                           container, desired_shape=(-1, 1))
     apply_concat(scope, result, concat_result_name,
                  container, axis=1)
-    cast_type = (onnx_proto.TensorProto.FLOAT if np.issubdtype(
-        ordinal_op.dtype, np.floating)
+    cast_type = (
+        onnx_proto.TensorProto.FLOAT
+        if np.issubdtype(ordinal_op.dtype, np.floating)
         else onnx_proto.TensorProto.INT64)
     apply_cast(scope, concat_result_name, operator.output_full_names,
                container, to=cast_type)

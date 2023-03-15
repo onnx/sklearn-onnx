@@ -2,9 +2,8 @@
 
 """Tests scikit-learn's OrdinalEncoder converter."""
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
-import onnx
 import onnxruntime
 from sklearn import __version__ as sklearn_version
 try:
@@ -20,20 +19,19 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 def ordinal_encoder_support():
-    # StrictVersion does not work with development versions
+    # pv.Version does not work with development versions
     vers = '.'.join(sklearn_version.split('.')[:2])
-    if StrictVersion(vers) < StrictVersion("0.20.0"):
+    if pv.Version(vers) < pv.Version("0.20.0"):
         return False
-    if StrictVersion(onnxruntime.__version__) < StrictVersion("0.3.0"):
+    if pv.Version(onnxruntime.__version__) < pv.Version("0.3.0"):
         return False
-    return StrictVersion(vers) >= StrictVersion("0.20.0")
+    return pv.Version(vers) >= pv.Version("0.20.0")
 
 
 class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
     @unittest.skipIf(
         not ordinal_encoder_support(),
-        reason="OrdinalEncoder was not available before 0.20",
-    )
+        reason="OrdinalEncoder was not available before 0.20")
     def test_model_ordinal_encoder(self):
         model = OrdinalEncoder(dtype=np.int64)
         data = np.array([[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]],
@@ -46,22 +44,13 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
-            model,
-            model_onnx,
-            basename="SklearnOrdinalEncoderInt64-SkipDim1",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+            data, model, model_onnx,
+            basename="SklearnOrdinalEncoderInt64-SkipDim1")
 
     @unittest.skipIf(
         not ordinal_encoder_support(),
-        reason="OrdinalEncoder was not available before 0.20",
-    )
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
-        reason="Requires opset 9.")
+        reason="OrdinalEncoder was not available before 0.20")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_ordinal_encoder_mixed_string_int_drop(self):
         data = [
             ["c0.4", "c0.2", 3],
@@ -82,19 +71,12 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             model, "ordinal encoder", inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            test,
-            model,
-            model_onnx,
-            basename="SklearnOrdinalEncoderMixedStringIntDrop",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+            test, model, model_onnx,
+            basename="SklearnOrdinalEncoderMixedStringIntDrop")
 
     @unittest.skipIf(
         not ordinal_encoder_support(),
-        reason="OrdinalEncoder was not available before 0.20",
-    )
+        reason="OrdinalEncoder was not available before 0.20")
     def test_ordinal_encoder_onecat(self):
         data = [["cat"], ["cat"]]
         model = OrdinalEncoder(categories="auto")
@@ -104,19 +86,12 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
                                      inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
-            model,
-            model_onnx,
-            basename="SklearnOrdinalEncoderOneStringCat",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+            data, model, model_onnx,
+            basename="SklearnOrdinalEncoderOneStringCat")
 
     @unittest.skipIf(
         not ordinal_encoder_support(),
-        reason="OrdinalEncoder was not available before 0.20",
-    )
+        reason="OrdinalEncoder was not available before 0.20")
     def test_ordinal_encoder_twocats(self):
         data = [["cat2"], ["cat1"]]
         model = OrdinalEncoder(categories="auto")
@@ -126,19 +101,12 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
                                      inputs, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
-            model,
-            model_onnx,
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-            basename="SklearnOrdinalEncoderTwoStringCat",
-        )
+            data, model, model_onnx,
+            basename="SklearnOrdinalEncoderTwoStringCat")
 
     @unittest.skipIf(
         not ordinal_encoder_support(),
-        reason="OrdinalEncoder was not available before 0.20",
-    )
+        reason="OrdinalEncoder was not available before 0.20")
     def test_model_ordinal_encoder_cat_list(self):
         model = OrdinalEncoder(categories=[[0, 1, 4, 5],
                                            [1, 2, 3, 5],
@@ -153,14 +121,8 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data,
-            model,
-            model_onnx,
-            basename="SklearnOrdinalEncoderCatList",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.5.0')",
-        )
+            data, model, model_onnx,
+            basename="SklearnOrdinalEncoderCatList")
 
 
 if __name__ == "__main__":

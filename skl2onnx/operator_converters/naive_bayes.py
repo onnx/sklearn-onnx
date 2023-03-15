@@ -99,7 +99,8 @@ def _joint_log_likelihood_gaussian(
     """
     features = model.theta_.shape[1]
     jointi = np.log(model.class_prior_)
-    sigma_sum_log = - 0.5 * np.sum(np.log(2. * np.pi * model.sigma_), axis=1)
+    var_sigma = model.var_ if hasattr(model, 'var_') else model.sigma_
+    sigma_sum_log = - 0.5 * np.sum(np.log(2. * np.pi * var_sigma), axis=1)
     theta_name = scope.get_unique_variable_name('theta')
     sigma_name = scope.get_unique_variable_name('sigma')
     sigma_sum_log_name = scope.get_unique_variable_name('sigma_sum_log')
@@ -116,7 +117,7 @@ def _joint_log_likelihood_gaussian(
         'part_log_likelihood')
 
     theta = model.theta_.reshape((1, -1, features))
-    sigma = model.sigma_.reshape((1, -1, features))
+    sigma = var_sigma.reshape((1, -1, features))
 
     container.add_initializer(theta_name, proto_dtype, theta.shape,
                               theta.ravel())
@@ -172,7 +173,11 @@ def _joint_log_likelihood_categorical(
         class_log_prior_name, onnx_proto.TensorProto.FLOAT,
         model.class_log_prior_.shape, model.class_log_prior_)
 
-    for i in range(model.n_features_):
+    n_features = (model.n_features_in_
+                  if hasattr(model, 'n_features_in_')
+                  else model.n_features_)
+
+    for i in range(n_features):
         feature_index_name = scope.get_unique_variable_name('feature_index')
         indices_name = scope.get_unique_variable_name('indices')
         cast_indices_name = scope.get_unique_variable_name('cast_indices')
@@ -387,7 +392,8 @@ def convert_sklearn_naive_bayes(scope: Scope, operator: Operator,
         'array_feature_extractor_result')
 
     class_type = onnx_proto.TensorProto.STRING
-    if np.issubdtype(classes.dtype, np.floating):
+    if (np.issubdtype(classes.dtype, np.floating) or
+            classes.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(classes.dtype, np.signedinteger):
@@ -458,10 +464,21 @@ def convert_sklearn_naive_bayes(scope: Scope, operator: Operator,
     reshaped_log_prob_name = scope.get_unique_variable_name(
         'reshaped_log_prob')
 
-    container.add_node('ReduceLogSumExp', sum_result_name,
-                       reduce_log_sum_exp_result_name,
-                       name=scope.get_unique_operator_name('ReduceLogSumExp'),
-                       axes=[1], keepdims=0)
+    if container.target_opset >= 18:
+        axis_name = scope.get_unique_variable_name('axis')
+        container.add_initializer(
+            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_node(
+            'ReduceLogSumExp', [sum_result_name, axis_name],
+            reduce_log_sum_exp_result_name,
+            name=scope.get_unique_operator_name('ReduceLogSumExp'),
+            keepdims=0)
+    else:
+        container.add_node(
+            'ReduceLogSumExp', sum_result_name,
+            reduce_log_sum_exp_result_name,
+            name=scope.get_unique_operator_name('ReduceLogSumExp'),
+            axes=[1], keepdims=0)
     apply_reshape(scope, reduce_log_sum_exp_result_name,
                   reshaped_log_prob_name, container,
                   desired_shape=log_prob_shape)
@@ -491,16 +508,21 @@ def convert_sklearn_naive_bayes(scope: Scope, operator: Operator,
 
 register_converter('SklearnBernoulliNB', convert_sklearn_naive_bayes,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnCategoricalNB', convert_sklearn_naive_bayes,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnComplementNB', convert_sklearn_naive_bayes,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnGaussianNB', convert_sklearn_naive_bayes,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})
 register_converter('SklearnMultinomialNB', convert_sklearn_naive_bayes,
                    options={'zipmap': [True, False, 'columns'],
+                            'output_class_labels': [False, True],
                             'nocl': [True, False]})

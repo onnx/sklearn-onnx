@@ -4,12 +4,10 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
-from distutils.version import StrictVersion
 import numpy
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
-import onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -18,9 +16,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
     def get_options(self):
         return {TfidfVectorizer: {"tokenexp": ""}}
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -37,13 +33,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer11Regex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer11Regex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_opset(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -66,14 +58,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             self.assertTrue(model_onnx is not None)
             if opset >= 10:
                 name = "SklearnTfidfVectorizer11Rx%d-OneOff-SklCol" % opset
-                dump_data_and_model(
-                    corpus, vect, model_onnx, basename=name,
-                    allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                                  "StrictVersion('0.4.0')")
+                dump_data_and_model(corpus, vect, model_onnx, basename=name)
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_word4(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -91,13 +78,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer11Regex4-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer11Regex4-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_empty_string(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -115,13 +98,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         # TfidfVectorizer in onnxruntime fails with empty strings
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer11EmptyStringRegex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) "
-                          "<= StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer11EmptyStringRegex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -144,13 +123,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         ]).reshape((4, 1))
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer11OutVocabRegex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer11OutVocabRegex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer22(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -167,13 +142,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer12(self):
         corpus = numpy.array([
             'AA AA',
@@ -188,13 +159,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer12SRegex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer12SRegex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer122(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -211,13 +178,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer12Regex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer12Regex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer12_normL1(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -233,13 +196,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer12L1Regex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer12L1Regex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer12_normL2(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -256,13 +215,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer12L2Regex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer12L2Regex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer13(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -279,13 +234,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer13Regex-OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+            basename="SklearnTfidfVectorizer13Regex-OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -310,13 +261,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         dump_data_and_model(
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisClassRegex-"
-                     "OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+                     "OneOff-SklCol")
 
-    @unittest.skipIf(
-        StrictVersion(onnx.__version__) <= StrictVersion("1.4.1"),
-        reason="Requires opset 10.")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
         corpus = numpy.array([
             'This is the first document.',
@@ -353,10 +300,48 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
         dump_data_and_model(
             corpus, vect, model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisIdRegex-"
-                     "OneOff-SklCol",
-            allow_failure="StrictVersion(onnxruntime.__version__) <= "
-                          "StrictVersion('0.4.0')")
+                     "OneOff-SklCol")
+
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    def test_model_tfidf_vectorizer_issue(self):
+        corpus = numpy.array([
+            'the-first document.',
+            'this-is the-third-one.',
+            'this-the first-document?',
+        ]).reshape((3, 1))
+        vect = TfidfVectorizer(
+            ngram_range=(1, 2),
+            token_pattern=r"\b[a-z ]+\b")
+        vect.fit(corpus.ravel())
+        with self.assertRaises(RuntimeError) as e:
+            convert_sklearn(vect, 'TfidfVectorizer',
+                            [('input', StringTensorType([1]))],
+                            options=self.get_options(),
+                            target_opset=TARGET_OPSET)
+            self.assertIn("More one decomposition in tokens", str(e))
+            self.assertIn(
+                "Unable to split n-grams 'the first document' into tokens.",
+                str(e))
+
+        corpus = numpy.array([
+            'first document.',
+            'this-is the-third-one.',
+            'the first document',
+        ]).reshape((3, 1))
+        vect = TfidfVectorizer(
+            ngram_range=(1, 2),
+            token_pattern=r"\b[a-z ]+\b")
+        vect.fit(corpus.ravel())
+        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
+                                     [('input', StringTensorType([1]))],
+                                     options=self.get_options(),
+                                     target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus, vect, model_onnx,
+            basename="SklearnTfidfVectorizerIssue-OneOff-SklCol")
 
 
 if __name__ == "__main__":
+    TestSklearnTfidfVectorizerRegex().test_model_tfidf_vectorizer_issue()
     unittest.main()

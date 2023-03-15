@@ -8,9 +8,6 @@ Benchmark a pipeline
 The following example checks up on every step in a pipeline,
 compares and benchmarks the predictions.
 
-.. contents::
-    :local:
-
 Create a pipeline
 +++++++++++++++++
 
@@ -60,7 +57,8 @@ initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
 model_onnx = convert_sklearn(pipe, initial_types=initial_types,
                              target_opset=12)
 
-sess = rt.InferenceSession(model_onnx.SerializeToString())
+sess = rt.InferenceSession(model_onnx.SerializeToString(),
+                           providers=["CPUExecutionProvider"])
 print("skl predict_proba")
 print(pipe.predict_proba(X_digits[:2]))
 onx_pred = sess.run(None, {'input': X_digits[:2].astype(np.float32)})[1]
@@ -106,7 +104,8 @@ pipe.predict_proba(X_digits[:2])
 
 for i, step in enumerate(steps):
     onnx_step = step['onnx_step']
-    sess = rt.InferenceSession(onnx_step.SerializeToString())
+    sess = rt.InferenceSession(onnx_step.SerializeToString(),
+                               providers=["CPUExecutionProvider"])
     onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
     skl_outputs = step['model']._debug.outputs
     if 'transform' in skl_outputs:

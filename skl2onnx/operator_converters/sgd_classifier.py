@@ -48,7 +48,7 @@ def _decision_function(scope, operator, container, model, proto_type):
     return score_name
 
 
-def _handle_zeros(scope, container, proba, reduced_proba, num_classes,
+def _handle_zeros(scope, container, scores, proba, reduced_proba, num_classes,
                   proto_type):
     """Handle cases where reduced_proba values are zeros to avoid NaNs in
     class probability scores because of divide by 0 when we calculate
@@ -87,7 +87,7 @@ def _handle_zeros(scope, container, proba, reduced_proba, num_classes,
     return proba_updated_name, reduced_proba_updated_name
 
 
-def _normalise_proba(scope, operator, container, proba, num_classes,
+def _normalise_proba(scope, operator, container, scores, proba, num_classes,
                      unity_name, proto_type):
     reduced_proba_name = scope.get_unique_variable_name('reduced_proba')
     sub_result_name = scope.get_unique_variable_name('sub_result')
@@ -110,7 +110,7 @@ def _normalise_proba(scope, operator, container, proba, num_classes,
                 'ReduceSum', [proba, axis_name], reduced_proba_name,
                 name=scope.get_unique_operator_name('ReduceSum'))
         proba_updated, reduced_proba_updated = _handle_zeros(
-            scope, container, proba, reduced_proba_name, num_classes,
+            scope, container, scores, proba, reduced_proba_name, num_classes,
             proto_type)
         apply_div(scope, [proba_updated, reduced_proba_updated],
                   operator.outputs[1].full_name, container, broadcast=1)
@@ -119,32 +119,50 @@ def _normalise_proba(scope, operator, container, proba, num_classes,
 
 def _predict_proba_log(scope, operator, container, scores, num_classes,
                        proto_type):
-    """Probability estimation for SGDClassifier with loss=log and
-    Logistic Regression.
+    """Probability estimation for SGDClassifier with loss=log (or log_loss)
+    and Logistic Regression.
     Positive class probabilities are computed as
         1. / (1. + exp(-scores))
         multiclass is handled by normalising that over all classes.
     """
-    negate_name = scope.get_unique_variable_name('negate')
-    negated_scores_name = scope.get_unique_variable_name('negated_scores')
-    exp_result_name = scope.get_unique_variable_name('exp_result')
+    if num_classes >= 3 or container.target_opset < 13:
+        negated_scores_name = scope.get_unique_variable_name('negated_scores')
+        negate_name = scope.get_unique_variable_name('negate')
+        exp_result_name = scope.get_unique_variable_name('exp_result')
+        unity_name = scope.get_unique_variable_name('unity')
+        add_result_name = scope.get_unique_variable_name('add_result')
+        proba_name = scope.get_unique_variable_name('proba')
+
+        container.add_initializer(negate_name, proto_type, [], [-1])
+        container.add_initializer(unity_name, proto_type, [], [1])
+
+        apply_mul(scope, [scores, negate_name],
+                  negated_scores_name, container, broadcast=1)
+        apply_exp(scope, negated_scores_name, exp_result_name, container)
+        apply_add(scope, [exp_result_name, unity_name],
+                  add_result_name, container, broadcast=1)
+        apply_reciprocal(scope, add_result_name, proba_name, container)
+        return _normalise_proba(scope, operator, container, scores, proba_name,
+                                num_classes, unity_name, proto_type)
+
+    # Sigmoid cannot be used for num_classes > 2 because
+    # onnxruntime has a different implementation than numpy.
+    # It introduces discrepancies when x < 1e16.
+    # Below that threshold, Sigmoid must be replaced by Exp
+    # because Sigmoid is not an increasing function.
+    sigmo = scope.get_unique_variable_name('sigmoid')
+    container.add_node('Sigmoid', [scores], [sigmo],
+                       name=scope.get_unique_operator_name('Sigmoid'))
+
     unity_name = scope.get_unique_variable_name('unity')
-    add_result_name = scope.get_unique_variable_name('add_result')
-    proba_name = scope.get_unique_variable_name('proba')
+    container.add_initializer(unity_name, proto_type, [1], [1])
 
-    container.add_initializer(negate_name, proto_type,
-                              [], [-1])
-    container.add_initializer(unity_name, proto_type,
-                              [], [1])
-
-    apply_mul(scope, [scores, negate_name],
-              negated_scores_name, container, broadcast=1)
-    apply_exp(scope, negated_scores_name, exp_result_name, container)
-    apply_add(scope, [exp_result_name, unity_name],
-              add_result_name, container, broadcast=1)
-    apply_reciprocal(scope, add_result_name, proba_name, container)
-    return _normalise_proba(scope, operator, container, proba_name,
-                            num_classes, unity_name, proto_type)
+    sigmo_0 = scope.get_unique_variable_name('sigmo_0')
+    container.add_node('Sub', [unity_name, sigmo], [sigmo_0],
+                       name=scope.get_unique_operator_name('Sub'))
+    apply_concat(scope, [sigmo_0, sigmo], [operator.outputs[1].full_name],
+                 container, axis=1)
+    return operator.outputs[1].full_name
 
 
 def _predict_proba_modified_huber(scope, operator, container,
@@ -177,7 +195,7 @@ def _predict_proba_modified_huber(scope, operator, container,
               add_result_name, container, broadcast=1)
     apply_div(scope, [add_result_name, constant_name],
               proba_name, container, broadcast=1)
-    return _normalise_proba(scope, operator, container, proba_name,
+    return _normalise_proba(scope, operator, container, scores, proba_name,
                             num_classes, unity_name, proto_type)
 
 
@@ -191,7 +209,8 @@ def convert_sklearn_sgd_classifier(scope: Scope, operator: Operator,
     if proto_type != onnx_proto.TensorProto.DOUBLE:
         proto_type = onnx_proto.TensorProto.FLOAT
 
-    if np.issubdtype(classes.dtype, np.floating):
+    if (np.issubdtype(classes.dtype, np.floating) or
+            classes.dtype == np.bool_):
         class_type = onnx_proto.TensorProto.INT32
         classes = classes.astype(np.int32)
     elif np.issubdtype(classes.dtype, np.signedinteger):
@@ -210,7 +229,7 @@ def convert_sklearn_sgd_classifier(scope: Scope, operator: Operator,
     scores = _decision_function(scope, operator, container, sgd_op, proto_type)
     options = container.get_options(sgd_op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
-    if sgd_op.loss == 'log' and not use_raw_scores:
+    if sgd_op.loss in ('log', 'log_loss') and not use_raw_scores:
         proba = _predict_proba_log(scope, operator, container, scores,
                                    len(classes), proto_type)
     elif sgd_op.loss == 'modified_huber' and not use_raw_scores:
@@ -237,7 +256,9 @@ def convert_sklearn_sgd_classifier(scope: Scope, operator: Operator,
 
     container.add_node('ArgMax', proba,
                        predicted_label_name,
-                       name=scope.get_unique_operator_name('ArgMax'), axis=1)
+                       name=scope.get_unique_operator_name('ArgMax'),
+                       axis=1,
+                       keepdims=1)
     container.add_node(
         'ArrayFeatureExtractor', [classes_name, predicted_label_name],
         final_label_name, op_domain='ai.onnx.ml',
@@ -261,4 +282,5 @@ register_converter('SklearnSGDClassifier',
                    convert_sklearn_sgd_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})

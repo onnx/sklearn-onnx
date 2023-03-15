@@ -2,15 +2,13 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 import sklearn
 from sklearn.datasets import (
-    load_iris, make_regression, make_classification,
-    load_boston
-)
+    load_iris, make_regression, make_classification)
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import (
     RandomForestClassifier, RandomForestRegressor,
@@ -18,11 +16,17 @@ from sklearn.ensemble import (
 )
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
+    DoubleTensorType,
     Int64TensorType,
-    onnx_built_with_ml,
 )
 from skl2onnx import convert_sklearn, to_onnx
 from test_utils import (
@@ -36,12 +40,12 @@ from test_utils import (
     dump_single_regression,
     fit_classification_model,
     fit_multilabel_classification_model,
+    fit_multi_output_classification_model,
     fit_regression_model,
     path_to_leaf,
     TARGET_OPSET,
 )
 try:
-    from sklearn.experimental import enable_hist_gradient_boosting  # noqa
     from sklearn.ensemble import (
         HistGradientBoostingClassifier,
         HistGradientBoostingRegressor
@@ -54,38 +58,23 @@ except ImportError:
 def _sklearn_version():
     # Remove development version 0.22.dev0 becomes 0.22.
     v = ".".join(sklearn.__version__.split('.')[:2])
-    return StrictVersion(v)
+    return pv.Version(v)
+
+
+ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_random_forest_classifier(self):
         model = RandomForestClassifier(n_estimators=3)
-        dump_one_class_classification(
-            model,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')"
-                          " or StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+        dump_one_class_classification(model)
+        dump_binary_classification(model)
+        dump_binary_classification(model, label_string=False)
         dump_binary_classification(
-            model,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')"
-                          " or StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
-        dump_multiple_classification(
-            model,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')"
-                          " or StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            model, label_string=False, label_bool=True)
+        dump_multiple_classification(model)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_classifier_mismatched_estimator_counts(self):
         model = RandomForestClassifier(n_estimators=3)
         X = [[0, 1], [1, 1], [2, 0]]
@@ -97,14 +86,14 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'binary classifier',
                                            [('input',
-                                             FloatTensorType([None, 2]))])
+                                             FloatTensorType([None, 2]))],
+                                           target_opset=TARGET_OPSET)
         dump_data_and_model(X, model, model_onnx,
                             basename=prefix + "Bin" +
                             model.__class__.__name__ +
                             '_mismatched_estimator_counts')
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor_mismatches(self):
         iris = load_iris()
         X, y = iris.data, iris.target
@@ -116,27 +105,20 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         clr.fit(X, y)
         model_onnx, prefix = convert_model(clr, 'reg',
                                            [('input',
-                                             FloatTensorType([None, 4]))])
+                                             FloatTensorType([None, 4]))],
+                                           target_opset=TARGET_OPSET)
         dump_data_and_model(X_test, clr, model_onnx,
                             basename=prefix + "RegMis" +
                             clr.__class__.__name__ +
                             '_mismatched_estimator_counts')
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor(self):
         model = RandomForestRegressor(n_estimators=3)
-        dump_single_regression(
-            model,
-            allow_failure=("StrictVersion(onnxruntime.__version__)"
-                           " <= StrictVersion('0.2.1')"),
-        )
-        dump_multiple_regression(
-            model,
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+        dump_single_regression(model)
+        dump_multiple_regression(model)
 
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor_mismatched_estimator_counts(self):
         model = RandomForestRegressor(n_estimators=3)
         X = [[0, 1], [1, 1], [2, 0]]
@@ -148,94 +130,63 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.n_estimators += 1
         model_onnx, prefix = convert_model(model, 'single regressor',
                                            [('input',
-                                             FloatTensorType([None, 2]))])
+                                             FloatTensorType([None, 2]))],
+                                           target_opset=TARGET_OPSET)
         dump_data_and_model(X, model, model_onnx,
                             basename=prefix + "Reg" +
                             model.__class__.__name__ +
                             "_mismatched_estimator_counts")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_extra_trees_classifier(self):
         model = ExtraTreesClassifier(n_estimators=3)
-        dump_one_class_classification(
-            model,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
-        dump_binary_classification(
-            model,
-            allow_failure=(
-                "StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
-                "StrictVersion(onnxruntime.__version__)"
-                " <= StrictVersion('0.2.1')"
-            ),
-        )
-        dump_multiple_classification(
-            model,
-            # Operator cast-1 is not implemented in onnxruntime
-            allow_failure=(
-                "StrictVersion(onnx.__version__) < StrictVersion('1.2') or "
-                "StrictVersion(onnxruntime.__version__)"
-                " <= StrictVersion('0.2.1')"
-            ),
-        )
+        dump_one_class_classification(model)
+        dump_binary_classification(model)
+        dump_multiple_classification(model)
 
+    @ignore_warnings(category=FutureWarning)
     def test_extra_trees_regressor(self):
         model = ExtraTreesRegressor(n_estimators=3)
-        dump_single_regression(
-            model,
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
-        dump_multiple_regression(
-            model,
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+        dump_single_regression(model)
+        dump_multiple_regression(model)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
             RandomForestClassifier(random_state=42),
             2, label_string=True)
         model_onnx = convert_sklearn(
-            model,
-            "multi-class nocl",
+            model, "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True, 'zipmap': False}})
+            options={id(model): {'nocl': True, 'zipmap': False}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
         dump_data_and_model(
             X[:5], model, model_onnx, classes=model.classes_,
-            basename="SklearnRFMultiNoCl", verbose=False,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+            basename="SklearnRFMultiNoCl")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_multi_class_nocl_all(self):
         model, X = fit_classification_model(
             RandomForestClassifier(random_state=42),
             2, label_string=True)
         model_onnx = convert_sklearn(
-            model,
-            "multi-class nocl",
+            model, "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True, 'zipmap': False}})
+            options={id(model): {'nocl': True, 'zipmap': False}},
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
         assert 'classlabels_strings' not in sonx
         assert 'cl0' not in sonx
         exp_label = model.predict(X)
         exp_proba = model.predict_proba(X)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'input': X.astype(numpy.float32)})
         exp_label = numpy.array([int(cl[2:]) for cl in exp_label])
         assert_almost_equal(exp_proba, got[1], decimal=5)
@@ -250,6 +201,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             # That explains why the test allows less than 3 differences.
             assert_almost_equal(exp_label, got[0])
 
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_classifier_int(self):
         model, X = fit_classification_model(
             RandomForestClassifier(n_estimators=5, random_state=42),
@@ -257,18 +209,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "random forest classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnRandomForestClassifierInt",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnRandomForestClassifierInt")
 
+    @ignore_warnings(category=FutureWarning)
     def test_extra_trees_classifier_int(self):
         model, X = fit_classification_model(
             ExtraTreesClassifier(n_estimators=5, random_state=42),
@@ -276,18 +223,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "extra trees classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnExtraTreesClassifierInt",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnExtraTreesClassifierInt")
 
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_classifier_bool(self):
         model, X = fit_classification_model(
             RandomForestClassifier(n_estimators=5, random_state=42),
@@ -295,18 +237,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "random forest classifier",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnRandomForestClassifierBool",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnRandomForestClassifierBool")
 
+    @ignore_warnings(category=FutureWarning)
     def test_extra_trees_classifier_bool(self):
         model, X = fit_classification_model(
             ExtraTreesClassifier(n_estimators=5, random_state=42),
@@ -314,54 +251,86 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "extra trees regression",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnExtraTreesClassifierBool",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnExtraTreesClassifierBool")
 
+    @ignore_warnings(category=FutureWarning)
+    def test_random_forest_classifier_double(self):
+        model, X = fit_classification_model(
+            RandomForestClassifier(n_estimators=5, random_state=42),
+            3, is_double=True)
+        for opv in [1, 2, 3]:
+            model_onnx = convert_sklearn(
+                model, "random forest classifier",
+                [("input", DoubleTensorType([None, X.shape[1]]))],
+                target_opset={'ai.onnx.ml': opv,
+                              '': TARGET_OPSET})
+            self.assertIsNotNone(model_onnx)
+            dump_data_and_model(
+                X, model, model_onnx,
+                basename="SklearnRandomForestClassifierDouble")
+
+    @ignore_warnings(category=FutureWarning)
+    def test_model_random_forest_classifier_multi_output_int(self):
+        model, X_test = fit_multi_output_classification_model(
+            RandomForestClassifier(random_state=42, n_estimators=20))
+        options = {id(model): {'zipmap': False}}
+        model_onnx = convert_sklearn(
+            model, "random forest classifier",
+            [("input", Int64TensorType([None, X_test.shape[1]]))],
+            options=options, target_opset=TARGET_OPSET)
+        self.assertTrue(model_onnx is not None)
+        assert 'zipmap' not in str(model_onnx).lower()
+        dump_data_and_model(
+            X_test.astype(numpy.int64), model, model_onnx,
+            basename="SklearnRandomForestClassifierMultiOutputInt")
+
+    @ignore_warnings(category=FutureWarning)
     def common_test_model_hgb_regressor(self, add_nan=False):
-        model = HistGradientBoostingRegressor(max_iter=5, max_depth=2)
+        rng = numpy.random.RandomState(12345)
+        model = HistGradientBoostingRegressor(max_iter=4, max_depth=2)
         X, y = make_regression(n_features=10, n_samples=1000,
                                n_targets=1, random_state=42)
         if add_nan:
-            rows = numpy.random.randint(0, X.shape[0] - 1, X.shape[0] // 3)
-            cols = numpy.random.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+            rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+            cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
             X[rows, cols] = numpy.nan
 
+        X = X.astype(numpy.float32)
+        y = y.astype(numpy.float32)
         X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5,
                                                        random_state=42)
         model.fit(X_train, y_train)
 
         model_onnx = convert_sklearn(
-            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
-        X_test = X_test.astype(numpy.float32)[:5]
+        X_test = X_test.astype(numpy.float32)[:10]
         dump_data_and_model(
             X_test, model, model_onnx,
-            basename="SklearnHGBRegressor", verbose=False,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+            basename=f"SklearnHGBRegressor{add_nan}", verbose=False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
+                     reason="issue with nan for earlier ort")
+    @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingRegressor is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
+                     reason="issue with nan for earlier ort")
+    @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
 
@@ -380,7 +349,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model.fit(X_train, y_train)
 
         model_onnx = convert_sklearn(
-            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "unused", [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         X_test = X_test.astype(numpy.float32)[:5]
 
@@ -388,17 +358,14 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             X_test, model, model_onnx,
             basename="SklearnHGBClassifier%s%d" % (
                 "nan" if add_nan else '', n_classes),
-            verbose=False,
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2') or "
-                          "StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')")
+            verbose=False)
 
         if n_classes == 2:
             model_onnx = convert_sklearn(
                 model, "unused",
                 [("input", FloatTensorType([None, X.shape[1]]))],
-                options={model.__class__: {'raw_scores': True}})
+                options={model.__class__: {'raw_scores': True}},
+                target_opset=TARGET_OPSET)
             self.assertIsNotNone(model_onnx)
             X_test = X_test.astype(numpy.float32)[:5]
 
@@ -409,161 +376,124 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                 basename="SklearnHGBClassifierRaw%s%d" % (
                     "nan" if add_nan else '', n_classes),
                 verbose=False,
-                allow_failure="StrictVersion(onnx.__version__)"
-                              " < StrictVersion('1.2') or "
-                              "StrictVersion(onnxruntime.__version__)"
-                              " < StrictVersion('1.2.0')",
                 methods=['predict', 'decision_function_binary'])
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
+                     reason="issue with nan for earlier ort")
+    @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
+                     reason="issue with nan for earlier ort")
+    @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="missing_go_to_left is missing")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version('1.2.0'),
+                     reason="issue with nan for earlier ort")
+    @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan_multi(self):
         self.common_test_model_hgb_classifier(False, n_classes=3)
 
-    @unittest.skipIf(_sklearn_version() < StrictVersion('0.22.0'),
+    @unittest.skipIf(_sklearn_version() < pv.Version('0.22.0'),
                      reason="NaN not allowed")
     @unittest.skipIf(HistGradientBoostingClassifier is None,
                      reason="scikit-learn 0.22 + manual activation")
+    @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan_multi(self):
         self.common_test_model_hgb_classifier(True, n_classes=3)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             RandomForestClassifier(random_state=42, n_estimators=5))
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn RandomForestClassifier",
+            model, "scikit-learn RandomForestClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options,
-            target_opset=TARGET_OPSET
-        )
+            options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnRandomForestClassifierMultiLabel-Out0",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnRandomForestClassifierMultiLabel-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_multilabel_low_samples(self):
         model, X_test = fit_multilabel_classification_model(
             RandomForestClassifier(random_state=42, n_estimators=5),
             n_samples=4)
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn RandomForestClassifier",
+            model, "scikit-learn RandomForestClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options,
-            target_opset=TARGET_OPSET
-        )
+            options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnRandomForestClassifierMultiLabelLowSamples-Out0",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnRandomForestClassifierMultiLabelLowSamples-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_extra_trees_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
             ExtraTreesClassifier(random_state=42, n_estimators=5))
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn ExtraTreesClassifier",
+            model, "scikit-learn ExtraTreesClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options,
-            target_opset=TARGET_OPSET
-        )
+            options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnExtraTreesClassifierMultiLabel-Out0",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnExtraTreesClassifierMultiLabel-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_model_extra_trees_classifier_multilabel_low_samples(self):
         model, X_test = fit_multilabel_classification_model(
             ExtraTreesClassifier(random_state=42, n_estimators=5),
             n_samples=10)
         options = {id(model): {'zipmap': False}}
         model_onnx = convert_sklearn(
-            model,
-            "scikit-learn ExtraTreesClassifier",
+            model, "scikit-learn ExtraTreesClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options,
-            target_opset=TARGET_OPSET
-        )
+            options=options, target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         assert 'zipmap' not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test,
-            model,
-            model_onnx,
-            basename="SklearnExtraTreesClassifierMultiLabelLowSamples-Out0",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X_test, model, model_onnx,
+            basename="SklearnExtraTreesClassifierMultiLabelLowSamples-Out0")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+    @ignore_warnings(category=FutureWarning)
     def test_boston_pca_rf(self):
-        data = load_boston()
-        X, y = data.data, data.target
+        X, y = make_regression(100, n_features=10)
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, random_state=0)
         pipe = Pipeline([
-            ('acp', PCA(n_components=7)),
-            ('rf', RandomForestRegressor())
-        ])
+            ('acp', PCA(n_components=3)),
+            ('rf', RandomForestRegressor(n_estimators=100))])
         pipe.fit(X_train, y_train)
         X32 = X_test.astype(numpy.float32)
         model_onnx = to_onnx(pipe, X32[:1], target_opset=TARGET_OPSET)
-
         dump_data_and_model(
-            X32, pipe,
-            model_onnx, methods=['predict'],
-            basename="SklearnBostonPCARF-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X32, pipe, model_onnx, methods=['predict'],
+            basename="SklearnBostonPCARF-Dec4")
 
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor_int(self):
         model, X = fit_regression_model(
             RandomForestRegressor(n_estimators=5, random_state=42),
@@ -571,18 +501,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "random forest regression",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnRandomForestRegressorInt-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnRandomForestRegressorInt-Dec4",)
 
+    @ignore_warnings(category=FutureWarning)
     def test_extra_trees_regressor_int(self):
         model, X = fit_regression_model(
             ExtraTreesRegressor(n_estimators=5, random_state=42),
@@ -593,14 +518,10 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnExtraTreesRegressorInt-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnExtraTreesRegressorInt-Dec4")
 
+    @ignore_warnings(category=FutureWarning)
     def test_random_forest_regressor_bool(self):
         model, X = fit_regression_model(
             RandomForestRegressor(n_estimators=5, random_state=42),
@@ -608,18 +529,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "random forest regression",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnRandomForestRegressorBool-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnRandomForestRegressorBool-Dec4")
 
+    @ignore_warnings(category=FutureWarning)
     def test_extra_trees_regressor_bool(self):
         model, X = fit_regression_model(
             ExtraTreesRegressor(n_estimators=5, random_state=42),
@@ -627,21 +543,14 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "extra trees regression",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnExtraTreesRegressorBool-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) <= StrictVersion('0.2.1')",
-        )
+            X, model, model_onnx,
+            basename="SklearnExtraTreesRegressorBool-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_randomforestregressor_decision_path(self):
         model = RandomForestRegressor(max_depth=2, n_estimators=2)
         X, y = make_classification(10, n_features=4, random_state=42)
@@ -652,7 +561,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -661,9 +572,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[1]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_extratreesregressor_decision_path(self):
         model = ExtraTreesRegressor(max_depth=2, n_estimators=2)
         X, y = make_classification(10, n_features=4, random_state=42)
@@ -674,7 +584,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -683,9 +595,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[1]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_randomforestclassifier_decision_path(self):
         model = RandomForestClassifier(max_depth=2, n_estimators=2)
         X, y = make_classification(3, n_features=4, random_state=42)
@@ -696,7 +607,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True, 'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -707,9 +620,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[2]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_extratreesclassifier_decision_path(self):
         model = ExtraTreesClassifier(max_depth=2, n_estimators=3)
         X, y = make_classification(10, n_features=4, random_state=42)
@@ -720,7 +632,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_path': True, 'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -731,9 +645,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         got = numpy.array([''.join(row) for row in res[2]])
         assert exp == got.ravel().tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_rf_regressor_decision_leaf(self):
         model = RandomForestRegressor(n_estimators=2, max_depth=3)
         X, y = make_regression(10, n_features=4, random_state=42)
@@ -744,7 +657,10 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel(), decimal=4)
@@ -752,9 +668,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         exp = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
         assert exp.tolist() == res[1].tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_rf_regressor_decision_path_leaf(self):
         model = RandomForestRegressor(n_estimators=3, max_depth=3)
         X, y = make_regression(10, n_features=4, random_state=42)
@@ -766,7 +681,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             options={id(model): {'decision_leaf': True,
                                  'decision_path': True}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel(), decimal=4)
@@ -777,9 +694,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         assert exp_path == got_path.ravel().tolist()
         assert exp_leaf.tolist() == res[2].tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_rf_classifier_decision_leaf(self):
         model = RandomForestClassifier(n_estimators=2, max_depth=3)
         X, y = make_classification(3, n_features=4, random_state=42)
@@ -790,7 +706,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model, initial_types=initial_types,
             options={id(model): {'decision_leaf': True, 'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -798,9 +716,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         exp = path_to_leaf(model.estimators_, dec[0].todense(), dec[1])
         assert exp.tolist() == res[2].tolist()
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 12, reason="LabelEncoder")
+    @ignore_warnings(category=FutureWarning)
     def test_rf_classifier_decision_path_leaf(self):
         model = RandomForestClassifier(n_estimators=3, max_depth=3)
         X, y = make_classification(3, n_features=4, random_state=42)
@@ -813,7 +730,9 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
                                  'decision_path': True,
                                  'zipmap': False}},
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': X.astype(numpy.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
@@ -826,4 +745,4 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

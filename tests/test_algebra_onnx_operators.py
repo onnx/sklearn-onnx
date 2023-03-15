@@ -2,32 +2,31 @@
 
 import unittest
 import warnings
-from distutils.version import StrictVersion
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
 from onnx import (
-    helper, TensorProto, load_model,
-    __version__ as onnx__version__)
+    helper, TensorProto, load_model)
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.cluster import KMeans
 from sklearn.datasets import load_iris
 from sklearn.utils.extmath import row_norms
-from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn
 from skl2onnx.common._topology import Variable
 from skl2onnx.common.data_types import (
-    FloatTensorType, guess_numpy_type, DoubleTensorType)
+    FloatTensorType, guess_numpy_type)
 from skl2onnx.algebra.onnx_operator import OnnxOperator
 from skl2onnx.algebra.onnx_ops import (
     OnnxSub, OnnxDiv, OnnxReshapeApi13,
-    OnnxReduceSumSquare, OnnxGemm,
+    OnnxReduceSumSquareApi18, OnnxGemm,
     OnnxAdd, OnnxArgMin, OnnxSqrt,
     OnnxArrayFeatureExtractor, OnnxMul,
     OnnxPad, OnnxBatchNormalization,
-    OnnxConstantOfShape)
-from test_utils import dump_data_and_model, TARGET_OPSET
+    OnnxConstantOfShape, OnnxMatMul, OnnxSoftmax)
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestOnnxOperators(unittest.TestCase):
@@ -85,7 +84,9 @@ class TestOnnxOperators(unittest.TestCase):
             custom_conversion_functions={CustomOpTransformer: conv},
             target_opset=TARGET_OPSET)
 
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         z2 = sess.run(None, {'input': mat.astype(np.float32)})[0]
         assert_almost_equal(z, z2)
 
@@ -132,7 +133,9 @@ class TestOnnxOperators(unittest.TestCase):
             target_opset=TARGET_OPSET)
 
         try:
-            sess = InferenceSession(model_onnx.SerializeToString())
+            sess = InferenceSession(
+                model_onnx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             raise AssertionError(
                 "Cannot load model\n---\n{}\n---".format(model_onnx)) from e
@@ -151,7 +154,7 @@ class TestOnnxOperators(unittest.TestCase):
             C2 = row_norms(C, squared=True).astype(dtype)
             C = C.astype(dtype)
 
-            rs = OnnxReduceSumSquare(
+            rs = OnnxReduceSumSquareApi18(
                 X, axes=[1], keepdims=1,
                 op_version=container.target_opset)
 
@@ -205,11 +208,11 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertEqual(cst.value, "a")
 
     def test_constant_of_shape(self):
-        for opset in [TARGET_OPSET, 14, 13, 12, 11, 10, 9]:
+        for opset in range(20, 8, -1):
+            if opset > TARGET_OPSET:
+                continue
             for value in [np.array([5], dtype=np.float32),
                           np.array(5, dtype=np.float32)]:
-                if opset > TARGET_OPSET:
-                    continue
                 with self.subTest(opset=opset, value=value):
                     tensor_value = onnx.helper.make_tensor(
                         "value", onnx.TensorProto.FLOAT,
@@ -222,7 +225,9 @@ class TestOnnxOperators(unittest.TestCase):
                     onx = cst.to_onnx(
                         {'X': shape}, target_opset=opset,
                         outputs=[('Y', FloatTensorType())])
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     res = sess.run(None, {'X': shape})
                     assert_almost_equal(
                         res[0], np.full(tuple(shape), 5, dtype=np.float32))
@@ -234,7 +239,9 @@ class TestOnnxOperators(unittest.TestCase):
                     onx = cst.to_onnx(
                         {'X': shape}, target_opset=opset,
                         outputs=[('Y', FloatTensorType())])
-                    sess = InferenceSession(onx.SerializeToString())
+                    sess = InferenceSession(
+                        onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
                     res = sess.run(None, {'X': shape})
                     assert_almost_equal(
                         res[0], np.full(tuple(shape), 5, dtype=np.float32))
@@ -247,24 +254,21 @@ class TestOnnxOperators(unittest.TestCase):
                             'X', value=value, op_version=opset,
                             output_names=['Y'])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_onnx_reversed_order(self):
         idi = np.identity(2)
         idi2 = np.identity(2) * 2
 
         onx = OnnxAdd(
-            OnnxAdd('X', idi, op_version=TARGET_OPSET),
-            idi2, output_names=['Y'],
+            OnnxAdd('X', idi.astype(np.float32), op_version=TARGET_OPSET),
+            idi2.astype(np.float32), output_names=['Y'],
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         self.assertEqual(len(model_def.graph.output), 1)
         onx = OnnxAdd(
-            idi2,
-            OnnxAdd(
-                'X', idi, op_version=TARGET_OPSET),
-            output_names=['Y'],
-            op_version=TARGET_OPSET)
+            idi2.astype(np.float32),
+            OnnxAdd('X', idi.astype(np.float32), op_version=TARGET_OPSET),
+            output_names=['Y'], op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': idi.astype(np.float32)})
         onnx2 = model_def.SerializeToString()
         self.assertIsInstance(onx.outputs, list)
@@ -272,9 +276,9 @@ class TestOnnxOperators(unittest.TestCase):
         self.assertIsInstance(onx.outputs[0], (Variable, tuple))
         if isinstance(onx.outputs[0], tuple):
             self.assertEqual(len(onx.outputs[0]), 2)
-            self.assertIsInstance(onx.outputs[0][1], DoubleTensorType)
+            self.assertIsInstance(onx.outputs[0][1], FloatTensorType)
         else:
-            self.assertIsInstance(onx.outputs[0].type, DoubleTensorType)
+            self.assertIsInstance(onx.outputs[0].type, FloatTensorType)
         # There should be 2 outputs here, bug in ONNX?
         self.assertEqual(len(model_def.graph.output), 1)
         reload = load_model(BytesIO(onnx2))
@@ -301,8 +305,7 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = helper.make_model(graph_def, producer_name='A')
         self.assertEqual(len(model_def.graph.output), 1)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_onnxt_array_feature_extractor(self):
         onx = OnnxArrayFeatureExtractor(
             'X', np.array([1], dtype=np.int64),
@@ -311,13 +314,14 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([2]))],
                                 target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': X})[0]
         self.assertEqual(got.shape, (2, 1))
         assert_almost_equal(X[:, 1:2], got)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_container_init(self):
         onx = OnnxReshapeApi13(
             OnnxReshapeApi13('X', np.array([1, -1], dtype=np.int64),
@@ -328,15 +332,16 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = onx.to_onnx({'X': X},
                                 outputs=[('Y', FloatTensorType([None, 2]))],
                                 target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = sess.run(None, {'X': X})[0]
         assert_almost_equal(X.reshape((1, -1)), got)
         inits = [row for row in str(model_def).split('\n')
                  if row.startswith("  initializer {")]
         self.assertEqual(len(inits), 1)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_default(self):
         pad = OnnxPad(mode='constant', value=1.5,
                       pads=[0, 1, 0, 1], op_version=10)
@@ -346,8 +351,7 @@ class TestOnnxOperators(unittest.TestCase):
         model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
         onnx.checker.check_model(model_def)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_batch_normalization(self):
 
         def _batchnorm_test_mode(x, s, bias, mean, var, epsilon=1e-5):
@@ -372,7 +376,9 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': x.astype(np.float32)},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
@@ -392,12 +398,13 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'X': x.astype(np.float32)},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'X': x})
         assert_almost_equal(y, got[0], decimal=5)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
-                     reason="only available for opset >= 11")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_onnxt_runtime_pad(self):
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]],
                         dtype=np.float32)
@@ -411,7 +418,9 @@ class TestOnnxOperators(unittest.TestCase):
             op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 
@@ -427,7 +436,9 @@ class TestOnnxOperators(unittest.TestCase):
             mode='reflect', op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'data': data, 'pads': pads})
         try:
             assert_almost_equal(exp, got[0])
@@ -446,10 +457,45 @@ class TestOnnxOperators(unittest.TestCase):
             mode='edge', op_version=TARGET_OPSET)
         model_def = onx.to_onnx({'data': data, 'pads': pads},
                                 target_opset=TARGET_OPSET)
-        oinf = InferenceSession(model_def.SerializeToString())
+        oinf = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         got = oinf.run(None, {'data': data, 'pads': pads})
         assert_almost_equal(exp, got[0])
 
+    def test_softmax(self):
+        X = np.random.randn(100, 4).astype(np.float32)
+        y = X.sum(axis=1) + np.random.randn(100) / 10
+        y = y.astype(np.float32)
+        self.assertEqual(y.shape, (100, ))
+        weight = np.random.randn(4, 1).astype(np.float32)
+        intercept = np.random.randn(1).astype(np.float32)
+
+        node = OnnxAdd(
+            OnnxMatMul('X', weight, op_version=TARGET_OPSET),
+            intercept, op_version=TARGET_OPSET)
+        nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
+        with open("debug_ort_add.onnx", "wb") as f:
+            f.write(nn_onnx.SerializeToString())
+        self.assertEqual(len(nn_onnx.graph.output), 1)
+
+        node = OnnxMatMul('X', weight, op_version=TARGET_OPSET)
+        nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
+        self.assertEqual(len(nn_onnx.graph.output), 1)
+
+        node = OnnxSoftmax(
+            OnnxAdd(
+                OnnxMatMul('X', weight, op_version=TARGET_OPSET),
+                intercept, op_version=TARGET_OPSET),
+            op_version=TARGET_OPSET)
+        nn_onnx = node.to_onnx({'X': X}, target_opset=TARGET_OPSET)
+        self.assertEqual(len(nn_onnx.graph.output), 1)
+
 
 if __name__ == "__main__":
+    # import logging
+    # logger = logging.getLogger('skl2onnx')
+    # logger.setLevel(logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
+    # TestOnnxOperators().test_softmax()
     unittest.main()

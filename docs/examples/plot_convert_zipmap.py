@@ -9,14 +9,11 @@ Probabilities as a vector or as a ZipMap
 
 A classifier usually returns a matrix of probabilities.
 By default, *sklearn-onnx* converts that matrix
-into a list of dictionaries where each probabilies is mapped
+into a list of dictionaries where each probabily is mapped
 to its class id or name. That mechanism retains the class names.
 This conversion increases the prediction time and is not
 always needed. Let's see how to deactivate this behaviour
 on the Iris example.
-
-.. contents::
-    :local:
 
 Train a model and convert it
 ++++++++++++++++++++++++++++

@@ -348,4 +348,5 @@ if OnnxEinsum is not None and OnnxErf is not None:
                        convert_gaussian_process_classifier,
                        options={'optim': [None, 'cdist'],
                                 'nocl': [False, True],
+                                'output_class_labels': [False, True],
                                 'zipmap': [False, True]})

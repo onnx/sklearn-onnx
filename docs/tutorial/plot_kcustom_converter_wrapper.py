@@ -16,16 +16,13 @@ can be rewritten by using a `PCA <https://scikit-learn.org/
 stable/modules/generated/sklearn.decomposition.PCA.html>`_.
 We could then reuse the converter associated to this model.
 
-.. contents::
-    :local:
-
 Custom model
 ++++++++++++
 
 Let's implement a simple custom model using
 :epkg:`scikit-learn` API. The model is preprocessing
 which decorrelates correlated random variables.
-If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
+If *X* is a matrix of features, :math:`V=\\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 """
 from mlprodict.onnxrt import OnnxInference

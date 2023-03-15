@@ -29,11 +29,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             X.astype(np.int64),
             model,
             model_onnx,
-            basename="SklearnLabelBinariserDefault",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnLabelBinariserDefault")
 
     def test_model_label_binariser_neg_label(self):
         X = np.array([1, 2, 6, 4, 2])
@@ -49,11 +45,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             X.astype(np.int64),
             model,
             model_onnx,
-            basename="SklearnLabelBinariserNegLabel",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnLabelBinariserNegLabel")
 
     def test_model_label_binariser_pos_label(self):
         X = np.array([1, 2, 6, 4, 2])
@@ -69,11 +61,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             X.astype(np.int64),
             model,
             model_onnx,
-            basename="SklearnLabelBinariserPosLabel",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnLabelBinariserPosLabel")
 
     def test_model_label_binariser_neg_pos_label(self):
         X = np.array([1, 2, 6, 4, 2])
@@ -89,11 +77,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             X.astype(np.int64),
             model,
             model_onnx,
-            basename="SklearnLabelBinariserNegPosLabel",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnLabelBinariserNegPosLabel")
 
     def test_model_label_binariser_binary_labels(self):
         X = np.array([1, 0, 0, 0, 1])
@@ -109,11 +93,7 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             X.astype(np.int64),
             model,
             model_onnx,
-            basename="SklearnLabelBinariserBinaryLabels",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnLabelBinariserBinaryLabels")
 
     def test_model_label_binariser_2d(self):
         X1 = np.array([[0, 1, 1], [1, 0, 0]], dtype=np.int64)
@@ -122,7 +102,9 @@ class TestSklearnLabelBinariser(unittest.TestCase):
             model, 'lb',
             [('float_input', Int64TensorType([None, X1.shape[1]]))],
             target_opset=TARGET_OPSET)
-        sess = InferenceSession(onnx_fs.SerializeToString())
+        sess = InferenceSession(
+            onnx_fs.SerializeToString(),
+            providers=["CPUExecutionProvider"])
 
         res = sess.run(None, input_feed={'float_input': X1})
         exp = model.transform(X1)

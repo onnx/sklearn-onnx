@@ -11,9 +11,6 @@ if all the data share the same type. But data held in a dataframe
 have usually multiple types, float, integer or string for categories.
 ONNX also supports that case.
 
-.. contents::
-    :local:
-
 A dataset with categories
 +++++++++++++++++++++++++
 

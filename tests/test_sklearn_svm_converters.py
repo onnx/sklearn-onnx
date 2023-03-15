@@ -4,10 +4,11 @@
 Tests scikit-linear converter.
 """
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy
+from numpy.testing import assert_almost_equal
 from sklearn.datasets import load_iris
-from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM
+from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM, LinearSVC
 try:
     from skl2onnx.common._apply_operation import apply_less
 except ImportError:
@@ -20,10 +21,13 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
 )
 from skl2onnx.operator_converters.ada_boost import _scikit_learn_before_022
-import onnx
 from onnxruntime import __version__ as ort_version
 from test_utils import (
-    dump_data_and_model, fit_regression_model, TARGET_OPSET)
+    dump_data_and_model, fit_regression_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession)
+
+
+ort_version = ort_version.split('+')[0]
 
 
 class TestSklearnSVM(unittest.TestCase):
@@ -104,13 +108,8 @@ class TestSklearnSVM(unittest.TestCase):
             },
         )
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBinSVCLinearPF-NoProbOpp",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnBinSVCLinearPF-NoProbOpp")
         model_onnx = convert_sklearn(
             model, "SVC", [("input", FloatTensorType([None, X.shape[1]]))],
             options={id(model): {'zipmap': False}},
@@ -118,13 +117,8 @@ class TestSklearnSVM(unittest.TestCase):
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBinSVCLinearPF-NoProbOpp",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnBinSVCLinearPF-NoProbOpp")
 
     def test_convert_svc_binary_linear_ptrue(self):
         model, X = self._fit_binary_classification(
@@ -150,13 +144,8 @@ class TestSklearnSVM(unittest.TestCase):
             },
         )
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBinSVCLinearPT",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnBinSVCLinearPT")
 
     def test_convert_svc_multi_linear_pfalse(self):
         model, X = self._fit_multi_classification(
@@ -178,9 +167,7 @@ class TestSklearnSVM(unittest.TestCase):
 
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnMclSVCLinearPF-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')")
+            basename="SklearnMclSVCLinearPF-Dec4")
 
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     def test_convert_svc_multi_linear_pfalse_ovr(self):
@@ -192,9 +179,7 @@ class TestSklearnSVM(unittest.TestCase):
             target_opset=TARGET_OPSET)
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnMclSVCOVR-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')")
+            basename="SklearnMclSVCOVR-Dec4")
 
     def test_convert_svc_multi_linear_ptrue(self):
         model, X = self._fit_multi_classification(
@@ -214,12 +199,10 @@ class TestSklearnSVM(unittest.TestCase):
                 "vectors_per_class": None})
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnMclSVCLinearPT-Dec2",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')")
+            basename="SklearnMclSVCLinearPT-Dec2")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_svr_linear(self):
         model, X = self._fit_binary_classification(SVR(kernel="linear"))
@@ -239,9 +222,7 @@ class TestSklearnSVM(unittest.TestCase):
                 "support_vectors": None,
             },
         )
-        dump_data_and_model(X,
-                            model,
-                            model_onnx,
+        dump_data_and_model(X, model, model_onnx,
                             basename="SklearnRegSVRLinear-Dec3")
 
     def test_convert_nusvc_binary_pfalse(self):
@@ -266,16 +247,11 @@ class TestSklearnSVM(unittest.TestCase):
             },
         )
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBinNuSVCPF-NoProbOpp",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnBinNuSVCPF-NoProbOpp")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_nusvc_binary_ptrue(self):
         model, X = self._fit_binary_classification(NuSVC(probability=True))
@@ -298,13 +274,8 @@ class TestSklearnSVM(unittest.TestCase):
             },
         )
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBinNuSVCPT",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnBinNuSVCPT")
 
     def test_convert_nusvc_multi_pfalse(self):
         model, X = self._fit_multi_classification(
@@ -330,9 +301,7 @@ class TestSklearnSVM(unittest.TestCase):
         )
         dump_data_and_model(
             X, model, model_onnx,
-            basename="SklearnMclNuSVCPF-Dec1",  # max relative error is 1e-5
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')")
+            basename="SklearnMclNuSVCPF-Dec1")
 
     def test_convert_svc_multi_pfalse_4(self):
         model, X = self._fit_multi_classification(
@@ -344,13 +313,8 @@ class TestSklearnSVM(unittest.TestCase):
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnMcSVCPF",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnMcSVCPF")
 
     @unittest.skipIf(_scikit_learn_before_022(),
                      reason="break_ties introduced after 0.22")
@@ -365,9 +329,7 @@ class TestSklearnSVM(unittest.TestCase):
         dump_data_and_model(
             X.astype(numpy.float32),
             model, model_onnx,
-            basename="SklearnMcSVCPFBTF-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')")
+            basename="SklearnMcSVCPFBTF-Dec4")
 
     def test_convert_svc_multi_ptrue_4(self):
         model, X = self._fit_multi_classification(SVC(probability=True), 4)
@@ -377,13 +339,8 @@ class TestSklearnSVM(unittest.TestCase):
         nodes = model_onnx.graph.node
         self.assertIsNotNone(nodes)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnMcSVCPF4-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnMcSVCPF4-Dec4")
 
     def test_convert_nusvc_multi_ptrue(self):
         model, X = self._fit_multi_classification(
@@ -407,16 +364,11 @@ class TestSklearnSVM(unittest.TestCase):
             },
         )
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnMclNuSVCPT-Dec3",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.4.0')"
-        )
+            X, model, model_onnx,
+            basename="SklearnMclNuSVCPT-Dec3")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_nusvr(self):
         model, X = self._fit_binary_classification(NuSVR())
@@ -440,7 +392,7 @@ class TestSklearnSVM(unittest.TestCase):
                             basename="SklearnRegNuSVR")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="use of recent Cast operator")
     def test_convert_nusvr_default(self):
         model, X = self._fit_binary_classification(NuSVR())
@@ -454,80 +406,51 @@ class TestSklearnSVM(unittest.TestCase):
         model, X = fit_regression_model(
             SVR(), is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "SVR",
+            model, "SVR",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnSVRInt-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
-        )
+            X, model, model_onnx,
+            basename="SklearnSVRInt-Dec4")
 
     def test_convert_nusvr_int(self):
         model, X = fit_regression_model(
             NuSVR(), is_int=True)
         model_onnx = convert_sklearn(
-            model,
-            "NuSVR",
-            [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            model, "NuSVR", [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnNuSVRInt-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
-        )
+            X, model, model_onnx,
+            basename="SklearnNuSVRInt-Dec4")
 
     def test_convert_svr_bool(self):
         model, X = fit_regression_model(
             SVR(), is_bool=True)
         model_onnx = convert_sklearn(
-            model,
-            "SVR",
+            model, "SVR",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnSVRBool-Dec4",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
-        )
+            X, model, model_onnx,
+            basename="SklearnSVRBool-Dec4")
 
     def test_convert_nusvr_bool(self):
         model, X = fit_regression_model(
             NuSVR(), is_bool=True)
         model_onnx = convert_sklearn(
-            model,
-            "NuSVR",
+            model, "NuSVR",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
-        )
+            target_opset=TARGET_OPSET)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnNuSVRBool",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')"
-        )
+            X, model, model_onnx,
+            basename="SklearnNuSVRBool")
 
     @unittest.skipIf(
-        StrictVersion(onnx.__version__) < StrictVersion("1.4.1"),
+        TARGET_OPSET < 9,
         reason="operator sign available since opset 9")
     def test_convert_oneclasssvm(self):
         model, X = self._fit_one_class_svm(OneClassSVM())
@@ -535,13 +458,166 @@ class TestSklearnSVM(unittest.TestCase):
             model, "OCSVM", [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBinOneClassSVM",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " < StrictVersion('0.5.0')")
+            X, model, model_onnx,
+            basename="SklearnBinOneClassSVM")
+
+    def test_model_linear_svc_binary_class(self):
+        model, X = self._fit_binary_classification(LinearSVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1].ravel(), decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_linear_svc_multi_class(self):
+        model, X = self._fit_multi_classification(LinearSVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_svc_binary_class_false(self):
+        model, X = self._fit_binary_classification(SVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1][:, 0], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    @unittest.skipIf(TARGET_OPSET < 12, reason="operator Less")
+    def test_model_svc_multi_class_false(self):
+        model, X = self._fit_multi_classification(SVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_svc_binary_class_true(self):
+        model, X = self._fit_binary_classification(
+            SVC(max_iter=10000, probability=True))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False}, target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_svc_multi_class_true(self):
+        model, X = self._fit_multi_classification(
+            SVC(max_iter=10000, probability=True))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False}, target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_nusvc_binary_class_false(self):
+        model, X = self._fit_binary_classification(NuSVC(max_iter=10000))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1][:, 0], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    @unittest.skipIf(TARGET_OPSET < 12, reason="operator Less")
+    def test_model_nusvc_multi_class_false(self):
+        model, X = self._fit_multi_classification(
+            NuSVC(max_iter=10000, nu=0.1))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.decision_function(X)
+        assert_almost_equal(proba, res[1], decimal=4)
+        assert_almost_equal(label, res[0])
+
+    def test_model_nusvc_binary_class_true(self):
+        model, X = self._fit_binary_classification(
+            NuSVC(max_iter=10000, probability=True))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False}, target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=5)
+        assert_almost_equal(label, res[0])
+
+    def test_model_nusvc_multi_class_true(self):
+        model, X = self._fit_multi_classification(
+            NuSVC(max_iter=10000, probability=True, nu=0.1))
+        model_onnx = convert_sklearn(
+            model, "linear SVC",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={'zipmap': False}, target_opset=TARGET_OPSET)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'input': X})
+        label = model.predict(X)
+        proba = model.predict_proba(X)
+        assert_almost_equal(proba, res[1], decimal=3)
+        assert_almost_equal(label, res[0])
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

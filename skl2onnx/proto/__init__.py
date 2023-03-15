@@ -20,17 +20,6 @@ except ImportError:
 from onnx.helper import split_complex_to_pairs
 
 
-def _check_onnx_version():
-    import pkg_resources
-    min_required_version = pkg_resources.parse_version('1.0.1')
-    current_version = pkg_resources.get_distribution('onnx').parsed_version
-    assert current_version >= min_required_version, (
-        'ONNXMLTools requires ONNX version 1.0.1 or a newer one')
-
-
-_check_onnx_version()
-
-
 def make_tensor_fixed(name, data_type, dims, vals, raw=False):
     '''
     Make a TensorProto with specified arguments.  If raw is False, this

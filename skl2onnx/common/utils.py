@@ -2,6 +2,9 @@
 
 import pprint
 from collections import OrderedDict
+import hashlib
+import numpy as np
+from onnx.numpy_helper import from_array
 from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed  # noqa
 from onnxconverter_common.utils import is_numeric_type, is_string_type  # noqa
 from onnxconverter_common.utils import cast_list, convert_to_python_value  # noqa
@@ -10,6 +13,15 @@ from onnxconverter_common.utils import convert_to_list  # noqa
 from onnxconverter_common.utils import check_input_and_output_numbers  # noqa
 from onnxconverter_common.utils import check_input_and_output_types  # noqa
 from .data_types import TensorType
+
+_unique_index = {'subgraph': 0}
+
+
+def get_unique_subgraph():
+    "Returns a unique identifier integer for subgraph."
+    global _unique_index
+    _unique_index['subgraph'] += 1
+    return _unique_index['subgraph']
 
 
 def get_producer():
@@ -94,13 +106,16 @@ def get_column_index(i, inputs):
             end += rel_end
     else:
         for ind, inp in enumerate(inputs):
-            if inp.onnx_name == i:
+            if inp.raw_name == i:
                 return ind, 0
         raise RuntimeError(
             "Unable to find column name %r among names %r. "
             "Make sure the input names specified with parameter "
             "initial_types fits the column names specified in the "
-            "pipeline to convert." % (i, [n.onnx_name for n in inputs]))
+            "pipeline to convert. This may happen because a "
+            "ColumnTransformer follows a transformer without "
+            "any mapped converter in a pipeline." % (
+                i, [n.raw_name for n in inputs]))
 
 
 def get_column_indices(indices, inputs, multiple):
@@ -139,3 +154,36 @@ def get_column_indices(indices, inputs, multiple):
                     "multiple variables ({0}). You should think about merging "
                     "initial types.".format(cols))
         return onnx_var, onnx_is
+
+
+def hash_array(value, length=15):
+    "Computes a hash identifying the value."
+    try:
+        onx = from_array(value)
+    except AttributeError as e:
+        # sparse matrix for example
+        if hasattr(value, 'tocoo'):
+            coo = value.tocoo()
+            arrs = [coo.data, coo.row, coo.col, np.array(coo.shape)]
+            m = hashlib.sha256()
+            for arr in arrs:
+                m.update(from_array(arr).SerializeToString())
+            return m.hexdigest()[:length]
+
+        raise ValueError(
+            "Unable to compute hash for type %r (value=%r)." % (
+                type(value), value)) from e
+    except RuntimeError as ee:
+        # cannot be serialized
+        if isinstance(value, (np.ndarray, list)):
+            b = str(value).encode('utf-8')
+            m = hashlib.sha256()
+            m.update(b)
+            return m.hexdigest()[:length]
+        raise RuntimeError(
+            "Unable to convert value type %r, (value=%r)." % (
+                type(value), value)) from ee
+
+    m = hashlib.sha256()
+    m.update(onx.SerializeToString())
+    return m.hexdigest()[:length]

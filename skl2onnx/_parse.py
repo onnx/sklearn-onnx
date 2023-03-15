@@ -13,10 +13,12 @@ except ImportError:
     class OutlierMixin:
         pass
 
+from sklearn.ensemble import (
+    IsolationForest, RandomTreesEmbedding, RandomForestClassifier)
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.linear_model import BayesianRidge
 from sklearn.model_selection import GridSearchCV
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import NearestNeighbors, LocalOutlierFactor
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.preprocessing import OneHotEncoder
@@ -46,7 +48,8 @@ from .common._registration import _converter_pool, _shape_calculator_pool
 from .common._topology import Topology, Variable
 from .common.data_types import (
     DictionaryType, Int64TensorType, SequenceType,
-    StringTensorType, TensorType, guess_tensor_type)
+    StringTensorType, TensorType, FloatTensorType,
+    guess_tensor_type)
 from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
@@ -82,7 +85,8 @@ def _fetch_input_slice(scope, inputs, column_indices):
     return array_feature_extractor_operator.outputs
 
 
-def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
+def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None,
+                                alias=None):
     """
     This function handles all non-pipeline models.
 
@@ -90,6 +94,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
     :param model: A scikit-learn object (e.g., *OneHotEncoder*
         or *LogisticRegression*)
     :param inputs: A list of variables
+    :param custom_parsers: dictionary of custom parsers
+    :param alias: use this alias instead of the one based on the class name
     :return: A list of output variables which will be passed to next
         stage
     """
@@ -101,7 +107,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         raise TypeError(
             "One input is not a Variable for model %r - %r."
             "" % (model, inputs))
-    alias = _get_sklearn_operator_name(type(model))
+    if alias is None:
+        alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs = inputs
 
@@ -121,9 +128,21 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
                 names = parser_names()
             if names is not None:
                 for name in names:
-                    var = scope.declare_local_variable(
-                        name, guess_tensor_type(inputs[0].type))
-                    this_operator.outputs.append(var)
+                    if isinstance(name, Variable):
+                        this_operator.outputs.append(name)
+                    elif isinstance(name, str):
+                        var = scope.declare_local_variable(
+                            name, guess_tensor_type(inputs[0].type))
+                        this_operator.outputs.append(var)
+                    elif isinstance(name, tuple) and len(name) == 2:
+                        var = scope.declare_local_variable(
+                            name[0], guess_tensor_type(name[1]))
+                        this_operator.outputs.append(var)
+                    else:
+                        raise RuntimeError(
+                            "Unexpected output type %r (value=%r) for "
+                            "operator %r." % (
+                                type(name), name, type(model)))
                 return this_operator.outputs
 
     if (type(model) in sklearn_classifier_list
@@ -136,8 +155,12 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         # be fixed in shape inference phase.
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
+        if type(model) in [RandomForestClassifier]:
+            prob_dtype = FloatTensorType()
+        else:
+            prob_dtype = guess_tensor_type(inputs[0].type)
         probability_tensor_variable = scope.declare_local_variable(
-            'probabilities', guess_tensor_type(inputs[0].type))
+            'probabilities', prob_dtype)
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(probability_tensor_variable)
 
@@ -153,8 +176,21 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
 
+    elif type(model) in {IsolationForest, LocalOutlierFactor}:
+        label_variable = scope.declare_local_variable(
+            'label', Int64TensorType())
+        score_tensor_variable = scope.declare_local_variable(
+            'scores', guess_tensor_type(inputs[0].type))
+        this_operator.outputs.append(label_variable)
+        this_operator.outputs.append(score_tensor_variable)
+        options = scope.get_options(model, dict(score_samples=False))
+        if options['score_samples']:
+            scores_var = scope.declare_local_variable(
+                'score_samples', guess_tensor_type(inputs[0].type))
+            this_operator.outputs.append(scores_var)
+
     elif type(model) in outlier_list or isinstance(model, OutlierMixin):
-        # For clustering, we may have two outputs, one for label and
+        # For outliers, we may have two outputs, one for label and
         # the other one for scores.
         label_variable = scope.declare_local_variable(
             'label', Int64TensorType())
@@ -163,7 +199,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         this_operator.outputs.append(label_variable)
         this_operator.outputs.append(score_tensor_variable)
 
-    elif type(model) == NearestNeighbors:
+    elif isinstance(model, NearestNeighbors):
         # For Nearest Neighbours, we have two outputs, one for nearest
         # neighbours' indices and the other one for distances
         index_variable = scope.declare_local_variable(
@@ -193,9 +229,16 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None):
         variable = scope.declare_local_variable('variable', otype)
         this_operator.outputs.append(variable)
     else:
-        # We assume that all scikit-learn operator produce a single output.
+        if hasattr(model, 'get_feature_names_out'):
+            try:
+                out_names = model.get_feature_names_out()
+            except (AttributeError, ValueError):
+                # Catch a bug in scikit-learn.
+                out_names = None
+            this_operator.feature_names_out_ = out_names
+        input_type = guess_tensor_type(inputs[0].type)
         variable = scope.declare_local_variable(
-            'variable', guess_tensor_type(inputs[0].type))
+            'variable', input_type)
         this_operator.outputs.append(variable)
 
     options = scope.get_options(model, dict(decision_path=False), fail=False)
@@ -244,7 +287,7 @@ def _parse_sklearn_feature_union(scope, model, inputs, custom_parsers=None):
     # Encode each transform as our IR object
     for name, transform in model.transformer_list:
         transformed_result_names.append(
-            _parse_sklearn_simple_model(
+            _parse_sklearn(
                 scope, transform, inputs,
                 custom_parsers=custom_parsers)[0])
         if (model.transformer_weights is not None and name in
@@ -371,17 +414,21 @@ def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
     return res
 
 
-def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
-    options = scope.get_options(model, dict(zipmap=True))
-    no_zipmap = (
-        (isinstance(options['zipmap'], bool) and not options['zipmap']) or
-        (model.__class__ in [NuSVC, SVC] and not model.probability))
-    probability_tensor = _parse_sklearn_simple_model(
-        scope, model, inputs, custom_parsers=custom_parsers)
-    if no_zipmap:
-        return probability_tensor
+def _parse_sklearn_random_trees_embedding(scope, model, inputs,
+                                          custom_parsers=None):
+    res = parse_sklearn(scope, model.base_estimator_, inputs,
+                        custom_parsers=custom_parsers)
+    if len(res) != 1:
+        raise RuntimeError(
+            "A regressor only produces one output not %r." % res)
+    scope.replace_raw_operator(
+        model.base_estimator_, model, "SklearnRandomTreesEmbedding")
+    return res
 
-    if options['zipmap'] == 'columns':
+
+def _apply_zipmap(zipmap_options, scope, model, input_type,
+                  probability_tensor):
+    if zipmap_options == 'columns':
         zipmap_operator = scope.declare_local_operator('SklearnZipMapColumns')
         classes = get_label_classes(scope, model)
         classes_names = get_label_classes(scope, model, node_names=True)
@@ -405,19 +452,21 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
                                "be integers or strings.")
         zipmap_operator.classlabels_int64s = classes
     elif np.issubdtype(classes.dtype, np.signedinteger):
-        zipmap_operator.classlabels_int64s = classes
-    elif np.issubdtype(classes.dtype, np.unsignedinteger):
-        zipmap_operator.classlabels_int64s = classes
+        zipmap_operator.classlabels_int64s = [int(i) for i in classes]
+    elif (np.issubdtype(classes.dtype, np.unsignedinteger) or
+            classes.dtype == np.bool_):
+        zipmap_operator.classlabels_int64s = [int(i) for i in classes]
     else:
         classes = np.array([s.encode('utf-8') for s in classes])
         zipmap_operator.classlabels_strings = classes
         label_type = StringTensorType([None])
 
     zip_label = scope.declare_local_variable('output_label', label_type)
-    zipmap_operator.outputs.append(zip_label)
+    if len(probability_tensor) == 2:
+        zipmap_operator.outputs.append(zip_label)
 
-    if options['zipmap'] == 'columns':
-        prob_type = probability_tensor[1].type
+    if zipmap_options == 'columns':
+        prob_type = probability_tensor[-1].type
         for cl in classes_names:
             output_cl = scope.declare_local_variable(cl, prob_type.__class__())
             zipmap_operator.outputs.append(output_cl)
@@ -426,11 +475,97 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
             'output_probability',
             SequenceType(
                 DictionaryType(
-                    label_type, guess_tensor_type(inputs[0].type))))
+                    label_type, guess_tensor_type(input_type))))
         zipmap_operator.outputs.append(zip_probability)
 
     zipmap_operator.init_status(is_evaluated=True)
     return zipmap_operator.outputs
+
+
+def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
+    options = scope.get_options(model, dict(zipmap=True))
+    no_zipmap = (
+        (isinstance(options['zipmap'], bool) and not options['zipmap']) or
+        (model.__class__ in [NuSVC, SVC] and not model.probability))
+    probability_tensor = _parse_sklearn_simple_model(
+        scope, model, inputs, custom_parsers=custom_parsers)
+
+    if no_zipmap:
+        if options.get('output_class_labels', False):
+            if not hasattr(model, "classes_"):
+                raise RuntimeError(
+                    "Model type %r has no attribute 'classes_'. "
+                    "Option 'output_class_labels' is invalid or a new parser "
+                    "must be used." % model.__class__.__name__)
+
+            clout = scope.declare_local_operator('SklearnClassLabels')
+            clout.classes = get_label_classes(scope, model)
+            if model.classes_.dtype in (np.int32, np.int64, np.bool_):
+                ctype = Int64TensorType
+            else:
+                ctype = StringTensorType
+            label_type = ctype(clout.classes.shape)
+            class_labels = scope.declare_local_variable(
+                'class_labels', label_type)
+            clout.outputs.append(class_labels)
+            outputs = list(probability_tensor)
+            outputs.append(class_labels)
+            return outputs
+        return probability_tensor
+
+    if options.get('output_class_labels', False):
+        raise RuntimeError(
+            "Option 'output_class_labels' is not compatible with option "
+            "'zipmap'.")
+
+    return _apply_zipmap(
+        options['zipmap'], scope, model, inputs[0].type, probability_tensor)
+
+
+def _parse_sklearn_multi_output_classifier(scope, model, inputs,
+                                           custom_parsers=None):
+    options = scope.get_options(model, dict(zipmap=True))
+    if options['zipmap']:
+        warnings.warn(
+            "Option zipmap is ignored for model %r. "
+            "Set option zipmap to False to "
+            "remove this message." % type(model),
+            UserWarning)
+    alias = _get_sklearn_operator_name(type(model))
+    this_operator = scope.declare_local_operator(alias, model)
+    this_operator.inputs = inputs
+
+    if hasattr(model, 'classes_'):
+        classes = model.classes_
+    else:
+        classes = [get_label_classes(scope, m) for m in model.estimators_]
+    if len(set(cl.dtype for cl in classes)) != 1:
+        raise RuntimeError(
+            "Class labels may have only one type %r."
+            "" % set(cl.dtype for cl in classes))
+    if classes[0].dtype in (np.int32, np.int64, np.bool_):
+        ctype = Int64TensorType
+    else:
+        ctype = StringTensorType
+
+    label = scope.declare_local_variable("label", ctype())
+    proba = scope.declare_local_variable(
+        "probabilities", SequenceType(guess_tensor_type(inputs[0].type)))
+    this_operator.outputs.append(label)
+    this_operator.outputs.append(proba)
+
+    options = scope.get_options(model)
+    if options.get('output_class_labels', False):
+        clout = scope.declare_local_operator('SklearnClassLabels')
+        clout.is_multi_output = True
+        clout.classes = classes
+        class_labels = scope.declare_local_variable(
+            "class_labels",
+            SequenceType(ctype()))
+        clout.outputs.append(class_labels)
+        return list(this_operator.outputs) + [class_labels]
+
+    return this_operator.outputs
 
 
 def _parse_sklearn_gaussian_process(scope, model, inputs, custom_parsers=None):
@@ -473,7 +608,7 @@ def _parse_sklearn_bayesian_ridge(scope, model, inputs, custom_parsers=None):
     return this_operator.outputs
 
 
-def _parse_sklearn(scope, model, inputs, custom_parsers=None):
+def _parse_sklearn(scope, model, inputs, custom_parsers=None, alias=None):
     """
     This is a delegate function. It does nothing but invokes the
     correct parsing function according to the input model's type.
@@ -487,6 +622,7 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None):
         classifiers, regressors, pipeline but they can be rewritten,
         *custom_parsers* is a dictionary ``{ type: fct_parser(scope,
         model, inputs, custom_parsers=None) }``
+    :param alias: alias of the model (None if based on the model class)
     :return: The output variables produced by the input model
     """
     for i, inp in enumerate(inputs):
@@ -494,6 +630,12 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None):
             raise TypeError(
                 "Unexpected input type %r for input %r: %r." % (
                     type(inp), i, inp))
+
+    if alias is not None:
+        outputs = _parse_sklearn_simple_model(scope, model, inputs,
+                                              custom_parsers=custom_parsers,
+                                              alias=alias)
+        return outputs
 
     tmodel = type(model)
     if custom_parsers is not None and tmodel in custom_parsers:
@@ -575,7 +717,8 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
                         custom_shape_calculators=None,
                         custom_parsers=None,
                         options=None, white_op=None,
-                        black_op=None, final_types=None):
+                        black_op=None, final_types=None,
+                        naming=None):
     """
     Puts *scikit-learn* object into an abstract container so that
     our framework can work seamlessly on models created
@@ -604,7 +747,15 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
     :param final_types: a python list. Works the same way as initial_types
         but not mandatory, it is used to overwrites the type
         (if type is not None) and the name of every output.
+    :param naming: the user may want to change the way intermediate
+        are named, this parameter can be a string (a prefix) or a
+        function, which signature is the following:
+        `get_name(name, existing_names)`, the library will then
+        check this name is unique and modify it if not
     :return: :class:`Topology <skl2onnx.common._topology.Topology>`
+
+    .. versionchanged:: 1.10.0
+        Parameter *naming* was added.
     """
     options = _process_options(model, options)
 
@@ -623,9 +774,7 @@ def parse_sklearn_model(model, initial_types=None, target_opset=None,
             aliases=sklearn_operator_name_map))
 
     # Declare an object to provide variables' and operators' naming mechanism.
-    # In contrast to CoreML, one global scope
-    # is enough for parsing scikit-learn models.
-    scope = topology.declare_scope('__root__', options=options)
+    scope = topology.declare_scope('__root__', options=options, naming=naming)
     inputs = scope.input_variables
 
     # The object raw_model_container is a part of the topology
@@ -657,7 +806,8 @@ def build_sklearn_parsers_map():
         BayesianRidge: _parse_sklearn_bayesian_ridge,
         GaussianProcessRegressor: _parse_sklearn_gaussian_process,
         GridSearchCV: _parse_sklearn_grid_search_cv,
-        MultiOutputClassifier: _parse_sklearn_simple_model,
+        MultiOutputClassifier: _parse_sklearn_multi_output_classifier,
+        RandomTreesEmbedding: _parse_sklearn_random_trees_embedding,
     }
     if ColumnTransformer is not None:
         map_parser[ColumnTransformer] = _parse_sklearn_column_transformer

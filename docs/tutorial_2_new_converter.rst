@@ -28,7 +28,14 @@ it displays an error message telling it misses a converter.
     except Exception as e:
         print(e)
 
-Following section shows how to create a custom converter.
+Following sections show how to create a custom converter.
+It assumes this new converter is not meant to be added to
+this package but only to be registered and used when converting
+a pipeline. To to contribute and add a converter
+for a :epkg:`scikit-learn` model, the logic is still the same,
+only the converter registration changes. `PR 737
+<https://github.com/onnx/sklearn-onnx/pull/737>`_ can be used as
+an example.
 
 .. toctree::
     :maxdepth: 1

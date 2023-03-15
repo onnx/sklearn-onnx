@@ -11,9 +11,6 @@ The following example focuses on one particular operator,
 CDist and compares its execution time between
 *onnxruntime* and *scipy*.
 
-.. contents::
-    :local:
-
 ONNX Graph with CDist
 +++++++++++++++++++++
 
@@ -56,7 +53,8 @@ print(onx)
 # We compute the output of CDist operator
 # with onnxruntime.
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
 res = sess.run(None, {'X': X, 'Y': Y})
 print(res)
 

@@ -27,7 +27,7 @@ except ImportError:
         os.path.join(
             os.path.dirname(__file__), "..", "tests"))
     from test_utils import fit_classification_model
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, TARGET_OPSET_ML
 
 
 class TestOptionColumns(unittest.TestCase):
@@ -65,16 +65,18 @@ class TestOptionColumns(unittest.TestCase):
             model, "multi-class ridge classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options={id(model): {'zipmap': 'columns'}},
-            target_opset=TARGET_OPSET)
+            target_opset={'': TARGET_OPSET, 'ai.onnx.ml': TARGET_OPSET_ML})
         self.assertIsNotNone(model_onnx)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [_.name for _ in sess.get_outputs()]
         self.assertEqual(['output_label', 'i0', 'i1', 'i2'], names)
         xt = X[:10].astype(np.float32)
         got = sess.run(None, {'input': xt})
         prob = model.predict_proba(xt)
         for i in range(prob.shape[1]):
-            assert_almost_equal(prob[:, i], got[i+1])
+            assert_almost_equal(prob[:, i], got[i + 1])
 
     def test_random_forest(self):
         self.c_test_model(RandomForestClassifier(n_estimators=3))

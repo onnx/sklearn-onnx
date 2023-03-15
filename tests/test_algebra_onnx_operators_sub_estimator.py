@@ -2,7 +2,7 @@
 
 import unittest
 import inspect
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from sklearn.base import (
@@ -11,9 +11,9 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
 from skl2onnx.algebra.onnx_ops import (
-    OnnxIdentity, OnnxCast, OnnxReduceMax, OnnxGreater,
+    OnnxIdentity, OnnxCast, OnnxReduceMaxApi18, OnnxGreater,
     OnnxExp)
 from skl2onnx import update_registered_converter
 from skl2onnx import to_onnx, get_model_alias
@@ -21,7 +21,7 @@ from skl2onnx.proto import onnx_proto
 from skl2onnx.common.data_types import (
     FloatTensorType, Int64TensorType)
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class ValidatorClassifier(BaseEstimator, ClassifierMixin):
@@ -83,7 +83,7 @@ def validator_classifier_converter(scope, operator, container):
     onnx_op = OnnxSubEstimator(model, input, op_version=opv,
                                options={'zipmap': False})
 
-    rmax = OnnxReduceMax(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
+    rmax = OnnxReduceMaxApi18(onnx_op[1], axes=[1], keepdims=0, op_version=opv)
     great = OnnxGreater(rmax, np.array([op.threshold], dtype=np.float32),
                         op_version=opv)
     valid = OnnxCast(great, to=onnx_proto.TensorProto.INT64,
@@ -187,7 +187,7 @@ def subsub_mmtwo_converter(scope, operator, container):
 class TestOnnxOperatorSubEstimator(unittest.TestCase):
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0"),
+        pv.Version(ort_version) < pv.Version("1.0"),
         reason="Cast not available.")
     def test_sub_estimator_exc(self):
         data = load_iris()
@@ -254,7 +254,7 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
             pass
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0"),
+        pv.Version(ort_version) < pv.Version("1.0"),
         reason="Cast not available.")
     def test_sub_estimator(self):
         data = load_iris()
@@ -273,14 +273,15 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         X32 = X_test[:5].astype(np.float32)
         model_onnx = to_onnx(
             model, X32, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(model_onnx.SerializeToString(),
+                                providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X32})
         assert_almost_equal(model.predict(X32), res[0])
         assert_almost_equal(model.predict_proba(X32), res[1], decimal=4)
         assert_almost_equal(model.validate(X32), res[2])
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.0"),
+        pv.Version(ort_version) < pv.Version("1.0"),
         reason="Cast not available.")
     def test_sub_sub_estimator(self):
         data = load_iris()
@@ -299,7 +300,8 @@ class TestOnnxOperatorSubEstimator(unittest.TestCase):
         X32 = X_test[:5].astype(np.float32)
         model_onnx = to_onnx(
             model, X32, target_opset=TARGET_OPSET)
-        sess = InferenceSession(model_onnx.SerializeToString())
+        sess = InferenceSession(model_onnx.SerializeToString(),
+                                providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X32})
         assert_almost_equal(model.transform(X32), res[0], decimal=5)
 

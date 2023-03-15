@@ -21,9 +21,6 @@ a decision tree. One small difference and the decision
 follows another path in the tree. Let's see how to solve
 that issue.
 
-.. contents::
-    :local:
-
 An example with fails
 +++++++++++++++++++++
 
@@ -77,8 +74,10 @@ exp1 = model1.predict(Xi_test)
 
 #################################
 # Conversion into ONNX.
-onx1 = to_onnx(model1, X_train[:1].astype(np.float32))
-sess1 = InferenceSession(onx1.SerializeToString())
+onx1 = to_onnx(model1, X_train[:1].astype(np.float32),
+               target_opset=15)
+sess1 = InferenceSession(onx1.SerializeToString(),
+                         providers=["CPUExecutionProvider"])
 
 ###################################
 # And the maximum difference.
@@ -136,9 +135,11 @@ model2.fit(Xi_train, yi_train)
 exp2 = model2.predict(Xi_test)
 
 onx2 = to_onnx(model2, X_train[:1].astype(np.float32),
-               options={StandardScaler: {'div': 'div_cast'}})
+               options={StandardScaler: {'div': 'div_cast'}},
+               target_opset=15)
 
-sess2 = InferenceSession(onx2.SerializeToString())
+sess2 = InferenceSession(onx2.SerializeToString(),
+                         providers=["CPUExecutionProvider"])
 got2 = sess2.run(None, {'X': Xi_test})[0]
 md2 = maxdiff(exp2, got2)
 

@@ -3,7 +3,7 @@
 """Tests GLMRegressor converter."""
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import numpy as np
 from sklearn.exceptions import ConvergenceWarning
 try:
@@ -31,7 +31,7 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 
 class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("1.2.0"),
+        pv.Version(ort_version) <= pv.Version("1.2.0"),
         reason="onnxruntime misses implementation for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_linear_regression_64(self):
@@ -46,7 +46,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnLinearRegressionDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="onnxruntime misses implementation for "
                "Relu, Tanh, Sigmoid for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -68,7 +68,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
                     basename="SklearnMLPRegressorDouble%s" % activation)
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="onnxruntime misses implementation for "
                "ReduceMean for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -86,7 +86,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnBaggingRegressorSGDDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) <= StrictVersion("1.2.0"),
+        pv.Version(ort_version) <= pv.Version("1.2.0"),
         reason="onnxruntime misses implementation for double")
     @ignore_warnings(category=warnings_to_skip)
     def test_model_sgd_regressor_64(self):
@@ -101,7 +101,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnLinearSGDRegressorDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="shape_inference fails")
     @ignore_warnings(category=warnings_to_skip)
     def test_gpr_rbf_fitted_true_double(self):
@@ -116,7 +116,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
             basename="SklearnGaussianProcessRBFTDouble")
 
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="onnxruntime misses implementation for "
                "TopK for double")
     @ignore_warnings(category=warnings_to_skip)
@@ -135,7 +135,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
 
     @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     @unittest.skipIf(
-        StrictVersion(ort_version) < StrictVersion("1.7.0"),
+        pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="onnxruntime misses implementation for "
                "Sum for double")
     @ignore_warnings(category=warnings_to_skip)

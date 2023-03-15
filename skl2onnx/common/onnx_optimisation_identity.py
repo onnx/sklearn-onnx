@@ -5,10 +5,14 @@ Optimization of :epkg:`ONNX` graphs.
 Functions in *onnxconverter-common* do not support
 opset < 9.
 """
+from logging import getLogger
 from onnx.helper import make_graph
 from ._onnx_optimisation_common import (
     _rename_node_input, _rename_node_output,
     _apply_optimisation_on_graph, _apply_remove_node_fct_node)
+
+
+logger = getLogger('skl2onnx')
 
 
 def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
@@ -52,7 +56,31 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                 idnodes.append((i, exnode, input, output))
         return idnodes
 
+    def retrieve_local_variables_subgraphs(graph):
+        local = set()
+        existing = set(i.name for i in graph.input)
+        for node in graph.node:
+            for i in node.input:
+                if i not in existing:
+                    local.add(i)
+            for o in node.output:
+                existing.add(o)
+            res = retrieve_local_variables_nodes([node])
+            for r in res:
+                if r not in existing:
+                    local.add(r)
+        return local
+
+    def retrieve_local_variables_nodes(nodes):
+        names = set()
+        for node in nodes:
+            for att in node.attribute:
+                if att.g:
+                    names |= retrieve_local_variables_subgraphs(att.g)
+        return names
+
     nodes = list(graph.node)
+    local_variables = retrieve_local_variables_nodes(nodes)
     rem = 1
     while rem > 0:
         rem = 0
@@ -67,6 +95,9 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
             if inp in inputs and out in outputs:
                 # Cannot be removed.
                 continue
+            if out in local_variables:
+                # out is used a local variable, this case is not implemented
+                continue
             if not restart and out not in outputs:
                 # We cannot change an output name.
                 for j in range(len(nodes)):
@@ -74,27 +105,39 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                         continue
                     if out in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], out, inp)
+                        logger.debug(
+                            '[VarId-a] rename node input %r into %r' % (
+                                out, inp))
                         rem += 1
                         if nodes[j].op_type == 'Identity':
                             restart = True
+                logger.debug('[NodeId-a] remove %r' % nodes[i])
                 nodes[i] = None
                 rem += 1
                 continue
-            if not restart and inp not in inputs and inp not in outputs:
+            if (not restart and inp not in inputs and inp not in outputs and
+                    out not in outputs):
                 # We cannot change an input name or an output name.
                 for j in range(len(nodes)):
                     if nodes[j] is None:
                         continue
                     if inp in nodes[j].output:
                         nodes[j] = _rename_node_output(nodes[j], inp, out)
+                        logger.debug(
+                            '[Var] rename node output %r into %r' % (
+                                out, inp))
                         rem += 1
                         if nodes[j].op_type == 'Identity':
                             restart = True
                     if inp in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], inp, out)
+                        logger.debug(
+                            '[VarId-b] rename node input %r into %r' % (
+                                out, inp))
                         rem += 1
                         if nodes[j].op_type == 'Identity':
                             restart = True
+                logger.debug('[NodeId-b] remove %r' % nodes[i])
                 nodes[i] = None
                 rem += 1
 

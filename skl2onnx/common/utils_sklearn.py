@@ -2,6 +2,7 @@
 
 import copy
 from collections import OrderedDict
+import warnings
 from sklearn.base import BaseEstimator
 from sklearn.pipeline import Pipeline
 
@@ -48,7 +49,9 @@ def enumerate_model_names(model, prefix="", short=True):
                     (key.endswith("_") and not key.endswith("__") and
                      not key.startswith('_'))):
                 try:
-                    obj = getattr(model, key)
+                    with warnings.catch_warnings():
+                        warnings.simplefilter("ignore", FutureWarning)
+                        obj = getattr(model, key)
                 except AttributeError:
                     continue
                 if (hasattr(obj, 'get_params') and
@@ -92,7 +95,7 @@ def _process_options(model, options):
             continue
         try:
             ri = k.rindex('__')
-            m2, k2 = k[:ri], k[ri+2:]
+            m2, k2 = k[:ri], k[ri + 2:]
         except ValueError:
             key = id(model)
             if key not in new_options:
@@ -115,8 +118,8 @@ def _process_options(model, options):
 def _process_pipeline_options(model, options):
     """
     Tells the final classifier of a pipeline that
-    options 'zipmap' or 'nocl' were attached to
-    the pipeline.
+    options 'zipmap', 'nocl' or 'output_class_labels'
+    were attached to the pipeline.
     """
     new_options = None
     names = dict(enumerate_model_names(model))
@@ -126,7 +129,7 @@ def _process_pipeline_options(model, options):
             last = v.steps[-1][1]
             key = id(last)
             for opt, val in opts.items():
-                if opt not in {'zipmap', 'nocl'}:
+                if opt not in {'zipmap', 'nocl', 'output_class_labels'}:
                     continue
                 if new_options is None:
                     new_options = copy.deepcopy(options)

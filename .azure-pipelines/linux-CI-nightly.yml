@@ -13,42 +13,36 @@ jobs:
     vmImage: 'ubuntu-latest'
   strategy:
     matrix:
-      Py39-OnnxLatest-Sk0242:
+      Py39-Onnx1102-SkLatest:
         python.version: '3.9'
         numpy.version: '>=1.18.3'
-        onnx.version: ''
+        onnx.version: '==1.10.2'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.2'
-      Py38-Onnx170-Sk0240:
+        sklearn.version: '>=1.0'
+      Py39-Onnx190-SkLatest:
+        python.version: '3.9'
+        numpy.version: '>=1.18.3'
+        onnx.version: '==1.9.0'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '>=1.0'
+      Py39-Onnx181-SkLatest:
+        python.version: '3.9'
+        numpy.version: '>=1.18.3'
+        onnx.version: '==1.8.1'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '>=1.0'
+      Py38-Onnx170-Sk0242:
         python.version: '3.8'
         numpy.version: '>=1.18.3'
         onnx.version: '==1.7.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.24.0'
-      Py37-Onnx160-Sk0230:
+        sklearn.version: '==0.24.2'
+      Py37-Onnx160-Sk0232:
         python.version: '3.7'
         numpy.version: '==1.18.1'
         onnx.version: '==1.6.0'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.23.0'
-      Py37-Onnx160-Sk0221:
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.22.1'
-      Py37-Onnx160-Sk0213:
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
-      Py37-Onnx150:
-        python.version: '3.7'
-        numpy.version: '==1.18.1'
-        onnx.version: '==1.6.0'
-        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
-        sklearn.version: '==0.21.3'
+        sklearn.version: '==0.23.2'
     maxParallel: 3
 
   steps:
@@ -75,7 +69,7 @@ jobs:
     displayName: 'install numpy'
 
   - script: |
-      pip install scikit-learn$(sklearn.version)
+      conda install scikit-learn$(sklearn.version)
     displayName: 'install scikit-learn'
 
   - script: |

@@ -38,19 +38,41 @@ from .onnx_optimisation_identity import onnx_remove_node_identity
 type_fct = type
 
 
-try:
-    from onnxconverter_common.topology import OPSET_TO_IR_VERSION
-    assert OPSET_TO_IR_VERSION[14] is not None
-except (ImportError, KeyError):
-    OPSET_TO_IR_VERSION = {
+def _default_OPSET_TO_IR_VERSION():
+    return {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
-        13: 7, 14: 7
+        13: 7, 14: 7, 15: 8, 16: 8, 17: 8, 18: 8
     }
 
-OPSET_ML_TO_OPSET = {1: 11, 2: 13}
+
+try:
+    from onnxconverter_common.topology import OPSET_TO_IR_VERSION
+    assert OPSET_TO_IR_VERSION[18] is not None
+except (ImportError, KeyError):
+    OPSET_TO_IR_VERSION = _default_OPSET_TO_IR_VERSION()
+
+OPSET_ML_TO_OPSET = {1: 11, 2: 15, 3: 18}
 
 logger = getLogger('skl2onnx')
+
+
+def get_default_opset_for_domain(domain):
+    """
+    Returns the associated for a domain given the main opset.
+    """
+    from .. import __max_supported_opset__ as main_opset
+    if domain == '':
+        return main_opset
+    if domain == 'ai.onnx.ml':
+        if main_opset >= 16:
+            return 3
+        if main_opset < 6:
+            return 1
+        return 2
+    if domain == 'ai.onnx.training':
+        return 1
+    return None
 
 
 class Variable:
@@ -89,8 +111,8 @@ class Variable:
                 else:
                     onnx_name = scope.get_unique_variable_name("U")
                 logger.debug(
-                    '[Var] rename raw_name=%r, onnx_name=%r into %r' % (
-                        raw_name, onnx_name0, onnx_name))
+                    '[Var] rename raw_name=%r, onnx_name=%r into %r',
+                    raw_name, onnx_name0, onnx_name)
             else:
                 raise TypeError(
                     "onnx_name must be a string not %r." % onnx_name)
@@ -134,7 +156,22 @@ class Variable:
                     raise TypeError(
                         "shape must contains integers not %r (type=%r)."
                         "" % (dim, dim.__class__))
-        logger.debug('[Var] +%s' % self)
+        logger.debug('[Var] +%s', self)
+
+        # links to operators using those variables
+        self.operators_outputs_ = []
+        self.operators_inputs_ = []
+        self._check()
+
+    def _check(self):
+        if self.type is not None and self.type.shape is not None:
+            for k in self.type.shape:
+                if k is None:
+                    continue
+                if not isinstance(k, (int, np.integer)):
+                    raise ValueError(
+                        "Unexpected type %r for shape %r."
+                        "" % (type(k), self))
 
     @property
     def raw_name(self):
@@ -166,14 +203,15 @@ class Variable:
 
     def init_status(self, is_fed=None, is_root=None, is_leaf=None):
         if is_fed is not None and is_fed != self.is_fed:
-            logger.debug('[Var] update is_fed=%r for %r, parent=%r' % (
-                is_fed, self, self._parent))
+            logger.debug(
+                '[Var] update is_fed=%r for %r, parent=%r',
+                is_fed, self, self._parent)
             self._is_fed = is_fed
         if is_root is not None and is_root != self.is_root:
-            logger.debug('[Var] update is_root=%r for %r' % (is_root, self))
+            logger.debug('[Var] update is_root=%r for %r', is_root, self)
             self._is_root = is_root
         if is_leaf is not None and is_leaf != self.is_leaf:
-            logger.debug('[Var] update is_leaf=%r for %r' % (is_leaf, self))
+            logger.debug('[Var] update is_leaf=%r for %r', is_leaf, self)
             self._is_leaf = is_leaf
 
     def __setattr__(self, name, value):
@@ -193,13 +231,17 @@ class Variable:
             raise TypeError(
                 "Unexpected new type for variable %r, new_type=%r." % (
                     self, new_type))
-        logger.debug('[Var] update type= for %r' % self)
+        logger.debug('[Var] update type for %r', self)
         self._type = new_type
+        self._check()
 
     def set_onnx_name(self, onnx_name):
         if onnx_name != self._onnx_name:
-            logger.debug('[Var] update onnx_name, from %r to %r in %r' % (
-                self.onnx_name, onnx_name, self))
+            logger.debug(
+                '[Var] update onnx_name, from %r to %r in %r',
+                self.onnx_name, onnx_name, self)
+            if self.scope is not None and not isinstance(self.scope, str):
+                self.scope.rename_onnx_name(self._onnx_name, onnx_name)
             self._onnx_name = onnx_name
 
     def set_parent(self, operator):
@@ -207,8 +249,8 @@ class Variable:
             raise RuntimeError(
                 "This variable is already the output of operator %r. "
                 "It cannot be the output of %r." % (self._parent, operator))
-        logger.debug('[Var] set parent for %r, parent=%r' % (
-            self, operator))
+        logger.debug(
+            '[Var] set parent for %r, parent=%r', self, operator)
         self._parent = operator
 
     def get_first_dimension(self):
@@ -220,6 +262,12 @@ class Variable:
                 len(self.type.shape) == 0):
             return None
         return self.type.shape[0]
+
+    def get_second_dimension(self):
+        if (self.type is None or self.type.shape is None or
+                len(self.type.shape) < 2):
+            return None
+        return self.type.shape[1]
 
     @property
     def full_name(self):
@@ -301,6 +349,31 @@ class Variable:
             return self.type
         raise IndexError("Unreachable element at index %d." % index)
 
+    def add_operator(self, op, in_or_out):
+        "Add a link to an operator, True for output, False for input."
+        if in_or_out:
+            self.operators_outputs_.append(op)
+        else:
+            self.operators_inputs_.append(op)
+
+    def check_compatible_type(self, other_type):
+
+        def empty_shape(shape):
+            return shape is None or len(shape) == 0
+
+        if self.type is None:
+            if other_type is None:
+                return
+        elif other_type is not None:
+            if isinstance(self.type, type(other_type)):
+                if self.type.shape == other_type.shape:
+                    return
+                if empty_shape(other_type.shape):
+                    return
+        raise TypeError(
+            "Incompatible type for variable %r and type %r." % (
+                self, other_type))
+
 
 class VariableStr(Variable):
     """
@@ -345,7 +418,14 @@ class Operator:
             if self.kind == 'Out':
                 v.set_parent(self.parent)
             super(Operator.OperatorList, self).append(v)
-            logger.debug("[Op] add %s %r to %r" % (self.kind, v, self.parent))
+            logger.debug("[Op] add %s %r to %r", self.kind, v, self.parent)
+            if self.kind == 'In':
+                v.add_operator(self.parent, False)
+            elif self.kind == "Out":
+                v.add_operator(self.parent, True)
+            else:
+                raise RuntimeError(
+                    "Unexpected value for kind=%r." % self.kind)
 
         def extend(self, vs):
             for v in vs:
@@ -367,8 +447,9 @@ class Operator:
             if not isinstance(v, Variable):
                 raise TypeError(
                     "Value v must be a Variable not %r." % type(v))
-            logger.debug("[Op] %s-change element %d from %r to %r in %r" % (
-                self.kind, i, self[i], v, self.parent))
+            logger.debug(
+                "[Op] %s-change element %d from %r to %r in %r",
+                self.kind, i, self[i], v, self.parent)
             list.__setitem__(self, i, v)
 
         def to_string(self):
@@ -412,7 +493,7 @@ class Operator:
         self._is_evaluated = None
         self.target_opset = target_opset
         self.scope_inst = scope_inst
-        logger.debug('[Op] +%r' % self)
+        logger.debug('[Op] +%r', self)
 
     def new_raw_operator(self, raw_operator, alias):
         """
@@ -429,6 +510,8 @@ class Operator:
     def __repr__(self):
         try:
             textop = repr(self.raw_operator)
+        except AttributeError:
+            textop = "MISSING OP"
         except KeyError:
             # The line above fails for python 3.7
             textop = type(self.raw_operator)
@@ -456,6 +539,9 @@ class Operator:
             if not isinstance(value, Operator.OperatorList):
                 raise TypeError(
                     "inputs or outputs must be of type Operator.OperatorList.")
+            ioo = name == 'outputs'
+            for v in value:
+                v.add_operator(self, ioo)
         self.__dict__[name] = value
 
     @property
@@ -464,8 +550,9 @@ class Operator:
 
     def init_status(self, is_evaluated=None):
         if is_evaluated is not None and is_evaluated != self.is_evaluated:
-            logger.debug('[Op] update is_evaluated=%r for %r' % (
-                is_evaluated, self))
+            logger.debug(
+                '[Op] update is_evaluated=%r for %r',
+                is_evaluated, self)
             self._is_evaluated = is_evaluated
 
     @property
@@ -508,11 +595,18 @@ class Operator:
             raise MissingShapeCalculator(
                 "Unable to find a shape calculator for alias '{}' "
                 "and type '{}'.".format(self.type, type(self.raw_operator)))
-        logger.debug("[Shape0] %r fed %r - %r" % (
-            self,
+        if shape_calc is None:
+            raise MissingShapeCalculator(
+                "Unexpected shape calculator for alias '{}' "
+                "and type '{}'.".format(self.type, type(self.raw_operator)))
+        logger.debug(
+            "[Shape-a] %r fed %r - %r", self,
             "".join(str(i.is_fed) for i in self.inputs),
-            "".join(str(i.is_fed) for i in self.outputs)))
+            "".join(str(i.is_fed) for i in self.outputs))
         shape_calc(self)
+        logger.debug(
+            "[Shape-b] %r inputs=%r - outputs=%r",
+            self, self.inputs, self.outputs)
 
 
 class Scope:
@@ -522,20 +616,12 @@ class Scope:
     provides functions to create a unique unused name.
     """
 
-    def __init__(self, name, parent_scopes=None, variable_name_set=None,
-                 operator_name_set=None, target_opset=None,
+    def __init__(self, name, target_opset=None,
                  custom_shape_calculators=None, options=None,
-                 registered_models=None):
+                 registered_models=None, naming=None):
         """
         :param name: A string, the unique ID of this scope in a
                      Topology object
-        :param parent_scopes: A list of Scope objects. The last element
-                              should be the direct parent scope (i.e.,
-                              where this scope is declared).
-        :param variable_name_set: A set of strings serving as the name
-                                  pool of variables
-        :param operator_name_set: A set of strings serving as the name
-                                  pool of operators
         :param target_opset: The target opset number for the converted
                              model.
         :param custom_conversion_functions: a dictionary for specifying
@@ -543,14 +629,19 @@ class Scope:
         :param custom_shape_calculators: a dictionary for specifying
                                 the user customized shape calculator
         :param options: see :ref:`l-conv-options`
+        :param naming: the user may want to change the way intermediate
+            are named, this parameter can be a string (a prefix) or a
+            function, which signature is the following:
+            `get_name(name, existing_names)`, the library will then
+            check this name is unique and modify it if not
         :param registered_models: registered models
+
+        .. versionchanged:: 1.10.0
+            Parameter *naming* was added.
         """
         self.name = name
-        self.parent_scopes = parent_scopes if parent_scopes else list()
-        self.onnx_variable_names = (
-            variable_name_set if variable_name_set is not None else set())
-        self.onnx_operator_names = (
-            operator_name_set if operator_name_set is not None else set())
+        self.onnx_variable_names = set()
+        self.onnx_operator_names = set()
         self.target_opset = target_opset
         self.custom_shape_calculators = custom_shape_calculators
 
@@ -575,22 +666,25 @@ class Scope:
 
         # Registered models
         self.registered_models = registered_models
+        self.naming = naming
+
+        if naming is None:
+            self._naming = Topology._generate_unique_name
+        elif isinstance(naming, str):
+            self._naming = (
+                lambda seed, names: Topology._generate_unique_name(
+                    self.naming + seed, names))
+        elif callable(self.naming):
+            self._naming = (
+                lambda seed, names: Topology._generate_unique_name(
+                    self.naming(seed, names), names))
+        else:
+            raise TypeError(
+                "Unexpected type for parameter naming: %r." % type(naming))
 
     def get(self, var_name, default_value):
         "Returns variable with 'name' or default value is not found."
         return self.variables.get(var_name, default_value)
-
-    def temp(self):
-        """
-        Creates a new Scope with the same options but no names.
-        """
-        scope = Scope(
-            'temp', parent_scopes=self.parent_scopes,
-            target_opset=self.target_opset,
-            custom_shape_calculators=self.custom_shape_calculators,
-            options=self.options,
-            registered_models=self.registered_models)
-        return scope
 
     def has_variable_name(self, name):
         """
@@ -607,55 +701,107 @@ class Scope:
         """
         return self.custom_shape_calculators.get(model_type, None)
 
-    def get_unique_variable_name(self, seed):
+    def get_unique_variable_name(self, seed, rename=True):
         """
         Creates a unique variable ID based on the given seed.
         """
         if not isinstance(seed, str):
             raise TypeError("Parameter seed must be a string not {}."
                             "".format(type(seed)))
-        name = Topology._generate_unique_name(seed, self.onnx_variable_names)
+        if rename:
+            name = self._naming(seed, self.onnx_variable_names)
+        else:
+            name = Topology._generate_unique_name(
+                seed, self.onnx_variable_names)
         return name
 
     def get_unique_operator_name(self, seed):
         """
         Creates a unique operator ID based on the given seed.
         """
-        return Topology._generate_unique_name(seed, self.onnx_operator_names)
+        return self._naming(seed, self.onnx_operator_names)
 
     def declare_local_variable(self, raw_name, type=None, prepend=False,
-                               missing_type=False):
+                               missing_type=False, rename=True):
         """
         This function may create a new variable in this scope. If
         *raw_name* has been used to create other variables, the new
         variable will hide all other variables created using *raw_name*.
         """
         if type is None and not missing_type:
-            raise RuntimeError("Unknown type for %r." % raw_name)
+            raise RuntimeError(
+                "Unknown type for %r (type=%r)." % (raw_name, type))
         # Get unique ID for the new variable
-        onnx_name = self.get_unique_variable_name(raw_name)
+        onnx_name = self.get_unique_variable_name(raw_name, rename=rename)
 
         # Create the variable
         variable = Variable(raw_name, onnx_name, self.name, type)
-        self.variables[onnx_name] = variable
-
-        if raw_name in self.variable_name_mapping:
-            # Hide existing variables with the same raw_name
-            if not prepend:
-                self.variable_name_mapping[raw_name].append(onnx_name)
-            else:
-                self.variable_name_mapping[raw_name].insert(0, onnx_name)
-        else:
-            self.variable_name_mapping[raw_name] = [onnx_name]
+        self.register_variable(variable, prepend=prepend)
         return variable
 
-    def declare_local_input(self, raw_name, type=None, prepend=False):
+    def register_variable(self, var, prepend=False):
+        "Adds a variable to the scope."
+        if var.onnx_name in self.variables:
+            raise RuntimeError(
+                "Variable %r already registered (other=%r)." % (
+                    var, self.variables[var.onnx_name]))
+
+        if var.raw_name in self.variable_name_mapping:
+            # Hide existing variables with the same raw_name
+            if not prepend:
+                self.variable_name_mapping[var.raw_name].append(var.onnx_name)
+            else:
+                self.variable_name_mapping[var.raw_name].insert(
+                    0, var.onnx_name)
+        else:
+            self.variable_name_mapping[var.raw_name] = [var.onnx_name]
+
+        self.variables[var.onnx_name] = var
+
+    def declare_existing_subgraph_name(self, graph_proto):
+        """
+        Declare all name from a subgraph in order to avoid being picked twice.
+        """
+        output_name = {o.name for o in graph_proto.output}
+        for node in graph_proto.node:
+            for name in node.output:
+                if name in output_name:
+                    continue
+                if self.has_variable_name(name):
+                    raise NameError(
+                        "Result name %r is already taken (outputs=%r) "
+                        "(node=%r)." % (
+                            name, output_name, node))
+                self.onnx_variable_names.add(name)
+            if node.name in self.onnx_operator_names:
+                raise NameError(
+                    "Operator name %r is already taken "
+                    "(node=%r)." % (
+                        node.name, node))
+            self.onnx_operator_names.add(node.name)
+
+    def rename_onnx_name(self, old_name, new_name):
+        if new_name in self.variables:
+            raise RuntimeError(
+                "Name %r already in variables (%r)." % (
+                    new_name, self.variables[new_name]))
+        if old_name not in self.variables:
+            raise RuntimeError(
+                "Unable to find name %r in variables." % old_name)
+        logger.debug(
+            '[Scope] update onnx_name, from %r to %r',
+            old_name, new_name)
+        self.variables[new_name] = self.variables[old_name]
+        del self.variables[old_name]
+
+    def declare_local_input(self, raw_name, type=None, prepend=False,
+                            rename=True):
         """
         Calls `declare_local_variable`. Registers this variable
         as an input.
         """
         var = self.declare_local_variable(
-            raw_name, type=type, prepend=prepend)
+            raw_name, type=type, prepend=prepend, rename=rename)
         self.input_variables.append(var)
         return var
 
@@ -739,8 +885,9 @@ class Scope:
         """
         for v in self.operators.values():
             if id(v.raw_operator) == id(op1):
-                logger.debug('[Scope] replace %d by %d in %r.' % (
-                    id(v.raw_operator), id(op1), v))
+                logger.debug(
+                    '[Scope] replace %d by %d in %r.',
+                    id(v.raw_operator), id(op1), v)
                 v.raw_operator = op2
                 v.type = alias
 
@@ -778,8 +925,6 @@ class Topology:
         self.scopes = []
         self.raw_model = model
         self.scope_names = set()
-        self.variable_name_set = set()
-        self.operator_name_set = set()
         self.initial_types = initial_types if initial_types else list()
         self.default_batch_size = default_batch_size
         self.target_opset = target_opset
@@ -810,6 +955,13 @@ class Topology:
             raise AssertionError()
         self.registered_models = registered_models
 
+    @property
+    def scope(self):
+        if len(self.scopes) != 1:
+            raise RuntimeError(
+                "Only one scope is allowed not %d." % len(self.scopes))
+        return self.scopes[0]
+
     @staticmethod
     def _generate_unique_name(seed, existing_names):
         """
@@ -824,7 +976,7 @@ class Topology:
 
         # Make the seed meet C-style naming convention
         # Only alphabets and numbers are allowed
-        seed = re.sub('[^0-9a-zA-Z]', '_', seed)
+        seed = re.sub('[^\\w+]', '_', seed)
         # The first symbol cannot be a number
         if re.match('^[0-9]', seed):
             seed = '_' + seed
@@ -845,7 +997,8 @@ class Topology:
     def get_unique_scope_name(self, seed):
         return Topology._generate_unique_name(seed, self.scope_names)
 
-    def declare_scope(self, seed, parent_scopes=None, options=None):
+    def declare_scope(self, seed, parent_scopes=None, options=None,
+                      naming=None):
         """
         Creates a new :class:`Scope <skl2onnx.common._topology.Scope>`
         and appends it to the list of existing scopes.
@@ -854,16 +1007,16 @@ class Topology:
             raise RuntimeError(
                 "Only one scope can be created.")
         scope = Scope(
-            self.get_unique_scope_name(seed), parent_scopes,
-            self.variable_name_set, self.operator_name_set, self.target_opset,
+            self.get_unique_scope_name(seed), target_opset=self.target_opset,
             custom_shape_calculators=self.custom_shape_calculators,
-            options=options, registered_models=self.registered_models)
+            options=options, registered_models=self.registered_models,
+            naming=naming)
 
         # Declare input variables.
         # They should be the inputs of the scikit-learn
         # model you want to convert into ONNX.
         for var_name, initial_type in self.initial_types:
-            scope.declare_local_input(var_name, initial_type)
+            scope.declare_local_input(var_name, initial_type, rename=False)
         self.scopes.append(scope)
         return scope
 
@@ -902,12 +1055,12 @@ class Topology:
         container.validate_options(operator)
         if verbose > 0:
             print("[call_converter] call converter for %r." % operator.type)
-        logger.debug("[Conv] call %r fed %r - %r" % (
-            operator,
+        logger.debug(
+            "[Conv] call %r fed %r - %r", operator,
             "".join(str(i.is_fed) for i in operator.inputs),
-            "".join(str(i.is_fed) for i in operator.outputs)))
+            "".join(str(i.is_fed) for i in operator.outputs))
         conv(self.scopes[0], operator, container)
-        logger.debug("[Conv] end - %r" % operator)
+        logger.debug("[Conv] end - %r", operator)
 
     def call_shape_calculator(self, operator):
         "Calls shape_calculator for operator *operator*."
@@ -927,14 +1080,14 @@ class Topology:
             shape_calc = None
 
         if shape_calc is not None:
-            logger.debug("[Shape1] %r fed %r - %r (source=%r)" % (
-                operator,
-                "".join(str(i.is_fed) for i in operator.inputs),
-                "".join(str(i.is_fed) for i in operator.outputs),
-                source))
+            logger.debug(
+                "[Shape1] %r fed %r - %r (source=%r)", operator,
+                ",".join(str(i.is_fed) for i in operator.inputs),
+                ",".join(str(i.is_fed) for i in operator.outputs),
+                source)
             shape_calc(operator)
         else:
-            logger.debug('[Shape2] call infer_types for %r' % operator)
+            logger.debug('[Shape2] call infer_types for %r', operator)
             operator.infer_types()
 
     def _initialize_graph_status_for_traversing(self):
@@ -955,11 +1108,14 @@ class Topology:
         for operator in self.unordered_operator_iterator():
             operator.init_status(is_evaluated=False)
 
-    def _propagate_status(self, operator, container, fed_variables):
+    def _propagate_status(self, operator, container, fed_variables,
+                          verbose=0):
         """
         Propagates status *is_fed* based on output variable
         and node added in the container.
         """
+        if verbose > 1:
+            print("[_propagate_status] after op=%r" % operator)
         vars = {}
         for node in container.nodes:
             for i in node.input:
@@ -967,8 +1123,10 @@ class Topology:
                     vars[i] = []
                 vars[i].append(node)
 
-        stack = [v.onnx_name for v in operator.outputs if v.is_fed]
-        stack.extend(v.onnx_name for v in operator.inputs if v.is_fed)
+        if verbose > 1:
+            print("[_propagate_status] newly fed=%r" % list(
+                v.onnx_name for v in operator.outputs if v.is_fed))
+        stack = list(fed_variables)
         scope = self.scopes[0]
         while len(stack) > 0:
             nodes = {}
@@ -982,11 +1140,15 @@ class Topology:
                 if all(fed_variables.get(n, False) for n in node.input):
                     for o in node.output:
                         if o not in fed_variables:
+                            if verbose > 1:
+                                print("[_propagate_status] add=%r" % o)
                             fed_variables[o] = o
                             stack.append(o)
                             if o in scope.variables:
                                 var = scope.variables[o]
                                 var.init_status(is_fed=True)
+                                if verbose > 1:
+                                    print("[_propagate_status] fed=%r" % var)
 
     def convert_operators(self, container=None, verbose=0):
         """
@@ -1012,21 +1174,29 @@ class Topology:
                     "One output is not a Variable for operator %r - %r."
                     "" % (type(operator.raw_operator), operator))
 
-        def _check_variable_(variable, operator):
+        def _check_variable_in_(variable, operator):
+            idop = id(operator)
+            ids = set(id(op) for op in variable.operators_inputs_)
+            if idop not in ids:
+                raise RuntimeError(
+                    "Operator %r not registered in the list of operators "
+                    "of %r taking it as an input [\n%s]." % (
+                        operator, variable,
+                        "\n".join(map(str, variable.operators_inputs_))))
+
+        def _check_variable_out_(variable, operator):
             if variable.is_fed:
                 add = ["", "--DEBUG-INFO--"]
-                add.append("self.variable_name_set=%s" % (
-                    pprint.pformat(self.variable_name_set)))
-                add.append("self.operator_name_set=%s" % (
-                    pprint.pformat(self.operator_name_set)))
                 for scope in self.scopes:
                     add.append('---')
                     add.append(pprint.pformat(
                         scope.variable_name_mapping))
                     add.append('---')
                     for var in scope.variables.values():
-                        add.append("   is_fed=%s %s" % (
-                            getattr(var, 'is_fed', '?'), var))
+                        add.append("   is_fed=%s %s - n_in=%d n_out=%d" % (
+                            getattr(var, 'is_fed', '?'), var,
+                            len(var.operators_inputs_),
+                            len(var.operators_outputs_)))
                     add.append('---')
                     for op in scope.operators.values():
                         add.append("   is_evaluated=%s %s" % (
@@ -1036,6 +1206,9 @@ class Topology:
                     add.append(" inputs={}".format(v))
                 for v in operator.outputs:
                     add.append(" outputs={}".format(v))
+                add.append('--- operator producing this variable--')
+                for op in variable.operators_outputs_:
+                    add.append(str(op))
                 raise RuntimeError(
                     "A variable is already assigned ({}) "
                     "for operator '{}' (name='{}'). "
@@ -1057,11 +1230,15 @@ class Topology:
         self._initialize_graph_status_for_traversing()
         fed_variables = {i.name: i for i in container.initializers}
         changes = 1
+        n_iter = 0
         while changes > 0:
+            n_iter += 1
             changes = 0
-            if verbose > 0:
-                print("[convert_operators] new iteration")
             ops = list(self.unordered_operator_iterator())
+            if verbose > 0:
+                print("[convert_operators] iteration %d - n_vars=%d "
+                      "n_ops=%d" % (
+                          n_iter, len(fed_variables), len(ops)))
             for operator in ops:
                 _check_operator_(operator)
                 for var in operator.inputs:
@@ -1070,27 +1247,47 @@ class Topology:
                 if (all(variable.is_fed for variable in operator.inputs) and
                         not operator.is_evaluated):
 
+                    for variable in operator.inputs:
+                        _check_variable_in_(variable, operator)
                     for variable in operator.outputs:
-                        _check_variable_(variable, operator)
-                        variable.init_status(is_fed=True)
+                        _check_variable_out_(variable, operator)
 
                     self.call_shape_calculator(operator)
                     self.call_converter(operator, container, verbose=verbose)
 
-                    for variable in operator.outputs:
-                        variable.init_status(is_fed=True)
-                        fed_variables[variable.onnx_name] = variable
-                    fed_variables.update(
-                        {i.name: i for i in container.initializers})
+                    # If an operator contains a sequence of operators,
+                    # output variables are not necessarily known at this stage.
                     operator.init_status(is_evaluated=True)
-                    self._propagate_status(operator, container, fed_variables)
+                    for variable in operator.outputs:
+                        if all(op.is_evaluated
+                               for op in variable.operators_outputs_):
+                            variable.init_status(is_fed=True)
+                            fed_variables[variable.onnx_name] = variable
+                    fed_variables.update(
+                        {i.name: i for i in container.initializers
+                         if i.name not in fed_variables})
+                    self._propagate_status(operator, container, fed_variables,
+                                           verbose=verbose)
+
+                    # unfed some variables (it happens when a node
+                    # shares an output with another node)
+                    rem = []
+                    for n, var in fed_variables.items():
+                        if not hasattr(var, 'operators_outputs_'):
+                            # initializer
+                            continue
+                        if any(not o.is_evaluated
+                               for o in var.operators_outputs_):
+                            rem.append(n)
+                    for r in rem:
+                        v = fed_variables[r]
+                        v.init_status(is_fed=False)
+                        del fed_variables[v.onnx_name]
                     changes += 1
 
-                    if verbose > 0:
-                        print('[convert_operators] yield %r.' % operator)
-
             if verbose > 0:
-                print("[convert_operators] end iteration")
+                print("[convert_operators] end iter: %d - n_vars=%d" % (
+                    n_iter, len(fed_variables)))
         if verbose > 0:
             print("[convert_operators] end.")
 
@@ -1103,11 +1300,17 @@ class Topology:
             rows = ["---VARS---"]
             for var in self.unordered_variable_iterator():
                 rows.append(
-                    "is_fed=%r is_leaf=%r is_root=%r - %r"
-                    "" % (var.is_fed, var.is_leaf, var.is_root, var))
+                    "is_fed=%r is_leaf=%r is_root=%r - %r - n_in=%d n_out=%d"
+                    "" % (var.is_fed, var.is_leaf, var.is_root, var,
+                          len(var.operators_inputs_),
+                          len(var.operators_outputs_)))
             rows.append("---OPERATORS---")
             for op in self.unordered_operator_iterator():
                 rows.append("is_eval=%r - %r" % (op.is_evaluated, op))
+            rows.append("---NODES---")
+            for node in container.nodes:
+                rows.append("%s: %r -> %r" % (
+                    node.op_type, node.input, node.output))
             raise RuntimeError(
                 "Not all operators have been evaluated. A variable name "
                 "is probably misspelled.\n%s"
@@ -1123,6 +1326,39 @@ class Topology:
             container.add_input(i)
         outputs = [v for v in self.unordered_variable_iterator()
                    if v.is_leaf]
+
+        # The function checks that for output variable,
+        # raw_name equal onnx_name. It swaps names if it is not the case.
+        to_swap = []
+        for out in outputs:
+            if out.raw_name != out.onnx_name:
+                to_swap.append(out)
+        if len(to_swap) != 0:
+            swaped = set()
+            for var in to_swap:
+                if var.raw_name in swaped:
+                    continue
+                swaped.add(var.raw_name)
+                if verbose > 1:
+                    print("[convert_operators] %r <-> %r." % (
+                        var.raw_name, var.onnx_name))
+                old_name = var.onnx_name
+                new_name = var.raw_name
+
+                try:
+                    container.swap_names(old_name, new_name)
+                except NotImplementedError as e:
+                    logger.debug(
+                        '[Topo] unable to swap %r and %r (%r).',
+                        old_name, new_name, e)
+                    continue
+
+                for v in self.unordered_variable_iterator():
+                    if v.onnx_name == old_name:
+                        v.set_onnx_name(new_name)
+                    elif v.onnx_name == new_name:
+                        v.set_onnx_name(old_name)
+
         for o in outputs:
             container.add_output(o)
 
@@ -1240,11 +1476,18 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     onnx_model = make_model(graph)
 
     # Update domain version
-    _update_domain_version(container, onnx_model)
-
-    # Add extra information
     opv = min(onnx_target_opset,
               _get_main_opset_version(onnx_model) or onnx_target_opset)
+    if not _update_domain_version(container, onnx_model, verbose=verbose):
+        # Main opset was not added. Doing it here.
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = ''
+        op_set.version = opv
+        if verbose > 0:
+            print('[convert_topology] +opset: name=%r, version=%s' % (
+                '', opv))
+
+    # Add extra information
     irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
     onnx_model.ir_version = irv
     onnx_model.producer_name = utils.get_producer()
@@ -1264,7 +1507,7 @@ def convert_topology(topology, model_name, doc_string, target_opset,
     return onnx_model
 
 
-def _update_domain_version(container, onnx_model):
+def _update_domain_version(container, onnx_model, verbose=0):
     # Merge operator sets for the same domain, the largest version
     # number would be kept
     purified_operator_set = dict()
@@ -1287,8 +1530,20 @@ def _update_domain_version(container, onnx_model):
         else:
             # Just create one ONNX element in opset_import
             op_set = onnx_model.opset_import.add()
+        if verbose > 0:
+            print('[_update_domain_version] +opset %d: name=%r, version=%s' % (
+                i, op_domain, op_version))
         op_set.domain = op_domain
+        if op_set != '':
+            max_supported = get_default_opset_for_domain(op_domain)
+            if max_supported is not None and max_supported < op_version:
+                raise RuntimeError(
+                    "The model is using version %d of domain %r not supported "
+                    "yet by this library. You need to specify "
+                    "target_opset={%r: %r}." % (
+                        op_version, op_domain, op_domain, max_supported))
         op_set.version = op_version
+
         i += 1
         if container.target_opset_any_domain(op_domain) < op_version:
             raise RuntimeError(
@@ -1297,6 +1552,7 @@ def _update_domain_version(container, onnx_model):
                 '%d.' % (
                     container.target_opset_any_domain(op_domain),
                     op_version))
+    return '' in purified_operator_set
 
 
 def _get_main_opset_version(model):

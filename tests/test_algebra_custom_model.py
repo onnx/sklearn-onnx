@@ -5,7 +5,6 @@ Tests scikit-learn's binarizer converter.
 """
 import unittest
 import numpy as np
-from distutils.version import StrictVersion
 import onnx
 import onnx.checker
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -72,8 +71,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
         except RuntimeError as e:
             assert "Method enumerate_initial_types is missing" in str(e)
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.7.0"),
-                     reason="checm_model crashes")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_custom_scaler(self):
         mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
         tr = CustomOpTransformerShape(op_version=TARGET_OPSET)
@@ -88,8 +86,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
             mat.astype(np.float32), tr, model_onnx,
             basename="CustomTransformerAlgebra")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.7.0"),
-                     reason="checm_model crashes")
+    @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_custom_scaler_pipeline_right(self):
         pipe = make_pipeline(
             StandardScaler(),
@@ -106,8 +103,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
             mat.astype(np.float32), pipe, model_onnx,
             basename="CustomTransformerPipelineRightAlgebra")
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) <= StrictVersion("1.3.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 8, reason="not available")
     def test_custom_scaler_pipeline_left(self):
         pipe = make_pipeline(
             CustomOpTransformer(op_version=TARGET_OPSET),
@@ -135,7 +131,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
         model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
 
-        if StrictVersion(onnx.__version__) >= StrictVersion("1.8.0"):
+        if TARGET_OPSET >= 13:
             # It fails for older version of onnx.
             onnx.checker.check_model(model_onnx)
 
@@ -145,4 +141,4 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

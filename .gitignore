@@ -30,6 +30,7 @@ coverage.xml
 .coverage
 __dump_data/
 junit/
+skl2onnx/algebra/_cache/*.rst
 docs/auto_examples
 docs/examples/graph*.*
 docs/examples/*.onnx
@@ -61,3 +62,8 @@ docs/examples/validator_classifier.dot
 docs/examples/mixture*.*
 docs/examples/cast1*
 docs/examples/cast2*
+docs/auto_tutorial
+docs/tutorial/*.onnx
+docs/tutorial/*.jpg
+docs/tutorial/*.png
+docs/tutorial/*.dot

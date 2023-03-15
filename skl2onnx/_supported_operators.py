@@ -2,6 +2,7 @@
 
 
 import warnings
+import logging
 
 # Calibrated classifier CV
 from sklearn.calibration import CalibratedClassifierCV
@@ -12,7 +13,7 @@ from sklearn.linear_model import (
     PassiveAggressiveClassifier,
     Perceptron,
     RidgeClassifier, RidgeClassifierCV,
-    SGDClassifier,
+    SGDClassifier
 )
 from sklearn.svm import LinearSVC, OneClassSVM
 
@@ -34,10 +35,39 @@ from sklearn.linear_model import (
     RANSACRegressor,
     Ridge, RidgeCV,
     SGDRegressor,
-    TheilSenRegressor,
+    TheilSenRegressor
 )
+try:
+    from sklearn.linear_model import GammaRegressor
+except ImportError:
+    # available since sklearn>=1.1
+    GammaRegressor = None
+try:
+    from sklearn.linear_model import QuantileRegressor
+except ImportError:
+    # available since sklearn>=1.0
+    QuantileRegressor = None
+try:
+    from sklearn.linear_model import PoissonRegressor
+except ImportError:
+    # available since sklearn>=0.23
+    PoissonRegressor = None
+try:
+    from sklearn.linear_model import TweedieRegressor
+except ImportError:
+    # available since sklearn>=0.23
+    TweedieRegressor = None
+try:
+    from sklearn.linear_model import SGDOneClassSVM
+except ImportError:
+    # available since sklearn>=1.0
+    SGDOneClassSVM = None
+
 from sklearn.svm import LinearSVR
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import (
+    LinearDiscriminantAnalysis,
+    QuadraticDiscriminantAnalysis
+)
 
 # Mixture
 from sklearn.mixture import (
@@ -45,7 +75,7 @@ from sklearn.mixture import (
 )
 
 # Multi-class
-from sklearn.multiclass import OneVsRestClassifier
+from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 
 # Tree-based models
 from sklearn.ensemble import (
@@ -54,7 +84,7 @@ from sklearn.ensemble import (
     ExtraTreesClassifier, ExtraTreesRegressor,
     GradientBoostingClassifier, GradientBoostingRegressor,
     IsolationForest,
-    RandomForestClassifier, RandomForestRegressor,
+    RandomForestClassifier, RandomForestRegressor, RandomTreesEmbedding,
     VotingClassifier
 )
 try:
@@ -89,9 +119,12 @@ from sklearn.svm import NuSVC, NuSVR, SVC, SVR
 
 # K-nearest neighbors
 from sklearn.neighbors import (
-    KNeighborsClassifier, RadiusNeighborsClassifier,
-    KNeighborsRegressor, RadiusNeighborsRegressor,
+    KNeighborsClassifier,
+    KNeighborsRegressor,
+    LocalOutlierFactor,
     NearestNeighbors,
+    RadiusNeighborsClassifier,
+    RadiusNeighborsRegressor,
 )
 try:
     from sklearn.neighbors import (
@@ -129,9 +162,15 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 # Operators for preprocessing and feature engineering
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.decomposition import (
-    PCA, IncrementalPCA, TruncatedSVD,
+    KernelPCA,
+    IncrementalPCA,
+    PCA,
+    TruncatedSVD,
 )
-from sklearn.feature_extraction import DictVectorizer
+from sklearn.feature_extraction import (
+    DictVectorizer,
+    FeatureHasher,
+)
 from sklearn.feature_extraction.text import (
     CountVectorizer, TfidfTransformer, TfidfVectorizer
 )
@@ -173,8 +212,10 @@ except ImportError:
     # Not available in scikit-learn < 0.20.0
     OrdinalEncoder = None
 from sklearn.preprocessing import (
-    MinMaxScaler, MaxAbsScaler,
     FunctionTransformer,
+    KernelCenterer,
+    MaxAbsScaler,
+    MinMaxScaler,
     PolynomialFeatures,
     QuantileTransformer,
     RobustScaler,
@@ -219,6 +260,8 @@ from .sklapi import CastRegressor, CastTransformer, ReplaceTransformer
 
 from .common._registration import register_converter, register_shape_calculator
 
+logger = logging.getLogger('skl2onnx')
+
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
 # predicted label and the other one is the probabilities of all
@@ -248,9 +291,11 @@ sklearn_classifier_list = list(filter(lambda m: m is not None, [
     MLPClassifier,
     MultinomialNB,
     NuSVC,
+    OneVsOneClassifier,
     OneVsRestClassifier,
     PassiveAggressiveClassifier,
     Perceptron,
+    QuadraticDiscriminantAnalysis,
     RandomForestClassifier,
     SGDClassifier,
     StackingClassifier,
@@ -264,7 +309,7 @@ cluster_list = [KMeans, MiniBatchKMeans]
 
 # Outlier detection algorithms:
 # produces two outputs, label and scores
-outlier_list = [OneClassSVM, IsolationForest]
+outlier_list = [IsolationForest, LocalOutlierFactor, OneClassSVM]
 
 
 # Associate scikit-learn types with our operator names. If two
@@ -288,15 +333,17 @@ def build_sklearn_operator_name_map():
         ComplementNB,
         CountVectorizer,
         DictVectorizer,
-        GaussianNB,
         DecisionTreeClassifier,
         DecisionTreeRegressor,
         ExtraTreeClassifier,
         ExtraTreeRegressor,
         ExtraTreesClassifier,
         ExtraTreesRegressor,
+        FeatureHasher,
         FeatureUnion,
         FunctionTransformer,
+        GammaRegressor,
+        GaussianNB,
         GaussianMixture,
         GaussianProcessClassifier,
         GaussianProcessRegressor,
@@ -315,6 +362,7 @@ def build_sklearn_operator_name_map():
         LinearRegression,
         LinearSVC,
         LinearSVR,
+        LocalOutlierFactor,
         MaxAbsScaler,
         MiniBatchKMeans,
         MinMaxScaler,
@@ -324,6 +372,8 @@ def build_sklearn_operator_name_map():
         MultiOutputClassifier,
         MultiOutputRegressor,
         KBinsDiscretizer,
+        KernelCenterer,
+        KernelPCA,
         KNeighborsClassifier,
         KNeighborsRegressor,
         KNeighborsTransformer,
@@ -333,18 +383,22 @@ def build_sklearn_operator_name_map():
         Normalizer,
         OneClassSVM,
         OneHotEncoder,
+        OneVsOneClassifier,
         OneVsRestClassifier,
         OrdinalEncoder,
         PCA,
         PLSRegression,
         Pipeline,
+        PoissonRegressor,
         PolynomialFeatures,
         PowerTransformer,
+        QuadraticDiscriminantAnalysis,
         QuantileTransformer,
         RadiusNeighborsClassifier,
         RadiusNeighborsRegressor,
         RandomForestClassifier,
         RandomForestRegressor,
+        RandomTreesEmbedding,
         RANSACRegressor,
         ReplaceTransformer,
         RFE,
@@ -357,6 +411,7 @@ def build_sklearn_operator_name_map():
         SelectKBest,
         SelectPercentile,
         SGDClassifier,
+        SGDOneClassSVM,
         SimpleImputer,
         StackingClassifier,
         StackingRegressor,
@@ -365,6 +420,7 @@ def build_sklearn_operator_name_map():
         TfidfVectorizer,
         TfidfTransformer,
         TruncatedSVD,
+        TweedieRegressor,
         VarianceThreshold,
         VotingClassifier,
         VotingRegressor,
@@ -397,6 +453,7 @@ def build_sklearn_operator_name_map():
         PassiveAggressiveClassifier: 'SklearnSGDClassifier',
         PassiveAggressiveRegressor: 'SklearnLinearRegressor',
         Perceptron: 'SklearnSGDClassifier',
+        QuantileRegressor: 'SklearnLinearRegressor',
         Ridge: 'SklearnLinearRegressor',
         RidgeCV: 'SklearnLinearRegressor',
         RidgeClassifier: 'SklearnLinearClassifier',
@@ -436,11 +493,13 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
         from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
         from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
         from skl2onnx import update_registered_converter
-        update_registered_converter(SGDClassifier, 'SklearnLinearClassifier',
-                                    calculate_linear_classifier_output_shapes,
-                                    convert_sklearn_random_forest_classifier,
-                                    options={'zipmap': [True, False, 'columns'],
-                                             'raw_scores': [True, False]})
+        update_registered_converter(
+                SGDClassifier, 'SklearnLinearClassifier',
+                calculate_linear_classifier_output_shapes,
+                convert_sklearn_random_forest_classifier,
+                options={'zipmap': [True, False, 'columns'],
+                         'output_class_labels': [False, True],
+                         'raw_scores': [True, False]})
 
     The function does not update the parser if not specified except if
     option `'zipmap'` is added to the list. Every classifier
@@ -458,7 +517,8 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     if parser is not None:
         from ._parse import update_registered_parser
         update_registered_parser(model, parser)
-    elif options is not None and 'zipmap' in options:
+    elif (options is not None and
+            ('zipmap' in options or 'output_class_labels' in options)):
         from ._parse import (
             _parse_sklearn_classifier, update_registered_parser)
         update_registered_parser(model, _parse_sklearn_classifier)
@@ -474,9 +534,12 @@ def _get_sklearn_operator_name(model_type):
              our conversion framework
     """
     if model_type not in sklearn_operator_name_map:
-        # "No proper operator name found, it means a local operator.
-        return None
-    return sklearn_operator_name_map[model_type]
+        # No proper operator name found, it means a local operator.
+        alias = None
+    else:
+        alias = sklearn_operator_name_map[model_type]
+    logger.debug('[parsing] found alias=%r for type=%r.', alias, model_type)
+    return alias
 
 
 def get_model_alias(model_type):

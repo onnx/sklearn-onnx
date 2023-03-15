@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import warnings
+from logging import getLogger
 import numpy as np
+from onnx import GraphProto
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
 from ..common.data_types import (
@@ -11,6 +13,7 @@ from ..common._topology import (
     _get_main_opset_version, OPSET_TO_IR_VERSION)
 from ..common._container import ModelComponentContainer
 from ..common import utils
+from ..common.data_types import guess_proto_type, _guess_numpy_type
 from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
@@ -18,6 +21,9 @@ from ..proto.onnx_helper_modified import make_graph, make_model, from_array
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
+
+
+logger = getLogger('skl2onnx')
 
 
 class OnnxOperatorItem:
@@ -134,7 +140,21 @@ class OnnxOperator:
     :param op_version: to select a specific version of the operator
     :param output_names: used defined names for the outputs
     :param domain: to overwrite the default domain
+    :param global_context: operator *If* executes one subgraph
+        whose nodes may use one existing output in the current
+        context. If not used in the main graph, these operators
+        are not linked to the output and cannot be retrieved.
+        *global_context* is a dictionary mapped the subgraph input
+        names to these operators.
+    :param clear_subgraph_inputs: clears subgraphs outputs.
+        Operator *If* does take subgraphs as attribute,
+        there are subgraphs with no inputs and
+        global variable as hidden inputs.
     :param kwargs: additional parameters of the operator
+
+    .. versionchanged:: 1.10.1
+        Parameter *global_context*, *clear_subgraph_inputs*
+        were added.
     """
     class OnnxOperatorVariable(GraphStateVar):
 
@@ -144,7 +164,14 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = "ov%s" % self.name
-            return Variable(name, name, scope=scope, type=None)
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
+            var = Variable(name, name, scope=scope, type=None)
+            if scope is not None:
+                scope.register_variable(var)
+            self.variable_ = var
+            return var
 
         def __repr__(self):
             return "OnnxOperatorVariable('%s')" % self.name
@@ -159,7 +186,20 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = self.name
-            return Variable(name, name, scope=scope, type=None)
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
+            if scope is not None:
+                if name in scope.variables:
+                    var = scope.variables[name]
+                else:
+                    onnx_name = scope.get_unique_variable_name(name)
+                    var = Variable(name, onnx_name, scope=scope, type=None)
+                    scope.register_variable(var)
+                self.variable_ = var
+            else:
+                var = Variable(name, name, scope=scope, type=None)
+            return var
 
         def __eq__(self, name):
             if isinstance(name, str):
@@ -182,9 +222,19 @@ class OnnxOperator:
             self.value = value
 
         def as_variable(self, scope):
-            name = "id%d" % id(self)
-            return Variable(name, name, scope=scope,
-                            type=_guess_type(self.value))
+            ha = utils.hash_array(self.value)
+            name = "CST%s" % ha
+            if (hasattr(self, "variable_") and
+                    self.variable_.onnx_name == name):
+                return self.variable_
+            if scope is not None:
+                var = scope.declare_local_variable(
+                    name, type=_guess_type(self.value))
+            else:
+                var = Variable(name, name, scope=scope,
+                               type=_guess_type(self.value))
+            self.variable_ = var
+            return var
 
         @property
         def ConstantValue(self):
@@ -223,7 +273,8 @@ class OnnxOperator:
         return found
 
     def __init__(self, *inputs, op_version=None, output_names=None,
-                 domain=None, **kwargs):
+                 domain=None, global_context=None,
+                 clear_subgraph_inputs=False, **kwargs):
 
         if (output_names is None and
                 self.__class__.__name__.startswith("OnnxScan")):
@@ -358,6 +409,20 @@ class OnnxOperator:
                     "class opset={})".format(
                         self.operator_name, *self.input_range,
                         len(self.inputs), op_version, self.op_version))
+        # global context
+        if global_context is None:
+            self.global_context = None
+        else:
+            if not isinstance(global_context, dict):
+                raise TypeError(
+                    "global_context must be a dictionary not %r."
+                    "" % type(global_context))
+            for k, v in global_context.items():
+                if not isinstance(v, (OnnxOperator, OnnxOperatorItem)):
+                    raise TypeError(
+                        "Value %r in must be an OnnxOperator or an "
+                        "OnnxOperatorItem not %r." % (k, type(v)))
+            self.global_context = global_context
 
         # check output
         self.output_names = output_names
@@ -413,33 +478,67 @@ class OnnxOperator:
                 self.expected_inputs.append(inp)
 
         self.output_names_ = None
-        self._post_process_attributes()
+        self._post_process_attributes(
+            clear_subgraph_inputs=clear_subgraph_inputs)
+        logger.debug(
+            '[Ops] +%s-%d (%s) id=%d',
+            self.__class__.__name__, self.op_version, self.domain, id(self))
 
-    def _post_process_attributes(self):
+    def _post_process_attributes(self, clear_subgraph_inputs=False):
         """
         Walks through attributes and replaces them by ONNX
         values.
         """
-        if (self.__class__.__name__.startswith("OnnxConstantOfShape") and
-                "value" in self.kwargs):
-            value = self.kwargs['value']
-            if isinstance(value, TensorProto):
-                return
-            if isinstance(value, np.ndarray):
-                if value.shape == (1, ):
-                    val = value[0]
-                elif len(value.shape) == 0:
-                    val = value
-                else:
-                    raise RuntimeError(
-                        "Unexpected shape %r for value, it must be an array "
-                        "of one element." % value.shape)
-                self.kwargs['value'] = from_array(
-                    np.array([val], dtype=value.dtype))
-                return
-            raise TypeError(
-                "Unexpected type %r for value. It should be an array "
-                "of one element." % type(value))
+        # Looks into attributes if there is any tuple
+        # (GraphProto, OnnxOperator). In that case, the function
+        # replaces the tuple by the graph proto and keeps
+        # in attributes graph_algebra the OnnxOperator
+        # which is the source of it.
+        updates = {}
+        graph_algebra = {}
+        for k, v in self.kwargs.items():
+            if isinstance(v, tuple) and isinstance(v[0], GraphProto):
+                updates[k] = v[0]
+                graph_algebra[k] = v[1]
+        if len(graph_algebra) > 0:
+            self.kwargs.update(updates)
+            self.graph_algebra = graph_algebra
+
+        if clear_subgraph_inputs:
+            for k, v in self.kwargs.items():
+                if isinstance(v, GraphProto):
+                    del v.input[:]
+
+        if self.__class__.__name__ == "OnnxConstantOfShape":
+            if "value" in self.kwargs:
+                value = self.kwargs['value']
+                if isinstance(value, TensorProto):
+                    return
+                if isinstance(value, np.ndarray):
+                    if value.shape == (1, ):
+                        val = value[0]
+                    elif len(value.shape) == 0:
+                        val = value
+                    else:
+                        raise RuntimeError(
+                            "Unexpected shape %r for value, it must be "
+                            "an array of one element." % value.shape)
+                    self.kwargs['value'] = from_array(
+                        np.array([val], dtype=value.dtype))
+                    return
+                raise TypeError(
+                    "Unexpected type %r for value. It should be an array "
+                    "of one element." % type(value))
+            return
+
+        if self.__class__.__name__ == "OnnxCast":
+            if "to" in self.kwargs:
+                value = self.kwargs['to']
+                if isinstance(value, int):
+                    return
+                to = guess_proto_type(_guess_numpy_type(value, None))
+                self.kwargs['to'] = to
+            return
 
     def __str__(self):
         """
@@ -480,7 +579,7 @@ class OnnxOperator:
         Returns an accessor to one of the output
         of this node.
         """
-        return OnnxOperatorItem(self, index)
+        return OnnxOperatorItem(self, index, self.op_version)
 
     def get_output_name(self, i, scope=None):
         "Returns name of output *i*."
@@ -499,8 +598,8 @@ class OnnxOperator:
             res = self.output_names_[i]
             if not isinstance(res, (tuple, Variable)):
                 raise RuntimeError(
-                        "Unable to retrieve output %r from %r."
-                        "" % (i, self))
+                    "Unable to retrieve output %r from %r."
+                    "" % (i, self))
             return res
 
     def _set_output_names_(self, scope, operator):
@@ -613,6 +712,7 @@ class OnnxOperator:
                 domain = self.__class__.domain
             inputs = self._add_to_inputs(operator)
 
+            logger.debug("[Ops.add_to] state id=%d", id(self))
             self.state = GraphState(
                 inputs, self.output_names_, self.operator_name,
                 scope, container, None, op_version=self.op_version,
@@ -747,7 +847,7 @@ class OnnxOperator:
                     obj._clean_attributes(*args, recursive=True)
 
     def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                target_opset=None, domain=None):
+                target_opset=None, domain=None, verbose=0):
         """
         Converts this operator into an ONNX graph.
 
@@ -760,6 +860,7 @@ class OnnxOperator:
         :param target_opset: dictionary with target opset per domain,
             None for the default one
         :param domain: domain of the operator
+        :param verbose: prints information
         """
         if isinstance(target_opset, dict):
             dom = self.domain or ''
@@ -817,19 +918,39 @@ class OnnxOperator:
             target_opset, registered_models=registered_models)
 
         model_name = self.__class__.__name__
+        logger.debug(
+            "[Ops.to_onnx] %s id=%d",
+            self.__class__.__name__, id(self))
         scope = Scope(model_name, target_opset=target_opset,
-                      variable_name_set=set(_[0] for _ in inputs),
                       registered_models=registered_models)
         for inp in inputs:
-            container.add_input(Variable(inp[0], inp[0],
-                                         scope=scope, type=inp[1]))
+            var = Variable(inp[0], inp[0], scope=scope, type=inp[1])
+            container.add_input(var)
+            scope.register_variable(var)
         self.add_to(scope, container, run_converters=True)
+
+        extra_outputs = []
         if other_outputs is not None:
-            for out in other_outputs:
-                if not hasattr(out, 'add_to'):
-                    raise RuntimeError(
-                        "Extra outputs must have method 'add_to'.")
-                out.add_to(scope, container, run_converters=True)
+            extra_outputs.extend(other_outputs)
+        if self.global_context is not None:
+            for name, var in self.global_context.items():
+                if var.output_names is None:
+                    # The variable name is likely to be different.
+                    from .onnx_ops import OnnxIdentity
+                    var2 = OnnxIdentity(
+                        var, op_version=var.op_version,
+                        output_names=[name])
+                else:
+                    var2 = var
+                extra_outputs.append(var2)
+        for out in extra_outputs:
+            if not hasattr(out, 'add_to'):
+                raise RuntimeError(
+                    "Extra outputs must have method 'add_to'.")
+            out.add_to(scope, container, run_converters=True)
+        logger.debug(
+            "[Ops.to_onnx] %s id=%d extra_outputs=%r",
+            self.__class__.__name__, id(self), extra_outputs)
 
         # infer shapes
         if outputs:
@@ -848,7 +969,12 @@ class OnnxOperator:
                 else:
                     raise TypeError("Outputs must be Variable or "
                                     "tuple(name, type).")
+            logger.debug(
+                "[Ops.to_onnx] %s id=%d outputs=%r",
+                self.__class__.__name__, id(self), outputs)
         else:
+            if verbose > 0:
+                print("[op.to_onnx] infer outputs")
             shapes = infer_outputs(container, container.inputs,
                                    initializer=container.initializers,
                                    target_opset=target_opset)
@@ -858,9 +984,22 @@ class OnnxOperator:
                 shapes = [shape for shape in shapes
                           if shape.onnx_name in set_names]
 
+        logger.debug(
+            "[Ops.to_onnx] %s id=%d shapes=%r",
+            self.__class__.__name__, id(self), shapes)
+        if verbose > 0:
+            print("[op.to_onnx] shapes=%r" % shapes)
+
         # add the output to the container
         for shape in shapes:
             container.add_output(shape)
+
+        container.ensure_topological_order()
+        if verbose >= 2:
+            print("---NODES---")
+            for node in container.nodes:
+                print("  %s - %s: %r -> %r" % (
+                    node.op_type, node.name, node.input, node.output))
 
         # convert the graph
         graph = make_graph(
@@ -948,12 +1087,16 @@ class OnnxSubEstimator(OnnxOperator):
 
     def __init__(self, skl_op, *inputs, op_version=None,
                  output_names=None, domain=None, options=None,
-                 **kwargs):
+                 input_types=None, **kwargs):
         OnnxOperator.__init__(
             self, *inputs, op_version=op_version,
             output_names=output_names, domain=domain, **kwargs)
         self.operator_instance = skl_op
         self.options = options
+        if skl_op is None and input_types is not None:
+            raise RuntimeError(
+                "input_types is only used when a sub-operator is defined.")
+        self.input_types = input_types
 
     def __repr__(self):
         return "%s(%r, %s, op_version=%r, output_names=%r)" % (
@@ -1026,18 +1169,32 @@ class OnnxSubEstimator(OnnxOperator):
                         raise RuntimeError("Unable to find variable "
                                            "{} in {}.".format(input, vars))
                 elif isinstance(input, tuple) and len(input) == 2:
-                    inputs.append(
-                        Variable(
-                            input[0], input[0], scope=scope, type=input[1]))
+                    if scope is not None and input[0] in scope.variables:
+                        var = scope.variables[input[0]]
+                    else:
+                        var = Variable(input[0], input[0], scope=scope,
+                                       type=input[1])
+                        if scope is not None:
+                            scope.register_variable(var)
+                    inputs.append(var)
                 else:
                     inputs.append(input)
 
+            logger.debug("[SubOps.add_to] state id=%d", id(self))
             self.state = GraphState(
                 inputs, self.output_names_, self.operator_instance,
                 scope, container, None, op_version=self.op_version,
                 op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                options=self.options, run_converters=run_converters, **kwargs)
+                options=self.options, run_converters=run_converters,
+                input_types=self.input_types, **kwargs)
             self.state.run()
+
+
+class WrappedModelAlias:
+
+    def __init__(self, model, alias):
+        self.model = model
+        self.alias = alias
 
 
 class OnnxSubOperator(OnnxSubEstimator):

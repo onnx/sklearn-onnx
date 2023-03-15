@@ -2,18 +2,24 @@
 
 import unittest
 import warnings
-from distutils.version import StrictVersion
+import packaging.version as pv
 from collections import OrderedDict
 import numpy as np
 from numpy.testing import assert_almost_equal
 from scipy.spatial.distance import pdist, squareform, cdist as scipy_cdist
 import onnx
 from onnx.onnx_cpp2py_export.checker import ValidationError
-from onnxruntime import InferenceSession, __version__ as ort_version
+from onnxruntime import __version__ as ort_version
+try:
+    # scikit-learn >= 0.22
+    from sklearn.utils._testing import ignore_warnings
+except ImportError:
+    # scikit-learn < 0.22
+    from sklearn.utils.testing import ignore_warnings
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd, OnnxIdentity, OnnxScan,
-    OnnxSub, OnnxReduceSumSquare,
+    OnnxSub, OnnxReduceSumSquareApi18,
     OnnxSqueezeApi11, OnnxShape)
 from skl2onnx.algebra.custom_ops import OnnxCDist
 try:
@@ -22,28 +28,28 @@ except ImportError:
     # onnx is too old
     OnnxConstantOfShape = None
 from onnx import (
-    helper, TensorProto,
-    __version__ as onnx__version__
-)
+    helper, TensorProto, __version__ as onnx__version__)
 from skl2onnx.algebra.complex_functions import (
-    onnx_squareform_pdist, onnx_cdist
-)
+    onnx_squareform_pdist, onnx_cdist)
 from skl2onnx.proto import get_latest_tested_opset_version
-from test_utils import TARGET_OPSET, TARGET_IR
+from test_utils import (
+    TARGET_OPSET, TARGET_IR,
+    InferenceSessionEx as InferenceSession)
 
 _TARGET_OPSET_ = min(get_latest_tested_opset_version(), TARGET_OPSET)
 
 
 THRESHOLD = "0.4.0"
 THRESHOLD2 = "0.5.0"
+ort_version = ".".join(ort_version.split('.')[:2])
 
 
 class TestOnnxOperatorsScan(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example(self):
         sum_in = onnx.helper.make_tensor_value_info(
             'sum_in', onnx.TensorProto.FLOAT, [2])
@@ -91,6 +97,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         )
 
         model_def = helper.make_model(graph_def, producer_name='onnx-example')
+        del model_def.opset_import[:]
         op_set = model_def.opset_import.add()
         op_set.domain = ''
         op_set.version = TARGET_OPSET
@@ -104,7 +111,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except Exception as e:
             if "Current official support for domain ai.onnx" in str(e):
                 return
@@ -116,10 +125,10 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(y, res[0])
         assert_almost_equal(z, res[1])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_algebra(self):
         initial = np.array([0, 0]).astype(np.float32).reshape((2,))
         x = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
@@ -144,7 +153,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             outputs=[('y', FloatTensorType()),
                      ('z', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'initial': initial, 'x': x})
 
         y = np.array([9, 12]).astype(np.float32).reshape((2,))
@@ -152,10 +163,10 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         assert_almost_equal(y, res[0])
         assert_almost_equal(z, res[1])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_pdist(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
@@ -165,7 +176,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         id_next = OnnxIdentity(
             'next_in', output_names=['next_out'],
             op_version=opv)
-        norm = OnnxReduceSumSquare(
+        norm = OnnxReduceSumSquareApi18(
             diff, output_names=['norm'], axes=[1],
             op_version=opv)
         flat = OnnxSqueezeApi11(
@@ -178,7 +189,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             other_outputs=[flat],
             target_opset=opv)
 
-        sess = InferenceSession(scan_body.SerializeToString())
+        sess = InferenceSession(
+            scan_body.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'next_in': x, 'next': x[:1]})
         assert_almost_equal(x, res[0])
         exp = np.array([0., 18., 20.], dtype=np.float32)
@@ -194,22 +207,24 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         try:
             onnx.checker.check_model(model_def)
         except ValidationError as e:
-            if StrictVersion(onnx__version__) <= StrictVersion("1.5.0"):
+            if pv.Version(onnx__version__) <= pv.Version("1.5.0"):
                 warnings.warn(e)
             else:
                 raise e
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'x': x})
 
         exp = squareform(pdist(x, metric="sqeuclidean"))
         assert_almost_equal(x, res[0])
         assert_almost_equal(exp, res[1])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_pdist_in(self):
         opv = _TARGET_OPSET_
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
@@ -226,27 +241,34 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('pdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
         x = np.array([1, 2, 4, 5]).astype(np.float32).reshape((2, 2))
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
         x = np.array([1, 2, 4, 5, 5, 6]).astype(np.float32).reshape((2, 3))
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((2, 3))
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = squareform(pdist(x * 2, metric="sqeuclidean"))
         assert_almost_equal(exp, res[0])
 
     @unittest.skipIf((OnnxConstantOfShape is None or
-                      StrictVersion(ort_version) <= StrictVersion(THRESHOLD)),
+                      pv.Version(ort_version) <= pv.Version(THRESHOLD)),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_constant_of_shape(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
 
@@ -256,7 +278,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             output_names=['mat'], op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = np.zeros((3, 2), dtype=np.float32)
         assert_almost_equal(exp, res[0])
@@ -269,15 +293,17 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             op_version=opv)
         model_def = cop2.to_onnx({'input': x},
                                  outputs=[('mat', FloatTensorType())])
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = np.full((3, 2), -5.)
         assert_almost_equal(exp, res[0])
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
@@ -294,7 +320,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -317,16 +345,18 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
         assert "u_scan0_" not in str(model_def)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.4.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in_mink(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
@@ -345,7 +375,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x2, metric="minkowski")
         assert_almost_equal(exp, res[0], decimal=5)
@@ -370,15 +402,17 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.5.0"),
-                     reason="only available for opset >= 10")
-    @unittest.skipIf(StrictVersion(ort_version) <= StrictVersion(THRESHOLD2),
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(pv.Version(ort_version) <= pv.Version(THRESHOLD2),
                      reason="fails with onnxruntime 0.4.0")
+    @ignore_warnings(category=DeprecationWarning)
     def test_onnx_example_cdist_in_custom_ops(self):
         x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
         x2 = np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0]).astype(
@@ -396,7 +430,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             outputs=[('cdist', FloatTensorType())])
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except RuntimeError as e:
             if "CDist is not a registered" in str(e):
                 return
@@ -424,7 +460,9 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             inputs=[('input', FloatTensorType([None, None]))],
             outputs=[('cdist', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'input': x})
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)

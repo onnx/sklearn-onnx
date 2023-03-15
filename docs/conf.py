@@ -1,6 +1,4 @@
 # SPDX-License-Identifier: Apache-2.0
-
-
 # -*- coding: utf-8 -*-
 #
 # Configuration file for the Sphinx documentation builder.
@@ -9,7 +7,7 @@ import os
 import sys
 import warnings
 import skl2onnx
-import sphinx_readable_theme
+import pydata_sphinx_theme
 
 sys.path.append(os.path.abspath('exts'))
 from github_link import make_linkcode_resolve  # noqa
@@ -18,7 +16,7 @@ from github_link import make_linkcode_resolve  # noqa
 # -- Project information -----------------------------------------------------
 
 project = 'sklearn-onnx'
-copyright = '2018-2021, Microsoft'
+copyright = '2018-2022, Microsoft'
 author = 'Microsoft'
 version = skl2onnx.__version__
 release = version
@@ -58,10 +56,8 @@ pygments_style = 'default'
 
 # -- Options for HTML output -------------------------------------------------
 
-html_theme = "sphinx_mo"
 html_static_path = ['_static']
-html_theme = "readable"
-html_theme_path = [sphinx_readable_theme.get_html_theme_path()]
+html_theme = "furo"
 html_logo = "logo_main.png"
 
 # -- Options for graphviz ----------------------------------------------------
@@ -92,27 +88,16 @@ intersphinx_mapping = {
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
     'pyquickhelper': (
         'http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/', None),
-    'onnxmltools': (
-        'http://www.xavierdupre.fr/app/onnxmltools/helpsphinx/index.html',
-        None),
-    'onnxruntime': (
-        'http://www.xavierdupre.fr/app/onnxruntime/helpsphinx/index.html',
-        None),
+    'onnxruntime': ('https://onnxruntime.ai/docs/api/python/', None),
     'pandas': ('https://pandas.pydata.org/pandas-docs/stable/', None),
     'scipy': ('https://docs.scipy.org/doc/scipy/reference', None),
     'seaborn': ('https://seaborn.pydata.org/', None),
     'scikit-learn': (
         'https://scikit-learn.org/stable/',
         None),
-    'sklearn': (
-        'https://scikit-learn.org/stable/',
-        None),
-    'skl2onnx': (
-        'http://www.xavierdupre.fr/app/sklearn-onnx/helpsphinx/index.html',
-        None),
-    'sklearn-onnx': (
-        'http://www.xavierdupre.fr/app/sklearn-onnx/helpsphinx/index.html',
-        None),
+    'sklearn': ('https://scikit-learn.org/stable/', None),
+    'skl2onnx': ('https://onnx.ai/sklearn-onnx/', None),
+    'sklearn-onnx': ('https://onnx.ai/sklearn-onnx/', None),
 }
 
 sphinx_gallery_conf = {
@@ -120,14 +105,14 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['auto_examples', 'auto_tutorial'],
     'capture_repr': ('_repr_html_', '__repr__'),
     'ignore_repr_types': r'matplotlib.text|matplotlib.axes',
-    'binder': {
-        'org': 'onnx',
-        'repo': 'onnx.ai/sklearn-onnx/',
-        'notebooks_dir': 'auto_examples',
-        'binderhub_url': 'https://mybinder.org',
-        'branch': 'master',
-        'dependencies': './requirements.txt'
-    },
+    # 'binder': {
+    #     'org': 'onnx',
+    #     'repo': 'onnx.ai/sklearn-onnx/',
+    #     'notebooks_dir': 'auto_examples',
+    #     'binderhub_url': 'https://mybinder.org',
+    #     'branch': 'main',
+    #     'dependencies': './requirements.txt'
+    # },
 }
 
 epkg_dictionary = {

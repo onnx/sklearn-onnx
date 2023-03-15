@@ -16,7 +16,7 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
 
 
 *sklearn-onnx* enables you to convert models from
-`sklearn-learn <https://scikit-learn.org/stable/>`_
+`scikit-learn <https://scikit-learn.org/stable/>`_
 toolkits into `ONNX <https://onnx.ai>`_.
 
 .. toctree::
@@ -53,6 +53,12 @@ The ONNX model has one opset number for every operator domain,
 this value is the maximum opset number among all
 onnx nodes.
 
+.. runpython::
+    :showcode:
+    
+    from skl2onnx import __max_supported_opset__
+    print("Last supported opset:", __max_supported_opset__)
+
 **Backend**
 
 *sklearn-onnx* converts models in ONNX format which
@@ -86,7 +92,7 @@ Every converter is tested with this backend.
     # Compute the prediction with ONNX Runtime
     import onnxruntime as rt
     import numpy
-    sess = rt.InferenceSession("rf_iris.onnx")
+    sess = rt.InferenceSession("rf_iris.onnx", providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]

@@ -26,13 +26,11 @@ from sklearn.preprocessing import (
 from sklearn.feature_extraction.text import CountVectorizer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnPipelineWithinPipeline(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
+
     def test_pipeline_pca_pipeline_minmax(self):
         model = Pipeline(
             memory=None,
@@ -79,13 +77,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMax",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMax")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_pipeline_pca_pipeline_none_lin(self):
         model = Pipeline(
             memory=None,
@@ -135,13 +128,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMaxLogReg",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMaxLogReg")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_pipeline_pca_pipeline_multinomial(self):
         model = Pipeline(
             memory=None,
@@ -201,13 +189,8 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMaxNB2",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMaxNB2")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_pipeline_pca_pipeline_multinomial_none(self):
         model = Pipeline(
             memory=None,
@@ -264,16 +247,11 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             data,
             model,
             model_onnx,
-            basename="SklearnPipelinePcaPipelineMinMaxNBNone",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnPipelinePcaPipelineMinMaxNBNone")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_pipeline_column_transformer_pipeline_imputer_scaler_lr(self):
         X = np.array([[1, 2], [3, np.nan], [3, 0]], dtype=np.float32)
         y = np.array([1, 0, 1])
@@ -313,16 +291,11 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnPipelineCTPipelineImputerScalerLR",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-                          " <= StrictVersion('0.2.1')",
-        )
+            basename="SklearnPipelineCTPipelineImputerScalerLR")
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer not available in 0.19")
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     def test_complex_pipeline(self):
 
         df = pandas.read_csv(StringIO(dedent("""

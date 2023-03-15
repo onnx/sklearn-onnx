@@ -23,10 +23,6 @@ generated/sklearn.manifold.TSNE.html#sklearn.manifold.TSNE.fit_transform>`_.
 This example proposes a way to train a machine learned model
 which approximates the outputs of a *t-SNE* transformer.
 
-
-.. contents::
-    :local:
-
 Implementation of the new transform
 +++++++++++++++++++++++++++++++++++
 

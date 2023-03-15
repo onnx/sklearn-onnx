@@ -2,10 +2,9 @@
 
 
 import unittest
-from distutils.version import StrictVersion
-import onnx
+import packaging.version as pv
 from onnx.defs import onnx_opset_version
-import onnxruntime
+from onnxruntime import __version__ as ort_version
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -15,7 +14,6 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
     fit_classification_model,
@@ -24,12 +22,11 @@ from test_utils import (
 )
 
 
+ort_version = '.'.join(ort_version.split('.')[:2])
+
+
 class TestSklearnAdaBoostModels(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=10, algorithm="SAMME.R", random_state=42,
@@ -46,17 +43,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierSAMMER",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnAdaBoostClassifierSAMMER")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r_decision_function(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=10, algorithm="SAMME.R", random_state=42,
@@ -76,17 +65,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnAdaBoostClassifierSAMMERDecisionFunction",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-            methods=['predict', 'decision_function'],
-        )
+            methods=['predict', 'decision_function'])
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r_logreg(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=5, algorithm="SAMME.R",
@@ -103,17 +84,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierSAMMERLogReg",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnAdaBoostClassifierSAMMERLogReg")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=5, algorithm="SAMME", random_state=42,
@@ -130,17 +103,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierSAMMEDT",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "< StrictVersion('0.5.0')",
-        )
+            basename="SklearnAdaBoostClassifierSAMMEDT")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_decision_function(self):
         model, X_test = fit_classification_model(AdaBoostClassifier(
             n_estimators=5, algorithm="SAMME", random_state=42,
@@ -160,17 +125,10 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnAdaBoostClassifierSAMMEDTDecisionFunction",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "< StrictVersion('0.5.0')",
             methods=['predict', 'decision_function_binary'],
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_lr(self):
         model, X_test = fit_classification_model(
             AdaBoostClassifier(learning_rate=0.3, random_state=42), 3,
@@ -186,17 +144,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierLR",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnAdaBoostClassifierLR")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_bool(self):
         model, X_test = fit_classification_model(
             AdaBoostClassifier(random_state=42), 3,
@@ -212,17 +162,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnAdaBoostClassifierBool",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnAdaBoostClassifierBool")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5))
@@ -235,19 +177,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressor-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) "
-            "< StrictVersion('0.5.0') or "
-            "StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
-        )
+            basename="SklearnAdaBoostRegressor-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_lreg(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5,
@@ -261,19 +193,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorLReg-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) "
-            "< StrictVersion('0.5.0') or "
-            "StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
-        )
+            basename="SklearnAdaBoostRegressorLReg-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_int(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(n_estimators=5), is_int=True)
@@ -286,19 +208,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorInt-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) "
-            "< StrictVersion('0.5.0') or "
-            "StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
-        )
+            basename="SklearnAdaBoostRegressorInt-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_lr10(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
@@ -311,23 +223,12 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorLR-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) "
-            "< StrictVersion('0.5.0') or "
-            "StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
-            verbose=False
-        )
+            basename="SklearnAdaBoostRegressorLR-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnxruntime.__version__) <
-                      StrictVersion("0.5.9999")),
+    @unittest.skipIf((pv.Version(ort_version) <
+                      pv.Version("0.5.9999")),
                      reason="not available")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_lr11(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42))
@@ -347,20 +248,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorLR-Dec4",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) "
-            "< StrictVersion('0.5.9999') or "
-            "StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
-            verbose=False
-        )
+            basename="SklearnAdaBoostRegressorLR-Dec4")
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
-    @unittest.skipIf((StrictVersion(onnx.__version__) <
-                      StrictVersion("1.5.0")),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_bool(self):
         model, X = fit_regression_model(
             AdaBoostRegressor(learning_rate=0.5, random_state=42),
@@ -375,15 +265,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnAdaBoostRegressorBool",
-            allow_failure="StrictVersion("
-            "onnxruntime.__version__) "
-            "< StrictVersion('0.5.0') or "
-            "StrictVersion(onnx.__version__) "
-            "== StrictVersion('1.4.1')",
-            verbose=False,
-        )
+            basename="SklearnAdaBoostRegressorBool")
 
 
 if __name__ == "__main__":
-    unittest.main()
+    # TestSklearnAdaBoostModels().test_ada_boost_classifier_lr()
+    unittest.main(verbosity=2)

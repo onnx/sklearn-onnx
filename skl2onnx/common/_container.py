@@ -29,11 +29,20 @@ from .utils import get_domain
 logger = getLogger('skl2onnx')
 
 
-def _get_operation_list():
+def _get_operation_list(use_shortlist=True):
     """
     Investigates this module to extract all ONNX functions
     which needs to be converted with these functions.
     """
+    # Reduce the scope of method _check_operator,
+    # it retrieves the stack trace and it takes a
+    # significant amount of time.
+    # This was mostly used to catch errors difficult to catch
+    # otherwise.
+    if use_shortlist:
+        shortlist = {'Clip', 'Normalizer', 'Upsample'}
+    else:
+        shortlist = None
     regs = [re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
                        "\\[?input_name"),
             re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', "
@@ -53,6 +62,8 @@ def _get_operation_list():
                     found = g.groups()[0]
                     break
             if found is None:
+                continue
+            if shortlist and found not in shortlist:
                 continue
             res[found] = v
     return res
@@ -121,6 +132,12 @@ class _WhiteBlackContainer:
             if node_type in self._black_op:
                 raise RuntimeError(
                     "Operator '{}' is black listed.".format(node_type))
+
+    def debug(self, *args, **kwargs):
+        """
+        Log debug information while converting a model.
+        """
+        logger.debug(*args, **kwargs)
 
 
 class RawModelContainerNode(_WhiteBlackContainer):
@@ -252,6 +269,79 @@ class ModelComponentContainer(_WhiteBlackContainer):
         # All registered models.
         self.registered_models = registered_models
 
+    def swap_names(self, old_name, new_name):
+        """
+        Swaps variables names.
+
+        :param old_name: old name
+        :param new_name: new name
+        :return: list of impacted objects
+        """
+        exc_list = {'Scan', 'Loop', 'If'}
+        for node in self.nodes:
+            if node.op_type not in exc_list:
+                continue
+            if (old_name in node.input or old_name in node.output or
+                    new_name in node.input or new_name in node.output):
+                raise NotImplementedError(
+                    "Unable to handle subgraphs for node type %r."
+                    "(%r, %r)" % (node.op_type, old_name, new_name))
+        res = []
+
+        for inp in self.inputs:
+            if inp.name == old_name:
+                inp.name = new_name
+                res.append(('Io', inp))
+            elif inp.name == new_name:
+                inp.name = old_name
+                res.append(('In', inp))
+
+        for inp in self.outputs:
+            if inp.name == old_name:
+                inp.name = new_name
+                res.append(('Oo', inp))
+            elif inp.name == new_name:
+                inp.name = old_name
+                res.append(('On', inp))
+
+        for inp in self.initializers:
+            if inp.name == old_name:
+                inp.name = new_name
+                res.append(('-o', inp))
+            elif inp.name == new_name:
+                inp.name = old_name
+                res.append(('-n', inp))
+
+        for node in self.nodes:
+            modified = False
+            new_input = []
+            for name in node.input:
+                if name == old_name:
+                    name = new_name
+                    modified = True
+                elif name == new_name:
+                    name = old_name
+                    modified = True
+                new_input.append(name)
+            new_output = []
+            for name in node.output:
+                if name == old_name:
+                    name = new_name
+                    modified = True
+                elif name == new_name:
+                    name = old_name
+                    modified = True
+                new_output.append(name)
+            if modified:
+                if node.op_type in exc_list:
+                    raise NotImplementedError(
+                        "Unable to handle subgraphs for node type %r."
+                        "" % node.op_type)
+                node.input[:] = new_input[:]
+                node.output[:] = new_output[:]
+                res.append(("n-", node))
+        return res
+
     def __str__(self):
         """
         Shows internal information.
@@ -343,7 +433,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                         or a float array).
         :return: created tensor
         """
-        logger.debug("[Init] %r, %r, %r" % (name, onnx_type, shape))
+        logger.debug("[Init] %r, %r, %r", name, onnx_type, shape)
         sparse_tensor = None
         tensor = None
 
@@ -491,12 +581,18 @@ class ModelComponentContainer(_WhiteBlackContainer):
                       attributes' names and attributes' values,
                       respectively.
         """
+        if ("axes" in attrs and
+            (attrs["axes"] is None or
+             not isinstance(attrs["axes"], (list, np.ndarray)))):
+            raise TypeError(
+                f"axes must be a list or an array not "
+                f"{type(attrs['axes'])}.")
         if name is None or not isinstance(
                 name, str) or name == '':
-            name = "N%d" % len(self.nodes)
+            name = f"N{len(self.nodes)}"
         existing_names = set(n.name for n in self.nodes)
         if name in existing_names:
-            name += "-N%d" % len(self.nodes)
+            name += f"-N{len(self.nodes)}"
 
         if op_domain is None:
             op_domain = get_domain()
@@ -508,8 +604,9 @@ class ModelComponentContainer(_WhiteBlackContainer):
             inputs = [inputs]
         if isinstance(outputs, str):
             outputs = [outputs]
-        logger.debug("[Node] %r - %r -> %r (name=%r)" % (
-            op_type, ",".join(inputs), ",".join(outputs), name))
+        logger.debug(
+            "[Node] %r - %r -> %r (name=%r)",
+            op_type, ",".join(inputs), ",".join(outputs), name)
         try:
             common = set(inputs) & set(outputs)
         except TypeError as e:
@@ -546,7 +643,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
 
         if upd:
             attrs.update(upd)
-        if 'dtype' in attrs:
+        if 'dtype' in attrs and op_type != 'EyeLike':
             raise RuntimeError("dtype should not be a parameter.")
         if len(dtypes) == 0:
             dtype = None
@@ -572,9 +669,11 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 op_version > self.target_opset_any_domain(op_domain)):
             raise RuntimeError(
                 "Opset number {} is higher than targeted opsets {} for "
-                "node '{}' (domain: '{}').".format(
+                "node type '{}' name='{}' input={} "
+                "output={} (domain='{}').".format(
                     op_version, self.target_opset_all,
-                    node.op_type, op_domain))
+                    node.op_type, node.name,
+                    node.input, node.output, op_domain))
 
     def target_opset_any_domain(self, domain):
         target_opset = self.target_opset_all
@@ -610,10 +709,14 @@ class ModelComponentContainer(_WhiteBlackContainer):
         key = domain, op_type
         vers = self._op_versions.get(key, None)
         if vers is None:
-            warnings.warn(
-                "Unable to find operator '{}' in domain '{}' in ONNX, "
-                "op_version is forced to 1.".format(
-                    op_type, domain))
+            if domain == "com.microsoft":
+                # avoid a not necessarily necessary warning
+                vers = 1
+            else:
+                warnings.warn(
+                    "Unable to find operator '{}' in domain '{}' in ONNX, "
+                    "op_version is forced to 1.".format(
+                        op_type, domain))
             vers = [1]
         highest = self.target_opset_any_domain(domain)
         pos = len(vers) - 1
@@ -702,8 +805,6 @@ class ModelComponentContainer(_WhiteBlackContainer):
         can only be an input for a node later in this list).
         The function raises an exception if a cycle is detected.
         """
-        if len(self.inputs) == 0:
-            raise RuntimeError("No input is defined.")
         order = {}
         for inp in self.inputs:
             name = inp.name
@@ -711,11 +812,15 @@ class ModelComponentContainer(_WhiteBlackContainer):
         for inp in self.initializers:
             name = inp.name
             order[name] = 0
+
         n_iter = 0
-        while n_iter < len(self.nodes) * 2:
+        missing_ops = []
+        cont = True
+        while cont and n_iter < len(self.nodes) * 2:
             n_iter += 1
             missing_names = set()
             missing_ops = []
+            cont = False
             for node in self.nodes:
                 maxi = 0
                 for name in node.input:
@@ -731,6 +836,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 key = id(node)
                 if key in order:
                     continue
+                cont = True
                 maxi += 1
                 order[key] = maxi
                 maxi += 1
@@ -771,7 +877,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                     "\n".join(rows)))
 
         # Update order
-        topo = [(order[id(node)], str(id(node))) for node in self.nodes]
-        topo.sort()
+        topo = sorted([(order[id(node)], str(id(node)))
+                      for node in self.nodes])
         map_nodes = {str(id(node)): node for node in self.nodes}
         self.nodes = [map_nodes[_[1]] for _ in topo]

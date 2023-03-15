@@ -3,6 +3,7 @@
 from logging import getLogger
 import numpy as np
 from scipy.sparse import coo_matrix
+from onnx import GraphProto
 from ..proto import onnx_proto, TensorProto
 from ..common.data_types import (
     guess_proto_type, _guess_numpy_type, _guess_type_proto_str,
@@ -25,8 +26,12 @@ class GraphState:
                  options=None, expected_inputs=None,
                  expected_outputs=None, input_range=None,
                  output_range=None, operator=None,
-                 run_converters=False, **attrs):
+                 run_converters=False, input_types=None, **attrs):
 
+        logger.debug(
+            "[State] +%s n_inputs=%r n_outputs=%r",
+            operator_name, -1 if inputs is None else len(inputs),
+            -1 if output_names is None else len(output_names))
         self.inputs = inputs
         self._output_names = output_names
         self._input_range = input_range.copy() if input_range else [1, 1e9]
@@ -39,6 +44,10 @@ class GraphState:
             self.operator_instance = operator_name
             self.is_model = True
             self.operator_name = get_model_alias(type(operator_name))
+        elif operator_name.__class__.__name__ == "WrappedModelAlias":
+            self.operator_instance = operator_name.model
+            self.is_model = True
+            self.operator_name = operator_name.alias
         else:
             self.operator_name = operator_name
             self.is_model = False
@@ -54,6 +63,7 @@ class GraphState:
         self.onnx_prefix_name = onnx_prefix_name
         self.attrs = attrs
         self.options = options
+        self.input_types = input_types
 
         for att in ['inputs', '_expected_inputs',
                     '_expected_outputs', 'computed_inputs_',
@@ -299,7 +309,8 @@ class GraphState:
             "sklearn-onnx/issues.".format(type(output), output))
 
     @staticmethod
-    def _update_inputs(inputs, names, scope, expected_inputs, input_range):
+    def _update_inputs(inputs, names, scope, expected_inputs,
+                       input_range, input_types=None):
         new_inputs = []
         for inp in inputs:
             if isinstance(inp, (Variable, tuple, GraphStateVar)):
@@ -316,9 +327,23 @@ class GraphState:
         for i in range(0, len(new_inputs)):
             inp = new_inputs[i]
             if isinstance(inp, tuple) and len(inp) == 2:
-                stype = None if isinstance(inp[1], str) else inp[1]
-                new_inputs[i] = Variable(
-                    inp[0], inp[0], type=stype, scope=scope)
+                if input_types is not None and i < len(input_types):
+                    stype = input_types[i]
+                else:
+                    stype = None if isinstance(inp[1], str) else inp[1]
+                if scope is not None:
+                    if inp[0] in scope.variables:
+                        var = scope.variables[inp[0]]
+                        if stype is not None:
+                            var.check_compatible_type(stype)
+                    else:
+                        onnx_name = scope.get_unique_variable_name(inp[0])
+                        var = Variable(
+                            inp[0], onnx_name, type=stype, scope=scope)
+                        scope.register_variable(var)
+                else:
+                    var = Variable(inp[0], inp[0], type=stype, scope=scope)
+                new_inputs[i] = var
                 inp = new_inputs[i]
             elif isinstance(inp, GraphStateVar):
                 new_inputs[i] = inp.as_variable(scope)
@@ -326,6 +351,7 @@ class GraphState:
             elif not isinstance(inp, Variable):
                 raise TypeError(
                     "Inputs %d - %r must be of type Variable." % (i, inp))
+
             if names is not None:
                 try:
                     onnx_name = (
@@ -358,6 +384,16 @@ class GraphState:
                                     new_inputs[j].type.__class__())
                                 break
 
+        # Overwrite types if input_types is specified.
+        if input_types is not None:
+            for i in range(len(new_inputs)):
+                if i >= len(input_types):
+                    raise RuntimeError(
+                        "Mismatch between computed inputs[%d]=%r and "
+                        "overwritten input_types[%d]=%r." % (
+                            i, new_inputs, i, input_types))
+                if input_types[i] is not None:
+                    new_inputs[i].type = input_types[i]
         return new_inputs
 
     @staticmethod
@@ -400,6 +436,21 @@ class GraphState:
 
     def run(self):
         if self.computed_outputs_ is None:
+
+            # We need to register all names in subgraphs and raise
+            # an exception if the names are already taken.
+            for k, v in self.attrs.items():
+                if isinstance(v, GraphProto):
+                    try:
+                        self.scope.declare_existing_subgraph_name(v)
+                    except NameError as e:
+                        raise RuntimeError(
+                            "A name exists both in the subgraph and "
+                            "in the main graph. Use set_onnx_name_prefix to "
+                            "to rename one of them, attribute=%r, "
+                            "op_type=%r." % (
+                                k, self.operator_name)) from e
+
             if self.operator is not None:
                 expected_outputs = self.operator.outputs
             else:
@@ -414,6 +465,11 @@ class GraphState:
                 else:
                     expected_outputs = None
 
+            logger.debug(
+                "[State.run] id=%d op_name=%r is_model=%r "
+                "expected_outputs=%r",
+                id(self), self.operator_name, self.is_model, expected_outputs)
+
             inputs = []
             for i in self.inputs:
                 v = self._get_var_name(i, False, index=None)
@@ -422,7 +478,12 @@ class GraphState:
             self.computed_inputs_ = GraphState._update_inputs(
                 self.inputs, inputs, scope=self.scope,
                 expected_inputs=self._expected_inputs,
-                input_range=self._input_range)
+                input_range=self._input_range,
+                input_types=self.input_types)
+
+            logger.debug(
+                "[State.run] id=%d op_name=%r computed_inputs_=%r",
+                id(self), self.operator_name, self.computed_inputs_)
 
             name = self.scope.get_unique_operator_name(self.onnx_prefix)
             if self.is_model:
@@ -432,13 +493,35 @@ class GraphState:
 
                 # a model is converted into a subgraph
                 sub_op_inputs = self.computed_inputs_
+                for v in sub_op_inputs:
+                    if not isinstance(v, Variable):
+                        raise TypeError(
+                            "Every input variable must be a Variable not %r,"
+                            " v=%r." % (type(v), v))
+                    scope = v.scope
+                    if hasattr(scope, 'variables'):
+                        if v.onnx_name not in scope.variables:
+                            raise RuntimeError(
+                                "Variable %r missing from scope "
+                                "(operator=%r, model=%r), list=%r." % (
+                                    v, self.operator,
+                                    type(self.operator_instance),
+                                    list(sorted(self.scope.variables))))
 
                 # output are not defined, we need to call a parser.
                 from .._parse import _parse_sklearn
                 self.scope.add_options(
                     id(self.operator_instance), self.options)
-                sub_outputs = _parse_sklearn(
-                    self.scope, self.operator_instance, sub_op_inputs)
+                try:
+                    sub_outputs = _parse_sklearn(
+                        self.scope, self.operator_instance, sub_op_inputs,
+                        alias=self.operator_name)
+                except RuntimeError as e:
+                    raise RuntimeError(
+                        "Unable to run parser for model type %r, inputs=%r "
+                        "(input_types=%r)." % (
+                            type(self.operator_instance), sub_op_inputs,
+                            self.input_types)) from e
                 set_input_names = set(v.onnx_name for v in sub_op_inputs)
                 sub_op = None
                 for op in self.scope.operators.values():
@@ -460,12 +543,12 @@ class GraphState:
                 sub_op.outputs = sub_outputs
 
                 shape_calc = get_shape_calculator(self.operator_name)
-                logger.debug("[StateShape] call %r fed %r - %r" % (
-                    sub_op,
+                logger.debug(
+                    "[StateShape] call %r fed %r - %r", sub_op,
                     "".join(str(i.is_fed) for i in sub_op.inputs),
-                    "".join(str(i.is_fed) for i in sub_op.outputs)))
+                    "".join(str(i.is_fed) for i in sub_op.outputs))
                 shape_calc(sub_op)
-                logger.debug("[StateShape] end - %r" % sub_op)
+                logger.debug("[StateShape] end - %r", sub_op)
 
                 # Add Identity nodes to be consistent with `is_fed`
                 # in Topology.
@@ -504,12 +587,12 @@ class GraphState:
                     # The parser was run on sub-operators but not the
                     # converter.
                     conv = get_converter(self.operator_name)
-                    logger.debug("[StateConv] %r fed %r - %r" % (
-                        sub_op,
+                    logger.debug(
+                        "[StateConv] %r fed %r - %r", sub_op,
                         "".join(str(i.is_fed) for i in sub_op.inputs),
-                        "".join(str(i.is_fed) for i in sub_op.outputs)))
+                        "".join(str(i.is_fed) for i in sub_op.outputs))
                     conv(self.scope, sub_op, self.container)
-                    logger.debug("[StateConv] %r - end." % sub_op)
+                    logger.debug("[StateConv] %r - end.", sub_op)
                 else:
                     if (expected_outputs is not None and
                             len(sub_op.outputs) == len(expected_outputs)):
@@ -548,6 +631,7 @@ class GraphState:
                 self.container.add_node(
                     self.operator_name, input_names, output_names,
                     name=name, **self.attrs)
+
                 computed_outputs = [
                     (name, ct[1]) for name, ct in zip(
                         output_names, self._expected_outputs)]
@@ -569,3 +653,5 @@ class GraphState:
                         var.set_onnx_name(name)
                         var.init_status(is_fed=True)
                         self.computed_outputs_.append(var)
+
+            logger.debug('[State.run] end id=%d', id(self))

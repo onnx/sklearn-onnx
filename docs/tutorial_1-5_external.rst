@@ -14,4 +14,6 @@ model are part of a pipeline.
     :maxdepth: 1
 
     auto_tutorial/plot_gexternal_lightgbm
+    auto_tutorial/plot_gexternal_lightgbm_reg
     auto_tutorial/plot_gexternal_xgboost
+    auto_tutorial/plot_gexternal_catboost

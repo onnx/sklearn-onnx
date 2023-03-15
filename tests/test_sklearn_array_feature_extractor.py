@@ -2,7 +2,7 @@
 
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import pandas as pd
 import numpy as np
 from onnxruntime import __version__ as ort_version
@@ -18,15 +18,14 @@ from skl2onnx.common.data_types import FloatTensorType
 from sklearn.pipeline import Pipeline
 from test_utils import (
     dump_data_and_model,
-    TARGET_OPSET
-)
+    TARGET_OPSET)
 
 
 class TestSklearnArrayFeatureExtractor(unittest.TestCase):
 
     @unittest.skipIf(
         ColumnTransformer is None or
-        StrictVersion(ort_version) <= StrictVersion("0.4.0"),
+        pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="onnxruntime too old")
     def test_array_feature_extractor(self):
         data_to_cluster = pd.DataFrame(

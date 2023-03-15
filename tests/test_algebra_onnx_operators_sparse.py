@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
+import packaging.version as pv
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -20,7 +20,6 @@ try:
 except ImportError:
     # onnx is too old.
     OnnxConstantOfShape = None
-from onnx import __version__ as onnx__version__
 from test_utils import TARGET_OPSET
 
 THRESHOLD = "1.3.0"
@@ -28,9 +27,9 @@ THRESHOLD = "1.3.0"
 
 class TestOnnxOperatorsSparse(unittest.TestCase):
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="only available for opset >= 11")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version(THRESHOLD),
                      reason="fails with onnxruntime < %s" % THRESHOLD)
     def test_onnx_init_dense(self):
         X = np.array([1, 2, 3, 4, 5, 6]).astype(np.float32).reshape((3, 2))
@@ -40,14 +39,16 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
         model_def = node.to_onnx({'X': X},
                                  outputs=[('Y', FloatTensorType())])
 
-        sess = InferenceSession(model_def.SerializeToString())
+        sess = InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, {'X': X})[0]
 
         assert_almost_equal(X + X, res)
 
-    @unittest.skipIf(StrictVersion(onnx__version__) < StrictVersion("1.6.0"),
+    @unittest.skipIf(TARGET_OPSET < 11,
                      reason="only available for opset >= 11")
-    @unittest.skipIf(StrictVersion(ort_version) < StrictVersion(THRESHOLD),
+    @unittest.skipIf(pv.Version(ort_version) < pv.Version(THRESHOLD),
                      reason="fails with onnxruntime < %s" % THRESHOLD)
     def test_onnx_init_sparse_coo(self):
         row = np.array([0, 0, 1, 3, 1], dtype=np.float32)
@@ -59,11 +60,13 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
             'X', X, output_names=['Y'],
             op_version=TARGET_OPSET)
 
-        model_def = node.to_onnx({'X': X},
-                                 outputs=[('Y', FloatTensorType())])
+        model_def = node.to_onnx(
+            {'X': X}, outputs=[('Y', FloatTensorType())])
 
         try:
-            sess = InferenceSession(model_def.SerializeToString())
+            sess = InferenceSession(
+                model_def.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except (RuntimeError, OrtInvalidArgument):
             # Sparse tensor is not supported for constant.
             return

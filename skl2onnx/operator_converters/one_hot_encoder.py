@@ -40,7 +40,7 @@ def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
         index_inputs = 0
 
         for index, cats in enumerate(ohe_op.categories_):
-            while sum(all_shapes[:index_inputs+1]) <= index:
+            while sum(all_shapes[:index_inputs + 1]) <= index:
                 index_inputs += 1
             index_in_input = index - sum(all_shapes[:index_inputs])
 
@@ -70,6 +70,9 @@ def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
     result, categories_len = [], 0
     for index, enum_c in enumerate(enum_cats):
         afeat, index_in, name, categories, inp_type = enum_c
+        container.debug(
+            "[conv.OneHotEncoder] cat %r/%r name=%r type=%r",
+            index + 1, len(enum_cats), name, inp_type)
         if len(categories) == 0:
             continue
         if afeat:
@@ -105,7 +108,9 @@ def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
                         "Category '{}' cannot be casted into int.".format(c))
                 if ci != c:
                     raise RuntimeError(
-                        "Category '{}' is not an int64.".format(c))
+                        "Category %r is not an int64. "
+                        "The converter only supports string and int64 "
+                        "categories not %r." % (c, type(c)))
             attrs['cats_int64s'] = categories.astype(np.int64)
         else:
             raise RuntimeError(

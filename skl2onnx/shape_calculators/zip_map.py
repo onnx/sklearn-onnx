@@ -2,13 +2,19 @@
 
 
 from ..common._registration import register_shape_calculator
-from ..common.utils import check_input_and_output_numbers
 
 
 def calculate_sklearn_zipmap(operator):
-    check_input_and_output_numbers(operator, output_count_range=2)
-    operator.outputs[0].type = operator.inputs[0].type.__class__(
-        operator.inputs[0].type.shape)
+    if (len(operator.inputs) != len(operator.outputs) or
+            len(operator.inputs) not in (1, 2)):
+        raise RuntimeError(
+            "SklearnZipMap expects the same number of inputs and outputs.")
+    if len(operator.inputs) == 2:
+        operator.outputs[0].type = operator.inputs[0].type.__class__(
+            operator.inputs[0].type.shape)
+        if operator.outputs[1].type is not None:
+            operator.outputs[1].type.element_type.value_type = \
+                operator.inputs[1].type.__class__([])
 
 
 def calculate_sklearn_zipmap_columns(operator):

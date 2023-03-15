@@ -16,13 +16,6 @@ a pipeline including a *XGBoost* model. *sklearn-onnx* can convert
 the whole pipeline as long as it knows the converter associated to
 a *XGBClassifier*. Let's see how to do it.
 
-A couple of errors might happen while trying to convert
-your own pipeline, some of them are described
-and explained in :ref:`errors-pipeline`.
-
-.. contents::
-    :local:
-
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
@@ -64,7 +57,7 @@ pipe.fit(X, y)
 try:
     convert_sklearn(pipe, 'pipeline_xgboost',
                     [('input', FloatTensorType([None, 2]))],
-                    target_opset=12)
+                    target_opset={'': 12, 'ai.onnx.ml': 2})
 except Exception as e:
     print(e)
 
@@ -106,7 +99,7 @@ update_registered_converter(
 model_onnx = convert_sklearn(
     pipe, 'pipeline_xgboost',
     [('input', FloatTensorType([None, 2]))],
-    target_opset=12)
+    target_opset={'': 12, 'ai.onnx.ml': 2})
 
 # And save.
 with open("pipeline_xgboost.onnx", "wb") as f:

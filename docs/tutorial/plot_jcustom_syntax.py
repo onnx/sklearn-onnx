@@ -7,19 +7,16 @@ Two ways to implement a converter
 .. index:: syntax
 
 There are two ways to write a converter. The first one
-is very verbose (see `ada_boost.py <https://github.com/onnx/
-sklearn-onnx/blob/master/skl2onnx/operator_converters/ada_boost.py>`_
-for an example). The other is less verbose and easier to understand
+is less verbose and easier to understand
 (see `k_means.py <https://github.com/onnx/sklearn-onnx/blob/
 master/skl2onnx/operator_converters/k_means.py>`_).
+The other is very verbose (see `ada_boost.py <https://github.com/onnx/
+sklearn-onnx/blob/master/skl2onnx/operator_converters/ada_boost.py>`_
+for an example).
 
 The first way is used in :ref:`l-plot-custom-converter`.
 This one demonstrates the second way which is usually the one
 used in other converter library. It is more verbose.
-
-.. contents::
-    :local:
-
 
 Custom model
 ++++++++++++
@@ -93,7 +90,10 @@ print(pred)
 def decorrelate_transformer_shape_calculator(operator):
     op = operator.raw_operator
     input_type = operator.inputs[0].type.__class__
-    input_dim = operator.inputs[0].type.shape[0]
+    # The shape may be unknown. *get_first_dimension*
+    # returns the appropriate value, None in most cases
+    # meaning the transformer can process any batch of observations.
+    input_dim = operator.inputs[0].get_first_dimension()
     output_type = input_type([input_dim, op.coef_.shape[1]])
     operator.outputs[0].type = output_type
 

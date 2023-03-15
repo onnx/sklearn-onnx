@@ -11,22 +11,31 @@ from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
+from ..algebra.onnx_ops import (
+    OnnxAdd, OnnxCast, OnnxExp, OnnxIdentity, OnnxMatMul,
+    OnnxReshape, OnnxSigmoid)
 
 
 def convert_sklearn_linear_regressor(scope: Scope, operator: Operator,
                                      container: ModelComponentContainer):
     op = operator.raw_operator
+    use_linear_op = container.is_allowed({'LinearRegressor'})
 
-    if type(operator.inputs[0].type) in (DoubleTensorType, ):
+    if (not use_linear_op or
+            type(operator.inputs[0].type) in (DoubleTensorType, )):
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         coef = scope.get_unique_variable_name('coef')
-        model_coef = op.coef_.T
+        if len(op.coef_.shape) == 1:
+            model_coef = op.coef_.reshape((-1, 1))
+        else:
+            model_coef = op.coef_.T
         container.add_initializer(
             coef, proto_dtype, model_coef.shape, model_coef.ravel().tolist())
         intercept = scope.get_unique_variable_name('intercept')
+        value_intercept = op.intercept_.reshape((-1, ))
         container.add_initializer(
-            intercept, proto_dtype, op.intercept_.shape,
-            op.intercept_.ravel().tolist())
+            intercept, proto_dtype, value_intercept.shape,
+            value_intercept.ravel().tolist())
         multiplied = scope.get_unique_variable_name('multiplied')
         container.add_node(
             'MatMul', [operator.inputs[0].full_name, coef], multiplied,
@@ -75,7 +84,7 @@ def convert_sklearn_bayesian_ridge(scope: Scope, operator: Operator,
         return
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
-    if op.normalize:
+    if hasattr(op, 'normalize') and op.normalize:
         # if self.normalize:
         #     X = (X - self.X_offset_) / self.X_scale_
         offset = scope.get_unique_variable_name('offset')
@@ -125,7 +134,81 @@ def convert_sklearn_bayesian_ridge(scope: Scope, operator: Operator,
     apply_sqrt(scope, std0, operator.outputs[1].full_name, container)
 
 
+def convert_sklearn_poisson_regressor(scope: Scope, operator: Operator,
+                                      container: ModelComponentContainer):
+    X = operator.inputs[0]
+    out = operator.outputs
+    op = operator.raw_operator
+    opv = container.target_opset
+    dtype = guess_numpy_type(X.type)
+    if dtype != np.float64:
+        dtype = np.float32
+
+    if isinstance(X.type, Int64TensorType):
+        input_var = OnnxCast(X, to=np.float32, op_version=opv)
+    else:
+        input_var = X
+
+    intercept = (op.intercept_.astype(dtype) if len(op.intercept_.shape) > 0
+                 else np.array([op.intercept_], dtype=dtype))
+    eta = OnnxAdd(
+        OnnxMatMul(input_var, op.coef_.astype(dtype), op_version=opv),
+        intercept, op_version=opv)
+
+    if hasattr(op, "_link_instance"):
+        # scikit-learn < 1.1
+        from sklearn.linear_model._glm.link import (
+            IdentityLink, LogLink, LogitLink)
+        if isinstance(op._link_instance, IdentityLink):
+            Y = OnnxIdentity(eta, op_version=opv)
+        elif isinstance(op._link_instance, LogLink):
+            Y = OnnxExp(eta, op_version=opv)
+        elif isinstance(op._link_instance, LogitLink):
+            Y = OnnxSigmoid(eta, op_version=opv)
+        else:
+            raise RuntimeError(
+                "Unexpected type %r for _link_instance "
+                "in operator type %r." % (
+                    type(op._link_instance), type(op)))
+    else:
+        # scikit-learn >= 1.1
+        from sklearn._loss.loss import (
+            AbsoluteError,
+            HalfBinomialLoss,
+            HalfGammaLoss,
+            HalfPoissonLoss,
+            HalfSquaredError,
+            HalfTweedieLoss,
+            HalfTweedieLossIdentity,
+            PinballLoss
+        )
+        loss = op._get_loss()
+        if isinstance(
+            loss,
+            (AbsoluteError, HalfSquaredError,
+             HalfTweedieLossIdentity, PinballLoss)):
+            Y = OnnxIdentity(eta, op_version=opv)
+        elif isinstance(loss, (HalfPoissonLoss, HalfGammaLoss,
+                               HalfTweedieLoss)):
+            Y = OnnxExp(eta, op_version=opv)
+        elif isinstance(loss, HalfBinomialLoss):
+            Y = OnnxSigmoid(eta, op_version=opv)
+        else:
+            raise RuntimeError(
+                f"Unexpected type of link for {loss!r} loss "
+                "in operator type {op!r}.")
+
+    last_dim = 1 if len(op.coef_.shape) == 1 else op.coef_.shape[-1]
+    final = OnnxReshape(Y, np.array([-1, last_dim], dtype=np.int64),
+                        op_version=opv, output_names=out[:1])
+    final.add_to(scope, container)
+
+
 register_converter('SklearnLinearRegressor', convert_sklearn_linear_regressor)
 register_converter('SklearnLinearSVR', convert_sklearn_linear_regressor)
 register_converter('SklearnBayesianRidge', convert_sklearn_bayesian_ridge,
                    options={'return_std': [True, False]})
+register_converter('SklearnPoissonRegressor',
+                   convert_sklearn_poisson_regressor)
+register_converter('SklearnTweedieRegressor',
+                   convert_sklearn_poisson_regressor)

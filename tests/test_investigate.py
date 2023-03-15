@@ -14,7 +14,6 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import FeatureUnion, Pipeline
 from sklearn.preprocessing import RobustScaler, StandardScaler
-import onnxruntime
 from skl2onnx import convert_sklearn
 from skl2onnx.helpers import (
     collect_intermediate_steps, compare_objects,
@@ -23,7 +22,7 @@ from skl2onnx.helpers.investigate import _alter_model_for_debugging
 from skl2onnx.common import MissingShapeCalculator
 from skl2onnx.common.data_types import (
     FloatTensorType, guess_data_type)
-from test_utils import TARGET_OPSET
+from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class MyScaler(StandardScaler):
@@ -47,8 +46,8 @@ class TestInvestigate(unittest.TestCase):
                 model, "pipeline", [("input", FloatTensorType([None, 2]))],
                 target_opset=opset)
 
-            assert len(steps) == 2
-            assert len(all_models) == 3
+            self.assertEqual(len(steps), 2)
+            self.assertEqual(len(all_models), 3)
 
             expected = 'version:%d}' % opset
             expected1 = 'version:1}'
@@ -60,8 +59,9 @@ class TestInvestigate(unittest.TestCase):
                     raise AssertionError(
                         "Unable to find '{}'\n'{}'\n".format(
                             expected, text))
-                sess = onnxruntime.InferenceSession(
-                    onnx_step.SerializeToString())
+                sess = InferenceSession(
+                    onnx_step.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
                 onnx_outputs = sess.run(None, {'input': data})
                 onnx_output = onnx_outputs[0]
                 skl_outputs = step['model']._debug.outputs['transform']
@@ -101,12 +101,15 @@ class TestInvestigate(unittest.TestCase):
             data_in = step_model._debug.inputs['transform']
             t = guess_data_type(data_in)
             try:
-                onnx_step = convert_sklearn(step_model, initial_types=t)
+                onnx_step = convert_sklearn(step_model, initial_types=t,
+                                            target_opset=TARGET_OPSET)
             except MissingShapeCalculator as e:
                 if "MyScaler" in str(e):
                     continue
                 raise
-            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+            sess = InferenceSession(
+                onnx_step.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': data_in})
             onnx_output = onnx_outputs[0]
             skl_outputs = step_model._debug.outputs['transform']
@@ -134,7 +137,9 @@ class TestInvestigate(unittest.TestCase):
         model.transform(data)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+            sess = InferenceSession(
+                onnx_step.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': data})
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
@@ -159,7 +164,9 @@ class TestInvestigate(unittest.TestCase):
         model.transform(data)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+            sess = InferenceSession(
+                onnx_step.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': data})
             onnx_output = onnx_outputs[0]
             skl_outputs = step['model']._debug.outputs['transform']
@@ -185,7 +192,9 @@ class TestInvestigate(unittest.TestCase):
         model.predict(X)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+            sess = InferenceSession(
+                onnx_step.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': X.astype(numpy.float32)})
             onnx_output = onnx_outputs[0]
             dbg_outputs = step['model']._debug.outputs
@@ -213,7 +222,9 @@ class TestInvestigate(unittest.TestCase):
         model.predict_proba(X)
         for step in steps:
             onnx_step = step['onnx_step']
-            sess = onnxruntime.InferenceSession(onnx_step.SerializeToString())
+            sess = InferenceSession(
+                onnx_step.SerializeToString(),
+                providers=["CPUExecutionProvider"])
             onnx_outputs = sess.run(None, {'input': X.astype(numpy.float32)})
             dbg_outputs = step['model']._debug.outputs
             if 'transform' in dbg_outputs:
@@ -238,6 +249,26 @@ class TestInvestigate(unittest.TestCase):
                 verbose=1)
         self.assertIn("[convert_sklearn] convert_topology", st.getvalue())
 
+    @unittest.skipIf(TARGET_OPSET < 18,
+                     reason="ReferenceEvaluator not implemented")
+    def test_replay_run(self):
+        try:
+            from .test_utils.utils_backend_onnx import ReferenceEvaluatorEx
+        except ImportError:
+            from test_utils.utils_backend_onnx import ReferenceEvaluatorEx
+        data = load_iris()
+        X, y = data.data, data.target
+        model = Pipeline([("scaler1", StandardScaler()),
+                          ("lr", LogisticRegression())])
+        model.fit(X, y)
+        onx = convert_sklearn(
+            model, initial_types=[('X', FloatTensorType())],
+            options={'zipmap': False})
+        sess = ReferenceEvaluatorEx(onx)
+        sess.run(None, {"X": X})
+        repl = sess.replay_run()
+        self.assertIn('probability_tensor', repl)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

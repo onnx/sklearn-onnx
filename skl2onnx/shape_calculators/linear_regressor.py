@@ -56,7 +56,13 @@ register_shape_calculator('SklearnLinearSVR',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnMLPRegressor',
                           calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnPoissonRegressor',
+                          calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnRANSACRegressor',
                           calculate_linear_regressor_output_shapes)
 register_shape_calculator('SklearnStackingRegressor',
+                          calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnTweedieRegressor',
+                          calculate_linear_regressor_output_shapes)
+register_shape_calculator('SklearnGammaRegressor',
                           calculate_linear_regressor_output_shapes)

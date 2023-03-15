@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-from distutils.version import StrictVersion
 import sys
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -18,15 +17,16 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
 
     def predict_with_onnxruntime(self, model_def, *inputs):
         import onnxruntime as ort
-        sess = ort.InferenceSession(model_def.SerializeToString())
+        sess = ort.InferenceSession(
+            model_def.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         names = [i.name for i in sess.get_inputs()]
         input = {name: input for name, input in zip(names, inputs)}
         res = sess.run(None, input)
         names = [o.name for o in sess.get_outputs()]
         return {name: output for name, output in zip(names, res)}
 
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_transpose2(self):
         from skl2onnx.algebra.onnx_ops import OnnxTranspose
 

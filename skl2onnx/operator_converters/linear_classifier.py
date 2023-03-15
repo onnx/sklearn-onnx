@@ -37,6 +37,7 @@ def convert_sklearn_linear_classifier(scope: Scope, operator: Operator,
     coefficients = op.coef_.flatten().astype(float).tolist()
     classes = get_label_classes(scope, op)
     number_of_classes = len(classes)
+    use_linear_op = container.is_allowed({'LinearClassifier'})
 
     options = container.get_options(op, dict(raw_scores=False))
     use_raw_scores = options['raw_scores']
@@ -90,7 +91,8 @@ def convert_sklearn_linear_classifier(scope: Scope, operator: Operator,
         raise RuntimeError('Label vector must be a string or a integer '
                            'tensor.')
 
-    if type(operator.inputs[0].type) in (DoubleTensorType, ):
+    if (not use_linear_op or
+            type(operator.inputs[0].type) in (DoubleTensorType, )):
         # Double -> double parameters not supported in ONNX LinearClassifier
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         coef = scope.get_unique_variable_name('coef')
@@ -145,7 +147,7 @@ def convert_sklearn_linear_classifier(scope: Scope, operator: Operator,
 
     label_name = operator.outputs[0].full_name
     input_name = operator.inputs[0].full_name
-    if type(operator.inputs[0].type) == BooleanTensorType:
+    if isinstance(operator.inputs[0].type, BooleanTensorType):
         cast_input_name = scope.get_unique_variable_name('cast_input')
 
         apply_cast(scope, input_name, cast_input_name,
@@ -230,7 +232,9 @@ register_converter('SklearnLinearClassifier',
                    convert_sklearn_linear_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
 register_converter('SklearnLinearSVC', convert_sklearn_linear_classifier,
                    options={'nocl': [True, False],
+                            'output_class_labels': [False, True],
                             'raw_scores': [True, False]})

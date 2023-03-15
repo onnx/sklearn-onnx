@@ -10,15 +10,16 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-from onnxruntime import InferenceSession
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 except ImportError:
     OrtFail = RuntimeError
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx.common.data_types import onnx_built_with_ml
-from test_utils import dump_data_and_model, TARGET_OPSET
+from test_utils import (
+    dump_data_and_model, TARGET_OPSET,
+    InferenceSessionEx as InferenceSession,
+    ReferenceEvaluatorEx)
 
 
 class TestGaussianMixtureConverter(unittest.TestCase):
@@ -45,8 +46,25 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model, X[:1], target_opset=tg,
             options={id(model): {'score_samples': True}},
             black_op=black_op)
+        if ReferenceEvaluatorEx is None:
+            sess = None
+        else:
+            try:
+                sess = ReferenceEvaluatorEx(onx)
+            except NotImplementedError:
+                sess = None
+        if sess is not None:
+            got = sess.run(None, {'X': X})
+            self.assertEqual(len(got), 3)
+            np.testing.assert_almost_equal(
+                expp.ravel(), got[1].ravel(), decimal=decimal)
+            np.testing.assert_almost_equal(
+                exp.ravel(), got[2].ravel(), decimal=decimal)
+
         try:
-            sess = InferenceSession(onx.SerializeToString())
+            sess = InferenceSession(
+                onx.SerializeToString(),
+                providers=["CPUExecutionProvider"])
         except OrtFail as e:
             raise RuntimeError('Issue {}\n{}'.format(e, str(onx)))
         got = sess.run(None, {'X': X})
@@ -56,8 +74,6 @@ class TestGaussianMixtureConverter(unittest.TestCase):
         np.testing.assert_almost_equal(
             exp.ravel(), got[2].ravel(), decimal=decimal)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="Missing Gemm (11)")
     @ignore_warnings(category=UserWarning)
@@ -73,9 +89,7 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                 self.assertIsNotNone(model_onnx)
                 dump_data_and_model(
                     X, model, model_onnx,
-                    basename="SklearnBinGaussianMixture",
-                    allow_failure="StrictVersion(onnxruntime.__version__)"
-                    "<= StrictVersion('0.2.1')")
+                    basename="SklearnBinGaussianMixture")
                 self._test_score(model, X, tg)
 
     @ignore_warnings(category=UserWarning)
@@ -96,14 +110,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
                     X,
                     model,
                     model_onnx,
-                    basename="SklearnBinBayesianGaussianMixture",
-                    allow_failure="StrictVersion(onnxruntime.__version__)"
-                    "<= StrictVersion('0.2.1')",
-                )
+                    basename="SklearnBinBayesianGaussianMixture")
                 self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_model_gaussian_mixture_multiclass(self):
         model, X = self._fit_model_multiclass_classification(
@@ -119,14 +128,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnMclGaussianMixture",
-            allow_failure="StrictVersion(onnxruntime.__version__)"
-            "<= StrictVersion('0.2.1')",
-        )
+            basename="SklearnMclGaussianMixture")
         self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_comp2(self):
         data = load_iris()
@@ -142,15 +146,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="GaussianMixtureC2",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_full(self):
         data = load_iris()
@@ -166,15 +164,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="GaussianMixtureC2Full",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_tied(self):
         data = load_iris()
@@ -190,15 +182,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="GaussianMixtureC2Tied",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_diag(self):
         data = load_iris()
@@ -215,15 +201,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="GaussianMixtureC2Diag",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_spherical(self):
         data = load_iris()
@@ -238,14 +218,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             X.astype(np.float32)[40:60],
             model, model_onnx,
             basename="GaussianMixtureC2Spherical",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')")
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET, decimal=4)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=UserWarning)
     def test_gaussian_mixture_full_black_op(self):
         data = load_iris()
@@ -266,15 +241,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="GaussianMixtureC2FullBL",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
     @ignore_warnings(category=UserWarning)
@@ -297,15 +266,9 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             X.astype(np.float32)[40:60],
             model, model_onnx,
             basename="GaussianMixtureC2FullBLNM",
-            intermediate_steps=True,
-            # Operator gemm is not implemented in onnxruntime
-            allow_failure="StrictVersion(onnx.__version__)"
-                          " < StrictVersion('1.2')",
-        )
+            intermediate_steps=True)
         self._test_score(model, X, TARGET_OPSET)
 
-    @unittest.skipIf(not onnx_built_with_ml(),
-                     reason="Requires ONNX-ML extension.")
     @unittest.skipIf(TARGET_OPSET < 11,
                      reason="OnnxEqual does not support float")
     @ignore_warnings(category=UserWarning)
@@ -325,11 +288,15 @@ class TestGaussianMixtureConverter(unittest.TestCase):
             black_op={'ReduceLogSumExp', 'ArgMax'})
         self.assertNotIn('ArgMax', str(model_onnx2))
 
-        sess1 = InferenceSession(model_onnx1.SerializeToString())
+        sess1 = InferenceSession(
+            model_onnx1.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res1 = sess1.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a1, b1, c1 = res1
 
-        sess2 = InferenceSession(model_onnx2.SerializeToString())
+        sess2 = InferenceSession(
+            model_onnx2.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res2 = sess2.run(None, {'input': (X[:5] * 1e2).astype(np.float32)})
         a2, b2, c2 = res2
 
@@ -344,4 +311,4 @@ class TestGaussianMixtureConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

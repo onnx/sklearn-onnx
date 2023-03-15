@@ -20,7 +20,7 @@ from ..algebra.onnx_ops import (
     OnnxNeg,
     OnnxNot,
     OnnxReciprocal,
-    OnnxReduceMean,
+    OnnxReduceMeanApi18,
     OnnxReduceSumApi11,
     OnnxReshapeApi13,
     OnnxShape,
@@ -78,32 +78,34 @@ def onnx_nearest_neighbors_indices_k(X, Y, k, metric='euclidean', dtype=None,
     :param kwargs: additional parameters for function @see fn onnx_cdist
     :return: top indices, top distances
     """
+    kwargs_dist = {k: v for k, v in kwargs.items() if k == 'p'}
+    kwargs_topk = {k: v for k, v in kwargs.items() if k != 'p'}
     if optim == 'cdist':
         from skl2onnx.algebra.custom_ops import OnnxCDist
         dist = OnnxCDist(X, Y, metric=metric, op_version=op_version,
-                         **kwargs)
+                         **kwargs_dist)
     elif optim is None:
         dim_in = Y.shape[1] if hasattr(Y, 'shape') else None
         dim_out = Y.shape[0] if hasattr(Y, 'shape') else None
         dist = onnx_cdist(X, Y, metric=metric, dtype=dtype,
                           op_version=op_version,
                           dim_in=dim_in, dim_out=dim_out,
-                          **kwargs)
+                          **kwargs_dist)
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
     if op_version < 10:
         neg_dist = OnnxMul(dist, np.array([-1], dtype=dtype),
                            op_version=op_version)
-        node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs)
+        node = OnnxTopK_1(neg_dist, k=k, op_version=1, **kwargs_topk)
     elif op_version < 11:
         neg_dist = OnnxMul(dist, np.array([-1], dtype=dtype),
                            op_version=op_version)
         node = OnnxTopK_10(neg_dist, np.array([k], dtype=np.int64),
-                           op_version=10, **kwargs)
+                           op_version=10, **kwargs_topk)
     else:
         node = OnnxTopK_11(dist, np.array([k], dtype=np.int64),
                            largest=0, sorted=1,
-                           op_version=11, **kwargs)
+                           op_version=11, **kwargs_topk)
         if keep_distances:
             return (node[1], OnnxMul(
                 node[0], np.array([-1], dtype=dtype), op_version=op_version))
@@ -383,12 +385,9 @@ def convert_nearest_neighbors_regressor(scope: Scope, operator: Operator,
                 shape = OnnxShape(res, op_version=opv)
                 norm = OnnxReshapeApi13(norm, shape, op_version=opv)
                 norm.set_onnx_name_prefix('normr')
-            if opv >= 12:
-                res = OnnxDiv(res, norm, op_version=opv, output_names=out)
-            else:
-                res = OnnxDiv(res, norm, op_version=opv)
-                res = OnnxReshapeApi13(res, np.array([-1, 1], dtype=np.int64),
-                                       output_names=out, op_version=opv)
+            res = OnnxDiv(res, norm, op_version=opv)
+            res = OnnxReshapeApi13(res, np.array([-1, 1], dtype=np.int64),
+                                   output_names=out, op_version=opv)
     else:
         if (hasattr(operator.raw_operator, '_y') and
                 len(np.squeeze(operator.raw_operator._y).shape) == 1):
@@ -397,8 +396,8 @@ def convert_nearest_neighbors_regressor(scope: Scope, operator: Operator,
             keepdims = 0
         else:
             keepdims = 0
-        res = OnnxReduceMean(reshaped_cast, axes=[axis], op_version=opv,
-                             keepdims=keepdims, output_names=out)
+        res = OnnxReduceMeanApi18(reshaped_cast, axes=[axis], op_version=opv,
+                                  keepdims=keepdims, output_names=out)
     res.add_to(scope, container)
 
 
@@ -456,7 +455,9 @@ def convert_nearest_neighbors_classifier(scope: Scope, operator: Operator,
             "Binary classification not implemented in scikit-learn. "
             "Check this code is not reused for other libraries.")
     classes = get_label_classes(scope, op)
-    if hasattr(classes, 'dtype') and np.issubdtype(classes.dtype, np.floating):
+    if hasattr(classes, 'dtype') and (
+            np.issubdtype(classes.dtype, np.floating) or
+            classes.dtype == np.bool_):
         classes = classes.astype(np.int32)
         is_integer = True
     elif isinstance(classes[0], (int, np.int32, np.int64)):
@@ -752,12 +753,14 @@ register_converter(
     options={'zipmap': [True, False, 'columns'],
              'nocl': [True, False],
              'raw_scores': [True, False],
+             'output_class_labels': [False, True],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnRadiusNeighborsClassifier', convert_nearest_neighbors_classifier,
     options={'zipmap': [True, False, 'columns'],
              'nocl': [True, False],
              'raw_scores': [True, False],
+             'output_class_labels': [False, True],
              'optim': [None, 'cdist']})
 register_converter(
     'SklearnKNeighborsRegressor', convert_nearest_neighbors_regressor,
