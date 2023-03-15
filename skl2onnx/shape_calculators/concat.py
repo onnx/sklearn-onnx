@@ -32,7 +32,7 @@ def calculate_sklearn_concat(operator):
                 C += 1
             else:
                 C = None
-        if len(seen_types) == 0:
+        if i.type not in seen_types:
             seen_types.append(i.type)
 
     def more_generic(t1, t2):
@@ -60,9 +60,9 @@ def calculate_sklearn_concat(operator):
     for seen in seen_types:
         if final_type is None:
             final_type = seen
-        elif seen != final_type:
+        elif seen.to_onnx_type() != final_type.to_onnx_type():
             merged_type = more_generic(final_type, seen)
-            if merged_type:
+            if isinstance(seen, merged_type):
                 final_type = seen
 
     if final_type is None:
