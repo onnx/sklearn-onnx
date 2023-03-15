@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import numpy as np
 from sklearn.base import is_regressor
 from sklearn.svm import LinearSVC
 from ..proto import onnx_proto
@@ -13,6 +14,8 @@ from ..common._apply_operation import (
     apply_slice, apply_sub, apply_cast, apply_abs, apply_add, apply_div)
 from ..common.utils_classifier import _finalize_converter_classes
 from ..common.data_types import guess_proto_type, Int64TensorType
+from ..algebra.onnx_ops import (
+    OnnxShape, OnnxSlice, OnnxTile)
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -172,9 +175,42 @@ def convert_one_vs_rest_classifier(scope: Scope, operator: Operator,
                                     op.classes_, proto_dtype)
 
 
+def convert_constant_predictor_classifier(scope: Scope, operator: Operator,
+                                          container: ModelComponentContainer):
+    """
+    Converts a *_ConstantPredictor* into *ONNX* format.
+    """
+    op_version = container.target_opset
+    proto_dtype = guess_proto_type(operator.inputs[0].type)
+    if proto_dtype != onnx_proto.TensorProto.DOUBLE:
+        proto_dtype = onnx_proto.TensorProto.FLOAT
+    op = operator.raw_operator
+    dtype = {onnx_proto.TensorProto.DOUBLE: np.float64,
+             onnx_proto.TensorProto.FLOAT: np.float32}
+    shape = OnnxShape(operator.inputs[0].full_name, op_version=op_version)
+    first = OnnxSlice(shape, np.array([0], dtype=np.int64),
+                      np.array([1], dtype=np.int64), op_version=op_version)
+    y = op.y_.astype(dtype[proto_dtype])
+    labels = OnnxTile(y.astype(np.int64),
+                      first, op_version=op_version,
+                      output_names=[operator.outputs[0].full_name])
+
+    cst = np.hstack([(1 - y).astype(y.dtype), y])
+    proba = OnnxTile(cst, first, op_version=op_version,
+                     output_names=[operator.outputs[1].full_name])
+
+    labels.add_to(scope, container)
+    proba.add_to(scope, container)
+
+
 register_converter('SklearnOneVsRestClassifier',
                    convert_one_vs_rest_classifier,
                    options={'zipmap': [True, False, 'columns'],
                             'nocl': [True, False],
                             'output_class_labels': [False, True],
                             'raw_scores': [True, False]})
+
+register_converter('Sklearn_ConstantPredictor',
+                   convert_constant_predictor_classifier,
+                   options={'zipmap': [True, False, 'columns'],
+                            'nocl': [True, False]})

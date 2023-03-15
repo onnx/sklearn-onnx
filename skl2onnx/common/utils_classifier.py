@@ -37,6 +37,9 @@ def get_label_classes(scope, op, node_names=False):
         classes = op.classes_
     elif hasattr(op, 'intercept_'):
         classes = len(op.intercept_)
+    elif hasattr(op, "y_"):
+        # _ConstantPredictor
+        classes = np.array(list(sorted(set(op.y_))))
     else:
         raise RuntimeError(
             "No known ways to retrieve the number of classes for class %r."
