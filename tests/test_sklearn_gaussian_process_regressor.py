@@ -14,7 +14,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.datasets import load_iris, make_regression, make_friedman2
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import (
-    Sum, DotProduct, ExpSineSquared, RationalQuadratic,
+    Sum, DotProduct, ExpSineSquared, Matern, RationalQuadratic,
     RBF, ConstantKernel as C, PairwiseKernel, WhiteKernel)
 from sklearn.model_selection import train_test_split
 try:
@@ -1235,6 +1235,90 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         m1 = res
         m2 = ker(x, x)
         assert_almost_equal(m2, m1, decimal=5)
+
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_kernel_matern_kernel(self):
+        ker = Matern()
+
+        # X, X
+        onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+        with open("debug.onnx", "wb") as f:
+            f.write(model_onnx.SerializeToString())
+
+        x = np.random.randn(4, 3)
+        x[0, 0] = x[1, 1] = x[2, 2] = 2.
+        x[3, 2] = 1.5
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'X': x.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(x)
+        assert_almost_equal(m2, m1, decimal=3)
+
+        # X, x
+        onx = convert_kernel(ker, 'X', x_train=x,
+                             output_names=['Y'], dtype=np.float32,
+                             op_version=_TARGET_OPSET_)
+        model_onnx = onx.to_onnx(
+            inputs=[('X', FloatTensorType([None, None]))],
+            target_opset=TARGET_OPSET)
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
+        res = sess.run(None, {'X': x.astype(np.float32)})[0]
+        m1 = res
+        m2 = ker(x, x)
+        assert_almost_equal(m2, m1, decimal=5)
+
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_kernel_matern_kernel_nu(self):
+        for nu in [0.5, 1.5, 2.5]:
+            with self.subTest(nu=nu):
+                ker = Matern()
+
+                # X, X        
+                onx = convert_kernel(ker, 'X', output_names=['Y'], dtype=np.float32,
+                                    op_version=_TARGET_OPSET_)
+                model_onnx = onx.to_onnx(
+                    inputs=[('X', FloatTensorType([None, None]))],
+                    target_opset=TARGET_OPSET)
+                with open("debug.onnx", "wb") as f:
+                    f.write(model_onnx.SerializeToString())
+
+                x = np.random.randn(4, 3)
+                x[0, 0] = x[1, 1] = x[2, 2] = 10.
+                x[3, 2] = 5.
+
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
+                res = sess.run(None, {'X': x.astype(np.float32)})[0]
+                m1 = res
+                m2 = ker(x)
+                assert_almost_equal(m2, m1, decimal=5)
+
+                # X, x
+                onx = convert_kernel(ker, 'X', x_train=x,
+                                    output_names=['Y'], dtype=np.float32,
+                                    op_version=_TARGET_OPSET_)
+                model_onnx = onx.to_onnx(
+                    inputs=[('X', FloatTensorType([None, None]))],
+                    target_opset=TARGET_OPSET)
+
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"])
+                res = sess.run(None, {'X': x.astype(np.float32)})[0]
+                m1 = res
+                m2 = ker(x, x)
+                assert_almost_equal(m2, m1, decimal=5)
 
 
 if __name__ == "__main__":

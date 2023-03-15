@@ -4,14 +4,14 @@ import math
 import numpy as np
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
-    RBF, DotProduct, ExpSineSquared,
+    RBF, DotProduct, ExpSineSquared, Matern,
     RationalQuadratic, PairwiseKernel,
     WhiteKernel,
 )
 from ..algebra.complex_functions import onnx_squareform_pdist, onnx_cdist
 from ..algebra.onnx_ops import (
     OnnxMul, OnnxMatMul, OnnxAdd,
-    OnnxTranspose, OnnxDiv, OnnxExp,
+    OnnxTranspose, OnnxDiv, OnnxExp, OnnxNeg,
     OnnxShape, OnnxSin, OnnxPow,
     OnnxReduceSumApi11, OnnxSqueezeApi11,
     OnnxIdentity, OnnxReduceSumSquareApi18,
@@ -29,7 +29,7 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
                         optim=None, op_version=None):
     if op_version is None:
         raise RuntimeError("op_version must not be None.")
-    if isinstance(kernel, Sum):
+    if type(kernel) is Sum:
         return OnnxAdd(
             convert_kernel_diag(
                 kernel.k1, X, dtype=dtype, optim=optim, op_version=op_version),
@@ -38,7 +38,7 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
             output_names=output_names,
             op_version=op_version)
 
-    if isinstance(kernel, Product):
+    if type(kernel) is Product:
         return OnnxMul(
             convert_kernel_diag(
                 kernel.k1, X, dtype=dtype, optim=optim, op_version=op_version),
@@ -46,7 +46,7 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
                 kernel.k2, X, dtype=dtype, optim=optim, op_version=op_version),
             output_names=output_names, op_version=op_version)
 
-    if isinstance(kernel, ConstantKernel):
+    if type(kernel) is ConstantKernel:
         onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype,
                                           op_version=op_version)
         return OnnxAdd(onnx_zeros,
@@ -54,10 +54,10 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
                                 dtype=dtype),
                        output_names=output_names, op_version=op_version)
 
-    if isinstance(kernel, (RBF, ExpSineSquared, RationalQuadratic)):
+    if type(kernel) in (RBF, ExpSineSquared, RationalQuadratic):
         onnx_zeros = _zero_vector_of_size(X, keepdims=0, dtype=dtype,
                                           op_version=op_version)
-        if isinstance(kernel, RBF):
+        if type(kernel) is RBF:
             return OnnxAdd(onnx_zeros,
                            np.array([1], dtype=dtype),
                            output_names=output_names,
@@ -66,7 +66,7 @@ def convert_kernel_diag(kernel, X, output_names=None, dtype=None,
             return OnnxAdd(onnx_zeros, np.array([1], dtype=dtype),
                            output_names=output_names, op_version=op_version)
 
-    if isinstance(kernel, DotProduct):
+    if type(kernel) is DotProduct:
         t_sigma_0 = py_make_float_array(kernel.sigma_0 ** 2, dtype=dtype)
         return OnnxSqueezeApi11(
             OnnxAdd(
@@ -205,9 +205,9 @@ def convert_kernel(kernel, X, output_names=None,
                    op_version=None):
     if op_version is None:
         raise RuntimeError("op_version must not be None.")
-    if isinstance(kernel, Sum):
+    if type(kernel) is Sum:
         clop = OnnxAdd
-    elif isinstance(kernel, Product):
+    elif type(kernel) is Product:
         clop = OnnxMul
     else:
         clop = None
@@ -219,7 +219,7 @@ def convert_kernel(kernel, X, output_names=None,
                            optim=optim, op_version=op_version),
             output_names=output_names, op_version=op_version)
 
-    if isinstance(kernel, ConstantKernel):
+    if type(kernel) is ConstantKernel:
         # X and x_train should have the same number of features.
         onnx_zeros_x = _zero_vector_of_size(
             X, keepdims=1, dtype=dtype, op_version=op_version)
@@ -237,7 +237,7 @@ def convert_kernel(kernel, X, output_names=None,
                        output_names=output_names,
                        op_version=op_version)
 
-    if isinstance(kernel, RBF):
+    if type(kernel) in (RBF, Matern):
         # length_scale = np.squeeze(length_scale).astype(float)
         zeroh = _zero_vector_of_size(X, axis=1, keepdims=0, dtype=dtype,
                                      op_version=op_version)
@@ -271,21 +271,47 @@ def convert_kernel(kernel, X, output_names=None,
             else:
                 raise ValueError("Unknown optimization '{}'.".format(optim))
 
-        tensor_value = py_make_float_array(-0.5, dtype=dtype, as_tensor=True)
+        if type(kernel) is RBF:
+            value_mul = 0.5
+        else:  # Matern
+            value_mul = (kernel.nu * 2) ** 0.5
+
+        tensor_value = py_make_float_array(
+                value_mul, dtype=dtype, as_tensor=True)
         cst5 = OnnxConstantOfShape(
             OnnxShape(zerov, op_version=op_version),
             value=tensor_value, op_version=op_version)
 
         # K = np.exp(-.5 * dists)
-        exp = OnnxExp(OnnxMul(dist, cst5, op_version=op_version),
-                      output_names=output_names, op_version=op_version)
+        K = OnnxMul(dist, cst5, op_version=op_version)
+        exp = OnnxExp(OnnxNeg(K, op_version=op_version), op_version=op_version)
+
+        if type(kernel) is RBF or kernel.nu == 0.5:
+            final = exp
+        elif kernel.nu == 1.5:
+            tv = np.array([1], dtype=dtype)
+            final = OnnxMul(OnnxAdd(K, tv, op_version=op_version), exp,
+                            op_version=op_version)
+        elif kernel.nu == 2.5:
+            tv = np.array([1], dtype=dtype)
+            tv3 = np.array([1./3], dtype=dtype)
+            bes = OnnxAdd(
+                    OnnxAdd(K, tv, op_version=op_version),
+                    OnnxMul(OnnxMul(K, K, op_version=op_version),
+                             tv3, op_version=op_version),
+                    op_version=op_version)
+            final = OnnxMul(bes, exp, op_version=op_version)
+        else:
+            raise RuntimeError(
+                f"The converter is not implemented for Matern(nu={kernel.nu}, ...).")
 
         # This should not be needed.
         # K = squareform(K)
         # np.fill_diagonal(K, 1)
-        return exp
+        return OnnxIdentity(final, op_version=op_version,
+                            output_names=output_names)
 
-    if isinstance(kernel, ExpSineSquared):
+    if type(kernel) is ExpSineSquared:
         if not isinstance(kernel.length_scale, (float, int)):
             raise NotImplementedError(
                 "length_scale should be float not {}.".format(
@@ -298,7 +324,7 @@ def convert_kernel(kernel, X, output_names=None,
             output_names=output_names, optim=optim,
             op_version=op_version)
 
-    if isinstance(kernel, DotProduct):
+    if type(kernel) is DotProduct:
         if not isinstance(kernel.sigma_0, (float, int)):
             raise NotImplementedError(
                 "sigma_0 should be float not {}.".format(
@@ -319,7 +345,7 @@ def convert_kernel(kernel, X, output_names=None,
                 dtype=dtype, output_names=output_names,
                 op_version=op_version)
 
-    if isinstance(kernel, RationalQuadratic):
+    if type(kernel) is RationalQuadratic:
         if x_train is None:
             return _convert_rational_quadratic(
                 X, X, length_scale=kernel.length_scale,
@@ -333,7 +359,7 @@ def convert_kernel(kernel, X, output_names=None,
                 output_names=output_names,
                 optim=optim, op_version=op_version)
 
-    if isinstance(kernel, PairwiseKernel):
+    if type(kernel) is PairwiseKernel:
         if x_train is None:
             return _convert_pairwise_kernel(
                 X, X, metric=kernel.metric,
@@ -345,7 +371,7 @@ def convert_kernel(kernel, X, output_names=None,
                 dtype=dtype, output_names=output_names,
                 optim=optim, op_version=op_version)
 
-    if isinstance(kernel, WhiteKernel):
+    if type(kernel) is WhiteKernel:
         # X and x_train should have the same number of features.
         onnx_zeros_x = _zero_vector_of_size(
             X, keepdims=1, dtype=dtype, op_version=op_version)
