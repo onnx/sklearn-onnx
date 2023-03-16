@@ -15,7 +15,7 @@ from ..common._apply_operation import (
 from ..common.utils_classifier import _finalize_converter_classes
 from ..common.data_types import guess_proto_type, Int64TensorType
 from ..algebra.onnx_ops import (
-    OnnxShape, OnnxSlice, OnnxTile)
+    OnnxReshape, OnnxShape, OnnxSlice, OnnxTile)
 from .._supported_operators import sklearn_operator_name_map
 
 
@@ -190,17 +190,19 @@ def convert_constant_predictor_classifier(scope: Scope, operator: Operator,
     shape = OnnxShape(operator.inputs[0].full_name, op_version=op_version)
     first = OnnxSlice(shape, np.array([0], dtype=np.int64),
                       np.array([1], dtype=np.int64), op_version=op_version)
-    y = op.y_.astype(dtype[proto_dtype])
+    y = op.y_.astype(dtype[proto_dtype]).ravel()
     labels = OnnxTile(y.astype(np.int64),
                       first, op_version=op_version,
                       output_names=[operator.outputs[0].full_name])
 
     cst = np.hstack([(1 - y).astype(y.dtype), y])
-    proba = OnnxTile(cst, first, op_version=op_version,
-                     output_names=[operator.outputs[1].full_name])
+    proba_flat = OnnxTile(cst, first, op_version=op_version)
+    proba_reshape = OnnxReshape(
+        proba_flat, np.array([-1, 2], dtype=np.int64),
+        output_names=[operator.outputs[1].full_name])
 
     labels.add_to(scope, container)
-    proba.add_to(scope, container)
+    proba_reshape.add_to(scope, container)
 
 
 register_converter('SklearnOneVsRestClassifier',
