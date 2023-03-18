@@ -75,7 +75,11 @@ from sklearn.mixture import (
 )
 
 # Multi-class
-from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
+from sklearn.multiclass import (
+    _ConstantPredictor,
+    OneVsRestClassifier,
+    OneVsOneClassifier
+)
 
 # Tree-based models
 from sklearn.ensemble import (
@@ -269,6 +273,7 @@ logger = logging.getLogger('skl2onnx')
 # included in the following list and one output for everything not in
 # the list.
 sklearn_classifier_list = list(filter(lambda m: m is not None, [
+    _ConstantPredictor,
     AdaBoostClassifier,
     BaggingClassifier,
     BernoulliNB,
@@ -316,6 +321,7 @@ outlier_list = [IsolationForest, LocalOutlierFactor, OneClassSVM]
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
     res = {k: "Sklearn" + k.__name__ for k in [
+        _ConstantPredictor,
         AdaBoostClassifier,
         AdaBoostRegressor,
         BaggingClassifier,
