@@ -439,7 +439,8 @@ def _apply_zipmap(zipmap_options, scope, model, input_type,
     zipmap_operator.inputs = probability_tensor
     label_type = Int64TensorType([None])
 
-    if (isinstance(model.classes_, list) and
+    if (hasattr(model, "classes_") and
+            isinstance(model.classes_, list) and
             isinstance(model.classes_[0], np.ndarray)):
         # multi-label problem
         pass
