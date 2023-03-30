@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
 import inspect
+import pprint
 import re
 import sys
 import traceback
@@ -9,20 +9,14 @@ import warnings
 from logging import getLogger
 import numpy as np
 from scipy.sparse import coo_matrix
+from onnx import SparseTensorProto, ValueInfoProto
 from onnx.defs import onnx_opset_version, get_all_schemas_with_history
+from onnx.helper import (
+    make_node, make_tensor, make_attribute, make_sparse_tensor)
+from onnx.numpy_helper import from_array
 import onnx.onnx_cpp2py_export.defs as C
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
-from ..proto.onnx_helper_modified import (
-    make_node, ValueInfoProto, make_tensor, make_attribute
-)
-try:
-    from ..proto import SparseTensorProto
-    from ..proto.onnx_helper_modified import make_sparse_tensor
-except ImportError:
-    # onnx is too old.
-    SparseTensorProto = None
-    make_sparse_tensor = None
 from .utils import get_domain
 
 
@@ -655,11 +649,11 @@ class ModelComponentContainer(_WhiteBlackContainer):
         else:
             dtype = None
         try:
-            node = make_node(op_type, inputs, outputs, name=name,
-                             _dtype=dtype, **attrs)
-        except ValueError as e:
-            raise ValueError("Unable to create node '{}' with name='{}'."
-                             "".format(op_type, name)) from e
+            node = make_node(op_type, inputs, outputs, name=name, **attrs)
+        except (ValueError, TypeError) as e:
+            raise ValueError(
+                f"Unable to create node {op_type!r} with name={name!r} and "
+                f"attributes={pprint.pformat(attrs)}.") from e
         node.domain = op_domain
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))
