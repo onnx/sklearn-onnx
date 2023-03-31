@@ -13,7 +13,6 @@ from onnx import SparseTensorProto, ValueInfoProto
 from onnx.defs import onnx_opset_version, get_all_schemas_with_history
 from onnx.helper import (
     make_node, make_tensor, make_attribute, make_sparse_tensor)
-from onnx.numpy_helper import from_array
 import onnx.onnx_cpp2py_export.defs as C
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
@@ -648,12 +647,21 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 "Unable to select a dtype among {}.".format(dtypes))
         else:
             dtype = None
+
+        new_attrs = {}
+        for k, v in attrs.items():
+            if hasattr(v, "shape") and len(v.shape) > 1:
+                # handle type numpy.matrix
+                new_attrs[k] = np.array(v).ravel()
+                continue
+            new_attrs[k] = v
+
         try:
-            node = make_node(op_type, inputs, outputs, name=name, **attrs)
+            node = make_node(op_type, inputs, outputs, name=name, **new_attrs)
         except (ValueError, TypeError) as e:
             raise ValueError(
                 f"Unable to create node {op_type!r} with name={name!r} and "
-                f"attributes={pprint.pformat(attrs)}.") from e
+                f"attributes={pprint.pformat(new_attrs)}.") from e
         node.domain = op_domain
 
         self.node_domain_version_pair_sets.add((op_domain, op_version))
