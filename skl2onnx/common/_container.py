@@ -638,15 +638,6 @@ class ModelComponentContainer(_WhiteBlackContainer):
             attrs.update(upd)
         if 'dtype' in attrs and op_type != 'EyeLike':
             raise RuntimeError("dtype should not be a parameter.")
-        if len(dtypes) == 0:
-            dtype = None
-        elif len(dtypes) == 1:
-            dtype = list(dtypes)[0]
-        elif (np.float32 in dtypes and np.float64 in dtypes):
-            raise RuntimeError(
-                "Unable to select a dtype among {}.".format(dtypes))
-        else:
-            dtype = None
 
         new_attrs = {}
         for k, v in attrs.items():
