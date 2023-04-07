@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-
+import sys
 
 import numpy as np
 from sklearn.preprocessing import MaxAbsScaler
@@ -216,17 +216,12 @@ def convert_sklearn_min_max_scaler(
         # parameter clip was introduced in scikit-learn 0.24
         offset = OnnxAdd(scaled, op.min_.astype(dtype),
                          op_version=opv)
-        collect = []
-        for i in range(op.data_min_.shape[0]):
-            gather = OnnxGather(offset, np.array([i], dtype=np.int64),
-                                axis=1, op_version=opv)
-            clipped = OnnxClip(gather, op.data_min_[i:i + 1].astype(dtype),
-                               op.data_max_[i:i + 1].astype(dtype),
-                               op_version=opv)
-            collect.append(clipped)
-        concat = OnnxConcat(*collect, op_version=opv, axis=1,
-                            output_names=[operator.outputs[0].full_name])
-        concat.add_to(scope, container)
+
+        clipped = OnnxClip(offset, np.array(op.feature_range[0], dtype=dtype),
+                           np.array(op.feature_range[1], dtype=dtype),
+                           op_version=opv,
+                           output_names=[operator.outputs[0].full_name])
+        clipped.add_to(scope, container)
     else:
         offset = OnnxAdd(scaled, op.min_.astype(dtype),
                          op_version=opv,
