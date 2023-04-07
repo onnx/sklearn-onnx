@@ -5,8 +5,7 @@ import numpy as np
 from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import RobustScaler, StandardScaler
 from ..algebra.onnx_ops import (
-    OnnxSub, OnnxDiv, OnnxCast, OnnxMul, OnnxClip, OnnxAdd,
-    OnnxGather, OnnxConcat)
+    OnnxSub, OnnxDiv, OnnxCast, OnnxMul, OnnxClip, OnnxAdd)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
