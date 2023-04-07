@@ -343,9 +343,11 @@ class TestSklearnScalerConverter(unittest.TestCase):
                                      target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         data[0][0] = 1e6
+        data[0][1] = 5
+        data[0][2] = -1.0
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float32),
-            model, model_onnx, basename="SklearnMinMaxScalerClip")
+            model, model_onnx, basename="SklearnMinMaxScalerClip",verbose=10,)
 
     @ignore_warnings(category=DeprecationWarning)
     @unittest.skipIf(TARGET_OPSET < 15, reason="old signature for clip")
@@ -365,6 +367,8 @@ class TestSklearnScalerConverter(unittest.TestCase):
                                      target_opset=TARGET_OPSET)
         self.assertTrue(model_onnx is not None)
         data[0][0] = 1e6
+        data[0][1] = 5
+        data[0][2] = -1.0
         dump_data_and_model(
             numpy.array(data, dtype=numpy.float64),
             model, model_onnx, basename="SklearnMinMaxScalerDouble")
