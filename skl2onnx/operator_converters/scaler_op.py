@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-import sys
+
 
 import numpy as np
 from sklearn.preprocessing import MaxAbsScaler
