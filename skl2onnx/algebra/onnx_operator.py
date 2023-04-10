@@ -4,6 +4,8 @@ import warnings
 from logging import getLogger
 import numpy as np
 from onnx import GraphProto
+from onnx.helper import make_graph, make_model
+from onnx.numpy_helper import from_array
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
 from ..common.data_types import (
@@ -17,7 +19,6 @@ from ..common.data_types import guess_proto_type, _guess_numpy_type
 from ..common._registration import _converter_pool, _shape_calculator_pool
 from .._supported_operators import sklearn_operator_name_map
 from ..proto import get_latest_tested_opset_version, onnx_proto
-from ..proto.onnx_helper_modified import make_graph, make_model, from_array
 from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
