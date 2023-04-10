@@ -2,9 +2,7 @@
 
 
 import onnx
-from ..proto.onnx_helper_modified import (
-    make_graph, make_model
-)
+from onnx.helper import make_graph, make_model
 from onnx.defs import get_all_schemas_with_history
 
 

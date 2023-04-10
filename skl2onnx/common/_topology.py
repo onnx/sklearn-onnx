@@ -8,6 +8,7 @@ from logging import getLogger
 from collections import OrderedDict
 import numpy as np
 from onnx import onnx_pb as onnx_proto
+from onnx.helper import make_graph, make_model, make_tensor_value_info
 from onnxconverter_common.data_types import (  # noqa
     DataType, TensorType,
     FloatType, Int64Type, StringType,
@@ -25,9 +26,6 @@ except ImportError:
 from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
-)
-from ..proto.onnx_helper_modified import (
-    make_graph, make_model, make_tensor_value_info
 )
 from . import _registration
 from . import utils

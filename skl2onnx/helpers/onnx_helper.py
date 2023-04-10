@@ -4,13 +4,11 @@ from logging import getLogger
 from io import BytesIO
 import numpy as np
 import onnx  # noqa
-from onnx import shape_inference, TensorProto
+from onnx import shape_inference, TensorProto, ValueInfoProto
 from onnx.numpy_helper import from_array, to_array
-from onnx.helper import make_tensor
-from ..proto.onnx_helper_modified import (
-    make_node, make_tensor_value_info, make_graph,
-    make_model, ValueInfoProto
-)
+from onnx.helper import (
+    make_tensor, make_node, make_tensor_value_info, make_graph,
+    make_model)
 from ..proto import get_latest_tested_opset_version
 from onnx import onnx_pb as onnx_proto
 from ..common._topology import Variable
