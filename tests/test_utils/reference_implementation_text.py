@@ -263,7 +263,7 @@ if onnx_opset_version() >= 18:
 
             w = self.weights_
             if self.weighting_criteria_ == getattr(
-                    WeightingCriteria, "TF", getattr(WeightingCriteria, "TF")):
+                    WeightingCriteria, "TF", getattr(WeightingCriteria, "kTF")):
                 i = 0
                 for f in frequencies:
                     Y[i] = f
