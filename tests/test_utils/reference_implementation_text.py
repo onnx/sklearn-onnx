@@ -247,6 +247,13 @@ if onnx_opset_version() >= 18:
             frequencies[output_idx] += 1
 
         def output_result(self, B: int, frequencies: List[int]) -> np.ndarray:
+
+            def _getattr(cls, name):
+                try:
+                    return getattr(cls, name)
+                except AttributeError:
+                    return getattr(cls, "k" + name)
+
             l_output_dims: List[int] = []
             if B == 0:
                 l_output_dims.append(self.output_size_)
@@ -262,15 +269,14 @@ if onnx_opset_version() >= 18:
             Y = np.empty((total_dims,), dtype=np.float32)
 
             w = self.weights_
-            if self.weighting_criteria_ == getattr(
-                    WeightingCriteria, "TF", getattr(WeightingCriteria, "kTF")):
+            if self.weighting_criteria_ == _getattr(
+                    WeightingCriteria, "TF"):
                 i = 0
                 for f in frequencies:
                     Y[i] = f
                     i += 1
-            elif self.weighting_criteria_ == getattr(
-                    WeightingCriteria, "IDF", getattr(
-                        WeightingCriteria, "kIDF")):
+            elif self.weighting_criteria_ == _getattr(
+                    WeightingCriteria, "IDF"):
                 if len(w) > 0:
                     p = 0
                     for _batch in range(B):
@@ -282,9 +288,8 @@ if onnx_opset_version() >= 18:
                     for f in frequencies:
                         Y[p] = 1 if f > 0 else 0
                         p += 1
-            elif self.weighting_criteria_ == getattr(
-                    WeightingCriteria, "TFIDF", getattr(
-                        WeightingCriteria, "kTFIDF")):
+            elif self.weighting_criteria_ == _getattr(
+                    WeightingCriteria, "TFIDF"):
                 if len(w) > 0:
                     p = 0
                     for _batch in range(B):
