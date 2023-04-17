@@ -5,6 +5,7 @@ import unittest
 import packaging.version as pv
 from onnx.defs import onnx_opset_version
 from onnxruntime import __version__ as ort_version
+from sklearn import __version__ as sklearn_version
 from sklearn.ensemble import AdaBoostClassifier, AdaBoostRegressor
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -23,15 +24,22 @@ from test_utils import (
 
 
 ort_version = '.'.join(ort_version.split('.')[:2])
+skl_version = '.'.join(sklearn_version.split('.')[:2])
 
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r(self):
-        model, X_test = fit_classification_model(AdaBoostClassifier(
-            n_estimators=10, algorithm="SAMME.R", random_state=42,
-            base_estimator=DecisionTreeClassifier(
-                max_depth=2, random_state=42)), 3)
+        if pv.Version(skl_version) < pv.Version("1.2"):
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=10, algorithm="SAMME.R", random_state=42,
+                base_estimator=DecisionTreeClassifier(
+                    max_depth=2, random_state=42)), 3)
+        else:
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=10, algorithm="SAMME.R", random_state=42,
+                estimator=DecisionTreeClassifier(
+                    max_depth=2, random_state=42)), 3)
         model_onnx = convert_sklearn(
             model,
             "AdaBoost classification",
@@ -47,10 +55,16 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r_decision_function(self):
-        model, X_test = fit_classification_model(AdaBoostClassifier(
-            n_estimators=10, algorithm="SAMME.R", random_state=42,
-            base_estimator=DecisionTreeClassifier(
-                max_depth=2, random_state=42)), 4)
+        if pv.Version(skl_version) < pv.Version("1.2"):
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=10, algorithm="SAMME.R", random_state=42,
+                base_estimator=DecisionTreeClassifier(
+                    max_depth=2, random_state=42)), 4)
+        else:
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=10, algorithm="SAMME.R", random_state=42,
+                estimator=DecisionTreeClassifier(
+                    max_depth=2, random_state=42)), 4)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model,
@@ -69,10 +83,16 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_r_logreg(self):
-        model, X_test = fit_classification_model(AdaBoostClassifier(
-            n_estimators=5, algorithm="SAMME.R",
-            base_estimator=LogisticRegression(
-                solver='liblinear')), 4)
+        if pv.Version(skl_version) < pv.Version("1.2"):
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=5, algorithm="SAMME.R",
+                base_estimator=LogisticRegression(
+                    solver='liblinear')), 4)
+        else:
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=5, algorithm="SAMME.R",
+                estimator=LogisticRegression(
+                    solver='liblinear')), 4)
         model_onnx = convert_sklearn(
             model,
             "AdaBoost classification",
@@ -88,10 +108,16 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme(self):
-        model, X_test = fit_classification_model(AdaBoostClassifier(
-            n_estimators=5, algorithm="SAMME", random_state=42,
-            base_estimator=DecisionTreeClassifier(
-                max_depth=6, random_state=42)), 2, n_features=7)
+        if pv.Version(skl_version) < pv.Version("1.2"):
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=5, algorithm="SAMME", random_state=42,
+                base_estimator=DecisionTreeClassifier(
+                    max_depth=6, random_state=42)), 2, n_features=7)
+        else:
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=5, algorithm="SAMME", random_state=42,
+                estimator=DecisionTreeClassifier(
+                    max_depth=6, random_state=42)), 2, n_features=7)
         model_onnx = convert_sklearn(
             model,
             "AdaBoostClSamme",
@@ -107,10 +133,16 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_samme_decision_function(self):
-        model, X_test = fit_classification_model(AdaBoostClassifier(
-            n_estimators=5, algorithm="SAMME", random_state=42,
-            base_estimator=DecisionTreeClassifier(
-                max_depth=6, random_state=42)), 2)
+        if pv.Version(skl_version) < pv.Version("1.2"):
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=5, algorithm="SAMME", random_state=42,
+                base_estimator=DecisionTreeClassifier(
+                    max_depth=6, random_state=42)), 2)
+        else:
+            model, X_test = fit_classification_model(AdaBoostClassifier(
+                n_estimators=5, algorithm="SAMME", random_state=42,
+                estimator=DecisionTreeClassifier(
+                    max_depth=6, random_state=42)), 2)
         options = {id(model): {'raw_scores': True}}
         model_onnx = convert_sklearn(
             model,
@@ -174,25 +206,28 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
+            backend="onnxruntime",
             basename="SklearnAdaBoostRegressor-Dec4")
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_lreg(self):
-        model, X = fit_regression_model(
-            AdaBoostRegressor(n_estimators=5,
-                              base_estimator=LinearRegression()))
+        if pv.Version(skl_version) < pv.Version("1.2"):
+            model, X = fit_regression_model(
+                AdaBoostRegressor(n_estimators=5,
+                                  base_estimator=LinearRegression()))
+        else:
+            model, X = fit_regression_model(
+                AdaBoostRegressor(n_estimators=5,
+                                  estimator=LinearRegression()))
         model_onnx = convert_sklearn(
             model, "AdaBoost regression",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
+            backend="onnxruntime",
             basename="SklearnAdaBoostRegressorLReg-Dec4")
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
@@ -205,9 +240,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
+            backend="onnxruntime",
             basename="SklearnAdaBoostRegressorInt-Dec4")
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
@@ -220,9 +254,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             target_opset=10)
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
+            backend="onnxruntime",
             basename="SklearnAdaBoostRegressorLR-Dec4")
 
     @unittest.skipIf((pv.Version(ort_version) <
@@ -262,9 +295,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
+            X, model, model_onnx,
+            backend="onnxruntime",
             basename="SklearnAdaBoostRegressorBool")
 
 

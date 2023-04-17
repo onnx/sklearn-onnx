@@ -58,7 +58,8 @@ class TestOptimisation(unittest.TestCase):
 
         # Create the model and check
         m = helper.make_model(
-            g, opset_imports=[helper.make_opsetid('', TARGET_OPSET)])
+            g, opset_imports=[helper.make_opsetid('', TARGET_OPSET)],
+            ir_version=8)
         checker.check_model(m)
 
         sess = InferenceSession(

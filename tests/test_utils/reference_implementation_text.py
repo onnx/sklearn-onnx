@@ -172,12 +172,14 @@ if onnx_opset_version() >= 18:
             OpRun.__init__(self, onnx_node, run_params)
             mode = self.mode  # type: ignore
 
-            if mode == "TF":
-                self.weighting_criteria_ = WeightingCriteria.kTF
-            elif mode == "IDF":
-                self.weighting_criteria_ = WeightingCriteria.kIDF
-            elif mode == "TFIDF":
-                self.weighting_criteria_ = WeightingCriteria.kTFIDF
+            value = getattr(WeightingCriteria, mode, None)
+            if value is None:
+                value = getattr(WeightingCriteria, "k" + mode, None)
+            if value is None:
+                raise ValueError(
+                    f"Unexpected mode={mode!r}, "
+                    f"not found in {dir(WeightingCriteria)}.")
+            self.weighting_criteria_ = value  # type: ignore
 
             self.min_gram_length_ = self.min_gram_length  # type: ignore
             self.max_gram_length_ = self.max_gram_length  # type: ignore
@@ -260,12 +262,15 @@ if onnx_opset_version() >= 18:
             Y = np.empty((total_dims,), dtype=np.float32)
 
             w = self.weights_
-            if self.weighting_criteria_ == WeightingCriteria.kTF:
+            if self.weighting_criteria_ == getattr(
+                    WeightingCriteria, "TF", getattr(WeightingCriteria, "TF")):
                 i = 0
                 for f in frequencies:
                     Y[i] = f
                     i += 1
-            elif self.weighting_criteria_ == WeightingCriteria.kIDF:
+            elif self.weighting_criteria_ == getattr(
+                    WeightingCriteria, "IDF", getattr(
+                        WeightingCriteria, "kIDF")):
                 if len(w) > 0:
                     p = 0
                     for _batch in range(B):
@@ -277,7 +282,9 @@ if onnx_opset_version() >= 18:
                     for f in frequencies:
                         Y[p] = 1 if f > 0 else 0
                         p += 1
-            elif self.weighting_criteria_ == WeightingCriteria.kTFIDF:
+            elif self.weighting_criteria_ == getattr(
+                    WeightingCriteria, "TFIDF", getattr(
+                        WeightingCriteria, "kTFIDF")):
                 if len(w) > 0:
                     p = 0
                     for _batch in range(B):

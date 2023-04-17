@@ -199,7 +199,8 @@ def convert_constant_predictor_classifier(scope: Scope, operator: Operator,
     proba_flat = OnnxTile(cst, first, op_version=op_version)
     proba_reshape = OnnxReshape(
         proba_flat, np.array([-1, 2], dtype=np.int64),
-        output_names=[operator.outputs[1].full_name])
+        output_names=[operator.outputs[1].full_name],
+        op_version=op_version)
 
     labels.add_to(scope, container)
     proba_reshape.add_to(scope, container)
