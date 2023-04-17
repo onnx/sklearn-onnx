@@ -58,6 +58,8 @@ def create_tensor(N, C, H=None, W=None):
 
 
 def _get_ir_version(opv):
+    if opv >= 19:
+        return 9
     if opv >= 15:
         return 8
     if opv >= 12:

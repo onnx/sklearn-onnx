@@ -30,6 +30,7 @@ coverage.xml
 .coverage
 __dump_data/
 junit/
+tests_dump/
 skl2onnx/algebra/_cache/*.rst
 docs/auto_examples
 docs/examples/graph*.*
