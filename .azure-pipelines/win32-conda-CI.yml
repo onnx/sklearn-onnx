@@ -15,7 +15,7 @@ jobs:
     matrix:
       Py311-Onnx140-Rt140-Skl122:
         python.version: '3.10'
-        onnx.version:  '-i https://test.pypi.org/simple/ onnx==1.14.0rc2'
+        onnx.version:  '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
