@@ -80,7 +80,7 @@ jobs:
         python.version: '3.9'
         onnx.version:  'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
         onnx.target_opset: ''
-        numpy.version: 'numpy>=1.22.3,<1.24'
+        numpy.version: 'numpy==1.23.5'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.11.1' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
         onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
