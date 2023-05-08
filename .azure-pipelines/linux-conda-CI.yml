@@ -14,9 +14,9 @@ jobs:
   strategy:
     matrix:
 
-      Py311-Onnx140-Rt140-Skl122:
+      Py310-Onnx140-Rt140-Skl122:
         do.bench: '0'
-        python.version: '3.11'
+        python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
         numpy.version: '>=1.21.1'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'

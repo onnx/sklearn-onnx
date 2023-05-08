@@ -13,8 +13,8 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
-      Py311-Onnx140-Rt140-Skl122:
-        python.version: '3.11'
+      Py310-Onnx140-Rt140-Skl122:
+        python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
         onnx.version:  'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
