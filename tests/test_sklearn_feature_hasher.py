@@ -18,7 +18,9 @@ from skl2onnx import to_onnx
 from skl2onnx.common.data_types import (
     StringTensorType, Int64TensorType, FloatTensorType,
     DoubleTensorType)
-from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
+from test_utils import (
+    TARGET_OPSET, TARGET_IR,
+    InferenceSessionEx as InferenceSession)
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
@@ -33,7 +35,8 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         graph = make_graph([node], 'hash', [X], [Y])
         onnx_model = make_model(graph, opset_imports=[
             make_opsetid('', TARGET_OPSET),
-            make_opsetid('com.microsoft', 1)])
+            make_opsetid('com.microsoft', 1)],
+            ir_version=TARGET_IR)
         check_model(onnx_model)
         sess = InferenceSession(
             onnx_model.SerializeToString(),
@@ -53,7 +56,8 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         graph = make_graph([node], 'hash', [X], [Y])
         onnx_model = make_model(graph, opset_imports=[
             make_opsetid('', TARGET_OPSET),
-            make_opsetid('com.microsoft', 1)])
+            make_opsetid('com.microsoft', 1)],
+            ir_version=TARGET_IR)
         check_model(onnx_model)
         sess = InferenceSession(
             onnx_model.SerializeToString(),

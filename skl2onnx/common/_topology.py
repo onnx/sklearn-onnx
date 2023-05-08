@@ -8,6 +8,7 @@ from logging import getLogger
 from collections import OrderedDict
 import numpy as np
 from onnx import onnx_pb as onnx_proto
+from onnx.helper import make_graph, make_model, make_tensor_value_info
 from onnxconverter_common.data_types import (  # noqa
     DataType, TensorType,
     FloatType, Int64Type, StringType,
@@ -26,9 +27,6 @@ from ..proto import (
     get_opset_number_from_onnx,
     get_latest_tested_opset_version
 )
-from ..proto.onnx_helper_modified import (
-    make_graph, make_model, make_tensor_value_info
-)
 from . import _registration
 from . import utils
 from .exceptions import MissingShapeCalculator, MissingConverter
@@ -42,7 +40,8 @@ def _default_OPSET_TO_IR_VERSION():
     return {
         1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3,
         7: 3, 8: 4, 9: 4, 10: 5, 11: 6, 12: 7,
-        13: 7, 14: 7, 15: 8, 16: 8, 17: 8, 18: 8
+        13: 7, 14: 7, 15: 8, 16: 8, 17: 8, 18: 8,
+        19: 9
     }
 
 

@@ -14,10 +14,23 @@ jobs:
   strategy:
     matrix:
 
-      Py310-Onnx130-Rt140-Skl121:
+      Py310-Onnx140-Rt140-Skl122:
+        do.bench: '0'
+        python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
+        numpy.version: '>=1.21.1'
+        scipy.version: '>=1.7.0'
+        onnx.version: 'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.14.0' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
+        sklearn.version: '>=1.2.2'
+        lgbm.version: ''
+        onnxcc.version: '>=1.8.1'  # git
+        run.example: '1'
+
+      Py310-Onnx130-Rt140-Skl122:
         do.bench: '0'
         python.version: '3.10'
-        numpy.version: '>=1.21.1'
+        numpy.version: '>=1.21.2'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.13.0rc1'
         onnx.target_opset: ''
@@ -51,7 +64,7 @@ jobs:
         sklearn.version: '==1.2.0'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'  # git
-        run.example: '1'
+        run.example: '0'
       Py310-Onnx120-Rt1201-Skl11:
         do.bench: '0'
         python.version: '3.10'

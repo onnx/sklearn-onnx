@@ -2,6 +2,7 @@
 
 import math
 import numpy as np
+from onnx.numpy_helper import from_array
 from sklearn.gaussian_process.kernels import (
     Sum, Product, ConstantKernel,
     RBF, DotProduct, ExpSineSquared, Matern,
@@ -18,7 +19,6 @@ from ..algebra.onnx_ops import (
     OnnxReduceL2_typed, OnnxEyeLike,
 )
 from ..algebra.custom_ops import OnnxCDist
-from ..proto.onnx_helper_modified import from_array
 try:
     from ..algebra.onnx_ops import OnnxConstantOfShape
 except ImportError:
