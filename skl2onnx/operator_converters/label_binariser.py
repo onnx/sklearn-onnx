@@ -30,9 +30,9 @@ def convert_sklearn_label_binariser(scope: Scope, operator: Operator,
                            name=scope.get_unique_operator_name('identity'))
     else:
         zeros_tensor = np.full((1, len(classes)),
-                               binariser_op.neg_label, dtype=np.float)
+                               binariser_op.neg_label, dtype=np.float32)
         unit_tensor = np.full((1, len(classes)),
-                              binariser_op.pos_label, dtype=np.float)
+                              binariser_op.pos_label, dtype=np.float32)
 
         classes_tensor_name = scope.get_unique_variable_name('classes_tensor')
         equal_condition_tensor_name = scope.get_unique_variable_name(

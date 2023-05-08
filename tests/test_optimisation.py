@@ -8,7 +8,9 @@ from onnx import helper
 from onnx import TensorProto as tp
 from skl2onnx.common.onnx_optimisation_identity import (
     onnx_remove_node_identity)
-from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
+from test_utils import (
+        TARGET_OPSET, TARGET_IR,
+        InferenceSessionEx as InferenceSession)
 
 
 class TestOptimisation(unittest.TestCase):
@@ -58,7 +60,8 @@ class TestOptimisation(unittest.TestCase):
 
         # Create the model and check
         m = helper.make_model(
-            g, opset_imports=[helper.make_opsetid('', TARGET_OPSET)])
+            g, opset_imports=[helper.make_opsetid('', TARGET_OPSET)],
+            ir_version=TARGET_IR)
         checker.check_model(m)
 
         sess = InferenceSession(
