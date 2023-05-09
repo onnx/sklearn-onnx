@@ -13,6 +13,17 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
+
+      Py310-Onnx140-Rt150-Skl122:
+        python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
+        onnx.version:  'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.22.3'
+        scipy.version: 'scipy'
+        onnxrt.version: '-i https://aiinfra.pkgs.visualstudio.com/PublicPackages/_packaging/ORT-Nightly/pypi/simple/ ort_nightly==1.15.0.dev20230502003'
+        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        sklearn.version: '>=1.2.2'
+
       Py310-Onnx140-Rt140-Skl122:
         python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
         onnx.version:  'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
@@ -117,6 +128,7 @@ jobs:
       call activate skl2onnxEnvironment
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
+      conda install coloredlogs flatbuffers packaging
     displayName: 'Install protobuf'
 
   - script: |
