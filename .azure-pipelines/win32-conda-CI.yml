@@ -128,7 +128,6 @@ jobs:
       call activate skl2onnxEnvironment
       python -m pip install --upgrade pip
       conda install -y -c conda-forge protobuf
-      conda install coloredlogs flatbuffers packaging
     displayName: 'Install protobuf'
 
   - script: |
@@ -139,6 +138,7 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
+      python -m pip install coloredlogs flatbuffers packaging
       python -m pip install $(onnxrt.version)
     displayName: 'Install onnxruntime'
 

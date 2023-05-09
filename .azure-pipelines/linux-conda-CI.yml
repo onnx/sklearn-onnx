@@ -209,7 +209,6 @@ jobs:
 
   - script: |
       conda install "numpy$(numpy.version)" "scipy$(scipy.version)"
-      conda install coloredlogs flatbuffers packaging
     displayName: 'install numpy, scipy'
 
   - script: |
@@ -248,6 +247,7 @@ jobs:
     displayName: 'install flake8'
 
   - script: |
+      pip install coloredlogs flatbuffers packaging
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
