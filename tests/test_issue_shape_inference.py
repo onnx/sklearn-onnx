@@ -4,11 +4,19 @@ import unittest
 import pandas as pd
 import numpy as np
 from numpy.testing import assert_almost_equal
+from onnx.reference import ReferenceEvaluator
+from onnx.shape_inference import infer_shapes
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.linear_model import LinearRegression
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import (
+    FloatTensorType,
+    Int64TensorType,
+)
+import onnxruntime as rt
 
 
 class TestIssueShapeInference(unittest.TestCase):
@@ -59,19 +67,8 @@ class TestIssueShapeInference(unittest.TestCase):
         X = df.drop("target", axis=1)
         y = df["target"]
         model.fit(X, y)
-
-        from skl2onnx import convert_sklearn
-        from skl2onnx.common.data_types import (
-            FloatTensorType,
-            StringTensorType,
-            Int64TensorType,
-        )
-        import onnxruntime as rt
-        from onnx_array_api.plotting.text_plot import onnx_simple_text_plot
-        from onnx.reference import ReferenceEvaluator
-        from onnx.shape_inference import infer_shapes
-        from skl2onnx.helpers.onnx_helper import select_model_inputs_outputs
-
+        X = X[:10]
+        expected = model.predict(X).reshape((-1, 1))
 
         initial_type = [
             ("num_1", FloatTensorType([None, 1])),
@@ -86,26 +83,30 @@ class TestIssueShapeInference(unittest.TestCase):
 
         feeds = dict(
             [
-                ("num_1", np.array([[1], [2]], dtype=np.float32)),
-                ("num_2", np.array([[1], [2]], dtype=np.float32)),
-                ("num_3", np.array([[1], [2]], dtype=np.float32)),
-                ("num_4", np.array([[1], [2]], dtype=np.float32)),
-                ("cat_1", np.array([[1], [2]], dtype=np.int64)),
-                ("cat_2", np.array([[1], [2]], dtype=np.int64)),
+                ("num_1", X.iloc[:, 0:1].astype(np.float32)),
+                ("num_2", X.iloc[:, 1:2].astype(np.float32)),
+                ("num_3", X.iloc[:, 2:3].astype(np.float32)),
+                ("num_4", X.iloc[:, 3:4].astype(np.float32)),
+                ("cat_1", X.iloc[:, 4:5].astype(np.int64)),
+                ("cat_2", X.iloc[:, 5:6].astype(np.int64)),
             ]
         )
 
+        # ReferenceEvaluator
         ref = ReferenceEvaluator(model_onnx, verbose=9)
-        expected = ref.run(None, feeds)
+        res = ref.run(None, feeds)
+        self.assertEqual(1, len(res))
+        self.assertEqual(expected.shape, res[0].shape)
+        assert_almost_equal(expected, res[0])
 
+        # onnxruntime
         sess = rt.InferenceSession(
-            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
-        )
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"])
         res = sess.run(None, feeds)
-        self.assertEqual(len(expected), len(res))
-        for a, b in zip(expected, res):
-            self.assertEqual(a.shape, b.shape)
-            assert_almost_equal(a, b)
+        self.assertEqual(1, len(res))
+        self.assertEqual(expected.shape, res[0].shape)
+        assert_almost_equal(expected, res[0])
 
 
 if __name__ == "__main__":
