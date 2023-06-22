@@ -71,7 +71,7 @@ def _get_doc_template():
         }} and {{sch.max_input}} inputs.
         {% endif %}
         {% for ii, inp in enumerate(sch.inputs) %}
-        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{inp.typeStr}}: {{
+        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{GetTypeStr(inp)}}: {{
         inp.description}}{% endfor %}
         {% endif %}
 
@@ -82,7 +82,7 @@ def _get_doc_template():
         }} and {{sch.max_output}} outputs.
         {% endif %}
         {% for ii, out in enumerate(sch.outputs) %}
-        * *{{getname(out, ii)}}*{{format_option(out)}}{{out.typeStr}}: {{
+        * *{{getname(out, ii)}}*{{format_option(out)}}{{GetTypeStr(out)}}: {{
         out.description}}{% endfor %}
         {% endif %}
 
@@ -151,7 +151,11 @@ def get_rst_doc(op_name=None):
             opts.append('optional')
         elif OpSchema.FormalParameterOption.Variadic == obj.option:
             opts.append('variadic')
-        if getattr(obj, 'isHomogeneous', False):
+        try:
+            h = obj.is_homogeneous
+        except AttributeError:
+            h = getattr(obj, 'isHomogeneous', False)
+        if h:
             opts.append('heterogeneous')
         if opts:
             return " (%s)" % ", ".join(opts)
@@ -221,6 +225,12 @@ def get_rst_doc(op_name=None):
             doc_url += sch.domain + "."
         return doc_url
 
+    def GetTypeStr(inou):
+        try:
+            return inou.type_str
+        except AttributeError:
+            return inou.typeStr
+
     fnwd = format_name_with_domain
     tmpl = _template_operator
     docs = tmpl.render(schemas=schemas, OpSchema=OpSchema,
@@ -231,7 +241,7 @@ def get_rst_doc(op_name=None):
                        format_name_with_domain=fnwd,
                        process_documentation=process_documentation,
                        build_doc_url=build_doc_url,
-                       str=str)
+                       str=str, GetTypeStr=GetTypeStr)
     return docs
 
 
