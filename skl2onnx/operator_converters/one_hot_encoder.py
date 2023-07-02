@@ -83,9 +83,9 @@ def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
             out_name = scope.get_unique_variable_name(
                 name + str(index_in))
             container.add_node(
-                'ArrayFeatureExtractor', [name, index_name],
-                out_name, op_domain='ai.onnx.ml',
-                name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+                'Gather', [name, index_name],
+                out_name, axis=1,
+                name=scope.get_unique_operator_name('Gather'))
             name = out_name
 
         attrs = {'name': scope.get_unique_operator_name('OneHotEncoder')}
@@ -141,9 +141,9 @@ def convert_sklearn_one_hot_encoder(scope: Scope, operator: Operator,
                 indices_to_keep_name, onnx_proto.TensorProto.INT64,
                 indices_to_keep.shape, indices_to_keep)
             container.add_node(
-                'ArrayFeatureExtractor', [ohe_output, indices_to_keep_name],
-                extracted_outputs_name, op_domain='ai.onnx.ml',
-                name=scope.get_unique_operator_name('ArrayFeatureExtractor'))
+                'Gather', [ohe_output, indices_to_keep_name],
+                extracted_outputs_name, axis=1,
+                name=scope.get_unique_operator_name('Gather'))
             ohe_output, categories = extracted_outputs_name, indices_to_keep
 
         result.append(ohe_output)
