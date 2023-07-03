@@ -158,7 +158,7 @@ def dynamic_class_creation(cache=False):
         name = '%s%d' % (obj.name or label, i)
         try:
             tys = obj.type_str or ''
-        except TypeError:
+        except AttributeError:
             tys = obj.typeStr or ''
         return (name, tys)
 

@@ -152,10 +152,10 @@ def get_rst_doc(op_name=None):
     def get_is_homogeneous(obj):
         try:
             return obj.is_homogeneous
-        except TypeError:
+        except AttributeError:
             try:
                 return obj.isHomogeneous
-            except TypeError:
+            except AttributeError:
                 return False
 
     def format_option(obj):
