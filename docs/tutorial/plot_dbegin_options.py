@@ -93,15 +93,6 @@ oinf = ReferenceEvaluator(model_def)
 print(oinf)
 
 
-##########################################
-# We need to compare that kind of visualisation to
-# what it would give with operator *ZipMap*.
-
-model_def = to_onnx(clr, X_train.astype(numpy.float32))
-oinf = ReferenceEvaluator(model_def)
-print(oinf)
-
-
 #######################################
 # Using function *id* has one flaw: it is not pickable.
 # It is just better to use strings.
