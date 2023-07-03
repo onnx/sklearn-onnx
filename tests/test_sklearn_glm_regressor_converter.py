@@ -646,7 +646,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_ransac_regressor_mlp(self):
         model, X = fit_regression_model(
             linear_model.RANSACRegressor(
-                estimator=MLPRegressor(solver='sgd', max_iter=20),
+                MLPRegressor(solver='sgd', max_iter=20),
                 min_samples=5))
         model_onnx = convert_sklearn(
             model, "ransac regressor",
@@ -661,7 +661,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
     def test_model_ransac_regressor_tree(self):
         model, X = fit_regression_model(
             linear_model.RANSACRegressor(
-                estimator=GradientBoostingRegressor(),
+                GradientBoostingRegressor(),
                 min_samples=5))
         model_onnx = convert_sklearn(
             model, "ransac regressor",

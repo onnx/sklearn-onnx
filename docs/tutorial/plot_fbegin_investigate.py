@@ -102,14 +102,14 @@ for step in steps:
 onx = to_onnx(pipe, X[:1].astype(numpy.float32),
               target_opset=17)
 
-oinf = ReferenceEvaluator(onx)
-oinf.run(None, {'X': X[:2].astype(numpy.float32)}, verbose=1)
+oinf = ReferenceEvaluator(onx, verbose=1)
+oinf.run(None, {'X': X[:2].astype(numpy.float32)})
 
 ###################################
 # And to get a sense of the intermediate results.
 
-oinf.run({'X': X[:2].astype(numpy.float32)},
-         verbose=3, fLOG=print)
+oinf = ReferenceEvaluator(onx, verbose=3)
+oinf.run({'X': X[:2].astype(numpy.float32)})
 
 # This way is usually better if you need to investigate
 # issues within the code of the runtime for an operator.
