@@ -370,7 +370,6 @@ def custom_classifier_converter(scope, operator, container):
 class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
     def check_transform(self, obj, X):
-        self.log.debug("[check_transform------] type(obj)=%r" % type(obj))
         expected = obj.transform(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET)
         try:
@@ -384,7 +383,6 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         assert_almost_equal(expected, got, decimal=5)
 
     def check_classifier(self, obj, X):
-        self.log.debug("[check_classifier------] type(obj)=%r" % type(obj))
         expected_labels = obj.predict(X)
         expected_probas = obj.predict_proba(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET,
