@@ -85,7 +85,8 @@ df_skl.set_index('size')[['mean_obs']].plot(
 
 onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
               target_opset=14)
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
 oinf = ReferenceEvaluator(onx)
 
 obs = []
@@ -109,7 +110,7 @@ for batch_size, repeat in tqdm(sizes):
     # ReferenceEvaluator
     context = {"oinf": oinf, 'X': X_test[:batch_size].astype(numpy.float32)}
     mt2 = measure_time(
-        "oinf.run({'X': X})['variable']", context, div_by_number=True,
+        "oinf.run(None, {'X': X})[0]", context, div_by_number=True,
         number=10, repeat=repeat)
     mt['pyrt'] = mt2['average'] / mt['size']
 
