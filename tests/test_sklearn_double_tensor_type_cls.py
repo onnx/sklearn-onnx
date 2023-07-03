@@ -134,7 +134,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_modelsgdlog_64(self):
         self._common_classifier(
-            [lambda: SGDClassifier(loss='log', random_state=32)],
+            [lambda: SGDClassifier(loss='log_loss', random_state=32)],
             "SGDClassifierLog")
 
     @unittest.skipIf(

@@ -156,7 +156,10 @@ def dynamic_class_creation(cache=False):
 
     def _c(obj, label, i):
         name = '%s%d' % (obj.name or label, i)
-        tys = obj.typeStr or ''
+        try:
+            tys = obj.type_str or ''
+        except TypeError:
+            tys = obj.typeStr or ''
         return (name, tys)
 
     for name in sorted(res):

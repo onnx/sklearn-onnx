@@ -33,7 +33,7 @@ def convert_pls_regression(scope: Scope, operator: Operator,
     norm_x = OnnxDiv(
         OnnxSub(X, coefs.astype(dtype), op_version=opv),
         std.astype(dtype), op_version=opv)
-    dot = OnnxMatMul(norm_x, op.coef_.astype(dtype),
+    dot = OnnxMatMul(norm_x, op.coef_.T.astype(dtype),
                      op_version=opv)
     pred = OnnxAdd(dot, ym.astype(dtype),
                    op_version=opv, output_names=operator.outputs)

@@ -369,12 +369,6 @@ def custom_classifier_converter(scope, operator, container):
 
 class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
-    def setUp(self, log=False):
-        self.log = logging.getLogger('skl2onnx')
-        if log:
-            self.log.setLevel(logging.DEBUG)
-            logging.basicConfig(level=logging.DEBUG)
-
     def check_transform(self, obj, X):
         self.log.debug("[check_transform------] type(obj)=%r" % type(obj))
         expected = obj.transform(X)
@@ -521,7 +515,4 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # cl = TestCustomModelAlgebraSubEstimator()
-    # cl.setUp(log=False)
-    # cl.test_custom_scaler_2()
     unittest.main()
