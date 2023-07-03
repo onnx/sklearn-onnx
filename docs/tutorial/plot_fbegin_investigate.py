@@ -113,11 +113,3 @@ oinf.run({'X': X[:2].astype(numpy.float32)},
 
 # This way is usually better if you need to investigate
 # issues within the code of the runtime for an operator.
-#
-#################################
-# Final graph
-# +++++++++++
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

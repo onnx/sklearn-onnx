@@ -92,13 +92,6 @@ model_def = to_onnx(clr, X_train.astype(numpy.float32),
 oinf = ReferenceEvaluator(model_def)
 print(oinf)
 
-##################################
-# Visually.
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 
 ##########################################
 # We need to compare that kind of visualisation to

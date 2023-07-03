@@ -115,12 +115,3 @@ print(oinf)
 
 pred_pyrt = oinf.run(None, {'X': X_test.astype(numpy.float32)})[0]
 print(diff(pred_skl, pred_pyrt))
-
-#############################
-# Final graph
-# You may need to install graphviz from https://graphviz.org/download/
-# +++++++++++
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
