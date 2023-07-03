@@ -23,15 +23,13 @@ for every label. By default, the labels are integers and the
 probabilites are stored in dictionaries. That's the purpose
 of operator *ZipMap* added at the end of the following graph.
 
-.. gdot::
-    :script: DOT-SECTION
-
+.. runpython::
     import numpy
+    from onnx.helper import printable_graph
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
     from sklearn.linear_model import LogisticRegression
     from skl2onnx import to_onnx
-    from mlprodict.onnxrt import OnnxInference
 
     iris = load_iris()
     X, y = iris.data, iris.target
@@ -40,22 +38,19 @@ of operator *ZipMap* added at the end of the following graph.
     clr.fit(X_train, y_train)
 
     model_def = to_onnx(clr, X_train.astype(numpy.float32))
-    oinf = OnnxInference(model_def)
-    print("DOT-SECTION", oinf.to_dot())
+    print(printable_graph(model_def))
 
 This operator is not really efficient as it copies every probabilies and
 labels in a different container. This time is usually significant for
 small classifiers. Then it makes sense to remove it.
 
-.. gdot::
-    :script: DOT-SECTION
-
+.. runpython::
     import numpy
+    from onnx.helper import printable_graph
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
     from sklearn.linear_model import LogisticRegression
     from skl2onnx import to_onnx
-    from mlprodict.onnxrt import OnnxInference
 
     iris = load_iris()
     X, y = iris.data, iris.target
@@ -65,8 +60,7 @@ small classifiers. Then it makes sense to remove it.
 
     model_def = to_onnx(clr, X_train.astype(numpy.float32),
                         options={LogisticRegression: {'zipmap': False}})
-    oinf = OnnxInference(model_def)
-    print("DOT-SECTION", oinf.to_dot())
+    print(printable_graph(model_def))
 
 There might be in the graph many classifiers, it is important to have
 a way to specify which classifier should keep its *ZipMap*
@@ -76,6 +70,7 @@ and which is not. So it is possible to specify options by id.
 from pprint import pformat
 import numpy
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
+from onnx.reference import ReferenceEvaluator
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import Pipeline
@@ -85,7 +80,6 @@ from sklearn.linear_model import LogisticRegression
 from skl2onnx.common._registration import _converter_pool
 from skl2onnx import to_onnx
 from onnxruntime import InferenceSession
-from mlprodict.onnxrt import OnnxInference
 
 iris = load_iris()
 X, y = iris.data, iris.target
@@ -95,7 +89,7 @@ clr.fit(X_train, y_train)
 
 model_def = to_onnx(clr, X_train.astype(numpy.float32),
                     options={id(clr): {'zipmap': False}})
-oinf = OnnxInference(model_def, runtime='python_compiled')
+oinf = ReferenceEvaluator(model_def)
 print(oinf)
 
 ##################################
@@ -111,15 +105,8 @@ ax.get_yaxis().set_visible(False)
 # what it would give with operator *ZipMap*.
 
 model_def = to_onnx(clr, X_train.astype(numpy.float32))
-oinf = OnnxInference(model_def, runtime='python_compiled')
+oinf = ReferenceEvaluator(model_def)
 print(oinf)
-
-##################################
-# Visually.
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
 
 
 #######################################
@@ -128,16 +115,8 @@ ax.get_yaxis().set_visible(False)
 
 model_def = to_onnx(clr, X_train.astype(numpy.float32),
                     options={'zipmap': False})
-oinf = OnnxInference(model_def, runtime='python_compiled')
+oinf = ReferenceEvaluator(model_def)
 print(oinf)
-
-
-##################################
-# Visually.
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
 
 
 #######################################
@@ -156,16 +135,8 @@ pipe.fit(X_train, y_train)
 
 model_def = to_onnx(pipe, X_train.astype(numpy.float32),
                     options={'clr__zipmap': False})
-oinf = OnnxInference(model_def, runtime='python_compiled')
+oinf = ReferenceEvaluator(model_def)
 print(oinf)
-
-##################################
-# Visually.
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 
 #######################################
 # Option *raw_scores*
@@ -187,8 +158,8 @@ model_def = to_onnx(
     pipe, X_train.astype(numpy.float32),
     options={id(pipe): {'zipmap': False}})
 
-oinf = OnnxInference(model_def, runtime='python_compiled')
-print(oinf.run({'X': X.astype(numpy.float32)[:5]}))
+oinf = ReferenceEvaluator(model_def)
+print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
 
 
 #######################################
@@ -198,8 +169,8 @@ model_def = to_onnx(
     pipe, X_train.astype(numpy.float32),
     options={id(pipe): {'raw_scores': True, 'zipmap': False}})
 
-oinf = OnnxInference(model_def, runtime='python_compiled')
-print(oinf.run({'X': X.astype(numpy.float32)[:5]}))
+oinf = ReferenceEvaluator(model_def)
+print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
 
 #########################################
 # It did not seem to work... We need to tell
@@ -210,8 +181,8 @@ model_def = to_onnx(
     pipe, X_train.astype(numpy.float32),
     options={id(pipe.steps[1][1]): {'raw_scores': True, 'zipmap': False}})
 
-oinf = OnnxInference(model_def, runtime='python_compiled')
-print(oinf.run({'X': X.astype(numpy.float32)[:5]}))
+oinf = ReferenceEvaluator(model_def)
+print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
 
 ###########################################
 # There are negative values. That works.
@@ -221,8 +192,8 @@ model_def = to_onnx(
     pipe, X_train.astype(numpy.float32),
     options={'clr__raw_scores': True, 'clr__zipmap': False})
 
-oinf = OnnxInference(model_def, runtime='python_compiled')
-print(oinf.run({'X': X.astype(numpy.float32)[:5]}))
+oinf = ReferenceEvaluator(model_def)
+print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
 
 
 #########################################

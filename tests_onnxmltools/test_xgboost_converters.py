@@ -224,7 +224,7 @@ class TestXGBoostModels(unittest.TestCase):
         X[:, 0] = X[:, 0].astype(np.int64).astype(X.dtype)
         df['A'] = df.A.astype(np.int64)
         df['B'] = df.B.astype(np.float32)
-        df['C'] = df.C.astype(np.str)
+        df['C'] = df.C.astype(np.str_)
         y = (iris.target == 0).astype(np.int32)
         model_to_test.fit(df, y)
         model_onnx = convert_sklearn(

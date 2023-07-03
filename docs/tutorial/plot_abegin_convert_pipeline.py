@@ -28,7 +28,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from skl2onnx import to_onnx
-from mlprodict.onnxrt import OnnxInference
+from onxn.reference import ReferenceEvaluator
 
 
 X, y = load_diabetes(return_X_y=True)
@@ -106,15 +106,14 @@ print(diff(pred_skl, pred_ort))
 # the prediction. It is not meant to be used into
 # production (it still relies on python), but it is
 # useful to investigate why the conversion went wrong.
-# It uses module :epkg:`mlprodict`.
 
-oinf = OnnxInference(onx, runtime="python_compiled")
+oinf = ReferenceEvaluator(onx)
 print(oinf)
 
 ##########################################
 # It works almost the same way.
 
-pred_pyrt = oinf.run({'X': X_test.astype(numpy.float32)})['variable']
+pred_pyrt = oinf.run(None, {'X': X_test.astype(numpy.float32)})[0]
 print(diff(pred_skl, pred_pyrt))
 
 #############################

@@ -28,7 +28,6 @@ could be trained and produced by another converter library.
 import sys
 from io import BytesIO
 import onnx
-from mlprodict.sklapi import OnnxTransformer
 from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from mlinsights.plotting.gallery import plot_gallery_images

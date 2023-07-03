@@ -18,7 +18,7 @@ of model :epkg:`NMF`. The converter can be written
 including a new ONNX operator but then it requires a
 runtime for it to be tested. This example shows how
 to do that with the python runtime implemented in
-:epkg:`mlprodict`. It may not be :epkg:`onnxruntime`
+:epkg:`onnx`. It may not be :epkg:`onnxruntime`
 but that speeds up the implementation of the converter.
 
 The example changes the transformer from
@@ -33,7 +33,6 @@ This time, the eigen values are not estimated at
 training time but at prediction time.
 """
 
-from mlprodict.onnxrt.ops_cpu import OpRunCustom, register_operator
 from skl2onnx.algebra.onnx_ops import (
     OnnxAdd,
     OnnxCast,
@@ -49,12 +48,12 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxTranspose,
 )
 from skl2onnx.algebra import OnnxOperator
-from mlprodict.onnxrt import OnnxInference
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 import pickle
 from io import BytesIO
 import numpy
 from numpy.testing import assert_almost_equal
+from onnx.reference import ReferenceEvaluator
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.datasets import load_iris
 from skl2onnx.common.data_types import guess_numpy_type, guess_proto_type
@@ -360,10 +359,10 @@ onx = to_onnx(dec, X.astype(numpy.float32), target_opset=17)
 
 register_operator(OpEig, name='Eig', overwrite=False)
 
-oinf = OnnxInference(onx)
+oinf = ReferenceEvaluator(onx)
 
 exp = dec.transform(X.astype(numpy.float32))
-got = oinf.run({'X': X.astype(numpy.float32)})['variable']
+got = oinf.run(None, {'X': X.astype(numpy.float32)})[0]
 
 
 def diff(p1, p2):
@@ -377,12 +376,3 @@ print(diff(exp, got))
 
 #############################################
 # It works!
-
-#############################
-# Final graph
-# +++++++++++
-
-oinf = OnnxInference(onx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

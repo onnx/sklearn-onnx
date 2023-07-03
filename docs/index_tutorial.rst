@@ -35,12 +35,11 @@ The tutorial was tested with following version:
     import onnxruntime
     import xgboost
     import skl2onnx
-    import mlprodict
     import pyquickhelper
 
     mods = [numpy, scipy, sklearn, lightgbm, xgboost,
             onnx, onnxmltools, onnxruntime,
-            skl2onnx, mlprodict, pyquickhelper]
+            skl2onnx, pyquickhelper]
     mods = [(m.__name__, m.__version__) for m in mods]
     mx = max(len(_[0]) for _ in mods) + 1
     for name, vers in sorted(mods):

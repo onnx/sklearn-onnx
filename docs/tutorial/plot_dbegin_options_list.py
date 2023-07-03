@@ -20,7 +20,7 @@ The first converter to change its behaviour depending on a black list
 of operators is for model *GaussianMixture*.
 """
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
+from onnx.reference import ReferenceEvaluator
 from timeit import timeit
 import numpy
 from onnxruntime import InferenceSession
@@ -49,15 +49,6 @@ print(model.score_samples(xt))
 print(sess.run(None, {'X': xt})[2])
 
 
-##################################
-# Display the ONNX graph.
-
-
-oinf = OnnxInference(model_onnx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 ###################################
 # Conversion without ReduceLogSumExp
 # ++++++++++++++++++++++++++++++++++
@@ -76,15 +67,6 @@ sess2 = InferenceSession(model_onnx2.SerializeToString())
 xt = X_test[:5].astype(numpy.float32)
 print(model.score_samples(xt))
 print(sess2.run(None, {'X': xt})[2])
-
-##################################
-# Display the ONNX graph.
-
-oinf = OnnxInference(model_onnx2)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 
 #######################################
 # Processing time

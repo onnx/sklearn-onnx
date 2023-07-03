@@ -20,7 +20,6 @@ Train a LightGBM classifier
 +++++++++++++++++++++++++++
 """
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
 import onnxruntime as rt
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
@@ -93,13 +92,3 @@ sess = rt.InferenceSession("pipeline_lightgbm.onnx")
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
-
-#############################
-# Final graph
-# +++++++++++
-
-
-oinf = OnnxInference(model_onnx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

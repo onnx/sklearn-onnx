@@ -49,7 +49,6 @@ However, the probability that both comparisons give
 different results is not null. The following graph shows
 the discord areas.
 """
-from mlprodict.sklapi import OnnxPipeline
 from skl2onnx.sklapi import CastTransformer
 from skl2onnx import to_onnx
 from onnxruntime import InferenceSession

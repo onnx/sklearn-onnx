@@ -18,11 +18,9 @@ A dataset with categories
 from mlinsights.plotting import pipeline2dot
 import numpy
 import pprint
-from mlprodict.onnx_conv import guess_schema_from_data
+from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
-from mlprodict.onnx_conv import to_onnx as to_onnx_ext
 from skl2onnx import to_onnx
 from pandas import DataFrame
 from sklearn.pipeline import Pipeline
@@ -82,16 +80,6 @@ onx = to_onnx_ext(
     pipe, train_data[:1],
     options={RandomForestClassifier: {'zipmap': False}})
 
-#######################################
-# Graph
-# +++++
-
-
-oinf = OnnxInference(onx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 
 #################################
 # Prediction with ONNX
@@ -109,8 +97,8 @@ except Exception as e:
 ###########################
 # Let's use a shortcut
 
-oinf = OnnxInference(onx)
-got = oinf.run(train_data)
+oinf = ReferenceEvaluator(onx)
+got = oinf.run(None, train_data)
 print(pipe.predict(train_data))
 print(got['label'])
 

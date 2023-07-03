@@ -31,7 +31,6 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 """
-from mlprodict.onnxrt import OnnxInference
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 import pickle
 from io import BytesIO
@@ -231,12 +230,3 @@ print(diff(exp, got))
 
 #############################################
 # The differences are smaller with double as expected.
-
-#############################
-# Final graph
-# +++++++++++
-
-oinf = OnnxInference(onx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

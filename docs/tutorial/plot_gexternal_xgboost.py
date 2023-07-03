@@ -21,7 +21,6 @@ Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
 import numpy
 import onnxruntime as rt
 from sklearn.datasets import load_iris, load_diabetes, make_classification
@@ -116,17 +115,6 @@ sess = rt.InferenceSession("pipeline_xgboost.onnx")
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
-
-#############################
-# Final graph
-# +++++++++++
-
-
-oinf = OnnxInference(model_onnx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 
 #######################################
 # Same example with XGBRegressor

@@ -28,8 +28,8 @@ has *n* steps, it converts the pipeline with step 1,
 then the pipeline with steps 1, 2, then 1, 2, 3...
 """
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
 import numpy
+from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -102,9 +102,8 @@ for step in steps:
 onx = to_onnx(pipe, X[:1].astype(numpy.float32),
               target_opset=17)
 
-oinf = OnnxInference(onx)
-oinf.run({'X': X[:2].astype(numpy.float32)},
-         verbose=1, fLOG=print)
+oinf = ReferenceEvaluator(onx)
+oinf.run(None, {'X': X[:2].astype(numpy.float32)}, verbose=1)
 
 ###################################
 # And to get a sense of the intermediate results.
