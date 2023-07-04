@@ -28,7 +28,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from skl2onnx import to_onnx
-from onxn.reference import ReferenceEvaluator
+from onnx.reference import ReferenceEvaluator
 
 
 X, y = load_diabetes(return_X_y=True)
