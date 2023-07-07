@@ -25,7 +25,6 @@ A new transformer
 +++++++++++++++++
 """
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
 import numpy
 from onnxruntime import InferenceSession
 from sklearn.base import TransformerMixin, BaseEstimator
@@ -174,18 +173,3 @@ def diff(p1, p2):
 
 print(diff(exp, y1))
 print(diff(exp, y2))
-
-
-################################
-# It works. The final looks like the following.
-
-oinf = OnnxInference(onx, runtime="python_compiled")
-print(oinf)
-
-#############################
-# Final graph
-# +++++++++++
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

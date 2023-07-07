@@ -9,7 +9,6 @@ lightgbm
 loky
 matplotlib
 mlinsights>=0.3.631
-mlprodict>=0.4.1259
 nbsphinx
 onnx
 onnxruntime

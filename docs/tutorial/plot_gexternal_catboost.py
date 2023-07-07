@@ -24,7 +24,6 @@ from onnx.helper import get_attribute_value
 from sklearn.datasets import load_iris
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from mlprodict.onnxrt import OnnxInference
 import onnxruntime as rt
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
@@ -147,12 +146,3 @@ sess = rt.InferenceSession("pipeline_catboost.onnx")
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
-
-#############################
-# Final graph
-# +++++++++++
-
-oinf = OnnxInference(model_onnx)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

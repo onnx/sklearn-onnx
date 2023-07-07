@@ -3,6 +3,7 @@
 import unittest
 import packaging.version as pv
 import numpy as np
+from sklearn import __version__ as skl_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.ensemble import BaggingClassifier
@@ -45,6 +46,9 @@ warnings_to_skip = (DeprecationWarning, FutureWarning, ConvergenceWarning)
 ort_version = ort_version.split('+')[0]
 ORT_VERSION = '1.7.0'
 onnx_version = ".".join(onnx_version.split('.')[:2])
+
+LOG_LOSS = ("log_loss" if pv.Version(skl_version) >= pv.Version("1.1")
+            else "log")
 
 
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
@@ -134,7 +138,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_modelsgdlog_64(self):
         self._common_classifier(
-            [lambda: SGDClassifier(loss='log', random_state=32)],
+            [lambda: SGDClassifier(loss=LOG_LOSS, random_state=32)],
             "SGDClassifierLog")
 
     @unittest.skipIf(

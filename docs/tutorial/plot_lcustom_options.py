@@ -22,7 +22,6 @@ Custom model
 ++++++++++++
 
 """
-from mlprodict.onnxrt import OnnxInference
 from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 from pandas import DataFrame
 from skl2onnx.tutorial import measure_time
@@ -165,15 +164,6 @@ exp = dec.transform(X.astype(numpy.float32))
 got2 = sess2.run(None, {'X': X.astype(numpy.float32)})[0]
 
 print(diff(exp, got2))
-
-##############################
-# Visually.
-
-
-oinf = OnnxInference(onx2)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
 
 
 #########################################
