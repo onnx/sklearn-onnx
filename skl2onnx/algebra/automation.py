@@ -71,7 +71,7 @@ def _get_doc_template():
         }} and {{sch.max_input}} inputs.
         {% endif %}
         {% for ii, inp in enumerate(sch.inputs) %}
-        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{inp.typeStr}}: {{
+        * *{{getname(inp, ii)}}*{{format_option(inp)}}{{get_type_str(inp)}}: {{
         inp.description}}{% endfor %}
         {% endif %}
 
@@ -82,7 +82,7 @@ def _get_doc_template():
         }} and {{sch.max_output}} outputs.
         {% endif %}
         {% for ii, out in enumerate(sch.outputs) %}
-        * *{{getname(out, ii)}}*{{format_option(out)}}{{out.typeStr}}: {{
+        * *{{getname(out, ii)}}*{{format_option(out)}}{{get_type_str(out)}}: {{
         out.description}}{% endfor %}
         {% endif %}
 
@@ -142,8 +142,21 @@ def get_rst_doc(op_name=None):
     def format_name_with_domain(sch):
         if sch.domain:
             return '{} ({})'.format(sch.name, sch.domain)
-        else:
-            return sch.name
+        return sch.name
+
+    def get_type_str(obj):
+        if hasattr(obj, "type_str"):
+            return obj.type_str
+        return obj.typeStr
+
+    def get_is_homogeneous(obj):
+        try:
+            return obj.is_homogeneous
+        except AttributeError:
+            try:
+                return obj.isHomogeneous
+            except AttributeError:
+                return False
 
     def format_option(obj):
         opts = []
@@ -151,12 +164,11 @@ def get_rst_doc(op_name=None):
             opts.append('optional')
         elif OpSchema.FormalParameterOption.Variadic == obj.option:
             opts.append('variadic')
-        if getattr(obj, 'isHomogeneous', False):
+        if get_is_homogeneous(obj):
             opts.append('heterogeneous')
         if opts:
             return " (%s)" % ", ".join(opts)
-        else:
-            return ""
+        return ""
 
     def getconstraint(const, ii):
         if const.type_param_str:
@@ -171,8 +183,7 @@ def get_rst_doc(op_name=None):
         name = obj.name
         if len(name) == 0:
             return str(i)
-        else:
-            return name
+        return name
 
     def process_documentation(doc):
         if doc is None:
@@ -231,7 +242,7 @@ def get_rst_doc(op_name=None):
                        format_name_with_domain=fnwd,
                        process_documentation=process_documentation,
                        build_doc_url=build_doc_url,
-                       str=str)
+                       str=str, get_type_str=get_type_str)
     return docs
 
 

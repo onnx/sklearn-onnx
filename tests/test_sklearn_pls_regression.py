@@ -31,7 +31,7 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X, pls2, model_onnx, methods=['predict'],
-            basename="SklearnPLSRegression")
+            basename="SklearnPLSRegression", verbose=10)
 
     def test_model_pls_regression64(self):
         X = numpy.array([[0., 0., 1.], [1., 0., 0.],

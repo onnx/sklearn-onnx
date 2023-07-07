@@ -17,6 +17,7 @@ Training a pipeline
 import numpy
 from pandas import DataFrame
 from tqdm import tqdm
+from onnx.reference import ReferenceEvaluator
 from sklearn import config_context
 from sklearn.datasets import make_regression
 from sklearn.ensemble import (
@@ -24,7 +25,6 @@ from sklearn.ensemble import (
     VotingRegressor)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from mlprodict.onnxrt import OnnxInference
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.tutorial import measure_time
@@ -85,8 +85,9 @@ df_skl.set_index('size')[['mean_obs']].plot(
 
 onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
               target_opset=14)
-sess = InferenceSession(onx.SerializeToString())
-oinf = OnnxInference(onx, runtime="python_compiled")
+sess = InferenceSession(onx.SerializeToString(),
+                        providers=["CPUExecutionProvider"])
+oinf = ReferenceEvaluator(onx)
 
 obs = []
 for batch_size, repeat in tqdm(sizes):
@@ -106,10 +107,10 @@ for batch_size, repeat in tqdm(sizes):
         number=10, repeat=repeat)
     mt['ort'] = mt2['average'] / mt['size']
 
-    # mlprodict
+    # ReferenceEvaluator
     context = {"oinf": oinf, 'X': X_test[:batch_size].astype(numpy.float32)}
     mt2 = measure_time(
-        "oinf.run({'X': X})['variable']", context, div_by_number=True,
+        "oinf.run(None, {'X': X})[0]", context, div_by_number=True,
         number=10, repeat=repeat)
     mt['pyrt'] = mt2['average'] / mt['size']
 

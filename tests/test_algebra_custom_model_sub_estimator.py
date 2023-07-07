@@ -4,7 +4,6 @@
 Tests scikit-learn's binarizer converter.
 """
 import unittest
-import logging
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -369,14 +368,7 @@ def custom_classifier_converter(scope, operator, container):
 
 class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
-    def setUp(self, log=False):
-        self.log = logging.getLogger('skl2onnx')
-        if log:
-            self.log.setLevel(logging.DEBUG)
-            logging.basicConfig(level=logging.DEBUG)
-
     def check_transform(self, obj, X):
-        self.log.debug("[check_transform------] type(obj)=%r" % type(obj))
         expected = obj.transform(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET)
         try:
@@ -390,7 +382,6 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
         assert_almost_equal(expected, got, decimal=5)
 
     def check_classifier(self, obj, X):
-        self.log.debug("[check_classifier------] type(obj)=%r" % type(obj))
         expected_labels = obj.predict(X)
         expected_probas = obj.predict_proba(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET,
@@ -521,7 +512,4 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # cl = TestCustomModelAlgebraSubEstimator()
-    # cl.setUp(log=False)
-    # cl.test_custom_scaler_2()
     unittest.main()
