@@ -870,7 +870,8 @@ class ModelComponentContainer(_WhiteBlackContainer):
                     "\n".join(rows)))
 
         # Update order
-        topo = sorted([(order[id(node)], str(id(node)))
+        topo = sorted([(order[id(node)], node.op_type,
+                        node.name, str(id(node)))
                       for node in self.nodes])
         map_nodes = {str(id(node)): node for node in self.nodes}
-        self.nodes = [map_nodes[_[1]] for _ in topo]
+        self.nodes = [map_nodes[_[-1]] for _ in topo]
