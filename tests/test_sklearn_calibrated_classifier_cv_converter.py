@@ -39,7 +39,6 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
-    onnx_built_with_ml,
 )
 from test_utils import (
     dump_data_and_model,
@@ -51,7 +50,6 @@ ort_version = ort_version.split("+")[0]
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
     def test_model_calibrated_classifier_cv_float(self):
         data = load_iris()

@@ -17,7 +17,6 @@ from skl2onnx.common.data_types import (
     Int64TensorType,
     BooleanTensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from test_utils import (
     dump_data_and_model,
     TARGET_OPSET,
@@ -92,7 +91,6 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
                 target_opset=TARGET_OPSET,
             )
 
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_pipeline_float(self):
         data = [
             {"ALL_LOWER": 1, "NEXT_ALL_LOWER": 1},
@@ -120,7 +118,6 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         res = sess.run(None, {"input": inp})
         assert_almost_equal(expected[0].ravel(), res[0].ravel())
 
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_pipeline_int(self):
         data = [
             {"ALL_LOWER": 1, "NEXT_ALL_LOWER": 1},
@@ -154,7 +151,6 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
         expected = model.transform(data)
         assert_almost_equal(expected[0], res)
 
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     def test_model_dict_vectorizer_pipeline_boolean(self):
         data = [
             {"ALL_LOWER": True, "NEXT_ALL_LOWER": True},

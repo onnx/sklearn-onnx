@@ -49,7 +49,6 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from skl2onnx.common.data_types import onnx_built_with_ml
 from skl2onnx.helpers.onnx_helper import (
     enumerate_model_node_outputs,
     select_model_inputs_outputs,
@@ -485,7 +484,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsRegressorMetricCityblock",
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
@@ -526,7 +524,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnRadiusNeighborsClassifierBinary",
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
@@ -569,7 +566,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnRadiusNeighborsClassifierMulti",
         )
 
-    @unittest.skipIf(not onnx_built_with_ml(), reason="Requires ONNX-ML extension.")
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
