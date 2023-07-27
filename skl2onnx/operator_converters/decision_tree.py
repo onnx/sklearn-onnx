@@ -245,7 +245,7 @@ def convert_sklearn_decision_tree_classifier(
     op = operator.raw_operator
     options = scope.get_options(
         op, dict(decision_path=False, decision_leaf=False))
-    if op.classes_.size == 1:
+    if np.asarray(op.classes_).size == 1:
         # The model was trained with one label. There is no need to build a tree.
         if op.n_outputs_ != 1:
             raise RuntimeError(
