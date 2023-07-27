@@ -3,6 +3,7 @@
 
 import numbers
 import numpy as np
+from onnx.numpy_helper import from_array
 from ..common._apply_operation import (
     apply_cast,
     apply_concat,
@@ -244,6 +245,49 @@ def convert_sklearn_decision_tree_classifier(
     op = operator.raw_operator
     options = scope.get_options(
         op, dict(decision_path=False, decision_leaf=False))
+    if op.classes_.size == 1:
+        # The model was trained with one label. There is no need to build a tree.
+        if op.n_outputs_ != 1:
+            raise RuntimeError(
+                f"One training class and multiple outputs is not "
+                f"supported yet for class {op.__class__.__name__!r}.")
+        if options['decision_path'] or options['decision_leaf']:
+            raise RuntimeError(
+                f"One training class, option 'decision_path' "
+                f"or 'decision_leaf' are not supported for "
+                f"class {op.__class__.__name__!r}.")
+
+        zero = scope.get_unique_variable_name('zero')
+        one = scope.get_unique_variable_name('one')
+        new_shape = scope.get_unique_variable_name('new_shape')
+        container.add_initializer(
+            zero, onnx_proto.TensorProto.INT64, [1], [0])
+        container.add_initializer(
+            one, onnx_proto.TensorProto.INT64, [1], [1])
+        container.add_initializer(
+            new_shape, onnx_proto.TensorProto.INT64, [2], [-1, 1])
+        shape = scope.get_unique_variable_name('shape')
+        container.add_node(
+            "Shape", [operator.inputs[0].full_name], [shape])
+        shape_sliced = scope.get_unique_variable_name('shape_sliced')
+        container.add_node(
+            "Slice", [shape, zero, one, zero], [shape_sliced])
+
+        # labels
+        container.add_node(
+            "ConstantOfShape", [shape_sliced],
+            [operator.outputs[0].full_name],
+            value=from_array(np.array([op.classes_[0]], dtype=np.int64)))
+        
+        # probabilities
+        probas = scope.get_unique_variable_name('probas')
+        container.add_node(
+            "ConstantOfShape", [shape_sliced], [probas],
+            value=from_array(np.array([1], dtype=dtype)))
+        container.add_node(
+            "Reshape", [probas, new_shape], [operator.outputs[1].full_name])
+        return
+
     if op.n_outputs_ == 1:
         attrs = get_default_tree_classifier_attribute_pairs()
         attrs['name'] = scope.get_unique_operator_name(op_type)
