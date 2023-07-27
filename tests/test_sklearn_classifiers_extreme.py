@@ -1,16 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
 import unittest
-import packaging.version as pv
 import numpy as np
-from numpy.testing import assert_almost_equal
 from onnx.reference import ReferenceEvaluator
 from sklearn.tree import DecisionTreeClassifier
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from test_utils import TARGET_OPSET
-
 
 
 class TestSklearnClassifiersExtreme(unittest.TestCase):

@@ -246,7 +246,8 @@ def convert_sklearn_decision_tree_classifier(
     options = scope.get_options(
         op, dict(decision_path=False, decision_leaf=False))
     if np.asarray(op.classes_).size == 1:
-        # The model was trained with one label. There is no need to build a tree.
+        # The model was trained with one label.
+        # There is no need to build a tree.
         if op.n_outputs_ != 1:
             raise RuntimeError(
                 f"One training class and multiple outputs is not "
@@ -278,7 +279,7 @@ def convert_sklearn_decision_tree_classifier(
             "ConstantOfShape", [shape_sliced],
             [operator.outputs[0].full_name],
             value=from_array(np.array([op.classes_[0]], dtype=np.int64)))
-        
+
         # probabilities
         probas = scope.get_unique_variable_name('probas')
         container.add_node(
