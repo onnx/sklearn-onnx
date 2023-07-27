@@ -5,7 +5,7 @@ coverage
 flake8
 furo
 joblib
-lightgbm
+lightgbm<4.0
 loky
 matplotlib
 mlinsights>=0.3.631
