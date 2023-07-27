@@ -26,12 +26,13 @@ from onnxruntime import InferenceSession
 # Implementations to benchmark.
 ##############################
 
+
 def fcts_model(X, y, kernel):
     "SVR."
     rf = SVR(kernel=kernel)
     rf.fit(X, y)
 
-    initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
+    initial_types = [("X", FloatTensorType([None, X.shape[1]]))]
     onx = convert_sklearn(rf, initial_types=initial_types)
     f = BytesIO()
     f.write(onx.SerializeToString())
@@ -43,27 +44,28 @@ def fcts_model(X, y, kernel):
         return rf.predict(X)
 
     def predict_onnxrt_predict(X, sess=sess):
-        return sess.run(outputs[:1], {'X': X})[0]
+        return sess.run(outputs[:1], {"X": X})[0]
 
-    return {'predict': (
-        predict_skl_predict,
-        predict_onnxrt_predict,
-    )}
+    return {
+        "predict": (
+            predict_skl_predict,
+            predict_onnxrt_predict,
+        )
+    }
 
 
 ##############################
 # Benchmarks
 ##############################
 
+
 def allow_configuration(**kwargs):
     return True
 
 
-def bench(n_obs, n_features, kernels,
-          methods, repeat=10, verbose=False):
+def bench(n_obs, n_features, kernels, methods, repeat=10, verbose=False):
     res = []
     for nfeat in n_features:
-
         ntrain = 1000
         X_train = np.empty((ntrain, nfeat)).astype(np.float32)
         X_train[:, :] = rand(ntrain, nfeat)[:, :]
@@ -75,11 +77,9 @@ def bench(n_obs, n_features, kernels,
 
             for n in n_obs:
                 for method in methods:
-
                     fct1, fct2 = fcts[method]
 
-                    if not allow_configuration(n=n, nfeat=nfeat,
-                                               kernel=kernel):
+                    if not allow_configuration(n=n, nfeat=nfeat, kernel=kernel):
                         continue
 
                     obs = dict(n_obs=n, nfeat=nfeat, kernel=kernel)
@@ -124,8 +124,7 @@ def bench(n_obs, n_features, kernels,
                         if len(p1.shape) == 1 and len(p2.shape) == 2:
                             p2 = p2.ravel()
                         try:
-                            assert_almost_equal(
-                                p1.ravel(), p2.ravel(), decimal=3)
+                            assert_almost_equal(p1.ravel(), p2.ravel(), decimal=3)
                         except AssertionError as e:
                             warnings.warn(str(e))
     return res
@@ -135,22 +134,21 @@ def bench(n_obs, n_features, kernels,
 # Plots.
 ##############################
 
+
 def plot_results(df, verbose=False):
     nrows = max(len(set(df.n_obs)), 2)
     ncols = 2
-    fig, ax = plt.subplots(nrows, ncols,
-                           figsize=(ncols * 4, nrows * 4))
+    fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     pos = 0
     row = 0
     for n_obs in sorted(set(df.n_obs)):
         a = ax[row, pos]
         if row == ax.shape[0] - 1:
-            a.set_xlabel("N features", fontsize='x-small')
+            a.set_xlabel("N features", fontsize="x-small")
         if pos == 0:
-            a.set_ylabel(
-                "Time (s) n_obs={}".format(n_obs), fontsize='x-small')
+            a.set_ylabel("Time (s) n_obs={}".format(n_obs), fontsize="x-small")
 
-        for color, kernel in zip('brgyc', sorted(set(df.kernel))):
+        for color, kernel in zip("brgyc", sorted(set(df.kernel))):
             subset = df[(df.kernel == kernel)]
             if subset.shape[0] == 0:
                 continue
@@ -159,13 +157,30 @@ def plot_results(df, verbose=False):
                 print(subset)
 
             label = "skl %s" % kernel
-            subset.plot(x="nfeat", y="time_skl", label=label, ax=a,
-                        logx=True, logy=True, c=color, style='--', lw=5)
+            subset.plot(
+                x="nfeat",
+                y="time_skl",
+                label=label,
+                ax=a,
+                logx=True,
+                logy=True,
+                c=color,
+                style="--",
+                lw=5,
+            )
             label = "ort %s" % kernel
-            subset.plot(x="nfeat", y="time_ort", label=label, ax=a,
-                        logx=True, logy=True, c=color, lw=3)
+            subset.plot(
+                x="nfeat",
+                y="time_ort",
+                label=label,
+                ax=a,
+                logx=True,
+                logy=True,
+                c=color,
+                lw=3,
+            )
 
-        a.legend(loc=0, fontsize='x-small')
+        a.legend(loc=0, fontsize="x-small")
         if row == 0:
             pass  # a.set_title("n_jobs={}".format(n_jobs), fontsize='x-small')
         row += 1
@@ -176,13 +191,12 @@ def plot_results(df, verbose=False):
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
-    methods = ['predict']
+    methods = ["predict"]
     n_features = [10, 50]
     kernels = ["linear", "poly", "rbf", "sigmoid"]
 
     start = time()
-    results = bench(n_obs, n_features, kernels,
-                    methods, repeat=repeat, verbose=verbose)
+    results = bench(n_obs, n_features, kernels, methods, repeat=repeat, verbose=verbose)
     end = time()
 
     results_df = pandas.DataFrame(results)
@@ -193,21 +207,24 @@ def run_bench(repeat=100, verbose=False):
     return results_df
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from datetime import datetime
     import sklearn
     import numpy
     import onnx
     import onnxruntime
     import skl2onnx
-    df = pandas.DataFrame([
-        {"name": "date", "version": str(datetime.now())},
-        {"name": "numpy", "version": numpy.__version__},
-        {"name": "scikit-learn", "version": sklearn.__version__},
-        {"name": "onnx", "version": onnx.__version__},
-        {"name": "onnxruntime", "version": onnxruntime.__version__},
-        {"name": "skl2onnx", "version": skl2onnx.__version__},
-    ])
+
+    df = pandas.DataFrame(
+        [
+            {"name": "date", "version": str(datetime.now())},
+            {"name": "numpy", "version": numpy.__version__},
+            {"name": "scikit-learn", "version": sklearn.__version__},
+            {"name": "onnx", "version": onnx.__version__},
+            {"name": "onnxruntime", "version": onnxruntime.__version__},
+            {"name": "skl2onnx", "version": skl2onnx.__version__},
+        ]
+    )
     df.to_csv("bench_plot_onnxruntime_svm_reg.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)

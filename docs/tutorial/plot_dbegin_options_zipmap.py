@@ -49,7 +49,7 @@ onx = to_onnx(clr, X_train, target_opset=12)
 # dictionaries.
 
 sess = rt.InferenceSession(onx.SerializeToString())
-res = sess.run(None, {'X': X_test})
+res = sess.run(None, {"X": X_test})
 print(res[1][:2])
 print("probabilities type:", type(res[1]))
 print("type for the first observations:", type(res[1][0]))
@@ -60,12 +60,12 @@ print("type for the first observations:", type(res[1][0]))
 #
 # Probabilities are now a matrix.
 
-initial_type = [('float_input', FloatTensorType([None, 4]))]
-options = {id(clr): {'zipmap': False}}
+initial_type = [("float_input", FloatTensorType([None, 4]))]
+options = {id(clr): {"zipmap": False}}
 onx2 = to_onnx(clr, X_train, options=options, target_opset=12)
 
 sess2 = rt.InferenceSession(onx2.SerializeToString())
-res2 = sess2.run(None, {'X': X_test})
+res2 = sess2.run(None, {"X": X_test})
 print(res2[1][:2])
 print("probabilities type:", type(res2[1]))
 print("type for the first observations:", type(res2[1][0]))
@@ -78,14 +78,17 @@ print("type for the first observations:", type(res2[1][0]))
 # the probabilities into columns. The final model produces
 # one output for the label, and one output per class.
 
-options = {id(clr): {'zipmap': 'columns'}}
+options = {id(clr): {"zipmap": "columns"}}
 onx3 = to_onnx(clr, X_train, options=options, target_opset=12)
 
 sess3 = rt.InferenceSession(onx3.SerializeToString())
-res3 = sess3.run(None, {'X': X_test})
+res3 = sess3.run(None, {"X": X_test})
 for i, out in enumerate(sess3.get_outputs()):
-    print("output: '{}' shape={} values={}...".format(
-        out.name, res3[i].shape, res3[i][:2]))
+    print(
+        "output: '{}' shape={} values={}...".format(
+            out.name, res3[i].shape, res3[i][:2]
+        )
+    )
 
 
 ###################################
@@ -93,16 +96,13 @@ for i, out in enumerate(sess3.get_outputs()):
 # +++++++++++++++++++++++++++++
 
 print("Average time with ZipMap:")
-print(sum(repeat(lambda: sess.run(None, {'X': X_test}),
-                 number=100, repeat=10)) / 10)
+print(sum(repeat(lambda: sess.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
 print("Average time without ZipMap:")
-print(sum(repeat(lambda: sess2.run(None, {'X': X_test}),
-                 number=100, repeat=10)) / 10)
+print(sum(repeat(lambda: sess2.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
 print("Average time without ZipMap but with columns:")
-print(sum(repeat(lambda: sess3.run(None, {'X': X_test}),
-                 number=100, repeat=10)) / 10)
+print(sum(repeat(lambda: sess3.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
 # The prediction is much faster without ZipMap
 # on this example.
@@ -120,12 +120,12 @@ print(sum(repeat(lambda: sess3.run(None, {'X': X_test}),
 # `output_class_labels` can be used to expose the labels
 # as a third output.
 
-initial_type = [('float_input', FloatTensorType([None, 4]))]
-options = {id(clr): {'zipmap': False, 'output_class_labels': True}}
+initial_type = [("float_input", FloatTensorType([None, 4]))]
+options = {id(clr): {"zipmap": False, "output_class_labels": True}}
 onx4 = to_onnx(clr, X_train, options=options, target_opset=12)
 
 sess4 = rt.InferenceSession(onx4.SerializeToString())
-res4 = sess4.run(None, {'X': X_test})
+res4 = sess4.run(None, {"X": X_test})
 print(res4[1][:2])
 print("probabilities type:", type(res4[1]))
 print("class labels:", res4[2])
@@ -134,8 +134,7 @@ print("class labels:", res4[2])
 # Processing time.
 
 print("Average time without ZipMap but with output_class_labels:")
-print(sum(repeat(lambda: sess4.run(None, {'X': X_test}),
-                 number=100, repeat=10)) / 10)
+print(sum(repeat(lambda: sess4.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
 ###########################################
 # MultiOutputClassifier
@@ -161,18 +160,22 @@ print(clr)
 onx5 = to_onnx(clr, X_train, target_opset=12)
 
 sess5 = rt.InferenceSession(onx5.SerializeToString())
-res5 = sess5.run(None, {'X': X_test[:3]})
+res5 = sess5.run(None, {"X": X_test[:3]})
 print(res5)
 
 ########################################
 # Option zipmap is ignored. Labels are missing but they can be
 # added back as a third output.
 
-onx6 = to_onnx(clr, X_train, target_opset=12,
-               options={'zipmap': False, 'output_class_labels': True})
+onx6 = to_onnx(
+    clr,
+    X_train,
+    target_opset=12,
+    options={"zipmap": False, "output_class_labels": True},
+)
 
 sess6 = rt.InferenceSession(onx6.SerializeToString())
-res6 = sess6.run(None, {'X': X_test[:3]})
+res6 = sess6.run(None, {"X": X_test[:3]})
 print("predicted labels", res6[0])
 print("predicted probabilies", res6[1])
 print("class labels", res6[2])

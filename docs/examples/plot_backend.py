@@ -44,11 +44,11 @@ with open(name, "wb") as f:
 # Let's use ONNX backend API to test it.
 
 model = onnx.load(name)
-rep = backend.prepare(model, 'CPU')
-x = np.array([[-1.0, -2.0, 5.0, 6.0],
-              [-1.0, -2.0, -3.0, -4.0],
-              [-1.0, -2.0, 7.0, 8.0]],
-             dtype=np.float32)
+rep = backend.prepare(model, "CPU")
+x = np.array(
+    [[-1.0, -2.0, 5.0, 6.0], [-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, 7.0, 8.0]],
+    dtype=np.float32,
+)
 label, proba = rep.run(x)
 print("label={}".format(label))
 print("probabilities={}".format(proba))
@@ -62,11 +62,11 @@ print(get_device())
 # The backend can also directly load the model
 # without using *onnx*.
 
-rep = backend.prepare(name, 'CPU')
-x = np.array([[-1.0, -2.0, -3.0, -4.0],
-              [-1.0, -2.0, -3.0, -4.0],
-              [-1.0, -2.0, -3.0, -4.0]],
-             dtype=np.float32)
+rep = backend.prepare(name, "CPU")
+x = np.array(
+    [[-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, -3.0, -4.0]],
+    dtype=np.float32,
+)
 label, proba = rep.run(x)
 print("label={}".format(label))
 print("probabilities={}".format(proba))

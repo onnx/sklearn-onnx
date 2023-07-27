@@ -7,12 +7,16 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_identity(scope: Scope, operator: Operator,
-                             container: ModelComponentContainer):
+def convert_sklearn_identity(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     apply_identity(
-        scope, operator.inputs[0].full_name,
-        operator.outputs[0].full_name, container,
-        operator_name=scope.get_unique_operator_name('CIdentity'))
+        scope,
+        operator.inputs[0].full_name,
+        operator.outputs[0].full_name,
+        container,
+        operator_name=scope.get_unique_operator_name("CIdentity"),
+    )
 
 
-register_converter('SklearnIdentity', convert_sklearn_identity)
+register_converter("SklearnIdentity", convert_sklearn_identity)

@@ -14,14 +14,14 @@ from onnxconverter_common.utils import check_input_and_output_numbers  # noqa
 from onnxconverter_common.utils import check_input_and_output_types  # noqa
 from .data_types import TensorType
 
-_unique_index = {'subgraph': 0}
+_unique_index = {"subgraph": 0}
 
 
 def get_unique_subgraph():
     "Returns a unique identifier integer for subgraph."
     global _unique_index
-    _unique_index['subgraph'] += 1
-    return _unique_index['subgraph']
+    _unique_index["subgraph"] += 1
+    return _unique_index["subgraph"]
 
 
 def get_producer():
@@ -29,6 +29,7 @@ def get_producer():
     Internal helper function to return the producer
     """
     from .. import __producer__
+
     return __producer__
 
 
@@ -37,6 +38,7 @@ def get_producer_version():
     Internal helper function to return the producer version
     """
     from .. import __producer_version__
+
     return __producer_version__
 
 
@@ -45,6 +47,7 @@ def get_domain():
     Internal helper function to return the model domain
     """
     from .. import __domain__
+
     return __domain__
 
 
@@ -53,6 +56,7 @@ def get_model_version():
     Internal helper function to return the model version
     """
     from .. import __model_version__
+
     return __model_version__
 
 
@@ -82,12 +86,13 @@ def get_column_index(i, inputs):
             return 0, 0
         vi = 0
         pos = 0
-        end = (inputs[0].type.shape[1]
-               if isinstance(inputs[0].type, TensorType) else 1)
+        end = inputs[0].type.shape[1] if isinstance(inputs[0].type, TensorType) else 1
         if end is None:
-            raise RuntimeError("Cannot extract a specific column {0} when "
-                               "one input ('{1}') has unknown "
-                               "dimension.".format(i, inputs[0]))
+            raise RuntimeError(
+                "Cannot extract a specific column {0} when "
+                "one input ('{1}') has unknown "
+                "dimension.".format(i, inputs[0])
+            )
         while True:
             if pos <= i < end:
                 return (vi, i - pos)
@@ -96,13 +101,20 @@ def get_column_index(i, inputs):
             if vi >= len(inputs):
                 raise RuntimeError(
                     "Input {} (i={}, end={}) is not available in\n{}".format(
-                        vi, i, end, pprint.pformat(inputs)))
-            rel_end = (inputs[vi].type.shape[1]
-                       if isinstance(inputs[vi].type, TensorType) else 1)
+                        vi, i, end, pprint.pformat(inputs)
+                    )
+                )
+            rel_end = (
+                inputs[vi].type.shape[1]
+                if isinstance(inputs[vi].type, TensorType)
+                else 1
+            )
             if rel_end is None:
-                raise RuntimeError("Cannot extract a specific column {0} when "
-                                   "one input ('{1}') has unknown "
-                                   "dimension.".format(i, inputs[vi]))
+                raise RuntimeError(
+                    "Cannot extract a specific column {0} when "
+                    "one input ('{1}') has unknown "
+                    "dimension.".format(i, inputs[vi])
+                )
             end += rel_end
     else:
         for ind, inp in enumerate(inputs):
@@ -114,8 +126,8 @@ def get_column_index(i, inputs):
             "initial_types fits the column names specified in the "
             "pipeline to convert. This may happen because a "
             "ColumnTransformer follows a transformer without "
-            "any mapped converter in a pipeline." % (
-                i, [n.raw_name for n in inputs]))
+            "any mapped converter in a pipeline." % (i, [n.raw_name for n in inputs])
+        )
 
 
 def get_column_indices(indices, inputs, multiple):
@@ -152,7 +164,8 @@ def get_column_indices(indices, inputs, multiple):
                 raise NotImplementedError(
                     "sklearn-onnx is not able to merge multiple columns from "
                     "multiple variables ({0}). You should think about merging "
-                    "initial types.".format(cols))
+                    "initial types.".format(cols)
+                )
         return onnx_var, onnx_is
 
 
@@ -162,7 +175,7 @@ def hash_array(value, length=15):
         onx = from_array(value)
     except AttributeError as e:
         # sparse matrix for example
-        if hasattr(value, 'tocoo'):
+        if hasattr(value, "tocoo"):
             coo = value.tocoo()
             arrs = [coo.data, coo.row, coo.col, np.array(coo.shape)]
             m = hashlib.sha256()
@@ -171,18 +184,18 @@ def hash_array(value, length=15):
             return m.hexdigest()[:length]
 
         raise ValueError(
-            "Unable to compute hash for type %r (value=%r)." % (
-                type(value), value)) from e
+            "Unable to compute hash for type %r (value=%r)." % (type(value), value)
+        ) from e
     except RuntimeError as ee:
         # cannot be serialized
         if isinstance(value, (np.ndarray, list)):
-            b = str(value).encode('utf-8')
+            b = str(value).encode("utf-8")
             m = hashlib.sha256()
             m.update(b)
             return m.hexdigest()[:length]
         raise RuntimeError(
-            "Unable to convert value type %r, (value=%r)." % (
-                type(value), value)) from ee
+            "Unable to convert value type %r, (value=%r)." % (type(value), value)
+        ) from ee
 
     m = hashlib.sha256()
     m.update(onx.SerializeToString())

@@ -11,4 +11,5 @@ def calculate_isolation_forest_output_shapes(operator):
 
 
 register_shape_calculator(
-    'SklearnIsolationForest', calculate_isolation_forest_output_shapes)
+    "SklearnIsolationForest", calculate_isolation_forest_output_shapes
+)

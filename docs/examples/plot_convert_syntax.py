@@ -36,6 +36,7 @@ def predict_with_onnxruntime(onx, X):
     res = sess.run(None, {input_name: X.astype(np.float32)})
     return res[0]
 
+
 #################################
 # Simple KMeans
 # +++++++++++++
@@ -48,8 +49,8 @@ tr = KMeans(n_clusters=2)
 tr.fit(X)
 
 onx = convert_sklearn(
-    tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
-    target_opset=12)
+    tr, initial_types=[("X", FloatTensorType((None, X.shape[1])))], target_opset=12
+)
 print(predict_with_onnxruntime(onx, X))
 
 #################################
@@ -83,8 +84,7 @@ print(predict_with_onnxruntime(onx, X))
 # before fitting the model.
 
 X = np.arange(20).reshape(10, 2)
-tr = wrap_as_onnx_mixin(KMeans(n_clusters=2),
-                        target_opset=12)
+tr = wrap_as_onnx_mixin(KMeans(n_clusters=2), target_opset=12)
 tr.fit(X)
 
 onx = tr.to_onnx(X.astype(np.float32))
@@ -97,9 +97,7 @@ print(predict_with_onnxruntime(onx, X))
 # This is a simple scaler.
 
 
-class CustomOpTransformer(BaseEstimator, TransformerMixin,
-                          OnnxOperatorMixin):
-
+class CustomOpTransformer(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -116,20 +114,22 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = operator.inputs[0].type
+
         return shape_calculator
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
-                         target_opset=None, **kwargs):
+    def to_onnx_operator(
+        self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
+    ):
         if inputs is None:
-            raise RuntimeError("Parameter inputs should contain at least "
-                               "one name.")
+            raise RuntimeError("Parameter inputs should contain at least " "one name.")
         opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
         W = self.W_.astype(np.float32)
         S = self.S_.astype(np.float32)
-        return OnnxDiv(OnnxSub(i0, W, op_version=12), S,
-                       output_names=outputs,
-                       op_version=opv)
+        return OnnxDiv(
+            OnnxSub(i0, W, op_version=12), S, output_names=outputs, op_version=opv
+        )
+
 
 #############################
 # Way 1
@@ -140,8 +140,8 @@ tr = make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2))
 tr.fit(X)
 
 onx = convert_sklearn(
-    tr, initial_types=[('X', FloatTensorType((None, X.shape[1])))],
-    target_opset=12)
+    tr, initial_types=[("X", FloatTensorType((None, X.shape[1])))], target_opset=12
+)
 print(predict_with_onnxruntime(onx, X))
 
 #############################
@@ -171,8 +171,8 @@ print(predict_with_onnxruntime(onx, X))
 
 X = np.arange(20).reshape(10, 2)
 tr = wrap_as_onnx_mixin(
-    make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)),
-    target_opset=12)
+    make_pipeline(CustomOpTransformer(), KMeans(n_clusters=2)), target_opset=12
+)
 
 tr.fit(X)
 
@@ -186,28 +186,37 @@ print(predict_with_onnxruntime(onx, X))
 # Finally, let's see the graph converted with *sklearn-onnx*.
 
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer  # noqa
-pydot_graph = GetPydotGraph(onx.graph, name=onx.graph.name, rankdir="TB",
-                            node_producer=GetOpNodeProducer(
-                                "docstring", color="yellow",
-                                fillcolor="yellow", style="filled"))
+
+pydot_graph = GetPydotGraph(
+    onx.graph,
+    name=onx.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline_onnx_mixin.dot")
 
 import os  # noqa
-os.system('dot -O -Gdpi=300 -Tpng pipeline_onnx_mixin.dot')
+
+os.system("dot -O -Gdpi=300 -Tpng pipeline_onnx_mixin.dot")
 
 import matplotlib.pyplot as plt  # noqa
+
 image = plt.imread("pipeline_onnx_mixin.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**
 
 import sklearn  # noqa
+
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 import skl2onnx  # noqa
+
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

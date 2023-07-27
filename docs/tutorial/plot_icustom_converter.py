@@ -31,7 +31,6 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 """
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 import pickle
 from io import BytesIO
 import numpy
@@ -58,15 +57,14 @@ class DecorrelateTransformer(TransformerMixin, BaseEstimator):
     * `self.coef_`: square root of the coveriance matrix
     """
 
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
 
     def fit(self, X, y=None, sample_weights=None):
         if sample_weights is not None:
-            raise NotImplementedError(
-                "sample_weights != None is not implemented.")
+            raise NotImplementedError("sample_weights != None is not implemented.")
         self.mean_ = numpy.mean(X, axis=0, keepdims=True)
         X = X - self.mean_
         V = X.T @ X / X.shape[0]
@@ -186,7 +184,9 @@ def decorrelate_transformer_converter(scope, operator, container):
     Y = OnnxMatMul(
         OnnxSub(X, op.mean_.astype(dtype), op_version=opv),
         op.coef_.astype(dtype),
-        op_version=opv, output_names=out[:1])
+        op_version=opv,
+        output_names=out[:1],
+    )
     Y.add_to(scope, container)
 
 
@@ -195,18 +195,19 @@ def decorrelate_transformer_converter(scope, operator, container):
 
 
 update_registered_converter(
-    DecorrelateTransformer, "SklearnDecorrelateTransformer",
+    DecorrelateTransformer,
+    "SklearnDecorrelateTransformer",
     decorrelate_transformer_shape_calculator,
-    decorrelate_transformer_converter)
+    decorrelate_transformer_converter,
+)
 
 
 onx = to_onnx(dec, X.astype(numpy.float32))
 
-sess = InferenceSession(onx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float32))
-got = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
 
 
 def diff(p1, p2):
@@ -223,11 +224,10 @@ print(diff(exp, got))
 
 onx = to_onnx(dec, X.astype(numpy.float64))
 
-sess = InferenceSession(onx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float64))
-got = sess.run(None, {'X': X.astype(numpy.float64)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float64)})[0]
 print(diff(exp, got))
 
 #############################################

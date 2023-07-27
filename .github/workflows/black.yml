@@ -1,0 +1,11 @@
+name: Black Format Checker
+on: [push, pull_request]
+jobs:
+  black-format-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: psf/black@stable
+        with:
+          options: "--diff --check"
+          src: "."

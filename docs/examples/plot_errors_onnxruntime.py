@@ -24,6 +24,7 @@ import onnxruntime as rt
 import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
+
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
@@ -35,8 +36,9 @@ clr = LogisticRegression().fit(data.data[:, :2], data.target)
 with open("logreg_iris.onnx", "wb") as f:
     f.write(
         skl2onnx.to_onnx(
-            clr, data.data[:, :2].astype(np.float32),
-            target_opset=12).SerializeToString())
+            clr, data.data[:, :2].astype(np.float32), target_opset=12
+        ).SerializeToString()
+    )
 
 example2 = "logreg_iris.onnx"
 sess = rt.InferenceSession(example2)
@@ -50,8 +52,7 @@ output_name = sess.get_outputs()[0].name
 # and cannot handle any other kind of floats.
 
 try:
-    x = np.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]],
-                 dtype=np.float64)
+    x = np.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0]], dtype=np.float64)
     sess.run([output_name], {input_name: x})
 except Exception as e:
     print("Unexpected type")
@@ -92,11 +93,12 @@ except Exception as e:
 # dimension is a multiple of the expected input dimension.
 
 for x in [
-        np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32),
-        np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32),
-        np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
-        np.array([1.0, 2.0, 3.0], dtype=np.float32),
-        np.array([[1.0, 2.0, 3.0]], dtype=np.float32)]:
+    np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32),
+    np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32),
+    np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
+    np.array([1.0, 2.0, 3.0], dtype=np.float32),
+    np.array([[1.0, 2.0, 3.0]], dtype=np.float32),
+]:
     try:
         r = sess.run([output_name], {input_name: x})
         print("Shape={0} and predicted labels={1}".format(x.shape, r))
@@ -104,15 +106,15 @@ for x in [
         print("Shape={0} and error={1}".format(x.shape, e))
 
 for x in [
-        np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32),
-        np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32),
-        np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
-        np.array([1.0, 2.0, 3.0], dtype=np.float32),
-        np.array([[1.0, 2.0, 3.0]], dtype=np.float32)]:
+    np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32),
+    np.array([[1.0, 2.0, 3.0, 4.0]], dtype=np.float32),
+    np.array([[1.0, 2.0], [3.0, 4.0]], dtype=np.float32),
+    np.array([1.0, 2.0, 3.0], dtype=np.float32),
+    np.array([[1.0, 2.0, 3.0]], dtype=np.float32),
+]:
     try:
         r = sess.run(None, {input_name: x})
-        print("Shape={0} and predicted probabilities={1}".format(
-            x.shape, r[1]))
+        print("Shape={0} and predicted probabilities={1}".format(x.shape, r[1]))
     except (RuntimeError, InvalidArgument) as e:
         print("Shape={0} and error={1}".format(x.shape, e))
 
@@ -121,9 +123,10 @@ for x in [
 # is higher than expects but produces a warning.
 
 for x in [
-        np.array([[[1.0, 2.0], [3.0, 4.0]]], dtype=np.float32),
-        np.array([[[1.0, 2.0, 3.0]]], dtype=np.float32),
-        np.array([[[1.0, 2.0]], [[3.0, 4.0]]], dtype=np.float32)]:
+    np.array([[[1.0, 2.0], [3.0, 4.0]]], dtype=np.float32),
+    np.array([[[1.0, 2.0, 3.0]]], dtype=np.float32),
+    np.array([[[1.0, 2.0]], [[3.0, 4.0]]], dtype=np.float32),
+]:
     try:
         r = sess.run([output_name], {input_name: x})
         print("Shape={0} and predicted labels={1}".format(x.shape, r))

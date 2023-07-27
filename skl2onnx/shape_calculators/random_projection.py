@@ -13,5 +13,6 @@ def random_projection_shape_calculator(operator):
     operator.outputs[0].type.shape = [n, c]
 
 
-register_shape_calculator('SklearnGaussianRandomProjection',
-                          random_projection_shape_calculator)
+register_shape_calculator(
+    "SklearnGaussianRandomProjection", random_projection_shape_calculator
+)

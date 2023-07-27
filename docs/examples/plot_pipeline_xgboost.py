@@ -34,9 +34,13 @@ from xgboost import XGBClassifier
 import skl2onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
-from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
+from skl2onnx.common.shape_calculator import (
+    calculate_linear_classifier_output_shapes,
+)  # noqa
 import onnxmltools
-from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost  # noqa
+from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
+    convert_xgboost,
+)  # noqa
 import onnxmltools.convert.common.data_types
 
 data = load_iris()
@@ -48,16 +52,18 @@ numpy.random.shuffle(ind)
 X = X[ind, :].copy()
 y = y[ind].copy()
 
-pipe = Pipeline([('scaler', StandardScaler()),
-                 ('lgbm', XGBClassifier(n_estimators=3))])
+pipe = Pipeline([("scaler", StandardScaler()), ("lgbm", XGBClassifier(n_estimators=3))])
 pipe.fit(X, y)
 
 # The conversion fails but it is expected.
 
 try:
-    convert_sklearn(pipe, 'pipeline_xgboost',
-                    [('input', FloatTensorType([None, 2]))],
-                    target_opset={'': 12, 'ai.onnx.ml': 2})
+    convert_sklearn(
+        pipe,
+        "pipeline_xgboost",
+        [("input", FloatTensorType([None, 2]))],
+        target_opset={"": 12, "ai.onnx.ml": 2},
+    )
 except Exception as e:
     print(e)
 
@@ -88,18 +94,23 @@ except Exception as e:
 ###########################
 # Let's register the new converter.
 update_registered_converter(
-    XGBClassifier, 'XGBoostXGBClassifier',
-    calculate_linear_classifier_output_shapes, convert_xgboost,
-    options={'nocl': [True, False], 'zipmap': [True, False, 'columns']})
+    XGBClassifier,
+    "XGBoostXGBClassifier",
+    calculate_linear_classifier_output_shapes,
+    convert_xgboost,
+    options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
+)
 
 ##################################
 # Convert again
 # +++++++++++++
 
 model_onnx = convert_sklearn(
-    pipe, 'pipeline_xgboost',
-    [('input', FloatTensorType([None, 2]))],
-    target_opset={'': 12, 'ai.onnx.ml': 2})
+    pipe,
+    "pipeline_xgboost",
+    [("input", FloatTensorType([None, 2]))],
+    target_opset={"": 12, "ai.onnx.ml": 2},
+)
 
 # And save.
 with open("pipeline_xgboost.onnx", "wb") as f:
@@ -127,18 +138,21 @@ print("predict_proba", pred_onx[1][:1])
 # ++++++++++++++++++++++
 
 pydot_graph = GetPydotGraph(
-    model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+    model_onnx.graph,
+    name=model_onnx.graph.name,
+    rankdir="TB",
     node_producer=GetOpNodeProducer(
-        "docstring", color="yellow",
-        fillcolor="yellow", style="filled"))
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng pipeline.dot')
+os.system("dot -O -Gdpi=300 -Tpng pipeline.dot")
 
 image = plt.imread("pipeline.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**

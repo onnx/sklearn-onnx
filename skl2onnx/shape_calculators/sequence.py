@@ -11,6 +11,7 @@ def calculate_sklearn_sequence_construct(operator):
     pass
 
 
-register_shape_calculator('SklearnSequenceAt', calculate_sklearn_sequence_at)
+register_shape_calculator("SklearnSequenceAt", calculate_sklearn_sequence_at)
 register_shape_calculator(
-    'SklearnSequenceConstruct', calculate_sklearn_sequence_construct)
+    "SklearnSequenceConstruct", calculate_sklearn_sequence_construct
+)

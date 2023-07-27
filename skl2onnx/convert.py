@@ -12,14 +12,25 @@ from . import shape_calculators  # noqa
 from . import operator_converters  # noqa
 
 
-def convert_sklearn(model, name=None, initial_types=None, doc_string='',
-                    target_opset=None, custom_conversion_functions=None,
-                    custom_shape_calculators=None,
-                    custom_parsers=None, options=None,
-                    intermediate=False,
-                    white_op=None, black_op=None, final_types=None,
-                    dtype=None, naming=None, model_optim=True,
-                    verbose=0):
+def convert_sklearn(
+    model,
+    name=None,
+    initial_types=None,
+    doc_string="",
+    target_opset=None,
+    custom_conversion_functions=None,
+    custom_shape_calculators=None,
+    custom_parsers=None,
+    options=None,
+    intermediate=False,
+    white_op=None,
+    black_op=None,
+    final_types=None,
+    dtype=None,
+    naming=None,
+    model_optim=True,
+    verbose=0,
+):
     """
     This function produces an equivalent
     ONNX model of the given scikit-learn model.
@@ -155,39 +166,54 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
         Parameter *naming* was added.
     """
     if initial_types is None:
-        if hasattr(model, 'infer_initial_types'):
+        if hasattr(model, "infer_initial_types"):
             initial_types = model.infer_initial_types()
         else:
-            raise ValueError('Initial types are required. See usage of '
-                             'convert(...) in skl2onnx.convert for details')
+            raise ValueError(
+                "Initial types are required. See usage of "
+                "convert(...) in skl2onnx.convert for details"
+            )
 
     if name is None:
         name = str(uuid4().hex)
     if dtype is not None:
         warnings.warn(
-            "Parameter dtype is no longer supported. "
-            "It will be removed in 1.9.0.",
-            DeprecationWarning)
+            "Parameter dtype is no longer supported. " "It will be removed in 1.9.0.",
+            DeprecationWarning,
+        )
 
-    target_opset = (target_opset
-                    if target_opset else get_latest_tested_opset_version())
+    target_opset = target_opset if target_opset else get_latest_tested_opset_version()
     # Parse scikit-learn model as our internal data structure
     # (i.e., Topology)
     if verbose >= 1:
         print("[convert_sklearn] parse_sklearn_model")
     topology = parse_sklearn_model(
-        model, initial_types, target_opset, custom_conversion_functions,
-        custom_shape_calculators, custom_parsers, options=options,
-        white_op=white_op, black_op=black_op,
-        final_types=final_types, naming=naming)
+        model,
+        initial_types,
+        target_opset,
+        custom_conversion_functions,
+        custom_shape_calculators,
+        custom_parsers,
+        options=options,
+        white_op=white_op,
+        black_op=black_op,
+        final_types=final_types,
+        naming=naming,
+    )
 
     # Convert our Topology object into ONNX. The outcome is an ONNX model.
     options = _process_options(model, options)
     if verbose >= 1:
         print("[convert_sklearn] convert_topology")
     onnx_model = convert_topology(
-        topology, name, doc_string, target_opset, options=options,
-        remove_identity=model_optim and not intermediate, verbose=verbose)
+        topology,
+        name,
+        doc_string,
+        target_opset,
+        options=options,
+        remove_identity=model_optim and not intermediate,
+        verbose=verbose,
+    )
     if verbose >= 1:
         print("[convert_sklearn] end")
         if verbose >= 2:
@@ -200,20 +226,29 @@ def convert_sklearn(model, name=None, initial_types=None, doc_string='',
                 print("  %r" % inp)
             print("---VARIABLES---")
             for k, v in sorted(scope.variables.items()):
-                print("  %r: is.fed=%r is_leaf=%r - %r" % (
-                    k, v.is_fed, v.is_leaf, v))
+                print("  %r: is.fed=%r is_leaf=%r - %r" % (k, v.is_fed, v.is_leaf, v))
             print("---OPERATORS---")
             for k, v in sorted(scope.operators.items()):
-                print("  %r: is.evaluated=%r - %r" % (
-                    k, v.is_evaluated, v))
+                print("  %r: is.evaluated=%r - %r" % (k, v.is_evaluated, v))
 
     return (onnx_model, topology) if intermediate else onnx_model
 
 
-def to_onnx(model, X=None, name=None, initial_types=None,
-            target_opset=None, options=None,
-            white_op=None, black_op=None, final_types=None,
-            dtype=None, naming=None, model_optim=True, verbose=0):
+def to_onnx(
+    model,
+    X=None,
+    name=None,
+    initial_types=None,
+    target_opset=None,
+    options=None,
+    white_op=None,
+    black_op=None,
+    final_types=None,
+    dtype=None,
+    naming=None,
+    model_optim=True,
+    verbose=0,
+):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
 
@@ -260,20 +295,28 @@ def to_onnx(model, X=None, name=None, initial_types=None,
     if isinstance(model, OnnxOperatorMixin):
         if options is not None:
             raise NotImplementedError(
-                "options not yet implemented for OnnxOperatorMixin.")
+                "options not yet implemented for OnnxOperatorMixin."
+            )
         return model.to_onnx(X=X, name=name, target_opset=target_opset)
     if name is None:
         name = "ONNX(%s)" % model.__class__.__name__
     initial_types = guess_initial_types(X, initial_types)
     if verbose >= 1:
         print("[to_onnx] initial_types=%r" % initial_types)
-    return convert_sklearn(model, initial_types=initial_types,
-                           target_opset=target_opset,
-                           name=name, options=options,
-                           white_op=white_op, black_op=black_op,
-                           final_types=final_types, dtype=dtype,
-                           verbose=verbose, naming=naming,
-                           model_optim=model_optim)
+    return convert_sklearn(
+        model,
+        initial_types=initial_types,
+        target_opset=target_opset,
+        name=name,
+        options=options,
+        white_op=white_op,
+        black_op=black_op,
+        final_types=final_types,
+        dtype=dtype,
+        verbose=verbose,
+        naming=naming,
+        model_optim=model_optim,
+    )
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):
@@ -283,6 +326,7 @@ def wrap_as_onnx_mixin(model, target_opset=None):
     and *OnnxOperatorMixin* API.
     """
     from .algebra.sklearn_ops import find_class
+
     cl = find_class(model.__class__)
     if "automation" in str(cl):
         raise RuntimeError("Wrong class name '{}'.".format(cl))

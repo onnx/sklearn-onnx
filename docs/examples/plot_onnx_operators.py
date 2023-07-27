@@ -46,17 +46,17 @@ from onnx import TensorProto
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 # Create one input (ValueInfoProto)
-X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 2])
+X = helper.make_tensor_value_info("X", TensorProto.FLOAT, [None, 2])
 
 # Create one output (ValueInfoProto)
-Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [None, 4])
+Y = helper.make_tensor_value_info("Y", TensorProto.FLOAT, [None, 4])
 
 # Create a node (NodeProto)
 node_def = helper.make_node(
-    'Pad',  # node name
-    ['X'],  # inputs
-    ['Y'],  # outputs
-    mode='constant',  # attributes
+    "Pad",  # node name
+    ["X"],  # inputs
+    ["Y"],  # outputs
+    mode="constant",  # attributes
     value=1.5,
     pads=[0, 1, 0, 1],
 )
@@ -64,18 +64,18 @@ node_def = helper.make_node(
 # Create the graph (GraphProto)
 graph_def = helper.make_graph(
     [node_def],
-    'test-model',
+    "test-model",
     [X],
     [Y],
 )
 
 # Create the model (ModelProto)
-model_def = helper.make_model(graph_def, producer_name='onnx-example')
+model_def = helper.make_model(graph_def, producer_name="onnx-example")
 model_def.opset_import[0].version = 10
 
-print('The model is:\n{}'.format(model_def))
+print("The model is:\n{}".format(model_def))
 onnx.checker.check_model(model_def)
-print('The model is checked!')
+print("The model is checked!")
 
 #####################################
 # Same example with sklearn-onnx
@@ -87,19 +87,24 @@ print('The model is checked!')
 
 from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 
-pad = OnnxPad('X', output_names=['Y'], mode='constant', value=1.5,
-              pads=[0, 1, 0, 1], op_version=10)
-model_def = pad.to_onnx({'X': X}, target_opset=10)
+pad = OnnxPad(
+    "X",
+    output_names=["Y"],
+    mode="constant",
+    value=1.5,
+    pads=[0, 1, 0, 1],
+    op_version=10,
+)
+model_def = pad.to_onnx({"X": X}, target_opset=10)
 
-print('The model is:\n{}'.format(model_def))
+print("The model is:\n{}".format(model_def))
 onnx.checker.check_model(model_def)
-print('The model is checked!')
+print("The model is checked!")
 
 ####################################
 # Inputs and outputs can also be skipped.
 
-pad = OnnxPad(mode='constant', value=1.5,
-              pads=[0, 1, 0, 1], op_version=10)
+pad = OnnxPad(mode="constant", value=1.5, pads=[0, 1, 0, 1], op_version=10)
 
 model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
 onnx.checker.check_model(model_def)
@@ -112,17 +117,17 @@ onnx.checker.check_model(model_def)
 
 
 # Preprocessing: create a model with two nodes, Y's shape is unknown
-node1 = helper.make_node('Transpose', ['X'], ['Y'], perm=[1, 0, 2])
-node2 = helper.make_node('Transpose', ['Y'], ['Z'], perm=[1, 0, 2])
+node1 = helper.make_node("Transpose", ["X"], ["Y"], perm=[1, 0, 2])
+node2 = helper.make_node("Transpose", ["Y"], ["Z"], perm=[1, 0, 2])
 
 graph = helper.make_graph(
     [node1, node2],
-    'two-transposes',
-    [helper.make_tensor_value_info('X', TensorProto.FLOAT, (2, 3, 4))],
-    [helper.make_tensor_value_info('Z', TensorProto.FLOAT, (2, 3, 4))],
+    "two-transposes",
+    [helper.make_tensor_value_info("X", TensorProto.FLOAT, (2, 3, 4))],
+    [helper.make_tensor_value_info("Z", TensorProto.FLOAT, (2, 3, 4))],
 )
 
-original_model = helper.make_model(graph, producer_name='onnx-examples')
+original_model = helper.make_model(graph, producer_name="onnx-examples")
 
 # Check the model and print Y's shape information
 onnx.checker.check_model(original_model)
@@ -133,12 +138,12 @@ onnx.checker.check_model(original_model)
 from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
 node = OnnxTranspose(
-    OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
-    perm=[1, 0, 2], op_version=12)
+    OnnxTranspose("X", perm=[1, 0, 2], op_version=12), perm=[1, 0, 2], op_version=12
+)
 X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
 # numpy arrays are good enough to define the input shape
-model_def = node.to_onnx({'X': X}, target_opset=12)
+model_def = node.to_onnx({"X": X}, target_opset=12)
 onnx.checker.check_model(model_def)
 
 ######################################
@@ -147,6 +152,7 @@ onnx.checker.check_model(model_def)
 
 def predict_with_onnxruntime(model_def, *inputs):
     import onnxruntime as ort
+
     sess = ort.InferenceSession(model_def.SerializeToString())
     names = [i.name for i in sess.get_inputs()]
     dinputs = {name: input for name, input in zip(names, inputs)}
@@ -163,25 +169,31 @@ print(Y)
 # ++++++++++++++++++++++
 
 pydot_graph = GetPydotGraph(
-    model_def.graph, name=model_def.graph.name, rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                    fillcolor="yellow", style="filled"))
+    model_def.graph,
+    name=model_def.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline_transpose2x.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot')
+os.system("dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot")
 
 image = plt.imread("pipeline_transpose2x.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**
 
 import sklearn  # noqa
+
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 import skl2onnx  # noqa
+
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

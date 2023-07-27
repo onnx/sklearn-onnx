@@ -24,16 +24,17 @@ from skl2onnx import to_onnx
 from skl2onnx.sklapi import TraceableTfidfVectorizer
 import skl2onnx.sklapi.register  # noqa
 
-corpus = numpy.array([
-    "This is the first document.",
-    "This document is the second document.",
-    "Is this the first document?",
-    "",
-]).reshape((4, ))
+corpus = numpy.array(
+    [
+        "This is the first document.",
+        "This document is the second document.",
+        "Is this the first document?",
+        "",
+    ]
+).reshape((4,))
 
 pattern = r"\b[a-z ]{1,10}\b"
-mod1 = TfidfVectorizer(ngram_range=(1, 2),
-                       token_pattern=pattern)
+mod1 = TfidfVectorizer(ngram_range=(1, 2), token_pattern=pattern)
 mod1.fit(corpus)
 
 
@@ -63,8 +64,7 @@ except RuntimeError as e:
 # instead of concatenating every piece into a string.
 
 
-mod2 = TraceableTfidfVectorizer(
-    ngram_range=(1, 2), token_pattern=pattern)
+mod2 = TraceableTfidfVectorizer(ngram_range=(1, 2), token_pattern=pattern)
 mod2.fit(corpus)
 
 pprint.pprint(mod2.vocabulary_)
@@ -72,8 +72,7 @@ pprint.pprint(mod2.vocabulary_)
 #######################################
 # Let's check it produces the same results.
 
-assert_almost_equal(mod1.transform(corpus).todense(),
-                    mod2.transform(corpus).todense())
+assert_almost_equal(mod1.transform(corpus).todense(), mod2.transform(corpus).todense())
 
 ####################################
 # Conversion. Line `import skl2onnx.sklapi.register`
@@ -83,7 +82,7 @@ assert_almost_equal(mod1.transform(corpus).todense(),
 
 onx = to_onnx(mod2, corpus)
 sess = InferenceSession(onx.SerializeToString())
-got = sess.run(None, {'X': corpus})
+got = sess.run(None, {"X": corpus})
 
 ###################################
 # Let's check if there are discrepancies...

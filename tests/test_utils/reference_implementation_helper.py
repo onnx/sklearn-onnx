@@ -3,19 +3,19 @@ import numpy as np
 
 
 def ErfInv(x):
-    sgn = -1. if x < 0 else 1.
-    x = (1. - x) * (1 + x)
+    sgn = -1.0 if x < 0 else 1.0
+    x = (1.0 - x) * (1 + x)
     log = np.log(x)
-    v = 2. / (3.14159 * 0.147) + 0.5 * log
-    v2 = 1. / 0.147 * log
+    v = 2.0 / (3.14159 * 0.147) + 0.5 * log
+    v2 = 1.0 / 0.147 * log
     v3 = -v + np.sqrt(v * v - v2)
     x = sgn * np.sqrt(v3)
     return x
 
 
 def ComputeLogistic(val):
-    v = 1. / (1. + np.exp(-np.abs(val)))
-    return (1. - v) if val < 0 else v
+    v = 1.0 / (1.0 + np.exp(-np.abs(val)))
+    return (1.0 - v) if val < 0 else v
 
 
 def ComputeProbit(val):
@@ -55,8 +55,8 @@ def sigmoid_probability(score, proba, probb):
 def multiclass_probability(k, R):
     max_iter = max(100, k)
     Q = np.empty((k, k), dtype=R.dtype)
-    Qp = np.empty((k, ), dtype=R.dtype)
-    P = np.empty((k, ), dtype=R.dtype)
+    Qp = np.empty((k,), dtype=R.dtype)
+    P = np.empty((k,), dtype=R.dtype)
     eps = 0.005 / k
 
     for t in range(0, k):
@@ -89,11 +89,10 @@ def multiclass_probability(k, R):
         for t in range(k):
             diff = (-Qp[t] + pQp) / Q[t, t]
             P[t] += diff
-            pQp = ((pQp + diff * (diff * Q[t, t] + 2 * Qp[t])) /
-                   (1 + diff) ** 2)
+            pQp = (pQp + diff * (diff * Q[t, t] + 2 * Qp[t])) / (1 + diff) ** 2
             for j in range(k):
                 Qp[j] = (Qp[j] + diff * Q[t, j]) / (1 + diff)
-                P[j] /= (1 + diff)
+                P[j] /= 1 + diff
     return P
 
 
@@ -123,17 +122,26 @@ def write_scores(n_classes, scores, post_transform, add_second_class):
             res = np.array([1 - scores[0], scores[0]], dtype=scores.dtype)
         elif add_second_class in (2, 3):
             if post_transform == "LOGISTIC":
-                return np.array([ComputeLogistic(-scores[0]),
-                                 ComputeLogistic(scores[0])],
-                                dtype=scores.dtype)
+                return np.array(
+                    [ComputeLogistic(-scores[0]), ComputeLogistic(scores[0])],
+                    dtype=scores.dtype,
+                )
             return np.array([-scores[0], scores[0]], dtype=scores.dtype)
         return np.array([scores[0]], dtype=scores.dtype)
     raise NotImplementedError(f"n_classes={n_classes} not supported.")
 
 
-def set_score_svm(max_weight, maxclass, n, post_transform,
-                  has_proba, weights_are_all_positive_,
-                  classlabels, posclass, negclass):
+def set_score_svm(
+    max_weight,
+    maxclass,
+    n,
+    post_transform,
+    has_proba,
+    weights_are_all_positive_,
+    classlabels,
+    posclass,
+    negclass,
+):
     write_additional_scores = -1
     if len(classlabels) == 2:
         write_additional_scores = 2 if post_transform == "NONE" else 0

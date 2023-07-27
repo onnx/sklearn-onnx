@@ -26,24 +26,27 @@ from .tests_helper import (  # noqa
     binary_array_to_string,
     path_to_leaf,
 )
+
 try:
     from .utils_backend_onnx import ReferenceEvaluatorEx
 except ImportError:
+
     def ReferenceEvaluatorEx(*args, **kwargs):
         raise NotImplementedError(
             "onnx package does not implement class ReferenceEvaluator. "
-            "Update to onnx>=1.13.0.")
+            "Update to onnx>=1.13.0."
+        )
 
 
 def InferenceSessionEx(onx, *args, verbose=0, **kwargs):
     from onnxruntime import InferenceSession
+
     if "providers" not in kwargs:
         kwargs["providers"] = ["CPUExecutionProvider"]
     try:
         return InferenceSession(onx, *args, **kwargs)
     except Exception as e:
-        if (TARGET_OPSET >= 18 and
-                "support for domain ai.onnx is till opset" in str(e)):
+        if TARGET_OPSET >= 18 and "support for domain ai.onnx is till opset" in str(e):
             return ReferenceEvaluatorEx(onx, verbose=verbose)
         raise e
 
