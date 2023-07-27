@@ -15,5 +15,5 @@ sphinxcontrib-blockdiag
 tqdm
 
 # docs/examples
-lightgbm
+lightgbm<4.0
 matplotlib
