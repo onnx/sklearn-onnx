@@ -43,32 +43,39 @@ model.fit(X_train)
 # ++++++++++++++++++
 
 model_onnx = to_onnx(
-    model, X_train[:1].astype(np.float32),
-    options={id(model): {'score_samples': True}},
-    target_opset=12)
-sess = InferenceSession(model_onnx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
+    model,
+    X_train[:1].astype(np.float32),
+    options={id(model): {"score_samples": True}},
+    target_opset=12,
+)
+sess = InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 xt = X_test[:5].astype(np.float32)
 print(model.score_samples(xt))
-print(sess.run(None, {'X': xt})[2])
+print(sess.run(None, {"X": xt})[2])
 
 
 ##################################
 # Display the ONNX graph.
 
 pydot_graph = GetPydotGraph(
-    model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                    fillcolor="yellow", style="filled"))
+    model_onnx.graph,
+    name=model_onnx.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("mixture.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng mixture.dot')
+os.system("dot -O -Gdpi=300 -Tpng mixture.dot")
 
 image = plt.imread("mixture.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 
 ###################################
@@ -80,43 +87,58 @@ ax.axis('off')
 # produces in that case.
 
 model_onnx2 = to_onnx(
-    model, X_train[:1].astype(np.float32),
-    options={id(model): {'score_samples': True}},
-    black_op={'ReduceLogSumExp'},
-    target_opset=12)
-sess2 = InferenceSession(model_onnx2.SerializeToString(),
-                         providers=["CPUExecutionProvider"])
+    model,
+    X_train[:1].astype(np.float32),
+    options={id(model): {"score_samples": True}},
+    black_op={"ReduceLogSumExp"},
+    target_opset=12,
+)
+sess2 = InferenceSession(
+    model_onnx2.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 xt = X_test[:5].astype(np.float32)
 print(model.score_samples(xt))
-print(sess2.run(None, {'X': xt})[2])
+print(sess2.run(None, {"X": xt})[2])
 
 ##################################
 # Display the ONNX graph.
 
 pydot_graph = GetPydotGraph(
-    model_onnx2.graph, name=model_onnx2.graph.name, rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                    fillcolor="yellow", style="filled"))
+    model_onnx2.graph,
+    name=model_onnx2.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("mixture2.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng mixture2.dot')
+os.system("dot -O -Gdpi=300 -Tpng mixture2.dot")
 
 image = plt.imread("mixture2.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 
 #######################################
 # Processing time
 # +++++++++++++++
 
-print(timeit(stmt="sess.run(None, {'X': xt})",
-             number=10000, globals={'sess': sess, 'xt': xt}))
+print(
+    timeit(
+        stmt="sess.run(None, {'X': xt})", number=10000, globals={"sess": sess, "xt": xt}
+    )
+)
 
-print(timeit(stmt="sess2.run(None, {'X': xt})",
-             number=10000, globals={'sess2': sess2, 'xt': xt}))
+print(
+    timeit(
+        stmt="sess2.run(None, {'X': xt})",
+        number=10000,
+        globals={"sess2": sess2, "xt": xt},
+    )
+)
 
 #################################
 # The model using ReduceLogSumExp is much faster.
@@ -132,21 +154,25 @@ print(timeit(stmt="sess2.run(None, {'X': xt})",
 
 try:
     to_onnx(
-        model, X_train[:1].astype(np.float32),
-        options={id(model): {'score_samples': True}},
-        black_op={'ReduceLogSumExp', 'Add'},
-        target_opset=12)
+        model,
+        X_train[:1].astype(np.float32),
+        options={id(model): {"score_samples": True}},
+        black_op={"ReduceLogSumExp", "Add"},
+        target_opset=12,
+    )
 except RuntimeError as e:
-    print('Error:', e)
+    print("Error:", e)
 
 
 #################################
 # **Versions used for this example**
 
 import sklearn  # noqa
+
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
 import skl2onnx  # noqa
+
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

@@ -4,10 +4,10 @@
 Tests scikit-learn's binarizer converter.
 """
 import unittest
-import logging
 import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
+
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
@@ -18,6 +18,7 @@ from sklearn.datasets import load_iris
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
+
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -27,21 +28,19 @@ except ImportError:
 from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
 from skl2onnx import to_onnx, update_registered_converter
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx.common.shape_calculator import (
-    calculate_linear_classifier_output_shapes)
+from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.algebra.onnx_ops import (
     OnnxArgMax,
     OnnxConcat,
     OnnxIdentity,
     OnnxReshape,
-    OnnxSoftmax)
+    OnnxSoftmax,
+)
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
-class CustomOpTransformer1(BaseEstimator, TransformerMixin,
-                           OnnxOperatorMixin):
-
+class CustomOpTransformer1(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -55,26 +54,26 @@ class CustomOpTransformer1(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return self.norm_.transform(X)
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
-                         target_opset=None, **kwargs):
+    def to_onnx_operator(
+        self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
+    ):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
         out = OnnxSubEstimator(self.norm_, i0, op_version=opv)
-        return OnnxIdentity(out, op_version=self.op_version,
-                            output_names=outputs)
+        return OnnxIdentity(out, op_version=self.op_version, output_names=outputs)
 
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = FloatTensorType(
-                shape=operator.inputs[0].type.shape)
+                shape=operator.inputs[0].type.shape
+            )
+
         return shape_calculator
 
 
-class CustomOpTransformer1w(BaseEstimator, TransformerMixin,
-                            OnnxOperatorMixin):
-
+class CustomOpTransformer1w(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -88,25 +87,24 @@ class CustomOpTransformer1w(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return self.norm_.transform(X)
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', )):
+    def to_onnx_operator(self, inputs=None, outputs=("Y",)):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         opv = self.op_version
         i0 = self.get_inputs(inputs, 0)
         out = OnnxSubEstimator(self.norm_, i0, op_version=opv)
-        return OnnxIdentity(out, op_version=self.op_version,
-                            output_names=outputs)
+        return OnnxIdentity(out, op_version=self.op_version, output_names=outputs)
 
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = FloatTensorType(
-                shape=operator.inputs[0].type.shape)
+                shape=operator.inputs[0].type.shape
+            )
+
         return shape_calculator
 
 
-class CustomOpTransformer2(BaseEstimator, TransformerMixin,
-                           OnnxOperatorMixin):
-
+class CustomOpTransformer2(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -120,26 +118,26 @@ class CustomOpTransformer2(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return self.norm_.transform(X)
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
-                         target_opset=None, **kwargs):
+    def to_onnx_operator(
+        self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
+    ):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
-        out = OnnxSubEstimator(self.norm_, i0, op_version=opv,
-                               output_names=outputs)
+        out = OnnxSubEstimator(self.norm_, i0, op_version=opv, output_names=outputs)
         return out
 
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = FloatTensorType(
-                shape=operator.inputs[0].type.shape)
+                shape=operator.inputs[0].type.shape
+            )
+
         return shape_calculator
 
 
-class CustomOpTransformer3(BaseEstimator, TransformerMixin,
-                           OnnxOperatorMixin):
-
+class CustomOpTransformer3(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -153,27 +151,28 @@ class CustomOpTransformer3(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return self.norm_.predict_proba(X)
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
-                         target_opset=None, **kwargs):
+    def to_onnx_operator(
+        self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
+    ):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
-        out = OnnxSubEstimator(self.norm_, i0, op_version=opv,
-                               options={'zipmap': False})
-        return OnnxIdentity(
-            out[1], output_names=outputs, op_version=self.op_version)
+        out = OnnxSubEstimator(
+            self.norm_, i0, op_version=opv, options={"zipmap": False}
+        )
+        return OnnxIdentity(out[1], output_names=outputs, op_version=self.op_version)
 
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = FloatTensorType(
-                shape=operator.inputs[0].type.shape)
+                shape=operator.inputs[0].type.shape
+            )
+
         return shape_calculator
 
 
-class CustomOpTransformer4(BaseEstimator, TransformerMixin,
-                           OnnxOperatorMixin):
-
+class CustomOpTransformer4(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -187,25 +186,26 @@ class CustomOpTransformer4(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return self.norm_.predict_proba(X)
 
-    def to_onnx_operator(self, inputs=None, outputs=('Y', ),
-                         target_opset=None, **kwargs):
+    def to_onnx_operator(
+        self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
+    ):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
         out = OnnxSubEstimator(self.norm_, i0, op_version=opv)
-        return OnnxIdentity(
-            out[1], output_names=outputs, op_version=opv)
+        return OnnxIdentity(out[1], output_names=outputs, op_version=opv)
 
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = FloatTensorType(
-                shape=operator.inputs[0].type.shape)
+                shape=operator.inputs[0].type.shape
+            )
+
         return shape_calculator
 
 
 class Custom2OpTransformer1(BaseEstimator, TransformerMixin):
-
     def __init__(self):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -219,8 +219,7 @@ class Custom2OpTransformer1(BaseEstimator, TransformerMixin):
 
 
 def custom_shape_calculator(operator):
-    operator.outputs[0].type = FloatTensorType(
-        shape=operator.inputs[0].type.shape)
+    operator.outputs[0].type = FloatTensorType(shape=operator.inputs[0].type.shape)
 
 
 def custom_transformer_converter1(scope, operator, container):
@@ -229,8 +228,7 @@ def custom_transformer_converter1(scope, operator, container):
     op = operator.raw_operator
     opv = container.target_opset
     out = OnnxSubEstimator(op.norm_, i0, op_version=opv)
-    final = OnnxIdentity(out, op_version=opv,
-                         output_names=outputs)
+    final = OnnxIdentity(out, op_version=opv, output_names=outputs)
     final.add_to(scope, container)
 
 
@@ -244,8 +242,7 @@ def custom_transformer_converter1w(scope, operator, container):
     op = operator.raw_operator
     opv = container.target_opset
     out = OnnxSubEstimator(op.norm_, i0, op_version=opv)
-    final = OnnxIdentity(out, op_version=opv,
-                         output_names=outputs)
+    final = OnnxIdentity(out, op_version=opv, output_names=outputs)
     final.add_to(scope, container)
 
 
@@ -260,8 +257,7 @@ def custom_transformer_converter1ww(scope, operator, container):
     opv = container.target_opset
     idin = OnnxIdentity(i0, op_version=opv)
     out = OnnxSubEstimator(op.norm_, idin, op_version=opv)
-    final = OnnxIdentity(out, op_version=opv,
-                         output_names=outputs)
+    final = OnnxIdentity(out, op_version=opv, output_names=outputs)
     final.add_to(scope, container)
 
 
@@ -274,13 +270,11 @@ def custom_transformer_converter2(scope, operator, container):
     outputs = operator.outputs
     op = operator.raw_operator
     opv = container.target_opset
-    out = OnnxSubEstimator(op.norm_, i0, op_version=opv,
-                           output_names=outputs)
+    out = OnnxSubEstimator(op.norm_, i0, op_version=opv, output_names=outputs)
     out.add_to(scope, container)
 
 
 class Custom2OpTransformer3(Custom2OpTransformer1):
-
     def fit(self, X, y=None):
         self.norm_ = LogisticRegression().fit(X, y)
         return self
@@ -294,10 +288,8 @@ def custom_transformer_converter3(scope, operator, container):
     outputs = operator.outputs
     op = operator.raw_operator
     opv = container.target_opset
-    out = OnnxSubEstimator(op.norm_, i0, op_version=opv,
-                           options={'zipmap': False})
-    final = OnnxIdentity(
-        out[1], output_names=outputs, op_version=opv)
+    out = OnnxSubEstimator(op.norm_, i0, op_version=opv, options={"zipmap": False})
+    final = OnnxIdentity(out[1], output_names=outputs, op_version=opv)
     final.add_to(scope, container)
 
 
@@ -311,13 +303,11 @@ def custom_transformer_converter4(scope, operator, container):
     op = operator.raw_operator
     opv = container.target_opset
     out = OnnxSubEstimator(op.norm_, i0, op_version=opv)
-    final = OnnxIdentity(
-        out[1], output_names=outputs, op_version=opv)
+    final = OnnxIdentity(out[1], output_names=outputs, op_version=opv)
     final.add_to(scope, container)
 
 
 class CustomOpClassifier(BaseEstimator, ClassifierMixin):
-
     def __init__(self):
         BaseEstimator.__init__(self)
         ClassifierMixin.__init__(self)
@@ -356,74 +346,69 @@ def custom_classifier_converter(scope, operator, container):
     y_list = [
         OnnxReshape(
             OnnxSubEstimator(est, X, op_version=opv)[1],
-            np.array([-1, 1], dtype=np.int64), op_version=opv)
-        for est in op.estimators_]
+            np.array([-1, 1], dtype=np.int64),
+            op_version=opv,
+        )
+        for est in op.estimators_
+    ]
     y_matrix = OnnxConcat(*y_list, axis=1, op_version=opv)
-    probs = OnnxSoftmax(y_matrix, axis=1, op_version=opv,
-                        output_names=[outputs[1]])
+    probs = OnnxSoftmax(y_matrix, axis=1, op_version=opv, output_names=[outputs[1]])
     probs.add_to(scope, container)
-    labels = OnnxArgMax(probs, axis=1, keepdims=0, op_version=opv,
-                        output_names=[outputs[0]])
+    labels = OnnxArgMax(
+        probs, axis=1, keepdims=0, op_version=opv, output_names=[outputs[0]]
+    )
     labels.add_to(scope, container)
 
 
 class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
-
-    def setUp(self, log=False):
-        self.log = logging.getLogger('skl2onnx')
-        if log:
-            self.log.setLevel(logging.DEBUG)
-            logging.basicConfig(level=logging.DEBUG)
-
     def check_transform(self, obj, X):
-        self.log.debug("[check_transform------] type(obj)=%r" % type(obj))
         expected = obj.transform(X)
         onx = to_onnx(obj, X, target_opset=TARGET_OPSET)
         try:
             sess = InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
+                onx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
         except InvalidArgument as e:
-            raise AssertionError(
-                "Issue %r with\n%s" % (e, str(onx))) from e
-        got = sess.run(None, {'X': X})[0]
+            raise AssertionError("Issue %r with\n%s" % (e, str(onx))) from e
+        got = sess.run(None, {"X": X})[0]
         assert_almost_equal(expected, got, decimal=5)
 
     def check_classifier(self, obj, X):
-        self.log.debug("[check_classifier------] type(obj)=%r" % type(obj))
         expected_labels = obj.predict(X)
         expected_probas = obj.predict_proba(X)
-        onx = to_onnx(obj, X, target_opset=TARGET_OPSET,
-                      options={id(obj): {'zipmap': False}})
+        onx = to_onnx(
+            obj, X, target_opset=TARGET_OPSET, options={id(obj): {"zipmap": False}}
+        )
         try:
             sess = InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
+                onx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
         except InvalidArgument as e:
-            raise AssertionError(
-                "Issue %r with\n%s" % (e, str(onx))) from e
-        got = sess.run(None, {'X': X})
+            raise AssertionError("Issue %r with\n%s" % (e, str(onx))) from e
+        got = sess.run(None, {"X": X})
         assert_almost_equal(expected_probas, got[1], decimal=5)
         assert_almost_equal(expected_labels, got[0])
 
     def test_custom_scaler_1(self):
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = CustomOpTransformer1(op_version=TARGET_OPSET)
         tr.fit(X)
         self.check_transform(tr, X)
 
     def test_custom_scaler_1_classic(self):
         update_registered_converter(
-            Custom2OpTransformer1, 'Custom2OpTransformer1',
+            Custom2OpTransformer1,
+            "Custom2OpTransformer1",
             custom_shape_calculator,
-            custom_transformer_converter1)
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+            custom_transformer_converter1,
+        )
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = Custom2OpTransformer1()
         tr.fit(X)
         self.check_transform(tr, X)
 
     def test_custom_scaler_1w(self):
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = CustomOpTransformer1w(op_version=TARGET_OPSET)
         tr.fit(X)
         with warnings.catch_warnings(record=True) as w:
@@ -435,42 +420,48 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
     def test_custom_scaler_1w_classic(self):
         update_registered_converter(
-            Custom2OpTransformer1w, 'Custom2OpTransformer1w',
+            Custom2OpTransformer1w,
+            "Custom2OpTransformer1w",
             custom_shape_calculator,
-            custom_transformer_converter1w)
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+            custom_transformer_converter1w,
+        )
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = Custom2OpTransformer1w()
         tr.fit(X)
         self.check_transform(tr, X)
 
     def test_custom_scaler_1ww_classic(self):
         update_registered_converter(
-            Custom2OpTransformer1ww, 'Custom2OpTransformer1ww',
+            Custom2OpTransformer1ww,
+            "Custom2OpTransformer1ww",
             custom_shape_calculator,
-            custom_transformer_converter1ww)
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+            custom_transformer_converter1ww,
+        )
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = Custom2OpTransformer1ww()
         tr.fit(X)
         self.check_transform(tr, X)
 
     def test_custom_scaler_2(self):
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = CustomOpTransformer2(op_version=TARGET_OPSET)
         tr.fit(X)
         self.check_transform(tr, X)
 
     def test_custom_scaler_2_classic(self):
         update_registered_converter(
-            Custom2OpTransformer2, 'Custom2OpTransformer2',
+            Custom2OpTransformer2,
+            "Custom2OpTransformer2",
             custom_shape_calculator,
-            custom_transformer_converter2)
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+            custom_transformer_converter2,
+        )
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = Custom2OpTransformer2()
         tr.fit(X)
         self.check_transform(tr, X)
 
     def test_custom_scaler_3(self):
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         y = np.array([0, 0, 1], dtype=np.int64)
         tr = CustomOpTransformer3(op_version=TARGET_OPSET)
         tr.fit(X, y)
@@ -478,17 +469,19 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
     def test_custom_scaler_3_classic(self):
         update_registered_converter(
-            Custom2OpTransformer3, 'Custom2OpTransformer3',
+            Custom2OpTransformer3,
+            "Custom2OpTransformer3",
             custom_shape_calculator,
-            custom_transformer_converter3)
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+            custom_transformer_converter3,
+        )
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         y = np.array([0, 0, 1], dtype=np.int64)
         tr = Custom2OpTransformer3()
         tr.fit(X, y)
         self.check_transform(tr, X)
 
     def test_custom_scaler_4(self):
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         y = np.array([0, 0, 1], dtype=np.int64)
         tr = CustomOpTransformer4(op_version=TARGET_OPSET)
         tr.fit(X, y)
@@ -496,10 +489,12 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
     def test_custom_scaler_4_classic(self):
         update_registered_converter(
-            Custom2OpTransformer4, 'Custom2OpTransformer4',
+            Custom2OpTransformer4,
+            "Custom2OpTransformer4",
             custom_shape_calculator,
-            custom_transformer_converter4)
-        X = np.array([[0., 1.], [0., 1.], [2., 2.]], dtype=np.float32)
+            custom_transformer_converter4,
+        )
+        X = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]], dtype=np.float32)
         tr = Custom2OpTransformer1()
         tr.fit(X)
         self.check_transform(tr, X)
@@ -507,11 +502,12 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
     @ignore_warnings(category=ConvergenceWarning)
     def test_custom_classifier(self):
         update_registered_converter(
-            CustomOpClassifier, 'CustomOpClassifier',
+            CustomOpClassifier,
+            "CustomOpClassifier",
             calculate_linear_classifier_output_shapes,
             custom_classifier_converter,
-            options={'zipmap': [False, True],
-                     'nocl': [False, True]})
+            options={"zipmap": [False, True], "nocl": [False, True]},
+        )
         data = load_iris()
         X, y = data.data, data.target
         X = X.astype(np.float32)
@@ -521,7 +517,4 @@ class TestCustomModelAlgebraSubEstimator(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # cl = TestCustomModelAlgebraSubEstimator()
-    # cl.setUp(log=False)
-    # cl.test_custom_scaler_2()
     unittest.main()

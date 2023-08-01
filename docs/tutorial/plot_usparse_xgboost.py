@@ -34,6 +34,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.ensemble import RandomForestClassifier
+
 try:
     from sklearn.ensemble import HistGradientBoostingClassifier
 except ImportError:
@@ -43,22 +44,25 @@ from lightgbm import LGBMClassifier
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx import to_onnx, update_registered_converter
 from skl2onnx.sklapi import CastTransformer, ReplaceTransformer
-from skl2onnx.common.shape_calculator import (
-    calculate_linear_classifier_output_shapes)
-from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
-    convert_xgboost)
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
-    convert_lightgbm)
+from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
+from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
 
 
 update_registered_converter(
-    XGBClassifier, 'XGBoostXGBClassifier',
-    calculate_linear_classifier_output_shapes, convert_xgboost,
-    options={'nocl': [True, False], 'zipmap': [True, False, 'columns']})
+    XGBClassifier,
+    "XGBoostXGBClassifier",
+    calculate_linear_classifier_output_shapes,
+    convert_xgboost,
+    options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
+)
 update_registered_converter(
-    LGBMClassifier, 'LightGbmLGBMClassifier',
-    calculate_linear_classifier_output_shapes, convert_lightgbm,
-    options={'nocl': [True, False], 'zipmap': [True, False]})
+    LGBMClassifier,
+    "LightGbmLGBMClassifier",
+    calculate_linear_classifier_output_shapes,
+    convert_lightgbm,
+    options={"nocl": [True, False], "zipmap": [True, False]},
+)
 
 
 ##########################################
@@ -67,7 +71,7 @@ update_registered_converter(
 #
 # Iris + a text column.
 
-cst = ['class zero', 'class one', 'class two']
+cst = ["class zero", "class one", "class two"]
 
 data = load_iris()
 X = data.data[:, :2]
@@ -93,19 +97,25 @@ y = y[ind].copy()
 # sparse matrices to be converted into dense matrices.
 
 
-def make_pipelines(df_train, y_train, models=None,
-                   sparse_threshold=1., replace_nan=False,
-                   insert_replace=False):
-
+def make_pipelines(
+    df_train,
+    y_train,
+    models=None,
+    sparse_threshold=1.0,
+    replace_nan=False,
+    insert_replace=False,
+):
     if models is None:
         models = [
-            RandomForestClassifier, HistGradientBoostingClassifier,
-            XGBClassifier, LGBMClassifier]
+            RandomForestClassifier,
+            HistGradientBoostingClassifier,
+            XGBClassifier,
+            LGBMClassifier,
+        ]
     models = [_ for _ in models if _ is not None]
 
     pipes = []
     for model in tqdm(models):
-
         if model == HistGradientBoostingClassifier:
             kwargs = dict(max_iter=5)
         elif model == XGBClassifier:
@@ -114,79 +124,107 @@ def make_pipelines(df_train, y_train, models=None,
             kwargs = dict(n_estimators=5)
 
         if insert_replace:
-            pipe = Pipeline([
-                ('union', ColumnTransformer([
-                    ('scale1', StandardScaler(), [0, 1]),
-                    ('subject',
-                     Pipeline([
-                         ('count', CountVectorizer()),
-                         ('tfidf', TfidfTransformer()),
-                         ('repl', ReplaceTransformer()),
-                     ]), "text"),
-                ], sparse_threshold=sparse_threshold)),
-                ('cast', CastTransformer()),
-                ('cls', model(max_depth=3, **kwargs)),
-            ])
+            pipe = Pipeline(
+                [
+                    (
+                        "union",
+                        ColumnTransformer(
+                            [
+                                ("scale1", StandardScaler(), [0, 1]),
+                                (
+                                    "subject",
+                                    Pipeline(
+                                        [
+                                            ("count", CountVectorizer()),
+                                            ("tfidf", TfidfTransformer()),
+                                            ("repl", ReplaceTransformer()),
+                                        ]
+                                    ),
+                                    "text",
+                                ),
+                            ],
+                            sparse_threshold=sparse_threshold,
+                        ),
+                    ),
+                    ("cast", CastTransformer()),
+                    ("cls", model(max_depth=3, **kwargs)),
+                ]
+            )
         else:
-            pipe = Pipeline([
-                ('union', ColumnTransformer([
-                    ('scale1', StandardScaler(), [0, 1]),
-                    ('subject',
-                     Pipeline([
-                         ('count', CountVectorizer()),
-                         ('tfidf', TfidfTransformer())
-                     ]), "text"),
-                ], sparse_threshold=sparse_threshold)),
-                ('cast', CastTransformer()),
-                ('cls', model(max_depth=3, **kwargs)),
-            ])
+            pipe = Pipeline(
+                [
+                    (
+                        "union",
+                        ColumnTransformer(
+                            [
+                                ("scale1", StandardScaler(), [0, 1]),
+                                (
+                                    "subject",
+                                    Pipeline(
+                                        [
+                                            ("count", CountVectorizer()),
+                                            ("tfidf", TfidfTransformer()),
+                                        ]
+                                    ),
+                                    "text",
+                                ),
+                            ],
+                            sparse_threshold=sparse_threshold,
+                        ),
+                    ),
+                    ("cast", CastTransformer()),
+                    ("cls", model(max_depth=3, **kwargs)),
+                ]
+            )
 
         try:
             pipe.fit(df_train, y_train)
         except TypeError as e:
-            obs = dict(model=model.__name__, pipe=pipe, error=e,
-                       model_onnx=None)
+            obs = dict(model=model.__name__, pipe=pipe, error=e, model_onnx=None)
             pipes.append(obs)
             continue
 
-        options = {model: {'zipmap': False}}
+        options = {model: {"zipmap": False}}
         if replace_nan:
-            options[TfidfTransformer] = {'nan': True}
+            options[TfidfTransformer] = {"nan": True}
 
         # convert
         with warnings.catch_warnings(record=False):
             warnings.simplefilter("ignore", (FutureWarning, UserWarning))
             model_onnx = to_onnx(
                 pipe,
-                initial_types=[('input', FloatTensorType([None, 2])),
-                               ('text', StringTensorType([None, 1]))],
-                target_opset={'': 12, 'ai.onnx.ml': 2},
-                options=options)
+                initial_types=[
+                    ("input", FloatTensorType([None, 2])),
+                    ("text", StringTensorType([None, 1])),
+                ],
+                target_opset={"": 12, "ai.onnx.ml": 2},
+                options=options,
+            )
 
-        with open('model.onnx', 'wb') as f:
+        with open("model.onnx", "wb") as f:
             f.write(model_onnx.SerializeToString())
 
         sess = rt.InferenceSession(model_onnx.SerializeToString())
-        inputs = {"input": df[["c0", "c1"]].values.astype(numpy.float32),
-                  "text": df[["text"]].values}
+        inputs = {
+            "input": df[["c0", "c1"]].values.astype(numpy.float32),
+            "text": df[["text"]].values,
+        }
         pred_onx = sess.run(None, inputs)
 
-        diff = numpy.abs(
-            pred_onx[1].ravel() -
-            pipe.predict_proba(df).ravel()).sum()
+        diff = numpy.abs(pred_onx[1].ravel() - pipe.predict_proba(df).ravel()).sum()
 
-        obs = dict(model=model.__name__,
-                   discrepencies=diff,
-                   model_onnx=model_onnx, pipe=pipe)
+        obs = dict(
+            model=model.__name__, discrepencies=diff, model_onnx=model_onnx, pipe=pipe
+        )
         pipes.append(obs)
 
     return pipes
 
 
 data_sparse = make_pipelines(df, y)
-stat = pandas.DataFrame(data_sparse).drop(['model_onnx', 'pipe'], axis=1)
-if 'error' in stat.columns:
-    print(stat.drop('error', axis=1))
+stat = pandas.DataFrame(data_sparse).drop(["model_onnx", "pipe"], axis=1)
+if "error" in stat.columns:
+    print(stat.drop("error", axis=1))
 stat
 
 ############################
@@ -198,10 +236,10 @@ stat
 # Let's replace sparse data with dense by using `sparse_threshold=0.`
 
 
-data_dense = make_pipelines(df, y, sparse_threshold=0.)
-stat = pandas.DataFrame(data_dense).drop(['model_onnx', 'pipe'], axis=1)
-if 'error' in stat.columns:
-    print(stat.drop('error', axis=1))
+data_dense = make_pipelines(df, y, sparse_threshold=0.0)
+stat = pandas.DataFrame(data_dense).drop(["model_onnx", "pipe"], axis=1)
+if "error" in stat.columns:
+    print(stat.drop("error", axis=1))
 stat
 
 ####################################
@@ -209,10 +247,10 @@ stat
 # applies on the data.
 
 print("sparse")
-print(data_sparse[-1]['pipe'].steps[0][-1].transform(df)[:2])
+print(data_sparse[-1]["pipe"].steps[0][-1].transform(df)[:2])
 print()
 print("dense")
-print(data_dense[-1]['pipe'].steps[0][-1].transform(df)[:2])
+print(data_dense[-1]["pipe"].steps[0][-1].transform(df)[:2])
 
 ####################################
 # This shows `RandomForestClassifier
@@ -235,10 +273,10 @@ print(data_dense[-1]['pipe'].steps[0][-1].transform(df)[:2])
 # Let's keep sparse data in the scikit-learn pipeline but
 # replace null values by nan in the onnx graph.
 
-data_dense = make_pipelines(df, y, sparse_threshold=1., replace_nan=True)
-stat = pandas.DataFrame(data_dense).drop(['model_onnx', 'pipe'], axis=1)
-if 'error' in stat.columns:
-    print(stat.drop('error', axis=1))
+data_dense = make_pipelines(df, y, sparse_threshold=1.0, replace_nan=True)
+stat = pandas.DataFrame(data_dense).drop(["model_onnx", "pipe"], axis=1)
+if "error" in stat.columns:
+    print(stat.drop("error", axis=1))
 stat
 
 
@@ -253,11 +291,12 @@ stat
 # It is equivalent to the previous options except it is
 # more explicit.
 
-data_dense = make_pipelines(df, y, sparse_threshold=1., replace_nan=False,
-                            insert_replace=True)
-stat = pandas.DataFrame(data_dense).drop(['model_onnx', 'pipe'], axis=1)
-if 'error' in stat.columns:
-    print(stat.drop('error', axis=1))
+data_dense = make_pipelines(
+    df, y, sparse_threshold=1.0, replace_nan=False, insert_replace=True
+)
+stat = pandas.DataFrame(data_dense).drop(["model_onnx", "pipe"], axis=1)
+if "error" in stat.columns:
+    print(stat.drop("error", axis=1))
 stat
 
 ######################################

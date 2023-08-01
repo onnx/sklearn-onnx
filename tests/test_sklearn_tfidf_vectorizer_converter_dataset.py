@@ -14,36 +14,46 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
-
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_tfidf_20newsgroups(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.5, random_state=42)
+            X, y, test_size=0.5, random_state=42
+        )
 
         model = TfidfVectorizer().fit(X_train)
         onnx_model = convert_sklearn(
-            model, 'cv', [('input', StringTensorType(X_test.shape))],
-            target_opset=TARGET_OPSET)
+            model,
+            "cv",
+            [("input", StringTensorType(X_test.shape))],
+            target_opset=TARGET_OPSET,
+        )
         dump_data_and_model(
-            X_test, model, onnx_model,
-            basename="SklearnTfidfVectorizer20newsgroups")
+            X_test, model, onnx_model, basename="SklearnTfidfVectorizer20newsgroups"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_tfidf_20newsgroups_nolowercase(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.5, random_state=42)
+            X, y, test_size=0.5, random_state=42
+        )
 
         model = TfidfVectorizer(lowercase=False).fit(X_train)
         onnx_model = convert_sklearn(
-            model, 'cv', [('input', StringTensorType(X_test.shape))],
-            target_opset=TARGET_OPSET)
+            model,
+            "cv",
+            [("input", StringTensorType(X_test.shape))],
+            target_opset=TARGET_OPSET,
+        )
         dump_data_and_model(
-            X_test, model, onnx_model,
-            basename="SklearnTfidfVectorizer20newsgroupsNOLower")
+            X_test,
+            model,
+            onnx_model,
+            basename="SklearnTfidfVectorizer20newsgroupsNOLower",
+        )
 
 
 if __name__ == "__main__":

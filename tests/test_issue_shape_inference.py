@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnx.reference import ReferenceEvaluator
-from onnx.shape_inference import infer_shapes
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
@@ -20,9 +19,7 @@ import onnxruntime as rt
 
 
 class TestIssueShapeInference(unittest.TestCase):
-    
     def test_shape_inference(self):
-
         cat_columns_openings = ["cat_1", "cat_2"]
         num_columns_openings = [
             "num_1",
@@ -40,7 +37,6 @@ class TestIssueShapeInference(unittest.TestCase):
                 ("onehot", OneHotEncoder(handle_unknown="ignore")),
             ]
         )
-
 
         preprocessor = ColumnTransformer(
             transformers=[
@@ -101,8 +97,8 @@ class TestIssueShapeInference(unittest.TestCase):
 
         # onnxruntime
         sess = rt.InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         res = sess.run(None, feeds)
         self.assertEqual(1, len(res))
         self.assertEqual(expected.shape, res[0].shape)

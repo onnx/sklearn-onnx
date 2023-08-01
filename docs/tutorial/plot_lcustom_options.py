@@ -22,8 +22,6 @@ Custom model
 ++++++++++++
 
 """
-from mlprodict.onnxrt import OnnxInference
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 from pandas import DataFrame
 from skl2onnx.tutorial import measure_time
 import numpy
@@ -32,8 +30,7 @@ from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.datasets import load_iris
 from skl2onnx import update_registered_converter
 from skl2onnx.common.data_types import guess_numpy_type
-from skl2onnx.algebra.onnx_ops import (
-    OnnxSub, OnnxMatMul, OnnxGemm)
+from skl2onnx.algebra.onnx_ops import OnnxSub, OnnxMatMul, OnnxGemm
 from skl2onnx import to_onnx
 
 
@@ -50,15 +47,14 @@ class DecorrelateTransformer(TransformerMixin, BaseEstimator):
     * `self.coef_`: square root of the coveriance matrix
     """
 
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
 
     def fit(self, X, y=None, sample_weights=None):
         if sample_weights is not None:
-            raise NotImplementedError(
-                "sample_weights != None is not implemented.")
+            raise NotImplementedError("sample_weights != None is not implemented.")
         self.mean_ = numpy.mean(X, axis=0, keepdims=True)
         X = X - self.mean_
         V = X.T @ X / X.shape[0]
@@ -108,19 +104,26 @@ def decorrelate_transformer_converter(scope, operator, container):
 
     dtype = guess_numpy_type(X.type)
     options = container.get_options(op, dict(use_gemm=False))
-    use_gemm = options['use_gemm']
-    print('conversion: use_gemm=', use_gemm)
+    use_gemm = options["use_gemm"]
+    print("conversion: use_gemm=", use_gemm)
 
     if use_gemm:
-        Y = OnnxGemm(X, op.coef_.astype(dtype),
-                     (- op.mean_ @ op.coef_).astype(dtype),
-                     op_version=opv, alpha=1., beta=1.,
-                     output_names=out[:1])
+        Y = OnnxGemm(
+            X,
+            op.coef_.astype(dtype),
+            (-op.mean_ @ op.coef_).astype(dtype),
+            op_version=opv,
+            alpha=1.0,
+            beta=1.0,
+            output_names=out[:1],
+        )
     else:
         Y = OnnxMatMul(
             OnnxSub(X, op.mean_.astype(dtype), op_version=opv),
             op.coef_.astype(dtype),
-            op_version=opv, output_names=out[:1])
+            op_version=opv,
+            output_names=out[:1],
+        )
     Y.add_to(scope, container)
 
 
@@ -130,10 +133,12 @@ def decorrelate_transformer_converter(scope, operator, container):
 
 
 update_registered_converter(
-    DecorrelateTransformer, "SklearnDecorrelateTransformer",
+    DecorrelateTransformer,
+    "SklearnDecorrelateTransformer",
     decorrelate_transformer_shape_calculator,
     decorrelate_transformer_converter,
-    options={'use_gemm': [True, False]})
+    options={"use_gemm": [True, False]},
+)
 
 
 onx = to_onnx(dec, X.astype(numpy.float32))
@@ -141,7 +146,7 @@ onx = to_onnx(dec, X.astype(numpy.float32))
 sess = InferenceSession(onx.SerializeToString())
 
 exp = dec.transform(X.astype(numpy.float32))
-got = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
 
 
 def diff(p1, p2):
@@ -156,24 +161,14 @@ print(diff(exp, got))
 ############################################
 # We try the non default option, `use_gemm: True`.
 
-onx2 = to_onnx(dec, X.astype(numpy.float32),
-               options={'use_gemm': True})
+onx2 = to_onnx(dec, X.astype(numpy.float32), options={"use_gemm": True})
 
 sess2 = InferenceSession(onx2.SerializeToString())
 
 exp = dec.transform(X.astype(numpy.float32))
-got2 = sess2.run(None, {'X': X.astype(numpy.float32)})[0]
+got2 = sess2.run(None, {"X": X.astype(numpy.float32)})[0]
 
 print(diff(exp, got2))
-
-##############################
-# Visually.
-
-
-oinf = OnnxInference(onx2)
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
 
 
 #########################################
@@ -186,18 +181,18 @@ ax.get_yaxis().set_visible(False)
 X32 = X.astype(numpy.float32)
 obs = []
 
-context = {'sess': sess, 'X32': X32}
+context = {"sess": sess, "X32": X32}
 mt = measure_time(
-    "sess.run(None, {'X': X32})", context, div_by_number=True,
-    number=100, repeat=1000)
-mt['use_gemm'] = False
+    "sess.run(None, {'X': X32})", context, div_by_number=True, number=100, repeat=1000
+)
+mt["use_gemm"] = False
 obs.append(mt)
 
-context = {'sess2': sess2, 'X32': X32}
+context = {"sess2": sess2, "X32": X32}
 mt2 = measure_time(
-    "sess2.run(None, {'X': X32})", context, div_by_number=True,
-    number=10, repeat=100)
-mt2['use_gemm'] = True
+    "sess2.run(None, {'X': X32})", context, div_by_number=True, number=10, repeat=100
+)
+mt2["use_gemm"] = True
 obs.append(mt2)
 
 DataFrame(obs).T

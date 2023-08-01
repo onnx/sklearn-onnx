@@ -9,11 +9,13 @@ from sklearn.calibration import CalibratedClassifierCV
 
 # Linear classifiers
 from sklearn.linear_model import (
-    LogisticRegression, LogisticRegressionCV,
+    LogisticRegression,
+    LogisticRegressionCV,
     PassiveAggressiveClassifier,
     Perceptron,
-    RidgeClassifier, RidgeClassifierCV,
-    SGDClassifier
+    RidgeClassifier,
+    RidgeClassifierCV,
+    SGDClassifier,
 )
 from sklearn.svm import LinearSVC, OneClassSVM
 
@@ -21,22 +23,31 @@ from sklearn.svm import LinearSVC, OneClassSVM
 from sklearn.linear_model import (
     ARDRegression,
     BayesianRidge,
-    ElasticNet, ElasticNetCV,
+    ElasticNet,
+    ElasticNetCV,
     HuberRegressor,
-    Lars, LarsCV,
-    Lasso, LassoCV,
-    LassoLars, LassoLarsCV,
+    Lars,
+    LarsCV,
+    Lasso,
+    LassoCV,
+    LassoLars,
+    LassoLarsCV,
     LassoLarsIC,
     LinearRegression,
-    MultiTaskElasticNet, MultiTaskElasticNetCV,
-    MultiTaskLasso, MultiTaskLassoCV,
-    OrthogonalMatchingPursuit, OrthogonalMatchingPursuitCV,
+    MultiTaskElasticNet,
+    MultiTaskElasticNetCV,
+    MultiTaskLasso,
+    MultiTaskLassoCV,
+    OrthogonalMatchingPursuit,
+    OrthogonalMatchingPursuitCV,
     PassiveAggressiveRegressor,
     RANSACRegressor,
-    Ridge, RidgeCV,
+    Ridge,
+    RidgeCV,
     SGDRegressor,
-    TheilSenRegressor
+    TheilSenRegressor,
 )
+
 try:
     from sklearn.linear_model import GammaRegressor
 except ImportError:
@@ -66,31 +77,36 @@ except ImportError:
 from sklearn.svm import LinearSVR
 from sklearn.discriminant_analysis import (
     LinearDiscriminantAnalysis,
-    QuadraticDiscriminantAnalysis
+    QuadraticDiscriminantAnalysis,
 )
 
 # Mixture
-from sklearn.mixture import (
-    GaussianMixture, BayesianGaussianMixture
-)
+from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 
 # Multi-class
 from sklearn.multiclass import (
     _ConstantPredictor,
     OneVsRestClassifier,
-    OneVsOneClassifier
+    OneVsOneClassifier,
 )
 
 # Tree-based models
 from sklearn.ensemble import (
-    AdaBoostClassifier, AdaBoostRegressor,
-    BaggingClassifier, BaggingRegressor,
-    ExtraTreesClassifier, ExtraTreesRegressor,
-    GradientBoostingClassifier, GradientBoostingRegressor,
+    AdaBoostClassifier,
+    AdaBoostRegressor,
+    BaggingClassifier,
+    BaggingRegressor,
+    ExtraTreesClassifier,
+    ExtraTreesRegressor,
+    GradientBoostingClassifier,
+    GradientBoostingRegressor,
     IsolationForest,
-    RandomForestClassifier, RandomForestRegressor, RandomTreesEmbedding,
-    VotingClassifier
+    RandomForestClassifier,
+    RandomForestRegressor,
+    RandomTreesEmbedding,
+    VotingClassifier,
 )
+
 try:
     from sklearn.ensemble import VotingRegressor
 except ImportError:
@@ -103,14 +119,14 @@ except ImportError:
     StackingClassifier = None
     StackingRegressor = None
 from sklearn.tree import (
-    DecisionTreeClassifier, DecisionTreeRegressor,
-    ExtraTreeClassifier, ExtraTreeRegressor
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    ExtraTreeClassifier,
+    ExtraTreeRegressor,
 )
 
 # Gaussian processes
-from sklearn.gaussian_process import (
-    GaussianProcessClassifier, GaussianProcessRegressor
-)
+from sklearn.gaussian_process import GaussianProcessClassifier, GaussianProcessRegressor
 
 # GridSearchCV
 from sklearn.model_selection import GridSearchCV
@@ -130,6 +146,7 @@ from sklearn.neighbors import (
     RadiusNeighborsClassifier,
     RadiusNeighborsRegressor,
 )
+
 try:
     from sklearn.neighbors import (
         KNeighborsTransformer,
@@ -146,6 +163,7 @@ from sklearn.naive_bayes import (
     GaussianNB,
     MultinomialNB,
 )
+
 try:
     from sklearn.naive_bayes import CategoricalNB
 except ImportError:
@@ -176,14 +194,23 @@ from sklearn.feature_extraction import (
     FeatureHasher,
 )
 from sklearn.feature_extraction.text import (
-    CountVectorizer, TfidfTransformer, TfidfVectorizer
+    CountVectorizer,
+    TfidfTransformer,
+    TfidfVectorizer,
 )
 from sklearn.feature_selection import (
-    GenericUnivariateSelect, RFE, RFECV,
-    SelectFdr, SelectFpr, SelectFromModel,
-    SelectFwe, SelectKBest, SelectPercentile,
-    VarianceThreshold
+    GenericUnivariateSelect,
+    RFE,
+    RFECV,
+    SelectFdr,
+    SelectFpr,
+    SelectFromModel,
+    SelectFwe,
+    SelectKBest,
+    SelectPercentile,
+    VarianceThreshold,
 )
+
 try:
     # 0.20
     from sklearn.impute import SimpleImputer
@@ -191,6 +218,7 @@ except ImportError:
     # 0.19
     from sklearn.preprocessing import Imputer as SimpleImputer
 from sklearn.preprocessing import Binarizer
+
 try:
     from sklearn.preprocessing import Imputer
 except ImportError:
@@ -207,9 +235,12 @@ except ImportError:
     # not available in 0.19
     KBinsDiscretizer = None
 from sklearn.preprocessing import (
-    LabelBinarizer, LabelEncoder,
-    Normalizer, OneHotEncoder
+    LabelBinarizer,
+    LabelEncoder,
+    Normalizer,
+    OneHotEncoder,
 )
+
 try:
     from sklearn.preprocessing import OrdinalEncoder
 except ImportError:
@@ -222,7 +253,7 @@ from sklearn.preprocessing import (
     MinMaxScaler,
     PolynomialFeatures,
     RobustScaler,
-    StandardScaler
+    StandardScaler,
 )
 
 try:
@@ -234,7 +265,7 @@ except ImportError:
 try:
     from sklearn.ensemble import (
         HistGradientBoostingClassifier,
-        HistGradientBoostingRegressor
+        HistGradientBoostingRegressor,
     )
 except ImportError:
     # Second verification as these models still require
@@ -242,7 +273,7 @@ except ImportError:
     try:
         from sklearn.ensemble._hist_gradient_boosting.gradient_boosting import (  # noqa
             HistGradientBoostingClassifier,
-            HistGradientBoostingRegressor
+            HistGradientBoostingRegressor,
         )
     except ImportError:
         HistGradientBoostingRegressor = None
@@ -263,7 +294,7 @@ from .sklapi import CastRegressor, CastTransformer, ReplaceTransformer
 
 from .common._registration import register_converter, register_shape_calculator
 
-logger = logging.getLogger('skl2onnx')
+logger = logging.getLogger("skl2onnx")
 
 # In most cases, scikit-learn operator produces only one output.
 # However, each classifier has basically two outputs; one is the
@@ -272,40 +303,45 @@ logger = logging.getLogger('skl2onnx')
 # classifiers. In the parsing stage, we produce two outputs for objects
 # included in the following list and one output for everything not in
 # the list.
-sklearn_classifier_list = list(filter(lambda m: m is not None, [
-    _ConstantPredictor,
-    AdaBoostClassifier,
-    BaggingClassifier,
-    BernoulliNB,
-    CategoricalNB,
-    CalibratedClassifierCV,
-    ComplementNB,
-    DecisionTreeClassifier,
-    ExtraTreeClassifier,
-    ExtraTreesClassifier,
-    GaussianNB,
-    GaussianProcessClassifier,
-    GradientBoostingClassifier,
-    HistGradientBoostingClassifier,
-    KNeighborsClassifier,
-    LinearDiscriminantAnalysis,
-    LinearSVC,
-    LogisticRegression,
-    LogisticRegressionCV,
-    MLPClassifier,
-    MultinomialNB,
-    NuSVC,
-    OneVsOneClassifier,
-    OneVsRestClassifier,
-    PassiveAggressiveClassifier,
-    Perceptron,
-    QuadraticDiscriminantAnalysis,
-    RandomForestClassifier,
-    SGDClassifier,
-    StackingClassifier,
-    SVC,
-    VotingClassifier,
-]))
+sklearn_classifier_list = list(
+    filter(
+        lambda m: m is not None,
+        [
+            _ConstantPredictor,
+            AdaBoostClassifier,
+            BaggingClassifier,
+            BernoulliNB,
+            CategoricalNB,
+            CalibratedClassifierCV,
+            ComplementNB,
+            DecisionTreeClassifier,
+            ExtraTreeClassifier,
+            ExtraTreesClassifier,
+            GaussianNB,
+            GaussianProcessClassifier,
+            GradientBoostingClassifier,
+            HistGradientBoostingClassifier,
+            KNeighborsClassifier,
+            LinearDiscriminantAnalysis,
+            LinearSVC,
+            LogisticRegression,
+            LogisticRegressionCV,
+            MLPClassifier,
+            MultinomialNB,
+            NuSVC,
+            OneVsOneClassifier,
+            OneVsRestClassifier,
+            PassiveAggressiveClassifier,
+            Perceptron,
+            QuadraticDiscriminantAnalysis,
+            RandomForestClassifier,
+            SGDClassifier,
+            StackingClassifier,
+            SVC,
+            VotingClassifier,
+        ],
+    )
+)
 
 # Clustering algorithms: produces two outputs, label and score for
 # each cluster in most cases.
@@ -320,159 +356,166 @@ outlier_list = [IsolationForest, LocalOutlierFactor, OneClassSVM]
 # scikit-learn models share a single name, it means their are
 # equivalent in terms of conversion.
 def build_sklearn_operator_name_map():
-    res = {k: "Sklearn" + k.__name__ for k in [
-        _ConstantPredictor,
-        AdaBoostClassifier,
-        AdaBoostRegressor,
-        BaggingClassifier,
-        BaggingRegressor,
-        BayesianGaussianMixture,
-        BayesianRidge,
-        BernoulliNB,
-        Binarizer,
-        CalibratedClassifierCV,
-        CategoricalNB,
-        CastRegressor,
-        CastTransformer,
-        ColumnTransformer,
-        ComplementNB,
-        CountVectorizer,
-        DictVectorizer,
-        DecisionTreeClassifier,
-        DecisionTreeRegressor,
-        ExtraTreeClassifier,
-        ExtraTreeRegressor,
-        ExtraTreesClassifier,
-        ExtraTreesRegressor,
-        FeatureHasher,
-        FeatureUnion,
-        FunctionTransformer,
-        GammaRegressor,
-        GaussianNB,
-        GaussianMixture,
-        GaussianProcessClassifier,
-        GaussianProcessRegressor,
-        GaussianRandomProjection,
-        GenericUnivariateSelect,
-        GradientBoostingClassifier,
-        GradientBoostingRegressor,
-        HistGradientBoostingClassifier,
-        HistGradientBoostingRegressor,
-        Imputer,
-        IncrementalPCA,
-        IsolationForest,
-        KMeans,
-        LabelBinarizer,
-        LabelEncoder,
-        LinearRegression,
-        LinearSVC,
-        LinearSVR,
-        LocalOutlierFactor,
-        MaxAbsScaler,
-        MiniBatchKMeans,
-        MinMaxScaler,
-        MLPClassifier,
-        MLPRegressor,
-        MultinomialNB,
-        MultiOutputClassifier,
-        MultiOutputRegressor,
-        KBinsDiscretizer,
-        KernelCenterer,
-        KernelPCA,
-        KNeighborsClassifier,
-        KNeighborsRegressor,
-        KNeighborsTransformer,
-        KNNImputer,
-        NearestNeighbors,
-        NeighborhoodComponentsAnalysis,
-        Normalizer,
-        OneClassSVM,
-        OneHotEncoder,
-        OneVsOneClassifier,
-        OneVsRestClassifier,
-        OrdinalEncoder,
-        PCA,
-        PLSRegression,
-        Pipeline,
-        PoissonRegressor,
-        PolynomialFeatures,
-        PowerTransformer,
-        QuadraticDiscriminantAnalysis,
-        RadiusNeighborsClassifier,
-        RadiusNeighborsRegressor,
-        RandomForestClassifier,
-        RandomForestRegressor,
-        RandomTreesEmbedding,
-        RANSACRegressor,
-        ReplaceTransformer,
-        RFE,
-        RFECV,
-        RobustScaler,
-        SelectFdr,
-        SelectFpr,
-        SelectFromModel,
-        SelectFwe,
-        SelectKBest,
-        SelectPercentile,
-        SGDClassifier,
-        SGDOneClassSVM,
-        SimpleImputer,
-        StackingClassifier,
-        StackingRegressor,
-        SVC,
-        SVR,
-        TfidfVectorizer,
-        TfidfTransformer,
-        TruncatedSVD,
-        TweedieRegressor,
-        VarianceThreshold,
-        VotingClassifier,
-        VotingRegressor,
-    ] if k is not None}
-    res.update({
-        ARDRegression: 'SklearnLinearRegressor',
-        ElasticNet: 'SklearnLinearRegressor',
-        ElasticNetCV: 'SklearnLinearRegressor',
-        GridSearchCV: 'SklearnGridSearchCV',
-        HuberRegressor: 'SklearnLinearRegressor',
-        LinearRegression: 'SklearnLinearRegressor',
-        Lars: 'SklearnLinearRegressor',
-        LarsCV: 'SklearnLinearRegressor',
-        Lasso: 'SklearnLinearRegressor',
-        LassoCV: 'SklearnLinearRegressor',
-        LassoLars: 'SklearnLinearRegressor',
-        LassoLarsCV: 'SklearnLinearRegressor',
-        LassoLarsIC: 'SklearnLinearRegressor',
-        LinearDiscriminantAnalysis: 'SklearnLinearClassifier',
-        LogisticRegression: 'SklearnLinearClassifier',
-        LogisticRegressionCV: 'SklearnLinearClassifier',
-        MultiTaskElasticNet: 'SklearnLinearRegressor',
-        MultiTaskElasticNetCV: 'SklearnLinearRegressor',
-        MultiTaskLasso: 'SklearnLinearRegressor',
-        MultiTaskLassoCV: 'SklearnLinearRegressor',
-        NuSVC: 'SklearnSVC',
-        NuSVR: 'SklearnSVR',
-        OrthogonalMatchingPursuit: 'SklearnLinearRegressor',
-        OrthogonalMatchingPursuitCV: 'SklearnLinearRegressor',
-        PassiveAggressiveClassifier: 'SklearnSGDClassifier',
-        PassiveAggressiveRegressor: 'SklearnLinearRegressor',
-        Perceptron: 'SklearnSGDClassifier',
-        QuantileRegressor: 'SklearnLinearRegressor',
-        Ridge: 'SklearnLinearRegressor',
-        RidgeCV: 'SklearnLinearRegressor',
-        RidgeClassifier: 'SklearnLinearClassifier',
-        RidgeClassifierCV: 'SklearnLinearClassifier',
-        SGDRegressor: 'SklearnLinearRegressor',
-        StandardScaler: 'SklearnScaler',
-        TheilSenRegressor: 'SklearnLinearRegressor',
-    })
+    res = {
+        k: "Sklearn" + k.__name__
+        for k in [
+            _ConstantPredictor,
+            AdaBoostClassifier,
+            AdaBoostRegressor,
+            BaggingClassifier,
+            BaggingRegressor,
+            BayesianGaussianMixture,
+            BayesianRidge,
+            BernoulliNB,
+            Binarizer,
+            CalibratedClassifierCV,
+            CategoricalNB,
+            CastRegressor,
+            CastTransformer,
+            ColumnTransformer,
+            ComplementNB,
+            CountVectorizer,
+            DictVectorizer,
+            DecisionTreeClassifier,
+            DecisionTreeRegressor,
+            ExtraTreeClassifier,
+            ExtraTreeRegressor,
+            ExtraTreesClassifier,
+            ExtraTreesRegressor,
+            FeatureHasher,
+            FeatureUnion,
+            FunctionTransformer,
+            GammaRegressor,
+            GaussianNB,
+            GaussianMixture,
+            GaussianProcessClassifier,
+            GaussianProcessRegressor,
+            GaussianRandomProjection,
+            GenericUnivariateSelect,
+            GradientBoostingClassifier,
+            GradientBoostingRegressor,
+            HistGradientBoostingClassifier,
+            HistGradientBoostingRegressor,
+            Imputer,
+            IncrementalPCA,
+            IsolationForest,
+            KMeans,
+            LabelBinarizer,
+            LabelEncoder,
+            LinearRegression,
+            LinearSVC,
+            LinearSVR,
+            LocalOutlierFactor,
+            MaxAbsScaler,
+            MiniBatchKMeans,
+            MinMaxScaler,
+            MLPClassifier,
+            MLPRegressor,
+            MultinomialNB,
+            MultiOutputClassifier,
+            MultiOutputRegressor,
+            KBinsDiscretizer,
+            KernelCenterer,
+            KernelPCA,
+            KNeighborsClassifier,
+            KNeighborsRegressor,
+            KNeighborsTransformer,
+            KNNImputer,
+            NearestNeighbors,
+            NeighborhoodComponentsAnalysis,
+            Normalizer,
+            OneClassSVM,
+            OneHotEncoder,
+            OneVsOneClassifier,
+            OneVsRestClassifier,
+            OrdinalEncoder,
+            PCA,
+            PLSRegression,
+            Pipeline,
+            PoissonRegressor,
+            PolynomialFeatures,
+            PowerTransformer,
+            QuadraticDiscriminantAnalysis,
+            RadiusNeighborsClassifier,
+            RadiusNeighborsRegressor,
+            RandomForestClassifier,
+            RandomForestRegressor,
+            RandomTreesEmbedding,
+            RANSACRegressor,
+            ReplaceTransformer,
+            RFE,
+            RFECV,
+            RobustScaler,
+            SelectFdr,
+            SelectFpr,
+            SelectFromModel,
+            SelectFwe,
+            SelectKBest,
+            SelectPercentile,
+            SGDClassifier,
+            SGDOneClassSVM,
+            SimpleImputer,
+            StackingClassifier,
+            StackingRegressor,
+            SVC,
+            SVR,
+            TfidfVectorizer,
+            TfidfTransformer,
+            TruncatedSVD,
+            TweedieRegressor,
+            VarianceThreshold,
+            VotingClassifier,
+            VotingRegressor,
+        ]
+        if k is not None
+    }
+    res.update(
+        {
+            ARDRegression: "SklearnLinearRegressor",
+            ElasticNet: "SklearnLinearRegressor",
+            ElasticNetCV: "SklearnLinearRegressor",
+            GridSearchCV: "SklearnGridSearchCV",
+            HuberRegressor: "SklearnLinearRegressor",
+            LinearRegression: "SklearnLinearRegressor",
+            Lars: "SklearnLinearRegressor",
+            LarsCV: "SklearnLinearRegressor",
+            Lasso: "SklearnLinearRegressor",
+            LassoCV: "SklearnLinearRegressor",
+            LassoLars: "SklearnLinearRegressor",
+            LassoLarsCV: "SklearnLinearRegressor",
+            LassoLarsIC: "SklearnLinearRegressor",
+            LinearDiscriminantAnalysis: "SklearnLinearClassifier",
+            LogisticRegression: "SklearnLinearClassifier",
+            LogisticRegressionCV: "SklearnLinearClassifier",
+            MultiTaskElasticNet: "SklearnLinearRegressor",
+            MultiTaskElasticNetCV: "SklearnLinearRegressor",
+            MultiTaskLasso: "SklearnLinearRegressor",
+            MultiTaskLassoCV: "SklearnLinearRegressor",
+            NuSVC: "SklearnSVC",
+            NuSVR: "SklearnSVR",
+            OrthogonalMatchingPursuit: "SklearnLinearRegressor",
+            OrthogonalMatchingPursuitCV: "SklearnLinearRegressor",
+            PassiveAggressiveClassifier: "SklearnSGDClassifier",
+            PassiveAggressiveRegressor: "SklearnLinearRegressor",
+            Perceptron: "SklearnSGDClassifier",
+            QuantileRegressor: "SklearnLinearRegressor",
+            Ridge: "SklearnLinearRegressor",
+            RidgeCV: "SklearnLinearRegressor",
+            RidgeClassifier: "SklearnLinearClassifier",
+            RidgeClassifierCV: "SklearnLinearClassifier",
+            SGDRegressor: "SklearnLinearRegressor",
+            StandardScaler: "SklearnScaler",
+            TheilSenRegressor: "SklearnLinearRegressor",
+        }
+    )
     if None in res:
         del res[None]
     return res
 
 
-def update_registered_converter(model, alias, shape_fct, convert_fct,
-                                overwrite=True, parser=None, options=None):
+def update_registered_converter(
+    model, alias, shape_fct, convert_fct, overwrite=True, parser=None, options=None
+):
     """
     Registers or updates a converter for a new model so that
     it can be converted when inserted in a *scikit-learn* pipeline.
@@ -510,21 +553,27 @@ def update_registered_converter(model, alias, shape_fct, convert_fct,
     must declare this option to let the default parser
     automatically handle that option.
     """  # noqa
-    if (not overwrite and model in sklearn_operator_name_map
-            and alias != sklearn_operator_name_map[model]):
-        warnings.warn("Model '{0}' was already registered under alias "
-                      "'{1}'.".format(model, sklearn_operator_name_map[model]))
+    if (
+        not overwrite
+        and model in sklearn_operator_name_map
+        and alias != sklearn_operator_name_map[model]
+    ):
+        warnings.warn(
+            "Model '{0}' was already registered under alias "
+            "'{1}'.".format(model, sklearn_operator_name_map[model])
+        )
     sklearn_operator_name_map[model] = alias
-    register_converter(alias, convert_fct, overwrite=overwrite,
-                       options=options)
+    register_converter(alias, convert_fct, overwrite=overwrite, options=options)
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
     if parser is not None:
         from ._parse import update_registered_parser
+
         update_registered_parser(model, parser)
-    elif (options is not None and
-            ('zipmap' in options or 'output_class_labels' in options)):
-        from ._parse import (
-            _parse_sklearn_classifier, update_registered_parser)
+    elif options is not None and (
+        "zipmap" in options or "output_class_labels" in options
+    ):
+        from ._parse import _parse_sklearn_classifier, update_registered_parser
+
         update_registered_parser(model, _parse_sklearn_classifier)
 
 
@@ -542,7 +591,7 @@ def _get_sklearn_operator_name(model_type):
         alias = None
     else:
         alias = sklearn_operator_name_map[model_type]
-    logger.debug('[parsing] found alias=%r for type=%r.', alias, model_type)
+    logger.debug("[parsing] found alias=%r for type=%r.", alias, model_type)
     return alias
 
 
@@ -557,9 +606,11 @@ def get_model_alias(model_type):
     """
     res = _get_sklearn_operator_name(model_type)
     if res is None:
-        raise RuntimeError("Unable to find alias for model '{}'. "
-                           "The converter is likely missing."
-                           "".format(model_type))
+        raise RuntimeError(
+            "Unable to find alias for model '{}'. "
+            "The converter is likely missing."
+            "".format(model_type)
+        )
     return res
 
 

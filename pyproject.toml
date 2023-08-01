@@ -1,0 +1,17 @@
+[tool.ruff]
+
+exclude = [
+    ".eggs",
+    ".git",
+    "build",
+    "dist",
+]
+
+# Same as Black.
+line-length = 88
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.per-file-ignores]
+"skl2onnx/algebra/onnx_ops.py" = ["F821"]

@@ -13,6 +13,15 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
+      Py310-Onnx140-Rt151-Skl130:
+        python.version: '3.11'  # onnxruntime cannot support python 3.11 yet
+        onnx.version:  'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.22.3'
+        scipy.version: 'scipy'
+        onnxrt.version: 'onnxruntime==1.15.1' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
+        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        sklearn.version: '>=1.3.0'
       Py310-Onnx140-Rt140-Skl122:
         python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
         onnx.version:  'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
@@ -21,7 +30,7 @@ jobs:
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.14.0' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
         onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
-        sklearn.version: '>=1.2.2'
+        sklearn.version: '==1.2.2'
       Py310-Onnx130-Rt140-Skl121:
         python.version: '3.10'
         onnx.version:  'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
@@ -30,7 +39,7 @@ jobs:
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.14.0' # -i https://test.pypi.org/simple/ ort-nightly==1.11.0.dev20220311003
         onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
-        sklearn.version: '>=1.2.2'
+        sklearn.version: '==1.2.2'
       Py310-Onnx130-Rt131-Skl120:
         python.version: '3.10'
         onnx.version:  'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
@@ -148,13 +157,9 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      pip install flake8
-    displayName: 'install flake8'
-
-  - script: |
-      call activate skl2onnxEnvironment
-      flake8 skl2onnx tests tests_onnxmltools
-    displayName: 'flake8'
+      python -m pip install ruff
+      ruff skl2onnx tests tests_onnxmltools
+    displayName: 'ruff'
 
   - script: |
       call activate skl2onnxEnvironment

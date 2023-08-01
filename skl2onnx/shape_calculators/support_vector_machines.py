@@ -32,38 +32,40 @@ def calculate_sklearn_svm_output_shapes(operator):
     op = operator.raw_operator
 
     N = operator.inputs[0].get_first_dimension()
-    if operator.type in ['SklearnOneClassSVM']:
+    if operator.type in ["SklearnOneClassSVM"]:
         operator.outputs[0].type = Int64TensorType([N, 1])
         operator.outputs[1].type.shape = [N, 1]
-    elif operator.type in ['SklearnSVC'] or isinstance(op, (SVC, NuSVC)):
+    elif operator.type in ["SklearnSVC"] or isinstance(op, (SVC, NuSVC)):
         number_of_classes = len(op.classes_)
-        check_input_and_output_numbers(operator, input_count_range=[1, None],
-                                       output_count_range=[1, 2])
+        check_input_and_output_numbers(
+            operator, input_count_range=[1, None], output_count_range=[1, 2]
+        )
 
         if all(isinstance(i, str) for i in op.classes_):
             operator.outputs[0].type = StringTensorType([N])
             operator.outputs[1].type.shape = [N, number_of_classes]
-        elif all(isinstance(i, (numbers.Real, bool, np.bool_))
-                 for i in op.classes_):
+        elif all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in op.classes_):
             operator.outputs[0].type = Int64TensorType([N])
             operator.outputs[1].type.shape = [N, number_of_classes]
         else:
-            raise RuntimeError('Class labels should be either all strings or '
-                               'all integers. C++ backends do not support '
-                               'mixed types.')
+            raise RuntimeError(
+                "Class labels should be either all strings or "
+                "all integers. C++ backends do not support "
+                "mixed types."
+            )
 
-    elif operator.type in ['SklearnSVR']:
-        check_input_and_output_numbers(operator, input_count_range=[1, None],
-                                       output_count_range=1)
+    elif operator.type in ["SklearnSVR"]:
+        check_input_and_output_numbers(
+            operator, input_count_range=[1, None], output_count_range=1
+        )
 
         operator.outputs[0].type.shape = [N, 1]
     else:
         raise RuntimeError(
-            "New kind of SVM, no shape calculator exist for '{}'.".format(
-                operator.type))
+            "New kind of SVM, no shape calculator exist for '{}'.".format(operator.type)
+        )
 
 
-register_shape_calculator(
-    'SklearnOneClassSVM', calculate_sklearn_svm_output_shapes)
-register_shape_calculator('SklearnSVC', calculate_sklearn_svm_output_shapes)
-register_shape_calculator('SklearnSVR', calculate_sklearn_svm_output_shapes)
+register_shape_calculator("SklearnOneClassSVM", calculate_sklearn_svm_output_shapes)
+register_shape_calculator("SklearnSVC", calculate_sklearn_svm_output_shapes)
+register_shape_calculator("SklearnSVR", calculate_sklearn_svm_output_shapes)
