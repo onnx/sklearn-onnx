@@ -241,7 +241,7 @@ def get_rst_doc(op_name=None):
             doc_url += sch.domain + "."
         return doc_url
 
-    def GetTypeStr(inou):
+    def get_type_str(inou):
         try:
             return inou.type_str
         except AttributeError:
