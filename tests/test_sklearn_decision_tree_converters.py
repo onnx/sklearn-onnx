@@ -7,8 +7,10 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
 from sklearn.tree import (
-    DecisionTreeClassifier, DecisionTreeRegressor,
-    ExtraTreeClassifier, ExtraTreeRegressor
+    DecisionTreeClassifier,
+    DecisionTreeRegressor,
+    ExtraTreeClassifier,
+    ExtraTreeRegressor,
 )
 from sklearn.datasets import make_classification
 from skl2onnx.common.data_types import (
@@ -35,26 +37,27 @@ from test_utils import (
 )
 
 
-ort_version = ort_version.split('+')[0]
+ort_version = ort_version.split("+")[0]
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("0.3.0"),
-        reason="No suitable kernel definition found "
-               "for op Cast(9) (node Cast)")
+        reason="No suitable kernel definition found " "for op Cast(9) (node Cast)",
+    )
     def test_decisiontree_classifier1(self):
         model = DecisionTreeClassifier(max_depth=2)
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
-        model_onnx = convert_sklearn(model, initial_types=initial_types,
-                                     target_opset=TARGET_OPSET)
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types, target_opset=TARGET_OPSET
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict_proba(X)
         if res[1][0][0] != pred[0, 0]:
             raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
@@ -64,13 +67,14 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
-        model_onnx = convert_sklearn(model, initial_types=initial_types,
-                                     target_opset=TARGET_OPSET)
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_types, target_opset=TARGET_OPSET
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         if res[0][0, 0] != pred[0]:
             raise AssertionError("{}\n--\n{}".format(pred, DataFrame(res[1])))
@@ -81,15 +85,17 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
-            model, initial_types=initial_types,
-            options={id(model): {'decision_path': True}},
-            target_opset=TARGET_OPSET)
+            model,
+            initial_types=initial_types,
+            options={id(model): {"decision_path": True}},
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         dec = model.decision_path(X)
@@ -102,15 +108,17 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
-            model, initial_types=initial_types,
-            options={id(model): {'decision_leaf': True}},
-            target_opset=TARGET_OPSET)
+            model,
+            initial_types=initial_types,
+            options={id(model): {"decision_leaf": True}},
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         dec = model.decision_path(X)
@@ -123,16 +131,17 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
-            model, initial_types=initial_types,
-            options={id(model): {'decision_leaf': True,
-                                 'decision_path': True}},
-            target_opset=TARGET_OPSET)
+            model,
+            initial_types=initial_types,
+            options={id(model): {"decision_leaf": True, "decision_path": True}},
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         dec = model.decision_path(X)
@@ -147,15 +156,17 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
-            model, initial_types=initial_types,
-            options={id(model): {'decision_path': True, 'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            model,
+            initial_types=initial_types,
+            options={id(model): {"decision_path": True, "zipmap": False}},
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         prob = model.predict_proba(X)
@@ -170,15 +181,17 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
-            model, initial_types=initial_types,
-            options={id(model): {'decision_leaf': True, 'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            model,
+            initial_types=initial_types,
+            options={id(model): {"decision_leaf": True, "zipmap": False}},
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         prob = model.predict_proba(X)
@@ -193,16 +206,23 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         X, y = make_classification(10, n_features=4, random_state=42)
         X = X[:, :2]
         model.fit(X, y)
-        initial_types = [('input', FloatTensorType((None, X.shape[1])))]
+        initial_types = [("input", FloatTensorType((None, X.shape[1])))]
         model_onnx = convert_sklearn(
-            model, initial_types=initial_types,
-            options={id(model): {'decision_leaf': True, 'decision_path': True,
-                                 'zipmap': False}},
-            target_opset=TARGET_OPSET)
+            model,
+            initial_types=initial_types,
+            options={
+                id(model): {
+                    "decision_leaf": True,
+                    "decision_path": True,
+                    "zipmap": False,
+                }
+            },
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X.astype(np.float32)})
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X.astype(np.float32)})
         pred = model.predict(X)
         assert_almost_equal(pred, res[0].ravel())
         prob = model.predict_proba(X)
@@ -241,84 +261,109 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
 
     def test_decision_tree_regressor_int(self):
         model, X = fit_regression_model(
-            DecisionTreeRegressor(random_state=42), is_int=True)
+            DecisionTreeRegressor(random_state=42), is_int=True
+        )
         model_onnx = convert_sklearn(
-            model, "decision tree regression",
+            model,
+            "decision tree regression",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnDecisionTreeRegressionInt")
+            X, model, model_onnx, basename="SklearnDecisionTreeRegressionInt"
+        )
 
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
-            DecisionTreeClassifier(),
-            4, label_string=True)
+            DecisionTreeClassifier(), 4, label_string=True
+        )
         model_onnx = convert_sklearn(
-            model, "multi-class nocl",
+            model,
+            "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True}},
-            target_opset=TARGET_OPSET)
+            options={id(model): {"nocl": True}},
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
-        assert 'classlabels_strings' not in sonx
-        assert 'cl0' not in sonx
+        assert "classlabels_strings" not in sonx
+        assert "cl0" not in sonx
         dump_data_and_model(
-            X, model, model_onnx, classes=model.classes_,
-            basename="SklearnDTMultiNoCl")
+            X, model, model_onnx, classes=model.classes_, basename="SklearnDTMultiNoCl"
+        )
 
     def test_model_decision_tree_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
-            DecisionTreeClassifier(random_state=42))
-        options = {id(model): {'zipmap': False}}
+            DecisionTreeClassifier(random_state=42)
+        )
+        options = {id(model): {"zipmap": False}}
         model_onnx = convert_sklearn(
-            model, "scikit-learn DecisionTreeClassifier",
+            model,
+            "scikit-learn DecisionTreeClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options, target_opset=TARGET_OPSET)
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
-        assert 'zipmap' not in str(model_onnx).lower()
+        assert "zipmap" not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test, model, model_onnx,
-            basename="SklearnDecisionTreeClassifierMultiLabel-Out0")
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnDecisionTreeClassifierMultiLabel-Out0",
+        )
 
     def test_model_extra_tree_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(
-            ExtraTreeClassifier(random_state=42))
-        options = {id(model): {'zipmap': False}}
+            ExtraTreeClassifier(random_state=42)
+        )
+        options = {id(model): {"zipmap": False}}
         model_onnx = convert_sklearn(
-            model, "scikit-learn ExtraTreeClassifier",
+            model,
+            "scikit-learn ExtraTreeClassifier",
             [("input", FloatTensorType([None, X_test.shape[1]]))],
-            options=options, target_opset=TARGET_OPSET)
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
-        assert 'zipmap' not in str(model_onnx).lower()
+        assert "zipmap" not in str(model_onnx).lower()
         dump_data_and_model(
-            X_test, model, model_onnx,
-            basename="SklearnExtraTreeClassifierMultiLabel-Out0")
+            X_test,
+            model,
+            model_onnx,
+            basename="SklearnExtraTreeClassifierMultiLabel-Out0",
+        )
 
     def test_decision_tree_regressor_bool(self):
         model, X = fit_regression_model(
-            DecisionTreeRegressor(random_state=42), is_bool=True)
+            DecisionTreeRegressor(random_state=42), is_bool=True
+        )
         model_onnx = convert_sklearn(
-            model, "decision tree regressor",
+            model,
+            "decision tree regressor",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnDecisionTreeRegressionBool-Dec4")
+            X, model, model_onnx, basename="SklearnDecisionTreeRegressionBool-Dec4"
+        )
 
     def test_extra_tree_regressor_bool(self):
         model, X = fit_regression_model(
-            ExtraTreeRegressor(random_state=42), is_bool=True)
+            ExtraTreeRegressor(random_state=42), is_bool=True
+        )
         model_onnx = convert_sklearn(
-            model, "extra tree regressor",
+            model,
+            "extra tree regressor",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnExtraTreeRegressionBool-Dec4")
+            X, model, model_onnx, basename="SklearnExtraTreeRegressionBool-Dec4"
+        )
 
 
 if __name__ == "__main__":

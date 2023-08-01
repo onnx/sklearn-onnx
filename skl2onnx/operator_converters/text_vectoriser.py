@@ -4,8 +4,7 @@
 import warnings
 from collections import OrderedDict, Counter
 import numpy as np
-from ..common._apply_operation import (
-    apply_cast, apply_reshape, apply_identity)
+from ..common._apply_operation import apply_cast, apply_reshape, apply_identity
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -24,7 +23,7 @@ def _intelligent_split(text, op, tokenizer, existing):
     <https://github.com/scikit-learn/scikit-learn/blob/master/
     sklearn/feature_extraction/text.py#L169>`_.
     """
-    if op.analyzer == 'word':
+    if op.analyzer == "word":
         if op.ngram_range[0] == op.ngram_range[1] == 1:
             spl = [text]
         elif op.ngram_range[0] == 1 and len(text) >= 2:
@@ -46,8 +45,7 @@ def _intelligent_split(text, op, tokenizer, existing):
             if len(spl) == 1:
                 pass
             elif len(spl) == 2:
-                if (spl[0] not in op.vocabulary_ or
-                        spl[1] not in op.vocabulary_):
+                if spl[0] not in op.vocabulary_ or spl[1] not in op.vocabulary_:
                     # This is neceassarily a single token.
                     spl = [text]
                 elif spl[0] in op.vocabulary_ and spl[1] in op.vocabulary_:
@@ -57,12 +55,16 @@ def _intelligent_split(text, op, tokenizer, existing):
                     pass
             elif len(spl) == 3:
                 stok = (all([s in op.vocabulary_ for s in spl]), spl)
-                spl12 = (spl[2] in op.vocabulary_ and
-                         (spl[0] + ' ' + spl[1]) in op.vocabulary_,
-                         [spl[0] + ' ' + spl[1], spl[2]])
-                spl23 = (spl[0] in op.vocabulary_ and
-                         (spl[1] + ' ' + spl[2]) in op.vocabulary_,
-                         [spl[0], spl[1] + ' ' + spl[2]])
+                spl12 = (
+                    spl[2] in op.vocabulary_
+                    and (spl[0] + " " + spl[1]) in op.vocabulary_,
+                    [spl[0] + " " + spl[1], spl[2]],
+                )
+                spl23 = (
+                    spl[0] in op.vocabulary_
+                    and (spl[1] + " " + spl[2]) in op.vocabulary_,
+                    [spl[0], spl[1] + " " + spl[2]],
+                )
                 c = Counter(map(lambda t: t[0], [stok, spl12, spl23]))
                 if c.get(True, -1) == 0:
                     spl = [text]
@@ -77,8 +79,10 @@ def _intelligent_split(text, op, tokenizer, existing):
                     pass
                 else:
                     exc = (
-                        "More than one decomposition in tokens: [" +
-                        ", ".join(map(lambda t: "-".join(t), found)) + "].")
+                        "More than one decomposition in tokens: ["
+                        + ", ".join(map(lambda t: "-".join(t), found))
+                        + "]."
+                    )
             elif any(map(lambda g: g in op.vocabulary_, spl)):
                 # TODO: handle this case with an algorithm
                 # which is able to break a string into
@@ -89,7 +93,8 @@ def _intelligent_split(text, op, tokenizer, existing):
                     "Unable to split n-grams '{}' into tokens. "
                     "{} This happens when a token contain "
                     "spaces. Token '{}' may be a token or a n-gram '{}'."
-                    "".format(text, exc, text, spl))
+                    "".format(text, exc, text, spl)
+                )
         else:
             # We reuse the tokenizer hoping that will clear
             # ambiguities but this might be slow.
@@ -102,9 +107,9 @@ def _intelligent_split(text, op, tokenizer, existing):
         raise RuntimeError(
             f"The converter cannot guess how to split expression "
             f"{text!r} into tokens. This case happens when tokens have "
-            f"spaces.")
-    if (op.ngram_range[0] == 1 and
-            (len(op.ngram_range) == 1 or op.ngram_range[1] > 1)):
+            f"spaces."
+        )
+    if op.ngram_range[0] == 1 and (len(op.ngram_range) == 1 or op.ngram_range[1] > 1):
         # All grams should be existing in the vocabulary.
         for g in spl:
             if g not in op.vocabulary_:
@@ -112,13 +117,15 @@ def _intelligent_split(text, op, tokenizer, existing):
                     "Unable to split n-grams '{}' into tokens {} "
                     "existing in the vocabulary. Token '{}' does not "
                     "exist in the vocabulary."
-                    ".".format(text, spl, g))
+                    ".".format(text, spl, g)
+                )
     existing.add(spl)
     return spl
 
 
-def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
-                                    container: ModelComponentContainer):
+def convert_sklearn_text_vectorizer(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     """
     Converters for class
     `TfidfVectorizer <https://scikit-learn.org/stable/modules/generated/
@@ -181,144 +188,168 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     """  # noqa
     op = operator.raw_operator
 
-    if (container.target_opset is not None and
-            container.target_opset < 9):
+    if container.target_opset is not None and container.target_opset < 9:
         raise RuntimeError(
             "Converter for '{}' only works for opset >= 9."
-            "".format(op.__class__.__name__))
+            "".format(op.__class__.__name__)
+        )
 
     if op.analyzer == "char_wb":
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
             "only tokenizer='word' is fully supported. "
             "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues.")
+            "https://github.com/onnx/sklearn-onnx/issues."
+        )
     if op.analyzer == "char":
         warnings.warn(
             "The conversion of CountVectorizer may not work. "
             "only tokenizer='word' is fully supported. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.",
-            UserWarning)
+            UserWarning,
+        )
     if op.strip_accents is not None:
         raise NotImplementedError(
             "CountVectorizer cannot be converted, "
             "only strip_accents=None is supported. "
             "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues.")
+            "https://github.com/onnx/sklearn-onnx/issues."
+        )
 
     options = container.get_options(
-        op, dict(separators="DEFAULT",
-                 tokenexp=None,
-                 nan=False,
-                 keep_empty_string=False))
-    if set(options) != {'separators', 'tokenexp', 'nan', 'keep_empty_string'}:
-        raise RuntimeError("Unknown option {} for {}".format(
-            set(options) - {'separators'}, type(op)))
+        op,
+        dict(separators="DEFAULT", tokenexp=None, nan=False, keep_empty_string=False),
+    )
+    if set(options) != {"separators", "tokenexp", "nan", "keep_empty_string"}:
+        raise RuntimeError(
+            "Unknown option {} for {}".format(set(options) - {"separators"}, type(op))
+        )
 
-    if op.analyzer == 'word':
-        default_pattern = '(?u)\\b\\w\\w+\\b'
-        if options['separators'] == "DEFAULT" and options['tokenexp'] is None:
+    if op.analyzer == "word":
+        default_pattern = "(?u)\\b\\w\\w+\\b"
+        if options["separators"] == "DEFAULT" and options["tokenexp"] is None:
             regex = op.token_pattern
             if regex == default_pattern:
-                regex = '[a-zA-Z0-9_]+'
+                regex = "[a-zA-Z0-9_]+"
             default_separators = None
-        elif options['tokenexp'] is not None:
-            if options['tokenexp']:
-                regex = options['tokenexp']
+        elif options["tokenexp"] is not None:
+            if options["tokenexp"]:
+                regex = options["tokenexp"]
             else:
                 regex = op.token_pattern
                 if regex == default_pattern:
-                    regex = '[a-zA-Z0-9_]+'
+                    regex = "[a-zA-Z0-9_]+"
             default_separators = None
         else:
             regex = None
-            default_separators = options['separators']
+            default_separators = options["separators"]
     else:
-        if options['separators'] != 'DEFAULT':
-            raise RuntimeError("Option separators has no effect "
-                               "if analyser != 'word'.")
-        regex = options['tokenexp'] if options['tokenexp'] else '.'
+        if options["separators"] != "DEFAULT":
+            raise RuntimeError(
+                "Option separators has no effect " "if analyser != 'word'."
+            )
+        regex = options["tokenexp"] if options["tokenexp"] else "."
         default_separators = None
 
     if op.preprocessor is not None:
         raise NotImplementedError(
             "Custom preprocessor cannot be converted into ONNX. "
             "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues.")
+            "https://github.com/onnx/sklearn-onnx/issues."
+        )
     if op.tokenizer is not None:
         raise NotImplementedError(
             "Custom tokenizer cannot be converted into ONNX. "
             "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues.")
+            "https://github.com/onnx/sklearn-onnx/issues."
+        )
     if op.strip_accents is not None:
         raise NotImplementedError(
             "Operator StringNormalizer cannot remove accents. "
             "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues.")
+            "https://github.com/onnx/sklearn-onnx/issues."
+        )
 
     if hasattr(op, "stop_words_"):
-        stop_words = op.stop_words_ | (
-            set(op.stop_words) if op.stop_words else set())
+        stop_words = op.stop_words_ | (set(op.stop_words) if op.stop_words else set())
     else:
         stop_words = set()
     for w in stop_words:
         if not isinstance(w, str):
             raise TypeError(
-                f"One stop word is not a string {w!r} "
-                f"in stop_words={stop_words}.")
+                f"One stop word is not a string {w!r} " f"in stop_words={stop_words}."
+            )
 
     if op.lowercase or stop_words:
         if len(operator.input_full_names) != 1:
-            raise RuntimeError("Only one input is allowed, found {}.".format(
-                operator.input_full_names))
+            raise RuntimeError(
+                "Only one input is allowed, found {}.".format(operator.input_full_names)
+            )
 
         # StringNormalizer
-        op_type = 'StringNormalizer'
-        attrs = {'name': scope.get_unique_operator_name(op_type)}
-        normalized = scope.get_unique_variable_name('normalized')
+        op_type = "StringNormalizer"
+        attrs = {"name": scope.get_unique_operator_name(op_type)}
+        normalized = scope.get_unique_variable_name("normalized")
         if container.target_opset >= 10:
-            attrs.update({
-                'case_change_action': 'LOWER',
-                'is_case_sensitive': not op.lowercase,
-            })
+            attrs.update(
+                {
+                    "case_change_action": "LOWER",
+                    "is_case_sensitive": not op.lowercase,
+                }
+            )
             op_version = 10
-            domain = ''
+            domain = ""
         else:
-            attrs.update({
-                'casechangeaction': 'LOWER',
-                'is_case_sensitive': not op.lowercase,
-            })
+            attrs.update(
+                {
+                    "casechangeaction": "LOWER",
+                    "is_case_sensitive": not op.lowercase,
+                }
+            )
             op_version = 9
-            domain = 'com.microsoft'
-        opvs = 1 if domain == 'com.microsoft' else op_version
+            domain = "com.microsoft"
+        opvs = 1 if domain == "com.microsoft" else op_version
         if stop_words:
-            attrs['stopwords'] = list(sorted(stop_words))
+            attrs["stopwords"] = list(sorted(stop_words))
 
-        if options['keep_empty_string']:
-            del attrs['name']
+        if options["keep_empty_string"]:
+            del attrs["name"]
             op_norm = OnnxStringNormalizer(
-                'text_in', op_version=container.target_opset,
-                output_names=['text_out'], **attrs)
+                "text_in",
+                op_version=container.target_opset,
+                output_names=["text_out"],
+                **attrs,
+            )
             scan_body = op_norm.to_onnx(
-                OrderedDict([('text_in', StringTensorType())]),
-                outputs=[('text_out', StringTensorType())],
-                target_opset=op_version)
+                OrderedDict([("text_in", StringTensorType())]),
+                outputs=[("text_out", StringTensorType())],
+                target_opset=op_version,
+            )
 
-            vector = scope.get_unique_variable_name('vector')
-            apply_reshape(scope, operator.input_full_names[0],
-                          vector, container,
-                          desired_shape=(-1, 1))
-            container.add_node('Scan', vector, normalized,
-                               body=scan_body.graph, num_scan_inputs=1)
+            vector = scope.get_unique_variable_name("vector")
+            apply_reshape(
+                scope,
+                operator.input_full_names[0],
+                vector,
+                container,
+                desired_shape=(-1, 1),
+            )
+            container.add_node(
+                "Scan", vector, normalized, body=scan_body.graph, num_scan_inputs=1
+            )
         else:
-            flatten = scope.get_unique_variable_name('flattened')
-            apply_reshape(scope, operator.input_full_names[0],
-                          flatten, container,
-                          desired_shape=(-1, ))
-            container.add_node(op_type, flatten,
-                               normalized, op_version=opvs,
-                               op_domain=domain, **attrs)
+            flatten = scope.get_unique_variable_name("flattened")
+            apply_reshape(
+                scope,
+                operator.input_full_names[0],
+                flatten,
+                container,
+                desired_shape=(-1,),
+            )
+            container.add_node(
+                op_type, flatten, normalized, op_version=opvs, op_domain=domain, **attrs
+            )
     else:
         normalized = operator.input_full_names
 
@@ -327,29 +358,36 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     while padvalue in op.vocabulary_:
         padvalue += "#"
 
-    op_type = 'Tokenizer'
-    attrs = {'name': scope.get_unique_operator_name(op_type)}
-    attrs.update({
-        'pad_value': padvalue,
-        'mark': False,
-        'mincharnum': 1,
-    })
+    op_type = "Tokenizer"
+    attrs = {"name": scope.get_unique_operator_name(op_type)}
+    attrs.update(
+        {
+            "pad_value": padvalue,
+            "mark": False,
+            "mincharnum": 1,
+        }
+    )
     if regex is None:
-        attrs['separators'] = default_separators
+        attrs["separators"] = default_separators
     else:
-        attrs['tokenexp'] = regex
+        attrs["tokenexp"] = regex
 
-    tokenized = scope.get_unique_variable_name('tokenized')
-    container.add_node(op_type, normalized, tokenized,
-                       op_domain='com.microsoft', **attrs)
+    tokenized = scope.get_unique_variable_name("tokenized")
+    container.add_node(
+        op_type, normalized, tokenized, op_domain="com.microsoft", **attrs
+    )
 
     # Flatten
     # Tokenizer outputs shape {1, C} or {1, 1, C}.
     # Second shape is not allowed by TfIdfVectorizer.
     # We use Flatten which produces {1, C} in both cases.
-    flatt_tokenized = scope.get_unique_variable_name('flattened')
-    container.add_node("Flatten", tokenized, flatt_tokenized,
-                       name=scope.get_unique_operator_name('Flatten'))
+    flatt_tokenized = scope.get_unique_variable_name("flattened")
+    container.add_node(
+        "Flatten",
+        tokenized,
+        flatt_tokenized,
+        name=scope.get_unique_operator_name("Flatten"),
+    )
     tokenized = flatt_tokenized
 
     # Ngram - TfIdfVectorizer
@@ -358,8 +396,8 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
     weights = [0 for i in range(C)]
     for k, v in op.vocabulary_.items():
         words[v] = k
-        weights[v] = 1.
-    mode = 'TF'
+        weights[v] = 1.0
+    mode = "TF"
 
     # Scikit-learn sorts n-grams by alphabetical order..
     # onnx assumes it is sorted by n.
@@ -371,7 +409,7 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
         if isinstance(w, tuple):
             # TraceableCountVectorizer, TraceableTfIdfVectorizer
             spl = list(w)
-            w = ' '.join(w)
+            w = " ".join(w)
         else:
             # CountVectorizer, TfIdfVectorizer
             try:
@@ -387,10 +425,10 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
             f"{len(errors)} errors occurred. You can fix it by using "
             f"class Traceable{op.__class__.__name__}.\n"
             f"You can learn more at https://github.com/scikit-learn/"
-            f"scikit-learn/issues/13733.\n{err}")
+            f"scikit-learn/issues/13733.\n{err}"
+        )
 
-    ng_split_words = sorted([(len(a[0]), a[0], i)
-                            for i, a in enumerate(split_words)])
+    ng_split_words = sorted([(len(a[0]), a[0], i) for i, a in enumerate(split_words)])
     key_indices = [a[2] for a in ng_split_words]
     ngcounts = [0 for i in range(op.ngram_range[0])]
 
@@ -406,75 +444,96 @@ def convert_sklearn_text_vectorizer(scope: Scope, operator: Operator,
         weights[ind] = weights_[i]
 
     # Create the node.
-    attrs = {'name': scope.get_unique_operator_name("TfIdfVectorizer")}
-    attrs.update({
-        'min_gram_length': op.ngram_range[0],
-        'max_gram_length': op.ngram_range[1],
-        'mode': mode,
-        'max_skip_count': 0,
-        'pool_strings': words,
-        'ngram_indexes': key_indices,
-        'ngram_counts': ngcounts,
-        'weights': list(map(np.float32, weights)),
-    })
-    output = scope.get_unique_variable_name('output')
+    attrs = {"name": scope.get_unique_operator_name("TfIdfVectorizer")}
+    attrs.update(
+        {
+            "min_gram_length": op.ngram_range[0],
+            "max_gram_length": op.ngram_range[1],
+            "mode": mode,
+            "max_skip_count": 0,
+            "pool_strings": words,
+            "ngram_indexes": key_indices,
+            "ngram_counts": ngcounts,
+            "weights": list(map(np.float32, weights)),
+        }
+    )
+    output = scope.get_unique_variable_name("output")
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
         proto_dtype = onnx_proto.TensorProto.FLOAT
 
     if proto_dtype == onnx_proto.TensorProto.DOUBLE:
-        output_tf = scope.get_unique_variable_name('cast_result')
+        output_tf = scope.get_unique_variable_name("cast_result")
     else:
         output_tf = output
 
     if container.target_opset < 9:
-        op_type = 'Ngram'
-        container.add_node(op_type, tokenized, output_tf,
-                           op_domain='com.microsoft', **attrs)
+        op_type = "Ngram"
+        container.add_node(
+            op_type, tokenized, output_tf, op_domain="com.microsoft", **attrs
+        )
     else:
-        op_type = 'TfIdfVectorizer'
-        container.add_node(op_type, tokenized, output_tf, op_domain='',
-                           op_version=9, **attrs)
+        op_type = "TfIdfVectorizer"
+        container.add_node(
+            op_type, tokenized, output_tf, op_domain="", op_version=9, **attrs
+        )
 
     if proto_dtype == onnx_proto.TensorProto.DOUBLE:
-        apply_cast(scope, output_tf, output,
-                   container, to=proto_dtype)
+        apply_cast(scope, output_tf, output, container, to=proto_dtype)
 
     if op.binary:
-        cast_result_name = scope.get_unique_variable_name('cast_result')
-        output_name = scope.get_unique_variable_name('output_name')
+        cast_result_name = scope.get_unique_variable_name("cast_result")
+        output_name = scope.get_unique_variable_name("output_name")
 
-        apply_cast(scope, output, cast_result_name, container,
-                   to=onnx_proto.TensorProto.BOOL)
-        apply_cast(scope, cast_result_name, output_name,
-                   container, to=onnx_proto.TensorProto.FLOAT)
+        apply_cast(
+            scope, output, cast_result_name, container, to=onnx_proto.TensorProto.BOOL
+        )
+        apply_cast(
+            scope,
+            cast_result_name,
+            output_name,
+            container,
+            to=onnx_proto.TensorProto.FLOAT,
+        )
         output = output_name
 
     options = container.get_options(op, dict(nan=False))
-    replace_by_nan = options.get('nan', False)
+    replace_by_nan = options.get("nan", False)
     if replace_by_nan:
         # This part replaces all null values by nan.
-        cst_nan_name = scope.get_unique_variable_name('nan_name')
+        cst_nan_name = scope.get_unique_variable_name("nan_name")
         container.add_initializer(cst_nan_name, proto_dtype, [1], [np.nan])
-        cst_zero_name = scope.get_unique_variable_name('zero_name')
+        cst_zero_name = scope.get_unique_variable_name("zero_name")
         container.add_initializer(cst_zero_name, proto_dtype, [1], [0])
 
-        mask_name = scope.get_unique_variable_name('mask_name')
-        container.add_node('Equal', [output, cst_zero_name],
-                           mask_name,
-                           name=scope.get_unique_operator_name('Equal'))
+        mask_name = scope.get_unique_variable_name("mask_name")
+        container.add_node(
+            "Equal",
+            [output, cst_zero_name],
+            mask_name,
+            name=scope.get_unique_operator_name("Equal"),
+        )
 
-        where_name = scope.get_unique_variable_name('where_name')
-        container.add_node('Where', [mask_name, cst_nan_name, output],
-                           where_name,
-                           name=scope.get_unique_operator_name('Where'))
+        where_name = scope.get_unique_variable_name("where_name")
+        container.add_node(
+            "Where",
+            [mask_name, cst_nan_name, output],
+            where_name,
+            name=scope.get_unique_operator_name("Where"),
+        )
         output = where_name
 
     apply_identity(scope, output, operator.output_full_names, container)
 
 
-register_converter('SklearnCountVectorizer', convert_sklearn_text_vectorizer,
-                   options={'tokenexp': None, 'separators': None,
-                            'nan': [True, False],
-                            'keep_empty_string': [True, False]})
+register_converter(
+    "SklearnCountVectorizer",
+    convert_sklearn_text_vectorizer,
+    options={
+        "tokenexp": None,
+        "separators": None,
+        "nan": [True, False],
+        "keep_empty_string": [True, False],
+    },
+)

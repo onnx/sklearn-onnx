@@ -17,13 +17,14 @@ a different runtime.
 Training a pipeline
 +++++++++++++++++++
 """
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 import numpy
 from onnxruntime import InferenceSession
 from sklearn.datasets import load_diabetes
 from sklearn.ensemble import (
-    GradientBoostingRegressor, RandomForestRegressor,
-    VotingRegressor)
+    GradientBoostingRegressor,
+    RandomForestRegressor,
+    VotingRegressor,
+)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
@@ -39,9 +40,11 @@ reg1 = GradientBoostingRegressor(random_state=1, n_estimators=5)
 reg2 = RandomForestRegressor(random_state=1, n_estimators=5)
 reg3 = LinearRegression()
 
-ereg = Pipeline(steps=[
-    ('voting', VotingRegressor([('gb', reg1), ('rf', reg2), ('lr', reg3)])),
-])
+ereg = Pipeline(
+    steps=[
+        ("voting", VotingRegressor([("gb", reg1), ("rf", reg2), ("lr", reg3)])),
+    ]
+)
 ereg.fit(X_train, y_train)
 
 #################################
@@ -54,8 +57,7 @@ ereg.fit(X_train, y_train)
 # into single float and ONNX runtimes may not fully
 # support doubles.
 
-onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
-              target_opset=12)
+onx = to_onnx(ereg, X_train[:1].astype(numpy.float32), target_opset=12)
 
 ###################################
 # Prediction with ONNX
@@ -64,7 +66,7 @@ onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
 # The first example uses :epkg:`onnxruntime`.
 
 sess = InferenceSession(onx.SerializeToString())
-pred_ort = sess.run(None, {'X': X_test.astype(numpy.float32)})[0]
+pred_ort = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 
 pred_skl = ereg.predict(X_test.astype(numpy.float32))
 
@@ -113,5 +115,5 @@ print(oinf)
 ##########################################
 # It works almost the same way.
 
-pred_pyrt = oinf.run(None, {'X': X_test.astype(numpy.float32)})[0]
+pred_pyrt = oinf.run(None, {"X": X_test.astype(numpy.float32)})[0]
 print(diff(pred_skl, pred_pyrt))

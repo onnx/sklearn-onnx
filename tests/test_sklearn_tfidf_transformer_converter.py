@@ -13,17 +13,19 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnTfidfTransformerConverter(unittest.TestCase):
-
     def test_model_tfidf_transform(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-            "Troisième document en français",
-        ]).reshape((5, 1))
-        data = (CountVectorizer(ngram_range=(1, 1)).fit_transform(
-            corpus.ravel()).todense())
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+                "Troisième document en français",
+            ]
+        ).reshape((5, 1))
+        data = (
+            CountVectorizer(ngram_range=(1, 1)).fit_transform(corpus.ravel()).todense()
+        )
         data = numpy.array(data.astype(numpy.float32))
 
         for sublinear_tf in (False, True):
@@ -44,9 +46,8 @@ class TestSklearnTfidfTransformerConverter(unittest.TestCase):
                         model_onnx = convert_sklearn(
                             model,
                             "TfidfTransformer",
-                            [("input",
-                              FloatTensorType([None, data.shape[1]]))],
-                            target_opset=TARGET_OPSET
+                            [("input", FloatTensorType([None, data.shape[1]]))],
+                            target_opset=TARGET_OPSET,
                         )
                         self.assertTrue(model_onnx is not None)
                         suffix = norm.upper() if norm else ""
@@ -57,7 +58,8 @@ class TestSklearnTfidfTransformerConverter(unittest.TestCase):
                             data,
                             model,
                             model_onnx,
-                            basename="SklearnTfidfTransform" + suffix)
+                            basename="SklearnTfidfTransform" + suffix,
+                        )
 
 
 if __name__ == "__main__":

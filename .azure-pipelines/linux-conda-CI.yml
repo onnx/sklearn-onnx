@@ -244,10 +244,6 @@ jobs:
     displayName: 'install onnx'
 
   - script: |
-      pip install flake8
-    displayName: 'install flake8'
-
-  - script: |
       pip install $(onnxrt.version)
     displayName: 'install onnxruntime'
 
@@ -334,11 +330,10 @@ jobs:
     displayName: 'pytest-onnxmltools'
     condition: eq(variables['run.example'], '1')
 
-  # Check flake8 after the tests to get more feedback.
-  # It is checked before the tests on the windows build.
   - script: |
-      flake8 skl2onnx tests tests_onnxmltools
-    displayName: 'flake8'
+      python -m pip install ruff
+      ruff skl2onnx tests tests_onnxmltools
+    displayName: 'ruff'
 
   - script: |
       if [ '$(onnx.target_opset)' != '' ]

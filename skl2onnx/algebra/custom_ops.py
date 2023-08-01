@@ -10,17 +10,16 @@ class OnnxCDist(OnnxOperator):
     """
 
     since_version = 1
-    expected_inputs = [('X', 'T'), ('Y', 'T')]
-    expected_outputs = [('dist', 'T')]
+    expected_inputs = [("X", "T"), ("Y", "T")]
+    expected_outputs = [("dist", "T")]
     input_range = [2, 2]
     output_range = [1, 1]
     is_deprecated = False
-    domain = 'com.microsoft'
-    operator_name = 'CDist'
+    domain = "com.microsoft"
+    operator_name = "CDist"
     past_version = {}
 
-    def __init__(self, X, Y, metric='sqeuclidean', op_version=None,
-                 **kwargs):
+    def __init__(self, X, Y, metric="sqeuclidean", op_version=None, **kwargs):
         """
         :param X: array or OnnxOperatorMixin
         :param Y: array or OnnxOperatorMixin
@@ -29,8 +28,9 @@ class OnnxCDist(OnnxOperator):
         :param op_version: opset version
         :param kwargs: addition parameter
         """
-        OnnxOperator.__init__(self, X, Y, metric=metric,
-                              op_version=op_version, **kwargs)
+        OnnxOperator.__init__(
+            self, X, Y, metric=metric, op_version=op_version, **kwargs
+        )
 
 
 class OnnxSolve(OnnxOperator):
@@ -40,17 +40,16 @@ class OnnxSolve(OnnxOperator):
     """
 
     since_version = 1
-    expected_inputs = [('A', 'T'), ('Y', 'T')]
-    expected_outputs = [('X', 'T')]
+    expected_inputs = [("A", "T"), ("Y", "T")]
+    expected_outputs = [("X", "T")]
     input_range = [2, 2]
     output_range = [1, 1]
     is_deprecated = False
-    domain = 'com.microsoft'
-    operator_name = 'Solve'
+    domain = "com.microsoft"
+    operator_name = "Solve"
     past_version = {}
 
-    def __init__(self, A, Y, lower=False, transposed=False,
-                 op_version=None, **kwargs):
+    def __init__(self, A, Y, lower=False, transposed=False, op_version=None, **kwargs):
         """
         :param A: array or OnnxOperatorMixin
         :param Y: array or OnnxOperatorMixin
@@ -60,6 +59,12 @@ class OnnxSolve(OnnxOperator):
         :param op_version: opset version
         :param kwargs: additional parameters
         """
-        OnnxOperator.__init__(self, A, Y,
-                              lower=lower, transposed=transposed,
-                              op_version=op_version, **kwargs)
+        OnnxOperator.__init__(
+            self,
+            A,
+            Y,
+            lower=lower,
+            transposed=transposed,
+            op_version=op_version,
+            **kwargs
+        )

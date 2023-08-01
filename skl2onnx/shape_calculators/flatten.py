@@ -7,8 +7,7 @@ from ..common.utils import check_input_and_output_numbers
 
 
 def calculate_sklearn_flatten(operator):
-    check_input_and_output_numbers(operator, output_count_range=1,
-                                   input_count_range=1)
+    check_input_and_output_numbers(operator, output_count_range=1, input_count_range=1)
     i = operator.inputs[0]
     N = i.get_first_dimension()
     if isinstance(i.type, TensorType):
@@ -26,4 +25,4 @@ def calculate_sklearn_flatten(operator):
         operator.outputs[0].type.shape = [N * C]
 
 
-register_shape_calculator('SklearnFlatten', calculate_sklearn_flatten)
+register_shape_calculator("SklearnFlatten", calculate_sklearn_flatten)

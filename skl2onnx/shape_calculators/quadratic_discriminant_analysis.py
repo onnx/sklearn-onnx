@@ -11,5 +11,6 @@ def calculate_quadratic_discriminant_analysis_shapes(operator):
 
 
 register_shape_calculator(
-    'SklearnQuadraticDiscriminantAnalysis',
-    calculate_quadratic_discriminant_analysis_shapes)
+    "SklearnQuadraticDiscriminantAnalysis",
+    calculate_quadratic_discriminant_analysis_shapes,
+)

@@ -3,9 +3,9 @@
 @brief Overloads :epkg:`TfidfVectorizer` and :epkg:`CountVectorizer`.
 """
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
+
 try:
-    from sklearn.feature_extraction.text import (
-        _VectorizerMixin as VectorizerMixin)
+    from sklearn.feature_extraction.text import _VectorizerMixin as VectorizerMixin
 except ImportError:  # pragma: no cover
     # scikit-learn < 0.23
     from sklearn.feature_extraction.text import VectorizerMixin
@@ -34,12 +34,12 @@ class NGramsMixin(VectorizerMixin):
             for token in tokens:
                 val = (token,) if isinstance(token, str) else token
                 if not isinstance(val, tuple):
-                    raise TypeError(
-                        f"Unexpected type {type(val)}:{val!r} for a token.")
+                    raise TypeError(f"Unexpected type {type(val)}:{val!r} for a token.")
                 if any(map(lambda x: not isinstance(x, str), val)):
                     raise TypeError(
                         f"Unexpected type {val!r}, one part of a "
-                        f"token is not a string.")
+                        f"token is not a string."
+                    )
                 new_tokens.append(val)
             tokens = new_tokens
 
@@ -69,13 +69,13 @@ class NGramsMixin(VectorizerMixin):
                         new_tokens.extend(token)
                     else:
                         raise TypeError(  # pragma: no cover
-                            f"Unable to build a n-grams out of {tokens}.")
+                            f"Unable to build a n-grams out of {tokens}."
+                        )
                 return tuple(new_tokens)
 
-            for n in range(min_n,
-                           min(max_n + 1, n_original_tokens + 1)):
+            for n in range(min_n, min(max_n + 1, n_original_tokens + 1)):
                 for i in range(n_original_tokens - n + 1):
-                    tokens_append(space_join(original_tokens[i: i + n]))
+                    tokens_append(space_join(original_tokens[i : i + n]))
         return tokens
 
     @staticmethod
@@ -83,8 +83,7 @@ class NGramsMixin(VectorizerMixin):
         update = {}
         for w, wid in new_voc.items():
             if not isinstance(w, tuple):
-                raise TypeError(
-                    f"Tuple is expected for a token not {type(w)}.")
+                raise TypeError(f"Tuple is expected for a token not {type(w)}.")
             s = " ".join(w)
             if s in expected:
                 if expected[s] != wid:
@@ -148,8 +147,7 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
     """
 
     def _word_ngrams(self, tokens, stop_words=None):
-        return NGramsMixin._word_ngrams(
-            self, tokens=tokens, stop_words=stop_words)
+        return NGramsMixin._word_ngrams(self, tokens=tokens, stop_words=stop_words)
 
     def fit(self, X, y=None):
         # scikit-learn implements fit_transform and fit calls it.
@@ -164,8 +162,8 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
         self.same_ = same
         if self.stop_words != same.stop_words:
             raise AssertionError(
-                f"Different stop_words {self.stop_words} "
-                f"!= {same.stop_words}.")
+                f"Different stop_words {self.stop_words} " f"!= {same.stop_words}."
+            )
         update, dups = self._fix_vocabulary(same.vocabulary_, self.vocabulary_)
         self.updated_vocabulary_ = update
         self.duplicated_vocabulary_ = dups
@@ -218,11 +216,10 @@ class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
     scikit-learn cannot distinguish between bi gram ("a b", "c") and
     ("a", "b c"). Therefore, there are merged into the same
     column by scikit-learn. This class, even if it is able to distinguish
-    between them, keeps the same ambiguity.    """
+    between them, keeps the same ambiguity."""
 
     def _word_ngrams(self, tokens, stop_words=None):
-        return NGramsMixin._word_ngrams(
-            self, tokens=tokens, stop_words=stop_words)
+        return NGramsMixin._word_ngrams(self, tokens=tokens, stop_words=stop_words)
 
     def fit(self, X, y=None):
         super().fit(X, y=y)
@@ -231,8 +228,8 @@ class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
         self.same_ = same
         if self.stop_words != same.stop_words:
             raise AssertionError(
-                f"Different stop_words {self.stop_words} "
-                f"!= {same.stop_words}.")
+                f"Different stop_words {self.stop_words} " f"!= {same.stop_words}."
+            )
         update, dups = self._fix_vocabulary(same.vocabulary_, self.vocabulary_)
         self.updated_vocabulary_ = update
         self.duplicated_vocabulary_ = dups

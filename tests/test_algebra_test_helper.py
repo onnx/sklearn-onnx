@@ -5,22 +5,30 @@ import numpy as np
 from skl2onnx.proto import onnx_proto
 from skl2onnx.algebra.type_helper import _guess_type
 from skl2onnx.common.data_types import (
-    FloatTensorType, Int64TensorType,
-    Int32TensorType, StringTensorType,
-    BooleanTensorType, DoubleTensorType,
-    Int8TensorType, UInt8TensorType,
-    guess_data_type, guess_numpy_type, _guess_numpy_type,
-    guess_proto_type, guess_tensor_type, _guess_type_proto)
+    FloatTensorType,
+    Int64TensorType,
+    Int32TensorType,
+    StringTensorType,
+    BooleanTensorType,
+    DoubleTensorType,
+    Int8TensorType,
+    UInt8TensorType,
+    guess_data_type,
+    guess_numpy_type,
+    _guess_numpy_type,
+    guess_proto_type,
+    guess_tensor_type,
+    _guess_type_proto,
+)
+
 try:
-    from skl2onnx.common.data_types import (
-        Complex64TensorType, Complex128TensorType)
+    from skl2onnx.common.data_types import Complex64TensorType, Complex128TensorType
 except ImportError:
     Complex64TensorType = None
     Complex128TensorType = None
 
 
 class TestAlgebraTestHelper(unittest.TestCase):
-
     def test_guess_type(self):
         dtypes = [
             (np.int32, Int32TensorType),
@@ -29,7 +37,7 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.str_, StringTensorType),
             (np.bool_, BooleanTensorType),
             (np.int8, Int8TensorType),
-            (np.uint8, UInt8TensorType)
+            (np.uint8, UInt8TensorType),
         ]
         if Complex64TensorType is not None:
             dtypes.append((np.complex64, Complex64TensorType))
@@ -47,12 +55,14 @@ class TestAlgebraTestHelper(unittest.TestCase):
         dtypes = [np.float64]
         for dtype in dtypes:
             mat = np.zeros((3, 3), dtype=dtype)
-            _guess_type(mat, )
+            _guess_type(
+                mat,
+            )
 
     def test_guess_data_type(self):
         ty = guess_data_type(np.array([3, 5], dtype=np.int32))
         self.assertEqual(len(ty), 1)
-        self.assertEqual(ty[0][0], 'input')
+        self.assertEqual(ty[0][0], "input")
         assert isinstance(ty[0][1], Int32TensorType)
 
         ty = guess_data_type("tensor(int32)", shape=[3, 5])
@@ -93,7 +103,7 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.str_, StringTensorType),
             (np.bool_, BooleanTensorType),
             (np.int8, Int8TensorType),
-            (np.uint8, UInt8TensorType)
+            (np.uint8, UInt8TensorType),
         ]
         if Complex64TensorType is not None:
             dtypes.append((np.complex64, Complex64TensorType))
@@ -116,14 +126,16 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.str_, StringTensorType, onnx_proto.TensorProto.STRING),
             (np.bool_, BooleanTensorType, onnx_proto.TensorProto.BOOL),
             (np.int8, Int8TensorType, onnx_proto.TensorProto.INT8),
-            (np.uint8, UInt8TensorType, onnx_proto.TensorProto.UINT8)
+            (np.uint8, UInt8TensorType, onnx_proto.TensorProto.UINT8),
         ]
         if Complex64TensorType is not None:
-            dtypes.append((np.complex64, Complex64TensorType,
-                           onnx_proto.TensorProto.COMPLEX64))
+            dtypes.append(
+                (np.complex64, Complex64TensorType, onnx_proto.TensorProto.COMPLEX64)
+            )
         if Complex128TensorType is not None:
-            dtypes.append((np.complex128, Complex128TensorType,
-                           onnx_proto.TensorProto.COMPLEX128))
+            dtypes.append(
+                (np.complex128, Complex128TensorType, onnx_proto.TensorProto.COMPLEX128)
+            )
         for dtype, exp, pt in dtypes:
             nt2 = guess_proto_type(exp([None, 1]))
             self.assertEqual(nt2, pt)
@@ -137,14 +149,16 @@ class TestAlgebraTestHelper(unittest.TestCase):
             (np.float32, FloatTensorType, onnx_proto.TensorProto.FLOAT),
             (np.float64, DoubleTensorType, onnx_proto.TensorProto.DOUBLE),
             (np.int8, FloatTensorType, onnx_proto.TensorProto.INT8),
-            (np.uint8, FloatTensorType, onnx_proto.TensorProto.UINT8)
+            (np.uint8, FloatTensorType, onnx_proto.TensorProto.UINT8),
         ]
         if Complex64TensorType is not None:
-            dtypes.append((np.complex64, Complex64TensorType,
-                           onnx_proto.TensorProto.COMPLEX64))
+            dtypes.append(
+                (np.complex64, Complex64TensorType, onnx_proto.TensorProto.COMPLEX64)
+            )
         if Complex128TensorType is not None:
-            dtypes.append((np.complex128, Complex128TensorType,
-                           onnx_proto.TensorProto.COMPLEX128))
+            dtypes.append(
+                (np.complex128, Complex128TensorType, onnx_proto.TensorProto.COMPLEX128)
+            )
         for dtype, exp, pt in dtypes:
             nt2 = guess_tensor_type(exp([None, 1]))
             self.assertEqual(nt2.__class__, exp)

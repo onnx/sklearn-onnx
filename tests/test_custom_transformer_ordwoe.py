@@ -29,10 +29,10 @@ class OrdinalWOETransformer(BaseEstimator, TransformerMixin):
         self.encoder_ = OrdinalEncoder().fit(X)
         tr = self.encoder_.transform(X)
         maxi = (tr.max(axis=1) + 1).astype(np.int64)
-        intervals = [[(i - 1, i, False, True) for i in range(0, m)]
-                     for m in maxi]
-        weights = [[10 * j + i for i in range(len(inter))]
-                   for j, inter in enumerate(intervals)]
+        intervals = [[(i - 1, i, False, True) for i in range(0, m)] for m in maxi]
+        weights = [
+            [10 * j + i for i in range(len(inter))] for j, inter in enumerate(intervals)
+        ]
         self.woe_ = WOETransformer(intervals, onehot=False, weights=weights)
         self.woe_.fit(tr)
         return self
@@ -42,25 +42,22 @@ class OrdinalWOETransformer(BaseEstimator, TransformerMixin):
         return self.woe_.transform(tr)
 
 
-def ordwoe_encoder_parser(
-        scope, model, inputs, custom_parsers=None):
+def ordwoe_encoder_parser(scope, model, inputs, custom_parsers=None):
     if len(inputs) != 1:
-        raise RuntimeError(
-            "Unexpected number of inputs: %d != 1." % len(inputs))
+        raise RuntimeError("Unexpected number of inputs: %d != 1." % len(inputs))
     if inputs[0].type is None:
-        raise RuntimeError(
-            "Unexpected type: %r." % (inputs[0], ))
+        raise RuntimeError("Unexpected type: %r." % (inputs[0],))
     alias = get_model_alias(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs.append(inputs[0])
     this_operator.outputs.append(
-        scope.declare_local_variable('catwoe', FloatTensorType()))
+        scope.declare_local_variable("catwoe", FloatTensorType())
+    )
     return this_operator.outputs
 
 
 def ordwoe_encoder_shape_calculator(operator):
-    check_input_and_output_numbers(
-        operator, input_count_range=1, output_count_range=1)
+    check_input_and_output_numbers(operator, input_count_range=1, output_count_range=1)
     input_dim = operator.inputs[0].get_first_dimension()
     shape = operator.inputs[0].type.shape
     second_dim = None if len(shape) != 2 else shape[1]
@@ -75,15 +72,14 @@ def ordwoe_encoder_converter(scope, operator, container):
 
     sub = OnnxSubEstimator(op.encoder_, X, op_version=opv)
     cast = OnnxCast(sub, op_version=opv, to=np.float32)
-    cat = OnnxSubEstimator(op.woe_, cast, op_version=opv,
-                           input_types=[Int64TensorType()])
-    idcat = OnnxIdentity(cat, output_names=operator.outputs[:1],
-                         op_version=opv)
+    cat = OnnxSubEstimator(
+        op.woe_, cast, op_version=opv, input_types=[Int64TensorType()]
+    )
+    idcat = OnnxIdentity(cat, output_names=operator.outputs[:1], op_version=opv)
     idcat.add_to(scope, container)
 
 
 class TestCustomTransformerOrdWOE(unittest.TestCase):
-
     def test_pipeline(self):
         data = load_iris()
         X = data.data.astype(np.float32)
@@ -92,19 +88,20 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
         expected = pipe.transform(X)
         onx = to_onnx(pipe, X, target_opset=TARGET_OPSET)
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        got = sess.run(None, {'X': X})[0]
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"X": X})[0]
         assert_almost_equal(expected, got)
 
     @unittest.skipIf(TARGET_OPSET < 12, reason="opset>=12 is required")
     def test_custom_ordinal_woe(self):
-
         update_registered_converter(
-            OrdinalWOETransformer, "OrdinalWOETransformer",
+            OrdinalWOETransformer,
+            "OrdinalWOETransformer",
             ordwoe_encoder_shape_calculator,
             ordwoe_encoder_converter,
-            parser=ordwoe_encoder_parser)
+            parser=ordwoe_encoder_parser,
+        )
 
         data = load_iris()
         X, y = data.data, data.target
@@ -117,9 +114,9 @@ class TestCustomTransformerOrdWOE(unittest.TestCase):
 
         onx = to_onnx(ordwoe, X, target_opset=TARGET_OPSET)
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        got = sess.run(None, {'X': X})[0]
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"X": X})[0]
         assert_almost_equal(expected, got)
 
 

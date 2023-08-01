@@ -20,37 +20,39 @@ import numpy
 import pprint
 from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from skl2onnx import to_onnx
 from pandas import DataFrame
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
+from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
+from skl2onnx import to_onnx
+from skl2onnx.algebra.type_helper import guess_initial_types
 
 
-data = DataFrame([
-    dict(CAT1='a', CAT2='c', num1=0.5, num2=0.6, y=0),
-    dict(CAT1='b', CAT2='d', num1=0.4, num2=0.8, y=1),
-    dict(CAT1='a', CAT2='d', num1=0.5, num2=0.56, y=0),
-    dict(CAT1='a', CAT2='d', num1=0.55, num2=0.56, y=1),
-    dict(CAT1='a', CAT2='c', num1=0.35, num2=0.86, y=0),
-    dict(CAT1='a', CAT2='c', num1=0.5, num2=0.68, y=1),
-])
+data = DataFrame(
+    [
+        dict(CAT1="a", CAT2="c", num1=0.5, num2=0.6, y=0),
+        dict(CAT1="b", CAT2="d", num1=0.4, num2=0.8, y=1),
+        dict(CAT1="a", CAT2="d", num1=0.5, num2=0.56, y=0),
+        dict(CAT1="a", CAT2="d", num1=0.55, num2=0.56, y=1),
+        dict(CAT1="a", CAT2="c", num1=0.35, num2=0.86, y=0),
+        dict(CAT1="a", CAT2="c", num1=0.5, num2=0.68, y=1),
+    ]
+)
 
-cat_cols = ['CAT1', 'CAT2']
-train_data = data.drop('y', axis=1)
+cat_cols = ["CAT1", "CAT2"]
+train_data = data.drop("y", axis=1)
 
 
-categorical_transformer = Pipeline([
-    ('onehot', OneHotEncoder(sparse=False, handle_unknown='ignore'))])
+categorical_transformer = Pipeline(
+    [("onehot", OneHotEncoder(sparse=False, handle_unknown="ignore"))]
+)
 preprocessor = ColumnTransformer(
-    transformers=[
-        ('cat', categorical_transformer, cat_cols)],
-    remainder='passthrough')
-pipe = Pipeline([('preprocess', preprocessor),
-                 ('rf', RandomForestClassifier())])
-pipe.fit(train_data, data['y'])
+    transformers=[("cat", categorical_transformer, cat_cols)], remainder="passthrough"
+)
+pipe = Pipeline([("preprocess", preprocessor), ("rf", RandomForestClassifier())])
+pipe.fit(train_data, data["y"])
 
 #####################################
 # Display.
@@ -67,19 +69,7 @@ ax.get_yaxis().set_visible(False)
 # Function *to_onnx* does not handle dataframes.
 
 
-try:
-    onx = to_onnx(pipe, train_data[:1])
-except NotImplementedError as e:
-    print(e)
-
-###################################
-# But it possible to use an extended one.
-
-
-onx = to_onnx_ext(
-    pipe, train_data[:1],
-    options={RandomForestClassifier: {'zipmap': False}})
-
+onx = to_onnx(pipe, train_data[:1], options={RandomForestClassifier: {"zipmap": False}})
 
 #################################
 # Prediction with ONNX
@@ -100,13 +90,13 @@ except Exception as e:
 oinf = ReferenceEvaluator(onx)
 got = oinf.run(None, train_data)
 print(pipe.predict(train_data))
-print(got['label'])
+print(got["label"])
 
 #################################
 # And probilities.
 
 print(pipe.predict_proba(train_data))
-print(got['probabilities'])
+print(got["probabilities"])
 
 ######################################
 # It looks ok. Let's dig into the details to
@@ -121,6 +111,21 @@ print(got['probabilities'])
 # the input type is the column type.
 
 
+def guess_schema_from_data(X):
+    init = guess_initial_types(X)
+    unique = set()
+    for _, col in init:
+        if len(col.shape) != 2:
+            return init
+        if col.shape[0] is not None:
+            return init
+        if len(unique) > 0 and col.__class__ not in unique:
+            return init
+        unique.add(col.__class__)
+    unique = list(unique)
+    return [("X", unique[0]([None, sum(_[1].shape[1] for _ in init)]))]
+
+
 init = guess_schema_from_data(train_data)
 
 pprint.pprint(init)
@@ -133,6 +138,7 @@ for c in train_data.columns:
     if c not in cat_cols:
         train_data[c] = train_data[c].astype(numpy.float32)
 
+
 init = guess_schema_from_data(train_data)
 pprint.pprint(init)
 
@@ -140,8 +146,8 @@ pprint.pprint(init)
 # Let's convert with *skl2onnx* only.
 
 onx2 = to_onnx(
-    pipe, initial_types=init,
-    options={RandomForestClassifier: {'zipmap': False}})
+    pipe, initial_types=init, options={RandomForestClassifier: {"zipmap": False}}
+)
 
 #####################################
 # Let's run it with onnxruntime.
@@ -149,8 +155,7 @@ onx2 = to_onnx(
 # where column names become keys, and column values become
 # values.
 
-inputs = {c: train_data[c].values.reshape((-1, 1))
-          for c in train_data.columns}
+inputs = {c: train_data[c].values.reshape((-1, 1)) for c in train_data.columns}
 pprint.pprint(inputs)
 
 #############################

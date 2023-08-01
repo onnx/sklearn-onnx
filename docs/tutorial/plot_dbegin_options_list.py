@@ -19,8 +19,6 @@ GaussianMixture
 The first converter to change its behaviour depending on a black list
 of operators is for model *GaussianMixture*.
 """
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from onnx.reference import ReferenceEvaluator
 from timeit import timeit
 import numpy
 from onnxruntime import InferenceSession
@@ -39,15 +37,18 @@ model.fit(X_train)
 # ++++++++++++++++++
 
 model_onnx = to_onnx(
-    model, X_train[:1].astype(numpy.float32),
-    options={id(model): {'score_samples': True}},
-    target_opset=12)
-sess = InferenceSession(model_onnx.SerializeToString(),
-                        providers=["CPUExecutionProvider"])
+    model,
+    X_train[:1].astype(numpy.float32),
+    options={id(model): {"score_samples": True}},
+    target_opset=12,
+)
+sess = InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 xt = X_test[:5].astype(numpy.float32)
 print(model.score_samples(xt))
-print(sess.run(None, {'X': xt})[2])
+print(sess.run(None, {"X": xt})[2])
 
 
 ###################################
@@ -59,26 +60,37 @@ print(sess.run(None, {'X': xt})[2])
 # produces in that case.
 
 model_onnx2 = to_onnx(
-    model, X_train[:1].astype(numpy.float32),
-    options={id(model): {'score_samples': True}},
-    black_op={'ReduceLogSumExp'},
-    target_opset=12)
-sess2 = InferenceSession(model_onnx2.SerializeToString(),
-                         providers=["CPUExecutionProvider"])
+    model,
+    X_train[:1].astype(numpy.float32),
+    options={id(model): {"score_samples": True}},
+    black_op={"ReduceLogSumExp"},
+    target_opset=12,
+)
+sess2 = InferenceSession(
+    model_onnx2.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 xt = X_test[:5].astype(numpy.float32)
 print(model.score_samples(xt))
-print(sess2.run(None, {'X': xt})[2])
+print(sess2.run(None, {"X": xt})[2])
 
 #######################################
 # Processing time
 # +++++++++++++++
 
-print(timeit(stmt="sess.run(None, {'X': xt})",
-             number=10000, globals={'sess': sess, 'xt': xt}))
+print(
+    timeit(
+        stmt="sess.run(None, {'X': xt})", number=10000, globals={"sess": sess, "xt": xt}
+    )
+)
 
-print(timeit(stmt="sess2.run(None, {'X': xt})",
-             number=10000, globals={'sess2': sess2, 'xt': xt}))
+print(
+    timeit(
+        stmt="sess2.run(None, {'X': xt})",
+        number=10000,
+        globals={"sess2": sess2, "xt": xt},
+    )
+)
 
 #################################
 # The model using ReduceLogSumExp is much faster.
@@ -94,9 +106,11 @@ print(timeit(stmt="sess2.run(None, {'X': xt})",
 
 try:
     to_onnx(
-        model, X_train[:1].astype(numpy.float32),
-        options={id(model): {'score_samples': True}},
-        black_op={'ReduceLogSumExp', 'Add'},
-        target_opset=12)
+        model,
+        X_train[:1].astype(numpy.float32),
+        options={id(model): {"score_samples": True}},
+        black_op={"ReduceLogSumExp", "Add"},
+        target_opset=12,
+    )
 except RuntimeError as e:
-    print('Error:', e)
+    print("Error:", e)

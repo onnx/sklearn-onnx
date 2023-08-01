@@ -14,7 +14,7 @@ from test_utils import (
     dump_multiple_classification,
     dump_binary_classification,
     dump_data_and_model,
-    TARGET_OPSET
+    TARGET_OPSET,
 )
 
 
@@ -43,28 +43,27 @@ def custom_tranform_converter(scope, operator, container):
     weights = [0.5, 0.1, 10]
     shape = [len(weights), 1]
     container.add_initializer(weights_name, atype, shape, weights)
-    apply_mul(scope, [input.full_name, weights_name], output.full_name,
-              container)
+    apply_mul(scope, [input.full_name, weights_name], output.full_name, container)
 
 
 class TestVotingClassifierConverter(unittest.TestCase):
     def test_operator_mul(self):
-
         model = CustomTransform()
         Xd = numpy.array([[1, 2], [3, 4], [4, 5]])
 
         model_onnx = convert_sklearn(
-            model, "CustomTransform",
+            model,
+            "CustomTransform",
             [("input", FloatTensorType([None, Xd.shape[1]]))],
             custom_shape_calculators={
                 CustomTransform: custom_transform_shape_calculator
             },
-            custom_conversion_functions={
-                CustomTransform: custom_tranform_converter
-            }, target_opset=TARGET_OPSET)
+            custom_conversion_functions={CustomTransform: custom_tranform_converter},
+            target_opset=TARGET_OPSET,
+        )
         dump_data_and_model(
-            Xd.astype(numpy.float32), model, model_onnx,
-            basename="CustomTransformerMul")
+            Xd.astype(numpy.float32), model, model_onnx, basename="CustomTransformerMul"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_binary(self):
@@ -78,8 +77,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(
-            model, suffix="Hard", comparable_outputs=[0],
-            target_opset=TARGET_OPSET)
+            model, suffix="Hard", comparable_outputs=[0], target_opset=TARGET_OPSET
+        )
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_binary_weights(self):
@@ -94,8 +93,11 @@ class TestVotingClassifierConverter(unittest.TestCase):
         )
         # predict_proba is not defined when voting is hard.
         dump_binary_classification(
-            model, suffix="WeightsHard", comparable_outputs=[0],
-            target_opset=TARGET_OPSET)
+            model,
+            suffix="WeightsHard",
+            comparable_outputs=[0],
+            target_opset=TARGET_OPSET,
+        )
 
     def test_voting_soft_binary(self):
         model = VotingClassifier(
@@ -107,8 +109,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_binary_classification(
-            model, suffix="Soft", comparable_outputs=[0, 1],
-            target_opset=TARGET_OPSET)
+            model, suffix="Soft", comparable_outputs=[0, 1], target_opset=TARGET_OPSET
+        )
 
     def test_voting_soft_binary_weighted(self):
         model = VotingClassifier(
@@ -121,8 +123,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_binary_classification(
-            model, suffix="WeightedSoft",
-            target_opset=TARGET_OPSET)
+            model, suffix="WeightedSoft", target_opset=TARGET_OPSET
+        )
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_multi(self):
@@ -136,8 +138,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, suffix="Hard", comparable_outputs=[0],
-            target_opset=TARGET_OPSET)
+            model, suffix="Hard", comparable_outputs=[0], target_opset=TARGET_OPSET
+        )
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_voting_hard_multi_weighted(self):
@@ -152,8 +154,11 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, suffix="WeightedHard", comparable_outputs=[0],
-            target_opset=TARGET_OPSET)
+            model,
+            suffix="WeightedHard",
+            comparable_outputs=[0],
+            target_opset=TARGET_OPSET,
+        )
 
     def test_voting_soft_multi(self):
         model = VotingClassifier(
@@ -164,8 +169,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
                 ("lr2", LogisticRegression()),
             ],
         )
-        dump_multiple_classification(
-            model, suffix="Soft", target_opset=TARGET_OPSET)
+        dump_multiple_classification(model, suffix="Soft", target_opset=TARGET_OPSET)
 
     def test_voting_soft_multi_string(self):
         model = VotingClassifier(
@@ -177,8 +181,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, label_string=True, suffix="Soft",
-            target_opset=TARGET_OPSET)
+            model, label_string=True, suffix="Soft", target_opset=TARGET_OPSET
+        )
 
     def test_voting_soft_multi_weighted(self):
         model = VotingClassifier(
@@ -191,8 +195,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, suffix="WeightedSoft",
-            target_opset=TARGET_OPSET)
+            model, suffix="WeightedSoft", target_opset=TARGET_OPSET
+        )
 
     def test_voting_soft_multi_weighted4(self):
         model = VotingClassifier(
@@ -207,8 +211,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, suffix="Weighted4Soft",
-            target_opset=TARGET_OPSET)
+            model, suffix="Weighted4Soft", target_opset=TARGET_OPSET
+        )
 
     def test_voting_soft_multi_weighted42(self):
         model = VotingClassifier(
@@ -223,8 +227,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
             ],
         )
         dump_multiple_classification(
-            model, suffix="Weighted42Soft",
-            target_opset=TARGET_OPSET)
+            model, suffix="Weighted42Soft", target_opset=TARGET_OPSET
+        )
 
 
 if __name__ == "__main__":

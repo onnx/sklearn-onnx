@@ -1,15 +1,16 @@
 # tests
-flatbuffers
+black
 pandas
 py-cpuinfo
 pybind11
 pytest
 pytest-cov
+ruff
 wheel
 
 # docs
+furo
 sphinx
-sphinx_modern_theme_modified
 sphinxcontrib-blockdiag
 tqdm
 

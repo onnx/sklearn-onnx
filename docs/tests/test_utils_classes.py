@@ -9,7 +9,6 @@ from skl2onnx.tutorial.imagenet_classes import class_names
 
 
 class TestUtilsClasses(unittest.TestCase):
-
     def test_classes(self):
         cl = class_names
         self.assertIsInstance(cl, dict)

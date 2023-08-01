@@ -9,8 +9,9 @@ from onnx import AttributeProto, NodeProto
 from onnx.helper import make_attribute
 
 
-def _apply_optimisation_on_graph(fct, onnx_model, recursive=True,
-                                 debug_info=None, **kwargs):
+def _apply_optimisation_on_graph(
+    fct, onnx_model, recursive=True, debug_info=None, **kwargs
+):
     """
     Applies an optimisation function *fct* on a graph
     and not on the model.
@@ -22,10 +23,8 @@ def _apply_optimisation_on_graph(fct, onnx_model, recursive=True,
     :param kwargs: additional parameters
     return: new onnx model
     """
-    if hasattr(onnx_model, 'graph'):
-        graph = fct(
-            onnx_model.graph, debug_info=debug_info + ['GRAPH'],
-            **kwargs)
+    if hasattr(onnx_model, "graph"):
+        graph = fct(onnx_model.graph, debug_info=debug_info + ["GRAPH"], **kwargs)
         new_model = make_model(graph)
         new_model.ir_version = onnx_model.ir_version
         new_model.producer_name = onnx_model.producer_name
@@ -33,7 +32,7 @@ def _apply_optimisation_on_graph(fct, onnx_model, recursive=True,
         new_model.domain = onnx_model.domain
         new_model.model_version = onnx_model.model_version
         new_model.doc_string = onnx_model.doc_string
-        if hasattr(onnx_model, 'value_info'):
+        if hasattr(onnx_model, "value_info"):
             graph.value_info.extend(onnx_model.value_info)
         while len(new_model.opset_import) > 0:
             new_model.opset_import.pop()
@@ -42,8 +41,10 @@ def _apply_optimisation_on_graph(fct, onnx_model, recursive=True,
             op_set.domain = oimp.domain
             op_set.version = oimp.version
         return new_model
-    raise TypeError("This function only works on 'ModelProto' anod not not on"
-                    " {}.".format(type(onnx_model)))
+    raise TypeError(
+        "This function only works on 'ModelProto' anod not not on"
+        " {}.".format(type(onnx_model))
+    )
 
 
 def _apply_remove_node_fct_node(fct, node, recursive, debug_info):
@@ -54,29 +55,30 @@ def _apply_remove_node_fct_node(fct, node, recursive, debug_info):
     :param recursive: does it in subgraphs as well
     :return: new node
     """
-    if not hasattr(node, 'attribute'):
+    if not hasattr(node, "attribute"):
         return node
     modified = 0
     new_atts = []
     for att in node.attribute:
-        if att.name == 'body':
+        if att.name == "body":
             new_body = fct(
-                att.g, recursive=recursive,
-                debug_info=debug_info + [att.name])
+                att.g, recursive=recursive, debug_info=debug_info + [att.name]
+            )
             new_atts.append(_make_att_graph(att.name, new_body))
             modified += 1
         else:
             new_atts.append(att)
     if modified > 0:
-        new_node = _make_node(node.op_type, node.input,
-                              node.output, name=node.name,
-                              attributes=new_atts)
+        new_node = _make_node(
+            node.op_type, node.input, node.output, name=node.name, attributes=new_atts
+        )
         return new_node
     return node
 
 
-def _make_node(op_type, inputs, outputs, name=None, doc_string=None,
-               domain=None, attributes=None):
+def _make_node(
+    op_type, inputs, outputs, name=None, doc_string=None, domain=None, attributes=None
+):
     """
     Constructs a NodeProto.
 
@@ -105,8 +107,8 @@ def _make_node(op_type, inputs, outputs, name=None, doc_string=None,
     if isinstance(attributes, dict):
         if len(attributes) > 0:
             node.attribute.extend(
-                make_attribute(key, value)
-                for key, value in sorted(attributes.items()))
+                make_attribute(key, value) for key, value in sorted(attributes.items())
+            )
     elif attributes:
         for att in attributes:
             node.attribute.extend([att])
@@ -132,10 +134,10 @@ def _rename_node_input(onnx_node, old_name, new_name=None):
     """
     inputs = [_replace(name, old_name, new_name) for name in onnx_node.input]
     outputs = list(onnx_node.output)
-    if hasattr(onnx_node, 'attribute'):
+    if hasattr(onnx_node, "attribute"):
         new_atts = []
         for att in onnx_node.attribute:
-            if att.name == 'body':
+            if att.name == "body":
                 new_body = _rename_graph_input(att.g, old_name, new_name)
                 attr = AttributeProto()
                 attr.name = att.name
@@ -148,8 +150,13 @@ def _rename_node_input(onnx_node, old_name, new_name=None):
     else:
         atts = onnx_node.attribute
     node = _make_node(
-        onnx_node.op_type, inputs, outputs, name=onnx_node.name,
-        domain=onnx_node.domain, attributes=atts)
+        onnx_node.op_type,
+        inputs,
+        outputs,
+        name=onnx_node.name,
+        domain=onnx_node.domain,
+        attributes=atts,
+    )
     return node
 
 
@@ -173,9 +180,8 @@ def _rename_graph_output(graph, old_name, new_name):
                 value_info.doc_string = o.type.doc_string
             outputs.append(value_info)
     nodes = list(graph.node)
-    nodes.append(_make_node('Identity', [old_name], [new_name]))
-    new_graph = make_graph(nodes, graph.name, graph.input, outputs,
-                           graph.initializer)
+    nodes.append(_make_node("Identity", [old_name], [new_name]))
+    new_graph = make_graph(nodes, graph.name, graph.input, outputs, graph.initializer)
     new_graph.value_info.extend(graph.value_info)
     return new_graph
 
@@ -200,9 +206,8 @@ def _rename_graph_input(graph, old_name, new_name):
                 value_info.doc_string = i.type.doc_string
             inputs.append(value_info)
     nodes = list(graph.node)
-    nodes.append(_make_node('Identity', [new_name], [old_name]))
-    new_graph = make_graph(nodes, graph.name, inputs, graph.output,
-                           graph.initializer)
+    nodes.append(_make_node("Identity", [new_name], [old_name]))
+    new_graph = make_graph(nodes, graph.name, inputs, graph.output, graph.initializer)
     new_graph.value_info.extend(graph.value_info)
     return new_graph
 
@@ -226,10 +231,10 @@ def _rename_node_output(onnx_node, old_name, new_name):
     """
     inputs = list(onnx_node.input)
     outputs = [_replace(name, old_name, new_name) for name in onnx_node.output]
-    if hasattr(onnx_node, 'attribute'):
+    if hasattr(onnx_node, "attribute"):
         new_atts = []
         for att in onnx_node.attribute:
-            if att.name == 'body':
+            if att.name == "body":
                 new_body = _rename_graph_output(att.g, old_name, new_name)
                 new_atts.append(_make_att_graph(att.name, new_body))
             else:
@@ -238,6 +243,11 @@ def _rename_node_output(onnx_node, old_name, new_name):
     else:
         atts = onnx_node.attribute
     node = _make_node(
-        onnx_node.op_type, inputs, outputs, name=onnx_node.name,
-        domain=onnx_node.domain, attributes=atts)
+        onnx_node.op_type,
+        inputs,
+        outputs,
+        name=onnx_node.name,
+        domain=onnx_node.domain,
+        attributes=atts,
+    )
     return node

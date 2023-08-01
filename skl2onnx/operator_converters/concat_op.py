@@ -7,8 +7,9 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_concat(scope: Scope, operator: Operator,
-                           container: ModelComponentContainer):
+def convert_sklearn_concat(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     exptype = operator.outputs[0].type
     new_inputs = []
     for inp in operator.inputs:
@@ -21,8 +22,7 @@ def convert_sklearn_concat(scope: Scope, operator: Operator,
         apply_cast(scope, inp.full_name, name, container, to=et)
         new_inputs.append(name)
 
-    apply_concat(scope, new_inputs, operator.outputs[0].full_name,
-                 container, axis=1)
+    apply_concat(scope, new_inputs, operator.outputs[0].full_name, container, axis=1)
 
 
-register_converter('SklearnConcat', convert_sklearn_concat)
+register_converter("SklearnConcat", convert_sklearn_concat)
