@@ -2,7 +2,11 @@
 
 import unittest
 import numpy as np
-from onnx.reference import ReferenceEvaluator
+
+try:
+    from onnx.reference import ReferenceEvaluator
+except ImportError:
+    ReferenceEvaluator = None
 from sklearn.tree import DecisionTreeClassifier
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
@@ -21,11 +25,15 @@ class TestSklearnClassifiersExtreme(unittest.TestCase):
         onx = to_onnx(cl, x, target_opset=TARGET_OPSET, options={"zipmap": False})
 
         for cls in [
-            lambda onx: ReferenceEvaluator(onx, verbose=0),
+            (lambda onx: ReferenceEvaluator(onx, verbose=0))
+            if ReferenceEvaluator is not None
+            else None,
             lambda onx: InferenceSession(
                 onx.SerializeToString(), providers=["CPUExecutionProvider"]
             ),
         ]:
+            if cls is None:
+                continue
             sess = cls(onx)
             res = sess.run(None, {"X": x})
             self.assertEqual(len(res), len(expected))

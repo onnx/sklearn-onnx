@@ -24,7 +24,6 @@ a custom converter. Let's get the data.
 import matplotlib.pyplot as plt
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-import numpy
 import onnxruntime as rt
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
