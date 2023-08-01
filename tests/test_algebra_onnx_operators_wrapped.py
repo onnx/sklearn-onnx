@@ -17,8 +17,7 @@ from test_utils import TARGET_OPSET
 
 
 class DecorrelateTransformer(TransformerMixin, BaseEstimator):
-
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
@@ -33,8 +32,7 @@ class DecorrelateTransformer(TransformerMixin, BaseEstimator):
 
 
 class DecorrelateTransformer2(TransformerMixin, BaseEstimator):
-
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
@@ -76,97 +74,104 @@ def decorrelate_transformer_convertor2(scope, operator, container):
 
 
 class TestOnnxOperatorsWrapped(unittest.TestCase):
-
-    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
-                     reason="onnxruntime too old")
+    @unittest.skipIf(
+        pv.Version(ortv) < pv.Version("0.5.0"), reason="onnxruntime too old"
+    )
     def test_sub(self):
-
         data = load_iris()
         X = data.data
         dec = DecorrelateTransformer()
         dec.fit(X)
 
         update_registered_converter(
-            DecorrelateTransformer, "SklearnDecorrelateTransformer",
+            DecorrelateTransformer,
+            "SklearnDecorrelateTransformer",
             decorrelate_transformer_shape_calculator,
-            decorrelate_transformer_convertor)
+            decorrelate_transformer_convertor,
+        )
 
         onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         exp = dec.transform(X.astype(np.float32))
-        got = sess.run(None, {'X': X.astype(np.float32)})[0]
+        got = sess.run(None, {"X": X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
-    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
-                     reason="onnxruntime too old")
+    @unittest.skipIf(
+        pv.Version(ortv) < pv.Version("0.5.0"), reason="onnxruntime too old"
+    )
     def test_sub_double(self):
-
         data = load_iris()
         X = data.data
         dec = DecorrelateTransformer()
         dec.fit(X)
 
         update_registered_converter(
-            DecorrelateTransformer, "SklearnDecorrelateTransformer",
+            DecorrelateTransformer,
+            "SklearnDecorrelateTransformer",
             decorrelate_transformer_shape_calculator,
-            decorrelate_transformer_convertor)
+            decorrelate_transformer_convertor,
+        )
 
         onx = to_onnx(dec, X.astype(np.float64), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         exp = dec.transform(X.astype(np.float64))
-        got = sess.run(None, {'X': X.astype(np.float64)})[0]
+        got = sess.run(None, {"X": X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
-    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
-                     reason="onnxruntime too old")
+    @unittest.skipIf(
+        pv.Version(ortv) < pv.Version("0.5.0"), reason="onnxruntime too old"
+    )
     def test_sub_output(self):
-
         data = load_iris()
         X = data.data
         dec = DecorrelateTransformer2()
         dec.fit(X)
 
         update_registered_converter(
-            DecorrelateTransformer2, "SklearnDecorrelateTransformer2",
+            DecorrelateTransformer2,
+            "SklearnDecorrelateTransformer2",
             decorrelate_transformer_shape_calculator,
-            decorrelate_transformer_convertor2)
+            decorrelate_transformer_convertor2,
+        )
 
         onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         exp = dec.transform(X.astype(np.float32))
-        got = sess.run(None, {'X': X.astype(np.float32)})[0]
+        got = sess.run(None, {"X": X.astype(np.float32)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
-    @unittest.skipIf(pv.Version(ortv) < pv.Version('0.5.0'),
-                     reason="onnxruntime too old")
+    @unittest.skipIf(
+        pv.Version(ortv) < pv.Version("0.5.0"), reason="onnxruntime too old"
+    )
     def test_sub_output_double(self):
-
         data = load_iris()
         X = data.data
         dec = DecorrelateTransformer2()
         dec.fit(X)
 
         update_registered_converter(
-            DecorrelateTransformer2, "SklearnDecorrelateTransformer2",
+            DecorrelateTransformer2,
+            "SklearnDecorrelateTransformer2",
             decorrelate_transformer_shape_calculator,
-            decorrelate_transformer_convertor2)
+            decorrelate_transformer_convertor2,
+        )
 
         onx = to_onnx(dec, X.astype(np.float64), target_opset=TARGET_OPSET)
         self.assertIn('output: "variable"', str(onx))
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         exp = dec.transform(X.astype(np.float64))
-        got = sess.run(None, {'X': X.astype(np.float64)})[0]
+        got = sess.run(None, {"X": X.astype(np.float64)})[0]
         assert_almost_equal(got, exp, decimal=4)
 
 

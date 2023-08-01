@@ -13,5 +13,6 @@ def calculate_sklearn_array_feature_extractor(operator):
     operator.outputs[0].type = i.type.__class__([N, C])
 
 
-register_shape_calculator('SklearnArrayFeatureExtractor',
-                          calculate_sklearn_array_feature_extractor)
+register_shape_calculator(
+    "SklearnArrayFeatureExtractor", calculate_sklearn_array_feature_extractor
+)

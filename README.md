@@ -2,14 +2,18 @@
 
 <p align="center"><img width="50%" src="docs/logo_main.png" /></p>
 
-| Linux | Windows |
-|-------|---------|
-| [![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master) | [![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master)|
+[![Build Status Linux](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status%2Fonnx.sklearn-onnx.linux.CI?branchName=refs%2Fpull%2F1009%2Fmerge)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=21&branchName=refs%2Fpull%2F1009%2Fmerge)
+
+[![Build Status Windows](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status%2Fonnx.sklearn-onnx.win.CI?branchName=refs%2Fpull%2F1009%2Fmerge)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=22&branchName=refs%2Fpull%2F1009%2Fmerge)
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Introduction
 *sklearn-onnx* converts [scikit-learn](https://scikit-learn.org/stable/) models to [ONNX](https://github.com/onnx/onnx).
 Once in the ONNX format, you can use tools like [ONNX Runtime](https://github.com/Microsoft/onnxruntime) for high performance scoring.
 All converters are tested with [onnxruntime](https://onnxruntime.ai/).
+Any external converter can be registered to convert scikit-learn pipeline
+including models or transformers coming from external libraries.
 
 ## Documentation
 Full documentation including tutorials is available at [https://onnx.ai/sklearn-onnx/](https://onnx.ai/sklearn-onnx/).

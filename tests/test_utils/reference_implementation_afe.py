@@ -28,8 +28,7 @@ def _array_feature_extrator(data, indices):
     try:
         tem = data[..., index]
     except IndexError as e:
-        raise RuntimeError(
-            f"data.shape={data.shape}, indices={indices}") from e
+        raise RuntimeError(f"data.shape={data.shape}, indices={indices}") from e
     res = tem.reshape(new_shape)
     return res
 
@@ -38,7 +37,6 @@ if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
 
     class ArrayFeatureExtractor(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(self, data, indices):

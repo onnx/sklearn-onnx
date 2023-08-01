@@ -14,329 +14,465 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
 )
-from test_utils import (
-    dump_data_and_model,
-    fit_classification_model,
-    TARGET_OPSET
-)
+from test_utils import dump_data_and_model, fit_classification_model, TARGET_OPSET
 
 ort_version = ".".join(ort_version.split(".")[:2])
 
-LOG_LOSS = ("log_loss" if pv.Version(skl_version) >= pv.Version("1.1")
-            else "log")
+LOG_LOSS = "log_loss" if pv.Version(skl_version) >= pv.Version("1.1") else "log"
 
 
 class TestSGDClassifierConverter(unittest.TestCase):
-
     def test_model_sgd_binary_class_hinge(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='hinge', random_state=42), 2)
+            SGDClassifier(loss="hinge", random_state=42), 2
+        )
         model_onnx = convert_sklearn(
             model,
             "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierBinaryHinge-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryHinge-Out0",
+        )
 
     def test_model_sgd_multi_class_hinge(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='hinge', random_state=42), 5)
+            SGDClassifier(loss="hinge", random_state=42), 5
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiHinge-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiHinge-Out0",
+        )
 
     def test_model_sgd_multi_class_hinge_string(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='hinge', random_state=42), 5, label_string=True)
+            SGDClassifier(loss="hinge", random_state=42), 5, label_string=True
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiHinge-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiHinge-Out0",
+        )
 
-    @unittest.skipIf(TARGET_OPSET < 13,
-                     reason="duplicated test")
+    @unittest.skipIf(TARGET_OPSET < 13, reason="duplicated test")
     def test_model_sgd_binary_class_log_sigmoid(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, n_features=2)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, n_features=2
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=10, options={'zipmap': False})
+            target_opset=10,
+            options={"zipmap": False},
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[:5], model, model_onnx,
+            X.astype(np.float32)[:5],
+            model,
+            model_onnx,
             basename="SklearnSGDClassifierBinaryLog-Dec4",
-            verbose=False)
+            verbose=False,
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET, options={'zipmap': False})
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32)[:5], model, model_onnx,
+            X.astype(np.float32)[:5],
+            model,
+            model_onnx,
             basename="SklearnSGDClassifierBinaryLog13-Dec4",
-            verbose=False)
+            verbose=False,
+        )
 
     def test_model_sgd_binary_class_log(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 2)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=min(TARGET_OPSET, 10))
+            target_opset=min(TARGET_OPSET, 10),
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierBinaryLog-Dec4")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryLog-Dec4",
+        )
 
     def test_model_sgd_binary_class_log_decision_function(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 2)
-        options = {id(model): {'raw_scores': True}}
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2
+        )
+        options = {id(model): {"raw_scores": True}}
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options,
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
+            X.astype(np.float32),
+            model,
+            model_onnx,
             basename="SklearnSGDClassifierBinaryLogDecisionFunction-Dec3",
-            methods=['predict', 'decision_function_binary'])
+            methods=["predict", "decision_function_binary"],
+        )
 
     def test_model_sgd_multi_class_log(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 5)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 5
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=min(12, TARGET_OPSET))
+            target_opset=min(12, TARGET_OPSET),
+        )
         X = np.array([X[1], X[1]])
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiLog")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiLog",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 13, reason="duplicated test")
     def test_model_sgd_multi_class_log_sigmoid(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 5)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 5
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET, options={'zipmap': False})
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
         X = np.array([X[1], X[1]])
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx, verbose=False,
-            basename="SklearnSGDClassifierMultiLog13")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnSGDClassifierMultiLog13",
+        )
 
     def test_model_sgd_multi_class_log_decision_function(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 3)
-        options = {id(model): {'raw_scores': True}}
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 3
+        )
+        options = {id(model): {"raw_scores": True}}
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options=options, target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiLogDecisionFunction-Dec3",
-            methods=['predict', 'decision_function'])
-
-    def test_model_sgd_binary_class_log_l1_no_intercept(self):
-        model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, penalty='l1', fit_intercept=False,
-                          random_state=42), 2)
-        model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierBinaryLogL1NoIntercept-Dec4")
-
-    @unittest.skipIf(pv.Version(ort_version) <= pv.Version("1.0.0"),
-                     reason="discrepencies")
-    def test_model_sgd_multi_class_log_l1_no_intercept(self):
-        model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, penalty='l1', fit_intercept=False,
-                          random_state=43), 3, n_features=7)
-        X = np.array([X[4], X[4]])
-        model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X.astype(np.float32),
-            model, model_onnx, verbose=False,
-            basename="SklearnSGDClassifierMultiLogL1NoIntercept-Dec4")
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiLogDecisionFunction-Dec3",
+            methods=["predict", "decision_function"],
+        )
+
+    def test_model_sgd_binary_class_log_l1_no_intercept(self):
+        model, X = fit_classification_model(
+            SGDClassifier(
+                loss=LOG_LOSS, penalty="l1", fit_intercept=False, random_state=42
+            ),
+            2,
+        )
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD binary classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryLogL1NoIntercept-Dec4",
+        )
+
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.0.0"), reason="discrepencies"
+    )
+    def test_model_sgd_multi_class_log_l1_no_intercept(self):
+        model, X = fit_classification_model(
+            SGDClassifier(
+                loss=LOG_LOSS, penalty="l1", fit_intercept=False, random_state=43
+            ),
+            3,
+            n_features=7,
+        )
+        X = np.array([X[4], X[4]])
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD multi-class classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnSGDClassifierMultiLogL1NoIntercept-Dec4",
+        )
 
     def test_model_sgd_binary_class_elasticnet_power_t(self):
         model, X = fit_classification_model(
-            SGDClassifier(penalty='elasticnet', l1_ratio=0.3,
-                          power_t=2, random_state=42), 2)
+            SGDClassifier(
+                penalty="elasticnet", l1_ratio=0.3, power_t=2, random_state=42
+            ),
+            2,
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierBinaryElasticnetPowerT-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryElasticnetPowerT-Out0",
+        )
 
     def test_model_sgd_multi_class_elasticnet_power_t(self):
         model, X = fit_classification_model(
-            SGDClassifier(penalty='elasticnet', l1_ratio=0.3,
-                          power_t=2, random_state=42), 5)
+            SGDClassifier(
+                penalty="elasticnet", l1_ratio=0.3, power_t=2, random_state=42
+            ),
+            5,
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiElasticnetPowerT-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiElasticnetPowerT-Out0",
+        )
 
     def test_model_sgd_binary_class_squared_hinge(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='squared_hinge', random_state=42), 2)
+            SGDClassifier(loss="squared_hinge", random_state=42), 2
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierBinarySquaredHinge-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinarySquaredHinge-Out0",
+        )
 
     def test_model_sgd_multi_class_squared_hinge(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='squared_hinge', random_state=42), 5)
+            SGDClassifier(loss="squared_hinge", random_state=42), 5
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiSquaredHinge-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiSquaredHinge-Out0",
+        )
 
     def test_model_sgd_binary_class_perceptron(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='perceptron', random_state=42), 2)
+            SGDClassifier(loss="perceptron", random_state=42), 2
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierBinaryPerceptron-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierBinaryPerceptron-Out0",
+        )
 
     def test_model_sgd_multi_class_perceptron(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='perceptron', random_state=42), 5)
+            SGDClassifier(loss="perceptron", random_state=42), 5
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnSGDClassifierMultiPerceptron-Out0")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnSGDClassifierMultiPerceptron-Out0",
+        )
 
     def test_model_sgd_binary_class_hinge_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='hinge', random_state=42), 2, is_int=True)
+            SGDClassifier(loss="hinge", random_state=42), 2, is_int=True
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnSGDClassifierBinaryHingeInt-Out0")
+            X, model, model_onnx, basename="SklearnSGDClassifierBinaryHingeInt-Out0"
+        )
 
     def test_model_sgd_multi_class_hinge_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss='hinge', random_state=42), 5, is_int=True)
+            SGDClassifier(loss="hinge", random_state=42), 5, is_int=True
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnSGDClassifierMultiHingeInt-Out0")
+            X, model, model_onnx, basename="SklearnSGDClassifierMultiHingeInt-Out0"
+        )
 
     def test_model_sgd_binary_class_log_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_int=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_int=True
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnSGDClassifierBinaryLogInt")
+            X, model, model_onnx, basename="SklearnSGDClassifierBinaryLogInt"
+        )
 
     def test_model_sgd_binary_class_log_bool(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_bool=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_bool=True
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD binary classifier",
+            model,
+            "scikit-learn SGD binary classifier",
             [("input", BooleanTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnSGDClassifierBinaryLogBool")
+            X, model, model_onnx, basename="SklearnSGDClassifierBinaryLogBool"
+        )
 
     def test_model_sgd_multi_class_log_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 5, is_int=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 5, is_int=True
+        )
         model_onnx = convert_sklearn(
-            model, "scikit-learn SGD multi-class classifier",
+            model,
+            "scikit-learn SGD multi-class classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         X = X[6:8]
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnSGDClassifierMultiLogInt")
+            X, model, model_onnx, basename="SklearnSGDClassifierMultiLogInt"
+        )
 
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42),
-            2, label_string=True)
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, label_string=True
+        )
         model_onnx = convert_sklearn(
-            model, "multi-class nocl",
+            model,
+            "multi-class nocl",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            options={id(model): {'nocl': True}},
-            target_opset=TARGET_OPSET)
+            options={id(model): {"nocl": True}},
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         sonx = str(model_onnx)
-        assert 'classlabels_strings' not in sonx
-        assert 'cl0' not in sonx
+        assert "classlabels_strings" not in sonx
+        assert "cl0" not in sonx
         dump_data_and_model(
-            X[6:8], model, model_onnx, classes=model.classes_,
-            basename="SklearnSGDMultiNoCl", verbose=False)
+            X[6:8],
+            model,
+            model_onnx,
+            classes=model.classes_,
+            basename="SklearnSGDMultiNoCl",
+            verbose=False,
+        )
 
 
 if __name__ == "__main__":

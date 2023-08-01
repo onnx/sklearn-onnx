@@ -157,13 +157,9 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      pip install flake8
-    displayName: 'install flake8'
-
-  - script: |
-      call activate skl2onnxEnvironment
-      flake8 skl2onnx tests tests_onnxmltools
-    displayName: 'flake8'
+      python -m pip install ruff
+      ruff skl2onnx tests tests_onnxmltools
+    displayName: 'ruff'
 
   - script: |
       call activate skl2onnxEnvironment

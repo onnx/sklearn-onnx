@@ -69,7 +69,6 @@ and which is not. So it is possible to specify options by id.
 
 from pprint import pformat
 import numpy
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 from onnx.reference import ReferenceEvaluator
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
@@ -87,8 +86,9 @@ X_train, X_test, y_train, _ = train_test_split(X, y, random_state=11)
 clr = LogisticRegression()
 clr.fit(X_train, y_train)
 
-model_def = to_onnx(clr, X_train.astype(numpy.float32),
-                    options={id(clr): {'zipmap': False}})
+model_def = to_onnx(
+    clr, X_train.astype(numpy.float32), options={id(clr): {"zipmap": False}}
+)
 oinf = ReferenceEvaluator(model_def)
 print(oinf)
 
@@ -97,8 +97,7 @@ print(oinf)
 # Using function *id* has one flaw: it is not pickable.
 # It is just better to use strings.
 
-model_def = to_onnx(clr, X_train.astype(numpy.float32),
-                    options={'zipmap': False})
+model_def = to_onnx(clr, X_train.astype(numpy.float32), options={"zipmap": False})
 oinf = ReferenceEvaluator(model_def)
 print(oinf)
 
@@ -111,14 +110,10 @@ print(oinf)
 # name convention.
 
 
-pipe = Pipeline([
-    ('norm', MinMaxScaler()),
-    ('clr', LogisticRegression())
-])
+pipe = Pipeline([("norm", MinMaxScaler()), ("clr", LogisticRegression())])
 pipe.fit(X_train, y_train)
 
-model_def = to_onnx(pipe, X_train.astype(numpy.float32),
-                    options={'clr__zipmap': False})
+model_def = to_onnx(pipe, X_train.astype(numpy.float32), options={"clr__zipmap": False})
 oinf = ReferenceEvaluator(model_def)
 print(oinf)
 
@@ -132,29 +127,28 @@ print(oinf)
 # First, with probabilities:
 
 
-pipe = Pipeline([
-    ('norm', MinMaxScaler()),
-    ('clr', LogisticRegression())
-])
+pipe = Pipeline([("norm", MinMaxScaler()), ("clr", LogisticRegression())])
 pipe.fit(X_train, y_train)
 
 model_def = to_onnx(
-    pipe, X_train.astype(numpy.float32),
-    options={id(pipe): {'zipmap': False}})
+    pipe, X_train.astype(numpy.float32), options={id(pipe): {"zipmap": False}}
+)
 
 oinf = ReferenceEvaluator(model_def)
-print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
+print(oinf.run(None, {"X": X.astype(numpy.float32)[:5]}))
 
 
 #######################################
 # Then with raw scores:
 
 model_def = to_onnx(
-    pipe, X_train.astype(numpy.float32),
-    options={id(pipe): {'raw_scores': True, 'zipmap': False}})
+    pipe,
+    X_train.astype(numpy.float32),
+    options={id(pipe): {"raw_scores": True, "zipmap": False}},
+)
 
 oinf = ReferenceEvaluator(model_def)
-print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
+print(oinf.run(None, {"X": X.astype(numpy.float32)[:5]}))
 
 #########################################
 # It did not seem to work... We need to tell
@@ -162,22 +156,26 @@ print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
 # and not the whole pipeline.
 
 model_def = to_onnx(
-    pipe, X_train.astype(numpy.float32),
-    options={id(pipe.steps[1][1]): {'raw_scores': True, 'zipmap': False}})
+    pipe,
+    X_train.astype(numpy.float32),
+    options={id(pipe.steps[1][1]): {"raw_scores": True, "zipmap": False}},
+)
 
 oinf = ReferenceEvaluator(model_def)
-print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
+print(oinf.run(None, {"X": X.astype(numpy.float32)[:5]}))
 
 ###########################################
 # There are negative values. That works.
 # Strings are still easier to use.
 
 model_def = to_onnx(
-    pipe, X_train.astype(numpy.float32),
-    options={'clr__raw_scores': True, 'clr__zipmap': False})
+    pipe,
+    X_train.astype(numpy.float32),
+    options={"clr__raw_scores": True, "clr__zipmap": False},
+)
 
 oinf = ReferenceEvaluator(model_def)
-print(oinf.run(None, {'X': X.astype(numpy.float32)[:5]}))
+print(oinf.run(None, {"X": X.astype(numpy.float32)[:5]}))
 
 
 #########################################
@@ -196,9 +194,11 @@ clrrf.predict(X_test[:2])
 paths, n_nodes_ptr = clrrf.decision_path(X_test[:2])
 print(paths.todense())
 
-model_def = to_onnx(clrrf, X_train.astype(numpy.float32),
-                    options={id(clrrf): {'decision_path': True,
-                                         'zipmap': False}})
+model_def = to_onnx(
+    clrrf,
+    X_train.astype(numpy.float32),
+    options={id(clrrf): {"decision_path": True, "zipmap": False}},
+)
 sess = InferenceSession(model_def.SerializeToString())
 
 ##########################################
@@ -209,7 +209,7 @@ print([o.name for o in sess.get_outputs()])
 ##########################################
 # Let's display the last one.
 
-res = sess.run(None, {'X': X_test[:2].astype(numpy.float32)})
+res = sess.run(None, {"X": X_test[:2].astype(numpy.float32)})
 print(res[-1])
 
 ############################################################
@@ -225,9 +225,9 @@ for k, v in sorted(_converter_pool.items()):
     opts = v.get_allowed_options()
     if not isinstance(opts, dict):
         continue
-    name = k.replace('Sklearn', '')
-    print('%s%s %r' % (name, " " * (30 - len(name)), opts))
+    name = k.replace("Sklearn", "")
+    print("%s%s %r" % (name, " " * (30 - len(name)), opts))
     for o in opts:
         all_opts.add(o)
 
-print('all options:', pformat(list(sorted(all_opts))))
+print("all options:", pformat(list(sorted(all_opts))))

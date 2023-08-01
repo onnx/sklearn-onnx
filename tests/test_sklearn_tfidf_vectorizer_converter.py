@@ -10,6 +10,7 @@ import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
+
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
@@ -24,314 +25,372 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType, FloatTensorType
 from onnxruntime import __version__ as ort_version
 from test_utils import (
-    dump_data_and_model, TARGET_OPSET,
-    InferenceSessionEx as InferenceSession)
+    dump_data_and_model,
+    TARGET_OPSET,
+    InferenceSessionEx as InferenceSession,
+)
 
 
-ort_version = '.'.join(ort_version.split('.')[:2])
+ort_version = ".".join(ort_version.split(".")[:2])
 
 
 class TestSklearnTfidfVectorizer(unittest.TestCase):
-
     def get_options(self):
         return {TfidfVectorizer: {"tokenexp": None}}
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("0.3.0"),
-        reason="Requires opset 9.")
+        pv.Version(ort_version) <= pv.Version("0.3.0"), reason="Requires opset 9."
+    )
     def test_model_tfidf_vectorizer11(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType())],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType())],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
-            basename="SklearnTfidfVectorizer11-OneOff-SklCol")
+            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11-OneOff-SklCol"
+        )
 
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': corpus.ravel()})[0]
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": corpus.ravel()})[0]
         assert res.shape == (4, 9)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("0.3.0"),
-        reason="Requires opset 9.")
+        pv.Version(ort_version) <= pv.Version("0.3.0"), reason="Requires opset 9."
+    )
     def test_model_tfidf_vectorizer11_nolowercase(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None, lowercase=False)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType())],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType())],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11NoL-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer11NoL-OneOff-SklCol",
+        )
 
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': corpus.ravel()})[0]
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": corpus.ravel()})[0]
         assert res.shape == (4, 11)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
-    @unittest.skipIf(
-        ColumnTransformer is None,
-        reason="Requires newer scikit-learn")
+    @unittest.skipIf(ColumnTransformer is None, reason="Requires newer scikit-learn")
     def test_model_tfidf_vectorizer11_compose(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         corpus = numpy.hstack([corpus, corpus])
         y = numpy.array([0, 1, 0, 1])
-        model = ColumnTransformer([
-            ('a', TfidfVectorizer(), 0),
-            ('b', TfidfVectorizer(), 1),
-        ])
+        model = ColumnTransformer(
+            [
+                ("a", TfidfVectorizer(), 0),
+                ("b", TfidfVectorizer(), 1),
+            ]
+        )
         model.fit(corpus, y)
-        model_onnx = convert_sklearn(model, "TfIdfcomp",
-                                     [("input", StringTensorType([4, 2]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            model,
+            "TfIdfcomp",
+            [("input", StringTensorType([4, 2]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': corpus})[0]
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": corpus})[0]
         exp = model.transform(corpus)
         assert_almost_equal(res, exp)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_empty_string_case1(self):
-        corpus = numpy.array([
-            'This is the first document.',
-            'This document is the second document.',
-            'And this is the third one.',
-            ' ',
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                " ",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus[:3].ravel())
-        model_onnx = convert_sklearn(vect, 'TfidfVectorizer',
-                                     [('input', StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
 
         # TfidfVectorizer in onnxruntime fails with empty strings,
         # which was fixed in version 0.3.0 afterward
         dump_data_and_model(
-            corpus[2:], vect, model_onnx,
-            basename="SklearnTfidfVectorizer11EmptyStringSepCase1-"
-                     "OneOff-SklCol")
+            corpus[2:],
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer11EmptyStringSepCase1-" "OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_empty_string_case2(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         # onnxruntime fails with empty strings
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11EmptyString-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer11EmptyString-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_out_vocabulary(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
-        corpus = numpy.array([
-            "AZZ ZZ This is the first document.",
-            "BZZ ZZ This document is the second document.",
-            "ZZZ ZZ And this is the third one.",
-            "WZZ ZZ Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "AZZ ZZ This is the first document.",
+                "BZZ ZZ This document is the second document.",
+                "ZZZ ZZ And this is the third one.",
+                "WZZ ZZ Is this the first document?",
+            ]
+        ).reshape((4, 1))
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer22(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(2, 2), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
-            basename="SklearnTfidfVectorizer22-OneOff-SklCol")
+            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer21(self):
         corpus = numpy.array(["AA AA", "AA AA BB"]).reshape((2, 1))
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
-            basename="SklearnTfidfVectorizer22S-OneOff-SklCol")
+            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22S-OneOff-SklCol"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer12(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 2), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
-            basename="SklearnTfidfVectorizer22-OneOff-SklCol")
+            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer12_normL1(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 2), norm="l1")
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer22L1-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer12_normL2(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 2), norm="l2")
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer22L2-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer13(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 3), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
-            basename="SklearnTfidfVectorizer13-OneOff-SklCol")
+            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer13-OneOff-SklCol"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11parenthesis_class(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the (first) document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the (first) document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         extra = {
             TfidfVectorizer: {
-                "separators": [
-                    " ", "\\.", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"
-                ]
+                "separators": [" ", "\\.", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"]
             }
         }
         model_onnx = convert_sklearn(
@@ -339,7 +398,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             "TfidfVectorizer",
             [("input", StringTensorType([1]))],
             options=extra,
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
         )
         self.assertTrue(model_onnx is not None)
         # This test depends on this issue:
@@ -348,105 +407,122 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11ParenthesisClass-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer11ParenthesisClass-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_idparenthesis_id(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the (first) document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the (first) document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
 
-        extra = {
-            id(vect): {"sep2": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]}
-        }
+        extra = {id(vect): {"sep2": [" ", ".", "?", ",", ";", ":", "!", "(", ")"]}}
         try:
             convert_sklearn(
                 vect,
                 "TfidfVectorizer",
                 [("input", StringTensorType([None, 1]))],
-                options=extra, target_opset=TARGET_OPSET)
+                options=extra,
+                target_opset=TARGET_OPSET,
+            )
         except (RuntimeError, NameError):
             pass
 
         extra = {
             id(vect): {
-                "separators": [
-                    " ", "[.]", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"
-                ]
+                "separators": [" ", "[.]", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"]
             }
         }
         model_onnx = convert_sklearn(
             vect,
             "TfidfVectorizer",
             [("input", StringTensorType([1]))],
-            options=extra, target_opset=TARGET_OPSET)
+            options=extra,
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx,
-            basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol")
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer_binary(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(binary=True)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType([1]))],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType([1]))],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizerBinary-OneOff-SklCol")
+            basename="SklearnTfidfVectorizerBinary-OneOff-SklCol",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("0.3.0"),
-        reason="Requires opset 9.")
+        pv.Version(ort_version) <= pv.Version("0.3.0"), reason="Requires opset 9."
+    )
     def test_model_tfidf_vectorizer11_64(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType())],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType())],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer1164-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer1164-OneOff-SklCol",
+        )
 
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': corpus.ravel()})[0]
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": corpus.ravel()})[0]
         assert res.shape == (4, 9)
 
-    @unittest.skipIf(
-        apply_less is None, reason="onnxconverter-common too old")
+    @unittest.skipIf(apply_less is None, reason="onnxconverter-common too old")
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        pv.Version(ort_version) < pv.Version("1.3.0"),
-        reason="Requires opset 9.")
+        pv.Version(ort_version) < pv.Version("1.3.0"), reason="Requires opset 9."
+    )
     def test_tfidf_svm(self):
         data = [
             ["schedule a meeting", 0],
@@ -454,7 +530,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             ["slot in a meeting", 0],
             ["call ron", 1],
             ["make a phone call", 1],
-            ["call in on the phone", 2]
+            ["call in on the phone", 2],
         ]
         docs = [doc for (doc, _) in data]
         labels = [label for (_, label) in data]
@@ -469,63 +545,75 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         embeddings = embeddings.astype(numpy.float32).todense()
         exp = clf.predict(embeddings)
 
-        initial_type = [('input', FloatTensorType([None, dim]))]
-        model_onnx = convert_sklearn(clf, initial_types=initial_type,
-                                     target_opset=TARGET_OPSET)
+        initial_type = [("input", FloatTensorType([None, dim]))]
+        model_onnx = convert_sklearn(
+            clf, initial_types=initial_type, target_opset=TARGET_OPSET
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': embeddings})[0]
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": embeddings})[0]
         assert_almost_equal(exp, res)
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.0.0"),
-        reason="Requires opset 10.")
+        pv.Version(ort_version) <= pv.Version("1.0.0"), reason="Requires opset 10."
+    )
     def test_model_tfidf_vectorizer_nan(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
         options = copy.deepcopy(self.get_options())
-        options[TfidfVectorizer]['nan'] = True
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType())],
-                                     options=options,
-                                     target_opset=TARGET_OPSET)
+        options[TfidfVectorizer]["nan"] = True
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType())],
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
         sess = InferenceSession(
-            model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': corpus.ravel()})[0]
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": corpus.ravel()})[0]
         assert res.shape == (4, 9)
         assert numpy.isnan(res[0, 0])
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_model_tfidf_vectorizer11_custom_vocabulary(self):
-        corpus = numpy.array([
-            "This is the first document.",
-            "This document is the second document.",
-            "And this is the third one.",
-            "Is this the first document?",
-        ]).reshape((4, 1))
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
         vc = ["first", "second", "third", "document", "this"]
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None, vocabulary=vc)
         vect.fit(corpus.ravel())
         self.assertFalse(hasattr(vect, "stop_words_"))
-        model_onnx = convert_sklearn(vect, "TfidfVectorizer",
-                                     [("input", StringTensorType())],
-                                     options=self.get_options(),
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType())],
+            options=self.get_options(),
+            target_opset=TARGET_OPSET,
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11CustomVocab-OneOff-SklCol")
+            basename="SklearnTfidfVectorizer11CustomVocab-OneOff-SklCol",
+        )
 
 
 if __name__ == "__main__":

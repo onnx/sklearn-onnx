@@ -19,11 +19,14 @@ a *LGBMClassifier*. Let's see how to do it.
 Train a LightGBM classifier
 +++++++++++++++++++++++++++
 """
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 import onnxruntime as rt
 from skl2onnx import convert_sklearn, update_registered_converter
-from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
+from skl2onnx.common.shape_calculator import (
+    calculate_linear_classifier_output_shapes,
+)  # noqa
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
+    convert_lightgbm,
+)  # noqa
 from skl2onnx.common.data_types import FloatTensorType
 import numpy
 from sklearn.datasets import load_iris
@@ -40,8 +43,9 @@ numpy.random.shuffle(ind)
 X = X[ind, :].copy()
 y = y[ind].copy()
 
-pipe = Pipeline([('scaler', StandardScaler()),
-                 ('lgbm', LGBMClassifier(n_estimators=3))])
+pipe = Pipeline(
+    [("scaler", StandardScaler()), ("lgbm", LGBMClassifier(n_estimators=3))]
+)
 pipe.fit(X, y)
 
 ######################################
@@ -58,18 +62,23 @@ pipe.fit(X, y)
 # lightgbm/shape_calculators/Classifier.py>`_.
 
 update_registered_converter(
-    LGBMClassifier, 'LightGbmLGBMClassifier',
-    calculate_linear_classifier_output_shapes, convert_lightgbm,
-    options={'nocl': [True, False], 'zipmap': [True, False, 'columns']})
+    LGBMClassifier,
+    "LightGbmLGBMClassifier",
+    calculate_linear_classifier_output_shapes,
+    convert_lightgbm,
+    options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
+)
 
 ##################################
 # Convert again
 # +++++++++++++
 
 model_onnx = convert_sklearn(
-    pipe, 'pipeline_lightgbm',
-    [('input', FloatTensorType([None, 2]))],
-    target_opset={'': 12, 'ai.onnx.ml': 2})
+    pipe,
+    "pipeline_lightgbm",
+    [("input", FloatTensorType([None, 2]))],
+    target_opset={"": 12, "ai.onnx.ml": 2},
+)
 
 # And save.
 with open("pipeline_lightgbm.onnx", "wb") as f:

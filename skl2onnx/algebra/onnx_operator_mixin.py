@@ -18,9 +18,17 @@ class OnnxOperatorMixin:
     sharing an API to convert object to *ONNX*.
     """
 
-    def to_onnx(self, X=None, name=None,
-                options=None, white_op=None, black_op=None,
-                final_types=None, target_opset=None, verbose=0):
+    def to_onnx(
+        self,
+        X=None,
+        name=None,
+        options=None,
+        white_op=None,
+        black_op=None,
+        final_types=None,
+        target_opset=None,
+        verbose=0,
+    ):
         """
         Converts the model in *ONNX* format.
         It calls method *_to_onnx* which must be
@@ -43,42 +51,52 @@ class OnnxOperatorMixin:
         :param verbose: displays information while converting
         """
         from .. import convert_sklearn
+
         if X is None:
             initial_types = self.infer_initial_types()
         else:
             initial_types = guess_initial_types(X, None)
-        if not hasattr(self, 'op_version'):
+        if not hasattr(self, "op_version"):
             if name is None:
                 name = self.__class__.__name__
             raise AttributeError(
                 "Attribute 'op_version' is missing for '{}' "
-                "(model: '{}').".format(
-                    self.__class__.__name__, name))
+                "(model: '{}').".format(self.__class__.__name__, name)
+            )
         return convert_sklearn(
-            self, initial_types=initial_types,
-            target_opset=target_opset or self.op_version, options=options,
-            white_op=white_op, black_op=black_op, final_types=final_types,
-            verbose=verbose)
+            self,
+            initial_types=initial_types,
+            target_opset=target_opset or self.op_version,
+            options=options,
+            white_op=white_op,
+            black_op=black_op,
+            final_types=final_types,
+            verbose=verbose,
+        )
 
     def infer_initial_types(self):
         """
         Infers initial types.
         """
-        if hasattr(self, 'enumerate_initial_types'):
+        if hasattr(self, "enumerate_initial_types"):
             return list(self.enumerate_initial_types())
-        raise RuntimeError("Method enumerate_initial_types is missing "
-                           "and initial_types are not defined.")
+        raise RuntimeError(
+            "Method enumerate_initial_types is missing "
+            "and initial_types are not defined."
+        )
 
     def _find_sklearn_parent(self):
         for cl in self.__class__.__bases__:
             if issubclass(cl, BaseEstimator):
                 return cl
-        raise RuntimeError("Unable to find any parent inherited from "
-                           "BaseEstimator: {}.".format(
-                               ", ".join(map(str, self.__class__.__bases__))))
+        raise RuntimeError(
+            "Unable to find any parent inherited from "
+            "BaseEstimator: {}.".format(", ".join(map(str, self.__class__.__bases__)))
+        )
 
-    def to_onnx_operator(self, inputs=None, outputs=None,
-                         target_opset=None, options=None):
+    def to_onnx_operator(
+        self, inputs=None, outputs=None, target_opset=None, options=None
+    ):
         """
         This function must be overloaded.
         """
@@ -92,6 +110,7 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
+
         def parser(scope=None, inputs=None):
             try:
                 op = self.to_onnx_operator(inputs=inputs, outputs=None)
@@ -111,6 +130,7 @@ class OnnxOperatorMixin:
                 except IndexError:
                     break
             return names
+
         return parser
 
     def get_inputs(self, inputs, i):
@@ -130,32 +150,36 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
-        if not hasattr(self, 'op_version'):
+        if not hasattr(self, "op_version"):
             raise AttributeError(
                 "Class '{}' should have an attribute 'op_version'.".format(
-                    self.__class__.__name__))
+                    self.__class__.__name__
+                )
+            )
 
         try:
             op = self.to_onnx_operator()
         except NotImplementedError:
             parent = self._find_sklearn_parent()
-            name = sklearn_operator_name_map.get(
-                parent, "Sklearn" + parent.__name__)
+            name = sklearn_operator_name_map.get(parent, "Sklearn" + parent.__name__)
             return get_shape_calculator(name)
 
         def shape_calculator(operator):
-            onx = op.to_onnx(operator.inputs, operator.outputs,
-                             target_opset=self.op_version)
+            onx = op.to_onnx(
+                operator.inputs, operator.outputs, target_opset=self.op_version
+            )
             inferred_model = shape_inference.infer_shapes(onx)
             shapes = Variable.from_pb(inferred_model.graph.value_info)
             shapes = {shape.onnx_name: shape for shape in shapes}
             for o in operator.outputs:
                 name = o.onnx_name
                 if name not in shapes:
-                    raise RuntimeError("Shape of output '{}' cannot be "
-                                       "infered. onnx_shape_calculator "
-                                       "must be overriden and return "
-                                       "a shape calculator.".format(name))
+                    raise RuntimeError(
+                        "Shape of output '{}' cannot be "
+                        "infered. onnx_shape_calculator "
+                        "must be overriden and return "
+                        "a shape calculator.".format(name)
+                    )
                 o.set_type(shapes[name].type)
 
         return shape_calculator
@@ -167,8 +191,10 @@ class OnnxOperatorMixin:
         mapped to the first *scikit-learn* parent
         it can find.
         """
-        def converter(scope: Scope, operator: Operator,
-                      container: ModelComponentContainer):
+
+        def converter(
+            scope: Scope, operator: Operator, container: ModelComponentContainer
+        ):
             inputs = operator.inputs  # getattr(self, "parsed_inputs_", None)
             outputs = operator.outputs  # kwargs.get('outputs', None)
             op_version = container.target_opset
@@ -176,23 +202,26 @@ class OnnxOperatorMixin:
             try:
                 if inputs:
                     op = self.to_onnx_operator(
-                        inputs=inputs, outputs=outputs,
-                        target_opset=op_version, options=options)
+                        inputs=inputs,
+                        outputs=outputs,
+                        target_opset=op_version,
+                        options=options,
+                    )
                 else:
                     op = self.to_onnx_operator(
-                        target_opset=op_version,
-                        outputs=outputs, options=options)
+                        target_opset=op_version, outputs=outputs, options=options
+                    )
             except TypeError:
                 warnings.warn(
                     "Signature should be to_onnx_operator(self, inputs=None, "
                     "outputs=None, target_opset=None, **kwargs). "
                     "This will be the case in version 1.11, class=%r."
                     "" % type(self),
-                    DeprecationWarning)
+                    DeprecationWarning,
+                )
                 try:
                     if inputs:
-                        op = self.to_onnx_operator(
-                            inputs=inputs, outputs=outputs)
+                        op = self.to_onnx_operator(inputs=inputs, outputs=outputs)
                     else:
                         op = self.to_onnx_operator()
                 except NotImplementedError:

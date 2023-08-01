@@ -38,9 +38,8 @@ clr = LogisticRegression(max_iter=500)
 clr.fit(X_train, y_train)
 print(clr)
 
-initial_type = [('float_input', FloatTensorType([None, 4]))]
-onx = convert_sklearn(clr, initial_types=initial_type,
-                      target_opset=12)
+initial_type = [("float_input", FloatTensorType([None, 4]))]
+onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
 ############################
 # Output type
@@ -50,7 +49,7 @@ onx = convert_sklearn(clr, initial_types=initial_type,
 # is a list of dictionaries with onnxruntime.
 
 sess = rt.InferenceSession(onx.SerializeToString())
-res = sess.run(None, {'float_input': X_test.astype(numpy.float32)})
+res = sess.run(None, {"float_input": X_test.astype(numpy.float32)})
 print(res[1][:2])
 print("probabilities type:", type(res[1]))
 print("type for the first observations:", type(res[1][0]))
@@ -61,13 +60,14 @@ print("type for the first observations:", type(res[1][0]))
 #
 # Let's remove the ZipMap operator.
 
-initial_type = [('float_input', FloatTensorType([None, 4]))]
-options = {id(clr): {'zipmap': False}}
-onx2 = convert_sklearn(clr, initial_types=initial_type, options=options,
-                       target_opset=12)
+initial_type = [("float_input", FloatTensorType([None, 4]))]
+options = {id(clr): {"zipmap": False}}
+onx2 = convert_sklearn(
+    clr, initial_types=initial_type, options=options, target_opset=12
+)
 
 sess2 = rt.InferenceSession(onx2.SerializeToString())
-res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})
+res2 = sess2.run(None, {"float_input": X_test.astype(numpy.float32)})
 print(res2[1][:2])
 print("probabilities type:", type(res2[1]))
 print("type for the first observations:", type(res2[1][0]))
@@ -80,15 +80,19 @@ print("type for the first observations:", type(res2[1][0]))
 # the probabilities into columns. The final model produces
 # one output for the label, and one output per class.
 
-options = {id(clr): {'zipmap': 'columns'}}
-onx3 = convert_sklearn(clr, initial_types=initial_type, options=options,
-                       target_opset=12)
+options = {id(clr): {"zipmap": "columns"}}
+onx3 = convert_sklearn(
+    clr, initial_types=initial_type, options=options, target_opset=12
+)
 
 sess3 = rt.InferenceSession(onx3.SerializeToString())
-res3 = sess3.run(None, {'float_input': X_test.astype(numpy.float32)})
+res3 = sess3.run(None, {"float_input": X_test.astype(numpy.float32)})
 for i, out in enumerate(sess3.get_outputs()):
-    print("output: '{}' shape={} values={}...".format(
-        out.name, res3[i].shape, res3[i][:2]))
+    print(
+        "output: '{}' shape={} values={}...".format(
+            out.name, res3[i].shape, res3[i][:2]
+        )
+    )
 
 
 ###################################
@@ -98,16 +102,13 @@ for i, out in enumerate(sess3.get_outputs()):
 X32 = X_test.astype(numpy.float32)
 
 print("Time with ZipMap:")
-print(repeat(lambda: sess.run(None, {'float_input': X32}),
-             number=100, repeat=10))
+print(repeat(lambda: sess.run(None, {"float_input": X32}), number=100, repeat=10))
 
 print("Time without ZipMap:")
-print(repeat(lambda: sess2.run(None, {'float_input': X32}),
-             number=100, repeat=10))
+print(repeat(lambda: sess2.run(None, {"float_input": X32}), number=100, repeat=10))
 
 print("Time without ZipMap but with columns:")
-print(repeat(lambda: sess3.run(None, {'float_input': X32}),
-             number=100, repeat=10))
+print(repeat(lambda: sess3.run(None, {"float_input": X32}), number=100, repeat=10))
 
 # The prediction is much faster without ZipMap
 # on this example.

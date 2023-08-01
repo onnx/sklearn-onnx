@@ -25,7 +25,6 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 """
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 import pickle
 from io import BytesIO
 import numpy
@@ -52,7 +51,7 @@ class DecorrelateTransformer(TransformerMixin, BaseEstimator):
     * `self.coef_`: square root of the coveriance matrix
     """
 
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
@@ -75,7 +74,7 @@ def test_decorrelate_transformer():
     pred = dec.transform(X)
     cov = pred.T @ pred
     for i in range(cov.shape[0]):
-        cov[i, i] = 1.
+        cov[i, i] = 1.0
     assert_almost_equal(numpy.identity(4), cov)
 
     st = BytesIO()
@@ -152,9 +151,11 @@ def decorrelate_transformer_converter(scope, operator, container):
 
 
 update_registered_converter(
-    DecorrelateTransformer, "SklearnDecorrelateTransformer",
+    DecorrelateTransformer,
+    "SklearnDecorrelateTransformer",
     decorrelate_transformer_shape_calculator,
-    decorrelate_transformer_converter)
+    decorrelate_transformer_converter,
+)
 
 
 onx = to_onnx(dec, X.astype(numpy.float32))
@@ -162,7 +163,7 @@ onx = to_onnx(dec, X.astype(numpy.float32))
 sess = InferenceSession(onx.SerializeToString())
 
 exp = dec.transform(X.astype(numpy.float32))
-got = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
 
 
 def diff(p1, p2):
@@ -182,7 +183,7 @@ onx = to_onnx(dec, X.astype(numpy.float64))
 sess = InferenceSession(onx.SerializeToString())
 
 exp = dec.transform(X.astype(numpy.float64))
-got = sess.run(None, {'X': X.astype(numpy.float64)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float64)})[0]
 print(diff(exp, got))
 
 #############################################

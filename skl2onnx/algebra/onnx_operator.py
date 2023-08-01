@@ -8,11 +8,16 @@ from onnx.helper import make_graph, make_model
 from onnx.numpy_helper import from_array
 from scipy.sparse import coo_matrix
 from ..proto import TensorProto
-from ..common.data_types import (
-    _guess_type_proto_str, _guess_type_proto_str_inv)
+from ..common.data_types import _guess_type_proto_str, _guess_type_proto_str_inv
 from ..common._topology import (
-    Variable, VariableStr, Scope, _update_domain_version, Operator,
-    _get_main_opset_version, OPSET_TO_IR_VERSION)
+    Variable,
+    VariableStr,
+    Scope,
+    _update_domain_version,
+    Operator,
+    _get_main_opset_version,
+    OPSET_TO_IR_VERSION,
+)
 from ..common._container import ModelComponentContainer
 from ..common import utils
 from ..common.data_types import guess_proto_type, _guess_numpy_type
@@ -24,7 +29,7 @@ from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
 
 
-logger = getLogger('skl2onnx')
+logger = getLogger("skl2onnx")
 
 
 class OnnxOperatorItem:
@@ -65,8 +70,9 @@ class OnnxOperatorItem:
         :param operator: overwrite inputs
         :param run_converters: must be True if called from method `to_onnx`
         """
-        self.onx_op.add_to(scope, container, operator=operator,
-                           run_converters=run_converters)
+        self.onx_op.add_to(
+            scope, container, operator=operator, run_converters=run_converters
+        )
 
     def get_output_name(self, i=0):
         """
@@ -91,20 +97,22 @@ class OnnxOperatorItem:
         """
         if self.onx_op is None:
             raise RuntimeError(
-                "self.onx_op cannot be None, type(self)={}".format(
-                    type(self)))
+                "self.onx_op cannot be None, type(self)={}".format(type(self))
+            )
         if self.index is None:
             raise RuntimeError(
-                "self.index cannot be None, type(self)={}".format(
-                    type(self)))
+                "self.index cannot be None, type(self)={}".format(type(self))
+            )
         outputs = self.onx_op.outputs
         if outputs is None:
             raise RuntimeError(
                 "self.onx_op.outputs cannot be None, "
                 "type(self)={}, type(self.onx_op)={}, "
                 "type(self.onx_op.state)={}".format(
-                    type(self), type(self.onx_op), type(self.onx_op.state)))
-        return outputs[self.index:self.index + 1]
+                    type(self), type(self.onx_op), type(self.onx_op.state)
+                )
+            )
+        return outputs[self.index : self.index + 1]
 
     def get_output_type_inference(self, input_shapes=None):
         """
@@ -112,20 +120,22 @@ class OnnxOperatorItem:
         """
         if self.onx_op is None:
             raise RuntimeError(
-                "self.onx_op cannot be None, type(self)={}".format(
-                    type(self)))
+                "self.onx_op cannot be None, type(self)={}".format(type(self))
+            )
         if self.index is None:
             raise RuntimeError(
-                "self.index cannot be None, type(self)={}".format(
-                    type(self)))
+                "self.index cannot be None, type(self)={}".format(type(self))
+            )
         outputs = self.onx_op.get_output_type_inference(input_shapes)
         if outputs is None:
             raise RuntimeError(
                 "self.onx_op.outputs cannot be None, "
                 "type(self)={}, type(self.onx_op)={}, "
                 "type(self.onx_op.state)={}".format(
-                    type(self), type(self.onx_op), type(self.onx_op.state)))
-        return outputs[self.index:self.index + 1]
+                    type(self), type(self.onx_op), type(self.onx_op.state)
+                )
+            )
+        return outputs[self.index : self.index + 1]
 
 
 class OnnxOperator:
@@ -157,16 +167,15 @@ class OnnxOperator:
         Parameter *global_context*, *clear_subgraph_inputs*
         were added.
     """
-    class OnnxOperatorVariable(GraphStateVar):
 
+    class OnnxOperatorVariable(GraphStateVar):
         def __init__(self, index, name=None):
             self.index = index
             self.name = name
 
         def as_variable(self, scope):
             name = "ov%s" % self.name
-            if (hasattr(self, "variable_") and
-                    self.variable_.onnx_name == name):
+            if hasattr(self, "variable_") and self.variable_.onnx_name == name:
                 return self.variable_
             var = Variable(name, name, scope=scope, type=None)
             if scope is not None:
@@ -187,8 +196,7 @@ class OnnxOperator:
 
         def as_variable(self, scope):
             name = self.name
-            if (hasattr(self, "variable_") and
-                    self.variable_.onnx_name == name):
+            if hasattr(self, "variable_") and self.variable_.onnx_name == name:
                 return self.variable_
             if scope is not None:
                 if name in scope.variables:
@@ -208,8 +216,7 @@ class OnnxOperator:
             elif isinstance(name, OnnxOperator.UnscopedVariable):
                 return self.name == name.name
             else:
-                raise TypeError('Unsupported type for comparison {}'.format(
-                    type(name)))
+                raise TypeError("Unsupported type for comparison {}".format(type(name)))
 
         def __repr__(self):
             return "UnscopedVariable('%s')" % self.name
@@ -225,15 +232,12 @@ class OnnxOperator:
         def as_variable(self, scope):
             ha = utils.hash_array(self.value)
             name = "CST%s" % ha
-            if (hasattr(self, "variable_") and
-                    self.variable_.onnx_name == name):
+            if hasattr(self, "variable_") and self.variable_.onnx_name == name:
                 return self.variable_
             if scope is not None:
-                var = scope.declare_local_variable(
-                    name, type=_guess_type(self.value))
+                var = scope.declare_local_variable(name, type=_guess_type(self.value))
             else:
-                var = Variable(name, name, scope=scope,
-                               type=_guess_type(self.value))
+                var = Variable(name, name, scope=scope, type=_guess_type(self.value))
             self.variable_ = var
             return var
 
@@ -256,9 +260,11 @@ class OnnxOperator:
         :param op_version: requested version
         :return: schema
         """
-        if not hasattr(self.__class__, 'past_version'):
-            raise RuntimeError("Missing attribute 'past_version', there is "
-                               "no other available schema.")
+        if not hasattr(self.__class__, "past_version"):
+            raise RuntimeError(
+                "Missing attribute 'past_version', there is "
+                "no other available schema."
+            )
         found = None
         for v in self.past_version.values():
             if v.since_version > op_version:
@@ -269,20 +275,27 @@ class OnnxOperator:
             raise RuntimeError(
                 "Operator '{}': requested version {} < "
                 "{} schema version.".format(
-                    self.__class__.__name__,
-                    op_version, self.since_version))
+                    self.__class__.__name__, op_version, self.since_version
+                )
+            )
         return found
 
-    def __init__(self, *inputs, op_version=None, output_names=None,
-                 domain=None, global_context=None,
-                 clear_subgraph_inputs=False, **kwargs):
-
-        if (output_names is None and
-                self.__class__.__name__.startswith("OnnxScan")):
+    def __init__(
+        self,
+        *inputs,
+        op_version=None,
+        output_names=None,
+        domain=None,
+        global_context=None,
+        clear_subgraph_inputs=False,
+        **kwargs
+    ):
+        if output_names is None and self.__class__.__name__.startswith("OnnxScan"):
             raise NotImplementedError(
                 "The class cannot infer the number of variables "
                 "for node '{}' yet. output_names must be specified"
-                ".".format(self.__class__.__name__))
+                ".".format(self.__class__.__name__)
+            )
         if isinstance(output_names, (str, Variable)):
             output_names = [output_names]
             if isinstance(output_names[0], str):
@@ -290,20 +303,22 @@ class OnnxOperator:
         elif isinstance(output_names, Operator):
             if len(output_names.outputs) == 0:
                 raise ValueError(
-                    "output_names cannot be empty (operator %r)."
-                    "" % output_names)
+                    "output_names cannot be empty (operator %r)." "" % output_names
+                )
             output_names = output_names.outputs.copy()
         elif isinstance(output_names, Operator.OperatorList):
             if len(output_names) == 0:
                 raise ValueError(
                     "output_names cannot be empty (operator %r)."
-                    "" % self.__class__.__name__)
+                    "" % self.__class__.__name__
+                )
             output_names = output_names.copy()
         elif isinstance(output_names, list):
             if len(output_names) == 0:
                 raise ValueError(
                     "output_names cannot be empty (operator %r)."
-                    "" % self.__class__.__name__)
+                    "" % self.__class__.__name__
+                )
             output_names = output_names.copy()
             for i in range(len(output_names)):
                 if isinstance(output_names[i], str):
@@ -311,10 +326,11 @@ class OnnxOperator:
         elif output_names is not None:
             raise TypeError(
                 "output_names must be a string or a list not %r."
-                "" % type(output_names))
+                "" % type(output_names)
+            )
 
         if op_version is None:
-            if domain == '':
+            if domain == "":
                 self.op_version = get_latest_tested_opset_version()
             else:
                 self.op_version = None
@@ -322,8 +338,7 @@ class OnnxOperator:
             self.op_version = op_version
         self.since_version = self.__class__.since_version
 
-        if (self.op_version is not None and
-                self.op_version < self.since_version):
+        if self.op_version is not None and self.op_version < self.since_version:
             schema = self.find_schema(self.op_version)
             self.since_version = schema.since_version
             self.expected_inputs = schema.expected_inputs.copy()
@@ -332,15 +347,18 @@ class OnnxOperator:
             self.output_range = schema.output_range
         else:
             self.expected_inputs = (
-                None if self.__class__.expected_inputs is None
-                else self.__class__.expected_inputs.copy())
+                None
+                if self.__class__.expected_inputs is None
+                else self.__class__.expected_inputs.copy()
+            )
             self.expected_outputs = (
-                None if self.__class__.expected_outputs is None
-                else self.__class__.expected_outputs.copy())
+                None
+                if self.__class__.expected_outputs is None
+                else self.__class__.expected_outputs.copy()
+            )
             self.input_range = self.__class__.input_range
             self.output_range = self.__class__.output_range
-            if self.__class__.__name__ not in {
-                    'OnnxScan', 'OnnxLoop', 'OnnxIf'}:
+            if self.__class__.__name__ not in {"OnnxScan", "OnnxLoop", "OnnxIf"}:
                 # TODO: the minimum opset depends on embedded graph
                 # by default, it takes the given op_version but the
                 # optimal value could be lower.
@@ -348,13 +366,13 @@ class OnnxOperator:
             if self.op_version is None:
                 self.op_version = self.since_version
 
-        if (self.op_version is not None and
-                self.op_version < self.since_version):
+        if self.op_version is not None and self.op_version < self.since_version:
             raise RuntimeError(
                 "Operator '{}': requested version {} < "
                 "{} schema version.".format(
-                    self.__class__.__name__,
-                    self.op_version, self.since_version))
+                    self.__class__.__name__, self.op_version, self.since_version
+                )
+            )
 
         self.state = None
         self.domain = domain
@@ -364,8 +382,9 @@ class OnnxOperator:
         # check inputs
         if len(inputs) == 0:
             if self.input_range[0] == self.input_range[1]:
-                self.inputs = [OnnxOperator.UnscopedVariable(_[0])
-                               for _ in self.expected_inputs]
+                self.inputs = [
+                    OnnxOperator.UnscopedVariable(_[0]) for _ in self.expected_inputs
+                ]
             else:
                 # The number of inputs may vary.
                 self.inputs = None
@@ -374,42 +393,53 @@ class OnnxOperator:
             for inp in inputs:
                 if isinstance(inp, str):
                     self.inputs.append(OnnxOperator.UnscopedVariable(inp))
-                elif isinstance(inp, (OnnxOperator, Variable,
-                                      OnnxOperatorItem, OnnxSubEstimator)):
+                elif isinstance(
+                    inp, (OnnxOperator, Variable, OnnxOperatorItem, OnnxSubEstimator)
+                ):
                     self.inputs.append(inp)
                 elif isinstance(inp, tuple) and len(inp) == 2:
                     self.inputs.append(inp)
                 elif isinstance(inp, (np.ndarray, coo_matrix)):
-                    self.inputs.append(
-                        OnnxOperator.ConstantVariable(inp))
+                    self.inputs.append(OnnxOperator.ConstantVariable(inp))
                 elif isinstance(inp, TensorProto):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
-                elif isinstance(inp, (OnnxOperator.OnnxOperatorVariable,
-                                      OnnxOperator.ConstantVariable)):
+                elif isinstance(
+                    inp,
+                    (OnnxOperator.OnnxOperatorVariable, OnnxOperator.ConstantVariable),
+                ):
                     self.inputs.append(inp)
-                elif isinstance(inp, (np.int64, np.float32,
-                                      np.float64, np.bool_,
-                                      np.int8, np.uint8)):
+                elif isinstance(
+                    inp, (np.int64, np.float32, np.float64, np.bool_, np.int8, np.uint8)
+                ):
                     self.inputs.append(OnnxOperator.ConstantVariable(inp))
-                elif isinstance(inp, (float, )):
+                elif isinstance(inp, (float,)):
                     self.inputs.append(np.float64(inp))
-                elif isinstance(inp, (int, )):
+                elif isinstance(inp, (int,)):
                     self.inputs.append(np.int64(inp))
                 else:
                     raise TypeError(
                         "Unable to interpret the input name for type {} in "
                         "operator '{}' (value={}).".format(
-                            type(inp), self.__class__.__name__, inp))
+                            type(inp), self.__class__.__name__, inp
+                        )
+                    )
 
         if self.inputs is not None:
-            if (len(self.inputs) < self.input_range[0] or
-                    len(self.inputs) > self.input_range[1]):
+            if (
+                len(self.inputs) < self.input_range[0]
+                or len(self.inputs) > self.input_range[1]
+            ):
                 raise RuntimeError(
                     "Operator '{}' expects a number of inputs "
                     "in [{}, {}] not {} (expected opset={}, "
                     "class opset={})".format(
-                        self.operator_name, *self.input_range,
-                        len(self.inputs), op_version, self.op_version))
+                        self.operator_name,
+                        *self.input_range,
+                        len(self.inputs),
+                        op_version,
+                        self.op_version
+                    )
+                )
         # global context
         if global_context is None:
             self.global_context = None
@@ -417,12 +447,14 @@ class OnnxOperator:
             if not isinstance(global_context, dict):
                 raise TypeError(
                     "global_context must be a dictionary not %r."
-                    "" % type(global_context))
+                    "" % type(global_context)
+                )
             for k, v in global_context.items():
                 if not isinstance(v, (OnnxOperator, OnnxOperatorItem)):
                     raise TypeError(
                         "Value %r in must be an OnnxOperator or an "
-                        "OnnxOperatorItem not %r." % (k, type(v)))
+                        "OnnxOperatorItem not %r." % (k, type(v))
+                    )
             self.global_context = global_context
 
         # check output
@@ -433,7 +465,8 @@ class OnnxOperator:
             if len(self.output_names) == 0:
                 raise ValueError(
                     "output_names can be None but cannot be empty for "
-                    "operator %r." % self)
+                    "operator %r." % self
+                )
             if self.output_variables is None:
                 self.output_variables = [None for o in self.output_names]
             for i in range(len(self.output_names)):
@@ -441,33 +474,32 @@ class OnnxOperator:
                 if isinstance(name, Variable):
                     self.output_variables[i] = name
                 else:
-                    raise TypeError("output_names must be a list of strings "
-                                    "and element %r is %r (%r)" % (
-                                        i, type(name), name))
+                    raise TypeError(
+                        "output_names must be a list of strings "
+                        "and element %r is %r (%r)" % (i, type(name), name)
+                    )
             if all(map(lambda x: x is None, self.output_variables)):
                 self.output_variables = None
 
-        if (self.output_names is not None and (
-                self.expected_outputs is None or
-                len(self.output_names) > len(self.expected_outputs))):
+        if self.output_names is not None and (
+            self.expected_outputs is None
+            or len(self.output_names) > len(self.expected_outputs)
+        ):
             if self.expected_outputs is None:
                 self.expected_outputs = []
-            for i in range(len(self.expected_outputs),
-                           len(self.output_names)):
+            for i in range(len(self.expected_outputs), len(self.output_names)):
                 self.expected_outputs.append((self.output_names[i], None))
 
-        if (self.expected_inputs is None or
-                len(self.inputs) > len(self.expected_inputs)):
+        if self.expected_inputs is None or len(self.inputs) > len(self.expected_inputs):
             if self.expected_inputs is None:
                 self.expected_inputs = []
-            for i in range(len(self.expected_inputs),
-                           len(self.inputs)):
+            for i in range(len(self.expected_inputs), len(self.inputs)):
                 inp = self.inputs[i]
                 if isinstance(inp, GraphStateVar):
                     inp = tuple(inp)
                 elif isinstance(inp, str):
                     inp = (inp, None)
-                elif hasattr(inp, 'add_to'):
+                elif hasattr(inp, "add_to"):
                     # OnnxOperator
                     existing = set(_[0] for _ in self.expected_inputs)
                     i = 10
@@ -479,11 +511,14 @@ class OnnxOperator:
                 self.expected_inputs.append(inp)
 
         self.output_names_ = None
-        self._post_process_attributes(
-            clear_subgraph_inputs=clear_subgraph_inputs)
+        self._post_process_attributes(clear_subgraph_inputs=clear_subgraph_inputs)
         logger.debug(
-            '[Ops] +%s-%d (%s) id=%d',
-            self.__class__.__name__, self.op_version, self.domain, id(self))
+            "[Ops] +%s-%d (%s) id=%d",
+            self.__class__.__name__,
+            self.op_version,
+            self.domain,
+            id(self),
+        )
 
     def _post_process_attributes(self, clear_subgraph_inputs=False):
         """
@@ -512,33 +547,36 @@ class OnnxOperator:
 
         if self.__class__.__name__ == "OnnxConstantOfShape":
             if "value" in self.kwargs:
-                value = self.kwargs['value']
+                value = self.kwargs["value"]
                 if isinstance(value, TensorProto):
                     return
                 if isinstance(value, np.ndarray):
-                    if value.shape == (1, ):
+                    if value.shape == (1,):
                         val = value[0]
                     elif len(value.shape) == 0:
                         val = value
                     else:
                         raise RuntimeError(
                             "Unexpected shape %r for value, it must be "
-                            "an array of one element." % value.shape)
-                    self.kwargs['value'] = from_array(
-                        np.array([val], dtype=value.dtype))
+                            "an array of one element." % value.shape
+                        )
+                    self.kwargs["value"] = from_array(
+                        np.array([val], dtype=value.dtype)
+                    )
                     return
                 raise TypeError(
                     "Unexpected type %r for value. It should be an array "
-                    "of one element." % type(value))
+                    "of one element." % type(value)
+                )
             return
 
         if self.__class__.__name__ == "OnnxCast":
             if "to" in self.kwargs:
-                value = self.kwargs['to']
+                value = self.kwargs["to"]
                 if isinstance(value, int):
                     return
                 to = guess_proto_type(_guess_numpy_type(value, None))
-                self.kwargs['to'] = to
+                self.kwargs["to"] = to
             return
 
     def __str__(self):
@@ -549,7 +587,9 @@ class OnnxOperator:
             self.__class__.__name__,
             len(self.inputs) if self.inputs is not None else 0,
             [str(o) for o in self.output_names]
-            if self.output_names is not None else "?")
+            if self.output_names is not None
+            else "?",
+        )
 
     def set_onnx_name_prefix(self, onnx_prefix_name):
         """
@@ -562,7 +602,7 @@ class OnnxOperator:
         if self.onnx_prefix_name is None:
             self.onnx_prefix_name = onnx_prefix_name
             for inp in self.inputs:
-                if hasattr(inp, 'onnx_prefix_name'):
+                if hasattr(inp, "onnx_prefix_name"):
                     inp.set_onnx_name_prefix(onnx_prefix_name)
         return self
 
@@ -588,7 +628,7 @@ class OnnxOperator:
             return self.state.computed_outputs_[i][0]
         if self.output_names_ is not None:
             return self.output_names_[i]
-        self._set_output_names_(getattr(self, 'scope', None) or scope, None)
+        self._set_output_names_(getattr(self, "scope", None) or scope, None)
         return self.output_names_[i]
 
     def get_output(self, i, scope=None):
@@ -599,8 +639,8 @@ class OnnxOperator:
             res = self.output_names_[i]
             if not isinstance(res, (tuple, Variable)):
                 raise RuntimeError(
-                    "Unable to retrieve output %r from %r."
-                    "" % (i, self))
+                    "Unable to retrieve output %r from %r." "" % (i, self)
+                )
             return res
 
     def _set_output_names_(self, scope, operator):
@@ -608,8 +648,7 @@ class OnnxOperator:
         if operator is not None:
             self.operator_ = operator
         if self.output_names_ is not None:
-            raise RuntimeError(
-                "output_names_ is already set.")
+            raise RuntimeError("output_names_ is already set.")
         elif self.output_variables is not None:
             outputs = [o.onnx_name for o in self.output_variables]
             self.output_names_ = outputs
@@ -621,15 +660,16 @@ class OnnxOperator:
             if operator is not None and len(louts) != len(operator.outputs):
                 raise RuntimeError(
                     "Output mismatch for '{}'\n{}\n{}".format(
-                        type(operator.raw_operator),
-                        louts, operator.outputs))
+                        type(operator.raw_operator), louts, operator.outputs
+                    )
+                )
             outputs = []
             for iname, name in enumerate(louts):
                 if name is None:
                     raise AssertionError(
-                        "Issue for operator '{}'.".format(
-                            type(operator.raw_operator)))
-                if name.startswith('u(') and name[-1] == ')':
+                        "Issue for operator '{}'.".format(type(operator.raw_operator))
+                    )
+                if name.startswith("u(") and name[-1] == ")":
                     name = scope.get_unique_variable_name(name[2:-1])
                 elif operator is not None:
                     oout = operator.outputs[iname]
@@ -639,15 +679,15 @@ class OnnxOperator:
         elif self.expected_outputs is None:
             raise AttributeError(
                 "expected_outputs is None for operator=%r, output_names=%r, "
-                "output_variables=%r, operator=%r" % (
-                    self, self.output_names, self.output_variables, operator))
+                "output_variables=%r, operator=%r"
+                % (self, self.output_names, self.output_variables, operator)
+            )
         else:
             if scope is None:
                 raise RuntimeError("scope must not be None.")
             outputs = []
             for name in self.expected_outputs:
-                name = scope.get_unique_variable_name(
-                    self.onnx_prefix + "_" + name[0])
+                name = scope.get_unique_variable_name(self.onnx_prefix + "_" + name[0])
                 outputs.append(name)
             self.output_names_ = outputs
         return outputs
@@ -657,21 +697,24 @@ class OnnxOperator:
         for input in self.inputs:
             if isinstance(input, OnnxOperator.OnnxOperatorVariable):
                 if operator is None:
-                    raise RuntimeError("A placeholder cannot be replaced "
-                                       "as an operator is not specified.")
+                    raise RuntimeError(
+                        "A placeholder cannot be replaced "
+                        "as an operator is not specified."
+                    )
                 if len(operator.inputs) == 0:
-                    raise RuntimeError("No input variable in {}.".format(
-                        operator))
+                    raise RuntimeError("No input variable in {}.".format(operator))
                 # The inputs must be looked into the graph.
                 for i in operator.inputs:
                     if i.onnx_name == input.name:
                         inputs.append(i)
                         break
                 else:
-                    vars = ', '.join(map(lambda o: "'%s'" % o.onnx_name,
-                                         operator.inputs))
-                    raise RuntimeError("Unable to find variable "
-                                       "{} in {}.".format(input, vars))
+                    vars = ", ".join(
+                        map(lambda o: "'%s'" % o.onnx_name, operator.inputs)
+                    )
+                    raise RuntimeError(
+                        "Unable to find variable " "{} in {}.".format(input, vars)
+                    )
             else:
                 inputs.append(input)
         return inputs
@@ -693,17 +736,18 @@ class OnnxOperator:
             if self.is_deprecated:
                 raise RuntimeError(
                     "Node '{}' is deprecated. This API cannot deprecated "
-                    "nodes.".format(self.__class__.__name__))
-            if (self.op_version is not None and
-                    self.op_version < self.since_version):
+                    "nodes.".format(self.__class__.__name__)
+                )
+            if self.op_version is not None and self.op_version < self.since_version:
                 raise RuntimeError(
                     "Incompatible versions for node '{}'  op_version {} "
                     "< since_version {}.".format(
-                        self.__class__.__name__, self.op_version,
-                        self.since_version))
-            if self.kwargs.get('op_version', '') is None:
+                        self.__class__.__name__, self.op_version, self.since_version
+                    )
+                )
+            if self.kwargs.get("op_version", "") is None:
                 kwargs = self.kwargs.copy()
-                del kwargs['op_version']
+                del kwargs["op_version"]
             else:
                 kwargs = self.kwargs
 
@@ -715,14 +759,23 @@ class OnnxOperator:
 
             logger.debug("[Ops.add_to] state id=%d", id(self))
             self.state = GraphState(
-                inputs, self.output_names_, self.operator_name,
-                scope, container, None, op_version=self.op_version,
-                op_domain=domain, onnx_prefix_name=self.onnx_prefix,
+                inputs,
+                self.output_names_,
+                self.operator_name,
+                scope,
+                container,
+                None,
+                op_version=self.op_version,
+                op_domain=domain,
+                onnx_prefix_name=self.onnx_prefix,
                 expected_inputs=self.expected_inputs,
                 expected_outputs=self.expected_outputs,
                 input_range=self.input_range,
                 output_range=self.output_range,
-                operator=operator, run_converters=run_converters, **kwargs)
+                operator=operator,
+                run_converters=run_converters,
+                **kwargs
+            )
             self.state.run()
         self._verify_add_to_()
 
@@ -730,9 +783,10 @@ class OnnxOperator:
         if self.state is None:
             raise RuntimeError(
                 "Graph was not produced for operator '{}': {}."
-                "".format(self.__class__.__name__, self))
+                "".format(self.__class__.__name__, self)
+            )
         for i in self.inputs:
-            if hasattr(i, '_verify_add_to_'):
+            if hasattr(i, "_verify_add_to_"):
                 i._verify_add_to_()
 
     @property
@@ -748,25 +802,30 @@ class OnnxOperator:
         """
         Returns the expected output types in a list.
         """
-        if (self.state is not None and
-                self.state.computed_outputs_ is not None):
+        if self.state is not None and self.state.computed_outputs_ is not None:
             return self.state.computed_outputs_
 
         expected_inputs = (
             self.state.computed_inputs_
-            if self.expected_inputs is None else self.expected_inputs)
+            if self.expected_inputs is None
+            else self.expected_inputs
+        )
         if expected_inputs is None:
             raise RuntimeError(
                 "Attribute 'expected_inputs' is empty for %r, "
-                "input_shapes=%r." % (self, input_shapes))
+                "input_shapes=%r." % (self, input_shapes)
+            )
 
         expected_outputs = (
             self.state.computed_outputs_
-            if self.expected_outputs is None else self.expected_outputs)
+            if self.expected_outputs is None
+            else self.expected_outputs
+        )
         if expected_outputs is None:
             raise RuntimeError(
                 "Attribute 'expected_outputs' is empty for %r, "
-                "input_shapes=%r." % (self, input_shapes))
+                "input_shapes=%r." % (self, input_shapes)
+            )
 
         # Shape inference only work on a full graph.
         if input_shapes is None:
@@ -790,15 +849,14 @@ class OnnxOperator:
 
         res = []
         for name, ct in expected_outputs:
-            if isinstance(ct, str) and ct[0] in ('T', 'V', 'I'):
-                if (ct[0] not in rev or
-                        all(map(lambda k: k not in given, rev[ct]))):
+            if isinstance(ct, str) and ct[0] in ("T", "V", "I"):
+                if ct[0] not in rev or all(map(lambda k: k not in given, rev[ct])):
                     raise NotImplementedError(
                         "Unable to guess output type for (%r, %r) - "
                         "given=%r - rev=%r input_shapes=%r expected_inputs"
-                        "=%r." % (
-                            name, ct, given, rev, input_shapes,
-                            self.expected_inputs))
+                        "=%r."
+                        % (name, ct, given, rev, input_shapes, self.expected_inputs)
+                    )
                 found = False
                 for ind in rev[ct]:
                     if ind in given:
@@ -809,9 +867,9 @@ class OnnxOperator:
                     raise NotImplementedError(
                         "Unable to guess output type for (%r, %r) - "
                         "given=%r - rev=%r input_shapes=%r expected_inputs"
-                        "=%r." % (
-                            name, ct, given, rev, input_shapes,
-                            self.expected_inputs))
+                        "=%r."
+                        % (name, ct, given, rev, input_shapes, self.expected_inputs)
+                    )
                 continue
             if isinstance(ct, str):
                 try:
@@ -819,16 +877,17 @@ class OnnxOperator:
                 except NotImplementedError as e:
                     raise NotImplementedError(
                         "Unable to guess output type for (%r, %r) - "
-                        "given=%r - rev=%r." % (name, ct, given, rev)) from e
+                        "given=%r - rev=%r." % (name, ct, given, rev)
+                    ) from e
                 res.append((name, dt))
                 continue
             try:
-                dt = _guess_type_proto_str(
-                    _guess_type_proto_str_inv(ct), None)
+                dt = _guess_type_proto_str(_guess_type_proto_str_inv(ct), None)
             except NotImplementedError as e:
                 raise NotImplementedError(
                     "Unable to guess output type for (%r, %r) - given=%r - "
-                    "rev=%r." % (name, ct, given, rev)) from e
+                    "rev=%r." % (name, ct, given, rev)
+                ) from e
             res.append((name, dt))
 
         return res
@@ -838,7 +897,7 @@ class OnnxOperator:
         Removes attributes in this node and its parents.
         """
         for arg in args:
-            if arg in ('state', 'output_names_'):
+            if arg in ("state", "output_names_"):
                 setattr(self, arg, None)
             elif hasattr(self, arg):
                 delattr(self, arg)
@@ -847,8 +906,15 @@ class OnnxOperator:
                 if isinstance(obj, OnnxOperator):
                     obj._clean_attributes(*args, recursive=True)
 
-    def to_onnx(self, inputs=None, outputs=None, other_outputs=None,
-                target_opset=None, domain=None, verbose=0):
+    def to_onnx(
+        self,
+        inputs=None,
+        outputs=None,
+        other_outputs=None,
+        target_opset=None,
+        domain=None,
+        verbose=0,
+    ):
         """
         Converts this operator into an ONNX graph.
 
@@ -864,26 +930,32 @@ class OnnxOperator:
         :param verbose: prints information
         """
         if isinstance(target_opset, dict):
-            dom = self.domain or ''
+            dom = self.domain or ""
             target_opset = target_opset.get(dom, None)
         elif isinstance(target_opset, int):
-            if self.domain not in ('', None):
+            if self.domain not in ("", None):
                 # The target_opset is for the domain ''
                 # We ignore it.
                 target_opset = None
         elif target_opset is not None:
             raise TypeError(
                 "target_opset must be a dictionary {domain: "
-                "target_opset} not %r for operator %r." % (
-                    target_opset, self.__class__.__name__))
-        if self.domain in ('', None) and target_opset == 1:
+                "target_opset} not %r for operator %r."
+                % (target_opset, self.__class__.__name__)
+            )
+        if self.domain in ("", None) and target_opset == 1:
             raise RuntimeError("target_opset cannot be 1.")
-        if (self.op_version is not None and target_opset is not None and
-                self.op_version > target_opset):
+        if (
+            self.op_version is not None
+            and target_opset is not None
+            and self.op_version > target_opset
+        ):
             raise RuntimeError(
                 "target_opset={} is lower than the version={} requested "
                 "for this node '{}'.".format(
-                    target_opset, self.op_version, self.__class__.__name__))
+                    target_opset, self.op_version, self.__class__.__name__
+                )
+            )
         if self.state is not None:
             # The conversion already happened and needs to be cleaned.
             self._clean_attributes("output_names_", "state")
@@ -899,31 +971,36 @@ class OnnxOperator:
                 ty = _guess_type(obj[1])
                 new_inputs.append((obj[0], ty))
             else:
-                raise TypeError("Inputs must be Variable or "
-                                "tuple(name, type) not {}."
-                                "".format(type(obj)))
+                raise TypeError(
+                    "Inputs must be Variable or "
+                    "tuple(name, type) not {}."
+                    "".format(type(obj))
+                )
         inputs = new_inputs
         for name, typ in inputs:
             if typ is None:
-                raise RuntimeError("Type input '{}' for operator '{}' "
-                                   "is unknown. You should specify "
-                                   "input types.".format(
-                                       name, self.__class__.__name__))
+                raise RuntimeError(
+                    "Type input '{}' for operator '{}' "
+                    "is unknown. You should specify "
+                    "input types.".format(name, self.__class__.__name__)
+                )
 
         registered_models = dict(
-            conv=_converter_pool, shape=_shape_calculator_pool,
-            aliases=sklearn_operator_name_map)
+            conv=_converter_pool,
+            shape=_shape_calculator_pool,
+            aliases=sklearn_operator_name_map,
+        )
 
         target_opset = self.get_latest_tested_opset_version(target_opset)
         container = ModelComponentContainer(
-            target_opset, registered_models=registered_models)
+            target_opset, registered_models=registered_models
+        )
 
         model_name = self.__class__.__name__
-        logger.debug(
-            "[Ops.to_onnx] %s id=%d",
-            self.__class__.__name__, id(self))
-        scope = Scope(model_name, target_opset=target_opset,
-                      registered_models=registered_models)
+        logger.debug("[Ops.to_onnx] %s id=%d", self.__class__.__name__, id(self))
+        scope = Scope(
+            model_name, target_opset=target_opset, registered_models=registered_models
+        )
         for inp in inputs:
             var = Variable(inp[0], inp[0], scope=scope, type=inp[1])
             container.add_input(var)
@@ -938,20 +1015,23 @@ class OnnxOperator:
                 if var.output_names is None:
                     # The variable name is likely to be different.
                     from .onnx_ops import OnnxIdentity
+
                     var2 = OnnxIdentity(
-                        var, op_version=var.op_version,
-                        output_names=[name])
+                        var, op_version=var.op_version, output_names=[name]
+                    )
                 else:
                     var2 = var
                 extra_outputs.append(var2)
         for out in extra_outputs:
-            if not hasattr(out, 'add_to'):
-                raise RuntimeError(
-                    "Extra outputs must have method 'add_to'.")
+            if not hasattr(out, "add_to"):
+                raise RuntimeError("Extra outputs must have method 'add_to'.")
             out.add_to(scope, container, run_converters=True)
         logger.debug(
             "[Ops.to_onnx] %s id=%d extra_outputs=%r",
-            self.__class__.__name__, id(self), extra_outputs)
+            self.__class__.__name__,
+            id(self),
+            extra_outputs,
+        )
 
         # infer shapes
         if outputs:
@@ -968,26 +1048,35 @@ class OnnxOperator:
                         type_shape = o[1]
                     shapes.append(Variable(o[0], o[0], None, type_shape))
                 else:
-                    raise TypeError("Outputs must be Variable or "
-                                    "tuple(name, type).")
+                    raise TypeError("Outputs must be Variable or " "tuple(name, type).")
             logger.debug(
                 "[Ops.to_onnx] %s id=%d outputs=%r",
-                self.__class__.__name__, id(self), outputs)
+                self.__class__.__name__,
+                id(self),
+                outputs,
+            )
         else:
             if verbose > 0:
                 print("[op.to_onnx] infer outputs")
-            shapes = infer_outputs(container, container.inputs,
-                                   initializer=container.initializers,
-                                   target_opset=target_opset)
+            shapes = infer_outputs(
+                container,
+                container.inputs,
+                initializer=container.initializers,
+                target_opset=target_opset,
+            )
             if self.output_names:
-                set_names = set(v.onnx_name if hasattr(v, 'onnx_name') else v
-                                for v in self.output_names)
-                shapes = [shape for shape in shapes
-                          if shape.onnx_name in set_names]
+                set_names = set(
+                    v.onnx_name if hasattr(v, "onnx_name") else v
+                    for v in self.output_names
+                )
+                shapes = [shape for shape in shapes if shape.onnx_name in set_names]
 
         logger.debug(
             "[Ops.to_onnx] %s id=%d shapes=%r",
-            self.__class__.__name__, id(self), shapes)
+            self.__class__.__name__,
+            id(self),
+            shapes,
+        )
         if verbose > 0:
             print("[op.to_onnx] shapes=%r" % shapes)
 
@@ -999,21 +1088,26 @@ class OnnxOperator:
         if verbose >= 2:
             print("---NODES---")
             for node in container.nodes:
-                print("  %s - %s: %r -> %r" % (
-                    node.op_type, node.name, node.input, node.output))
+                print(
+                    "  %s - %s: %r -> %r"
+                    % (node.op_type, node.name, node.input, node.output)
+                )
 
         # convert the graph
         graph = make_graph(
-            container.nodes, model_name, container.inputs,
-            container.outputs, container.initializers)
+            container.nodes,
+            model_name,
+            container.inputs,
+            container.outputs,
+            container.initializers,
+        )
         onnx_model = make_model(graph)
 
         # domains
         _update_domain_version(container, onnx_model)
 
         # metadata
-        opv = min(target_opset,
-                  _get_main_opset_version(onnx_model) or target_opset)
+        opv = min(target_opset, _get_main_opset_version(onnx_model) or target_opset)
         irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
         onnx_model.ir_version = irv
         onnx_model.producer_name = utils.get_producer()
@@ -1041,8 +1135,7 @@ class OnnxOperator:
         for node in self.enumerate_nodes():
             if self.inputs:
                 for i, input in enumerate(self.inputs):
-                    if isinstance(input, (OnnxOperator.UnscopedVariable,
-                                          Variable)):
+                    if isinstance(input, (OnnxOperator.UnscopedVariable, Variable)):
                         yield (node, i)
 
     def enumerate_initial_types(self):
@@ -1086,24 +1179,41 @@ class OnnxSubEstimator(OnnxOperator):
     input_range = [1, 1e9]
     output_range = [1, 1e9]
 
-    def __init__(self, skl_op, *inputs, op_version=None,
-                 output_names=None, domain=None, options=None,
-                 input_types=None, **kwargs):
+    def __init__(
+        self,
+        skl_op,
+        *inputs,
+        op_version=None,
+        output_names=None,
+        domain=None,
+        options=None,
+        input_types=None,
+        **kwargs
+    ):
         OnnxOperator.__init__(
-            self, *inputs, op_version=op_version,
-            output_names=output_names, domain=domain, **kwargs)
+            self,
+            *inputs,
+            op_version=op_version,
+            output_names=output_names,
+            domain=domain,
+            **kwargs
+        )
         self.operator_instance = skl_op
         self.options = options
         if skl_op is None and input_types is not None:
             raise RuntimeError(
-                "input_types is only used when a sub-operator is defined.")
+                "input_types is only used when a sub-operator is defined."
+            )
         self.input_types = input_types
 
     def __repr__(self):
         return "%s(%r, %s, op_version=%r, output_names=%r)" % (
-            self.__class__.__name__, self.operator_instance,
+            self.__class__.__name__,
+            self.operator_instance,
             ", ".join("%r" % i for i in self.inputs),
-            self.op_version, self.output_names)
+            self.op_version,
+            self.output_names,
+        )
 
     def add_to(self, scope, container, operator=None, run_converters=False):
         """
@@ -1116,9 +1226,9 @@ class OnnxSubEstimator(OnnxOperator):
         :param run_converters: must be True if called from method `to_onnx`
         """
         if self.state is None:
-            if self.kwargs.get('op_version', '') is None:
+            if self.kwargs.get("op_version", "") is None:
                 kwargs = self.kwargs.copy()
-                del kwargs['op_version']
+                del kwargs["op_version"]
             else:
                 kwargs = self.kwargs
 
@@ -1133,18 +1243,24 @@ class OnnxSubEstimator(OnnxOperator):
                     louts = self.output_names
                 outputs = []
                 for name in louts:
-                    if (isinstance(name, str) and name.startswith('u(') and
-                            name[-1] == ')'):
+                    if (
+                        isinstance(name, str)
+                        and name.startswith("u(")
+                        and name[-1] == ")"
+                    ):
                         name = VariableStr(
-                            scope.get_unique_variable_name(name[2:-1]),
-                            scope=scope)
-                    if (isinstance(name, Variable) and
-                            name.raw_name.startswith('u(') and
-                            name.raw_name[-1] == ')'):
+                            scope.get_unique_variable_name(name[2:-1]), scope=scope
+                        )
+                    if (
+                        isinstance(name, Variable)
+                        and name.raw_name.startswith("u(")
+                        and name.raw_name[-1] == ")"
+                    ):
                         name = VariableStr(
-                            scope.get_unique_variable_name(
-                                name.raw_name[2:-1]),
-                            scope=scope, type=name.type)
+                            scope.get_unique_variable_name(name.raw_name[2:-1]),
+                            scope=scope,
+                            type=name.type,
+                        )
                     outputs.append(name)
                 self.output_names_ = outputs
             else:
@@ -1154,27 +1270,29 @@ class OnnxSubEstimator(OnnxOperator):
             for input in self.inputs:
                 if isinstance(input, OnnxOperator.OnnxOperatorVariable):
                     if operator is None:
-                        raise RuntimeError("A placeholder cannot be replaced "
-                                           "as an operator is not specified.")
+                        raise RuntimeError(
+                            "A placeholder cannot be replaced "
+                            "as an operator is not specified."
+                        )
                     if len(operator.inputs) == 0:
-                        raise RuntimeError("No input variable in {}.".format(
-                            operator))
+                        raise RuntimeError("No input variable in {}.".format(operator))
                     # The inputs must be looked into the graph.
                     for i in operator.inputs:
                         if i.onnx_name == input.name:
                             inputs.append(i)
                             break
                     else:
-                        vars = ', '.join(map(lambda o: "'%s'" % o.onnx_name,
-                                             operator.inputs))
-                        raise RuntimeError("Unable to find variable "
-                                           "{} in {}.".format(input, vars))
+                        vars = ", ".join(
+                            map(lambda o: "'%s'" % o.onnx_name, operator.inputs)
+                        )
+                        raise RuntimeError(
+                            "Unable to find variable " "{} in {}.".format(input, vars)
+                        )
                 elif isinstance(input, tuple) and len(input) == 2:
                     if scope is not None and input[0] in scope.variables:
                         var = scope.variables[input[0]]
                     else:
-                        var = Variable(input[0], input[0], scope=scope,
-                                       type=input[1])
+                        var = Variable(input[0], input[0], scope=scope, type=input[1])
                         if scope is not None:
                             scope.register_variable(var)
                     inputs.append(var)
@@ -1183,16 +1301,24 @@ class OnnxSubEstimator(OnnxOperator):
 
             logger.debug("[SubOps.add_to] state id=%d", id(self))
             self.state = GraphState(
-                inputs, self.output_names_, self.operator_instance,
-                scope, container, None, op_version=self.op_version,
-                op_domain=None, onnx_prefix_name=self.onnx_prefix,
-                options=self.options, run_converters=run_converters,
-                input_types=self.input_types, **kwargs)
+                inputs,
+                self.output_names_,
+                self.operator_instance,
+                scope,
+                container,
+                None,
+                op_version=self.op_version,
+                op_domain=None,
+                onnx_prefix_name=self.onnx_prefix,
+                options=self.options,
+                run_converters=run_converters,
+                input_types=self.input_types,
+                **kwargs
+            )
             self.state.run()
 
 
 class WrappedModelAlias:
-
     def __init__(self, model, alias):
         self.model = model
         self.alias = alias
@@ -1207,6 +1333,10 @@ class OnnxSubOperator(OnnxSubEstimator):
 
     def __init__(self, *args, **kwargs):
         OnnxSubEstimator.__init__(self, *args, **kwargs)
-        warnings.warn(("Class OnnxSubOperator will be removed in 1.10. "
-                       "It should be replaced by OnnxSubEstimator."),
-                      DeprecationWarning)
+        warnings.warn(
+            (
+                "Class OnnxSubOperator will be removed in 1.10. "
+                "It should be replaced by OnnxSubEstimator."
+            ),
+            DeprecationWarning,
+        )

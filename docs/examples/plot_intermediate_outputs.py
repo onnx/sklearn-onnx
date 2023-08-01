@@ -40,7 +40,10 @@ import onnxruntime as rt
 from skl2onnx import convert_sklearn
 import pprint
 from skl2onnx.common.data_types import (
-    FloatTensorType, StringTensorType, Int64TensorType)
+    FloatTensorType,
+    StringTensorType,
+    Int64TensorType,
+)
 import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
@@ -50,39 +53,49 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 
-titanic_url = ('https://raw.githubusercontent.com/amueller/'
-               'scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv')
+titanic_url = (
+    "https://raw.githubusercontent.com/amueller/"
+    "scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv"
+)
 data = pd.read_csv(titanic_url)
-X = data.drop('survived', axis=1)
-y = data['survived']
+X = data.drop("survived", axis=1)
+y = data["survived"]
 
 # SimpleImputer on string is not available
 # for string in ONNX-ML specifications.
 # So we do it beforehand.
-for cat in ['embarked', 'sex', 'pclass']:
-    X[cat].fillna('missing', inplace=True)
+for cat in ["embarked", "sex", "pclass"]:
+    X[cat].fillna("missing", inplace=True)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-numeric_features = ['age', 'fare']
-numeric_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='median')),
-    ('scaler', StandardScaler())])
+numeric_features = ["age", "fare"]
+numeric_transformer = Pipeline(
+    steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
+)
 
-categorical_features = ['embarked', 'sex', 'pclass']
-categorical_transformer = Pipeline(steps=[
-    # --- SimpleImputer is not available for strings in ONNX-ML specifications.
-    # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+categorical_features = ["embarked", "sex", "pclass"]
+categorical_transformer = Pipeline(
+    steps=[
+        # --- SimpleImputer is not available for strings in ONNX-ML specifications.
+        # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+        ("onehot", OneHotEncoder(handle_unknown="ignore"))
+    ]
+)
 
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', numeric_transformer, numeric_features),
-        ('cat', categorical_transformer, categorical_features),
-    ])
+        ("num", numeric_transformer, numeric_features),
+        ("cat", categorical_transformer, categorical_features),
+    ]
+)
 
-clf = Pipeline(steps=[('preprocessor', preprocessor),
-                      ('classifier', LogisticRegression(solver='lbfgs'))])
+clf = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        ("classifier", LogisticRegression(solver="lbfgs")),
+    ]
+)
 
 clf.fit(X_train, y_train)
 
@@ -104,9 +117,9 @@ def convert_dataframe_schema(df, drop=None):
     for k, v in zip(df.columns, df.dtypes):
         if drop is not None and k in drop:
             continue
-        if v == 'int64':
+        if v == "int64":
             t = Int64TensorType([None, 1])
-        elif v == 'float64':
+        elif v == "float64":
             t = FloatTensorType([None, 1])
         else:
             t = StringTensorType([None, 1])
@@ -128,8 +141,7 @@ pprint.pprint(inputs)
 # ++++++++++++++++++++++++++++++
 
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
-                                 target_opset=12)
+    model_onnx = convert_sklearn(clf, "pipeline_titanic", inputs, target_opset=12)
 except Exception as e:
     print(e)
 
@@ -138,14 +150,13 @@ except Exception as e:
 # *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
 # must be applied on columns of the same type.
 
-X_train['pclass'] = X_train['pclass'].astype(str)
-X_test['pclass'] = X_test['pclass'].astype(str)
+X_train["pclass"] = X_train["pclass"].astype(str)
+X_test["pclass"] = X_test["pclass"].astype(str)
 white_list = numeric_features + categorical_features
 to_drop = [c for c in X_train.columns if c not in white_list]
 inputs = convert_dataframe_schema(X_train, to_drop)
 
-model_onnx = convert_sklearn(clf, 'pipeline_titanic', inputs,
-                             target_opset=12)
+model_onnx = convert_sklearn(clf, "pipeline_titanic", inputs, target_opset=12)
 
 
 # And save.
@@ -211,7 +222,7 @@ for out in enumerate_model_node_outputs(model_onnx):
 # and textual pipeline: *variable1*, *variable2*.
 # Let's look into the numerical pipeline first.
 
-num_onnx = select_model_inputs_outputs(model_onnx, 'variable1')
+num_onnx = select_model_inputs_outputs(model_onnx, "variable1")
 save_onnx_model(num_onnx, "pipeline_titanic_numerical.onnx")
 
 ################################
@@ -225,7 +236,7 @@ print("numerical features", numX[0][:1])
 # We do the same for the textual features.
 
 print(model_onnx)
-text_onnx = select_model_inputs_outputs(model_onnx, 'variable2')
+text_onnx = select_model_inputs_outputs(model_onnx, "variable2")
 save_onnx_model(text_onnx, "pipeline_titanic_textual.onnx")
 sess = rt.InferenceSession("pipeline_titanic_textual.onnx")
 numT = sess.run(None, inputs)
@@ -238,33 +249,41 @@ print("textual features", numT[0][:1])
 # Finally, let's see both subgraphs. First, numerical pipeline.
 
 pydot_graph = GetPydotGraph(
-    num_onnx.graph, name=num_onnx.graph.name, rankdir="TB",
+    num_onnx.graph,
+    name=num_onnx.graph.name,
+    rankdir="TB",
     node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"))
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline_titanic_num.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic_num.dot')
+os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic_num.dot")
 
 image = plt.imread("pipeline_titanic_num.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 ######################################
 # Then textual pipeline.
 
 pydot_graph = GetPydotGraph(
-    text_onnx.graph, name=text_onnx.graph.name, rankdir="TB",
+    text_onnx.graph,
+    name=text_onnx.graph.name,
+    rankdir="TB",
     node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"))
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline_titanic_text.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic_text.dot')
+os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic_text.dot")
 
 image = plt.imread("pipeline_titanic_text.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**

@@ -26,18 +26,18 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from skl2onnx import to_onnx
 from skl2onnx.helpers.onnx_helper import (
-    add_output_initializer, select_model_inputs_outputs)
+    add_output_initializer,
+    select_model_inputs_outputs,
+)
 
 
 data = load_iris()
 X, y = data.data.astype(numpy.float32), data.target
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-model = LogisticRegression(penalty='elasticnet', C=2.,
-                           solver='saga', l1_ratio=0.5)
+model = LogisticRegression(penalty="elasticnet", C=2.0, solver="saga", l1_ratio=0.5)
 model.fit(X_train, y_train)
 
-onx = to_onnx(model, X_train[:1], target_opset=12,
-              options={'zipmap': False})
+onx = to_onnx(model, X_train[:1], target_opset=12, options={"zipmap": False})
 
 ########################################
 # Add training parameter
@@ -45,9 +45,8 @@ onx = to_onnx(model, X_train[:1], target_opset=12,
 #
 
 new_onx = add_output_initializer(
-    onx,
-    ['C', 'l1_ratio'],
-    [numpy.array([model.C]), numpy.array([model.l1_ratio])])
+    onx, ["C", "l1_ratio"], [numpy.array([model.C]), numpy.array([model.l1_ratio])]
+)
 
 ########################################
 # Inference
@@ -55,7 +54,7 @@ new_onx = add_output_initializer(
 
 sess = InferenceSession(new_onx.SerializeToString())
 print("output names:", [o.name for o in sess.get_outputs()])
-res = sess.run(None, {'X': X_test[:2]})
+res = sess.run(None, {"X": X_test[:2]})
 print("outputs")
 pprint.pprint(res)
 
@@ -72,11 +71,11 @@ pprint.pprint(res)
 # Next function removes unneeded outputs from a model,
 # not only the constants. Next model only keeps the probabilities.
 
-simple_onx = select_model_inputs_outputs(new_onx, ['probabilities'])
+simple_onx = select_model_inputs_outputs(new_onx, ["probabilities"])
 
 sess = InferenceSession(simple_onx.SerializeToString())
 print("output names:", [o.name for o in sess.get_outputs()])
-res = sess.run(None, {'X': X_test[:2]})
+res = sess.run(None, {"X": X_test[:2]})
 print("outputs")
 pprint.pprint(res)
 
@@ -102,6 +101,6 @@ model = load("simplified_model.onnx", "wb")
 
 sess = InferenceSession(model.SerializeToString())
 print("output names:", [o.name for o in sess.get_outputs()])
-res = sess.run(None, {'X': X_test[:2]})
+res = sess.run(None, {"X": X_test[:2]})
 print("outputs")
 pprint.pprint(res)

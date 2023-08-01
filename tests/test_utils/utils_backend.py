@@ -75,9 +75,7 @@ def is_backend_enabled(backend):
             return False
     if backend == "onnx":
         return onnx_opset_version() >= 18
-    raise NotImplementedError(
-        "Not implemented for backend '{0}'".format(backend)
-    )
+    raise NotImplementedError("Not implemented for backend '{0}'".format(backend))
 
 
 def compare_backend(
@@ -279,17 +277,12 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
         kwargs["decimal"] = min(kwargs["decimal"], 2)
     if Dec1:
         kwargs["decimal"] = min(kwargs["decimal"], 1)
-    if isinstance(expected, numpy.ndarray) and isinstance(
-        output, numpy.ndarray
-    ):
+    if isinstance(expected, numpy.ndarray) and isinstance(output, numpy.ndarray):
         if SkipDim1:
             # Arrays like (2, 1, 2, 3) becomes (2, 2, 3)
             # as one dimension is useless.
-            expected = expected.reshape(
-                tuple([d for d in expected.shape if d > 1])
-            )
-            output = output.reshape(
-                tuple([d for d in expected.shape if d > 1]))
+            expected = expected.reshape(tuple([d for d in expected.shape if d > 1]))
+            output = output.reshape(tuple([d for d in expected.shape if d > 1]))
         if NoProb or NoProbOpp:
             # One vector is (N,) with scores, negative for class 0
             # positive for class 1
@@ -315,21 +308,11 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                     output = -output
             elif expected.shape != output.shape:
                 raise NotImplementedError(
-                    "Shape mismatch: {0} != {1}".format(
-                        expected.shape, output.shape
-                    )
+                    "Shape mismatch: {0} != {1}".format(expected.shape, output.shape)
                 )
-        if (
-            len(expected.shape) == 1
-            and len(output.shape) == 2
-            and output.shape[1] == 1
-        ):
+        if len(expected.shape) == 1 and len(output.shape) == 2 and output.shape[1] == 1:
             output = output.ravel()
-        if (
-            len(output.shape) == 3
-            and output.shape[0] == 1
-            and len(expected.shape) == 2
-        ):
+        if len(output.shape) == 3 and output.shape[0] == 1 and len(expected.shape) == 2:
             output = output.reshape(output.shape[1:])
         if expected.dtype in (
             numpy.str_,
@@ -346,14 +329,10 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                     return OnnxRuntimeAssertionError(str(e))
         else:
             try:
-                assert_array_almost_equal(
-                    expected, output, verbose=verbose, **kwargs
-                )
+                assert_array_almost_equal(expected, output, verbose=verbose, **kwargs)
             except Exception as e:
                 longer = (
-                    "\n--EXPECTED--\n{0}\n--OUTPUT--\n{1}".format(
-                        expected, output
-                    )
+                    "\n--EXPECTED--\n{0}\n--OUTPUT--\n{1}".format(expected, output)
                     if verbose
                     else ""
                 )
@@ -364,8 +343,7 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                         diff = numpy.abs(expected_ - output_).max()
                     else:
                         diff = max(
-                            (1 if ci != cj else 0)
-                            for ci, cj in zip(expected_, output_)
+                            (1 if ci != cj else 0) for ci, cj in zip(expected_, output_)
                         )
                     if diff == 0:
                         return None

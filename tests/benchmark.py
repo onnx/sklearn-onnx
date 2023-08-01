@@ -70,8 +70,7 @@ def run_all_tests(folder=None, verbose=True):
                         print(t.__class__.__name__)
                         break
                 except TypeError as e:
-                    raise RuntimeError(
-                        "Unable to run test '{}'.".format(ts)) from e
+                    raise RuntimeError("Unable to run test '{}'.".format(ts)) from e
             runner.run(ts)
 
     from test_utils.tests_helper import make_report_backend

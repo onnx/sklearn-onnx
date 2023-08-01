@@ -39,8 +39,7 @@ from sklearn.decomposition import PCA
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
-pipe = Pipeline(steps=[('pca', PCA()),
-                       ('logistic', LogisticRegression())])
+pipe = Pipeline(steps=[("pca", PCA()), ("logistic", LogisticRegression())])
 
 digits = datasets.load_digits()
 X_digits = digits.data[:1000]
@@ -53,14 +52,13 @@ pipe.fit(X_digits, y_digits)
 # ++++++++++++++++++
 
 
-initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
-model_onnx = convert_sklearn(pipe, initial_types=initial_types,
-                             target_opset=12)
+initial_types = [("input", FloatTensorType((None, X_digits.shape[1])))]
+model_onnx = convert_sklearn(pipe, initial_types=initial_types, target_opset=12)
 
 sess = rt.InferenceSession(model_onnx.SerializeToString())
 print("skl predict_proba")
 print(pipe.predict_proba(X_digits[:2]))
-onx_pred = sess.run(None, {'input': X_digits[:2].astype(np.float32)})[1]
+onx_pred = sess.run(None, {"input": X_digits[:2].astype(np.float32)})[1]
 df = pd.DataFrame(onx_pred)
 print("onnx predict_proba")
 print(df.values)
@@ -76,19 +74,18 @@ print(df.values)
 # an smaller ONNX graph for every operator.
 
 
-steps = collect_intermediate_steps(pipe, "pipeline",
-                                   initial_types)
+steps = collect_intermediate_steps(pipe, "pipeline", initial_types)
 
 assert len(steps) == 2
 
 pipe.predict_proba(X_digits[:2])
 
 for i, step in enumerate(steps):
-    onnx_step = step['onnx_step']
+    onnx_step = step["onnx_step"]
     sess = rt.InferenceSession(onnx_step.SerializeToString())
-    onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
-    skl_outputs = step['model']._debug.outputs
-    print("step 1", type(step['model']))
+    onnx_outputs = sess.run(None, {"input": X_digits[:2].astype(np.float32)})
+    skl_outputs = step["model"]._debug.outputs
+    print("step 1", type(step["model"]))
     print("skl outputs")
     print(skl_outputs)
     print("onnx outputs")
@@ -104,21 +101,21 @@ for i, step in enumerate(steps):
 # needed to *replay* the prediction of the model.
 
 to_save = {
-    'model': steps[1]['model'],
-    'data_input': steps[1]['model']._debug.inputs,
-    'data_output': steps[1]['model']._debug.outputs,
-    'inputs': steps[1]['inputs'],
-    'outputs': steps[1]['outputs'],
+    "model": steps[1]["model"],
+    "data_input": steps[1]["model"]._debug.inputs,
+    "data_output": steps[1]["model"]._debug.outputs,
+    "inputs": steps[1]["inputs"],
+    "outputs": steps[1]["outputs"],
 }
-del steps[1]['model']._debug
+del steps[1]["model"]._debug
 
-with open('classifier.pkl', 'wb') as f:
+with open("classifier.pkl", "wb") as f:
     pickle.dump(to_save, f)
 
-with open('classifier.pkl', 'rb') as f:
+with open("classifier.pkl", "rb") as f:
     restored = pickle.load(f)
 
-print(restored['model'].predict_proba(restored['data_input']['predict_proba']))
+print(restored["model"].predict_proba(restored["data_input"]["predict_proba"]))
 
 #################################
 # **Versions used for this example**
