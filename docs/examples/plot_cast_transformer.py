@@ -30,7 +30,6 @@ based on the assumption ``(x / y)`` is usually different from
 """
 import onnxruntime
 import onnx
-import numpy
 import os
 import math
 import numpy as np
