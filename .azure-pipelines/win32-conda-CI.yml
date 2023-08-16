@@ -15,7 +15,7 @@ jobs:
     matrix:
       Py310-Onnx140-Rt151-Skl130:
         python.version: '3.11'  # onnxruntime cannot support python 3.11 yet
-        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.14.1rc2'
+        onnx.version:  'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
@@ -24,7 +24,7 @@ jobs:
         sklearn.version: '>=1.3.0'
       Py310-Onnx140-Rt140-Skl122:
         python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
-        onnx.version:  '-i https://test.pypi.org/simple/ onnx==1.14.1rc2'
+        onnx.version:  'onnx==1.14.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
