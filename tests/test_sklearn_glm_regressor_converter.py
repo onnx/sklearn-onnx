@@ -226,6 +226,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx, basename="SklearnLinearSVRBool")
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.1.0"), reason="sklearn fails on windows"
+    )
     def test_model_ridge(self):
         model, X = fit_regression_model(linear_model.Ridge())
         model_onnx = convert_sklearn(
@@ -238,6 +241,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx, basename="SklearnRidge-Dec4")
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.1.0"), reason="sklearn fails on windows"
+    )
     def test_model_ridge_int(self):
         model, X = fit_regression_model(linear_model.Ridge(), is_int=True)
         model_onnx = convert_sklearn(
@@ -250,6 +256,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
         dump_data_and_model(X, model, model_onnx, basename="SklearnRidgeInt-Dec4")
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.1.0"), reason="sklearn fails on windows"
+    )
     def test_model_ridge_bool(self):
         model, X = fit_regression_model(linear_model.Ridge(), is_bool=True)
         model_onnx = convert_sklearn(

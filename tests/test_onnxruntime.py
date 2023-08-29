@@ -2,6 +2,7 @@
 
 import os
 import unittest
+import packinging.version as pv
 import numpy as np
 from numpy.testing import assert_allclose
 
@@ -10,7 +11,7 @@ try:
     from test_utils import ReferenceEvaluatorEx
 except ImportError:
     ReferenceEvaluatorEx = None
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, __version__ as ort_version
 
 
 class TestOnnxruntime(unittest.TestCase):
@@ -87,6 +88,10 @@ class TestOnnxruntime(unittest.TestCase):
     )
 
     @unittest.skipIf(ReferenceEvaluatorEx is None, "onnx too old")
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.12.0"),
+        reason="ai.opset.ml==3 not implemented",
+    )
     def test_tree_ensemble_classifier(self):
         """
         The onnx graph was produced by the following code.
@@ -127,6 +132,10 @@ class TestOnnxruntime(unittest.TestCase):
         assert_allclose(labelo, label)
 
     @unittest.skipIf(ReferenceEvaluatorEx is None, "onnx too old")
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.12.0"),
+        reason="ai.opset.ml==3 not implemented",
+    )
     def test_tree_ensemble_classifier_2(self):
         X = self.X3_15
         name = os.path.join(os.path.dirname(__file__), "datasets", "treecl2.onnx")
@@ -138,6 +147,10 @@ class TestOnnxruntime(unittest.TestCase):
         assert_allclose(labelo, label)
 
     @unittest.skipIf(ReferenceEvaluatorEx is None, "onnx too old")
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.12.0"),
+        reason="ai.opset.ml==3 not implemented",
+    )
     def test_tree_ensemble_classifier_3(self):
         X = self.X3_15[:, :10]
         name = os.path.join(os.path.dirname(__file__), "datasets", "treecl3.onnx")

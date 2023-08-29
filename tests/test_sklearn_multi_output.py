@@ -15,11 +15,13 @@ try:
 except ImportError:
     from sklearn.utils.testing import ignore_warnings
 from sklearn import __version__ as skl_ver
+from onnxruntime import __version__ as ort_version
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 skl_ver = ".".join(skl_ver.split(".")[:2])
+ort_version = ort_version.split("+")[0]
 
 
 class TestMultiOutputConverter(unittest.TestCase):
@@ -31,6 +33,9 @@ class TestMultiOutputConverter(unittest.TestCase):
             # logging.basicConfig(level=logging.DEBUG)
             pass
 
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.1.0"), reason="sklearn fails on windows"
+    )
     def test_multi_output_regressor(self):
         X, y = load_linnerud(return_X_y=True)
         clf = MultiOutputRegressor(Ridge(random_state=123)).fit(X, y)
