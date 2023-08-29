@@ -511,7 +511,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_binary(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 2)
@@ -526,7 +527,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_binary_nozipmap(self):
         model, X = fit_classification_model(
@@ -568,7 +570,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_binary_mispelled_zipmap(self):
         model, X = fit_classification_model(
@@ -590,7 +593,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_binary_mispelled_zipmap_wrong_value(self):
         model, X = fit_classification_model(
@@ -612,7 +616,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_multi_class(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 5)
@@ -629,7 +634,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_int(self):
         model, X = fit_classification_model(
@@ -646,7 +652,8 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_model_ridge_classifier_bool(self):
         model, X = fit_classification_model(

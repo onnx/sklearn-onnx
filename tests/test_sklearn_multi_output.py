@@ -34,7 +34,8 @@ class TestMultiOutputConverter(unittest.TestCase):
             pass
 
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="sklearn fails on windows",
     )
     def test_multi_output_regressor(self):
         X, y = load_linnerud(return_X_y=True)
