@@ -2,7 +2,7 @@
 
 import os
 import unittest
-import packinging.version as pv
+import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_allclose
 
