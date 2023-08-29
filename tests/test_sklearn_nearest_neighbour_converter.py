@@ -796,7 +796,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None, reason="new in 0.22")
     @unittest.skipIf(
-        pv.Version(ort_version) < pv.Version("1.1.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
     )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_default(self):

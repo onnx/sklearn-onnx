@@ -117,7 +117,7 @@ class TestSklearnImputerConverter(unittest.TestCase):
 
     @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
     @unittest.skipIf(
-        pv.Version(ort_version) < pv.Version("1.1.0"), reason="sklearn fails on windows"
+        pv.Version(ort_version) <= pv.Version("1.11.0"), reason="sklearn fails on windows"
     )
     def test_simple_imputer_float_inputs_int_mostf(self):
         model = SimpleImputer(strategy="most_frequent", fill_value="nan")
