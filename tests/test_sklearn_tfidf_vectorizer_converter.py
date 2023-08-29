@@ -642,18 +642,20 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
         self.assertIn('name: "locale"', str(model_onnx))
         self.assertIn(f's: "{locale}"', str(model_onnx))
-        dump_data_and_model(
-            corpus,
-            vect,
-            model_onnx,
-            basename="SklearnTfidfVectorizer11Locale-OneOff-SklCol",
-        )
+        if sys.platform == "win32":
+            # Linux fails due to misconfiguration with langage-pack-en.
+            dump_data_and_model(
+                corpus,
+                vect,
+                model_onnx,
+                basename="SklearnTfidfVectorizer11Locale-OneOff-SklCol",
+            )
 
-        sess = InferenceSession(
-            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
-        )
-        res = sess.run(None, {"input": corpus.ravel()})[0]
-        assert res.shape == (4, 9)
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
+            res = sess.run(None, {"input": corpus.ravel()})[0]
+            assert res.shape == (4, 9)
 
 
 if __name__ == "__main__":
