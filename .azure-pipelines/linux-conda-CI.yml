@@ -201,7 +201,7 @@ jobs:
       packageSpecs: 'python=$(python.version)'
 
   - script: |
-      apt-get install -y language-pack-en
+      sudo apt-get install -y language-pack-en
     displayName: 'Install packages'
 
   - script: |
