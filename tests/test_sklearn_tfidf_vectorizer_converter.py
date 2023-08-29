@@ -630,7 +630,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         ).reshape((4, 1))
         vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
         vect.fit(corpus.ravel())
-        locale = "en_US"
+        locale = "en"
         options = self.get_options()
         options[TfidfVectorizer].update({"locale": locale})
         model_onnx = convert_sklearn(
