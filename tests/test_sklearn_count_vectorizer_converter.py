@@ -130,7 +130,34 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             basename="SklearnCountVectorizerBinary-OneOff-SklCol",
         )
 
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    def test_model_count_vectorizer11_locale(self):
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
+        vect = CountVectorizer(ngram_range=(1, 1))
+        vect.fit(corpus.ravel())
+        locale = "en_US"
+        options = {CountVectorizer: {"locale": locale}}
+        model_onnx = convert_sklearn(
+            vect,
+            "CountVectorizer",
+            [("input", StringTensorType([1]))],
+            target_opset=TARGET_OPSET,
+            options=options,
+        )
+        self.assertIn('name: "locale"', str(model_onnx))
+        self.assertIn(f's: "{locale}"', str(model_onnx))
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            corpus, vect, model_onnx, basename="SklearnCountVectorizer11-OneOff-SklCol"
+        )
+
 
 if __name__ == "__main__":
-    TestSklearnCountVectorizer().test_model_count_vectorizer12()
     unittest.main(verbosity=2)
