@@ -4,8 +4,9 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
-import packaging.version as pv
 import copy
+import sys
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.feature_extraction.text import TfidfVectorizer

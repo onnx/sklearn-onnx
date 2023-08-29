@@ -4,6 +4,7 @@
 Tests scikit-learn's CountVectorizer converter.
 """
 import unittest
+import sys
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer
 from skl2onnx import convert_sklearn
