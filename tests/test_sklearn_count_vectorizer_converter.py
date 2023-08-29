@@ -155,7 +155,10 @@ class TestSklearnCountVectorizer(unittest.TestCase):
         self.assertIn(f's: "{locale}"', str(model_onnx))
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx, basename="SklearnCountVectorizer11-OneOff-SklCol"
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnCountVectorizer11Locale-OneOff-SklCol",
         )
 
 

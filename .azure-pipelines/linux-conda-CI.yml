@@ -201,7 +201,7 @@ jobs:
       packageSpecs: 'python=$(python.version)'
 
   - script: |
-      test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
+      test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev language-pack-en
       conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge "numpy$(numpy.version)"
       conda install protobuf
