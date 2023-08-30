@@ -65,8 +65,7 @@ def add_onnx_graph(
     """
     Adds a whole ONNX graph to an existing one following
     :epkg:`skl2onnx` API assuming this ONNX graph implements
-    an `operator <http://onnx.ai/sklearn-onnx/api_summary.html?
-    highlight=operator#skl2onnx.common._topology.Operator>`_.
+    an `operator <http://onnx.ai/sklearn-onnx/api_summary.htmlskl2onnx.common._topology.Operator>`_.
 
     :param scope: scope (to get unique names)
     :param operator: operator
