@@ -31,7 +31,7 @@ from skl2onnx.algebra.onnx_operator_mixin import OnnxOperatorMixin
 
 
 def predict_with_onnxruntime(onx, X):
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     res = sess.run(None, {input_name: X.astype(np.float32)})
     return res[0]

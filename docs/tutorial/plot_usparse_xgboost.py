@@ -204,7 +204,9 @@ def make_pipelines(
         with open("model.onnx", "wb") as f:
             f.write(model_onnx.SerializeToString())
 
-        sess = rt.InferenceSession(model_onnx.SerializeToString())
+        sess = rt.InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         inputs = {
             "input": df[["c0", "c1"]].values.astype(numpy.float32),
             "text": df[["text"]].values,

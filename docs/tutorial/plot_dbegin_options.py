@@ -34,17 +34,18 @@ of operator *ZipMap* added at the end of the following graph.
     iris = load_iris()
     X, y = iris.data, iris.target
     X_train, _, y_train, __ = train_test_split(X, y, random_state=11)
-    clr = LogisticRegression()
+    clr = LogisticRegression(max_iter=1000)
     clr.fit(X_train, y_train)
 
     model_def = to_onnx(clr, X_train.astype(numpy.float32))
-    print(printable_graph(model_def))
+    print(printable_graph(model_def.graph))
 
 This operator is not really efficient as it copies every probabilies and
 labels in a different container. This time is usually significant for
 small classifiers. Then it makes sense to remove it.
 
 .. runpython::
+
     import numpy
     from onnx.helper import printable_graph
     from sklearn.datasets import load_iris
@@ -55,12 +56,12 @@ small classifiers. Then it makes sense to remove it.
     iris = load_iris()
     X, y = iris.data, iris.target
     X_train, _, y_train, __ = train_test_split(X, y, random_state=11)
-    clr = LogisticRegression()
+    clr = LogisticRegression(max_iter=1000)
     clr.fit(X_train, y_train)
 
     model_def = to_onnx(clr, X_train.astype(numpy.float32),
                         options={LogisticRegression: {'zipmap': False}})
-    print(printable_graph(model_def))
+    print(printable_graph(model_def.graph))
 
 There might be in the graph many classifiers, it is important to have
 a way to specify which classifier should keep its *ZipMap*
@@ -199,7 +200,9 @@ model_def = to_onnx(
     X_train.astype(numpy.float32),
     options={id(clrrf): {"decision_path": True, "zipmap": False}},
 )
-sess = InferenceSession(model_def.SerializeToString())
+sess = InferenceSession(
+    model_def.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 ##########################################
 # The model produces 3 outputs.

@@ -48,7 +48,7 @@ onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 # Let's confirm the output type of the probabilities
 # is a list of dictionaries with onnxruntime.
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 res = sess.run(None, {"float_input": X_test.astype(numpy.float32)})
 print(res[1][:2])
 print("probabilities type:", type(res[1]))
@@ -66,7 +66,9 @@ onx2 = convert_sklearn(
     clr, initial_types=initial_type, options=options, target_opset=12
 )
 
-sess2 = rt.InferenceSession(onx2.SerializeToString())
+sess2 = rt.InferenceSession(
+    onx2.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res2 = sess2.run(None, {"float_input": X_test.astype(numpy.float32)})
 print(res2[1][:2])
 print("probabilities type:", type(res2[1]))
@@ -85,7 +87,9 @@ onx3 = convert_sklearn(
     clr, initial_types=initial_type, options=options, target_opset=12
 )
 
-sess3 = rt.InferenceSession(onx3.SerializeToString())
+sess3 = rt.InferenceSession(
+    onx3.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res3 = sess3.run(None, {"float_input": X_test.astype(numpy.float32)})
 for i, out in enumerate(sess3.get_outputs()):
     print(

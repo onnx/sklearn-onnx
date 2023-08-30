@@ -21,6 +21,8 @@ except ImportError:
     # changed in 0.20
     SimpleImputer = None
 
+from onnxruntime import __version__ as ort_version
+
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -35,6 +37,7 @@ from test_utils import (
 
 
 skl_ver = ".".join(sklearn.__version__.split(".")[:2])
+ort_version = ort_version.split("+")[0]
 
 
 class TestSklearnImputerConverter(unittest.TestCase):
@@ -113,6 +116,14 @@ class TestSklearnImputerConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_ver) <= pv.Version("1.1.0"),
+        reason="sklearn fails on windows",
+    )
     def test_simple_imputer_float_inputs_int_mostf(self):
         model = SimpleImputer(strategy="most_frequent", fill_value="nan")
         data = [[1, 2], [np.nan, 3], [7, 6], [8, np.nan]]

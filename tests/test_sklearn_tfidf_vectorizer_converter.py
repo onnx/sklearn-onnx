@@ -4,8 +4,9 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
-import packaging.version as pv
 import copy
+import sys
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -614,6 +615,48 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             model_onnx,
             basename="SklearnTfidfVectorizer11CustomVocab-OneOff-SklCol",
         )
+
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("0.3.0"), reason="Requires opset 9."
+    )
+    def test_model_tfidf_vectorizer_locale(self):
+        corpus = numpy.array(
+            [
+                "This is the first document.",
+                "This document is the second document.",
+                "And this is the third one.",
+                "Is this the first document?",
+            ]
+        ).reshape((4, 1))
+        vect = TfidfVectorizer(ngram_range=(1, 1), norm=None)
+        vect.fit(corpus.ravel())
+        locale = "en_US"
+        options = self.get_options()
+        options[TfidfVectorizer].update({"locale": locale})
+        model_onnx = convert_sklearn(
+            vect,
+            "TfidfVectorizer",
+            [("input", StringTensorType())],
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIn('name: "locale"', str(model_onnx))
+        self.assertIn(f's: "{locale}"', str(model_onnx))
+        if sys.platform == "win32":
+            # Linux fails due to misconfiguration with langage-pack-en.
+            dump_data_and_model(
+                corpus,
+                vect,
+                model_onnx,
+                basename="SklearnTfidfVectorizer11Locale-OneOff-SklCol",
+            )
+
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
+            res = sess.run(None, {"input": corpus.ravel()})[0]
+            assert res.shape == (4, 9)
 
 
 if __name__ == "__main__":

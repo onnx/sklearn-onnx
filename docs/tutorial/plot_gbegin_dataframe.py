@@ -78,7 +78,7 @@ onx = to_onnx(pipe, train_data[:1], options={RandomForestClassifier: {"zipmap": 
 # *onnxruntime* does not support dataframes.
 
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 try:
     sess.run(None, train_data)
 except Exception as e:
@@ -161,7 +161,7 @@ pprint.pprint(inputs)
 #############################
 # Inference.
 
-sess2 = InferenceSession(onx2.SerializeToString())
+sess2 = InferenceSession(onx2.SerializeToString(), providers=["CPUExecutionProvider"])
 
 got2 = sess2.run(None, inputs)
 

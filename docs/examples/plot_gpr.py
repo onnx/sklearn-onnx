@@ -51,7 +51,7 @@ print(gpr)
 initial_type = [("X", FloatTensorType([None, X_train.shape[1]]))]
 onx = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 try:
     pred_onx = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 except RuntimeError as e:
@@ -74,7 +74,7 @@ except RuntimeError as e:
 initial_type = [("X", FloatTensorType([None, None]))]
 onx = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 
 pred_skl = gpr.predict(X_test)
@@ -111,7 +111,9 @@ print("min(Y)-max(Y):", min(y_test), max(y_test))
 initial_type = [("X", DoubleTensorType([None, None]))]
 onx64 = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-sess64 = rt.InferenceSession(onx64.SerializeToString())
+sess64 = rt.InferenceSession(
+    onx64.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 pred_onx64 = sess64.run(None, {"X": X_test})[0]
 
 print(pred_onx64[0, :10])
@@ -169,7 +171,9 @@ onx64_std = convert_sklearn(
     gpr, initial_types=initial_type, options=options, target_opset=12
 )
 
-sess64_std = rt.InferenceSession(onx64_std.SerializeToString())
+sess64_std = rt.InferenceSession(
+    onx64_std.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 pred_onx64_std = sess64_std.run(None, {"X": X_test[:5]})
 
 pprint.pprint(pred_onx64_std)

@@ -410,7 +410,7 @@ print("ptsne_knn.tranform\n", ptsne_knn.transform(X_test[:2]))
 ##########################
 # Predictions with onnxruntime.
 
-sess = rt.InferenceSession("predictable_tsne.onnx")
+sess = rt.InferenceSession("predictable_tsne.onnx", providers=["CPUExecutionProvider"])
 
 pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
 print("transform", pred_onx[0])
