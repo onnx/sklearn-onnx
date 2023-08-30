@@ -117,7 +117,7 @@ print("predict_proba", pipe.predict_proba(X[:1]))
 ##########################
 # Predictions with onnxruntime.
 
-sess = rt.InferenceSession("pipeline_xgboost.onnx")
+sess = rt.InferenceSession("pipeline_xgboost.onnx", providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
@@ -151,7 +151,7 @@ onx = to_onnx(
     pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
 )
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, {"X": X_test[:5].astype(numpy.float32)})
 print("predict", pred_onx[0].ravel())
 
@@ -187,7 +187,9 @@ except AssertionError as e:
     cont = False
 
 if cont:
-    sess = rt.InferenceSession(onx.SerializeToString())
+    sess = rt.InferenceSession(
+        onx.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
     pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]

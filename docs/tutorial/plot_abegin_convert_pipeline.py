@@ -65,7 +65,7 @@ onx = to_onnx(ereg, X_train[:1].astype(numpy.float32), target_opset=12)
 #
 # The first example uses :epkg:`onnxruntime`.
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 pred_ort = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 
 pred_skl = ereg.predict(X_test.astype(numpy.float32))

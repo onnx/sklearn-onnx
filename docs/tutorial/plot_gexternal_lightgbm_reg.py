@@ -121,8 +121,12 @@ model_onnx_split = to_onnx(
 # Discrepancies
 # +++++++++++++
 
-sess = InferenceSession(model_onnx.SerializeToString())
-sess_split = InferenceSession(model_onnx_split.SerializeToString())
+sess = InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
+sess_split = InferenceSession(
+    model_onnx_split.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 X32 = X.astype(numpy.float32)
 expected = reg.predict(X32)
@@ -175,7 +179,9 @@ for i in tqdm(list(range(20, 170, 20)) + [200, 300, 400, 500]):
         target_opset={"": 14, "ai.onnx.ml": 2},
         options={"split": i},
     )
-    sess_split = InferenceSession(model_onnx_split.SerializeToString())
+    sess_split = InferenceSession(
+        model_onnx_split.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
     got_split = sess_split.run(None, {"X": X32})[0].ravel()
     disc_split = numpy.abs(got_split - expected).max()
     res.append(dict(split=i, disc=disc_split))

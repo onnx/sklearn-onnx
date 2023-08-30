@@ -105,7 +105,7 @@ onx = to_onnx(tfidf, strings)
 # Execution with ONNX
 # +++++++++++++++++++
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 got = sess.run(None, {"X": strings})[0]
 print(f"differences={diff(tr, got):g}")
 print(print_sparse_matrix(got))

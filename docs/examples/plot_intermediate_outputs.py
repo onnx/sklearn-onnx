@@ -195,7 +195,7 @@ for k in inputs:
 ################################
 # We are ready to run *onnxruntime*.
 
-sess = rt.InferenceSession("pipeline_titanic.onnx")
+sess = rt.InferenceSession("pipeline_titanic.onnx", providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
 print("predict_proba", pred_onx[1][:1])
@@ -228,7 +228,9 @@ save_onnx_model(num_onnx, "pipeline_titanic_numerical.onnx")
 ################################
 # Let's compute the numerical features.
 
-sess = rt.InferenceSession("pipeline_titanic_numerical.onnx")
+sess = rt.InferenceSession(
+    "pipeline_titanic_numerical.onnx", providers=["CPUExecutionProvider"]
+)
 numX = sess.run(None, inputs)
 print("numerical features", numX[0][:1])
 
@@ -238,7 +240,9 @@ print("numerical features", numX[0][:1])
 print(model_onnx)
 text_onnx = select_model_inputs_outputs(model_onnx, "variable2")
 save_onnx_model(text_onnx, "pipeline_titanic_textual.onnx")
-sess = rt.InferenceSession("pipeline_titanic_textual.onnx")
+sess = rt.InferenceSession(
+    "pipeline_titanic_textual.onnx", providers=["CPUExecutionProvider"]
+)
 numT = sess.run(None, inputs)
 print("textual features", numT[0][:1])
 
