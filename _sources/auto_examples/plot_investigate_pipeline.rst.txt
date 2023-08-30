@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_investigate_pipeline.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_investigate_pipeline.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -38,7 +38,7 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-51
+.. GENERATED FROM PYTHON SOURCE LINES 25-50
 
 .. code-block:: default
 
@@ -59,8 +59,7 @@ and must be removed. Look for comment starting with ``---`` below.
     from sklearn.linear_model import LogisticRegression
     from sklearn.pipeline import Pipeline
 
-    pipe = Pipeline(steps=[('pca', PCA()),
-                           ('logistic', LogisticRegression())])
+    pipe = Pipeline(steps=[("pca", PCA()), ("logistic", LogisticRegression())])
 
     digits = datasets.load_digits()
     X_digits = digits.data[:1000]
@@ -76,7 +75,7 @@ and must be removed. Look for comment starting with ``---`` below.
 
  .. code-block:: none
 
-    /home/xadupre/github/scikit-learn/sklearn/linear_model/_logistic.py:458: ConvergenceWarning: lbfgs failed to converge (status=1):
+    /home/xadupre/github/scikit-learn/sklearn/linear_model/_logistic.py:472: ConvergenceWarning: lbfgs failed to converge (status=1):
     STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
 
     Increase the number of iterations (max_iter) or scale the data as shown in:
@@ -89,30 +88,31 @@ and must be removed. Look for comment starting with ``---`` below.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-1 {color: black;background-color: white;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">PCA</label><div class="sk-toggleable__content"><pre>PCA()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression()</pre></div></div></div></div></div></div></div>
+    <style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">PCA</label><div class="sk-toggleable__content"><pre>PCA()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">LogisticRegression</label><div class="sk-toggleable__content"><pre>LogisticRegression()</pre></div></div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 51-53
 
 Conversion to ONNX
 ++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-68
+.. GENERATED FROM PYTHON SOURCE LINES 53-68
 
 .. code-block:: default
 
 
 
-    initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
-    model_onnx = convert_sklearn(pipe, initial_types=initial_types,
-                                 target_opset=12)
+    initial_types = [("input", FloatTensorType((None, X_digits.shape[1])))]
+    model_onnx = convert_sklearn(pipe, initial_types=initial_types, target_opset=12)
 
-    sess = rt.InferenceSession(model_onnx.SerializeToString())
+    sess = rt.InferenceSession(
+        model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
     print("skl predict_proba")
     print(pipe.predict_proba(X_digits[:2]))
-    onx_pred = sess.run(None, {'input': X_digits[:2].astype(np.float32)})[1]
+    onx_pred = sess.run(None, {"input": X_digits[:2].astype(np.float32)})[1]
     df = pd.DataFrame(onx_pred)
     print("onnx predict_proba")
     print(df.values)
@@ -154,25 +154,26 @@ is failing. The following method modifies the scikit-learn
 pipeline to steal the intermediate outputs and produces
 an smaller ONNX graph for every operator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-97
+.. GENERATED FROM PYTHON SOURCE LINES 77-98
 
 .. code-block:: default
 
 
 
-    steps = collect_intermediate_steps(pipe, "pipeline",
-                                       initial_types)
+    steps = collect_intermediate_steps(pipe, "pipeline", initial_types)
 
     assert len(steps) == 2
 
     pipe.predict_proba(X_digits[:2])
 
     for i, step in enumerate(steps):
-        onnx_step = step['onnx_step']
-        sess = rt.InferenceSession(onnx_step.SerializeToString())
-        onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
-        skl_outputs = step['model']._debug.outputs
-        print("step 1", type(step['model']))
+        onnx_step = step["onnx_step"]
+        sess = rt.InferenceSession(
+            onnx_step.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        onnx_outputs = sess.run(None, {"input": X_digits[:2].astype(np.float32)})
+        skl_outputs = step["model"]._debug.outputs
+        print("step 1", type(step["model"]))
         print("skl outputs")
         print(skl_outputs)
         print("onnx outputs")
@@ -301,7 +302,7 @@ an smaller ONNX graph for every operator.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-105
+.. GENERATED FROM PYTHON SOURCE LINES 99-106
 
 Pickle
 ++++++
@@ -311,27 +312,27 @@ It can be pickle independetly from the others.
 Attribute *_debug* contains all the information
 needed to *replay* the prediction of the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-123
+.. GENERATED FROM PYTHON SOURCE LINES 106-124
 
 .. code-block:: default
 
 
     to_save = {
-        'model': steps[1]['model'],
-        'data_input': steps[1]['model']._debug.inputs,
-        'data_output': steps[1]['model']._debug.outputs,
-        'inputs': steps[1]['inputs'],
-        'outputs': steps[1]['outputs'],
+        "model": steps[1]["model"],
+        "data_input": steps[1]["model"]._debug.inputs,
+        "data_output": steps[1]["model"]._debug.outputs,
+        "inputs": steps[1]["inputs"],
+        "outputs": steps[1]["outputs"],
     }
-    del steps[1]['model']._debug
+    del steps[1]["model"]._debug
 
-    with open('classifier.pkl', 'wb') as f:
+    with open("classifier.pkl", "wb") as f:
         pickle.dump(to_save, f)
 
-    with open('classifier.pkl', 'rb') as f:
+    with open("classifier.pkl", "rb") as f:
         restored = pickle.load(f)
 
-    print(restored['model'].predict_proba(restored['data_input']['predict_proba']))
+    print(restored["model"].predict_proba(restored["data_input"]["predict_proba"]))
 
 
 
@@ -351,11 +352,11 @@ needed to *replay* the prediction of the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-125
+.. GENERATED FROM PYTHON SOURCE LINES 125-126
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-131
+.. GENERATED FROM PYTHON SOURCE LINES 126-132
 
 .. code-block:: default
 
@@ -374,10 +375,10 @@ needed to *replay* the prediction of the model.
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -385,7 +386,7 @@ needed to *replay* the prediction of the model.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.274 seconds)
+   **Total running time of the script:** (0 minutes 0.279 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_investigate_pipeline.py:
@@ -393,6 +394,8 @@ needed to *replay* the prediction of the model.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

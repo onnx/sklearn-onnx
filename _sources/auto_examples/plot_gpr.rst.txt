@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_gpr.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_gpr.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -57,7 +57,7 @@ on the Boston dataset.
     dataset = load_diabetes()
     X, y = dataset.data, dataset.target
     X_train, X_test, y_train, y_test = train_test_split(X, y)
-    gpr = GaussianProcessRegressor(DotProduct() + RBF(), alpha=1.)
+    gpr = GaussianProcessRegressor(DotProduct() + RBF(), alpha=1.0)
     gpr.fit(X_train, y_train)
     print(gpr)
 
@@ -69,9 +69,7 @@ on the Boston dataset.
 
  .. code-block:: none
 
-    /home/xadupre/github/scikit-learn/sklearn/gaussian_process/kernels.py:430: ConvergenceWarning: The optimal value found for dimension 0 of parameter k1__sigma_0 is close to the specified upper bound 100000.0. Increasing the bound and calling fit again may find a better value.
-      warnings.warn(
-    /home/xadupre/github/scikit-learn/sklearn/gaussian_process/kernels.py:420: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
+    /home/xadupre/github/scikit-learn/sklearn/gaussian_process/kernels.py:419: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
       warnings.warn(
     GaussianProcessRegressor(alpha=1.0,
                              kernel=DotProduct(sigma_0=1) + RBF(length_scale=1))
@@ -87,19 +85,17 @@ First attempt to convert a model into ONNX
 The documentation suggests the following way to
 convert a model into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-62
+.. GENERATED FROM PYTHON SOURCE LINES 50-60
 
 .. code-block:: default
 
 
-    initial_type = [('X', FloatTensorType([None, X_train.shape[1]]))]
-    onx = convert_sklearn(gpr, initial_types=initial_type,
-                          target_opset=12)
+    initial_type = [("X", FloatTensorType([None, X_train.shape[1]]))]
+    onx = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-    sess = rt.InferenceSession(onx.SerializeToString())
+    sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
     try:
-        pred_onx = sess.run(
-            None, {'X': X_test.astype(numpy.float32)})[0]
+        pred_onx = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
     except RuntimeError as e:
         print(str(e))
 
@@ -110,7 +106,7 @@ convert a model into ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-75
+.. GENERATED FROM PYTHON SOURCE LINES 61-73
 
 Second attempt: variable dimensions
 +++++++++++++++++++++++++++++++++++
@@ -125,18 +121,16 @@ We need to disable these checkings by replacing
 the fixed dimensions by an empty value.
 (see next line).
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-88
+.. GENERATED FROM PYTHON SOURCE LINES 73-84
 
 .. code-block:: default
 
 
-    initial_type = [('X', FloatTensorType([None, None]))]
-    onx = convert_sklearn(gpr, initial_types=initial_type,
-                          target_opset=12)
+    initial_type = [("X", FloatTensorType([None, None]))]
+    onx = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-    sess = rt.InferenceSession(onx.SerializeToString())
-    pred_onx = sess.run(
-        None, {'X': X_test.astype(numpy.float32)})[0]
+    sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    pred_onx = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 
     pred_skl = gpr.predict(X_test)
     print(pred_skl[:10])
@@ -150,28 +144,27 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [155.86157227 161.37359619 169.98284912 163.67077637 179.60345459
-     112.92480469 140.47344971 107.94818115 131.79040527 178.3425293 ]
-    [270336.]
+    [157.67407448 142.03651212 160.8484086  135.0034477  100.48107033
+     171.43261057 134.12309522 167.4292642  155.90885873 201.31475888]
+    [155.5]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-92
+.. GENERATED FROM PYTHON SOURCE LINES 85-88
 
 The differences seems quite important.
 Let's confirm that by looking at the biggest
 differences.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-98
+.. GENERATED FROM PYTHON SOURCE LINES 88-93
 
 .. code-block:: default
 
 
-    diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) -
-                                numpy.squeeze(pred_onx)))[-5:]
+    diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) - numpy.squeeze(pred_onx)))[-5:]
     print(diff)
-    print('min(Y)-max(Y):', min(y_test), max(y_test))
+    print("min(Y)-max(Y):", min(y_test), max(y_test))
 
 
 
@@ -181,14 +174,13 @@ differences.
 
  .. code-block:: none
 
-    [270230.27374268 270231.13311768 270231.22369385 270233.97131348
-     270236.3505249 ]
-    min(Y)-max(Y): 42.0 346.0
+    [2.24528426 2.36538915 2.37925239 2.38045369 2.63459276]
+    min(Y)-max(Y): 25.0 336.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-115
+.. GENERATED FROM PYTHON SOURCE LINES 94-110
 
 Third attempt: use of double
 ++++++++++++++++++++++++++++
@@ -207,17 +199,18 @@ tells the conversion function that every real
 constant matrix such as the trained coefficients
 will be dumped as doubles and not as floats anymore.
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-125
+.. GENERATED FROM PYTHON SOURCE LINES 110-121
 
 .. code-block:: default
 
 
-    initial_type = [('X', DoubleTensorType([None, None]))]
-    onx64 = convert_sklearn(gpr, initial_types=initial_type,
-                            target_opset=12)
+    initial_type = [("X", DoubleTensorType([None, None]))]
+    onx64 = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-    sess64 = rt.InferenceSession(onx64.SerializeToString())
-    pred_onx64 = sess64.run(None, {'X': X_test})[0]
+    sess64 = rt.InferenceSession(
+        onx64.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    pred_onx64 = sess64.run(None, {"X": X_test})[0]
 
     print(pred_onx64[0, :10])
 
@@ -229,24 +222,23 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [155.86221577]
+    [157.67407447]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-127
+.. GENERATED FROM PYTHON SOURCE LINES 122-123
 
 The new differences look much better.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-133
+.. GENERATED FROM PYTHON SOURCE LINES 123-128
 
 .. code-block:: default
 
 
-    diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) -
-                                numpy.squeeze(pred_onx64)))[-5:]
+    diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) - numpy.squeeze(pred_onx64)))[-5:]
     print(diff)
-    print('min(Y)-max(Y):', min(y_test), max(y_test))
+    print("min(Y)-max(Y):", min(y_test), max(y_test))
 
 
 
@@ -256,13 +248,14 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [0.0048411  0.00493731 0.00496565 0.00522617 0.00536676]
-    min(Y)-max(Y): 42.0 346.0
+    [7.92597632e-09 8.98936037e-09 9.23387233e-09 9.66474545e-09
+     1.00339719e-08]
+    min(Y)-max(Y): 25.0 336.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-140
+.. GENERATED FROM PYTHON SOURCE LINES 129-135
 
 Size increase
 +++++++++++++
@@ -271,7 +264,7 @@ As a result, the ONNX model is almost twice bigger
 because every coefficient is stored as double and
 and not as floats anymore.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-146
+.. GENERATED FROM PYTHON SOURCE LINES 135-141
 
 .. code-block:: default
 
@@ -295,7 +288,7 @@ and not as floats anymore.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-158
+.. GENERATED FROM PYTHON SOURCE LINES 142-153
 
 return_std=True
 +++++++++++++++
@@ -309,16 +302,17 @@ The converter needs to know that an extended graph is required.
 That's done through the option mechanism
 (see :ref:`l-conv-options`).
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-167
+.. GENERATED FROM PYTHON SOURCE LINES 153-163
 
 .. code-block:: default
 
 
-    initial_type = [('X', DoubleTensorType([None, None]))]
-    options = {GaussianProcessRegressor: {'return_std': True}}
+    initial_type = [("X", DoubleTensorType([None, None]))]
+    options = {GaussianProcessRegressor: {"return_std": True}}
     try:
-        onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                                    options=options, target_opset=12)
+        onx64_std = convert_sklearn(
+            gpr, initial_types=initial_type, options=options, target_opset=12
+        )
     except RuntimeError as e:
         print(e)
 
@@ -329,24 +323,27 @@ That's done through the option mechanism
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-172
+.. GENERATED FROM PYTHON SOURCE LINES 164-168
 
 This error highlights the fact that the *scikit-learn*
 computes internal variables on first call to method predict.
 The converter needs them to be initialized by calling method
 predict at least once and then converting again.
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-182
+.. GENERATED FROM PYTHON SOURCE LINES 168-181
 
 .. code-block:: default
 
 
     gpr.predict(X_test[:1], return_std=True)
-    onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                                options=options, target_opset=12)
+    onx64_std = convert_sklearn(
+        gpr, initial_types=initial_type, options=options, target_opset=12
+    )
 
-    sess64_std = rt.InferenceSession(onx64_std.SerializeToString())
-    pred_onx64_std = sess64_std.run(None, {'X': X_test[:5]})
+    sess64_std = rt.InferenceSession(
+        onx64_std.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    pred_onx64_std = sess64_std.run(None, {"X": X_test[:5]})
 
     pprint.pprint(pred_onx64_std)
 
@@ -358,22 +355,21 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[155.86221577],
-           [161.37604364],
-           [169.97800802],
-           [163.66931185],
-           [179.59932504]]),
-     array([589.99334399,   0.        ,   0.        , 502.71732585,
-             0.        ])]
+    [array([[157.67407447],
+           [142.03651212],
+           [160.8484086 ],
+           [135.0034477 ],
+           [100.48107033]]),
+     array([1.00845167, 1.0054851 , 1.0139891 , 1.00514903, 1.01019988])]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-184
+.. GENERATED FROM PYTHON SOURCE LINES 182-183
 
 Let's compare with *scikit-learn* prediction.
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-187
+.. GENERATED FROM PYTHON SOURCE LINES 183-186
 
 .. code-block:: default
 
@@ -388,29 +384,30 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([155.86157227, 161.37359619, 169.98284912, 163.67077637,
-           179.60174561]),
-     array([1.01325219, 1.00510439, 1.00620633, 1.0110021 , 1.00937738]))
+    (array([157.67407448, 142.03651212, 160.8484086 , 135.0034477 ,
+           100.48107033]),
+     array([1.00845384, 1.00548596, 1.01398906, 1.00515132, 1.01019995]))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-189
+.. GENERATED FROM PYTHON SOURCE LINES 187-188
 
 It looks good. Let's do a better checks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-199
+.. GENERATED FROM PYTHON SOURCE LINES 188-199
 
 .. code-block:: default
 
 
 
-    pred_onx64_std = sess64_std.run(None, {'X': X_test})
+    pred_onx64_std = sess64_std.run(None, {"X": X_test})
     pred_std = gpr.predict(X_test, return_std=True)
 
 
-    diff = numpy.sort(numpy.abs(numpy.squeeze(pred_onx64_std[1]) -
-                                numpy.squeeze(pred_std[1])))[-5:]
+    diff = numpy.sort(
+        numpy.abs(numpy.squeeze(pred_onx64_std[1]) - numpy.squeeze(pred_std[1]))
+    )[-5:]
     print(diff)
 
 
@@ -421,7 +418,8 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [717.44499291 726.51668442 729.78735343 737.89521503 840.48277943]
+    [2.54371954e-06 2.56724555e-06 2.58754006e-06 2.63925354e-06
+     3.30249346e-06]
 
 
 
@@ -451,10 +449,10 @@ There are some discrepencies but it seems reasonable.
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -462,7 +460,7 @@ There are some discrepencies but it seems reasonable.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.592 seconds)
+   **Total running time of the script:** (0 minutes 3.428 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:
@@ -470,6 +468,8 @@ There are some discrepencies but it seems reasonable.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

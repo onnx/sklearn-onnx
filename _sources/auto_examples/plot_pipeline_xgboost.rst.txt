@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_pipeline_xgboost.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_pipeline_xgboost.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -35,7 +35,7 @@ a *XGBClassifier*. Let's see how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-72
+.. GENERATED FROM PYTHON SOURCE LINES 22-78
 
 .. code-block:: default
 
@@ -54,9 +54,13 @@ Train a XGBoost classifier
     import skl2onnx
     from skl2onnx.common.data_types import FloatTensorType
     from skl2onnx import convert_sklearn, update_registered_converter
-    from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes  # noqa
+    from skl2onnx.common.shape_calculator import (
+        calculate_linear_classifier_output_shapes,
+    )  # noqa
     import onnxmltools
-    from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost  # noqa
+    from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
+        convert_xgboost,
+    )  # noqa
     import onnxmltools.convert.common.data_types
 
     data = load_iris()
@@ -68,16 +72,18 @@ Train a XGBoost classifier
     X = X[ind, :].copy()
     y = y[ind].copy()
 
-    pipe = Pipeline([('scaler', StandardScaler()),
-                     ('lgbm', XGBClassifier(n_estimators=3))])
+    pipe = Pipeline([("scaler", StandardScaler()), ("lgbm", XGBClassifier(n_estimators=3))])
     pipe.fit(X, y)
 
     # The conversion fails but it is expected.
 
     try:
-        convert_sklearn(pipe, 'pipeline_xgboost',
-                        [('input', FloatTensorType([None, 2]))],
-                        target_opset={'': 12, 'ai.onnx.ml': 2})
+        convert_sklearn(
+            pipe,
+            "pipeline_xgboost",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset={"": 12, "ai.onnx.ml": 2},
+        )
     except Exception as e:
         print(e)
 
@@ -114,7 +120,7 @@ Train a XGBoost classifier
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-84
+.. GENERATED FROM PYTHON SOURCE LINES 79-90
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -128,22 +134,25 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-87
+.. GENERATED FROM PYTHON SOURCE LINES 92-93
 
 Then we import the converter and shape calculator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-90
+.. GENERATED FROM PYTHON SOURCE LINES 95-96
 
 Let's register the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-95
+.. GENERATED FROM PYTHON SOURCE LINES 96-104
 
 .. code-block:: default
 
     update_registered_converter(
-        XGBClassifier, 'XGBoostXGBClassifier',
-        calculate_linear_classifier_output_shapes, convert_xgboost,
-        options={'nocl': [True, False], 'zipmap': [True, False, 'columns']})
+        XGBClassifier,
+        "XGBoostXGBClassifier",
+        calculate_linear_classifier_output_shapes,
+        convert_xgboost,
+        options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
+    )
 
 
 
@@ -152,20 +161,22 @@ Let's register the new converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-98
+.. GENERATED FROM PYTHON SOURCE LINES 105-107
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-108
+.. GENERATED FROM PYTHON SOURCE LINES 107-119
 
 .. code-block:: default
 
 
     model_onnx = convert_sklearn(
-        pipe, 'pipeline_xgboost',
-        [('input', FloatTensorType([None, 2]))],
-        target_opset={'': 12, 'ai.onnx.ml': 2})
+        pipe,
+        "pipeline_xgboost",
+        [("input", FloatTensorType([None, 2]))],
+        target_opset={"": 12, "ai.onnx.ml": 2},
+    )
 
     # And save.
     with open("pipeline_xgboost.onnx", "wb") as f:
@@ -178,14 +189,14 @@ Convert again
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-113
+.. GENERATED FROM PYTHON SOURCE LINES 120-124
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-117
+.. GENERATED FROM PYTHON SOURCE LINES 124-128
 
 .. code-block:: default
 
@@ -201,22 +212,22 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [0 1 2 2 1]
-    predict_proba [[0.69600695 0.1526681  0.15132491]]
+    predict [1 0 2 0 1]
+    predict_proba [[0.15089607 0.44885972 0.40024427]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-119
+.. GENERATED FROM PYTHON SOURCE LINES 129-130
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-125
+.. GENERATED FROM PYTHON SOURCE LINES 130-136
 
 .. code-block:: default
 
 
-    sess = rt.InferenceSession("pipeline_xgboost.onnx")
+    sess = rt.InferenceSession("pipeline_xgboost.onnx", providers=["CPUExecutionProvider"])
     pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
     print("predict", pred_onx[0])
     print("predict_proba", pred_onx[1][:1])
@@ -229,35 +240,38 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [0 1 2 2 1]
-    predict_proba [{0: 0.6960069537162781, 1: 0.15266810357570648, 2: 0.15132491290569305}]
+    predict [1 0 2 0 1]
+    predict_proba [{0: 0.1508960723876953, 1: 0.44885972142219543, 2: 0.40024426579475403}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-128
+.. GENERATED FROM PYTHON SOURCE LINES 137-139
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-143
+.. GENERATED FROM PYTHON SOURCE LINES 139-157
 
 .. code-block:: default
 
 
     pydot_graph = GetPydotGraph(
-        model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+        model_onnx.graph,
+        name=model_onnx.graph.name,
+        rankdir="TB",
         node_producer=GetOpNodeProducer(
-            "docstring", color="yellow",
-            fillcolor="yellow", style="filled"))
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
     pydot_graph.write_dot("pipeline.dot")
 
-    os.system('dot -O -Gdpi=300 -Tpng pipeline.dot')
+    os.system("dot -O -Gdpi=300 -Tpng pipeline.dot")
 
     image = plt.imread("pipeline.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
-    ax.axis('off')
+    ax.axis("off")
 
 
 
@@ -277,11 +291,11 @@ Display the ONNX graph
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-145
+.. GENERATED FROM PYTHON SOURCE LINES 158-159
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-153
+.. GENERATED FROM PYTHON SOURCE LINES 159-167
 
 .. code-block:: default
 
@@ -302,12 +316,12 @@ Display the ONNX graph
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
     onnxmltools:  1.11.2
-    xgboost:  1.7.3
+    xgboost:  1.7.6
 
 
 
@@ -315,7 +329,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.691 seconds)
+   **Total running time of the script:** (0 minutes 1.335 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_xgboost.py:
@@ -323,6 +337,8 @@ Display the ONNX graph
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

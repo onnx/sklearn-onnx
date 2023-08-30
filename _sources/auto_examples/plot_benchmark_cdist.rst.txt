@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_benchmark_cdist.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_benchmark_cdist.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -54,7 +54,7 @@ function computes pairwise distances.
     X = np.ones((2, 4), dtype=np.float32)
     Y = np.ones((3, 4), dtype=np.float32)
     Y *= 2
-    print(cdist(X, Y, metric='euclidean'))
+    print(cdist(X, Y, metric="euclidean"))
 
 
 
@@ -74,15 +74,13 @@ function computes pairwise distances.
 
 ONNX
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-49
+.. GENERATED FROM PYTHON SOURCE LINES 41-47
 
 .. code-block:: default
 
 
-    op = OnnxCDist('X', 'Y', op_version=12, output_names=['Z'],
-                   metric='euclidean')
-    onx = op.to_onnx({'X': X, 'Y': Y},
-                     outputs=[('Z', FloatTensorType())])
+    op = OnnxCDist("X", "Y", op_version=12, output_names=["Z"], metric="euclidean")
+    onx = op.to_onnx({"X": X, "Y": Y}, outputs=[("Z", FloatTensorType())])
     print(onx)
 
 
@@ -95,8 +93,12 @@ ONNX
  .. code-block:: none
 
     ir_version: 8
+    opset_import {
+      domain: "com.microsoft"
+      version: 1
+    }
     producer_name: "skl2onnx"
-    producer_version: "1.14.0"
+    producer_version: "1.15.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -106,12 +108,12 @@ ONNX
         output: "Z"
         name: "CD_CDist"
         op_type: "CDist"
+        domain: "com.microsoft"
         attribute {
           name: "metric"
-          s: "euclidean"
           type: STRING
+          s: "euclidean"
         }
-        domain: "com.microsoft"
       }
       name: "OnnxCDist"
       input {
@@ -153,16 +155,12 @@ ONNX
         }
       }
     }
-    opset_import {
-      domain: "com.microsoft"
-      version: 1
-    }
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-55
+.. GENERATED FROM PYTHON SOURCE LINES 48-53
 
 CDist and onnxruntime
 +++++++++++++++++++++
@@ -170,14 +168,13 @@ CDist and onnxruntime
 We compute the output of CDist operator
 with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-61
+.. GENERATED FROM PYTHON SOURCE LINES 53-58
 
 .. code-block:: default
 
 
-    sess = InferenceSession(onx.SerializeToString(),
-                            providers=["CPUExecutionProvider"])
-    res = sess.run(None, {'X': X, 'Y': Y})
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    res = sess.run(None, {"X": X, "Y": Y})
     print(res)
 
 
@@ -194,14 +191,14 @@ with onnxruntime.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-66
+.. GENERATED FROM PYTHON SOURCE LINES 59-63
 
 Benchmark
 +++++++++
 
 Let's compare onnxruntime and scipy.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-83
+.. GENERATED FROM PYTHON SOURCE LINES 63-85
 
 .. code-block:: default
 
@@ -209,17 +206,22 @@ Let's compare onnxruntime and scipy.
 
     def measure_time(name, stmt, context, repeat=100, number=20):
         tim = Timer(stmt, globals=context)
-        res = np.array(
-            tim.repeat(repeat=repeat, number=number))
+        res = np.array(tim.repeat(repeat=repeat, number=number))
         res /= number
         mean = np.mean(res)
-        dev = np.mean(res ** 2)
+        dev = np.mean(res**2)
         dev = (dev - mean**2) ** 0.5
         return dict(
-            average=mean, deviation=dev, min_exec=np.min(res),
-            max_exec=np.max(res), repeat=repeat, number=number,
-            nrows=context['X'].shape[0], ncols=context['Y'].shape[1],
-            name=name)
+            average=mean,
+            deviation=dev,
+            min_exec=np.min(res),
+            max_exec=np.max(res),
+            repeat=repeat,
+            number=number,
+            nrows=context["X"].shape[0],
+            ncols=context["Y"].shape[1],
+            name=name,
+        )
 
 
 
@@ -229,18 +231,18 @@ Let's compare onnxruntime and scipy.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 86-87
 
 scipy
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-92
+.. GENERATED FROM PYTHON SOURCE LINES 87-94
 
 .. code-block:: default
 
 
     time_scipy = measure_time(
-        "scipy", "cdist(X, Y)",
-        context={'cdist': cdist, 'X': X, 'Y': Y})
+        "scipy", "cdist(X, Y)", context={"cdist": cdist, "X": X, "Y": Y}
+    )
     pprint(time_scipy)
 
 
@@ -252,10 +254,10 @@ scipy
 
  .. code-block:: none
 
-    {'average': 6.455253499780156e-06,
-     'deviation': 8.708922725775654e-07,
-     'max_exec': 1.072999999678359e-05,
-     'min_exec': 5.390000001170847e-06,
+    {'average': 9.84484999992219e-06,
+     'deviation': 4.450414501003498e-06,
+     'max_exec': 4.325500000277316e-05,
+     'min_exec': 3.990000004705508e-06,
      'name': 'scipy',
      'ncols': 4,
      'nrows': 2,
@@ -265,18 +267,18 @@ scipy
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-94
+.. GENERATED FROM PYTHON SOURCE LINES 95-96
 
 onnxruntime
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-100
+.. GENERATED FROM PYTHON SOURCE LINES 96-102
 
 .. code-block:: default
 
 
     time_ort = measure_time(
-        "ort", "sess.run(None, {'X': X, 'Y': Y})",
-        context={'sess': sess, 'X': X, 'Y': Y})
+        "ort", "sess.run(None, {'X': X, 'Y': Y})", context={"sess": sess, "X": X, "Y": Y}
+    )
     pprint(time_ort)
 
 
@@ -287,10 +289,10 @@ onnxruntime
 
  .. code-block:: none
 
-    {'average': 1.2687857000173608e-05,
-     'deviation': 1.6693917723816003e-06,
-     'max_exec': 1.7610000008971836e-05,
-     'min_exec': 1.0040000006483751e-05,
+    {'average': 1.90378500000179e-05,
+     'deviation': 9.14980003126398e-06,
+     'max_exec': 5.8449999994536486e-05,
+     'min_exec': 1.1034999999992579e-05,
      'name': 'ort',
      'ncols': 4,
      'nrows': 2,
@@ -300,11 +302,11 @@ onnxruntime
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-102
+.. GENERATED FROM PYTHON SOURCE LINES 103-104
 
 Longer benchmark
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-126
+.. GENERATED FROM PYTHON SOURCE LINES 104-129
 
 .. code-block:: default
 
@@ -317,20 +319,21 @@ Longer benchmark
         Y = np.random.randn(10, 4).astype(np.float32)
 
         time_scipy = measure_time(
-            "scipy", "cdist(X, Y)",
-            context={'cdist': cdist, 'X': X, 'Y': Y})
+            "scipy", "cdist(X, Y)", context={"cdist": cdist, "X": X, "Y": Y}
+        )
         time_ort = measure_time(
-            "ort", "sess.run(None, {'X': X, 'Y': Y})",
-            context={'sess': sess, 'X': X, 'Y': Y})
-        metric = dict(N=dim, scipy=time_scipy['average'],
-                      ort=time_ort['average'])
+            "ort",
+            "sess.run(None, {'X': X, 'Y': Y})",
+            context={"sess": sess, "X": X, "Y": Y},
+        )
+        metric = dict(N=dim, scipy=time_scipy["average"], ort=time_ort["average"])
         metrics.append(metric)
 
     df = DataFrame(metrics)
-    df['scipy/ort'] = df['scipy'] / df['ort']
+    df["scipy/ort"] = df["scipy"] / df["ort"]
     print(df)
 
-    df.plot(x='N', y=['scipy/ort'])
+    df.plot(x="N", y=["scipy/ort"])
 
 
 
@@ -345,21 +348,21 @@ Longer benchmark
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     75%|#######5  | 3/4 [00:00<00:00, 11.93it/s]    100%|##########| 4/4 [00:01<00:00,  2.19it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|█████     | 2/4 [00:00<00:00, 19.40it/s]    100%|██████████| 4/4 [00:02<00:00,  1.41it/s]    100%|██████████| 4/4 [00:02<00:00,  1.64it/s]
            N     scipy       ort  scipy/ort
-    0     10  0.000004  0.000009   0.467956
-    1    100  0.000009  0.000012   0.780008
-    2   1000  0.000065  0.000024   2.775544
-    3  10000  0.000591  0.000193   3.055958
+    0     10  0.000010  0.000014   0.695364
+    1    100  0.000012  0.000015   0.824828
+    2   1000  0.000095  0.000041   2.312891
+    3  10000  0.000741  0.000287   2.578285
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-128
+.. GENERATED FROM PYTHON SOURCE LINES 130-131
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-133
+.. GENERATED FROM PYTHON SOURCE LINES 131-136
 
 .. code-block:: default
 
@@ -377,9 +380,9 @@ Longer benchmark
  .. code-block:: none
 
     numpy: 1.23.5
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.15.0
 
 
 
@@ -387,7 +390,7 @@ Longer benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.989 seconds)
+   **Total running time of the script:** (0 minutes 2.761 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_cdist.py:
@@ -395,6 +398,8 @@ Longer benchmark
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

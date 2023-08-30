@@ -63,9 +63,14 @@ from skl2onnx.common.data_types import FloatTensorType
 
 
 class PredictableTSNE(BaseEstimator, TransformerMixin):
-
-    def __init__(self, transformer=None, estimator=None,
-                 normalize=True, keep_tsne_outputs=False, **kwargs):
+    def __init__(
+        self,
+        transformer=None,
+        estimator=None,
+        normalize=True,
+        keep_tsne_outputs=False,
+        **kwargs
+    ):
         """
         :param transformer: `TSNE` by default
         :param estimator: `MLPRegressor` by default
@@ -90,11 +95,12 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         if not hasattr(transformer, "fit_transform"):
             raise AttributeError(
                 "Transformer {} does not have a 'fit_transform' "
-                "method.".format(type(transformer)))
+                "method.".format(type(transformer))
+            )
         if not hasattr(estimator, "predict"):
             raise AttributeError(
-                "Estimator {} does not have a 'predict' method.".format(
-                    type(estimator)))
+                "Estimator {} does not have a 'predict' method.".format(type(estimator))
+            )
         self.normalize = normalize
         if kwargs:
             self.set_params(**kwargs)
@@ -132,21 +138,22 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
 
         sig = inspect.signature(self.transformer.fit_transform)
         pars = {}
-        for p in ['sample_weight', 'y']:
+        for p in ["sample_weight", "y"]:
             if p in sig.parameters and p in params:
                 pars[p] = params[p]
         target = self.transformer_.fit_transform(X, **pars)
 
         sig = inspect.signature(self.estimator.fit)
-        if 'sample_weight' in sig.parameters:
+        if "sample_weight" in sig.parameters:
             self.estimator_ = clone(self.estimator).fit(
-                X, target, sample_weight=sample_weight)
+                X, target, sample_weight=sample_weight
+            )
         else:
             self.estimator_ = clone(self.estimator).fit(X, target)
         mean = target.mean(axis=0)
         var = target.std(axis=0)
         self.mean_ = mean
-        self.inv_std_ = 1. / var
+        self.inv_std_ = 1.0 / var
         exp = (target - mean) * self.inv_std_
         got = (self.estimator_.predict(X) - mean) * self.inv_std_
         self.loss_ = mean_squared_error(exp, got)
@@ -191,11 +198,11 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         """
         pt, pe, pn = {}, {}, {}
         for k, v in values.items():
-            if k.startswith('e_'):
+            if k.startswith("e_"):
                 pe[k[2:]] = v
-            elif k.startswith('t_'):
+            elif k.startswith("t_"):
                 pt[k[2:]] = v
-            elif k.startswith('n_'):
+            elif k.startswith("n_"):
                 pn[k[2:]] = v
             else:
                 raise ValueError("Unexpected parameter name '{0}'.".format(k))
@@ -217,10 +224,9 @@ imgs = digits.images
 n_samples, n_features = Xd.shape
 n_samples, n_features
 
-X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(
-    Xd, yd, imgs)
+X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(Xd, yd, imgs)
 
-tsne = TSNE(n_components=2, init='pca', random_state=0)
+tsne = TSNE(n_components=2, init="pca", random_state=0)
 
 
 def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
@@ -229,13 +235,17 @@ def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
 
     fig, ax = plt.subplots(1, 2, figsize=figsize)
     for i in range(X.shape[0]):
-        ax[0].text(X[i, 0], X[i, 1], str(y[i]),
-                   color=plt.cm.Set1(y[i] / 10.),
-                   fontdict={'weight': 'bold', 'size': 9})
+        ax[0].text(
+            X[i, 0],
+            X[i, 1],
+            str(y[i]),
+            color=plt.cm.Set1(y[i] / 10.0),
+            fontdict={"weight": "bold", "size": 9},
+        )
 
-    if hasattr(offsetbox, 'AnnotationBbox'):
+    if hasattr(offsetbox, "AnnotationBbox"):
         # only print thumbnails with matplotlib > 1.0
-        shown_images = numpy.array([[1., 1.]])  # just something big
+        shown_images = numpy.array([[1.0, 1.0]])  # just something big
         for i in range(X.shape[0]):
             dist = numpy.sum((X[i] - shown_images) ** 2, 1)
             if numpy.min(dist) < 4e-3:
@@ -243,19 +253,18 @@ def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
                 continue
             shown_images = numpy.r_[shown_images, [X[i]]]
             imagebox = offsetbox.AnnotationBbox(
-                offsetbox.OffsetImage(imgs[i], cmap=plt.cm.gray_r),
-                X[i])
+                offsetbox.OffsetImage(imgs[i], cmap=plt.cm.gray_r), X[i]
+            )
             ax[0].add_artist(imagebox)
     ax[0].set_xticks([]), ax[0].set_yticks([])
-    ax[1].plot(Xp[:, 0], Xp[:, 1], '.')
+    ax[1].plot(Xp[:, 0], Xp[:, 1], ".")
     if title is not None:
         ax[0].set_title(title)
     return ax
 
 
 X_train_tsne = tsne.fit_transform(X_train)
-plot_embedding(X_train_tsne, y_train, imgs_train,
-               "t-SNE embedding of the digits")
+plot_embedding(X_train_tsne, y_train, imgs_train, "t-SNE embedding of the digits")
 
 #######################################
 # Repeatable t-SNE
@@ -267,18 +276,24 @@ ptsne_knn = PredictableTSNE()
 ptsne_knn.fit(X_train, y_train)
 
 X_train_tsne2 = ptsne_knn.transform(X_train)
-plot_embedding(X_train_tsne2, y_train, imgs_train,
-               "Predictable t-SNE of the digits\n"
-               "StandardScaler+KNeighborsRegressor")
+plot_embedding(
+    X_train_tsne2,
+    y_train,
+    imgs_train,
+    "Predictable t-SNE of the digits\n" "StandardScaler+KNeighborsRegressor",
+)
 
 ################################
 # We check on test set.
 
 
 X_test_tsne2 = ptsne_knn.transform(X_test)
-plot_embedding(X_test_tsne2, y_test, imgs_test,
-               "Predictable t-SNE of the digits\n"
-               "StandardScaler+KNeighborsRegressor")
+plot_embedding(
+    X_test_tsne2,
+    y_test,
+    imgs_test,
+    "Predictable t-SNE of the digits\n" "StandardScaler+KNeighborsRegressor",
+)
 
 #######################################
 # ONNX - shape_calculator, converter
@@ -292,13 +307,12 @@ plot_embedding(X_test_tsne2, y_test, imgs_test,
 
 
 def predictable_tsne_shape_calculator(operator):
-
-    input = operator.inputs[0]      # inputs in ONNX graph
+    input = operator.inputs[0]  # inputs in ONNX graph
     # output = operator.outputs[0]    # output in ONNX graph
-    op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+    op = operator.raw_operator  # scikit-learn model (mmust be fitted)
 
-    N = input.type.shape[0]         # number of observations
-    C = op.estimator_._y.shape[1]   # dimension of outputs
+    N = input.type.shape[0]  # number of observations
+    C = op.estimator_._y.shape[1]  # dimension of outputs
 
     # new output definition
     operator.outputs[0].type = FloatTensorType([N, C])
@@ -317,8 +331,8 @@ def predictable_tsne_converter(scope, operator, container):
     :param container: contains the ONNX graph
     """
     # input = operator.inputs[0]      # input in ONNX graph
-    output = operator.outputs[0]    # output in ONNX graph
-    op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+    output = operator.outputs[0]  # output in ONNX graph
+    op = operator.raw_operator  # scikit-learn model (mmust be fitted)
 
     # First step is the k nearest-neighbours,
     # we reuse existing converter and declare it as local
@@ -329,7 +343,7 @@ def predictable_tsne_converter(scope, operator, container):
     knn_op.inputs = operator.inputs
 
     # We add an intermediate outputs.
-    knn_output = scope.declare_local_variable('knn_output', FloatTensorType())
+    knn_output = scope.declare_local_variable("knn_output", FloatTensorType())
     knn_op.outputs.append(knn_output)
 
     # We adjust the output of the submodel.
@@ -337,27 +351,38 @@ def predictable_tsne_converter(scope, operator, container):
     shape_calc(knn_op)
 
     # We add the normalizer which needs a unique node name.
-    name = scope.get_unique_operator_name('Scaler')
+    name = scope.get_unique_operator_name("Scaler")
 
     # The parameter follows the specifications of ONNX
     # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
-    attrs = dict(name=name,
-                 scale=op.inv_std_.ravel().astype(numpy.float32),
-                 offset=op.mean_.ravel().astype(numpy.float32))
+    attrs = dict(
+        name=name,
+        scale=op.inv_std_.ravel().astype(numpy.float32),
+        offset=op.mean_.ravel().astype(numpy.float32),
+    )
 
     # Let's finally add the scaler which connects the output
     # of the k-nearest neighbours model to output of the whole model
     # declared in ONNX graph
-    container.add_node('Scaler', [knn_output.onnx_name], [output.full_name],
-                       op_domain='ai.onnx.ml', **attrs)
+    container.add_node(
+        "Scaler",
+        [knn_output.onnx_name],
+        [output.full_name],
+        op_domain="ai.onnx.ml",
+        **attrs
+    )
+
 
 ##################################
 # We now need to declare the new converter.
 
 
-update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
-                            predictable_tsne_shape_calculator,
-                            predictable_tsne_converter)
+update_registered_converter(
+    PredictableTSNE,
+    "CustomPredictableTSNE",
+    predictable_tsne_shape_calculator,
+    predictable_tsne_converter,
+)
 
 ####################################
 # Conversion to ONNX
@@ -367,9 +392,11 @@ update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
 # to convert.
 
 model_onnx = convert_sklearn(
-    ptsne_knn, 'predictable_tsne',
-    [('input', FloatTensorType([None, X_test.shape[1]]))],
-    target_opset=12)
+    ptsne_knn,
+    "predictable_tsne",
+    [("input", FloatTensorType([None, X_test.shape[1]]))],
+    target_opset=12,
+)
 
 # And save.
 with open("predictable_tsne.onnx", "wb") as f:
@@ -383,7 +410,7 @@ print("ptsne_knn.tranform\n", ptsne_knn.transform(X_test[:2]))
 ##########################
 # Predictions with onnxruntime.
 
-sess = rt.InferenceSession("predictable_tsne.onnx")
+sess = rt.InferenceSession("predictable_tsne.onnx", providers=["CPUExecutionProvider"])
 
 pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
 print("transform", pred_onx[0])
@@ -401,17 +428,21 @@ print("transform", pred_onx[0])
 # ++++++++++++++++++++++
 
 pydot_graph = GetPydotGraph(
-    model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+    model_onnx.graph,
+    name=model_onnx.graph.name,
+    rankdir="TB",
     node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"))
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline_tsne.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng pipeline_tsne.dot')
+os.system("dot -O -Gdpi=300 -Tpng pipeline_tsne.dot")
 
 image = plt.imread("pipeline_tsne.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**

@@ -37,7 +37,7 @@ from skl2onnx import convert_sklearn
 dataset = load_diabetes()
 X, y = dataset.data, dataset.target
 X_train, X_test, y_train, y_test = train_test_split(X, y)
-gpr = GaussianProcessRegressor(DotProduct() + RBF(), alpha=1.)
+gpr = GaussianProcessRegressor(DotProduct() + RBF(), alpha=1.0)
 gpr.fit(X_train, y_train)
 print(gpr)
 
@@ -48,14 +48,12 @@ print(gpr)
 # The documentation suggests the following way to
 # convert a model into ONNX.
 
-initial_type = [('X', FloatTensorType([None, X_train.shape[1]]))]
-onx = convert_sklearn(gpr, initial_types=initial_type,
-                      target_opset=12)
+initial_type = [("X", FloatTensorType([None, X_train.shape[1]]))]
+onx = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 try:
-    pred_onx = sess.run(
-        None, {'X': X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 except RuntimeError as e:
     print(str(e))
 
@@ -73,13 +71,11 @@ except RuntimeError as e:
 # the fixed dimensions by an empty value.
 # (see next line).
 
-initial_type = [('X', FloatTensorType([None, None]))]
-onx = convert_sklearn(gpr, initial_types=initial_type,
-                      target_opset=12)
+initial_type = [("X", FloatTensorType([None, None]))]
+onx = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-sess = rt.InferenceSession(onx.SerializeToString())
-pred_onx = sess.run(
-    None, {'X': X_test.astype(numpy.float32)})[0]
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+pred_onx = sess.run(None, {"X": X_test.astype(numpy.float32)})[0]
 
 pred_skl = gpr.predict(X_test)
 print(pred_skl[:10])
@@ -90,10 +86,9 @@ print(pred_onx[0, :10])
 # Let's confirm that by looking at the biggest
 # differences.
 
-diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) -
-                            numpy.squeeze(pred_onx)))[-5:]
+diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) - numpy.squeeze(pred_onx)))[-5:]
 print(diff)
-print('min(Y)-max(Y):', min(y_test), max(y_test))
+print("min(Y)-max(Y):", min(y_test), max(y_test))
 
 ###########################
 # Third attempt: use of double
@@ -113,22 +108,22 @@ print('min(Y)-max(Y):', min(y_test), max(y_test))
 # constant matrix such as the trained coefficients
 # will be dumped as doubles and not as floats anymore.
 
-initial_type = [('X', DoubleTensorType([None, None]))]
-onx64 = convert_sklearn(gpr, initial_types=initial_type,
-                        target_opset=12)
+initial_type = [("X", DoubleTensorType([None, None]))]
+onx64 = convert_sklearn(gpr, initial_types=initial_type, target_opset=12)
 
-sess64 = rt.InferenceSession(onx64.SerializeToString())
-pred_onx64 = sess64.run(None, {'X': X_test})[0]
+sess64 = rt.InferenceSession(
+    onx64.SerializeToString(), providers=["CPUExecutionProvider"]
+)
+pred_onx64 = sess64.run(None, {"X": X_test})[0]
 
 print(pred_onx64[0, :10])
 
 ################################
 # The new differences look much better.
 
-diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) -
-                            numpy.squeeze(pred_onx64)))[-5:]
+diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) - numpy.squeeze(pred_onx64)))[-5:]
 print(diff)
-print('min(Y)-max(Y):', min(y_test), max(y_test))
+print("min(Y)-max(Y):", min(y_test), max(y_test))
 
 ####################################
 # Size increase
@@ -156,11 +151,12 @@ print("ONNX with doubles:", size64)
 # That's done through the option mechanism
 # (see :ref:`l-conv-options`).
 
-initial_type = [('X', DoubleTensorType([None, None]))]
-options = {GaussianProcessRegressor: {'return_std': True}}
+initial_type = [("X", DoubleTensorType([None, None]))]
+options = {GaussianProcessRegressor: {"return_std": True}}
 try:
-    onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                                options=options, target_opset=12)
+    onx64_std = convert_sklearn(
+        gpr, initial_types=initial_type, options=options, target_opset=12
+    )
 except RuntimeError as e:
     print(e)
 
@@ -171,11 +167,14 @@ except RuntimeError as e:
 # predict at least once and then converting again.
 
 gpr.predict(X_test[:1], return_std=True)
-onx64_std = convert_sklearn(gpr, initial_types=initial_type,
-                            options=options, target_opset=12)
+onx64_std = convert_sklearn(
+    gpr, initial_types=initial_type, options=options, target_opset=12
+)
 
-sess64_std = rt.InferenceSession(onx64_std.SerializeToString())
-pred_onx64_std = sess64_std.run(None, {'X': X_test[:5]})
+sess64_std = rt.InferenceSession(
+    onx64_std.SerializeToString(), providers=["CPUExecutionProvider"]
+)
+pred_onx64_std = sess64_std.run(None, {"X": X_test[:5]})
 
 pprint.pprint(pred_onx64_std)
 
@@ -188,12 +187,13 @@ pprint.pprint(gpr.predict(X_test[:5], return_std=True))
 # It looks good. Let's do a better checks.
 
 
-pred_onx64_std = sess64_std.run(None, {'X': X_test})
+pred_onx64_std = sess64_std.run(None, {"X": X_test})
 pred_std = gpr.predict(X_test, return_std=True)
 
 
-diff = numpy.sort(numpy.abs(numpy.squeeze(pred_onx64_std[1]) -
-                            numpy.squeeze(pred_std[1])))[-5:]
+diff = numpy.sort(
+    numpy.abs(numpy.squeeze(pred_onx64_std[1]) - numpy.squeeze(pred_std[1]))
+)[-5:]
 print(diff)
 
 #################################

@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_bbegin_measure_time.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_bbegin_measure_time.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -31,21 +31,23 @@ to compute predictions.
 Training a pipeline
 +++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-46
+.. GENERATED FROM PYTHON SOURCE LINES 17-47
 
 .. code-block:: default
 
     import numpy
     from pandas import DataFrame
     from tqdm import tqdm
+    from onnx.reference import ReferenceEvaluator
     from sklearn import config_context
     from sklearn.datasets import make_regression
     from sklearn.ensemble import (
-        GradientBoostingRegressor, RandomForestRegressor,
-        VotingRegressor)
+        GradientBoostingRegressor,
+        RandomForestRegressor,
+        VotingRegressor,
+    )
     from sklearn.linear_model import LinearRegression
     from sklearn.model_selection import train_test_split
-    from mlprodict.onnxrt import OnnxInference
     from onnxruntime import InferenceSession
     from skl2onnx import to_onnx
     from skl2onnx.tutorial import measure_time
@@ -53,15 +55,14 @@ Training a pipeline
 
     N = 11000
     X, y = make_regression(N, n_features=10)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, train_size=0.01)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.01)
     print("Train shape", X_train.shape)
     print("Test shape", X_test.shape)
 
     reg1 = GradientBoostingRegressor(random_state=1)
     reg2 = RandomForestRegressor(random_state=1)
     reg3 = LinearRegression()
-    ereg = VotingRegressor([('gb', reg1), ('rf', reg2), ('lr', reg3)])
+    ereg = VotingRegressor([("gb", reg1), ("rf", reg2), ("lr", reg3)])
     ereg.fit(X_train, y_train)
 
 
@@ -79,16 +80,16 @@ Training a pipeline
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-14 {color: black;background-color: white;}#sk-container-id-14 pre{padding: 0;}#sk-container-id-14 div.sk-toggleable {background-color: white;}#sk-container-id-14 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-14 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-14 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-14 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-14 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-14 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-14 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-14 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-14 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-14 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-14 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-14 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-14 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-14 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-14 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-14 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-14 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-14 div.sk-item {position: relative;z-index: 1;}#sk-container-id-14 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-14 div.sk-item::before, #sk-container-id-14 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-14 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-14 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-14 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-14 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-14 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-14 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-14 div.sk-label-container {text-align: center;}#sk-container-id-14 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-14 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-14" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
+    <style>#sk-container-id-1 {color: black;}#sk-container-id-1 pre{padding: 0;}#sk-container-id-1 div.sk-toggleable {background-color: white;}#sk-container-id-1 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-1 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-1 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-1 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-1 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-1 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-1 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-1 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-1 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-1 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-1 div.sk-item {position: relative;z-index: 1;}#sk-container-id-1 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-1 div.sk-item::before, #sk-container-id-1 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-1 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-1 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-1 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-1 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-1 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-1 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-1 div.sk-label-container {text-align: center;}#sk-container-id-1 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-1 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
                                 (&#x27;rf&#x27;, RandomForestRegressor(random_state=1)),
-                                (&#x27;lr&#x27;, LinearRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-46" type="checkbox" ><label for="sk-estimator-id-46" class="sk-toggleable__label sk-toggleable__label-arrow">VotingRegressor</label><div class="sk-toggleable__content"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
+                                (&#x27;lr&#x27;, LinearRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label sk-toggleable__label-arrow">VotingRegressor</label><div class="sk-toggleable__content"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
                                 (&#x27;rf&#x27;, RandomForestRegressor(random_state=1)),
-                                (&#x27;lr&#x27;, LinearRegression())])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>gb</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-47" type="checkbox" ><label for="sk-estimator-id-47" class="sk-toggleable__label sk-toggleable__label-arrow">GradientBoostingRegressor</label><div class="sk-toggleable__content"><pre>GradientBoostingRegressor(random_state=1)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>rf</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-48" type="checkbox" ><label for="sk-estimator-id-48" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor(random_state=1)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>lr</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-49" type="checkbox" ><label for="sk-estimator-id-49" class="sk-toggleable__label sk-toggleable__label-arrow">LinearRegression</label><div class="sk-toggleable__content"><pre>LinearRegression()</pre></div></div></div></div></div></div></div></div></div></div>
+                                (&#x27;lr&#x27;, LinearRegression())])</pre></div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>gb</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label sk-toggleable__label-arrow">GradientBoostingRegressor</label><div class="sk-toggleable__content"><pre>GradientBoostingRegressor(random_state=1)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>rf</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label sk-toggleable__label-arrow">RandomForestRegressor</label><div class="sk-toggleable__content"><pre>RandomForestRegressor(random_state=1)</pre></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label sk-toggleable"><label>lr</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label sk-toggleable__label-arrow">LinearRegression</label><div class="sk-toggleable__content"><pre>LinearRegression()</pre></div></div></div></div></div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-56
+.. GENERATED FROM PYTHON SOURCE LINES 48-57
 
 Measure the processing time
 +++++++++++++++++++++++++++
@@ -100,22 +101,22 @@ may be useful if you need to optimize the prediction.
 We measure the processing time per observation whether
 or not an observation belongs to a batch or is a single one.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-73
+.. GENERATED FROM PYTHON SOURCE LINES 57-74
 
 .. code-block:: default
 
 
-    sizes = [(1, 50), (10, 50), (1000, 10), (10000, 5)]
+    sizes = [(1, 50), (10, 50), (100, 10)]
 
     with config_context(assume_finite=True):
         obs = []
         for batch_size, repeat in tqdm(sizes):
-            context = {"ereg": ereg, 'X': X_test[:batch_size]}
+            context = {"ereg": ereg, "X": X_test[:batch_size]}
             mt = measure_time(
-                "ereg.predict(X)", context, div_by_number=True,
-                number=10, repeat=repeat)
-            mt['size'] = context['X'].shape[0]
-            mt['mean_obs'] = mt['average'] / mt['size']
+                "ereg.predict(X)", context, div_by_number=True, number=10, repeat=repeat
+            )
+            mt["size"] = context["X"].shape[0]
+            mt["mean_obs"] = mt["average"] / mt["size"]
             obs.append(mt)
 
     df_skl = DataFrame(obs)
@@ -129,7 +130,7 @@ or not an observation belongs to a batch or is a single one.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:03<00:10,  3.56s/it]     50%|#####     | 2/4 [00:06<00:06,  3.44s/it]     75%|#######5  | 3/4 [00:10<00:03,  3.58s/it]    100%|##########| 4/4 [00:18<00:00,  5.37s/it]    100%|##########| 4/4 [00:18<00:00,  4.70s/it]
+      0%|          | 0/3 [00:00<?, ?it/s]     33%|███▎      | 1/3 [00:07<00:14,  7.06s/it]     67%|██████▋   | 2/3 [00:12<00:06,  6.25s/it]    100%|██████████| 3/3 [00:14<00:00,  4.01s/it]    100%|██████████| 3/3 [00:14<00:00,  4.70s/it]
 
 
 .. raw:: html
@@ -166,47 +167,36 @@ or not an observation belongs to a batch or is a single one.
       <tbody>
         <tr>
           <th>0</th>
-          <td>0.007118</td>
-          <td>0.001354</td>
-          <td>0.005786</td>
-          <td>0.012553</td>
+          <td>0.014108</td>
+          <td>0.004352</td>
+          <td>0.008928</td>
+          <td>0.029686</td>
           <td>50</td>
           <td>10</td>
           <td>1</td>
-          <td>0.007118</td>
+          <td>0.014108</td>
         </tr>
         <tr>
           <th>1</th>
-          <td>0.006686</td>
-          <td>0.001005</td>
-          <td>0.005542</td>
-          <td>0.010000</td>
+          <td>0.011358</td>
+          <td>0.003103</td>
+          <td>0.008228</td>
+          <td>0.020336</td>
           <td>50</td>
           <td>10</td>
           <td>10</td>
-          <td>0.000669</td>
+          <td>0.001136</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>0.037563</td>
-          <td>0.003221</td>
-          <td>0.033256</td>
-          <td>0.045436</td>
+          <td>0.013486</td>
+          <td>0.002790</td>
+          <td>0.009885</td>
+          <td>0.018525</td>
           <td>10</td>
           <td>10</td>
-          <td>1000</td>
-          <td>0.000038</td>
-        </tr>
-        <tr>
-          <th>3</th>
-          <td>0.162250</td>
-          <td>0.008343</td>
-          <td>0.153190</td>
-          <td>0.177519</td>
-          <td>5</td>
-          <td>10</td>
-          <td>10000</td>
-          <td>0.000016</td>
+          <td>100</td>
+          <td>0.000135</td>
         </tr>
       </tbody>
     </table>
@@ -215,17 +205,16 @@ or not an observation belongs to a batch or is a single one.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-75
+.. GENERATED FROM PYTHON SOURCE LINES 75-76
 
 Graphe.
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-79
+.. GENERATED FROM PYTHON SOURCE LINES 76-79
 
 .. code-block:: default
 
 
-    df_skl.set_index('size')[['mean_obs']].plot(
-        title="scikit-learn", logx=True, logy=True)
+    df_skl.set_index("size")[["mean_obs"]].plot(title="scikit-learn", logx=True, logy=True)
 
 
 
@@ -247,40 +236,46 @@ ONNX runtime
 The same is done with the two ONNX runtime
 available.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-123
+.. GENERATED FROM PYTHON SOURCE LINES 85-129
 
 .. code-block:: default
 
 
-    onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
-                  target_opset=14)
-    sess = InferenceSession(onx.SerializeToString())
-    oinf = OnnxInference(onx, runtime="python_compiled")
+    onx = to_onnx(ereg, X_train[:1].astype(numpy.float32), target_opset=14)
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    oinf = ReferenceEvaluator(onx)
 
     obs = []
     for batch_size, repeat in tqdm(sizes):
-
         # scikit-learn
-        context = {"ereg": ereg, 'X': X_test[:batch_size].astype(numpy.float32)}
+        context = {"ereg": ereg, "X": X_test[:batch_size].astype(numpy.float32)}
         mt = measure_time(
-            "ereg.predict(X)", context, div_by_number=True,
-            number=10, repeat=repeat)
-        mt['size'] = context['X'].shape[0]
-        mt['skl'] = mt['average'] / mt['size']
+            "ereg.predict(X)", context, div_by_number=True, number=10, repeat=repeat
+        )
+        mt["size"] = context["X"].shape[0]
+        mt["skl"] = mt["average"] / mt["size"]
 
         # onnxruntime
-        context = {"sess": sess, 'X': X_test[:batch_size].astype(numpy.float32)}
+        context = {"sess": sess, "X": X_test[:batch_size].astype(numpy.float32)}
         mt2 = measure_time(
-            "sess.run(None, {'X': X})[0]", context, div_by_number=True,
-            number=10, repeat=repeat)
-        mt['ort'] = mt2['average'] / mt['size']
+            "sess.run(None, {'X': X})[0]",
+            context,
+            div_by_number=True,
+            number=10,
+            repeat=repeat,
+        )
+        mt["ort"] = mt2["average"] / mt["size"]
 
-        # mlprodict
-        context = {"oinf": oinf, 'X': X_test[:batch_size].astype(numpy.float32)}
+        # ReferenceEvaluator
+        context = {"oinf": oinf, "X": X_test[:batch_size].astype(numpy.float32)}
         mt2 = measure_time(
-            "oinf.run({'X': X})['variable']", context, div_by_number=True,
-            number=10, repeat=repeat)
-        mt['pyrt'] = mt2['average'] / mt['size']
+            "oinf.run(None, {'X': X})[0]",
+            context,
+            div_by_number=True,
+            number=10,
+            repeat=repeat,
+        )
+        mt["pyrt"] = mt2["average"] / mt["size"]
 
         # end
         obs.append(mt)
@@ -297,7 +292,7 @@ available.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     25%|##5       | 1/4 [00:03<00:10,  3.65s/it]     50%|#####     | 2/4 [00:07<00:07,  3.52s/it]     75%|#######5  | 3/4 [00:18<00:07,  7.29s/it]    100%|##########| 4/4 [00:34<00:00, 10.72s/it]    100%|##########| 4/4 [00:34<00:00,  8.71s/it]
+      0%|          | 0/3 [00:00<?, ?it/s]     33%|███▎      | 1/3 [00:15<00:31, 15.60s/it]     67%|██████▋   | 2/3 [00:40<00:21, 21.10s/it]    100%|██████████| 3/3 [01:03<00:00, 21.84s/it]    100%|██████████| 3/3 [01:03<00:00, 21.09s/it]
 
 
 .. raw:: html
@@ -336,55 +331,42 @@ available.
       <tbody>
         <tr>
           <th>0</th>
-          <td>0.007177</td>
-          <td>0.000710</td>
-          <td>0.005820</td>
-          <td>0.010053</td>
+          <td>0.012201</td>
+          <td>0.003428</td>
+          <td>0.008608</td>
+          <td>0.021660</td>
           <td>50</td>
           <td>10</td>
           <td>1</td>
-          <td>0.007177</td>
-          <td>0.000026</td>
-          <td>0.000077</td>
+          <td>0.012201</td>
+          <td>0.000030</td>
+          <td>0.018960</td>
         </tr>
         <tr>
           <th>1</th>
-          <td>0.006645</td>
-          <td>0.000843</td>
-          <td>0.005670</td>
-          <td>0.008772</td>
+          <td>0.011550</td>
+          <td>0.003386</td>
+          <td>0.008357</td>
+          <td>0.023143</td>
           <td>50</td>
           <td>10</td>
           <td>10</td>
-          <td>0.000664</td>
-          <td>0.000010</td>
-          <td>0.000010</td>
+          <td>0.001155</td>
+          <td>0.000021</td>
+          <td>0.003811</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>0.034182</td>
-          <td>0.001519</td>
-          <td>0.032991</td>
-          <td>0.038628</td>
+          <td>0.013936</td>
+          <td>0.004899</td>
+          <td>0.009295</td>
+          <td>0.023858</td>
           <td>10</td>
           <td>10</td>
-          <td>1000</td>
-          <td>0.000034</td>
+          <td>100</td>
+          <td>0.000139</td>
           <td>0.000004</td>
-          <td>0.000080</td>
-        </tr>
-        <tr>
-          <th>3</th>
-          <td>0.155520</td>
-          <td>0.003090</td>
-          <td>0.151416</td>
-          <td>0.160624</td>
-          <td>5</td>
-          <td>10</td>
-          <td>10000</td>
-          <td>0.000016</td>
-          <td>0.000003</td>
-          <td>0.000014</td>
+          <td>0.002129</td>
         </tr>
       </tbody>
     </table>
@@ -393,18 +375,18 @@ available.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-125
+.. GENERATED FROM PYTHON SOURCE LINES 130-131
 
 Graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-130
+.. GENERATED FROM PYTHON SOURCE LINES 131-136
 
 .. code-block:: default
 
 
-    df.set_index('size')[['skl', 'ort', 'pyrt']].plot(
-        title="Average prediction time per runtime",
-        logx=True, logy=True)
+    df.set_index("size")[["skl", "ort", "pyrt"]].plot(
+        title="Average prediction time per runtime", logx=True, logy=True
+    )
 
 
 
@@ -418,7 +400,7 @@ Graph.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-137
+.. GENERATED FROM PYTHON SOURCE LINES 137-143
 
 :epkg:`ONNX` runtimes are much faster than :epkg:`scikit-learn`
 to predict one observation. :epkg:`scikit-learn` is optimized
@@ -430,7 +412,7 @@ parallelization and languages (:epkg:`C++`, :epkg:`openmp`).
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  55.146 seconds)
+   **Total running time of the script:** (1 minutes 19.181 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_bbegin_measure_time.py:
@@ -438,6 +420,8 @@ parallelization and languages (:epkg:`C++`, :epkg:`openmp`).
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

@@ -39,7 +39,7 @@ print("producer_version={}".format(model.producer_version))
 #############################
 # With *ONNX Runtime*:
 
-sess = InferenceSession(example)
+sess = InferenceSession(example, providers=["CPUExecutionProvider"])
 meta = sess.get_modelmeta()
 
 print("custom_metadata_map={}".format(meta.custom_metadata_map))

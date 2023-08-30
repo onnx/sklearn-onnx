@@ -27,9 +27,8 @@ through every step of the pipeline. If the pipeline
 has *n* steps, it converts the pipeline with step 1,
 then the pipeline with steps 1, 2, then 1, 2, 3...
 """
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-from mlprodict.onnxrt import OnnxInference
 import numpy
+from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -45,10 +44,7 @@ from skl2onnx.common.data_types import FloatTensorType
 data = load_iris()
 X = data.data
 
-pipe = Pipeline(steps=[
-    ('std', StandardScaler()),
-    ('km', KMeans(3, n_init=3))
-])
+pipe = Pipeline(steps=[("std", StandardScaler()), ("km", KMeans(3, n_init=3))])
 pipe.fit(X)
 
 #################################
@@ -56,9 +52,8 @@ pipe.fit(X)
 # overloads the methods *transform* and
 # returns an ONNX graph for every step.
 steps = collect_intermediate_steps(
-    pipe, "pipeline",
-    [("X", FloatTensorType([None, X.shape[1]]))],
-    target_opset=17)
+    pipe, "pipeline", [("X", FloatTensorType([None, X.shape[1]]))], target_opset=17
+)
 
 #####################################
 # We call method transform to population the
@@ -70,14 +65,15 @@ pipe.transform(X)
 # ONNX and scikit-learn outputs.
 
 for step in steps:
-    print('----------------------------')
-    print(step['model'])
-    onnx_step = step['onnx_step']
-    sess = InferenceSession(onnx_step.SerializeToString(),
-                            providers=["CPUExecutionProvider"])
-    onnx_outputs = sess.run(None, {'X': X.astype(numpy.float32)})
+    print("----------------------------")
+    print(step["model"])
+    onnx_step = step["onnx_step"]
+    sess = InferenceSession(
+        onnx_step.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    onnx_outputs = sess.run(None, {"X": X.astype(numpy.float32)})
     onnx_output = onnx_outputs[-1]
-    skl_outputs = step['model']._debug.outputs['transform']
+    skl_outputs = step["model"]._debug.outputs["transform"]
 
     # comparison
     diff = numpy.abs(skl_outputs.ravel() - onnx_output.ravel()).max()
@@ -99,26 +95,16 @@ for step in steps:
 # fails due to nan values or a dimension mismatch.
 
 
-onx = to_onnx(pipe, X[:1].astype(numpy.float32),
-              target_opset=17)
+onx = to_onnx(pipe, X[:1].astype(numpy.float32), target_opset=17)
 
-oinf = OnnxInference(onx)
-oinf.run({'X': X[:2].astype(numpy.float32)},
-         verbose=1, fLOG=print)
+oinf = ReferenceEvaluator(onx, verbose=1)
+oinf.run(None, {"X": X[:2].astype(numpy.float32)})
 
 ###################################
 # And to get a sense of the intermediate results.
 
-oinf.run({'X': X[:2].astype(numpy.float32)},
-         verbose=3, fLOG=print)
+oinf = ReferenceEvaluator(onx, verbose=3)
+oinf.run(None, {"X": X[:2].astype(numpy.float32)})
 
 # This way is usually better if you need to investigate
 # issues within the code of the runtime for an operator.
-#
-#################################
-# Final graph
-# +++++++++++
-
-ax = plot_graphviz(oinf.to_dot())
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)

@@ -47,15 +47,14 @@ class DecorrelateTransformer(TransformerMixin, BaseEstimator):
     * `self.coef_`: square root of the coveriance matrix
     """
 
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
 
     def fit(self, X, y=None, sample_weights=None):
         if sample_weights is not None:
-            raise NotImplementedError(
-                "sample_weights != None is not implemented.")
+            raise NotImplementedError("sample_weights != None is not implemented.")
         self.mean_ = numpy.mean(X, axis=0, keepdims=True)
         X = X - self.mean_
         V = X.T @ X / X.shape[0]
@@ -87,6 +86,7 @@ print(pred)
 #
 # The shape calculator does not change.
 
+
 def decorrelate_transformer_shape_calculator(operator):
     op = operator.raw_operator
     input_type = operator.inputs[0].type.__class__
@@ -115,45 +115,48 @@ def decorrelate_transformer_converter(scope, operator, container):
     # type as the input.
     proto_dtype = guess_proto_type(X.type)
 
-    mean_name = scope.get_unique_variable_name('mean')
-    container.add_initializer(mean_name, proto_dtype,
-                              op.mean_.shape, list(op.mean_.ravel()))
+    mean_name = scope.get_unique_variable_name("mean")
+    container.add_initializer(
+        mean_name, proto_dtype, op.mean_.shape, list(op.mean_.ravel())
+    )
 
-    coef_name = scope.get_unique_variable_name('coef')
-    container.add_initializer(coef_name, proto_dtype,
-                              op.coef_.shape, list(op.coef_.ravel()))
+    coef_name = scope.get_unique_variable_name("coef")
+    container.add_initializer(
+        coef_name, proto_dtype, op.coef_.shape, list(op.coef_.ravel())
+    )
 
-    op_name = scope.get_unique_operator_name('sub')
-    sub_name = scope.get_unique_variable_name('sub')
+    op_name = scope.get_unique_operator_name("sub")
+    sub_name = scope.get_unique_variable_name("sub")
     # This function is defined in package onnxconverter_common.
     # Most common operators can be added to the graph with
     # these functions. It handles the case when specifications
     # changed accross opsets (a parameter becomes an input
     # for example).
-    apply_sub(scope, [X.full_name, mean_name], sub_name, container,
-              operator_name=op_name)
+    apply_sub(
+        scope, [X.full_name, mean_name], sub_name, container, operator_name=op_name
+    )
 
-    op_name = scope.get_unique_operator_name('matmul')
-    container.add_node(
-        'MatMul', [sub_name, coef_name],
-        out[0].full_name, name=op_name)
+    op_name = scope.get_unique_operator_name("matmul")
+    container.add_node("MatMul", [sub_name, coef_name], out[0].full_name, name=op_name)
 
 
 ##########################################
 # We need to let *skl2onnx* know about the new converter.
 
 update_registered_converter(
-    DecorrelateTransformer, "SklearnDecorrelateTransformer",
+    DecorrelateTransformer,
+    "SklearnDecorrelateTransformer",
     decorrelate_transformer_shape_calculator,
-    decorrelate_transformer_converter)
+    decorrelate_transformer_converter,
+)
 
 
 onx = to_onnx(dec, X.astype(numpy.float32))
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float32))
-got = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
 
 
 def diff(p1, p2):
@@ -170,10 +173,10 @@ print(diff(exp, got))
 
 onx = to_onnx(dec, X.astype(numpy.float64))
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float64))
-got = sess.run(None, {'X': X.astype(numpy.float64)})[0]
+got = sess.run(None, {"X": X.astype(numpy.float64)})[0]
 print(diff(exp, got))
 
 #############################################

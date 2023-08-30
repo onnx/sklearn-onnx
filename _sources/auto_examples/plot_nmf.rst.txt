@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_nmf.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_nmf.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -37,7 +37,7 @@ gradient descent.
 Building a simple model
 +++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-58
+.. GENERATED FROM PYTHON SOURCE LINES 25-59
 
 .. code-block:: default
 
@@ -51,15 +51,16 @@ Building a simple model
     import matplotlib.pyplot as plt
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
     import onnx
-    from skl2onnx.algebra.onnx_ops import (
-        OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum)
+    from skl2onnx.algebra.onnx_ops import OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum
     from skl2onnx.common.data_types import FloatTensorType
     from onnxruntime import InferenceSession
 
 
-    mat = np.array([[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0],
-                    [1, 0, 0, 0], [1, 0, 0, 0]], dtype=np.float64)
-    mat[:mat.shape[1], :] += np.identity(mat.shape[1])
+    mat = np.array(
+        [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
+        dtype=np.float64,
+    )
+    mat[: mat.shape[1], :] += np.identity(mat.shape[1])
 
     mod = NMF(n_components=2)
     W = mod.fit_transform(mat)
@@ -83,17 +84,17 @@ Building a simple model
  .. code-block:: none
 
     original predictions
-    [(0, 0, 1.8940573361824338), (0, 1, 0.30724412295249387), (0, 2, 0.30724412295249387), (0, 3, 0.10910977984398254), (1, 0, 1.106606957298055), (1, 1, 0.19083366185515177), (1, 2, 0.19083366185515177), (1, 3, 0.0), (2, 0, 1.106606957298055), (2, 1, 0.19083366185515177), (2, 2, 0.19083366185515177), (2, 3, 0.0), (3, 0, 1.0146708954543895), (3, 1, 0.0), (3, 2, 0.0), (3, 3, 0.9848905236525014), (4, 0, 0.9470286680912169), (4, 1, 0.15362206147624693), (4, 2, 0.15362206147624693), (4, 3, 0.05455488992199127)]
+    [(0, 0, 1.8940507356352687), (0, 1, 0.10912372262184848), (0, 2, 0.3072453141962623), (0, 3, 0.3072453141962623), (1, 0, 1.014673742790866), (1, 1, 0.9848866016414943), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066115912409111), (2, 1, 0.0), (2, 2, 0.19083752823558645), (2, 3, 0.19083752823558645), (3, 0, 1.1066115912409111), (3, 1, 0.0), (3, 2, 0.19083752823558645), (3, 3, 0.19083752823558645), (4, 0, 0.9470253678176344), (4, 1, 0.05456186131092424), (4, 2, 0.15362265709813114), (4, 3, 0.15362265709813114)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 60-62
 
 Let's rewrite the prediction in a way it is closer
 to the function we need to convert into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-75
+.. GENERATED FROM PYTHON SOURCE LINES 62-76
 
 .. code-block:: default
 
@@ -119,12 +120,12 @@ to the function we need to convert into ONNX.
 
  .. code-block:: none
 
-    [(0, 0, 1.8940573361824338), (0, 1, 0.30724412295249387), (0, 2, 0.30724412295249387), (0, 3, 0.10910977984398254), (1, 0, 1.106606957298055), (1, 1, 0.19083366185515177), (1, 2, 0.19083366185515177), (1, 3, 0.0), (2, 0, 1.106606957298055), (2, 1, 0.19083366185515177), (2, 2, 0.19083366185515177), (2, 3, 0.0), (3, 0, 1.0146708954543895), (3, 1, 0.0), (3, 2, 0.0), (3, 3, 0.9848905236525014), (4, 0, 0.9470286680912169), (4, 1, 0.15362206147624693), (4, 2, 0.15362206147624693), (4, 3, 0.05455488992199127)]
+    [(0, 0, 1.8940507356352687), (0, 1, 0.10912372262184848), (0, 2, 0.3072453141962623), (0, 3, 0.3072453141962623), (1, 0, 1.014673742790866), (1, 1, 0.9848866016414943), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066115912409111), (2, 1, 0.0), (2, 2, 0.19083752823558645), (2, 3, 0.19083752823558645), (3, 0, 1.1066115912409111), (3, 1, 0.0), (3, 2, 0.19083752823558645), (3, 3, 0.19083752823558645), (4, 0, 0.9470253678176344), (4, 1, 0.05456186131092424), (4, 2, 0.15362265709813114), (4, 3, 0.15362265709813114)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-86
+.. GENERATED FROM PYTHON SOURCE LINES 77-87
 
 Conversion into ONNX
 ++++++++++++++++++++
@@ -137,7 +138,7 @@ The following converter does not need to be registered,
 it just creates an ONNX graph equivalent to function
 *predict* implemented above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-112
+.. GENERATED FROM PYTHON SOURCE LINES 87-113
 
 .. code-block:: default
 
@@ -151,20 +152,20 @@ it just creates an ONNX graph equivalent to function
         and returns the predictions for it. It assumes
         these indices applies on the training data.
         """
-        col = OnnxArrayFeatureExtractor(H, 'col')
-        row = OnnxArrayFeatureExtractor(W.T, 'row')
+        col = OnnxArrayFeatureExtractor(H, "col")
+        row = OnnxArrayFeatureExtractor(W.T, "row")
         dot = OnnxMul(col, row, op_version=op_version)
         res = OnnxReduceSum(dot, output_names="rec", op_version=op_version)
         indices_type = np.array([0], dtype=np.int64)
-        onx = res.to_onnx(inputs={'col': indices_type,
-                                  'row': indices_type},
-                          outputs=[('rec', FloatTensorType((None, 1)))],
-                          target_opset=op_version)
+        onx = res.to_onnx(
+            inputs={"col": indices_type, "row": indices_type},
+            outputs=[("rec", FloatTensorType((None, 1)))],
+            target_opset=op_version,
+        )
         return onx
 
 
-    model_onnx = nmf_to_onnx(W.astype(np.float32),
-                             H.astype(np.float32))
+    model_onnx = nmf_to_onnx(W.astype(np.float32), H.astype(np.float32))
     print(model_onnx)
 
 
@@ -176,8 +177,16 @@ it just creates an ONNX graph equivalent to function
  .. code-block:: none
 
     ir_version: 7
+    opset_import {
+      domain: ""
+      version: 12
+    }
+    opset_import {
+      domain: "ai.onnx.ml"
+      version: 1
+    }
     producer_name: "skl2onnx"
-    producer_version: "1.14.0"
+    producer_version: "1.16.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -217,30 +226,30 @@ it just creates an ONNX graph equivalent to function
         dims: 2
         dims: 4
         data_type: 1
-        float_data: 1.9596576690673828
-        float_data: 0.3379417061805725
-        float_data: 0.3379417061805725
-        float_data: 0.0
-        float_data: 0.884244441986084
-        float_data: 0.0
-        float_data: 0.0
-        float_data: 0.8582920432090759
+        float_data: 1.98630548
+        float_data: 0
+        float_data: 0.342542619
+        float_data: 0.342542619
+        float_data: 0.900879145
+        float_data: 0.874432623
+        float_data: 0
+        float_data: 0
         name: "Ar_ArrayFeatureExtractorcst"
       }
       initializer {
         dims: 2
         dims: 5
         data_type: 1
-        float_data: 0.9091630578041077
-        float_data: 0.5646940469741821
-        float_data: 0.5646940469741821
-        float_data: 0.0
-        float_data: 0.45458152890205383
-        float_data: 0.12712430953979492
-        float_data: 0.0
-        float_data: 0.0
-        float_data: 1.1475005149841309
-        float_data: 0.06356215476989746
+        float_data: 0.896955
+        float_data: 0
+        float_data: 0.557120502
+        float_data: 0.557120502
+        float_data: 0.448477507
+        float_data: 0.124793746
+        float_data: 1.126315
+        float_data: 0
+        float_data: 0
+        float_data: 0.0623968728
         name: "Ar_ArrayFeatureExtractorcst1"
       }
       input {
@@ -283,35 +292,27 @@ it just creates an ONNX graph equivalent to function
         }
       }
     }
-    opset_import {
-      domain: ""
-      version: 12
-    }
-    opset_import {
-      domain: "ai.onnx.ml"
-      version: 1
-    }
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-114
+.. GENERATED FROM PYTHON SOURCE LINES 114-115
 
 Let's compute prediction with it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-136
+.. GENERATED FROM PYTHON SOURCE LINES 115-137
 
 .. code-block:: default
 
 
-    sess = InferenceSession(model_onnx.SerializeToString())
+    sess = InferenceSession(
+        model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
 
 
     def predict_onnx(sess, row_indices, col_indices):
-        res = sess.run(None,
-                       {'col': col_indices,
-                        'row': row_indices})
+        res = sess.run(None, {"col": col_indices, "row": row_indices})
         return res
 
 
@@ -334,27 +335,30 @@ Let's compute prediction with it.
 
  .. code-block:: none
 
-    [(0, 0, 1.8940574), (0, 1, 0.30724412), (0, 2, 0.30724412), (0, 3, 0.10910978), (1, 0, 1.106607), (1, 1, 0.19083367), (1, 2, 0.19083367), (1, 3, 0.0), (2, 0, 1.106607), (2, 1, 0.19083367), (2, 2, 0.19083367), (2, 3, 0.0), (3, 0, 1.014671), (3, 1, 0.0), (3, 2, 0.0), (3, 3, 0.9848906), (4, 0, 0.9470287), (4, 1, 0.15362206), (4, 2, 0.15362206), (4, 3, 0.05455489)]
+    [(0, 0, 1.8940508), (0, 1, 0.10912372), (0, 2, 0.3072453), (0, 3, 0.3072453), (1, 0, 1.0146737), (1, 1, 0.9848866), (1, 2, 0.0), (1, 3, 0.0), (2, 0, 1.1066115), (2, 1, 0.0), (2, 2, 0.19083752), (2, 3, 0.19083752), (3, 0, 1.1066115), (3, 1, 0.0), (3, 2, 0.19083752), (3, 3, 0.19083752), (4, 0, 0.9470254), (4, 1, 0.05456186), (4, 2, 0.15362266), (4, 3, 0.15362266)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-138
+.. GENERATED FROM PYTHON SOURCE LINES 138-139
 
 The ONNX graph looks like the following.
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-147
+.. GENERATED FROM PYTHON SOURCE LINES 139-151
 
 .. code-block:: default
 
     pydot_graph = GetPydotGraph(
-        model_onnx.graph, name=model_onnx.graph.name,
-        rankdir="TB", node_producer=GetOpNodeProducer("docstring"))
+        model_onnx.graph,
+        name=model_onnx.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer("docstring"),
+    )
     pydot_graph.write_dot("graph_nmf.dot")
-    os.system('dot -O -Tpng graph_nmf.dot')
+    os.system("dot -O -Tpng graph_nmf.dot")
     image = plt.imread("graph_nmf.dot.png")
     plt.imshow(image)
-    plt.axis('off')
+    plt.axis("off")
 
 
 
@@ -374,11 +378,11 @@ The ONNX graph looks like the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-149
+.. GENERATED FROM PYTHON SOURCE LINES 152-153
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-155
+.. GENERATED FROM PYTHON SOURCE LINES 153-159
 
 .. code-block:: default
 
@@ -397,10 +401,10 @@ The ONNX graph looks like the following.
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -408,7 +412,7 @@ The ONNX graph looks like the following.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.368 seconds)
+   **Total running time of the script:** (0 minutes 0.298 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_nmf.py:
@@ -416,6 +420,8 @@ The ONNX graph looks like the following.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

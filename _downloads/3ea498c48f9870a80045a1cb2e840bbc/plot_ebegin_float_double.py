@@ -49,7 +49,6 @@ However, the probability that both comparisons give
 different results is not null. The following graph shows
 the discord areas.
 """
-from mlprodict.sklapi import OnnxPipeline
 from skl2onnx.sklapi import CastTransformer
 from skl2onnx import to_onnx
 from onnxruntime import InferenceSession
@@ -64,15 +63,18 @@ import matplotlib.pyplot as plt
 
 def area_mismatch_rule(N, delta, factor, rule=None):
     if rule is None:
-        def rule(t): return numpy.float32(t)
+
+        def rule(t):
+            return numpy.float32(t)
+
     xst = []
     yst = []
     xsf = []
     ysf = []
     for x in range(-N, N):
         for y in range(-N, N):
-            dx = (1. + x * delta) * factor
-            dy = (1. + y * delta) * factor
+            dx = (1.0 + x * delta) * factor
+            dy = (1.0 + y * delta) * factor
             c1 = 1 if numpy.float64(dx) <= numpy.float64(dy) else 0
             c2 = 1 if numpy.float32(dx) <= rule(dy) else 0
             key = abs(c1 - c2)
@@ -91,12 +93,12 @@ xst, yst, xsf, ysf = area_mismatch_rule(100, delta, factor)
 
 
 fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-ax.plot(xst, yst, '.', label="agree")
-ax.plot(xsf, ysf, '.', label="disagree")
+ax.plot(xst, yst, ".", label="agree")
+ax.plot(xsf, ysf, ".", label="disagree")
 ax.set_title("Region where x <= y and (float)x <= (float)y agree")
 ax.set_xlabel("x")
 ax.set_ylabel("y")
-ax.plot([min(xst), max(xst)], [min(yst), max(yst)], 'k--')
+ax.plot([min(xst), max(xst)], [min(yst), max(yst)], "k--")
 ax.legend()
 
 
@@ -116,15 +118,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, y)
 Xi_train, yi_train = X_train.copy(), y_train.copy()
 Xi_test, yi_test = X_test.copy(), y_test.copy()
 for i in range(X.shape[1]):
-    Xi_train[:, i] = (Xi_train[:, i] * 2 ** i).astype(numpy.int64)
-    Xi_test[:, i] = (Xi_test[:, i] * 2 ** i).astype(numpy.int64)
+    Xi_train[:, i] = (Xi_train[:, i] * 2**i).astype(numpy.int64)
+    Xi_test[:, i] = (Xi_test[:, i] * 2**i).astype(numpy.int64)
 
 max_depth = 10
 
-model = Pipeline([
-    ('scaler', StandardScaler()),
-    ('dt', DecisionTreeRegressor(max_depth=max_depth))
-])
+model = Pipeline(
+    [("scaler", StandardScaler()), ("dt", DecisionTreeRegressor(max_depth=max_depth))]
+)
 
 model.fit(Xi_train, yi_train)
 
@@ -144,15 +145,14 @@ def diff(p1, p2):
     return d.max(), (d / numpy.abs(p1)).max()
 
 
-onx = to_onnx(model, Xi_train[:1].astype(numpy.float32),
-              target_opset=15)
+onx = to_onnx(model, Xi_train[:1].astype(numpy.float32), target_opset=15)
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 X32 = Xi_test.astype(numpy.float32)
 
 skl = model.predict(X32)
-ort = sess.run(None, {'X': X32})[0]
+ort = sess.run(None, {"X": X32})[0]
 
 print(diff(skl, ort))
 
@@ -192,24 +192,25 @@ print(diff(skl, ort))
 #
 
 
-model2 = Pipeline([
-    ('scaler', StandardScaler()),
-    ('cast', CastTransformer()),
-    ('dt', DecisionTreeRegressor(max_depth=max_depth))
-])
+model2 = Pipeline(
+    [
+        ("scaler", StandardScaler()),
+        ("cast", CastTransformer()),
+        ("dt", DecisionTreeRegressor(max_depth=max_depth)),
+    ]
+)
 
 model2.fit(Xi_train, yi_train)
 
 ##########################################
 # The discrepencies.
 
-onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32),
-               target_opset=15)
+onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32), target_opset=15)
 
-sess2 = InferenceSession(onx2.SerializeToString())
+sess2 = InferenceSession(onx2.SerializeToString(), providers=["CPUExecutionProvider"])
 
 skl2 = model2.predict(X32)
-ort2 = sess2.run(None, {'X': X32})[0]
+ort2 = sess2.run(None, {"X": X32})[0]
 
 print(diff(skl2, ort2))
 
@@ -220,22 +221,27 @@ print(diff(skl2, ort2))
 # the *dx* is still here. To remove it, we need to use
 # double in ONNX normalizer.
 
-model3 = Pipeline([
-    ('cast64', CastTransformer(dtype=numpy.float64)),
-    ('scaler', StandardScaler()),
-    ('cast', CastTransformer()),
-    ('dt', DecisionTreeRegressor(max_depth=max_depth))
-])
+model3 = Pipeline(
+    [
+        ("cast64", CastTransformer(dtype=numpy.float64)),
+        ("scaler", StandardScaler()),
+        ("cast", CastTransformer()),
+        ("dt", DecisionTreeRegressor(max_depth=max_depth)),
+    ]
+)
 
 model3.fit(Xi_train, yi_train)
-onx3 = to_onnx(model3, Xi_train[:1].astype(numpy.float32),
-               options={StandardScaler: {'div': 'div_cast'}},
-               target_opset=15)
+onx3 = to_onnx(
+    model3,
+    Xi_train[:1].astype(numpy.float32),
+    options={StandardScaler: {"div": "div_cast"}},
+    target_opset=15,
+)
 
-sess3 = InferenceSession(onx3.SerializeToString())
+sess3 = InferenceSession(onx3.SerializeToString(), providers=["CPUExecutionProvider"])
 
 skl3 = model3.predict(X32)
-ort3 = sess3.run(None, {'X': X32})[0]
+ort3 = sess3.run(None, {"X": X32})[0]
 
 print(diff(skl3, ort3))
 
@@ -244,45 +250,3 @@ print(diff(skl3, ort3))
 # the computation type when a pipeline includes a discontinuous
 # function. It is better to keep the same types all along
 # before using a decision tree.
-#
-# Sledgehammer
-# ++++++++++++
-#
-# The idea here is to always train the next step based
-# on ONNX outputs. That way, every step of the pipeline
-# is trained based on ONNX output.
-#
-# * Trains the first step.
-# * Converts the step into ONNX
-# * Computes ONNX outputs.
-# * Trains the second step on these outputs.
-# * Converts the second step into ONNX.
-# * Merges it with the first step.
-# * Computes ONNX outputs of the merged two first steps.
-# * ...
-#
-# It is implemented in
-# class :epkg:`OnnxPipeline`.
-
-
-model_onx = OnnxPipeline([
-    ('scaler', StandardScaler()),
-    ('dt', DecisionTreeRegressor(max_depth=max_depth))
-])
-
-model_onx.fit(Xi_train, yi_train)
-
-#############################################
-# By using opset 17 and opset 3 for domain ai.onnx.ml, the tree thresholds
-# can be stored as double and not float anymore. That lowerss the discrepancies
-# even if the outputs are still float.
-
-onx4 = to_onnx(model_onx, Xi_train[:1].astype(numpy.float32),
-               target_opset=17)
-
-sess4 = InferenceSession(onx4.SerializeToString())
-
-skl4 = model_onx.predict(X32)
-ort4 = sess4.run(None, {'X': X32})[0]
-
-print(diff(skl4, ort4))

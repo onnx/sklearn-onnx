@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_onnx_operators.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_onnx_operators.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -66,17 +66,17 @@ on github `onnx.proto
     from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
     # Create one input (ValueInfoProto)
-    X = helper.make_tensor_value_info('X', TensorProto.FLOAT, [None, 2])
+    X = helper.make_tensor_value_info("X", TensorProto.FLOAT, [None, 2])
 
     # Create one output (ValueInfoProto)
-    Y = helper.make_tensor_value_info('Y', TensorProto.FLOAT, [None, 4])
+    Y = helper.make_tensor_value_info("Y", TensorProto.FLOAT, [None, 4])
 
     # Create a node (NodeProto)
     node_def = helper.make_node(
-        'Pad',  # node name
-        ['X'],  # inputs
-        ['Y'],  # outputs
-        mode='constant',  # attributes
+        "Pad",  # node name
+        ["X"],  # inputs
+        ["Y"],  # outputs
+        mode="constant",  # attributes
         value=1.5,
         pads=[0, 1, 0, 1],
     )
@@ -84,18 +84,18 @@ on github `onnx.proto
     # Create the graph (GraphProto)
     graph_def = helper.make_graph(
         [node_def],
-        'test-model',
+        "test-model",
         [X],
         [Y],
     )
 
     # Create the model (ModelProto)
-    model_def = helper.make_model(graph_def, producer_name='onnx-example')
+    model_def = helper.make_model(graph_def, producer_name="onnx-example")
     model_def.opset_import[0].version = 10
 
-    print('The model is:\n{}'.format(model_def))
+    print("The model is:\n{}".format(model_def))
     onnx.checker.check_model(model_def)
-    print('The model is checked!')
+    print("The model is checked!")
 
 
 
@@ -107,6 +107,9 @@ on github `onnx.proto
 
     The model is:
     ir_version: 9
+    opset_import {
+      version: 10
+    }
     producer_name: "onnx-example"
     graph {
       node {
@@ -115,21 +118,21 @@ on github `onnx.proto
         op_type: "Pad"
         attribute {
           name: "mode"
-          s: "constant"
           type: STRING
+          s: "constant"
         }
         attribute {
           name: "pads"
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 1
           type: INTS
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 1
         }
         attribute {
           name: "value"
-          f: 1.5
           type: FLOAT
+          f: 1.5
         }
       }
       name: "test-model"
@@ -164,9 +167,6 @@ on github `onnx.proto
         }
       }
     }
-    opset_import {
-      version: 10
-    }
 
     The model is checked!
 
@@ -182,20 +182,26 @@ Every operator has its own class in *sklearn-onnx*.
 The list is dynamically created based on the installed
 onnx package.
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-98
+.. GENERATED FROM PYTHON SOURCE LINES 87-104
 
 .. code-block:: default
 
 
     from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
 
-    pad = OnnxPad('X', output_names=['Y'], mode='constant', value=1.5,
-                  pads=[0, 1, 0, 1], op_version=10)
-    model_def = pad.to_onnx({'X': X}, target_opset=10)
+    pad = OnnxPad(
+        "X",
+        output_names=["Y"],
+        mode="constant",
+        value=1.5,
+        pads=[0, 1, 0, 1],
+        op_version=10,
+    )
+    model_def = pad.to_onnx({"X": X}, target_opset=10)
 
-    print('The model is:\n{}'.format(model_def))
+    print("The model is:\n{}".format(model_def))
     onnx.checker.check_model(model_def)
-    print('The model is checked!')
+    print("The model is checked!")
 
 
 
@@ -207,8 +213,12 @@ onnx package.
 
     The model is:
     ir_version: 5
+    opset_import {
+      domain: ""
+      version: 10
+    }
     producer_name: "skl2onnx"
-    producer_version: "1.14.0"
+    producer_version: "1.16.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -217,25 +227,25 @@ onnx package.
         output: "Y"
         name: "Pa_Pad"
         op_type: "Pad"
+        domain: ""
         attribute {
           name: "mode"
-          s: "constant"
           type: STRING
+          s: "constant"
         }
         attribute {
           name: "pads"
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 1
           type: INTS
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 1
         }
         attribute {
           name: "value"
-          f: 1.5
           type: FLOAT
+          f: 1.5
         }
-        domain: ""
       }
       name: "OnnxPad"
       input {
@@ -269,27 +279,22 @@ onnx package.
         }
       }
     }
-    opset_import {
-      domain: ""
-      version: 10
-    }
 
     The model is checked!
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-100
+.. GENERATED FROM PYTHON SOURCE LINES 105-106
 
 Inputs and outputs can also be skipped.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-107
+.. GENERATED FROM PYTHON SOURCE LINES 106-112
 
 .. code-block:: default
 
 
-    pad = OnnxPad(mode='constant', value=1.5,
-                  pads=[0, 1, 0, 1], op_version=10)
+    pad = OnnxPad(mode="constant", value=1.5, pads=[0, 1, 0, 1], op_version=10)
 
     model_def = pad.to_onnx({pad.inputs[0].name: X}, target_opset=10)
     onnx.checker.check_model(model_def)
@@ -301,31 +306,31 @@ Inputs and outputs can also be skipped.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-112
+.. GENERATED FROM PYTHON SOURCE LINES 113-117
 
 Multiple operators
 ++++++++++++++++++
 
 Let's use the second example from the documentation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-130
+.. GENERATED FROM PYTHON SOURCE LINES 117-135
 
 .. code-block:: default
 
 
 
     # Preprocessing: create a model with two nodes, Y's shape is unknown
-    node1 = helper.make_node('Transpose', ['X'], ['Y'], perm=[1, 0, 2])
-    node2 = helper.make_node('Transpose', ['Y'], ['Z'], perm=[1, 0, 2])
+    node1 = helper.make_node("Transpose", ["X"], ["Y"], perm=[1, 0, 2])
+    node2 = helper.make_node("Transpose", ["Y"], ["Z"], perm=[1, 0, 2])
 
     graph = helper.make_graph(
         [node1, node2],
-        'two-transposes',
-        [helper.make_tensor_value_info('X', TensorProto.FLOAT, (2, 3, 4))],
-        [helper.make_tensor_value_info('Z', TensorProto.FLOAT, (2, 3, 4))],
+        "two-transposes",
+        [helper.make_tensor_value_info("X", TensorProto.FLOAT, (2, 3, 4))],
+        [helper.make_tensor_value_info("Z", TensorProto.FLOAT, (2, 3, 4))],
     )
 
-    original_model = helper.make_model(graph, producer_name='onnx-examples')
+    original_model = helper.make_model(graph, producer_name="onnx-examples")
 
     # Check the model and print Y's shape information
     onnx.checker.check_model(original_model)
@@ -337,11 +342,11 @@ Let's use the second example from the documentation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-132
+.. GENERATED FROM PYTHON SOURCE LINES 136-137
 
 Which we translate into:
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-144
+.. GENERATED FROM PYTHON SOURCE LINES 137-149
 
 .. code-block:: default
 
@@ -349,12 +354,12 @@ Which we translate into:
     from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
 
     node = OnnxTranspose(
-        OnnxTranspose('X', perm=[1, 0, 2], op_version=12),
-        perm=[1, 0, 2], op_version=12)
+        OnnxTranspose("X", perm=[1, 0, 2], op_version=12), perm=[1, 0, 2], op_version=12
+    )
     X = np.arange(2 * 3 * 4).reshape((2, 3, 4)).astype(np.float32)
 
     # numpy arrays are good enough to define the input shape
-    model_def = node.to_onnx({'X': X}, target_opset=12)
+    model_def = node.to_onnx({"X": X}, target_opset=12)
     onnx.checker.check_model(model_def)
 
 
@@ -364,11 +369,11 @@ Which we translate into:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-146
+.. GENERATED FROM PYTHON SOURCE LINES 150-151
 
 Let's the output with onnxruntime
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-161
+.. GENERATED FROM PYTHON SOURCE LINES 151-169
 
 .. code-block:: default
 
@@ -376,7 +381,10 @@ Let's the output with onnxruntime
 
     def predict_with_onnxruntime(model_def, *inputs):
         import onnxruntime as ort
-        sess = ort.InferenceSession(model_def.SerializeToString())
+
+        sess = ort.InferenceSession(
+            model_def.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         names = [i.name for i in sess.get_inputs()]
         dinputs = {name: input for name, input in zip(names, inputs)}
         res = sess.run(None, dinputs)
@@ -406,28 +414,32 @@ Let's the output with onnxruntime
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-164
+.. GENERATED FROM PYTHON SOURCE LINES 170-172
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-178
+.. GENERATED FROM PYTHON SOURCE LINES 172-190
 
 .. code-block:: default
 
 
     pydot_graph = GetPydotGraph(
-        model_def.graph, name=model_def.graph.name, rankdir="TB",
-        node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                        fillcolor="yellow", style="filled"))
+        model_def.graph,
+        name=model_def.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer(
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
     pydot_graph.write_dot("pipeline_transpose2x.dot")
 
-    os.system('dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot')
+    os.system("dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot")
 
     image = plt.imread("pipeline_transpose2x.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
-    ax.axis('off')
+    ax.axis("off")
 
 
 
@@ -447,19 +459,21 @@ Display the ONNX graph
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-180
+.. GENERATED FROM PYTHON SOURCE LINES 191-192
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-188
+.. GENERATED FROM PYTHON SOURCE LINES 192-202
 
 .. code-block:: default
 
 
     import sklearn  # noqa
+
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
     import skl2onnx  # noqa
+
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -472,10 +486,10 @@ Display the ONNX graph
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -483,7 +497,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  1.010 seconds)
+   **Total running time of the script:** (0 minutes 0.736 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_onnx_operators.py:
@@ -491,6 +505,8 @@ Display the ONNX graph
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

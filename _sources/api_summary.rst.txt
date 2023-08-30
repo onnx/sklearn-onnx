@@ -45,7 +45,6 @@ it is possible to enable logging:
     import logging
     logger = logging.getLogger('skl2onnx')
     logger.setLevel(logging.DEBUG)
-    logging.basicConfig(level=logging.DEBUG)
 
 Example :ref:`l-example-logging` illustrates what it looks like.
 

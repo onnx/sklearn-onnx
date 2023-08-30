@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -38,7 +38,7 @@ Imports, setups
 All imports. It also registered onnx converters for :epgk:`xgboost`
 and :epkg:`lightgbm`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-58
+.. GENERATED FROM PYTHON SOURCE LINES 22-59
 
 .. code-block:: default
 
@@ -57,8 +57,8 @@ and :epkg:`lightgbm`.
         if mi == ma:
             ma += 1
         mat = numpy.empty(m.shape, dtype=numpy.str_)
-        mat[:, :] = '.'
-        if hasattr(m, 'todense'):
+        mat[:, :] = "."
+        if hasattr(m, "todense"):
             dense = m.todense()
         else:
             dense = m
@@ -66,15 +66,15 @@ and :epkg:`lightgbm`.
             for j in range(m.shape[1]):
                 if dense[i, j] > 0:
                     c = int((dense[i, j] - mi) / (ma - mi) * 25)
-                    mat[i, j] = chr(ord('A') + c)
-        return '\n'.join(''.join(line) for line in mat)
+                    mat[i, j] = chr(ord("A") + c)
+        return "\n".join("".join(line) for line in mat)
 
 
     def diff(a, b):
         if a.shape != b.shape:
             raise ValueError(
-                f"Cannot compare matrices with different shapes "
-                f"{a.shape} != {b.shape}.")
+                f"Cannot compare matrices with different shapes " f"{a.shape} != {b.shape}."
+            )
         d = numpy.abs(a - b).sum() / a.size
         return d
 
@@ -85,29 +85,32 @@ and :epkg:`lightgbm`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-63
+
+.. GENERATED FROM PYTHON SOURCE LINES 60-64
 
 Artificial datasets
 +++++++++++++++++++
 
 Iris + a text column.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-78
+.. GENERATED FROM PYTHON SOURCE LINES 64-81
 
 .. code-block:: default
 
 
 
-    strings = numpy.array([
-        "This a sentence.",
-        "This a sentence with more characters $^*&'(-...",
-        """var = ClassName(var2, user=mail@anywhere.com, pwd"""
-        """=")_~-('&]@^\\`|[{#")""",
-        "c79857654",
-        "https://complex-url.com/;76543u3456?g=hhh&amp;h=23",
-        "01-03-05T11:12:13",
-        "https://complex-url.com/;dd76543u3456?g=ddhhh&amp;h=23",
-    ]).reshape((-1, 1))
+    strings = numpy.array(
+        [
+            "This a sentence.",
+            "This a sentence with more characters $^*&'(-...",
+            """var = ClassName(var2, user=mail@anywhere.com, pwd"""
+            """=")_~-('&]@^\\`|[{#")""",
+            "c79857654",
+            "https://complex-url.com/;76543u3456?g=hhh&amp;h=23",
+            "01-03-05T11:12:13",
+            "https://complex-url.com/;dd76543u3456?g=ddhhh&amp;h=23",
+        ]
+    ).reshape((-1, 1))
 
     pprint.pprint(strings)
 
@@ -131,21 +134,17 @@ Iris + a text column.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-81
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 Fit a TfIdfVectorizer
 +++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-88
+.. GENERATED FROM PYTHON SOURCE LINES 84-87
 
 .. code-block:: default
 
 
-    tfidf = Pipeline([
-        ('pre', ColumnTransformer([
-            ('tfidf', TfidfVectorizer(), 0)
-        ]))
-    ])
+    tfidf = Pipeline([("pre", ColumnTransformer([("tfidf", TfidfVectorizer(), 0)]))])
 
 
 
@@ -154,11 +153,11 @@ Fit a TfIdfVectorizer
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-90
+.. GENERATED FROM PYTHON SOURCE LINES 88-89
 
 We leave a couple of strings out of the training set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-98
+.. GENERATED FROM PYTHON SOURCE LINES 89-97
 
 .. code-block:: default
 
@@ -190,12 +189,12 @@ We leave a couple of strings out of the training set.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-101
+.. GENERATED FROM PYTHON SOURCE LINES 98-100
 
 Conversion to ONNX
 ++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-105
+.. GENERATED FROM PYTHON SOURCE LINES 100-104
 
 .. code-block:: default
 
@@ -210,18 +209,18 @@ Conversion to ONNX
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-108
+.. GENERATED FROM PYTHON SOURCE LINES 105-107
 
 Execution with ONNX
 +++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-113
+.. GENERATED FROM PYTHON SOURCE LINES 107-112
 
 .. code-block:: default
 
 
-    sess = InferenceSession(onx.SerializeToString())
-    got = sess.run(None, {'X': strings})[0]
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    got = sess.run(None, {"X": strings})[0]
     print(f"differences={diff(tr, got):g}")
     print(print_sparse_matrix(got))
 
@@ -247,7 +246,7 @@ Execution with ONNX
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.030 seconds)
+   **Total running time of the script:** (0 minutes 0.031 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py:
@@ -255,6 +254,8 @@ Execution with ONNX
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

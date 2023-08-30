@@ -1,21 +1,21 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" data-content_root="">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
-    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
-        <title>Computation times - sklearn-onnx 1.14.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <!-- Generated with Sphinx 7.1.2 and Furo 2023.08.19 -->
+        <title>Computation times - sklearn-onnx 1.16.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=92fd9be5" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
 
@@ -129,7 +129,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.14.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.16.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -155,7 +155,7 @@
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.14.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.16.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -165,8 +165,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_cbegin_opset.html">What is the opset number?</a></li>
@@ -178,17 +178,16 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gbegin_cst.html">Store arrays in one onnx graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gbegin_dataframe.html">Dataframe as an input</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gconverting.html">Modify the ONNX graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gbegin_transfer_learning.html">Transfer Learning with ONNX</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
@@ -196,46 +195,41 @@
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_3_new_operator.html">Extend ONNX, extend runtime</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_pextend_python_runtime.html">Fast design with a python runtime</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_qextend_onnxruntime.html">Fast runtime with onnxruntime</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_woe_transformer.html">Converter for WOE</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_summary.html">API Summary</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="plot_metadata.html">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_logging.html">Logging, verbose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_decision_function.html">Probabilities or raw scores</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_model.html">Train, convert and predict a model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_investigate_pipeline.html">Investigate a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_benchmark_cdist.html">Compare CDist with scipy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_zipmap.html">Probabilities as a vector or as a ZipMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_black_op.html">Convert a model with a reduced list of operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_benchmark_pipeline.html">Benchmark a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_pipeline_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_nmf.html">Custom Operator for NMF Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_cast_transformer.html">Discrepencies with StandardScaler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_benchmark_pipeline.html">Benchmark a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_pipeline_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_gpr.html">Discrepencies with GaussianProcessorRegressor: use of double</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_onnx_operators.html">Play with ONNX operators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_syntax.html">Different ways to convert a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_custom_parser_alternative.html">When a custom model is neither a classifier nor a regressor (alternative)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_custom_parser.html">When a custom model is neither a classifier nor a regressor</a></li>
@@ -281,99 +275,59 @@
         <article role="main">
           <section id="computation-times">
 <span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">#</a></h1>
-<p><strong>01:36.683</strong> total execution time for <strong>auto_examples</strong> files:</p>
+<p><strong>00:03.261</strong> total execution time for <strong>auto_examples</strong> files:</p>
 <div class="table-wrapper docutils container">
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_model.py</span></code>)</p></td>
-<td><p>00:25.419</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_backend.html#sphx-glr-auto-examples-plot-backend-py"><span class="std std-ref">ONNX Runtime Backend for ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_backend.py</span></code>)</p></td>
+<td><p>00:03.261</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_benchmark_cdist.html#sphx-glr-auto-examples-plot-benchmark-cdist-py"><span class="std std-ref">Compare CDist with scipy</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_cdist.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_benchmark_pipeline.html#sphx-glr-auto-examples-plot-benchmark-pipeline-py"><span class="std std-ref">Benchmark a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_pipeline.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_black_op.html#sphx-glr-auto-examples-plot-black-op-py"><span class="std std-ref">Convert a model with a reduced list of operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_black_op.py</span></code>)</p></td>
-<td><p>00:21.877</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tfidfvectorizer.py</span></code>)</p></td>
-<td><p>00:10.979</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_benchmark_pipeline.html#sphx-glr-auto-examples-plot-benchmark-pipeline-py"><span class="std std-ref">Benchmark a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_pipeline.py</span></code>)</p></td>
-<td><p>00:06.685</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_complex_pipeline.py</span></code>)</p></td>
-<td><p>00:05.573</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_intermediate_outputs.py</span></code>)</p></td>
-<td><p>00:04.105</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="plot_cast_transformer.html#sphx-glr-auto-examples-plot-cast-transformer-py"><span class="std std-ref">Discrepencies with StandardScaler</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_cast_transformer.py</span></code>)</p></td>
-<td><p>00:03.795</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_syntax.html#sphx-glr-auto-examples-plot-convert-syntax-py"><span class="std std-ref">Different ways to convert a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_syntax.py</span></code>)</p></td>
-<td><p>00:03.632</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_complex_pipeline.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_parser_alternative.html#sphx-glr-auto-examples-plot-custom-parser-alternative-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor (alternative)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser_alternative.py</span></code>)</p></td>
-<td><p>00:02.812</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_parser.html#sphx-glr-auto-examples-plot-custom-parser-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser.py</span></code>)</p></td>
-<td><p>00:02.623</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_benchmark_cdist.html#sphx-glr-auto-examples-plot-benchmark-cdist-py"><span class="std std-ref">Compare CDist with scipy</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_cdist.py</span></code>)</p></td>
-<td><p>00:01.989</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline_xgboost.html#sphx-glr-auto-examples-plot-pipeline-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_xgboost.py</span></code>)</p></td>
-<td><p>00:01.691</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_lightgbm.py</span></code>)</p></td>
-<td><p>00:01.669</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_gpr.html#sphx-glr-auto-examples-plot-gpr-py"><span class="std std-ref">Discrepencies with GaussianProcessorRegressor: use of double</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_gpr.py</span></code>)</p></td>
-<td><p>00:01.592</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_onnx_operators.html#sphx-glr-auto-examples-plot-onnx-operators-py"><span class="std std-ref">Play with ONNX operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_onnx_operators.py</span></code>)</p></td>
-<td><p>00:01.010</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_nmf.html#sphx-glr-auto-examples-plot-nmf-py"><span class="std std-ref">Custom Operator for NMF Decomposition</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_nmf.py</span></code>)</p></td>
-<td><p>00:00.368</p></td>
-<td><p>0.0 MB</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_investigate_pipeline.html#sphx-glr-auto-examples-plot-investigate-pipeline-py"><span class="std std-ref">Investigate a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_investigate_pipeline.py</span></code>)</p></td>
-<td><p>00:00.274</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_decision_function.html#sphx-glr-auto-examples-plot-convert-decision-function-py"><span class="std std-ref">Probabilities or raw scores</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_decision_function.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="plot_convert_model.html#sphx-glr-auto-examples-plot-convert-model-py"><span class="std std-ref">Train, convert and predict a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_model.py</span></code>)</p></td>
-<td><p>00:00.182</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_zipmap.py</span></code>)</p></td>
-<td><p>00:00.153</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_syntax.html#sphx-glr-auto-examples-plot-convert-syntax-py"><span class="std std-ref">Different ways to convert a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_syntax.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Draw a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline.py</span></code>)</p></td>
-<td><p>00:00.124</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_zipmap.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_logging.html#sphx-glr-auto-examples-plot-logging-py"><span class="std std-ref">Logging, verbose</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_logging.py</span></code>)</p></td>
-<td><p>00:00.092</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_model.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_decision_function.html#sphx-glr-auto-examples-plot-convert-decision-function-py"><span class="std std-ref">Probabilities or raw scores</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_decision_function.py</span></code>)</p></td>
-<td><p>00:00.042</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_parser.html#sphx-glr-auto-examples-plot-custom-parser-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_backend.html#sphx-glr-auto-examples-plot-backend-py"><span class="std std-ref">ONNX Runtime Backend for ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_backend.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_parser_alternative.html#sphx-glr-auto-examples-plot-custom-parser-alternative-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor (alternative)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser_alternative.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
@@ -381,7 +335,47 @@
 <td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_gpr.html#sphx-glr-auto-examples-plot-gpr-py"><span class="std std-ref">Discrepencies with GaussianProcessorRegressor: use of double</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_gpr.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_intermediate_outputs.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_investigate_pipeline.html#sphx-glr-auto-examples-plot-investigate-pipeline-py"><span class="std std-ref">Investigate a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_investigate_pipeline.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_logging.html#sphx-glr-auto-examples-plot-logging-py"><span class="std std-ref">Logging, verbose</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_logging.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="plot_metadata.html#sphx-glr-auto-examples-plot-metadata-py"><span class="std std-ref">Metadata</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_metadata.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_nmf.html#sphx-glr-auto-examples-plot-nmf-py"><span class="std std-ref">Custom Operator for NMF Decomposition</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_nmf.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_onnx_operators.html#sphx-glr-auto-examples-plot-onnx-operators-py"><span class="std std-ref">Play with ONNX operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_onnx_operators.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Draw a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_lightgbm.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline_xgboost.html#sphx-glr-auto-examples-plot-pipeline-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_xgboost.py</span></code>)</p></td>
+<td><p>00:00.000</p></td>
+<td><p>0.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tfidfvectorizer.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
 <td><p>0.0 MB</p></td>
 </tr>
@@ -401,7 +395,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2018-2022, Microsoft
+                Copyright &#169; 2018-2023, Microsoft
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -421,9 +415,9 @@
       
     </aside>
   </div>
-</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-    <script src="../_static/doctools.js"></script>
-    <script src="../_static/sphinx_highlight.js"></script>
-    <script src="../_static/scripts/furo.js"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=9a8fb93a"></script>
+    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

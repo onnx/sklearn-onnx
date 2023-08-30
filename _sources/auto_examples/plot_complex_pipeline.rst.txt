@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_complex_pipeline.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_complex_pipeline.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -45,7 +45,7 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-91
+.. GENERATED FROM PYTHON SOURCE LINES 32-101
 
 .. code-block:: default
 
@@ -70,40 +70,50 @@ and must be removed. Look for comment starting with ``---`` below.
     from skl2onnx.common.data_types import FloatTensorType, StringTensorType
     from skl2onnx.common.data_types import Int64TensorType
 
-    titanic_url = ('https://raw.githubusercontent.com/amueller/'
-                   'scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv')
+    titanic_url = (
+        "https://raw.githubusercontent.com/amueller/"
+        "scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv"
+    )
     data = pd.read_csv(titanic_url)
-    X = data.drop('survived', axis=1)
-    y = data['survived']
+    X = data.drop("survived", axis=1)
+    y = data["survived"]
     print(data.dtypes)
 
     # SimpleImputer on string is not available for
     # string in ONNX-ML specifications.
     # So we do it beforehand.
-    for cat in ['embarked', 'sex', 'pclass']:
-        X[cat].fillna('missing', inplace=True)
+    for cat in ["embarked", "sex", "pclass"]:
+        X[cat].fillna("missing", inplace=True)
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-    numeric_features = ['age', 'fare']
-    numeric_transformer = Pipeline(steps=[
-        ('imputer', SimpleImputer(strategy='median')),
-        ('scaler', StandardScaler())])
+    numeric_features = ["age", "fare"]
+    numeric_transformer = Pipeline(
+        steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
+    )
 
-    categorical_features = ['embarked', 'sex', 'pclass']
-    categorical_transformer = Pipeline(steps=[
-        # --- SimpleImputer is not available for strings in ONNX-ML specifications.
-        # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-        ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+    categorical_features = ["embarked", "sex", "pclass"]
+    categorical_transformer = Pipeline(
+        steps=[
+            # --- SimpleImputer is not available for strings in ONNX-ML specifications.
+            # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+            ("onehot", OneHotEncoder(handle_unknown="ignore"))
+        ]
+    )
 
     preprocessor = ColumnTransformer(
         transformers=[
-            ('num', numeric_transformer, numeric_features),
-            ('cat', categorical_transformer, categorical_features),
-        ])
+            ("num", numeric_transformer, numeric_features),
+            ("cat", categorical_transformer, categorical_features),
+        ]
+    )
 
-    clf = Pipeline(steps=[('preprocessor', preprocessor),
-                          ('classifier', LogisticRegression(solver='lbfgs'))])
+    clf = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("classifier", LogisticRegression(solver="lbfgs")),
+        ]
+    )
 
 
     clf.fit(X_train, y_train)
@@ -136,7 +146,7 @@ and must be removed. Look for comment starting with ``---`` below.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-5 {color: black;background-color: white;}#sk-container-id-5 pre{padding: 0;}#sk-container-id-5 div.sk-toggleable {background-color: white;}#sk-container-id-5 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-5 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-5 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-5 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-5 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-5 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-5 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-5 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-5 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-5 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-5 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-5 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-5 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-5 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-5 div.sk-item {position: relative;z-index: 1;}#sk-container-id-5 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-5 div.sk-item::before, #sk-container-id-5 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-5 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-5 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-5 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-5 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-5 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-5 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-5 div.sk-label-container {text-align: center;}#sk-container-id-5 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-5 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-5" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
+    <style>#sk-container-id-5 {color: black;}#sk-container-id-5 pre{padding: 0;}#sk-container-id-5 div.sk-toggleable {background-color: white;}#sk-container-id-5 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-5 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-5 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-5 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-5 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-5 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-5 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-5 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-5 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-5 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-5 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-5 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-5 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-5 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-5 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-5 div.sk-item {position: relative;z-index: 1;}#sk-container-id-5 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-5 div.sk-item::before, #sk-container-id-5 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-5 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-5 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-5 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-5 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-5 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-5 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-5 div.sk-label-container {text-align: center;}#sk-container-id-5 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-5 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-5" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
                      ColumnTransformer(transformers=[(&#x27;num&#x27;,
                                                       Pipeline(steps=[(&#x27;imputer&#x27;,
                                                                        SimpleImputer(strategy=&#x27;median&#x27;)),
@@ -173,7 +183,7 @@ and must be removed. Look for comment starting with ``---`` below.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-98
+.. GENERATED FROM PYTHON SOURCE LINES 102-108
 
 Define the inputs of the ONNX graph
 +++++++++++++++++++++++++++++++++++
@@ -182,7 +192,7 @@ Define the inputs of the ONNX graph
 but it needs to know which feature has which name.
 We simply reuse the dataframe column definition.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-100
+.. GENERATED FROM PYTHON SOURCE LINES 108-110
 
 .. code-block:: default
 
@@ -214,11 +224,11 @@ We simply reuse the dataframe column definition.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-102
+.. GENERATED FROM PYTHON SOURCE LINES 111-112
 
 After conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-123
+.. GENERATED FROM PYTHON SOURCE LINES 112-133
 
 .. code-block:: default
 
@@ -229,9 +239,9 @@ After conversion.
         for k, v in zip(df.columns, df.dtypes):
             if drop is not None and k in drop:
                 continue
-            if v == 'int64':
+            if v == "int64":
                 t = Int64TensorType([None, 1])
-            elif v == 'float64':
+            elif v == "float64":
                 t = FloatTensorType([None, 1])
             else:
                 t = StringTensorType([None, 1])
@@ -268,25 +278,26 @@ After conversion.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-127
+.. GENERATED FROM PYTHON SOURCE LINES 134-137
 
 Merging single column into vectors is not
 the most efficient way to compute the prediction.
 It could be done before converting the pipeline into a graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-131
+.. GENERATED FROM PYTHON SOURCE LINES 139-141
 
 Convert the pipeline into ONNX
 ++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-138
+.. GENERATED FROM PYTHON SOURCE LINES 141-149
 
 .. code-block:: default
 
 
     try:
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                                     target_opset=12)
+        model_onnx = convert_sklearn(
+            clf, "pipeline_titanic", initial_inputs, target_opset=12
+        )
     except Exception as e:
         print(e)
 
@@ -297,23 +308,23 @@ Convert the pipeline into ONNX
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-142
+.. GENERATED FROM PYTHON SOURCE LINES 150-153
 
 Predictions are more efficient if the graph is small.
 That's why the converter checks that there is no unused input.
 They need to be removed from the graph inputs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-152
+.. GENERATED FROM PYTHON SOURCE LINES 153-163
 
 .. code-block:: default
 
 
-    to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
-               'name', 'body', 'home.dest', 'boat'}
+    to_drop = {"parch", "sibsp", "cabin", "ticket", "name", "body", "home.dest", "boat"}
     initial_inputs = convert_dataframe_schema(X_train, to_drop)
     try:
-        model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                                     target_opset=12)
+        model_onnx = convert_sklearn(
+            clf, "pipeline_titanic", initial_inputs, target_opset=12
+        )
     except Exception as e:
         print(e)
 
@@ -324,21 +335,20 @@ They need to be removed from the graph inputs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-156
+.. GENERATED FROM PYTHON SOURCE LINES 164-167
 
 *scikit-learn* does implicit conversions when it can.
 *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
 must be applied on columns of the same type.
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-167
+.. GENERATED FROM PYTHON SOURCE LINES 167-177
 
 .. code-block:: default
 
 
     initial_inputs = convert_dataframe_schema(X_train, to_drop)
 
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                                 target_opset=12)
+    model_onnx = convert_sklearn(clf, "pipeline_titanic", initial_inputs, target_opset=12)
 
 
     # And save.
@@ -352,7 +362,7 @@ must be applied on columns of the same type.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-174
+.. GENERATED FROM PYTHON SOURCE LINES 178-184
 
 Compare the predictions
 +++++++++++++++++++++++
@@ -361,7 +371,7 @@ Final step, we need to ensure the converted model
 produces the same predictions, labels and probabilities.
 Let's start with *scikit-learn*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-178
+.. GENERATED FROM PYTHON SOURCE LINES 184-188
 
 .. code-block:: default
 
@@ -377,14 +387,14 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 0 0 1 1]
-    predict_proba [[0.79113857 0.20886143]
-     [0.90867425 0.09132575]]
+    predict [1 0 0 1 0]
+    predict_proba [[0.34887729 0.65112271]
+     [0.92762608 0.07237392]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-188
+.. GENERATED FROM PYTHON SOURCE LINES 189-198
 
 Predictions with onnxruntime.
 We need to remove the dropped columns and to change
@@ -396,7 +406,7 @@ Last detail, every column was described  not really as a vector
 but as a matrix of one column which explains the last line
 with the *reshape*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-196
+.. GENERATED FROM PYTHON SOURCE LINES 198-206
 
 .. code-block:: default
 
@@ -415,17 +425,16 @@ with the *reshape*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-198
+.. GENERATED FROM PYTHON SOURCE LINES 207-208
 
 We are ready to run *onnxruntime*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-205
+.. GENERATED FROM PYTHON SOURCE LINES 208-214
 
 .. code-block:: default
 
 
-    sess = rt.InferenceSession("pipeline_titanic.onnx",
-                               providers=["CPUExecutionProvider"])
+    sess = rt.InferenceSession("pipeline_titanic.onnx", providers=["CPUExecutionProvider"])
     pred_onx = sess.run(None, inputs)
     print("predict", pred_onx[0][:5])
     print("predict_proba", pred_onx[1][:2])
@@ -438,31 +447,36 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 0 0 1 1]
-    predict_proba [{0: 0.7911385297775269, 1: 0.20886144042015076}, {0: 0.9086743593215942, 1: 0.09132567048072815}]
+    predict [1 0 0 1 0]
+    predict_proba [{0: 0.34887731075286865, 1: 0.6511226892471313}, {0: 0.9276261329650879, 1: 0.0723738968372345}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 206-209
+.. GENERATED FROM PYTHON SOURCE LINES 215-218
 
 The output of onnxruntime is a list of dictionaries.
 Let's swith to an array but that requires to convert again with
 an additional option zipmap.
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-222
+.. GENERATED FROM PYTHON SOURCE LINES 218-236
 
 .. code-block:: default
 
 
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                                 target_opset=12,
-                                 options={id(clf): {'zipmap': False}})
+    model_onnx = convert_sklearn(
+        clf,
+        "pipeline_titanic",
+        initial_inputs,
+        target_opset=12,
+        options={id(clf): {"zipmap": False}},
+    )
     with open("pipeline_titanic_nozipmap.onnx", "wb") as f:
         f.write(model_onnx.SerializeToString())
 
-    sess = rt.InferenceSession("pipeline_titanic_nozipmap.onnx",
-                               providers=["CPUExecutionProvider"])
+    sess = rt.InferenceSession(
+        "pipeline_titanic_nozipmap.onnx", providers=["CPUExecutionProvider"]
+    )
     pred_onx = sess.run(None, inputs)
     print("predict", pred_onx[0][:5])
     print("predict_proba", pred_onx[1][:2])
@@ -475,18 +489,18 @@ an additional option zipmap.
 
  .. code-block:: none
 
-    predict [0 0 0 1 1]
-    predict_proba [[0.7911385  0.20886144]
-     [0.90867436 0.09132567]]
+    predict [1 0 0 1 0]
+    predict_proba [[0.3488773  0.6511227 ]
+     [0.92762613 0.0723739 ]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-224
+.. GENERATED FROM PYTHON SOURCE LINES 237-238
 
 Let's check they are the same.
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-226
+.. GENERATED FROM PYTHON SOURCE LINES 238-240
 
 .. code-block:: default
 
@@ -499,7 +513,7 @@ Let's check they are the same.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-233
+.. GENERATED FROM PYTHON SOURCE LINES 241-247
 
 .. _l-plot-complex-pipeline-graph:
 
@@ -508,25 +522,27 @@ Display the ONNX graph
 
 Finally, let's see the graph converted with *sklearn-onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-249
+.. GENERATED FROM PYTHON SOURCE LINES 247-265
 
 .. code-block:: default
 
 
-    pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name,
-                                rankdir="TB",
-                                node_producer=GetOpNodeProducer("docstring",
-                                                                color="yellow",
-                                                                fillcolor="yellow",
-                                                                style="filled"))
+    pydot_graph = GetPydotGraph(
+        model_onnx.graph,
+        name=model_onnx.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer(
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
     pydot_graph.write_dot("pipeline_titanic.dot")
 
-    os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic.dot')
+    os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic.dot")
 
     image = plt.imread("pipeline_titanic.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
-    ax.axis('off')
+    ax.axis("off")
 
 
 
@@ -546,11 +562,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-251
+.. GENERATED FROM PYTHON SOURCE LINES 266-267
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 251-257
+.. GENERATED FROM PYTHON SOURCE LINES 267-273
 
 .. code-block:: default
 
@@ -569,10 +585,10 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.15.0
 
 
 
@@ -580,7 +596,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  5.573 seconds)
+   **Total running time of the script:** (0 minutes 8.095 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_complex_pipeline.py:
@@ -588,6 +604,8 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

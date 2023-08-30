@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_custom_model.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_custom_model.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -56,7 +56,7 @@ And to predict on a test set:
 * k nearest neightbours, :math:`f(X') \rightarrow X'_3`
 * final normalization, simple scaling :math:`X'_3 \rightarrow X'_4`
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-206
+.. GENERATED FROM PYTHON SOURCE LINES 43-213
 
 .. code-block:: default
 
@@ -83,9 +83,14 @@ And to predict on a test set:
 
 
     class PredictableTSNE(BaseEstimator, TransformerMixin):
-
-        def __init__(self, transformer=None, estimator=None,
-                     normalize=True, keep_tsne_outputs=False, **kwargs):
+        def __init__(
+            self,
+            transformer=None,
+            estimator=None,
+            normalize=True,
+            keep_tsne_outputs=False,
+            **kwargs
+        ):
             """
             :param transformer: `TSNE` by default
             :param estimator: `MLPRegressor` by default
@@ -110,11 +115,12 @@ And to predict on a test set:
             if not hasattr(transformer, "fit_transform"):
                 raise AttributeError(
                     "Transformer {} does not have a 'fit_transform' "
-                    "method.".format(type(transformer)))
+                    "method.".format(type(transformer))
+                )
             if not hasattr(estimator, "predict"):
                 raise AttributeError(
-                    "Estimator {} does not have a 'predict' method.".format(
-                        type(estimator)))
+                    "Estimator {} does not have a 'predict' method.".format(type(estimator))
+                )
             self.normalize = normalize
             if kwargs:
                 self.set_params(**kwargs)
@@ -152,21 +158,22 @@ And to predict on a test set:
 
             sig = inspect.signature(self.transformer.fit_transform)
             pars = {}
-            for p in ['sample_weight', 'y']:
+            for p in ["sample_weight", "y"]:
                 if p in sig.parameters and p in params:
                     pars[p] = params[p]
             target = self.transformer_.fit_transform(X, **pars)
 
             sig = inspect.signature(self.estimator.fit)
-            if 'sample_weight' in sig.parameters:
+            if "sample_weight" in sig.parameters:
                 self.estimator_ = clone(self.estimator).fit(
-                    X, target, sample_weight=sample_weight)
+                    X, target, sample_weight=sample_weight
+                )
             else:
                 self.estimator_ = clone(self.estimator).fit(X, target)
             mean = target.mean(axis=0)
             var = target.std(axis=0)
             self.mean_ = mean
-            self.inv_std_ = 1. / var
+            self.inv_std_ = 1.0 / var
             exp = (target - mean) * self.inv_std_
             got = (self.estimator_.predict(X) - mean) * self.inv_std_
             self.loss_ = mean_squared_error(exp, got)
@@ -211,11 +218,11 @@ And to predict on a test set:
             """
             pt, pe, pn = {}, {}, {}
             for k, v in values.items():
-                if k.startswith('e_'):
+                if k.startswith("e_"):
                     pe[k[2:]] = v
-                elif k.startswith('t_'):
+                elif k.startswith("t_"):
                     pt[k[2:]] = v
-                elif k.startswith('n_'):
+                elif k.startswith("n_"):
                     pn[k[2:]] = v
                 else:
                     raise ValueError("Unexpected parameter name '{0}'.".format(k))
@@ -230,14 +237,14 @@ And to predict on a test set:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-211
+.. GENERATED FROM PYTHON SOURCE LINES 214-218
 
 Experimentation on MNIST
 ++++++++++++++++++++++++
 
 Let's fit t-SNE...
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-260
+.. GENERATED FROM PYTHON SOURCE LINES 218-269
 
 .. code-block:: default
 
@@ -250,10 +257,9 @@ Let's fit t-SNE...
     n_samples, n_features = Xd.shape
     n_samples, n_features
 
-    X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(
-        Xd, yd, imgs)
+    X_train, X_test, y_train, y_test, imgs_train, imgs_test = train_test_split(Xd, yd, imgs)
 
-    tsne = TSNE(n_components=2, init='pca', random_state=0)
+    tsne = TSNE(n_components=2, init="pca", random_state=0)
 
 
     def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
@@ -262,13 +268,17 @@ Let's fit t-SNE...
 
         fig, ax = plt.subplots(1, 2, figsize=figsize)
         for i in range(X.shape[0]):
-            ax[0].text(X[i, 0], X[i, 1], str(y[i]),
-                       color=plt.cm.Set1(y[i] / 10.),
-                       fontdict={'weight': 'bold', 'size': 9})
+            ax[0].text(
+                X[i, 0],
+                X[i, 1],
+                str(y[i]),
+                color=plt.cm.Set1(y[i] / 10.0),
+                fontdict={"weight": "bold", "size": 9},
+            )
 
-        if hasattr(offsetbox, 'AnnotationBbox'):
+        if hasattr(offsetbox, "AnnotationBbox"):
             # only print thumbnails with matplotlib > 1.0
-            shown_images = numpy.array([[1., 1.]])  # just something big
+            shown_images = numpy.array([[1.0, 1.0]])  # just something big
             for i in range(X.shape[0]):
                 dist = numpy.sum((X[i] - shown_images) ** 2, 1)
                 if numpy.min(dist) < 4e-3:
@@ -276,19 +286,18 @@ Let's fit t-SNE...
                     continue
                 shown_images = numpy.r_[shown_images, [X[i]]]
                 imagebox = offsetbox.AnnotationBbox(
-                    offsetbox.OffsetImage(imgs[i], cmap=plt.cm.gray_r),
-                    X[i])
+                    offsetbox.OffsetImage(imgs[i], cmap=plt.cm.gray_r), X[i]
+                )
                 ax[0].add_artist(imagebox)
         ax[0].set_xticks([]), ax[0].set_yticks([])
-        ax[1].plot(Xp[:, 0], Xp[:, 1], '.')
+        ax[1].plot(Xp[:, 0], Xp[:, 1], ".")
         if title is not None:
             ax[0].set_title(title)
         return ax
 
 
     X_train_tsne = tsne.fit_transform(X_train)
-    plot_embedding(X_train_tsne, y_train, imgs_train,
-                   "t-SNE embedding of the digits")
+    plot_embedding(X_train_tsne, y_train, imgs_train, "t-SNE embedding of the digits")
 
 
 
@@ -304,19 +313,19 @@ Let's fit t-SNE...
  .. code-block:: none
 
 
-    array([<AxesSubplot: title={'center': 't-SNE embedding of the digits'}>,
-           <AxesSubplot: >], dtype=object)
+    array([<Axes: title={'center': 't-SNE embedding of the digits'}>,
+           <Axes: >], dtype=object)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 261-265
+.. GENERATED FROM PYTHON SOURCE LINES 270-274
 
 Repeatable t-SNE
 ++++++++++++++++
 
 Just to check it is working.
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-274
+.. GENERATED FROM PYTHON SOURCE LINES 274-286
 
 .. code-block:: default
 
@@ -325,9 +334,12 @@ Just to check it is working.
     ptsne_knn.fit(X_train, y_train)
 
     X_train_tsne2 = ptsne_knn.transform(X_train)
-    plot_embedding(X_train_tsne2, y_train, imgs_train,
-                   "Predictable t-SNE of the digits\n"
-                   "StandardScaler+KNeighborsRegressor")
+    plot_embedding(
+        X_train_tsne2,
+        y_train,
+        imgs_train,
+        "Predictable t-SNE of the digits\n" "StandardScaler+KNeighborsRegressor",
+    )
 
 
 
@@ -343,25 +355,28 @@ Just to check it is working.
  .. code-block:: none
 
 
-    array([<AxesSubplot: title={'center': 'Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor'}>,
-           <AxesSubplot: >], dtype=object)
+    array([<Axes: title={'center': 'Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor'}>,
+           <Axes: >], dtype=object)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 275-276
+.. GENERATED FROM PYTHON SOURCE LINES 287-288
 
 We check on test set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-283
+.. GENERATED FROM PYTHON SOURCE LINES 288-298
 
 .. code-block:: default
 
 
 
     X_test_tsne2 = ptsne_knn.transform(X_test)
-    plot_embedding(X_test_tsne2, y_test, imgs_test,
-                   "Predictable t-SNE of the digits\n"
-                   "StandardScaler+KNeighborsRegressor")
+    plot_embedding(
+        X_test_tsne2,
+        y_test,
+        imgs_test,
+        "Predictable t-SNE of the digits\n" "StandardScaler+KNeighborsRegressor",
+    )
 
 
 
@@ -377,12 +392,12 @@ We check on test set.
  .. code-block:: none
 
 
-    array([<AxesSubplot: title={'center': 'Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor'}>,
-           <AxesSubplot: >], dtype=object)
+    array([<Axes: title={'center': 'Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor'}>,
+           <Axes: >], dtype=object)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-292
+.. GENERATED FROM PYTHON SOURCE LINES 299-307
 
 ONNX - shape_calculator, converter
 ++++++++++++++++++++++++++++++++++
@@ -393,20 +408,19 @@ one to calculate the shape of the outputs based
 on the inputs, the other one to do the actual
 conversion of the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 292-307
+.. GENERATED FROM PYTHON SOURCE LINES 307-321
 
 .. code-block:: default
 
 
 
     def predictable_tsne_shape_calculator(operator):
-
-        input = operator.inputs[0]      # inputs in ONNX graph
+        input = operator.inputs[0]  # inputs in ONNX graph
         # output = operator.outputs[0]    # output in ONNX graph
-        op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+        op = operator.raw_operator  # scikit-learn model (mmust be fitted)
 
-        N = input.type.shape[0]         # number of observations
-        C = op.estimator_._y.shape[1]   # dimension of outputs
+        N = input.type.shape[0]  # number of observations
+        C = op.estimator_._y.shape[1]  # dimension of outputs
 
         # new output definition
         operator.outputs[0].type = FloatTensorType([N, C])
@@ -419,12 +433,12 @@ conversion of the model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 308-310
+.. GENERATED FROM PYTHON SOURCE LINES 322-324
 
 Then the converter model. We
 reuse existing converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 310-354
+.. GENERATED FROM PYTHON SOURCE LINES 324-376
 
 .. code-block:: default
 
@@ -438,8 +452,8 @@ reuse existing converter.
         :param container: contains the ONNX graph
         """
         # input = operator.inputs[0]      # input in ONNX graph
-        output = operator.outputs[0]    # output in ONNX graph
-        op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+        output = operator.outputs[0]  # output in ONNX graph
+        op = operator.raw_operator  # scikit-learn model (mmust be fitted)
 
         # First step is the k nearest-neighbours,
         # we reuse existing converter and declare it as local
@@ -450,7 +464,7 @@ reuse existing converter.
         knn_op.inputs = operator.inputs
 
         # We add an intermediate outputs.
-        knn_output = scope.declare_local_variable('knn_output', FloatTensorType())
+        knn_output = scope.declare_local_variable("knn_output", FloatTensorType())
         knn_op.outputs.append(knn_output)
 
         # We adjust the output of the submodel.
@@ -458,19 +472,26 @@ reuse existing converter.
         shape_calc(knn_op)
 
         # We add the normalizer which needs a unique node name.
-        name = scope.get_unique_operator_name('Scaler')
+        name = scope.get_unique_operator_name("Scaler")
 
         # The parameter follows the specifications of ONNX
         # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
-        attrs = dict(name=name,
-                     scale=op.inv_std_.ravel().astype(numpy.float32),
-                     offset=op.mean_.ravel().astype(numpy.float32))
+        attrs = dict(
+            name=name,
+            scale=op.inv_std_.ravel().astype(numpy.float32),
+            offset=op.mean_.ravel().astype(numpy.float32),
+        )
 
         # Let's finally add the scaler which connects the output
         # of the k-nearest neighbours model to output of the whole model
         # declared in ONNX graph
-        container.add_node('Scaler', [knn_output.onnx_name], [output.full_name],
-                           op_domain='ai.onnx.ml', **attrs)
+        container.add_node(
+            "Scaler",
+            [knn_output.onnx_name],
+            [output.full_name],
+            op_domain="ai.onnx.ml",
+            **attrs
+        )
 
 
 
@@ -479,19 +500,23 @@ reuse existing converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 355-356
+
+.. GENERATED FROM PYTHON SOURCE LINES 377-378
 
 We now need to declare the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 356-362
+.. GENERATED FROM PYTHON SOURCE LINES 378-387
 
 .. code-block:: default
 
 
 
-    update_registered_converter(PredictableTSNE, 'CustomPredictableTSNE',
-                                predictable_tsne_shape_calculator,
-                                predictable_tsne_converter)
+    update_registered_converter(
+        PredictableTSNE,
+        "CustomPredictableTSNE",
+        predictable_tsne_shape_calculator,
+        predictable_tsne_converter,
+    )
 
 
 
@@ -500,7 +525,7 @@ We now need to declare the new converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 363-368
+.. GENERATED FROM PYTHON SOURCE LINES 388-393
 
 Conversion to ONNX
 ++++++++++++++++++
@@ -508,15 +533,17 @@ Conversion to ONNX
 We just need to call *convert_sklearn* as any other model
 to convert.
 
-.. GENERATED FROM PYTHON SOURCE LINES 368-378
+.. GENERATED FROM PYTHON SOURCE LINES 393-405
 
 .. code-block:: default
 
 
     model_onnx = convert_sklearn(
-        ptsne_knn, 'predictable_tsne',
-        [('input', FloatTensorType([None, X_test.shape[1]]))],
-        target_opset=12)
+        ptsne_knn,
+        "predictable_tsne",
+        [("input", FloatTensorType([None, X_test.shape[1]]))],
+        target_opset=12,
+    )
 
     # And save.
     with open("predictable_tsne.onnx", "wb") as f:
@@ -529,11 +556,11 @@ to convert.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 379-380
+.. GENERATED FROM PYTHON SOURCE LINES 406-407
 
 We now compare the prediction.
 
-.. GENERATED FROM PYTHON SOURCE LINES 380-383
+.. GENERATED FROM PYTHON SOURCE LINES 407-410
 
 .. code-block:: default
 
@@ -549,22 +576,22 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[ 1.1081381   0.09305604]
-     [-0.05512788 -0.40800577]]
+     [[-0.7351301   1.2556596 ]
+     [ 0.00878066  0.44443586]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 384-385
+.. GENERATED FROM PYTHON SOURCE LINES 411-412
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 385-391
+.. GENERATED FROM PYTHON SOURCE LINES 412-418
 
 .. code-block:: default
 
 
-    sess = rt.InferenceSession("predictable_tsne.onnx")
+    sess = rt.InferenceSession("predictable_tsne.onnx", providers=["CPUExecutionProvider"])
 
     pred_onx = sess.run(None, {"input": X_test[:1].astype(numpy.float32)})
     print("transform", pred_onx[0])
@@ -577,18 +604,18 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[1.1081381  0.09305604]]
+    transform [[-0.7351301  1.2556596]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 392-395
+.. GENERATED FROM PYTHON SOURCE LINES 419-422
 
 The converter for the nearest neighbours produces an ONNX graph
 which does not allow multiple predictions at a time. Let's call
 *onnxruntime* for the second row.
 
-.. GENERATED FROM PYTHON SOURCE LINES 395-399
+.. GENERATED FROM PYTHON SOURCE LINES 422-426
 
 .. code-block:: default
 
@@ -604,33 +631,37 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[-0.05512788 -0.40800577]]
+    transform [[0.00878066 0.44443586]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 400-402
+.. GENERATED FROM PYTHON SOURCE LINES 427-429
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 402-416
+.. GENERATED FROM PYTHON SOURCE LINES 429-447
 
 .. code-block:: default
 
 
     pydot_graph = GetPydotGraph(
-        model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+        model_onnx.graph,
+        name=model_onnx.graph.name,
+        rankdir="TB",
         node_producer=GetOpNodeProducer(
-            "docstring", color="yellow", fillcolor="yellow", style="filled"))
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
     pydot_graph.write_dot("pipeline_tsne.dot")
 
-    os.system('dot -O -Gdpi=300 -Tpng pipeline_tsne.dot')
+    os.system("dot -O -Gdpi=300 -Tpng pipeline_tsne.dot")
 
     image = plt.imread("pipeline_tsne.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
-    ax.axis('off')
+    ax.axis("off")
 
 
 
@@ -650,11 +681,11 @@ Display the ONNX graph
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 417-418
+.. GENERATED FROM PYTHON SOURCE LINES 448-449
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 418-424
+.. GENERATED FROM PYTHON SOURCE LINES 449-455
 
 .. code-block:: default
 
@@ -673,10 +704,10 @@ Display the ONNX graph
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -684,7 +715,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  25.419 seconds)
+   **Total running time of the script:** (0 minutes 14.886 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:
@@ -692,6 +723,8 @@ Display the ONNX graph
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python
