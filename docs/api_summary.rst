@@ -63,6 +63,11 @@ lists all available converters.
 
 .. autofunction:: skl2onnx.update_registered_parser
 
+Helpers for new converters
+==========================
+
+.. autofunction:: skl2onnx.helpers.integration.add_onnx_graph
+
 Manipulate ONNX graphs
 ======================
 
