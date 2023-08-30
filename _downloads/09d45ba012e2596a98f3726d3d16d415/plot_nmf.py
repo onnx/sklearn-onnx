@@ -32,15 +32,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnx
-from skl2onnx.algebra.onnx_ops import (
-    OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum)
+from skl2onnx.algebra.onnx_ops import OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
 
 
-mat = np.array([[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0],
-                [1, 0, 0, 0], [1, 0, 0, 0]], dtype=np.float64)
-mat[:mat.shape[1], :] += np.identity(mat.shape[1])
+mat = np.array(
+    [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
+    dtype=np.float64,
+)
+mat[: mat.shape[1], :] += np.identity(mat.shape[1])
 
 mod = NMF(n_components=2)
 W = mod.fit_transform(mat)
@@ -93,32 +94,32 @@ def nmf_to_onnx(W, H, op_version=12):
     and returns the predictions for it. It assumes
     these indices applies on the training data.
     """
-    col = OnnxArrayFeatureExtractor(H, 'col')
-    row = OnnxArrayFeatureExtractor(W.T, 'row')
+    col = OnnxArrayFeatureExtractor(H, "col")
+    row = OnnxArrayFeatureExtractor(W.T, "row")
     dot = OnnxMul(col, row, op_version=op_version)
     res = OnnxReduceSum(dot, output_names="rec", op_version=op_version)
     indices_type = np.array([0], dtype=np.int64)
-    onx = res.to_onnx(inputs={'col': indices_type,
-                              'row': indices_type},
-                      outputs=[('rec', FloatTensorType((None, 1)))],
-                      target_opset=op_version)
+    onx = res.to_onnx(
+        inputs={"col": indices_type, "row": indices_type},
+        outputs=[("rec", FloatTensorType((None, 1)))],
+        target_opset=op_version,
+    )
     return onx
 
 
-model_onnx = nmf_to_onnx(W.astype(np.float32),
-                         H.astype(np.float32))
+model_onnx = nmf_to_onnx(W.astype(np.float32), H.astype(np.float32))
 print(model_onnx)
 
 ########################################
 # Let's compute prediction with it.
 
-sess = InferenceSession(model_onnx.SerializeToString())
+sess = InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 
 def predict_onnx(sess, row_indices, col_indices):
-    res = sess.run(None,
-                   {'col': col_indices,
-                    'row': row_indices})
+    res = sess.run(None, {"col": col_indices, "row": row_indices})
     return res
 
 
@@ -136,13 +137,16 @@ print(onnx_preds)
 ###################################
 # The ONNX graph looks like the following.
 pydot_graph = GetPydotGraph(
-    model_onnx.graph, name=model_onnx.graph.name,
-    rankdir="TB", node_producer=GetOpNodeProducer("docstring"))
+    model_onnx.graph,
+    name=model_onnx.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer("docstring"),
+)
 pydot_graph.write_dot("graph_nmf.dot")
-os.system('dot -O -Tpng graph_nmf.dot')
+os.system("dot -O -Tpng graph_nmf.dot")
 image = plt.imread("graph_nmf.dot.png")
 plt.imshow(image)
-plt.axis('off')
+plt.axis("off")
 
 #################################
 # **Versions used for this example**

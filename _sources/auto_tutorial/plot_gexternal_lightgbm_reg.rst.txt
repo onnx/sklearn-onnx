@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm_reg.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm_reg.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -51,7 +51,7 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|`.
 Train a LGBMRegressor
 +++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-61
+.. GENERATED FROM PYTHON SOURCE LINES 38-66
 
 .. code-block:: default
 
@@ -65,15 +65,20 @@ Train a LGBMRegressor
     from lightgbm import LGBMRegressor
     from onnxruntime import InferenceSession
     from skl2onnx import to_onnx, update_registered_converter
-    from skl2onnx.common.shape_calculator import calculate_linear_regressor_output_shapes  # noqa
+    from skl2onnx.common.shape_calculator import (
+        calculate_linear_regressor_output_shapes,
+    )  # noqa
     from onnxmltools import __version__ as oml_version
-    from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
+    from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
+        convert_lightgbm,
+    )  # noqa
 
 
     N = 1000
     X = numpy.random.randn(N, 20)
-    y = (numpy.random.randn(N) +
-         numpy.random.randn(N) * 100 * numpy.random.randint(0, 1, 1000))
+    y = numpy.random.randn(N) + numpy.random.randn(N) * 100 * numpy.random.randint(
+        0, 1, 1000
+    )
 
     reg = LGBMRegressor(n_estimators=1000)
     reg.fit(X, y)
@@ -82,16 +87,27 @@ Train a LGBMRegressor
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    [LightGBM] [Warning] Auto-choosing row-wise multi-threading, the overhead of testing was 0.000384 seconds.
+    You can set `force_row_wise=true` to remove the overhead.
+    And if memory is not enough, you can set `force_col_wise=true`.
+    [LightGBM] [Info] Total Bins 5100
+    [LightGBM] [Info] Number of data points in the train set: 1000, number of used features: 20
+    [LightGBM] [Info] Start training from score 0.047737
+
 
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-16 {color: black;background-color: white;}#sk-container-id-16 pre{padding: 0;}#sk-container-id-16 div.sk-toggleable {background-color: white;}#sk-container-id-16 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-16 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-16 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-16 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-16 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-16 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-16 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-16 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-16 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-16 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-16 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-16 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-16 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-16 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-16 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-16 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-16 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-16 div.sk-item {position: relative;z-index: 1;}#sk-container-id-16 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-16 div.sk-item::before, #sk-container-id-16 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-16 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-16 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-16 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-16 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-16 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-16 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-16 div.sk-label-container {text-align: center;}#sk-container-id-16 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-16 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-16" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-57" type="checkbox" checked><label for="sk-estimator-id-57" class="sk-toggleable__label sk-toggleable__label-arrow">LGBMRegressor</label><div class="sk-toggleable__content"><pre>LGBMRegressor(n_estimators=1000)</pre></div></div></div></div></div>
+    <style>#sk-container-id-4 {color: black;}#sk-container-id-4 pre{padding: 0;}#sk-container-id-4 div.sk-toggleable {background-color: white;}#sk-container-id-4 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-4 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-4 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-4 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-4 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-4 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-4 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-4 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-4 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-4 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-4 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-4 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-4 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-4 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-4 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-4 div.sk-item {position: relative;z-index: 1;}#sk-container-id-4 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-4 div.sk-item::before, #sk-container-id-4 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-4 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-4 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-4 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-4 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-4 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-4 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-4 div.sk-label-container {text-align: center;}#sk-container-id-4 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-4 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-4" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" checked><label for="sk-estimator-id-15" class="sk-toggleable__label sk-toggleable__label-arrow">LGBMRegressor</label><div class="sk-toggleable__content"><pre>LGBMRegressor(n_estimators=1000)</pre></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-73
+.. GENERATED FROM PYTHON SOURCE LINES 67-78
 
 Register the converter for LGBMClassifier
 +++++++++++++++++++++++++++++++++++++++++
@@ -105,7 +121,7 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
 lightgbm/shape_calculators/Regressor.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-94
+.. GENERATED FROM PYTHON SOURCE LINES 78-102
 
 .. code-block:: default
 
@@ -113,22 +129,25 @@ lightgbm/shape_calculators/Regressor.py>`_.
 
     def skl2onnx_convert_lightgbm(scope, operator, container):
         options = scope.get_options(operator.raw_operator)
-        if 'split' in options:
-            if pv.Version(oml_version) < pv.Version('1.9.2'):
+        if "split" in options:
+            if pv.Version(oml_version) < pv.Version("1.9.2"):
                 warnings.warn(
                     "Option split was released in version 1.9.2 but %s is "
-                    "installed. It will be ignored." % oml_version)
-            operator.split = options['split']
+                    "installed. It will be ignored." % oml_version
+                )
+            operator.split = options["split"]
         else:
             operator.split = None
         convert_lightgbm(scope, operator, container)
 
 
     update_registered_converter(
-        LGBMRegressor, 'LightGbmLGBMRegressor',
+        LGBMRegressor,
+        "LightGbmLGBMRegressor",
         calculate_linear_regressor_output_shapes,
         skl2onnx_convert_lightgbm,
-        options={'split': None})
+        options={"split": None},
+    )
 
 
 
@@ -137,7 +156,7 @@ lightgbm/shape_calculators/Regressor.py>`_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-101
+.. GENERATED FROM PYTHON SOURCE LINES 103-109
 
 Convert
 +++++++
@@ -146,16 +165,20 @@ We convert the same model following the two scenarios, one single
 TreeEnsembleRegressor node, or more. *split* parameter is the number of
 trees per node TreeEnsembleRegressor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-108
+.. GENERATED FROM PYTHON SOURCE LINES 109-120
 
 .. code-block:: default
 
 
-    model_onnx = to_onnx(reg, X[:1].astype(numpy.float32),
-                         target_opset={'': 14, 'ai.onnx.ml': 2})
-    model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32),
-                               target_opset={'': 14, 'ai.onnx.ml': 2},
-                               options={'split': 100})
+    model_onnx = to_onnx(
+        reg, X[:1].astype(numpy.float32), target_opset={"": 14, "ai.onnx.ml": 2}
+    )
+    model_onnx_split = to_onnx(
+        reg,
+        X[:1].astype(numpy.float32),
+        target_opset={"": 14, "ai.onnx.ml": 2},
+        options={"split": 100},
+    )
 
 
 
@@ -164,30 +187,33 @@ trees per node TreeEnsembleRegressor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 121-123
 
 Discrepancies
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-127
+.. GENERATED FROM PYTHON SOURCE LINES 123-142
 
 .. code-block:: default
 
 
-    sess = InferenceSession(model_onnx.SerializeToString())
-    sess_split = InferenceSession(model_onnx_split.SerializeToString())
+    sess = InferenceSession(
+        model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    sess_split = InferenceSession(
+        model_onnx_split.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
 
     X32 = X.astype(numpy.float32)
     expected = reg.predict(X32)
-    got = sess.run(None, {'X': X32})[0].ravel()
-    got_split = sess_split.run(None, {'X': X32})[0].ravel()
+    got = sess.run(None, {"X": X32})[0].ravel()
+    got_split = sess_split.run(None, {"X": X32})[0].ravel()
 
     disp = numpy.abs(got - expected).sum()
     disp_split = numpy.abs(got_split - expected).sum()
 
     print("sum of discrepancies 1 node", disp)
-    print("sum of discrepancies split node",
-          disp_split, "ratio:", disp / disp_split)
+    print("sum of discrepancies split node", disp_split, "ratio:", disp / disp_split)
 
 
 
@@ -197,18 +223,18 @@ Discrepancies
 
  .. code-block:: none
 
-    sum of discrepancies 1 node 0.0002170055282193992
-    sum of discrepancies split node 4.3252795611109084e-05 ratio: 5.01714456033134
+    sum of discrepancies 1 node 0.00021466136283891635
+    sum of discrepancies split node 4.437120443243742e-05 ratio: 4.837852963080463
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-130
+.. GENERATED FROM PYTHON SOURCE LINES 143-145
 
 The sum of the discrepancies were reduced 4, 5 times.
 The maximum is much better too.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-137
+.. GENERATED FROM PYTHON SOURCE LINES 145-152
 
 .. code-block:: default
 
@@ -227,30 +253,32 @@ The maximum is much better too.
 
  .. code-block:: none
 
-    max discrepancies 1 node 1.7663594098493718e-06
-    max discrepancies split node 3.081887920419746e-07 ratio: 5.731420010915899
+    max discrepancies 1 node 2.4378910405964405e-06
+    max discrepancies split node 4.344075570372752e-07 ratio: 5.611990401877959
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-142
+.. GENERATED FROM PYTHON SOURCE LINES 153-157
 
 Processing time
 +++++++++++++++
 
 The processing time is slower but not much.
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-150
+.. GENERATED FROM PYTHON SOURCE LINES 157-167
 
 .. code-block:: default
 
 
-    print("processing time no split",
-          timeit.timeit(
-              lambda: sess.run(None, {'X': X32})[0], number=150))
-    print("processing time split",
-          timeit.timeit(
-              lambda: sess_split.run(None, {'X': X32})[0], number=150))
+    print(
+        "processing time no split",
+        timeit.timeit(lambda: sess.run(None, {"X": X32})[0], number=150),
+    )
+    print(
+        "processing time split",
+        timeit.timeit(lambda: sess_split.run(None, {"X": X32})[0], number=150),
+    )
 
 
 
@@ -260,13 +288,13 @@ The processing time is slower but not much.
 
  .. code-block:: none
 
-    processing time no split 2.637800576000245
-    processing time split 2.7089149429998542
+    processing time no split 3.964509700000235
+    processing time split 4.466033599999719
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-156
+.. GENERATED FROM PYTHON SOURCE LINES 168-173
 
 Split influence
 +++++++++++++++
@@ -274,22 +302,27 @@ Split influence
 Let's see how the sum of the discrepancies moves against
 the parameter *split*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-171
+.. GENERATED FROM PYTHON SOURCE LINES 173-193
 
 .. code-block:: default
 
 
     res = []
     for i in tqdm(list(range(20, 170, 20)) + [200, 300, 400, 500]):
-        model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32),
-                                   target_opset={'': 14, 'ai.onnx.ml': 2},
-                                   options={'split': i})
-        sess_split = InferenceSession(model_onnx_split.SerializeToString())
-        got_split = sess_split.run(None, {'X': X32})[0].ravel()
+        model_onnx_split = to_onnx(
+            reg,
+            X[:1].astype(numpy.float32),
+            target_opset={"": 14, "ai.onnx.ml": 2},
+            options={"split": i},
+        )
+        sess_split = InferenceSession(
+            model_onnx_split.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got_split = sess_split.run(None, {"X": X32})[0].ravel()
         disc_split = numpy.abs(got_split - expected).max()
         res.append(dict(split=i, disc=disc_split))
 
-    df = DataFrame(res).set_index('split')
+    df = DataFrame(res).set_index("split")
     df["baseline"] = disc
     print(df)
 
@@ -301,37 +334,38 @@ the parameter *split*.
 
  .. code-block:: none
 
-      0%|          | 0/12 [00:00<?, ?it/s]      8%|8         | 1/12 [00:02<00:27,  2.51s/it]     17%|#6        | 2/12 [00:04<00:22,  2.26s/it]     25%|##5       | 3/12 [00:06<00:19,  2.17s/it]     33%|###3      | 4/12 [00:08<00:17,  2.13s/it]     42%|####1     | 5/12 [00:11<00:16,  2.31s/it]     50%|#####     | 6/12 [00:13<00:14,  2.35s/it]     58%|#####8    | 7/12 [00:16<00:11,  2.31s/it]     67%|######6   | 8/12 [00:19<00:10,  2.54s/it]     75%|#######5  | 9/12 [00:21<00:07,  2.57s/it]     83%|########3 | 10/12 [00:24<00:05,  2.73s/it]     92%|#########1| 11/12 [00:27<00:02,  2.61s/it]    100%|##########| 12/12 [00:29<00:00,  2.47s/it]    100%|##########| 12/12 [00:29<00:00,  2.44s/it]
+      0%|          | 0/12 [00:00<?, ?it/s]      8%|▊         | 1/12 [00:02<00:30,  2.80s/it]     17%|█▋        | 2/12 [00:05<00:26,  2.67s/it]     25%|██▌       | 3/12 [00:07<00:22,  2.47s/it]     33%|███▎      | 4/12 [00:10<00:20,  2.51s/it]     42%|████▏     | 5/12 [00:13<00:18,  2.67s/it]     50%|█████     | 6/12 [00:15<00:15,  2.54s/it]     58%|█████▊    | 7/12 [00:17<00:12,  2.45s/it]     67%|██████▋   | 8/12 [00:20<00:09,  2.42s/it]     75%|███████▌  | 9/12 [00:22<00:07,  2.53s/it]     83%|████████▎ | 10/12 [00:24<00:04,  2.37s/it]     92%|█████████▏| 11/12 [00:26<00:02,  2.26s/it]    100%|██████████| 12/12 [00:29<00:00,  2.30s/it]    100%|██████████| 12/12 [00:29<00:00,  2.44s/it]
                    disc  baseline
     split                        
-    20     2.396380e-07  0.000002
-    40     2.127739e-07  0.000002
-    60     2.453829e-07  0.000002
-    80     3.785900e-07  0.000002
-    100    3.081888e-07  0.000002
-    120    3.457641e-07  0.000002
-    140    3.081888e-07  0.000002
-    160    4.130784e-07  0.000002
-    200    4.680156e-07  0.000002
-    300    6.390029e-07  0.000002
-    400    1.001937e-06  0.000002
-    500    1.001937e-06  0.000002
+    20     1.575103e-07  0.000002
+    40     3.037472e-07  0.000002
+    60     2.724040e-07  0.000002
+    80     3.189124e-07  0.000002
+    100    4.344076e-07  0.000002
+    120    4.277097e-07  0.000002
+    140    4.333597e-07  0.000002
+    160    6.661283e-07  0.000002
+    200    6.661283e-07  0.000002
+    300    8.337342e-07  0.000002
+    400    1.094292e-06  0.000002
+    500    1.333882e-06  0.000002
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-173
+.. GENERATED FROM PYTHON SOURCE LINES 194-195
 
 Graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-179
+.. GENERATED FROM PYTHON SOURCE LINES 195-202
 
 .. code-block:: default
 
     _, ax = plt.subplots(1, 1)
-    df.plot(title="Sum of discrepancies against split\n"
-                  "split = number of tree per node",
-            ax=ax)
+    df.plot(
+        title="Sum of discrepancies against split\n" "split = number of tree per node",
+        ax=ax,
+    )
 
     # plt.show()
 
@@ -349,7 +383,7 @@ Graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  39.867 seconds)
+   **Total running time of the script:** (0 minutes 44.260 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm_reg.py:
@@ -357,6 +391,8 @@ Graph.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

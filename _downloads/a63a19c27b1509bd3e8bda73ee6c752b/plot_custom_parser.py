@@ -33,9 +33,7 @@ from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from onnxconverter_common.onnx_ops import (
-    apply_identity, apply_cast, apply_greater
-)
+from onnxconverter_common.onnx_ops import apply_identity, apply_cast, apply_greater
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common._registration import get_shape_calculator
@@ -44,20 +42,20 @@ import matplotlib.pyplot as plt
 
 
 class ValidatorClassifier(BaseEstimator, ClassifierMixin):
-
     def __init__(self, estimator=None, threshold=0.75):
         ClassifierMixin.__init__(self)
         BaseEstimator.__init__(self)
         if estimator is None:
-            estimator = LogisticRegression(solver='liblinear')
+            estimator = LogisticRegression(solver="liblinear")
         self.estimator = estimator
         self.threshold = threshold
 
     def fit(self, X, y, sample_weight=None):
         sig = inspect.signature(self.estimator.fit)
-        if 'sample_weight' in sig.parameters:
+        if "sample_weight" in sig.parameters:
             self.estimator_ = clone(self.estimator).fit(
-                X, y, sample_weight=sample_weight)
+                X, y, sample_weight=sample_weight
+            )
         else:
             self.estimator_ = clone(self.estimator).fit(X, y)
         return self
@@ -97,8 +95,7 @@ print(model.validate(X_test))
 # to this new model.
 
 try:
-    to_onnx(model, X_train[:1].astype(np.float32),
-            target_opset=12)
+    to_onnx(model, X_train[:1].astype(np.float32), target_opset=12)
 except RuntimeError as e:
     print(e)
 
@@ -112,27 +109,27 @@ except RuntimeError as e:
 
 
 def validator_classifier_shape_calculator(operator):
-
     input0 = operator.inputs[0]  # inputs in ONNX graph
     outputs = operator.outputs  # outputs in ONNX graph
     op = operator.raw_operator  # scikit-learn model (mmust be fitted)
     if len(outputs) != 3:
         raise RuntimeError("3 outputs expected not {}.".format(len(outputs)))
 
-    N = input0.type.shape[0]                    # number of observations
-    C = op.estimator_.classes_.shape[0]         # dimension of outputs
+    N = input0.type.shape[0]  # number of observations
+    C = op.estimator_.classes_.shape[0]  # dimension of outputs
 
-    outputs[0].type = Int64TensorType([N])      # label
-    outputs[1].type = FloatTensorType([N, C])   # probabilities
-    outputs[2].type = Int64TensorType([C])      # validation
+    outputs[0].type = Int64TensorType([N])  # label
+    outputs[1].type = FloatTensorType([N, C])  # probabilities
+    outputs[2].type = Int64TensorType([C])  # validation
+
 
 #############################
 # Then the converter.
 
 
 def validator_classifier_converter(scope, operator, container):
-    outputs = operator.outputs      # outputs in ONNX graph
-    op = operator.raw_operator      # scikit-learn model (mmust be fitted)
+    outputs = operator.outputs  # outputs in ONNX graph
+    op = operator.raw_operator  # scikit-learn model (mmust be fitted)
 
     # We reuse existing converter and declare it
     # as a local operator.
@@ -142,8 +139,8 @@ def validator_classifier_converter(scope, operator, container):
     val_op.inputs = operator.inputs
 
     # We add an intermediate outputs.
-    val_label = scope.declare_local_variable('val_label', Int64TensorType())
-    val_prob = scope.declare_local_variable('val_prob', FloatTensorType())
+    val_label = scope.declare_local_variable("val_label", Int64TensorType())
+    val_prob = scope.declare_local_variable("val_prob", FloatTensorType())
     val_op.outputs.append(val_label)
     val_op.outputs.append(val_prob)
 
@@ -152,30 +149,36 @@ def validator_classifier_converter(scope, operator, container):
     shape_calc(val_op)
 
     # We now handle the validation.
-    val_max = scope.get_unique_variable_name('val_max')
+    val_max = scope.get_unique_variable_name("val_max")
     if container.target_opset >= 18:
-        axis_name = scope.get_unique_variable_name('axis')
-        container.add_initializer(
-            axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+        axis_name = scope.get_unique_variable_name("axis")
+        container.add_initializer(axis_name, onnx_proto.TensorProto.INT64, [1], [1])
         container.add_node(
-            'ReduceMax', [val_prob.full_name, axis_name], val_max,
-            name=scope.get_unique_operator_name('ReduceMax'),
-            keepdims=0)
+            "ReduceMax",
+            [val_prob.full_name, axis_name],
+            val_max,
+            name=scope.get_unique_operator_name("ReduceMax"),
+            keepdims=0,
+        )
     else:
         container.add_node(
-            'ReduceMax', val_prob.full_name, val_max,
-            name=scope.get_unique_operator_name('ReduceMax'),
-            axes=[1], keepdims=0)
+            "ReduceMax",
+            val_prob.full_name,
+            val_max,
+            name=scope.get_unique_operator_name("ReduceMax"),
+            axes=[1],
+            keepdims=0,
+        )
 
-    th_name = scope.get_unique_variable_name('threshold')
+    th_name = scope.get_unique_variable_name("threshold")
     container.add_initializer(
-        th_name, onnx_proto.TensorProto.FLOAT, [1], [op.threshold])
-    val_bin = scope.get_unique_variable_name('val_bin')
+        th_name, onnx_proto.TensorProto.FLOAT, [1], [op.threshold]
+    )
+    val_bin = scope.get_unique_variable_name("val_bin")
     apply_greater(scope, [val_max, th_name], val_bin, container)
 
-    val_val = scope.get_unique_variable_name('validate')
-    apply_cast(scope, val_bin, val_val, container,
-               to=onnx_proto.TensorProto.INT64)
+    val_val = scope.get_unique_variable_name("validate")
+    apply_cast(scope, val_bin, val_val, container, to=onnx_proto.TensorProto.INT64)
 
     # We finally link the intermediate output to the shared converter.
     apply_identity(scope, val_label.full_name, outputs[0].full_name, container)
@@ -187,16 +190,18 @@ def validator_classifier_converter(scope, operator, container):
 # Then the registration.
 
 
-update_registered_converter(ValidatorClassifier, 'CustomValidatorClassifier',
-                            validator_classifier_shape_calculator,
-                            validator_classifier_converter)
+update_registered_converter(
+    ValidatorClassifier,
+    "CustomValidatorClassifier",
+    validator_classifier_shape_calculator,
+    validator_classifier_converter,
+)
 
 ########################
 # And conversion...
 
 try:
-    to_onnx(model, X_test[:1].astype(np.float32),
-            target_opset=12)
+    to_onnx(model, X_test[:1].astype(np.float32), target_opset=12)
 except RuntimeError as e:
     print(e)
 
@@ -218,9 +223,9 @@ def validator_classifier_parser(scope, model, inputs, custom_parsers=None):
     this_operator.inputs.append(inputs[0])
 
     # outputs
-    val_label = scope.declare_local_variable('val_label', Int64TensorType())
-    val_prob = scope.declare_local_variable('val_prob', FloatTensorType())
-    val_val = scope.declare_local_variable('val_val', Int64TensorType())
+    val_label = scope.declare_local_variable("val_label", Int64TensorType())
+    val_prob = scope.declare_local_variable("val_prob", FloatTensorType())
+    val_val = scope.declare_local_variable("val_val", Int64TensorType())
     this_operator.outputs.append(val_label)
     this_operator.outputs.append(val_prob)
     this_operator.outputs.append(val_val)
@@ -228,20 +233,23 @@ def validator_classifier_parser(scope, model, inputs, custom_parsers=None):
     # end
     return this_operator.outputs
 
+
 ###############################
 # Registration.
 
 
-update_registered_converter(ValidatorClassifier, 'CustomValidatorClassifier',
-                            validator_classifier_shape_calculator,
-                            validator_classifier_converter,
-                            parser=validator_classifier_parser)
+update_registered_converter(
+    ValidatorClassifier,
+    "CustomValidatorClassifier",
+    validator_classifier_shape_calculator,
+    validator_classifier_converter,
+    parser=validator_classifier_parser,
+)
 
 #############################
 # And conversion again.
 
-model_onnx = to_onnx(model, X_test[:1].astype(np.float32),
-                     target_opset=12)
+model_onnx = to_onnx(model, X_test[:1].astype(np.float32), target_opset=12)
 
 #######################################
 # Final test
@@ -251,8 +259,10 @@ model_onnx = to_onnx(model, X_test[:1].astype(np.float32),
 
 X32 = X_test[:5].astype(np.float32)
 
-sess = rt.InferenceSession(model_onnx.SerializeToString())
-results = sess.run(None, {'X': X32})
+sess = rt.InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
+results = sess.run(None, {"X": X32})
 
 print("--labels--")
 print("sklearn", model.predict(X32))
@@ -271,17 +281,21 @@ print("onnx", results[2])
 # ++++++++++++++++++++++
 
 pydot_graph = GetPydotGraph(
-    model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
+    model_onnx.graph,
+    name=model_onnx.graph.name,
+    rankdir="TB",
     node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"))
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("validator_classifier.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng validator_classifier.dot')
+os.system("dot -O -Gdpi=300 -Tpng validator_classifier.dot")
 
 image = plt.imread("validator_classifier.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**

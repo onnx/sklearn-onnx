@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_kcustom_converter_wrapper.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_kcustom_converter_wrapper.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -42,12 +42,10 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-99
+.. GENERATED FROM PYTHON SOURCE LINES 28-97
 
 .. code-block:: default
 
-    from mlprodict.onnxrt import OnnxInference
-    from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
     import pickle
     from io import BytesIO
     import numpy
@@ -74,7 +72,7 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
         * `self.coef_`: square root of the coveriance matrix
         """
 
-        def __init__(self, alpha=0.):
+        def __init__(self, alpha=0.0):
             BaseEstimator.__init__(self)
             TransformerMixin.__init__(self)
             self.alpha = alpha
@@ -97,7 +95,7 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
         pred = dec.transform(X)
         cov = pred.T @ pred
         for i in range(cov.shape[0]):
-            cov[i, i] = 1.
+            cov[i, i] = 1.0
         assert_almost_equal(numpy.identity(4), cov)
 
         st = BytesIO()
@@ -134,14 +132,14 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-104
+.. GENERATED FROM PYTHON SOURCE LINES 98-102
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 Let's try to convert it and see what happens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-111
+.. GENERATED FROM PYTHON SOURCE LINES 102-109
 
 .. code-block:: default
 
@@ -177,7 +175,7 @@ Let's try to convert it and see what happens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-120
+.. GENERATED FROM PYTHON SOURCE LINES 110-118
 
 This error means there is no converter associated
 to *DecorrelateTransformer*. Let's do it.
@@ -188,7 +186,7 @@ First the shape calculator. We retrieve the input type
 add tells the output type has the same type,
 the same number of rows and a specific number of columns.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-130
+.. GENERATED FROM PYTHON SOURCE LINES 118-128
 
 .. code-block:: default
 
@@ -209,14 +207,14 @@ the same number of rows and a specific number of columns.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-135
+.. GENERATED FROM PYTHON SOURCE LINES 129-133
 
 The converter. One thing we need to pay attention to
 is the target opset. This information is important
 to make sure that every node is defined following the
 specifications of that opset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-151
+.. GENERATED FROM PYTHON SOURCE LINES 133-149
 
 .. code-block:: default
 
@@ -243,28 +241,30 @@ specifications of that opset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-153
+.. GENERATED FROM PYTHON SOURCE LINES 150-151
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-178
+.. GENERATED FROM PYTHON SOURCE LINES 151-178
 
 .. code-block:: default
 
 
 
     update_registered_converter(
-        DecorrelateTransformer, "SklearnDecorrelateTransformer",
+        DecorrelateTransformer,
+        "SklearnDecorrelateTransformer",
         decorrelate_transformer_shape_calculator,
-        decorrelate_transformer_converter)
+        decorrelate_transformer_converter,
+    )
 
 
     onx = to_onnx(dec, X.astype(numpy.float32))
 
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
     exp = dec.transform(X.astype(numpy.float32))
-    got = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+    got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
 
 
     def diff(p1, p2):
@@ -300,10 +300,10 @@ Let's check it works as well with double.
 
     onx = to_onnx(dec, X.astype(numpy.float64))
 
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
     exp = dec.transform(X.astype(numpy.float64))
-    got = sess.run(None, {'X': X.astype(numpy.float64)})[0]
+    got = sess.run(None, {"X": X.astype(numpy.float64)})[0]
     print(diff(exp, got))
 
 
@@ -323,36 +323,10 @@ Let's check it works as well with double.
 
 The differences are smaller with double as expected.
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-196
-
-Final graph
-+++++++++++
-
-.. GENERATED FROM PYTHON SOURCE LINES 196-201
-
-.. code-block:: default
-
-
-    oinf = OnnxInference(onx)
-    ax = plot_graphviz(oinf.to_dot())
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-
-
-.. image-sg:: /auto_tutorial/images/sphx_glr_plot_kcustom_converter_wrapper_001.png
-   :alt: plot kcustom converter wrapper
-   :srcset: /auto_tutorial/images/sphx_glr_plot_kcustom_converter_wrapper_001.png
-   :class: sphx-glr-single-img
-
-
-
-
-
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.499 seconds)
+   **Total running time of the script:** (0 minutes 0.056 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_kcustom_converter_wrapper.py:
@@ -360,6 +334,8 @@ Final graph
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

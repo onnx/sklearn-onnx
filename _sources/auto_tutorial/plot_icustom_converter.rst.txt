@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_icustom_converter.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_icustom_converter.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -48,12 +48,10 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-124
+.. GENERATED FROM PYTHON SOURCE LINES 34-121
 
 .. code-block:: default
 
-    from mlprodict.onnxrt import OnnxInference
-    from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
     import pickle
     from io import BytesIO
     import numpy
@@ -80,15 +78,14 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
         * `self.coef_`: square root of the coveriance matrix
         """
 
-        def __init__(self, alpha=0.):
+        def __init__(self, alpha=0.0):
             BaseEstimator.__init__(self)
             TransformerMixin.__init__(self)
             self.alpha = alpha
 
         def fit(self, X, y=None, sample_weights=None):
             if sample_weights is not None:
-                raise NotImplementedError(
-                    "sample_weights != None is not implemented.")
+                raise NotImplementedError("sample_weights != None is not implemented.")
             self.mean_ = numpy.mean(X, axis=0, keepdims=True)
             X = X - self.mean_
             V = X.T @ X / X.shape[0]
@@ -159,11 +156,11 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-126
+.. GENERATED FROM PYTHON SOURCE LINES 122-123
 
 Trained coefficients.
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-130
+.. GENERATED FROM PYTHON SOURCE LINES 123-127
 
 .. code-block:: default
 
@@ -188,14 +185,14 @@ Trained coefficients.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-135
+.. GENERATED FROM PYTHON SOURCE LINES 128-132
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 Let's try to convert it and see what happens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-142
+.. GENERATED FROM PYTHON SOURCE LINES 132-139
 
 .. code-block:: default
 
@@ -231,7 +228,7 @@ Let's try to convert it and see what happens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-151
+.. GENERATED FROM PYTHON SOURCE LINES 140-148
 
 This error means there is no converter associated
 to *DecorrelateTransformer*. Let's implement it.
@@ -242,7 +239,7 @@ First the shape calculator. We retrieve the input type
 add tells the output type has the same type,
 the same number of rows and a specific number of columns.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-164
+.. GENERATED FROM PYTHON SOURCE LINES 148-161
 
 .. code-block:: default
 
@@ -266,14 +263,14 @@ the same number of rows and a specific number of columns.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-169
+.. GENERATED FROM PYTHON SOURCE LINES 162-166
 
 The converter. One thing we need to pay attention to
 is the target opset. This information is important
 to make sure that every node is defined following the
 specifications of that opset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-194
+.. GENERATED FROM PYTHON SOURCE LINES 166-193
 
 .. code-block:: default
 
@@ -298,7 +295,9 @@ specifications of that opset.
         Y = OnnxMatMul(
             OnnxSub(X, op.mean_.astype(dtype), op_version=opv),
             op.coef_.astype(dtype),
-            op_version=opv, output_names=out[:1])
+            op_version=opv,
+            output_names=out[:1],
+        )
         Y.add_to(scope, container)
 
 
@@ -309,28 +308,30 @@ specifications of that opset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-196
+.. GENERATED FROM PYTHON SOURCE LINES 194-195
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-221
+.. GENERATED FROM PYTHON SOURCE LINES 195-222
 
 .. code-block:: default
 
 
 
     update_registered_converter(
-        DecorrelateTransformer, "SklearnDecorrelateTransformer",
+        DecorrelateTransformer,
+        "SklearnDecorrelateTransformer",
         decorrelate_transformer_shape_calculator,
-        decorrelate_transformer_converter)
+        decorrelate_transformer_converter,
+    )
 
 
     onx = to_onnx(dec, X.astype(numpy.float32))
 
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
     exp = dec.transform(X.astype(numpy.float32))
-    got = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+    got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
 
 
     def diff(p1, p2):
@@ -355,21 +356,21 @@ We need to let *skl2onnx* know about the new converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-223
+.. GENERATED FROM PYTHON SOURCE LINES 223-224
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-232
+.. GENERATED FROM PYTHON SOURCE LINES 224-233
 
 .. code-block:: default
 
 
     onx = to_onnx(dec, X.astype(numpy.float64))
 
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
     exp = dec.transform(X.astype(numpy.float64))
-    got = sess.run(None, {'X': X.astype(numpy.float64)})[0]
+    got = sess.run(None, {"X": X.astype(numpy.float64)})[0]
     print(diff(exp, got))
 
 
@@ -385,40 +386,14 @@ Let's check it works as well with double.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-234
+.. GENERATED FROM PYTHON SOURCE LINES 234-235
 
 The differences are smaller with double as expected.
-
-.. GENERATED FROM PYTHON SOURCE LINES 236-238
-
-Final graph
-+++++++++++
-
-.. GENERATED FROM PYTHON SOURCE LINES 238-243
-
-.. code-block:: default
-
-
-    oinf = OnnxInference(onx)
-    ax = plot_graphviz(oinf.to_dot())
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-
-
-.. image-sg:: /auto_tutorial/images/sphx_glr_plot_icustom_converter_001.png
-   :alt: plot icustom converter
-   :srcset: /auto_tutorial/images/sphx_glr_plot_icustom_converter_001.png
-   :class: sphx-glr-single-img
-
-
-
-
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.321 seconds)
+   **Total running time of the script:** (0 minutes 0.038 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_icustom_converter.py:
@@ -426,6 +401,8 @@ Final graph
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

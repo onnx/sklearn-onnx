@@ -27,4 +27,3 @@ used in the ONNX graph.
     auto_tutorial/plot_gbegin_cst
     auto_tutorial/plot_gbegin_dataframe
     auto_tutorial/plot_gconverting
-    auto_tutorial/plot_gbegin_transfer_learning

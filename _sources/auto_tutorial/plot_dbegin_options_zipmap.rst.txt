@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_dbegin_options_zipmap.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_dbegin_options_zipmap.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -86,8 +86,8 @@ dictionaries.
 .. code-block:: default
 
 
-    sess = rt.InferenceSession(onx.SerializeToString())
-    res = sess.run(None, {'X': X_test})
+    sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    res = sess.run(None, {"X": X_test})
     print(res[1][:2])
     print("probabilities type:", type(res[1]))
     print("type for the first observations:", type(res[1][0]))
@@ -100,7 +100,7 @@ dictionaries.
 
  .. code-block:: none
 
-    [{10: 0.02909434586763382, 12: 0.9069037437438965, 14: 0.06400192528963089}, {10: 0.001469946000725031, 12: 0.6960583329200745, 14: 0.30247175693511963}]
+    [{10: 0.9532986879348755, 12: 0.046700991690158844, 14: 2.392355042957206e-07}, {10: 9.972082715137276e-09, 12: 0.0012002107687294483, 14: 0.9987998008728027}]
     probabilities type: <class 'list'>
     type for the first observations: <class 'dict'>
 
@@ -114,17 +114,19 @@ Option zipmap=False
 
 Probabilities are now a matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-73
+.. GENERATED FROM PYTHON SOURCE LINES 62-75
 
 .. code-block:: default
 
 
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    options = {id(clr): {'zipmap': False}}
+    initial_type = [("float_input", FloatTensorType([None, 4]))]
+    options = {id(clr): {"zipmap": False}}
     onx2 = to_onnx(clr, X_train, options=options, target_opset=12)
 
-    sess2 = rt.InferenceSession(onx2.SerializeToString())
-    res2 = sess2.run(None, {'X': X_test})
+    sess2 = rt.InferenceSession(
+        onx2.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res2 = sess2.run(None, {"X": X_test})
     print(res2[1][:2])
     print("probabilities type:", type(res2[1]))
     print("type for the first observations:", type(res2[1][0]))
@@ -137,15 +139,15 @@ Probabilities are now a matrix.
 
  .. code-block:: none
 
-    [[0.02909435 0.90690374 0.06400193]
-     [0.00146995 0.69605833 0.30247176]]
+    [[9.5329869e-01 4.6700992e-02 2.3923550e-07]
+     [9.9720827e-09 1.2002108e-03 9.9879980e-01]]
     probabilities type: <class 'numpy.ndarray'>
     type for the first observations: <class 'numpy.ndarray'>
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-80
+.. GENERATED FROM PYTHON SOURCE LINES 76-82
 
 Option zipmap='columns'
 +++++++++++++++++++++++
@@ -154,19 +156,24 @@ This options removes the final operator ZipMap and splits
 the probabilities into columns. The final model produces
 one output for the label, and one output per class.
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-91
+.. GENERATED FROM PYTHON SOURCE LINES 82-98
 
 .. code-block:: default
 
 
-    options = {id(clr): {'zipmap': 'columns'}}
+    options = {id(clr): {"zipmap": "columns"}}
     onx3 = to_onnx(clr, X_train, options=options, target_opset=12)
 
-    sess3 = rt.InferenceSession(onx3.SerializeToString())
-    res3 = sess3.run(None, {'X': X_test})
+    sess3 = rt.InferenceSession(
+        onx3.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res3 = sess3.run(None, {"X": X_test})
     for i, out in enumerate(sess3.get_outputs()):
-        print("output: '{}' shape={} values={}...".format(
-            out.name, res3[i].shape, res3[i][:2]))
+        print(
+            "output: '{}' shape={} values={}...".format(
+                out.name, res3[i].shape, res3[i][:2]
+            )
+        )
 
 
 
@@ -177,35 +184,32 @@ one output for the label, and one output per class.
 
  .. code-block:: none
 
-    output: 'output_label' shape=(38,) values=[12 12]...
-    output: 'i10' shape=(38,) values=[0.02909435 0.00146995]...
-    output: 'i12' shape=(38,) values=[0.90690374 0.69605833]...
-    output: 'i14' shape=(38,) values=[0.06400193 0.30247176]...
+    output: 'output_label' shape=(38,) values=[10 14]...
+    output: 'i10' shape=(38,) values=[9.532987e-01 9.972083e-09]...
+    output: 'i12' shape=(38,) values=[0.04670099 0.00120021]...
+    output: 'i14' shape=(38,) values=[2.392355e-07 9.987998e-01]...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-94
+.. GENERATED FROM PYTHON SOURCE LINES 99-101
 
 Let's compare prediction time
 +++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-114
+.. GENERATED FROM PYTHON SOURCE LINES 101-118
 
 .. code-block:: default
 
 
     print("Average time with ZipMap:")
-    print(sum(repeat(lambda: sess.run(None, {'X': X_test}),
-                     number=100, repeat=10)) / 10)
+    print(sum(repeat(lambda: sess.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
     print("Average time without ZipMap:")
-    print(sum(repeat(lambda: sess2.run(None, {'X': X_test}),
-                     number=100, repeat=10)) / 10)
+    print(sum(repeat(lambda: sess2.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
     print("Average time without ZipMap but with columns:")
-    print(sum(repeat(lambda: sess3.run(None, {'X': X_test}),
-                     number=100, repeat=10)) / 10)
+    print(sum(repeat(lambda: sess3.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
     # The prediction is much faster without ZipMap
     # on this example.
@@ -223,16 +227,16 @@ Let's compare prediction time
  .. code-block:: none
 
     Average time with ZipMap:
-    0.003929830000015499
+    0.006968360000064422
     Average time without ZipMap:
-    0.0014273400999172737
+    0.0026670199999898614
     Average time without ZipMap but with columns:
-    0.002505180000025575
+    0.004141249999884166
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-122
+.. GENERATED FROM PYTHON SOURCE LINES 119-126
 
 Option zimpap=False and output_class_labels=True
 ++++++++++++++++++++++++++++++++++++++++++++++++
@@ -242,17 +246,19 @@ much faster but labels are lost in the process. Option
 `output_class_labels` can be used to expose the labels
 as a third output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-133
+.. GENERATED FROM PYTHON SOURCE LINES 126-139
 
 .. code-block:: default
 
 
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    options = {id(clr): {'zipmap': False, 'output_class_labels': True}}
+    initial_type = [("float_input", FloatTensorType([None, 4]))]
+    options = {id(clr): {"zipmap": False, "output_class_labels": True}}
     onx4 = to_onnx(clr, X_train, options=options, target_opset=12)
 
-    sess4 = rt.InferenceSession(onx4.SerializeToString())
-    res4 = sess4.run(None, {'X': X_test})
+    sess4 = rt.InferenceSession(
+        onx4.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res4 = sess4.run(None, {"X": X_test})
     print(res4[1][:2])
     print("probabilities type:", type(res4[1]))
     print("class labels:", res4[2])
@@ -265,26 +271,25 @@ as a third output.
 
  .. code-block:: none
 
-    [[0.02909435 0.90690374 0.06400193]
-     [0.00146995 0.69605833 0.30247176]]
+    [[9.5329869e-01 4.6700992e-02 2.3923550e-07]
+     [9.9720827e-09 1.2002108e-03 9.9879980e-01]]
     probabilities type: <class 'numpy.ndarray'>
     class labels: [10 12 14]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-135
+.. GENERATED FROM PYTHON SOURCE LINES 140-141
 
 Processing time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-140
+.. GENERATED FROM PYTHON SOURCE LINES 141-145
 
 .. code-block:: default
 
 
     print("Average time without ZipMap but with output_class_labels:")
-    print(sum(repeat(lambda: sess4.run(None, {'X': X_test}),
-                     number=100, repeat=10)) / 10)
+    print(sum(repeat(lambda: sess4.run(None, {"X": X_test}), number=100, repeat=10)) / 10)
 
 
 
@@ -295,12 +300,12 @@ Processing time.
  .. code-block:: none
 
     Average time without ZipMap but with output_class_labels:
-    0.002399530100001357
+    0.003581729999950767
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-148
+.. GENERATED FROM PYTHON SOURCE LINES 146-153
 
 MultiOutputClassifier
 +++++++++++++++++++++
@@ -310,7 +315,7 @@ to predict. Instead of returning a matrix of probabilities, it returns
 a sequence of matrices. Let's first modify the labels to get
 a problem for a MultiOutputClassifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-153
+.. GENERATED FROM PYTHON SOURCE LINES 153-158
 
 .. code-block:: default
 
@@ -336,11 +341,11 @@ a problem for a MultiOutputClassifier.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-155
+.. GENERATED FROM PYTHON SOURCE LINES 159-160
 
 Let's train a MultiOutputClassifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-167
+.. GENERATED FROM PYTHON SOURCE LINES 160-174
 
 .. code-block:: default
 
@@ -352,8 +357,10 @@ Let's train a MultiOutputClassifier.
 
     onx5 = to_onnx(clr, X_train, target_opset=12)
 
-    sess5 = rt.InferenceSession(onx5.SerializeToString())
-    res5 = sess5.run(None, {'X': X_test[:3]})
+    sess5 = rt.InferenceSession(
+        onx5.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res5 = sess5.run(None, {"X": X_test[:3]})
     print(res5)
 
 
@@ -365,35 +372,41 @@ Let's train a MultiOutputClassifier.
  .. code-block:: none
 
     MultiOutputClassifier(estimator=LogisticRegression(max_iter=500))
-    /home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py:529: UserWarning: Option zipmap is ignored for model <class 'sklearn.multioutput.MultiOutputClassifier'>. Set option zipmap to False to remove this message.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py:551: UserWarning: Option zipmap is ignored for model <class 'sklearn.multioutput.MultiOutputClassifier'>. Set option zipmap to False to remove this message.
       warnings.warn(
-    [array([[ 10, 110],
-           [ 10, 110],
-           [ 10, 110]], dtype=int64), [array([[9.5487159e-01, 4.5127936e-02, 4.7449998e-07],
-           [9.7273737e-01, 2.7262522e-02, 1.5831836e-07],
-           [9.6799171e-01, 3.2008070e-02, 2.2276080e-07]], dtype=float32), array([[7.2772932e-01, 8.8738047e-02, 1.0638156e-04, 1.8342626e-01],
-           [8.3462042e-01, 6.5695420e-02, 6.4909793e-05, 9.9619307e-02],
-           [7.9595613e-01, 6.4299725e-02, 6.8941692e-05, 1.3967523e-01]],
+    [array([[ 14, 114],
+           [ 12, 112],
+           [ 12, 112]], dtype=int64), [array([[1.5121835e-04, 1.6296931e-01, 8.3687949e-01],
+           [7.3818588e-03, 7.9895413e-01, 1.9366404e-01],
+           [4.2174147e-03, 8.5948825e-01, 1.3629435e-01]], dtype=float32), array([[4.0355229e-04, 1.9043219e-01, 5.6093395e-01, 2.4823032e-01],
+           [5.2199918e-03, 4.4712257e-01, 1.9140574e-01, 3.5625172e-01],
+           [3.1568978e-03, 5.7498026e-01, 1.5389088e-01, 2.6797205e-01]],
           dtype=float32)]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-170
+.. GENERATED FROM PYTHON SOURCE LINES 175-177
 
 Option zipmap is ignored. Labels are missing but they can be
 added back as a third output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-181
+.. GENERATED FROM PYTHON SOURCE LINES 177-194
 
 .. code-block:: default
 
 
-    onx6 = to_onnx(clr, X_train, target_opset=12,
-                   options={'zipmap': False, 'output_class_labels': True})
+    onx6 = to_onnx(
+        clr,
+        X_train,
+        target_opset=12,
+        options={"zipmap": False, "output_class_labels": True},
+    )
 
-    sess6 = rt.InferenceSession(onx6.SerializeToString())
-    res6 = sess6.run(None, {'X': X_test[:3]})
+    sess6 = rt.InferenceSession(
+        onx6.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res6 = sess6.run(None, {"X": X_test[:3]})
     print("predicted labels", res6[0])
     print("predicted probabilies", res6[1])
     print("class labels", res6[2])
@@ -407,25 +420,25 @@ added back as a third output.
 
  .. code-block:: none
 
-    predicted labels [[ 10 110]
-     [ 10 110]
-     [ 10 110]]
-    predicted probabilies [array([[9.5487159e-01, 4.5127936e-02, 4.7449998e-07],
-           [9.7273737e-01, 2.7262522e-02, 1.5831836e-07],
-           [9.6799171e-01, 3.2008070e-02, 2.2276080e-07]], dtype=float32), array([[7.2772932e-01, 8.8738047e-02, 1.0638156e-04, 1.8342626e-01],
-           [8.3462042e-01, 6.5695420e-02, 6.4909793e-05, 9.9619307e-02],
-           [7.9595613e-01, 6.4299725e-02, 6.8941692e-05, 1.3967523e-01]],
+    predicted labels [[ 14 114]
+     [ 12 112]
+     [ 12 112]]
+    predicted probabilies [array([[1.5121835e-04, 1.6296931e-01, 8.3687949e-01],
+           [7.3818588e-03, 7.9895413e-01, 1.9366404e-01],
+           [4.2174147e-03, 8.5948825e-01, 1.3629435e-01]], dtype=float32), array([[4.0355229e-04, 1.9043219e-01, 5.6093395e-01, 2.4823032e-01],
+           [5.2199918e-03, 4.4712257e-01, 1.9140574e-01, 3.5625172e-01],
+           [3.1568978e-03, 5.7498026e-01, 1.5389088e-01, 2.6797205e-01]],
           dtype=float32)]
     class labels [array([10, 12, 14], dtype=int64), array([ 110,  112,  114, 1000], dtype=int64)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-183
+.. GENERATED FROM PYTHON SOURCE LINES 195-196
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-189
+.. GENERATED FROM PYTHON SOURCE LINES 196-202
 
 .. code-block:: default
 
@@ -444,10 +457,10 @@ added back as a third output.
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -455,7 +468,7 @@ added back as a third output.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.267 seconds)
+   **Total running time of the script:** (0 minutes 0.467 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_zipmap.py:
@@ -463,6 +476,8 @@ added back as a third output.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

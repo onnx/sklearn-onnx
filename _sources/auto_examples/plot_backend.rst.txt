@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_backend.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_backend.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -89,25 +89,29 @@ Let's use ONNX backend API to test it.
 
 
     model = onnx.load(name)
-    rep = backend.prepare(model, 'CPU')
-    x = np.array([[-1.0, -2.0, 5.0, 6.0],
-                  [-1.0, -2.0, -3.0, -4.0],
-                  [-1.0, -2.0, 7.0, 8.0]],
-                 dtype=np.float32)
+    rep = backend.prepare(model, "CPU")
+    x = np.array(
+        [[-1.0, -2.0, 5.0, 6.0], [-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, 7.0, 8.0]],
+        dtype=np.float32,
+    )
     label, proba = rep.run(x)
     print("label={}".format(label))
     print("probabilities={}".format(proba))
 
 
 
-
-
 .. rst-class:: sphx-glr-script-out
 
- .. code-block:: none
+.. code-block:: pytb
 
-    label=[2 1 2]
-    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 0.04301583021879196, 1: 0.9569841623306274, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
+    Traceback (most recent call last):
+      File "/home/xadupre/github/sklearn-onnx/docs/examples/plot_backend.py", line 47, in <module>
+        rep = backend.prepare(model, "CPU")
+      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/backend/backend.py", line 143, in prepare
+        return cls.prepare(bin, device, **kwargs)
+      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/backend/backend.py", line 124, in prepare
+        raise RuntimeError(f"Incompatible device expected '{device}', got '{get_device()}'")
+    RuntimeError: Incompatible device expected 'CPU', got 'GPU'
 
 
 
@@ -124,18 +128,6 @@ GPU or CPU.
     print(get_device())
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    CPU
-
-
-
-
 .. GENERATED FROM PYTHON SOURCE LINES 62-64
 
 The backend can also directly load the model
@@ -146,27 +138,14 @@ without using *onnx*.
 .. code-block:: default
 
 
-    rep = backend.prepare(name, 'CPU')
-    x = np.array([[-1.0, -2.0, -3.0, -4.0],
-                  [-1.0, -2.0, -3.0, -4.0],
-                  [-1.0, -2.0, -3.0, -4.0]],
-                 dtype=np.float32)
+    rep = backend.prepare(name, "CPU")
+    x = np.array(
+        [[-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, -3.0, -4.0]],
+        dtype=np.float32,
+    )
     label, proba = rep.run(x)
     print("label={}".format(label))
     print("probabilities={}".format(proba))
-
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    label=[1 1 1]
-    probabilities=[{0: 0.04301583021879196, 1: 0.9569841623306274, 2: 0.0}, {0: 0.04301583021879196, 1: 0.9569841623306274, 2: 0.0}, {0: 0.04301583021879196, 1: 0.9569841623306274, 2: 0.0}]
-
-
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 75-78
@@ -191,25 +170,9 @@ with the same API.
     print("skl2onnx: ", skl2onnx.__version__)
 
 
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
-
-
-
-
-
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.112 seconds)
+   **Total running time of the script:** (0 minutes 3.261 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:
@@ -217,6 +180,8 @@ with the same API.
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

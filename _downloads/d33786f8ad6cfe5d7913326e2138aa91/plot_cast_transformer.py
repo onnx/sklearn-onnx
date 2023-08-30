@@ -30,7 +30,6 @@ based on the assumption ``(x / y)`` is usually different from
 """
 import onnxruntime
 import onnx
-import numpy
 import os
 import math
 import numpy as np
@@ -50,38 +49,32 @@ from skl2onnx import to_onnx
 # The weird data.
 
 X, y = make_regression(10000, 10, random_state=3)
-X_train, X_test, y_train, _ = train_test_split(
-    X, y, random_state=3)
+X_train, X_test, y_train, _ = train_test_split(X, y, random_state=3)
 Xi_train, yi_train = X_train.copy(), y_train.copy()
 Xi_test = X_test.copy()
 for i in range(X.shape[1]):
-    Xi_train[:, i] = (Xi_train[:, i] * math.pi * 2 ** i).astype(
-        np.int64)
-    Xi_test[:, i] = (Xi_test[:, i] * math.pi * 2 ** i).astype(
-        np.int64)
+    Xi_train[:, i] = (Xi_train[:, i] * math.pi * 2**i).astype(np.int64)
+    Xi_test[:, i] = (Xi_test[:, i] * math.pi * 2**i).astype(np.int64)
 max_depth = 10
 Xi_test = Xi_test.astype(np.float32)
 
 #################################
 # A simple model.
 
-model1 = Pipeline([
-    ('scaler', StandardScaler()),
-    ('dt', DecisionTreeRegressor(max_depth=max_depth))
-])
+model1 = Pipeline(
+    [("scaler", StandardScaler()), ("dt", DecisionTreeRegressor(max_depth=max_depth))]
+)
 model1.fit(Xi_train, yi_train)
 exp1 = model1.predict(Xi_test)
 
 #################################
 # Conversion into ONNX.
-onx1 = to_onnx(model1, X_train[:1].astype(np.float32),
-               target_opset=15)
-sess1 = InferenceSession(onx1.SerializeToString(),
-                         providers=["CPUExecutionProvider"])
+onx1 = to_onnx(model1, X_train[:1].astype(np.float32), target_opset=15)
+sess1 = InferenceSession(onx1.SerializeToString(), providers=["CPUExecutionProvider"])
 
 ###################################
 # And the maximum difference.
-got1 = sess1.run(None, {'X': Xi_test})[0]
+got1 = sess1.run(None, {"X": Xi_test})[0]
 
 
 def maxdiff(a1, a2):
@@ -96,17 +89,21 @@ print(md1)
 # The graph.
 
 pydot_graph = GetPydotGraph(
-    onx1.graph, name=onx1.graph.name, rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                    fillcolor="yellow", style="filled"))
+    onx1.graph,
+    name=onx1.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("cast1.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng cast1.dot')
+os.system("dot -O -Gdpi=300 -Tpng cast1.dot")
 
 image = plt.imread("cast1.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 ########################################
 # New pipeline
@@ -124,23 +121,27 @@ ax.axis('off')
 # `'div'`) and to use double by inserting an explicit
 # Cast.
 
-model2 = Pipeline([
-    ('cast64', CastTransformer(dtype=np.float64)),
-    ('scaler', StandardScaler()),
-    ('cast', CastTransformer()),
-    ('dt', DecisionTreeRegressor(max_depth=max_depth))
-])
+model2 = Pipeline(
+    [
+        ("cast64", CastTransformer(dtype=np.float64)),
+        ("scaler", StandardScaler()),
+        ("cast", CastTransformer()),
+        ("dt", DecisionTreeRegressor(max_depth=max_depth)),
+    ]
+)
 
 model2.fit(Xi_train, yi_train)
 exp2 = model2.predict(Xi_test)
 
-onx2 = to_onnx(model2, X_train[:1].astype(np.float32),
-               options={StandardScaler: {'div': 'div_cast'}},
-               target_opset=15)
+onx2 = to_onnx(
+    model2,
+    X_train[:1].astype(np.float32),
+    options={StandardScaler: {"div": "div_cast"}},
+    target_opset=15,
+)
 
-sess2 = InferenceSession(onx2.SerializeToString(),
-                         providers=["CPUExecutionProvider"])
-got2 = sess2.run(None, {'X': Xi_test})[0]
+sess2 = InferenceSession(onx2.SerializeToString(), providers=["CPUExecutionProvider"])
+got2 = sess2.run(None, {"X": Xi_test})[0]
 md2 = maxdiff(exp2, got2)
 
 print(md2)
@@ -149,25 +150,31 @@ print(md2)
 # The graph.
 
 pydot_graph = GetPydotGraph(
-    onx2.graph, name=onx2.graph.name, rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                    fillcolor="yellow", style="filled"))
+    onx2.graph,
+    name=onx2.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("cast2.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng cast2.dot')
+os.system("dot -O -Gdpi=300 -Tpng cast2.dot")
 
 image = plt.imread("cast2.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**
 
 import sklearn  # noqa
+
 print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
 import skl2onnx  # noqa
+
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)
 print("skl2onnx: ", skl2onnx.__version__)

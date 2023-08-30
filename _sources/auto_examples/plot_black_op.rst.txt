@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_black_op.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_black_op.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -66,7 +66,7 @@ of operators is for model *GaussianMixture*.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-3 {color: black;background-color: white;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GaussianMixture()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox" checked><label for="sk-estimator-id-7" class="sk-toggleable__label sk-toggleable__label-arrow">GaussianMixture</label><div class="sk-toggleable__content"><pre>GaussianMixture()</pre></div></div></div></div></div>
+    <style>#sk-container-id-3 {color: black;}#sk-container-id-3 pre{padding: 0;}#sk-container-id-3 div.sk-toggleable {background-color: white;}#sk-container-id-3 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-3 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-3 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-3 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-3 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-3 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-3 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-3 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-3 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-3 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-3 div.sk-item {position: relative;z-index: 1;}#sk-container-id-3 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-3 div.sk-item::before, #sk-container-id-3 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-3 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-3 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-3 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-3 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-3 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-3 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-3 div.sk-label-container {text-align: center;}#sk-container-id-3 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-3 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GaussianMixture()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox" checked><label for="sk-estimator-id-7" class="sk-toggleable__label sk-toggleable__label-arrow">GaussianMixture</label><div class="sk-toggleable__content"><pre>GaussianMixture()</pre></div></div></div></div></div>
     </div>
     <br />
     <br />
@@ -76,21 +76,24 @@ of operators is for model *GaussianMixture*.
 Default conversion
 ++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-57
+.. GENERATED FROM PYTHON SOURCE LINES 44-60
 
 .. code-block:: default
 
 
     model_onnx = to_onnx(
-        model, X_train[:1].astype(np.float32),
-        options={id(model): {'score_samples': True}},
-        target_opset=12)
-    sess = InferenceSession(model_onnx.SerializeToString(),
-                            providers=["CPUExecutionProvider"])
+        model,
+        X_train[:1].astype(np.float32),
+        options={id(model): {"score_samples": True}},
+        target_opset=12,
+    )
+    sess = InferenceSession(
+        model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
 
     xt = X_test[:5].astype(np.float32)
     print(model.score_samples(xt))
-    print(sess.run(None, {'X': xt})[2])
+    print(sess.run(None, {"X": xt})[2])
 
 
 
@@ -101,37 +104,41 @@ Default conversion
 
  .. code-block:: none
 
-    [-2.35262849 -1.77470989 -1.85001598 -3.50263433 -2.44689391]
-    [[-2.3526287]
-     [-1.7747092]
-     [-1.8500156]
-     [-3.5026336]
-     [-2.4468932]]
+    [-1.55507181 -1.88300778 -3.57222331 -1.67405519 -1.85984688]
+    [[-1.5550716]
+     [-1.8830082]
+     [-3.572221 ]
+     [-1.6740558]
+     [-1.8598464]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-59
+.. GENERATED FROM PYTHON SOURCE LINES 61-62
 
 Display the ONNX graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-74
+.. GENERATED FROM PYTHON SOURCE LINES 62-81
 
 .. code-block:: default
 
 
     pydot_graph = GetPydotGraph(
-        model_onnx.graph, name=model_onnx.graph.name, rankdir="TB",
-        node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                        fillcolor="yellow", style="filled"))
+        model_onnx.graph,
+        name=model_onnx.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer(
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
     pydot_graph.write_dot("mixture.dot")
 
-    os.system('dot -O -Gdpi=300 -Tpng mixture.dot')
+    os.system("dot -O -Gdpi=300 -Tpng mixture.dot")
 
     image = plt.imread("mixture.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
-    ax.axis('off')
+    ax.axis("off")
 
 
 
@@ -148,11 +155,11 @@ Display the ONNX graph.
  .. code-block:: none
 
 
-    (-0.5, 5287.5, 8425.5, -0.5)
+    (-0.5, 4796.5, 8425.5, -0.5)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-81
+.. GENERATED FROM PYTHON SOURCE LINES 82-88
 
 Conversion without ReduceLogSumExp
 ++++++++++++++++++++++++++++++++++
@@ -161,22 +168,25 @@ Parameter *black_op* is used to tell the converter
 not to use this operator. Let's see what the converter
 produces in that case.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-94
+.. GENERATED FROM PYTHON SOURCE LINES 88-104
 
 .. code-block:: default
 
 
     model_onnx2 = to_onnx(
-        model, X_train[:1].astype(np.float32),
-        options={id(model): {'score_samples': True}},
-        black_op={'ReduceLogSumExp'},
-        target_opset=12)
-    sess2 = InferenceSession(model_onnx2.SerializeToString(),
-                             providers=["CPUExecutionProvider"])
+        model,
+        X_train[:1].astype(np.float32),
+        options={id(model): {"score_samples": True}},
+        black_op={"ReduceLogSumExp"},
+        target_opset=12,
+    )
+    sess2 = InferenceSession(
+        model_onnx2.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
 
     xt = X_test[:5].astype(np.float32)
     print(model.score_samples(xt))
-    print(sess2.run(None, {'X': xt})[2])
+    print(sess2.run(None, {"X": xt})[2])
 
 
 
@@ -186,37 +196,41 @@ produces in that case.
 
  .. code-block:: none
 
-    [-2.35262849 -1.77470989 -1.85001598 -3.50263433 -2.44689391]
-    [[-2.3526287]
-     [-1.7747092]
-     [-1.8500156]
-     [-3.5026336]
-     [-2.4468932]]
+    [-1.55507181 -1.88300778 -3.57222331 -1.67405519 -1.85984688]
+    [[-1.5550716]
+     [-1.8830082]
+     [-3.5722215]
+     [-1.6740558]
+     [-1.8598464]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-96
+.. GENERATED FROM PYTHON SOURCE LINES 105-106
 
 Display the ONNX graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-111
+.. GENERATED FROM PYTHON SOURCE LINES 106-125
 
 .. code-block:: default
 
 
     pydot_graph = GetPydotGraph(
-        model_onnx2.graph, name=model_onnx2.graph.name, rankdir="TB",
-        node_producer=GetOpNodeProducer("docstring", color="yellow",
-                                        fillcolor="yellow", style="filled"))
+        model_onnx2.graph,
+        name=model_onnx2.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer(
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
     pydot_graph.write_dot("mixture2.dot")
 
-    os.system('dot -O -Gdpi=300 -Tpng mixture2.dot')
+    os.system("dot -O -Gdpi=300 -Tpng mixture2.dot")
 
     image = plt.imread("mixture2.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
     ax.imshow(image)
-    ax.axis('off')
+    ax.axis("off")
 
 
 
@@ -237,21 +251,29 @@ Display the ONNX graph.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-114
+.. GENERATED FROM PYTHON SOURCE LINES 126-128
 
 Processing time
 +++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-121
+.. GENERATED FROM PYTHON SOURCE LINES 128-143
 
 .. code-block:: default
 
 
-    print(timeit(stmt="sess.run(None, {'X': xt})",
-                 number=10000, globals={'sess': sess, 'xt': xt}))
+    print(
+        timeit(
+            stmt="sess.run(None, {'X': xt})", number=10000, globals={"sess": sess, "xt": xt}
+        )
+    )
 
-    print(timeit(stmt="sess2.run(None, {'X': xt})",
-                 number=10000, globals={'sess2': sess2, 'xt': xt}))
+    print(
+        timeit(
+            stmt="sess2.run(None, {'X': xt})",
+            number=10000,
+            globals={"sess2": sess2, "xt": xt},
+        )
+    )
 
 
 
@@ -261,17 +283,17 @@ Processing time
 
  .. code-block:: none
 
-    0.4812870999999177
-    0.8075209660000837
+    0.4618227000000843
+    0.5505055000000993
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-123
+.. GENERATED FROM PYTHON SOURCE LINES 144-145
 
 The model using ReduceLogSumExp is much faster.
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-132
+.. GENERATED FROM PYTHON SOURCE LINES 147-154
 
 If the converter cannot convert without...
 ++++++++++++++++++++++++++++++++++++++++++
@@ -281,19 +303,21 @@ of operators. If a converter fails to convert without using
 a blacklisted operator (or only whitelisted operators),
 *skl2onnx* raises an error.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-143
+.. GENERATED FROM PYTHON SOURCE LINES 154-167
 
 .. code-block:: default
 
 
     try:
         to_onnx(
-            model, X_train[:1].astype(np.float32),
-            options={id(model): {'score_samples': True}},
-            black_op={'ReduceLogSumExp', 'Add'},
-            target_opset=12)
+            model,
+            X_train[:1].astype(np.float32),
+            options={id(model): {"score_samples": True}},
+            black_op={"ReduceLogSumExp", "Add"},
+            target_opset=12,
+        )
     except RuntimeError as e:
-        print('Error:', e)
+        print("Error:", e)
 
 
 
@@ -309,19 +333,21 @@ a blacklisted operator (or only whitelisted operators),
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-145
+.. GENERATED FROM PYTHON SOURCE LINES 168-169
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-153
+.. GENERATED FROM PYTHON SOURCE LINES 169-179
 
 .. code-block:: default
 
 
     import sklearn  # noqa
+
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
     import skl2onnx  # noqa
+
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
     print("skl2onnx: ", skl2onnx.__version__)
@@ -334,10 +360,10 @@ a blacklisted operator (or only whitelisted operators),
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.15.0
 
 
 
@@ -345,7 +371,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  21.877 seconds)
+   **Total running time of the script:** (0 minutes 31.602 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_black_op.py:
@@ -353,6 +379,8 @@ a blacklisted operator (or only whitelisted operators),
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

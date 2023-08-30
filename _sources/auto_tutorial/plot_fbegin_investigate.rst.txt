@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -44,13 +44,12 @@ through every step of the pipeline. If the pipeline
 has *n* steps, it converts the pipeline with step 1,
 then the pipeline with steps 1, 2, then 1, 2, 3...
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-42
+.. GENERATED FROM PYTHON SOURCE LINES 30-41
 
 .. code-block:: default
 
-    from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
-    from mlprodict.onnxrt import OnnxInference
     import numpy
+    from onnx.reference import ReferenceEvaluator
     from onnxruntime import InferenceSession
     from sklearn.pipeline import Pipeline
     from sklearn.preprocessing import StandardScaler
@@ -67,11 +66,11 @@ then the pipeline with steps 1, 2, then 1, 2, 3...
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-44
+.. GENERATED FROM PYTHON SOURCE LINES 42-43
 
 The pipeline.
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-54
+.. GENERATED FROM PYTHON SOURCE LINES 43-50
 
 .. code-block:: default
 
@@ -79,10 +78,7 @@ The pipeline.
     data = load_iris()
     X = data.data
 
-    pipe = Pipeline(steps=[
-        ('std', StandardScaler()),
-        ('km', KMeans(3, n_init=3))
-    ])
+    pipe = Pipeline(steps=[("std", StandardScaler()), ("km", KMeans(3, n_init=3))])
     pipe.fit(X)
 
 
@@ -93,27 +89,26 @@ The pipeline.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-13 {color: black;background-color: white;}#sk-container-id-13 pre{padding: 0;}#sk-container-id-13 div.sk-toggleable {background-color: white;}#sk-container-id-13 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-13 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-13 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-13 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-13 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-13 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-13 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-13 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-13 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-13 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-13 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-13 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-13 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-13 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-13 div.sk-item {position: relative;z-index: 1;}#sk-container-id-13 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-13 div.sk-item::before, #sk-container-id-13 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-13 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-13 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-13 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-13 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-13 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-13 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-13 div.sk-label-container {text-align: center;}#sk-container-id-13 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-13 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-13" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+    <style>#sk-container-id-13 {color: black;}#sk-container-id-13 pre{padding: 0;}#sk-container-id-13 div.sk-toggleable {background-color: white;}#sk-container-id-13 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-13 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-13 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-13 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-13 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-13 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-13 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-13 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-13 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-13 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-13 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-13 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-13 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-13 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-13 div.sk-item {position: relative;z-index: 1;}#sk-container-id-13 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-13 div.sk-item::before, #sk-container-id-13 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-13 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-13 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-13 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-13 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-13 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-13 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-13 div.sk-label-container {text-align: center;}#sk-container-id-13 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-13 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-13" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
                     (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-43" type="checkbox" ><label for="sk-estimator-id-43" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
                     (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-45" type="checkbox" ><label for="sk-estimator-id-45" class="sk-toggleable__label sk-toggleable__label-arrow">KMeans</label><div class="sk-toggleable__content"><pre>KMeans(n_clusters=3, n_init=3)</pre></div></div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-58
+.. GENERATED FROM PYTHON SOURCE LINES 51-54
 
 The function goes through every step,
 overloads the methods *transform* and
 returns an ONNX graph for every step.
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-63
+.. GENERATED FROM PYTHON SOURCE LINES 54-58
 
 .. code-block:: default
 
     steps = collect_intermediate_steps(
-        pipe, "pipeline",
-        [("X", FloatTensorType([None, X.shape[1]]))],
-        target_opset=17)
+        pipe, "pipeline", [("X", FloatTensorType([None, X.shape[1]]))], target_opset=17
+    )
 
 
 
@@ -122,12 +117,12 @@ returns an ONNX graph for every step.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 We call method transform to population the
 cache the overloaded methods *transform* keeps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-68
+.. GENERATED FROM PYTHON SOURCE LINES 61-63
 
 .. code-block:: default
 
@@ -142,178 +137,179 @@ cache the overloaded methods *transform* keeps.
  .. code-block:: none
 
 
-    array([[3.97220157, 0.21295824, 3.12241924],
-           [3.99787307, 0.99604549, 2.67093263],
-           [4.17484361, 0.65198444, 2.97003927],
-           [4.1789179 , 0.9034561 , 2.87439521],
-           [4.09527298, 0.40215457, 3.30139711],
-           [3.88570212, 1.21154793, 3.51109541],
-           [4.19951064, 0.50244932, 3.14534167],
-           [3.95532767, 0.09132468, 2.99164562],
-           [4.38817034, 1.42174651, 2.91632391],
-           [4.03786574, 0.78993078, 2.79062164],
-           [3.90506362, 0.78999385, 3.3258656 ],
-           [4.06107053, 0.27618123, 3.04773291],
-           [4.14433414, 1.03497888, 2.80131879],
-           [4.61165831, 1.33482453, 3.20416659],
-           [4.13289816, 1.63865558, 3.89627182],
-           [4.48651213, 2.39898792, 4.50815311],
-           [4.01625262, 1.20748818, 3.61501306],
-           [3.89697041, 0.21618828, 3.05706539],
-           [3.71098466, 1.20986655, 3.35219798],
-           [4.086616  , 0.86706182, 3.50365186],
-           [3.64546316, 0.50401564, 2.81135074],
-           [3.93005961, 0.66826437, 3.28039115],
-           [4.49472411, 0.68658071, 3.58831498],
-           [3.56212928, 0.47945627, 2.55875855],
-           [3.97077425, 0.36345425, 2.96339957],
-           [3.86402575, 0.99023912, 2.5530338 ],
-           [3.77367018, 0.22683089, 2.82754129],
-           [3.87807792, 0.2947186 , 3.06173653],
-           [3.86275216, 0.25361098, 2.95552455],
-           [4.07994174, 0.65019824, 2.87333352],
-           [3.99861021, 0.80138328, 2.72803208],
-           [3.55568868, 0.52309257, 2.73641792],
-           [4.49114086, 1.57658655, 4.12348735],
-           [4.43501224, 1.87652483, 4.23530312],
-           [3.95950739, 0.76858489, 2.71091534],
-           [4.00072575, 0.54896332, 2.86311402],
-           [3.78300091, 0.63079314, 3.0615144 ],
-           [4.23490423, 0.45982568, 3.40343436],
-           [4.40153286, 1.2336976 , 2.99955514],
-           [3.89069251, 0.14580827, 2.95527858],
-           [3.9951345 , 0.20261743, 3.12357878],
-           [4.62328438, 2.67055552, 2.88854512],
-           [4.40353892, 0.90927099, 3.14807862],
-           [3.68912032, 0.50081008, 2.86147193],
-           [3.8939904 , 0.92159916, 3.34925913],
-           [3.99460105, 1.01946042, 2.64670109],
-           [4.12768297, 0.86953764, 3.53518427],
-           [4.21738173, 0.72275914, 2.99333175],
-           [3.95835329, 0.72324305, 3.34508059],
-           [3.95372786, 0.30295342, 2.90117552],
-           [0.93688791, 3.43619989, 1.92126695],
-           [0.97602613, 2.97232682, 1.43652719],
-           [0.70684331, 3.51850037, 1.70536445],
-           [2.68055347, 3.33264308, 0.9535028 ],
-           [1.0882743 , 3.35747592, 0.93174089],
-           [1.79517817, 2.77550662, 0.36129564],
-           [0.99454069, 3.01808184, 1.60954394],
-           [3.2941058 , 2.77360088, 1.4844702 ],
-           [1.11736796, 3.21148368, 1.13778849],
-           [2.41310146, 2.66294828, 0.76189431],
-           [3.71811095, 3.62389817, 1.95510958],
-           [1.44115032, 2.70011145, 0.78733906],
-           [2.72209616, 3.53658932, 1.25528011],
-           [1.26899484, 2.98813829, 0.68046933],
-           [2.03366801, 2.32311723, 0.7386478 ],
-           [0.96655433, 3.14311522, 1.48632293],
-           [1.66143984, 2.68234835, 0.80567208],
-           [2.1051166 , 2.63954211, 0.57184189],
-           [2.32028627, 3.97369206, 1.19832221],
-           [2.44625761, 2.87494798, 0.66720431],
-           [1.17881254, 3.03853641, 1.35243001],
-           [1.61047248, 2.8022861 , 0.54870182],
-           [1.63287534, 3.68305664, 0.80222733],
-           [1.52405623, 2.96833851, 0.59281379],
-           [1.27009395, 2.9760862 , 0.92691417],
-           [1.00782039, 3.13002382, 1.24582165],
-           [1.07063185, 3.56679427, 1.28841255],
-           [0.49696775, 3.5903606 , 1.44058261],
-           [1.32774484, 2.93839428, 0.60609916],
-           [2.42011876, 2.58203512, 0.75979573],
-           [2.67031866, 2.99796537, 0.88332283],
-           [2.74916442, 2.92597852, 0.97295414],
-           [2.00733004, 2.68907313, 0.39450078],
-           [1.40409915, 3.42215998, 0.55254609],
-           [1.87359817, 2.62771445, 0.90409172],
-           [1.38942931, 2.75915071, 1.72093827],
-           [0.75864765, 3.30075052, 1.50231003],
-           [2.18888648, 3.73017167, 1.06440319],
-           [1.85885082, 2.37943811, 0.82259848],
-           [2.39150476, 2.98789866, 0.58180763],
-           [2.24875062, 2.89079656, 0.47613928],
-           [1.23068597, 2.86642713, 0.86151719],
-           [2.0971052 , 2.86642575, 0.38623038],
-           [3.33176642, 2.96966239, 1.51536817],
-           [2.03396275, 2.77003779, 0.29666246],
-           [1.81194891, 2.38255534, 0.82460449],
-           [1.78545021, 2.55559903, 0.57017344],
-           [1.37597729, 2.8455521 , 0.74674716],
-           [3.04410524, 2.56987887, 1.27214703],
-           [1.8789993 , 2.64007308, 0.3839694 ],
-           [1.07518249, 4.24274589, 2.3231268 ],
-           [1.50664789, 3.57067982, 0.76586458],
-           [0.53503117, 4.44150237, 2.16460668],
-           [0.75898803, 3.69480186, 1.19079906],
-           [0.53772877, 4.11613683, 1.74890266],
-           [1.21258624, 5.03326801, 2.79880246],
-           [2.73154786, 3.3503222 , 1.20493915],
-           [0.92230348, 4.577021  , 2.26064879],
-           [1.39208869, 4.363498  , 1.51591765],
-           [1.50326811, 4.79334275, 3.24565892],
-           [0.4769421 , 3.62749566, 1.73398281],
-           [1.01951679, 3.89360823, 1.11653632],
-           [0.28300998, 4.1132966 , 1.8209098 ],
-           [1.90771307, 3.82688169, 0.94077286],
-           [1.49665868, 3.91538879, 1.39463942],
-           [0.69648261, 3.89835633, 1.91923245],
-           [0.44800197, 3.70128288, 1.41396325],
-           [2.11710726, 5.18341242, 3.87020286],
-           [1.8369882 , 5.58136629, 2.97188789],
-           [2.35409464, 4.02615768, 1.17309015],
-           [0.54832687, 4.31907679, 2.29006262],
-           [1.61278191, 3.4288432 , 0.90897245],
-           [1.47513288, 5.19031307, 2.79625003],
-           [1.14174615, 3.64273089, 0.86066075],
-           [0.53620233, 4.00723617, 2.1727675 ],
-           [0.67208548, 4.2637671 , 2.35489518],
-           [1.06663455, 3.45930032, 0.81175026],
-           [0.93494533, 3.27575645, 1.03569718],
-           [0.83553248, 4.05342943, 1.39558948],
-           [0.74854302, 4.1585729 , 2.05837295],
-           [1.07047627, 4.71100584, 2.30034327],
-           [2.18621697, 5.12224641, 3.90678521],
-           [0.87437682, 4.13401784, 1.48399598],
-           [1.0947599 , 3.39830644, 0.81512611],
-           [1.58049956, 3.63719075, 0.81393069],
-           [1.27157117, 5.08776655, 2.87804494],
-           [1.08615557, 4.00416552, 2.32144511],
-           [0.50258278, 3.58815834, 1.4859412 ],
-           [1.0625801 , 3.19454679, 0.98183333],
-           [0.24502791, 4.09907253, 1.9903383 ],
-           [0.59235157, 4.28416057, 2.0929821 ],
-           [0.52380862, 4.17402084, 2.08177428],
-           [1.50664789, 3.57067982, 0.76586458],
-           [0.56488438, 4.32128686, 2.26218919],
-           [0.87242105, 4.3480018 , 2.43867573],
-           [0.53197842, 4.1240495 , 1.84004429],
-           [1.50771114, 3.97564407, 1.03723854],
-           [0.43328422, 3.7539635 , 1.46435048],
-           [1.09439379, 3.7969924 , 2.186898  ],
-           [1.12558627, 3.25638099, 1.0145515 ]])
+    array([[3.12119834, 0.21295824, 3.98940603],
+           [2.6755083 , 0.99604549, 4.01793312],
+           [2.97416665, 0.65198444, 4.19343668],
+           [2.88014429, 0.9034561 , 4.19784749],
+           [3.30022609, 0.40215457, 4.11157152],
+           [3.50554424, 1.21154793, 3.89893116],
+           [3.14856384, 0.50244932, 4.21638048],
+           [2.99184826, 0.09132468, 3.97313411],
+           [2.92515933, 1.42174651, 4.40757189],
+           [2.79398956, 0.78993078, 4.05764261],
+           [3.32125333, 0.78999385, 3.92088109],
+           [3.0493632 , 0.27618123, 4.07853631],
+           [2.80635045, 1.03497888, 4.16440431],
+           [3.21220972, 1.33482453, 4.63069748],
+           [3.88834965, 1.63865558, 4.14619343],
+           [4.4998303 , 2.39898792, 4.49547518],
+           [3.60978017, 1.20748818, 4.02966144],
+           [3.05594182, 0.21618828, 3.91388548],
+           [3.34493953, 1.20986655, 3.72562039],
+           [3.50065397, 0.86706182, 4.10101938],
+           [2.80825681, 0.50401564, 3.66383713],
+           [3.27800809, 0.66826437, 3.94496718],
+           [3.58990876, 0.68658071, 4.51061335],
+           [2.55934697, 0.47945627, 3.57996434],
+           [2.96493153, 0.36345425, 3.98817445],
+           [2.55682739, 0.99023912, 3.88431906],
+           [2.8279719 , 0.22683089, 3.79088782],
+           [3.05970831, 0.2947186 , 3.89539875],
+           [2.95425291, 0.25361098, 3.88085622],
+           [2.87745051, 0.65019824, 4.09851673],
+           [2.73238773, 0.80138328, 4.01796142],
+           [2.73361981, 0.52309257, 3.57350896],
+           [4.11853014, 1.57658655, 4.5037664 ],
+           [4.22845606, 1.87652483, 4.4465301 ],
+           [2.71452112, 0.76858489, 3.97906378],
+           [2.86508665, 0.54896332, 4.01986385],
+           [3.0573692 , 0.63079314, 3.80064093],
+           [3.40284985, 0.45982568, 4.25136846],
+           [3.00742655, 1.2336976 , 4.42052558],
+           [2.95472117, 0.14580827, 3.90865188],
+           [3.12324651, 0.20261743, 4.01192633],
+           [2.90164193, 2.67055552, 4.64398605],
+           [3.15411688, 0.90927099, 4.42154566],
+           [2.8613548 , 0.50081008, 3.70483773],
+           [3.34606471, 0.92159916, 3.9078554 ],
+           [2.65231058, 1.01946042, 4.01421067],
+           [3.53206587, 0.86953764, 4.14238152],
+           [2.99813103, 0.72275914, 4.23577398],
+           [3.34116935, 0.72324305, 3.97409784],
+           [2.90222887, 0.30295342, 3.97223984],
+           [1.9003878 , 3.43619989, 0.95288059],
+           [1.41851492, 2.97232682, 0.99352148],
+           [1.68457079, 3.51850037, 0.72661726],
+           [0.96940962, 3.33264308, 2.69898424],
+           [0.9112523 , 3.35747592, 1.11074501],
+           [0.35721918, 2.77550662, 1.8143491 ],
+           [1.59351202, 3.01808184, 1.00650285],
+           [1.50213315, 2.77360088, 3.31296552],
+           [1.11632078, 3.21148368, 1.14114175],
+           [0.77921299, 2.66294828, 2.42994048],
+           [1.97194958, 3.62389817, 3.73666782],
+           [0.77530513, 2.70011145, 1.45918639],
+           [1.25941769, 3.53658932, 2.74268279],
+           [0.66155141, 2.98813829, 1.28976474],
+           [0.73833453, 2.32311723, 2.05251547],
+           [1.46572707, 3.14311522, 0.98780965],
+           [0.80185102, 2.68234835, 1.67700171],
+           [0.568386  , 2.63954211, 2.12682734],
+           [1.19987895, 3.97369206, 2.33743839],
+           [0.67881532, 2.87494798, 2.46667974],
+           [1.34222961, 3.03853641, 1.1880022 ],
+           [0.53061062, 2.8022861 , 1.63233668],
+           [0.79234309, 3.68305664, 1.65142259],
+           [0.57371215, 2.96833851, 1.54593744],
+           [0.90589785, 2.9760862 , 1.2933375 ],
+           [1.22490527, 3.13002382, 1.03085926],
+           [1.26783271, 3.56679427, 1.09304603],
+           [1.42114042, 3.5903606 , 0.52050254],
+           [0.58974672, 2.93839428, 1.34712856],
+           [0.76432091, 2.58203512, 2.44164622],
+           [0.89738242, 2.99796537, 2.69027665],
+           [0.98549851, 2.92597852, 2.76965187],
+           [0.3921368 , 2.68907313, 2.02829879],
+           [0.54223583, 3.42215998, 1.4211892 ],
+           [0.90567816, 2.62771445, 1.88799766],
+           [1.70872911, 2.75915071, 1.39853465],
+           [1.48190142, 3.30075052, 0.78009974],
+           [1.06129323, 3.73017167, 2.2083069 ],
+           [0.81863359, 2.37943811, 1.87666989],
+           [0.599882  , 2.98789866, 2.41035271],
+           [0.4914813 , 2.89079656, 2.26782134],
+           [0.84409423, 2.86642713, 1.25085451],
+           [0.38941349, 2.86642575, 2.11791607],
+           [1.53271026, 2.96966239, 3.35089399],
+           [0.30831638, 2.77003779, 2.05312152],
+           [0.81726253, 2.38255534, 1.83091351],
+           [0.56428027, 2.55559903, 1.80454586],
+           [0.72672271, 2.8455521 , 1.39825227],
+           [1.28805849, 2.56987887, 3.06324547],
+           [0.38163798, 2.64007308, 1.89861511],
+           [2.31271244, 4.24274589, 1.0584579 ],
+           [0.76585766, 3.57067982, 1.5185265 ],
+           [2.14762671, 4.44150237, 0.52472   ],
+           [1.17645413, 3.69480186, 0.77236486],
+           [1.73594932, 4.11613683, 0.53031563],
+           [2.78128346, 5.03326801, 1.2022172 ],
+           [1.22550604, 3.3503222 , 2.74462238],
+           [2.2426558 , 4.577021  , 0.92275933],
+           [1.50462864, 4.363498  , 1.40314162],
+           [3.22975724, 4.79334275, 1.48323372],
+           [1.71837714, 3.62749566, 0.4787491 ],
+           [1.10409694, 3.89360823, 1.0325986 ],
+           [1.80475907, 4.1132966 , 0.27818948],
+           [0.94858807, 3.82688169, 1.91870424],
+           [1.39433359, 3.91538879, 1.49910975],
+           [1.90677079, 3.89835633, 0.68622715],
+           [1.39713702, 3.70128288, 0.46463058],
+           [3.85224062, 5.18341242, 2.10127163],
+           [2.95786451, 5.58136629, 1.83092395],
+           [1.17790381, 4.02615768, 2.37017622],
+           [2.27442972, 4.31907679, 0.52540209],
+           [0.91211061, 3.4288432 , 1.62249456],
+           [2.77937737, 5.19031307, 1.47042293],
+           [0.84735471, 3.64273089, 1.15814207],
+           [2.15695444, 4.00723617, 0.520093  ],
+           [2.33581345, 4.2637671 , 0.66660166],
+           [0.79774043, 3.45930032, 1.08324891],
+           [1.022307  , 3.27575645, 0.94925151],
+           [1.3842265 , 4.05342943, 0.84098317],
+           [2.03854964, 4.1585729 , 0.75748198],
+           [2.28297732, 4.71100584, 1.07124861],
+           [3.88774921, 5.12224641, 2.17345728],
+           [1.47357101, 4.13401784, 0.87682321],
+           [0.7964005 , 3.39830644, 1.11534598],
+           [0.80521086, 3.63719075, 1.59782917],
+           [2.8607372 , 5.08776655, 1.25982873],
+           [2.3101089 , 4.00416552, 1.07214028],
+           [1.46990247, 3.58815834, 0.51434392],
+           [0.97017134, 3.19454679, 1.0762733 ],
+           [1.97333575, 4.09907253, 0.23050145],
+           [2.07939567, 4.28416057, 0.57373487],
+           [2.06609741, 4.17402084, 0.51130902],
+           [0.76585766, 3.57067982, 1.5185265 ],
+           [2.24723796, 4.32128686, 0.54141867],
+           [2.42521977, 4.3480018 , 0.85128501],
+           [1.82594618, 4.1240495 , 0.52475835],
+           [1.03093862, 3.97564407, 1.52100812],
+           [1.44892686, 3.7539635 , 0.44371189],
+           [2.17585453, 3.7969924 , 1.08437101],
+           [1.00508668, 3.25638099, 1.13739231]])
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-71
+.. GENERATED FROM PYTHON SOURCE LINES 64-66
 
 We compute every step and compare
 ONNX and scikit-learn outputs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-92
+.. GENERATED FROM PYTHON SOURCE LINES 66-88
 
 .. code-block:: default
 
 
     for step in steps:
-        print('----------------------------')
-        print(step['model'])
-        onnx_step = step['onnx_step']
-        sess = InferenceSession(onnx_step.SerializeToString(),
-                                providers=["CPUExecutionProvider"])
-        onnx_outputs = sess.run(None, {'X': X.astype(numpy.float32)})
+        print("----------------------------")
+        print(step["model"])
+        onnx_step = step["onnx_step"]
+        sess = InferenceSession(
+            onnx_step.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        onnx_outputs = sess.run(None, {"X": X.astype(numpy.float32)})
         onnx_output = onnx_outputs[-1]
-        skl_outputs = step['model']._debug.outputs['transform']
+        skl_outputs = step["model"]._debug.outputs["transform"]
 
         # comparison
         diff = numpy.abs(skl_outputs.ravel() - onnx_output.ravel()).max()
@@ -343,7 +339,7 @@ ONNX and scikit-learn outputs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-100
+.. GENERATED FROM PYTHON SOURCE LINES 89-96
 
 Python runtime to look into every node
 ++++++++++++++++++++++++++++++++++++++
@@ -353,18 +349,16 @@ into every node of the ONNX graph.
 This option can be used to check when the computation
 fails due to nan values or a dimension mismatch.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-109
+.. GENERATED FROM PYTHON SOURCE LINES 96-103
 
 .. code-block:: default
 
 
 
-    onx = to_onnx(pipe, X[:1].astype(numpy.float32),
-                  target_opset=17)
+    onx = to_onnx(pipe, X[:1].astype(numpy.float32), target_opset=17)
 
-    oinf = OnnxInference(onx)
-    oinf.run({'X': X[:2].astype(numpy.float32)},
-             verbose=1, fLOG=print)
+    oinf = ReferenceEvaluator(onx, verbose=1)
+    oinf.run(None, {"X": X[:2].astype(numpy.float32)})
 
 
 
@@ -374,47 +368,26 @@ fails due to nan values or a dimension mismatch.
 
  .. code-block:: none
 
-    +ki='Ad_Addcst': (3,) (dtype=float32 min=1.0029560327529907 max=5.035177230834961)
-    +ki='Ge_Gemmcst': (3, 4) (dtype=float32 min=-1.3049873113632202 max=1.131404995918274)
-    +ki='Mu_Mulcst': (1,) (dtype=float32 min=0.0 max=0.0)
-    -- OnnxInference: run 8 nodes with 1 inputs
-    Onnx-Scaler(X) -> variable    (name='Scaler')
-    +kr='variable': (2, 4) (dtype=float32 min=-1.340226411819458 max=1.0190045833587646)
-    Onnx-ReduceSumSquare(variable) -> Re_reduced0    (name='Re_ReduceSumSquare')
-    +kr='Re_reduced0': (2, 1) (dtype=float32 min=4.850505828857422 max=5.376197338104248)
-    Onnx-Mul(Re_reduced0, Mu_Mulcst) -> Mu_C0    (name='Mu_Mul')
-    +kr='Mu_C0': (2, 1) (dtype=float32 min=0.0 max=0.0)
-    Onnx-Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0    (name='Ge_Gemm')
-    +kr='Ge_Y0': (2, 3) (dtype=float32 min=-10.366023063659668 max=7.877023220062256)
-    Onnx-Add(Re_reduced0, Ge_Y0) -> Ad_C01    (name='Ad_Add')
-    +kr='Ad_C01': (2, 3) (dtype=float32 min=-4.98982572555542 max=12.727529525756836)
-    Onnx-Add(Ad_Addcst, Ad_C01) -> Ad_C0    (name='Ad_Add1')
-    +kr='Ad_C0': (2, 3) (dtype=float32 min=0.045351505279541016 max=15.982987403869629)
-    Onnx-ArgMin(Ad_C0) -> label    (name='Ar_ArgMin')
-    +kr='label': (2,) (dtype=int64 min=1 max=1)
-    Onnx-Sqrt(Ad_C0) -> scores    (name='Sq_Sqrt')
-    +kr='scores': (2, 3) (dtype=float32 min=0.2129589319229126 max=3.997872829437256)
 
-    {'label': array([1, 1]), 'scores': array([[3.9722016 , 0.21295893, 3.1224194 ],
-           [3.9978728 , 0.99604493, 2.6709325 ]], dtype=float32)}
+    [array([1, 1]), array([[3.1211984 , 0.21295893, 3.9894059 ],
+           [2.675508  , 0.99604493, 4.017933  ]], dtype=float32)]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-111
+.. GENERATED FROM PYTHON SOURCE LINES 104-105
 
 And to get a sense of the intermediate results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-118
+.. GENERATED FROM PYTHON SOURCE LINES 105-111
 
 .. code-block:: default
 
 
-    oinf.run({'X': X[:2].astype(numpy.float32)},
-             verbose=3, fLOG=print)
+    oinf = ReferenceEvaluator(onx, verbose=3)
+    oinf.run(None, {"X": X[:2].astype(numpy.float32)})
 
     # This way is usually better if you need to investigate
     # issues within the code of the runtime for an operator.
-    #
 
 
 
@@ -423,84 +396,36 @@ And to get a sense of the intermediate results.
 
  .. code-block:: none
 
-    +ki='Ad_Addcst': (3,) (dtype=float32 min=1.0029560327529907 max=5.035177230834961
-    [3.255458 5.035177 1.002956]
-    +ki='Ge_Gemmcst': (3, 4) (dtype=float32 min=-1.3049873113632202 max=1.131404995918274
-    [[ 1.131405    0.07903422  0.98537153  0.9990883 ]
-     [-1.0145789   0.85326266 -1.3049873  -1.2548935 ]
-     [-0.06881714 -0.89339954  0.3452218   0.284393  ]]
-    +ki='Mu_Mulcst': (1,) (dtype=float32 min=0.0 max=0.0
-    [0.]
-    -kv='X' shape=(2, 4) dtype=float32 min=0.20000000298023224 max=5.099999904632568
-    -- OnnxInference: run 8 nodes with 1 inputs
-    Onnx-Scaler(X) -> variable    (name='Scaler')
-    +kr='variable': (2, 4) (dtype=float32 min=-1.340226411819458 max=1.0190045833587646)
-    [[-0.9006812   1.0190046  -1.3402264  -1.3154442 ]
-     [-1.1430167  -0.13197924 -1.3402264  -1.3154442 ]]
-    Onnx-ReduceSumSquare(variable) -> Re_reduced0    (name='Re_ReduceSumSquare')
-    +kr='Re_reduced0': (2, 1) (dtype=float32 min=4.850505828857422 max=5.376197338104248)
-    [[5.3761973]
-     [4.850506 ]]
-    Onnx-Mul(Re_reduced0, Mu_Mulcst) -> Mu_C0    (name='Mu_Mul')
-    +kr='Mu_C0': (2, 1) (dtype=float32 min=0.0 max=0.0)
-    [[0.]
-     [0.]]
-    Onnx-Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0    (name='Ge_Gemm')
-    +kr='Ge_Y0': (2, 3) (dtype=float32 min=-10.366023063659668 max=7.877023220062256)
-    [[  7.14673   -10.366023    3.370349 ]
-     [  7.877023   -8.893578    1.2804183]]
-    Onnx-Add(Re_reduced0, Ge_Y0) -> Ad_C01    (name='Ad_Add')
-    +kr='Ad_C01': (2, 3) (dtype=float32 min=-4.98982572555542 max=12.727529525756836)
-    [[12.522927  -4.9898257  8.746546 ]
-     [12.72753   -4.0430717  6.130924 ]]
-    Onnx-Add(Ad_Addcst, Ad_C01) -> Ad_C0    (name='Ad_Add1')
-    +kr='Ad_C0': (2, 3) (dtype=float32 min=0.045351505279541016 max=15.982987403869629)
-    [[15.778385    0.04535151  9.749502  ]
-     [15.982987    0.9921055   7.13388   ]]
-    Onnx-ArgMin(Ad_C0) -> label    (name='Ar_ArgMin')
-    +kr='label': (2,) (dtype=int64 min=1 max=1)
-    [1 1]
-    Onnx-Sqrt(Ad_C0) -> scores    (name='Sq_Sqrt')
-    +kr='scores': (2, 3) (dtype=float32 min=0.2129589319229126 max=3.997872829437256)
-    [[3.9722016  0.21295893 3.1224194 ]
-     [3.9978728  0.99604493 2.6709325 ]]
-    [VALIDATE] type <class 'onnx.onnx_ml_pb2.ModelProto'>
-    [VALIDATE] mis={}
+     +C Ad_Addcst: float32:(3,) in [0.9830552339553833, 5.035177230834961]
+     +C Ge_Gemmcst: float32:(3, 4) in [-1.3049873113632202, 1.1359702348709106]
+     +C Mu_Mulcst: float32:(1,) in [0.0, 0.0]
+     +I X: float32:(2, 4) in [0.20000000298023224, 5.099999904632568]
+    Scaler(X) -> variable
+     + variable: float32:(2, 4) in [-1.340226411819458, 1.0190045833587646]
+    ReduceSumSquare(variable) -> Re_reduced0
+     + Re_reduced0: float32:(2, 1) in [4.850505828857422, 5.376197338104248]
+    Mul(Re_reduced0, Mu_Mulcst) -> Mu_C0
+     + Mu_C0: float32:(2, 1) in [0.0, 0.0]
+    Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0
+     + Ge_Y0: float32:(2, 3) in [-10.366023063659668, 7.967348575592041]
+    Add(Re_reduced0, Ge_Y0) -> Ad_C01
+     + Ad_C01: float32:(2, 3) in [-4.98982572555542, 12.817853927612305]
+    Add(Ad_Addcst, Ad_C01) -> Ad_C0
+     + Ad_C0: float32:(2, 3) in [0.045351505279541016, 16.143783569335938]
+    ArgMin(Ad_C0) -> label
+     + label: int64:(2,) in [1, 1]
+    Sqrt(Ad_C0) -> scores
+     + scores: float32:(2, 3) in [0.2129589319229126, 4.017932891845703]
 
-    {'label': array([1, 1]), 'scores': array([[3.9722016 , 0.21295893, 3.1224194 ],
-           [3.9978728 , 0.99604493, 2.6709325 ]], dtype=float32)}
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 119-121
-
-Final graph
-+++++++++++
-
-.. GENERATED FROM PYTHON SOURCE LINES 121-125
-
-.. code-block:: default
-
-
-    ax = plot_graphviz(oinf.to_dot())
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
-
-
-
-.. image-sg:: /auto_tutorial/images/sphx_glr_plot_fbegin_investigate_001.png
-   :alt: plot fbegin investigate
-   :srcset: /auto_tutorial/images/sphx_glr_plot_fbegin_investigate_001.png
-   :class: sphx-glr-single-img
-
-
+    [array([1, 1]), array([[3.1211984 , 0.21295893, 3.9894059 ],
+           [2.675508  , 0.99604493, 4.017933  ]], dtype=float32)]
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.505 seconds)
+   **Total running time of the script:** (0 minutes 0.291 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py:
@@ -508,6 +433,8 @@ Final graph
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

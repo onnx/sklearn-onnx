@@ -37,9 +37,8 @@ clr = LogisticRegression(max_iter=500)
 clr.fit(X_train, y_train)
 print(clr)
 
-initial_type = [('float_input', FloatTensorType([None, 4]))]
-onx = convert_sklearn(clr, initial_types=initial_type,
-                      target_opset=12)
+initial_type = [("float_input", FloatTensorType([None, 4]))]
+onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
 ############################
 # Output type
@@ -48,9 +47,8 @@ onx = convert_sklearn(clr, initial_types=initial_type,
 # Let's confirm the output type of the probabilities
 # is a list of dictionaries with onnxruntime.
 
-sess = rt.InferenceSession(onx.SerializeToString(),
-                           providers=["CPUExecutionProvider"])
-res = sess.run(None, {'float_input': X_test.astype(numpy.float32)})
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+res = sess.run(None, {"float_input": X_test.astype(numpy.float32)})
 print("skl", clr.predict_proba(X_test[:1]))
 print("onnx", res[1][:2])
 
@@ -59,14 +57,16 @@ print("onnx", res[1][:2])
 # ++++++++++++++++++++++++++++++++
 #
 
-initial_type = [('float_input', FloatTensorType([None, 4]))]
-options = {id(clr): {'raw_scores': True}}
-onx2 = convert_sklearn(clr, initial_types=initial_type, options=options,
-                       target_opset=12)
+initial_type = [("float_input", FloatTensorType([None, 4]))]
+options = {id(clr): {"raw_scores": True}}
+onx2 = convert_sklearn(
+    clr, initial_types=initial_type, options=options, target_opset=12
+)
 
-sess2 = rt.InferenceSession(onx2.SerializeToString(),
-                            providers=["CPUExecutionProvider"])
-res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})
+sess2 = rt.InferenceSession(
+    onx2.SerializeToString(), providers=["CPUExecutionProvider"]
+)
+res2 = sess2.run(None, {"float_input": X_test.astype(numpy.float32)})
 print("skl", clr.decision_function(X_test[:1]))
 print("onnx", res2[1][:2])
 

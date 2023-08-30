@@ -1,20 +1,20 @@
 <!doctype html>
-<html class="no-js" lang="en">
+<html class="no-js" lang="en" data-content_root="">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <!-- Generated with Sphinx 6.1.3 and Furo 2022.12.07 -->
-        <title>skl2onnx.common._container - sklearn-onnx 1.14.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <!-- Generated with Sphinx 7.1.2 and Furo 2023.08.19 -->
+        <title>skl2onnx.common._container - sklearn-onnx 1.16.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=92fd9be5" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=135e06be" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=36a5483c" />
     
     
 
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">sklearn-onnx 1.14.0 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">sklearn-onnx 1.16.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -154,7 +154,7 @@
     <img class="sidebar-logo" src="../../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.14.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.16.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -164,8 +164,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_cbegin_opset.html">What is the opset number?</a></li>
@@ -177,17 +177,16 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gbegin_cst.html">Store arrays in one onnx graph</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gbegin_dataframe.html">Dataframe as an input</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gconverting.html">Modify the ONNX graph</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gbegin_transfer_learning.html">Transfer Learning with ONNX</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
@@ -195,46 +194,41 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_3_new_operator.html">Extend ONNX, extend runtime</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_pextend_python_runtime.html">Fast design with a python runtime</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_qextend_onnxruntime.html">Fast runtime with onnxruntime</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_woe_transformer.html">Converter for WOE</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_summary.html">API Summary</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_metadata.html">Metadata</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_logging.html">Logging, verbose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_convert_decision_function.html">Probabilities or raw scores</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_investigate_pipeline.html">Investigate a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_benchmark_cdist.html">Compare CDist with scipy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_convert_zipmap.html">Probabilities as a vector or as a ZipMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_black_op.html">Convert a model with a reduced list of operators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_benchmark_pipeline.html">Benchmark a pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_nmf.html">Custom Operator for NMF Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_cast_transformer.html">Discrepencies with StandardScaler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_benchmark_pipeline.html">Benchmark a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_gpr.html">Discrepencies with GaussianProcessorRegressor: use of double</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_onnx_operators.html">Play with ONNX operators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_convert_syntax.html">Different ways to convert a model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_custom_parser_alternative.html">When a custom model is neither a classifier nor a regressor (alternative)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_custom_parser.html">When a custom model is neither a classifier nor a regressor</a></li>
@@ -280,8 +274,8 @@
           <h1>Source code for skl2onnx.common._container</h1><div class="highlight"><pre>
 <span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 
-
 <span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
@@ -289,28 +283,20 @@
 <span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
+<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">SparseTensorProto</span><span class="p">,</span> <span class="n">ValueInfoProto</span>
 <span class="kn">from</span> <span class="nn">onnx.defs</span> <span class="kn">import</span> <span class="n">onnx_opset_version</span><span class="p">,</span> <span class="n">get_all_schemas_with_history</span>
+<span class="kn">from</span> <span class="nn">onnx.helper</span> <span class="kn">import</span> <span class="n">make_node</span><span class="p">,</span> <span class="n">make_tensor</span><span class="p">,</span> <span class="n">make_attribute</span><span class="p">,</span> <span class="n">make_sparse_tensor</span>
 <span class="kn">import</span> <span class="nn">onnx.onnx_cpp2py_export.defs</span> <span class="k">as</span> <span class="nn">C</span>
 <span class="kn">from</span> <span class="nn">onnxconverter_common.onnx_ops</span> <span class="kn">import</span> <span class="vm">__dict__</span> <span class="k">as</span> <span class="n">dict_apply_operation</span>
 <span class="kn">from</span> <span class="nn">..proto</span> <span class="kn">import</span> <span class="n">TensorProto</span>
-<span class="kn">from</span> <span class="nn">..proto.onnx_helper_modified</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">make_node</span><span class="p">,</span> <span class="n">ValueInfoProto</span><span class="p">,</span> <span class="n">make_tensor</span><span class="p">,</span> <span class="n">make_attribute</span>
-<span class="p">)</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">..proto</span> <span class="kn">import</span> <span class="n">SparseTensorProto</span>
-    <span class="kn">from</span> <span class="nn">..proto.onnx_helper_modified</span> <span class="kn">import</span> <span class="n">make_sparse_tensor</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="c1"># onnx is too old.</span>
-    <span class="n">SparseTensorProto</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">make_sparse_tensor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_domain</span>
 
 
-<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;skl2onnx&#39;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;skl2onnx&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_operation_list</span><span class="p">(</span><span class="n">use_shortlist</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Investigates this module to extract all ONNX functions</span>
 <span class="sd">    which needs to be converted with these functions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -320,20 +306,19 @@
     <span class="c1"># This was mostly used to catch errors difficult to catch</span>
     <span class="c1"># otherwise.</span>
     <span class="k">if</span> <span class="n">use_shortlist</span><span class="p">:</span>
-        <span class="n">shortlist</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Clip&#39;</span><span class="p">,</span> <span class="s1">&#39;Normalizer&#39;</span><span class="p">,</span> <span class="s1">&#39;Upsample&#39;</span><span class="p">}</span>
+        <span class="n">shortlist</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Clip&quot;</span><span class="p">,</span> <span class="s2">&quot;Normalizer&quot;</span><span class="p">,</span> <span class="s2">&quot;Upsample&quot;</span><span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">shortlist</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">regs</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;container.add_node[(]&#39;([A-Z][a-zA-Z0-9]*)&#39;, &quot;</span>
-                       <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">[?input_name&quot;</span><span class="p">),</span>
-            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;container.add_node[(]&#39;([A-Z][a-zA-Z0-9]*)&#39;, &quot;</span>
-                       <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">[</span><span class="se">\\</span><span class="s2">]&quot;</span><span class="p">),</span>
-            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;container.add_node[(]&#39;([A-Z][a-zA-Z0-9]*)&#39;, &quot;</span>
-                       <span class="s2">&quot;inputs&quot;</span><span class="p">),</span>
-            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;scope, &#39;([A-Z][a-zA-Z0-9]*)&#39;, </span><span class="se">\\</span><span class="s2">[?input_name&quot;</span><span class="p">),</span>
-            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;op_type = &#39;([A-Z][a-zA-Z0-9]*)&#39;&quot;</span><span class="p">)]</span>
+    <span class="n">regs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;container.add_node[(]&#39;([A-Z][a-zA-Z0-9]*)&#39;, &quot;</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">[?input_name&quot;</span><span class="p">),</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;container.add_node[(]&#39;([A-Z][a-zA-Z0-9]*)&#39;, &quot;</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">[</span><span class="se">\\</span><span class="s2">]&quot;</span><span class="p">),</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;container.add_node[(]&#39;([A-Z][a-zA-Z0-9]*)&#39;, &quot;</span> <span class="s2">&quot;inputs&quot;</span><span class="p">),</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;scope, &#39;([A-Z][a-zA-Z0-9]*)&#39;, </span><span class="se">\\</span><span class="s2">[?input_name&quot;</span><span class="p">),</span>
+        <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;op_type = &#39;([A-Z][a-zA-Z0-9]*)&#39;&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
     <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dict_apply_operation</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;apply_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">callable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;apply_&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
             <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">source</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getsource</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">regs</span><span class="p">:</span>
@@ -349,31 +334,35 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
-<span class="k">def</span> <span class="nf">_build_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">defined_options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">,</span>
-                   <span class="n">allowed_options</span><span class="p">,</span> <span class="n">fail</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_build_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">defined_options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">,</span> <span class="n">allowed_options</span><span class="p">,</span> <span class="n">fail</span><span class="p">):</span>
     <span class="n">opts</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">default_values</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default_values</span>
     <span class="k">if</span> <span class="n">defined_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">defined_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="p">{}))</span>
         <span class="n">opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">defined_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="p">{}))</span>
-    <span class="k">if</span> <span class="n">allowed_options</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;passthrough&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">allowed_options</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;passthrough&quot;</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">opts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed_options</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">fail</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">NameError</span><span class="p">(</span>
                         <span class="s2">&quot;Option &#39;</span><span class="si">{}</span><span class="s2">&#39; not in </span><span class="si">{}</span><span class="s2"> for class &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                            <span class="n">k</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">allowed_options</span><span class="p">)),</span>
-                            <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+                            <span class="n">k</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">allowed_options</span><span class="p">)),</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="n">allowed</span> <span class="o">=</span> <span class="n">allowed_options</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">allowed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">allowed</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Unexpected value [</span><span class="si">{!r}</span><span class="s2">] for option &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
                     <span class="s2">&quot; (it must be in </span><span class="si">{}</span><span class="s2">) for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">allowed</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">fail</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allowed_options</span> <span class="o">!=</span> <span class="s1">&#39;passthrough&#39;</span><span class="p">:</span>
+                        <span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">allowed</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+    <span class="k">elif</span> <span class="n">fail</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">opts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">allowed_options</span> <span class="o">!=</span> <span class="s2">&quot;passthrough&quot;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;Options </span><span class="si">{}</span><span class="s2"> are not registerd for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">opts</span><span class="p">)),</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+                <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">opts</span><span class="p">)),</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">opts</span>
 
 
@@ -381,14 +370,13 @@
 
 
 <span class="k">class</span> <span class="nc">_WhiteBlackContainer</span><span class="p">:</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_white_op</span> <span class="o">=</span> <span class="n">white_op</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_black_op</span> <span class="o">=</span> <span class="n">black_op</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
     <span class="k">def</span> <span class="nf">is_allowed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tells if a node is white listed or not black listed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_type</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">set</span><span class="p">)):</span>
@@ -400,39 +388,40 @@
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">check_white_black_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks a node type is allowed according to white</span>
 <span class="sd">        and black lists.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_white_op</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">node_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_white_op</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Operator &#39;</span><span class="si">{}</span><span class="s2">&#39; is not white listed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_type</span><span class="p">))</span>
+                    <span class="s2">&quot;Operator &#39;</span><span class="si">{}</span><span class="s2">&#39; is not white listed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_type</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_black_op</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">node_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_black_op</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Operator &#39;</span><span class="si">{}</span><span class="s2">&#39; is black listed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_type</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Operator &#39;</span><span class="si">{}</span><span class="s2">&#39; is black listed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_type</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log debug information while converting a model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">RawModelContainerNode</span><span class="p">(</span><span class="n">_WhiteBlackContainer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This node is the carrier of the model we want to convert.</span>
 <span class="sd">    It provides an abstract layer so that our parsing</span>
 <span class="sd">    framework can work with models generated by different tools.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param raw_model: *scikit-learn* model to convert</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_WhiteBlackContainer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_model</span> <span class="o">=</span> <span class="n">raw_model</span>
 
     <span class="nd">@property</span>
@@ -441,7 +430,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function should return a list of strings. Each string</span>
 <span class="sd">        corresponds to an input variable name.</span>
 <span class="sd">        :return: a list of string</span>
@@ -450,7 +439,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function should return a list of strings. Each string</span>
 <span class="sd">        corresponds to an output variable name.</span>
 <span class="sd">        :return: a list of string</span>
@@ -459,18 +448,17 @@
 
 
 <div class="viewcode-block" id="SklearnModelContainerNode"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.SklearnModelContainerNode">[docs]</a><span class="k">class</span> <span class="nc">SklearnModelContainerNode</span><span class="p">(</span><span class="n">RawModelContainerNode</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main container for one *scikit-learn* model.</span>
 <span class="sd">    Every converter adds nodes to an existing container</span>
 <span class="sd">    which is converted into a *ONNX* graph by an instance of</span>
 <span class="sd">    :class:`Topology &lt;skl2onnx.common._topology.Topology&gt;`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SklearnModelContainerNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span>
-            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="p">)</span>
         <span class="c1"># Scikit-learn models have no input and output specified,</span>
         <span class="c1"># so we create them and store them in this container.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -498,15 +486,22 @@
 
 
 <div class="viewcode-block" id="ModelComponentContainer"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer">[docs]</a><span class="k">class</span> <span class="nc">ModelComponentContainer</span><span class="p">(</span><span class="n">_WhiteBlackContainer</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    In the conversion phase, this class is used to collect all materials</span>
 <span class="sd">    required to build an *ONNX* *GraphProto*, which is encapsulated in a</span>
 <span class="sd">    *ONNX* *ModelProto*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_opset</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">registered_models</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target_opset</span><span class="p">,</span>
+        <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">registered_models</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param target_opset: number, for example, 7 for *ONNX 1.2*, and</span>
 <span class="sd">                             8 for *ONNX 1.3*.</span>
 <span class="sd">        :param options: see :ref:`l-conv-options`</span>
@@ -518,7 +513,8 @@
 <span class="sd">        :param verbose: display information while converting</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_WhiteBlackContainer</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
+        <span class="p">)</span>
         <span class="c1"># Inputs of ONNX graph. They are ValueInfoProto in ONNX.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># Outputs of ONNX graph. They are ValueInfoProto in ONNX.</span>
@@ -540,57 +536,62 @@
         <span class="c1"># matches the ONNX version.</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_opset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span> <span class="o">=</span> <span class="n">target_opset</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="o">=</span> <span class="n">target_opset</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">target_opset</span><span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="n">target_opset</span><span class="p">}</span>
         <span class="c1"># Additional options given to converters.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="n">options</span>
         <span class="c1"># All registered models.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="o">=</span> <span class="n">registered_models</span>
 
     <span class="k">def</span> <span class="nf">swap_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Swaps variables names.</span>
 
 <span class="sd">        :param old_name: old name</span>
 <span class="sd">        :param new_name: new name</span>
 <span class="sd">        :return: list of impacted objects</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">exc_list</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Scan&#39;</span><span class="p">,</span> <span class="s1">&#39;Loop&#39;</span><span class="p">,</span> <span class="s1">&#39;If&#39;</span><span class="p">}</span>
+        <span class="n">exc_list</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Scan&quot;</span><span class="p">,</span> <span class="s2">&quot;Loop&quot;</span><span class="p">,</span> <span class="s2">&quot;If&quot;</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">exc_list</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">old_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span> <span class="ow">or</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span> <span class="ow">or</span>
-                    <span class="n">new_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span> <span class="ow">or</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">old_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span>
+                <span class="ow">or</span> <span class="n">old_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span>
+                <span class="ow">or</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span>
+                <span class="ow">or</span> <span class="n">new_name</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span>
+            <span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
                     <span class="s2">&quot;Unable to handle subgraphs for node type </span><span class="si">%r</span><span class="s2">.&quot;</span>
-                    <span class="s2">&quot;(</span><span class="si">%r</span><span class="s2">, </span><span class="si">%r</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">))</span>
+                    <span class="s2">&quot;(</span><span class="si">%r</span><span class="s2">, </span><span class="si">%r</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
                 <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_name</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Io&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;Io&quot;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">new_name</span><span class="p">:</span>
                 <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">old_name</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;In&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;In&quot;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
                 <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_name</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;Oo&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;Oo&quot;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">new_name</span><span class="p">:</span>
                 <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">old_name</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;On&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;On&quot;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">initializers</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">old_name</span><span class="p">:</span>
                 <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">new_name</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">new_name</span><span class="p">:</span>
                 <span class="n">inp</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">old_name</span>
-                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
+                <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="n">inp</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="n">modified</span> <span class="o">=</span> <span class="kc">False</span>
@@ -615,43 +616,38 @@
             <span class="k">if</span> <span class="n">modified</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">op_type</span> <span class="ow">in</span> <span class="n">exc_list</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                        <span class="s2">&quot;Unable to handle subgraphs for node type </span><span class="si">%r</span><span class="s2">.&quot;</span>
-                        <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">)</span>
+                        <span class="s2">&quot;Unable to handle subgraphs for node type </span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="n">node</span><span class="o">.</span><span class="n">op_type</span>
+                    <span class="p">)</span>
                 <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_input</span><span class="p">[:]</span>
                 <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_output</span><span class="p">[:]</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;n-&quot;</span><span class="p">,</span> <span class="n">node</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">res</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shows internal information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;INPUTS&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">inp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
-                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;OUTPUTS&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="p">:</span>
-                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">out</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">initializers</span><span class="p">:</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;INITIALIZERS&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">ini</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">initializers</span><span class="p">:</span>
-                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ini</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ini</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_info</span><span class="p">:</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;NODES&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_info</span><span class="p">:</span>
-                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;PROTO&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">nod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
-                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                    <span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nod</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+                <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nod</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_make_value_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
@@ -663,7 +659,7 @@
         <span class="k">return</span> <span class="n">value_info</span>
 
 <div class="viewcode-block" id="ModelComponentContainer.add_input"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_input">[docs]</a>    <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds our *Variable* object defined _parser.py into the the input</span>
 <span class="sd">        list of the final ONNX model.</span>
 
@@ -672,7 +668,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_value_info</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="ModelComponentContainer.add_output"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_output">[docs]</a>    <span class="k">def</span> <span class="nf">add_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds our *Variable* object defined *_parser.py* into the the</span>
 <span class="sd">        output list of the final ONNX model.</span>
 
@@ -681,7 +677,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_value_info</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds an option, for example,</span>
 <span class="sd">        ``add_options(id(clr), {&#39;raw_scores&#39;: True})``</span>
 <span class="sd">        tells the converter associated to ``clr`` to</span>
@@ -701,7 +697,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">model_id</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">options</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ModelComponentContainer.add_initializer"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_initializer">[docs]</a>    <span class="k">def</span> <span class="nf">add_initializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a *TensorProto* into the initializer list of the final</span>
 <span class="sd">        ONNX model.</span>
 
@@ -725,54 +721,77 @@
             <span class="n">tensor</span><span class="o">.</span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">raw_data</span>
             <span class="n">tensor</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="n">content</span><span class="p">,</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
-                          <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
-                          <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
+            <span class="n">content</span><span class="p">,</span>
+            <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">,</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">str_</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">):</span>
             <span class="n">tensor</span> <span class="o">=</span> <span class="n">make_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="n">content</span><span class="p">])</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="n">SparseTensorProto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">SparseTensorProto</span><span class="p">)):</span>
+        <span class="k">elif</span> <span class="n">SparseTensorProto</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">SparseTensorProto</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Not implemented yet.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">shape</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tensor</span> <span class="o">=</span> <span class="n">make_attribute</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">coo_matrix</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">SparseTensorProto</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;Sparse matrices require SparseTensorProto. Update onnx.&quot;</span><span class="p">)</span>
+                    <span class="s2">&quot;Sparse matrices require SparseTensorProto. Update onnx.&quot;</span>
+                <span class="p">)</span>
             <span class="n">values_tensor</span> <span class="o">=</span> <span class="n">make_tensor</span><span class="p">(</span>
-                <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">onnx_type</span><span class="p">,</span>
-                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="p">),</span> <span class="n">vals</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span>
-                       <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">content</span><span class="o">.</span><span class="n">col</span><span class="p">)]</span>
+                <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_v&quot;</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">onnx_type</span><span class="p">,</span>
+                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">),),</span>
+                <span class="n">vals</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">i</span> <span class="o">*</span> <span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">content</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
+            <span class="p">]</span>
             <span class="n">indices_tensor</span> <span class="o">=</span> <span class="n">make_tensor</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">INT64</span><span class="p">,</span>
-                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="p">),</span> <span class="n">vals</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_i&quot;</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">INT64</span><span class="p">,</span>
+                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),),</span>
+                <span class="n">vals</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">dense_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
             <span class="n">sparse_tensor</span> <span class="o">=</span> <span class="n">make_sparse_tensor</span><span class="p">(</span>
-                <span class="n">values_tensor</span><span class="p">,</span> <span class="n">indices_tensor</span><span class="p">,</span> <span class="n">dense_shape</span><span class="p">)</span>
+                <span class="n">values_tensor</span><span class="p">,</span> <span class="n">indices_tensor</span><span class="p">,</span> <span class="n">dense_shape</span>
+            <span class="p">)</span>
 
             <span class="c1"># cached value: same without names</span>
             <span class="n">values_tensor</span> <span class="o">=</span> <span class="n">make_tensor</span><span class="p">(</span>
-                <span class="s2">&quot;_v&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">onnx_type</span><span class="p">,</span>
-                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">),</span> <span class="p">),</span> <span class="n">vals</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+                <span class="s2">&quot;_v&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">onnx_type</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="o">.</span><span class="n">data</span><span class="p">),),</span> <span class="n">vals</span><span class="o">=</span><span class="n">content</span><span class="o">.</span><span class="n">data</span>
+            <span class="p">)</span>
             <span class="n">indices_tensor</span> <span class="o">=</span> <span class="n">make_tensor</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;_i&quot;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">INT64</span><span class="p">,</span>
-                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),</span> <span class="p">),</span> <span class="n">vals</span><span class="o">=</span><span class="n">indices</span><span class="p">)</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;_i&quot;</span><span class="p">,</span>
+                <span class="n">data_type</span><span class="o">=</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">INT64</span><span class="p">,</span>
+                <span class="n">dims</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">),),</span>
+                <span class="n">vals</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">cached_value</span> <span class="o">=</span> <span class="n">make_sparse_tensor</span><span class="p">(</span>
-                <span class="n">values_tensor</span><span class="p">,</span> <span class="n">indices_tensor</span><span class="p">,</span> <span class="n">dense_shape</span><span class="p">)</span>
+                <span class="n">values_tensor</span><span class="p">,</span> <span class="n">indices_tensor</span><span class="p">,</span> <span class="n">dense_shape</span>
+            <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Shape of initializer cannot contain None.&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="s1">&#39;dtype&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                    <span class="n">content</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Shape of initializer cannot contain None.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">content</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">):</span>
                 <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">tensor</span> <span class="o">=</span> <span class="n">make_tensor</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">content</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                     <span class="s2">&quot;Unable to make a tensor name=</span><span class="si">%r</span><span class="s2"> &quot;</span>
-                    <span class="s2">&quot;onnx_type=</span><span class="si">%r</span><span class="s2"> shape=</span><span class="si">%r</span><span class="s2"> content-type=</span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                        <span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">content</span><span class="p">)))</span> <span class="kn">from</span> <span class="nn">e</span>
+                    <span class="s2">&quot;onnx_type=</span><span class="si">%r</span><span class="s2"> shape=</span><span class="si">%r</span><span class="s2"> content-type=</span><span class="si">%r</span><span class="s2">.&quot;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
         <span class="k">if</span> <span class="n">tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cached_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -789,8 +808,12 @@
                 <span class="k">return</span> <span class="n">tensor</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
-                <span class="s1">&#39;Identity&#39;</span><span class="p">,</span> <span class="n">cached_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_op&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;Identity&quot;</span><span class="p">,</span>
+                <span class="n">cached_name</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">op_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_op&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="n">name</span>
 
         <span class="k">if</span> <span class="n">sparse_tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -799,30 +822,37 @@
             <span class="k">if</span> <span class="n">cached_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">initializers_strings</span><span class="p">[</span><span class="n">content</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
-                    <span class="s1">&#39;Constant&#39;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">sparse_value</span><span class="o">=</span><span class="n">sparse_tensor</span><span class="p">,</span>
-                    <span class="n">op_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_op&#39;</span><span class="p">)</span>
+                    <span class="s2">&quot;Constant&quot;</span><span class="p">,</span>
+                    <span class="p">[],</span>
+                    <span class="p">[</span><span class="n">name</span><span class="p">],</span>
+                    <span class="n">sparse_value</span><span class="o">=</span><span class="n">sparse_tensor</span><span class="p">,</span>
+                    <span class="n">op_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_op&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
                 <span class="k">return</span> <span class="n">sparse_tensor</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
-                <span class="s1">&#39;Identity&#39;</span><span class="p">,</span> <span class="n">cached_name</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_op&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;Identity&quot;</span><span class="p">,</span>
+                <span class="n">cached_name</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="n">op_version</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_op&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">return</span> <span class="n">name</span>
 
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;Either tensor or sparse_tensor should be defined.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Either tensor or sparse_tensor should be defined.&quot;</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">add_value_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_value_info</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_check_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks that if *op_type* is one of the operators defined in</span>
 <span class="sd">        :mod:`skl2onnx.common._apply_container`, then it was called</span>
 <span class="sd">        from a function defined in this submodule by looking</span>
 <span class="sd">        into the callstack. The test is enabled for *python &gt;= 3.6*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">op_type</span> <span class="ow">in</span> <span class="n">_apply_operation_specific</span> <span class="ow">and</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">op_type</span> <span class="ow">in</span> <span class="n">_apply_operation_specific</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">):</span>
             <span class="n">tb</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">extract_stack</span><span class="p">()</span>
             <span class="n">operation</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">fct</span> <span class="o">=</span> <span class="n">_apply_operation_specific</span><span class="p">[</span><span class="n">op_type</span><span class="p">]</span>
@@ -835,13 +865,21 @@
             <span class="k">if</span> <span class="n">skl2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                     <span class="s2">&quot;Operator &#39;</span><span class="si">{0}</span><span class="s2">&#39; should be added with function &quot;</span>
-                    <span class="s2">&quot;&#39;</span><span class="si">{1}</span><span class="s2">&#39; in submodule _apply_operation.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">op_type</span><span class="p">,</span> <span class="n">fct</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+                    <span class="s2">&quot;&#39;</span><span class="si">{1}</span><span class="s2">&#39; in submodule _apply_operation.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">fct</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">check_white_black_list</span><span class="p">(</span><span class="n">op_type</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ModelComponentContainer.add_node"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_type</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">op_domain</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ModelComponentContainer.add_node"><a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">op_type</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">,</span>
+        <span class="n">outputs</span><span class="p">,</span>
+        <span class="n">op_domain</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">op_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">attrs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a *NodeProto* into the node list of the final ONNX model.</span>
 <span class="sd">        If the input operator&#39;s domain-version information cannot be</span>
 <span class="sd">        found in our domain-version pool (a Python set), we may add it.</span>
@@ -861,14 +899,13 @@
 <span class="sd">                      attributes&#39; names and attributes&#39; values,</span>
 <span class="sd">                      respectively.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;axes&quot;</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="ow">and</span>
-            <span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span>
-             <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)))):</span>
+        <span class="k">if</span> <span class="s2">&quot;axes&quot;</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;axes&quot;</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;axes must be a list or an array not &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;axes&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
-                <span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="sa">f</span><span class="s2">&quot;axes must be a list or an array not &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;axes&#39;</span><span class="p">])</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;N</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="n">existing_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">existing_names</span><span class="p">:</span>
@@ -886,74 +923,89 @@
             <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">outputs</span><span class="p">]</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s2">&quot;[Node] </span><span class="si">%r</span><span class="s2"> - </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%r</span><span class="s2"> (name=</span><span class="si">%r</span><span class="s2">)&quot;</span><span class="p">,</span>
-            <span class="n">op_type</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
+            <span class="n">op_type</span><span class="p">,</span>
+            <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span>
+            <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span>
+            <span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">common</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;inputs or outputs are wrong, inputs=</span><span class="si">%r</span><span class="s2">, outputs=</span><span class="si">%r</span><span class="s2">, node=</span><span class="si">%r</span><span class="s2">.&quot;</span>
-                <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">op_type</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">op_type</span><span class="p">)</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
         <span class="k">if</span> <span class="n">common</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;inputs and outputs cannot have &quot;</span>
                 <span class="s2">&quot;variables in common </span><span class="si">{}</span><span class="s2"> in node &#39;</span><span class="si">{}</span><span class="s2">&#39; &quot;</span>
-                <span class="s2">&quot;with name &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">common</span><span class="p">,</span> <span class="n">op_type</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
-                <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">):</span>
-            <span class="n">type_list</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Inputs must be a list of string but get [</span><span class="si">%s</span><span class="s1">]&#39;</span>
-                             <span class="o">%</span> <span class="n">type_list</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">)):</span>
-            <span class="n">type_list</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Outputs must be a list of string but get [</span><span class="si">%s</span><span class="s1">]&#39;</span>
-                             <span class="o">%</span> <span class="n">type_list</span><span class="p">)</span>
+                <span class="s2">&quot;with name &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">common</span><span class="p">,</span> <span class="n">op_type</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">):</span>
+            <span class="n">type_list</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Inputs must be a list of string but get [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">type_list</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outputs</span>
+        <span class="p">):</span>
+            <span class="n">type_list</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Outputs must be a list of string but get [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="n">type_list</span>
+            <span class="p">)</span>
         <span class="n">upd</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">dtypes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s1">&#39;Failed to create ONNX node. Undefined &#39;</span>
-                    <span class="s1">&#39;attribute pair (</span><span class="si">%s</span><span class="s1">, </span><span class="si">%s</span><span class="s1">) found for type </span><span class="si">%r</span><span class="s1"> and &#39;</span>
-                    <span class="s1">&#39;version </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                        <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">op_type</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
+                    <span class="s2">&quot;Failed to create ONNX node. Undefined &quot;</span>
+                    <span class="s2">&quot;attribute pair (</span><span class="si">%s</span><span class="s2">, </span><span class="si">%s</span><span class="s2">) found for type </span><span class="si">%r</span><span class="s2"> and &quot;</span>
+                    <span class="s2">&quot;version </span><span class="si">%r</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">op_type</span><span class="p">,</span> <span class="n">op_version</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
                 <span class="n">upd</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
                 <span class="n">dtypes</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">upd</span><span class="p">:</span>
             <span class="n">attrs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">upd</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;dtype&#39;</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="ow">and</span> <span class="n">op_type</span> <span class="o">!=</span> <span class="s1">&#39;EyeLike&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;dtype&quot;</span> <span class="ow">in</span> <span class="n">attrs</span> <span class="ow">and</span> <span class="n">op_type</span> <span class="o">!=</span> <span class="s2">&quot;EyeLike&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;dtype should not be a parameter.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dtypes</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span> <span class="ow">in</span> <span class="n">dtypes</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span> <span class="ow">in</span> <span class="n">dtypes</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;Unable to select a dtype among </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dtypes</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dtype</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">new_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;shape&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># handle type numpy.matrix</span>
+                <span class="n">new_attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+                <span class="k">continue</span>
+            <span class="n">new_attrs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">node</span> <span class="o">=</span> <span class="n">make_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
-                             <span class="n">_dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="o">**</span><span class="n">attrs</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unable to create node &#39;</span><span class="si">{}</span><span class="s2">&#39; with name=&#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span>
-                             <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="n">node</span> <span class="o">=</span> <span class="n">make_node</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">new_attrs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unable to create node </span><span class="si">{</span><span class="n">op_type</span><span class="si">!r}</span><span class="s2"> with name=</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> and &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;attributes=</span><span class="si">{</span><span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">new_attrs</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
         <span class="n">node</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">op_domain</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">node_domain_version_pair_sets</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">op_domain</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="n">op_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="n">op_version</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">op_version</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Opset number </span><span class="si">{}</span><span class="s2"> is higher than targeted opsets </span><span class="si">{}</span><span class="s2"> for &quot;</span>
                 <span class="s2">&quot;node type &#39;</span><span class="si">{}</span><span class="s2">&#39; name=&#39;</span><span class="si">{}</span><span class="s2">&#39; input=</span><span class="si">{}</span><span class="s2"> &quot;</span>
                 <span class="s2">&quot;output=</span><span class="si">{}</span><span class="s2"> (domain=&#39;</span><span class="si">{}</span><span class="s2">&#39;).&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">op_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span><span class="p">,</span>
-                    <span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">op_domain</span><span class="p">))</span></div>
+                    <span class="n">op_version</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span><span class="p">,</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">,</span>
+                    <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">,</span>
+                    <span class="n">op_domain</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">target_opset_any_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
         <span class="n">target_opset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span>
@@ -962,7 +1014,7 @@
                 <span class="n">to</span> <span class="o">=</span> <span class="n">target_opset</span><span class="p">[</span><span class="n">domain</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">to</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">domain</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">domain</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                 <span class="n">to</span> <span class="o">=</span> <span class="n">onnx_opset_version</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">to</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">smap</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">schema_version_map</span><span class="p">()</span>
@@ -977,14 +1029,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">target_opset_onnx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_op_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">op_type</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines the highest version of operator</span>
 <span class="sd">        *op_type* below or equal to *target_opset*.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_op_versions&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_op_versions&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_build_op_version</span><span class="p">()</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">domain</span><span class="p">,</span> <span class="n">op_type</span>
         <span class="n">vers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_op_versions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -995,8 +1047,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                     <span class="s2">&quot;Unable to find operator &#39;</span><span class="si">{}</span><span class="s2">&#39; in domain &#39;</span><span class="si">{}</span><span class="s2">&#39; in ONNX, &quot;</span>
-                    <span class="s2">&quot;op_version is forced to 1.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">op_type</span><span class="p">,</span> <span class="n">domain</span><span class="p">))</span>
+                    <span class="s2">&quot;op_version is forced to 1.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">domain</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="n">vers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">highest</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">domain</span><span class="p">)</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vers</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
@@ -1006,8 +1058,8 @@
             <span class="n">pos</span> <span class="o">-=</span> <span class="mi">1</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
             <span class="s2">&quot;Unable to find a suitable version for operator &#39;</span><span class="si">{}</span><span class="s2">&#39; &quot;</span>
-            <span class="s2">&quot;in domain &#39;</span><span class="si">{}</span><span class="s2">&#39;. Available versions: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">op_type</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">vers</span><span class="p">))</span>
+            <span class="s2">&quot;in domain &#39;</span><span class="si">{}</span><span class="s2">&#39;. Available versions: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">vers</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_build_op_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
@@ -1025,28 +1077,28 @@
     <span class="k">def</span> <span class="nf">_get_allowed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s2">&quot;aliases&quot;</span><span class="p">]:</span>
                     <span class="k">return</span> <span class="kc">None</span>
-                <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">][</span><span class="n">model</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s1">&#39;alias&#39;</span><span class="p">):</span>
+                <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s2">&quot;aliases&quot;</span><span class="p">][</span><span class="n">model</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;alias&quot;</span><span class="p">):</span>
                 <span class="n">alias</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">alias</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s2">&quot;aliases&quot;</span><span class="p">]:</span>
                     <span class="k">return</span> <span class="p">{}</span>
-                <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;aliases&#39;</span><span class="p">][</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)]</span>
-            <span class="n">conv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s1">&#39;conv&#39;</span><span class="p">][</span><span class="n">alias</span><span class="p">]</span>
+                <span class="n">alias</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s2">&quot;aliases&quot;</span><span class="p">][</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)]</span>
+            <span class="n">conv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s2">&quot;conv&quot;</span><span class="p">][</span><span class="n">alias</span><span class="p">]</span>
             <span class="n">allowed</span> <span class="o">=</span> <span class="n">conv</span><span class="o">.</span><span class="n">get_allowed_options</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">allowed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="p">{}</span>
             <span class="k">return</span> <span class="n">allowed</span>
-        <span class="n">clname</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-                  <span class="k">else</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">clname</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="k">else</span> <span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
             <span class="s2">&quot;No registered models, no known allowed options &quot;</span>
-            <span class="s2">&quot;for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">clname</span><span class="p">))</span>
+            <span class="s2">&quot;for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">clname</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">validate_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validates every operator allows the options</span>
 <span class="sd">        given by the user at converter time</span>
 <span class="sd">        for an operator.</span>
@@ -1055,7 +1107,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">skl_op</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns additional options for a model.</span>
 <span class="sd">        It first looks by class then by id (``id(model)``).</span>
 <span class="sd">        :param model: model being converted</span>
@@ -1065,11 +1117,15 @@
 <span class="sd">        :return: dictionary</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">_build_options</span><span class="p">(</span>
-            <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_allowed_options</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">)</span>
+            <span class="n">model</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">,</span>
+            <span class="n">default_values</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_allowed_options</span><span class="p">(</span><span class="n">model</span><span class="p">),</span>
+            <span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">has_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">option_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tells if a model allows one specific options.</span>
 
 <span class="sd">        :param model: model being converted</span>
@@ -1079,7 +1135,7 @@
         <span class="k">return</span> <span class="n">option_name</span> <span class="ow">in</span> <span class="n">opts</span>
 
     <span class="k">def</span> <span class="nf">ensure_topological_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures and modifies the order of nodes to have</span>
 <span class="sd">        a topological order (every node in the list</span>
 <span class="sd">        can only be an input for a node later in this list).</span>
@@ -1125,42 +1181,58 @@
                         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                             <span class="s2">&quot;Unable to sort a node (cycle). An output was &quot;</span>
                             <span class="s2">&quot;already ordered with name </span><span class="si">%r</span><span class="s2"> (iteration=</span><span class="si">%r</span><span class="s2">).&quot;</span>
-                            <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">))</span>
+                            <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">n_iter</span><span class="p">)</span>
+                        <span class="p">)</span>
                     <span class="n">order</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">maxi</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_ops</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+
             <span class="k">def</span> <span class="nf">nstr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
                     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">#</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
                 <span class="k">return</span> <span class="n">name</span>
-            <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) -&gt; [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span>
-                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">nstr</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">input</span><span class="p">)),</span>
-                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">output</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">missing_ops</span><span class="p">]</span>
+
+            <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) -&gt; [</span><span class="si">%s</span><span class="s2">]&quot;</span>
+                <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span>
+                    <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">nstr</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">input</span><span class="p">)),</span>
+                    <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">output</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">missing_ops</span>
+            <span class="p">]</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--all-nodes--&quot;</span><span class="p">)</span>
             <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--&quot;</span><span class="p">)</span>
-            <span class="n">rows</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">|</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) -&gt; [</span><span class="si">%s</span><span class="s2">]&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span>
-                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">nstr</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">input</span><span class="p">)),</span>
-                <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">output</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">|</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">) -&gt; [</span><span class="si">%s</span><span class="s2">]&quot;</span>
+                <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span>
+                    <span class="n">n</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="n">n</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span>
+                    <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">nstr</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">input</span><span class="p">)),</span>
+                    <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">output</span><span class="p">),</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
+            <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;After </span><span class="si">%d</span><span class="s2"> iterations for </span><span class="si">%d</span><span class="s2"> nodes, still unable &quot;</span>
                 <span class="s2">&quot;to sort names </span><span class="si">%r</span><span class="s2">. The graph may be disconnected. &quot;</span>
-                <span class="s2">&quot;List of operators: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
-                    <span class="n">n_iter</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span> <span class="n">missing_names</span><span class="p">,</span>
-                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)))</span>
+                <span class="s2">&quot;List of operators: </span><span class="si">%s</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">n_iter</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">),</span> <span class="n">missing_names</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+            <span class="p">)</span>
 
         <span class="c1"># Update order</span>
-        <span class="n">topo</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([(</span><span class="n">order</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)],</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)))</span>
-                      <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">])</span>
+        <span class="n">topo</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="n">order</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)],</span> <span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)))</span>
+                <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">map_nodes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)):</span> <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">map_nodes</span><span class="p">[</span><span class="n">_</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">topo</span><span class="p">]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">map_nodes</span><span class="p">[</span><span class="n">_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">topo</span><span class="p">]</span></div>
 </pre></div>
         </article>
       </div>
@@ -1173,7 +1245,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2018-2022, Microsoft
+                Copyright &#169; 2018-2023, Microsoft
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -1193,9 +1265,9 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/sphinx_highlight.js"></script>
-    <script src="../../../_static/scripts/furo.js"></script>
+</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=9a8fb93a"></script>
+    <script src="../../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

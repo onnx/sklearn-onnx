@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_convert_zipmap.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_convert_zipmap.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -34,7 +34,7 @@ on the Iris example.
 Train a model and convert it
 ++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-45
+.. GENERATED FROM PYTHON SOURCE LINES 22-44
 
 .. code-block:: default
 
@@ -57,9 +57,8 @@ Train a model and convert it
     clr.fit(X_train, y_train)
     print(clr)
 
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    onx = convert_sklearn(clr, initial_types=initial_type,
-                          target_opset=12)
+    initial_type = [("float_input", FloatTensorType([None, 4]))]
+    onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
 
 
@@ -74,7 +73,7 @@ Train a model and convert it
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-51
+.. GENERATED FROM PYTHON SOURCE LINES 45-50
 
 Output type
 +++++++++++
@@ -82,13 +81,13 @@ Output type
 Let's confirm the output type of the probabilities
 is a list of dictionaries with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-58
+.. GENERATED FROM PYTHON SOURCE LINES 50-57
 
 .. code-block:: default
 
 
-    sess = rt.InferenceSession(onx.SerializeToString())
-    res = sess.run(None, {'float_input': X_test.astype(numpy.float32)})
+    sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+    res = sess.run(None, {"float_input": X_test.astype(numpy.float32)})
     print(res[1][:2])
     print("probabilities type:", type(res[1]))
     print("type for the first observations:", type(res[1][0]))
@@ -101,32 +100,35 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    [{0: 0.9724591970443726, 1: 0.027540581300854683, 2: 2.352435330976732e-07}, {0: 0.9776268601417542, 1: 0.022372985258698463, 2: 1.9038986920349998e-07}]
+    [{0: 9.76420778897591e-05, 1: 0.046403080224990845, 2: 0.9534992575645447}, {0: 0.018943823873996735, 1: 0.8978846669197083, 2: 0.083171546459198}]
     probabilities type: <class 'list'>
     type for the first observations: <class 'dict'>
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-63
+.. GENERATED FROM PYTHON SOURCE LINES 58-62
 
 Without ZipMap
 ++++++++++++++
 
 Let's remove the ZipMap operator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-75
+.. GENERATED FROM PYTHON SOURCE LINES 62-77
 
 .. code-block:: default
 
 
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    options = {id(clr): {'zipmap': False}}
-    onx2 = convert_sklearn(clr, initial_types=initial_type, options=options,
-                           target_opset=12)
+    initial_type = [("float_input", FloatTensorType([None, 4]))]
+    options = {id(clr): {"zipmap": False}}
+    onx2 = convert_sklearn(
+        clr, initial_types=initial_type, options=options, target_opset=12
+    )
 
-    sess2 = rt.InferenceSession(onx2.SerializeToString())
-    res2 = sess2.run(None, {'float_input': X_test.astype(numpy.float32)})
+    sess2 = rt.InferenceSession(
+        onx2.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res2 = sess2.run(None, {"float_input": X_test.astype(numpy.float32)})
     print(res2[1][:2])
     print("probabilities type:", type(res2[1]))
     print("type for the first observations:", type(res2[1][0]))
@@ -139,15 +141,15 @@ Let's remove the ZipMap operator.
 
  .. code-block:: none
 
-    [[9.7245920e-01 2.7540581e-02 2.3524353e-07]
-     [9.7762686e-01 2.2372985e-02 1.9038987e-07]]
+    [[9.7642078e-05 4.6403080e-02 9.5349926e-01]
+     [1.8943824e-02 8.9788467e-01 8.3171546e-02]]
     probabilities type: <class 'numpy.ndarray'>
     type for the first observations: <class 'numpy.ndarray'>
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-82
+.. GENERATED FROM PYTHON SOURCE LINES 78-84
 
 One output per class
 ++++++++++++++++++++
@@ -156,20 +158,26 @@ This options removes the final operator ZipMap and splits
 the probabilities into columns. The final model produces
 one output for the label, and one output per class.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-94
+.. GENERATED FROM PYTHON SOURCE LINES 84-102
 
 .. code-block:: default
 
 
-    options = {id(clr): {'zipmap': 'columns'}}
-    onx3 = convert_sklearn(clr, initial_types=initial_type, options=options,
-                           target_opset=12)
+    options = {id(clr): {"zipmap": "columns"}}
+    onx3 = convert_sklearn(
+        clr, initial_types=initial_type, options=options, target_opset=12
+    )
 
-    sess3 = rt.InferenceSession(onx3.SerializeToString())
-    res3 = sess3.run(None, {'float_input': X_test.astype(numpy.float32)})
+    sess3 = rt.InferenceSession(
+        onx3.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    res3 = sess3.run(None, {"float_input": X_test.astype(numpy.float32)})
     for i, out in enumerate(sess3.get_outputs()):
-        print("output: '{}' shape={} values={}...".format(
-            out.name, res3[i].shape, res3[i][:2]))
+        print(
+            "output: '{}' shape={} values={}...".format(
+                out.name, res3[i].shape, res3[i][:2]
+            )
+        )
 
 
 
@@ -180,20 +188,20 @@ one output for the label, and one output per class.
 
  .. code-block:: none
 
-    output: 'output_label' shape=(38,) values=[0 0]...
-    output: 'i0' shape=(38,) values=[0.9724592  0.97762686]...
-    output: 'i1' shape=(38,) values=[0.02754058 0.02237299]...
-    output: 'i2' shape=(38,) values=[2.3524353e-07 1.9038987e-07]...
+    output: 'output_label' shape=(38,) values=[2 1]...
+    output: 'i0' shape=(38,) values=[9.7642078e-05 1.8943824e-02]...
+    output: 'i1' shape=(38,) values=[0.04640308 0.89788467]...
+    output: 'i2' shape=(38,) values=[0.95349926 0.08317155]...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 103-105
 
 Let's compare prediction time
 +++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-119
+.. GENERATED FROM PYTHON SOURCE LINES 105-124
 
 .. code-block:: default
 
@@ -201,16 +209,13 @@ Let's compare prediction time
     X32 = X_test.astype(numpy.float32)
 
     print("Time with ZipMap:")
-    print(repeat(lambda: sess.run(None, {'float_input': X32}),
-                 number=100, repeat=10))
+    print(repeat(lambda: sess.run(None, {"float_input": X32}), number=100, repeat=10))
 
     print("Time without ZipMap:")
-    print(repeat(lambda: sess2.run(None, {'float_input': X32}),
-                 number=100, repeat=10))
+    print(repeat(lambda: sess2.run(None, {"float_input": X32}), number=100, repeat=10))
 
     print("Time without ZipMap but with columns:")
-    print(repeat(lambda: sess3.run(None, {'float_input': X32}),
-                 number=100, repeat=10))
+    print(repeat(lambda: sess3.run(None, {"float_input": X32}), number=100, repeat=10))
 
     # The prediction is much faster without ZipMap
     # on this example.
@@ -228,20 +233,20 @@ Let's compare prediction time
  .. code-block:: none
 
     Time with ZipMap:
-    [0.012372604999882242, 0.004819102000055864, 0.002799700999958077, 0.005126302000007854, 0.004604101999802879, 0.0027419010000357957, 0.0030426010000610404, 0.0026854010000079143, 0.0026163009999891074, 0.0026090009998824826]
+    [0.004339300000083313, 0.003741600000012113, 0.0030674999998154817, 0.002657600000020466, 0.002626199999667733, 0.0029488000000128523, 0.0027304000000185624, 0.0026580999997349863, 0.003430199999911565, 0.0028902999997626466]
     Time without ZipMap:
-    [0.0016827009999360598, 0.0011974000001373497, 0.0012046009999266971, 0.0011644000001069799, 0.0011607010001171147, 0.0012080000001333246, 0.001181700999950408, 0.0011657999998533342, 0.0013147009999556758, 0.0015800999999555643]
+    [0.001563100000112172, 0.002031699999861303, 0.0012540000002445595, 0.0012501999999585678, 0.0015628999999535154, 0.0018725999998423504, 0.0012913999999000225, 0.0015812999999980093, 0.0016777000000729458, 0.0020423000000846514]
     Time without ZipMap but with columns:
-    [0.00204040099993108, 0.0020714009999664995, 0.0020063009999375936, 0.001988400999834994, 0.0019787999999607564, 0.0019756009999127855, 0.0021800010001697956, 0.002363000999821452, 0.0021929009999439586, 0.002378501000066535]
+    [0.0032931999999163963, 0.002602000000024418, 0.002499299999726645, 0.002414399999906891, 0.002675799999906303, 0.004039400000237947, 0.0024936999998317333, 0.0022391000002244255, 0.00329169999986334, 0.003487199999653967]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-121
+.. GENERATED FROM PYTHON SOURCE LINES 125-126
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-127
+.. GENERATED FROM PYTHON SOURCE LINES 126-132
 
 .. code-block:: default
 
@@ -260,10 +265,10 @@ Let's compare prediction time
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -271,7 +276,7 @@ Let's compare prediction time
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.153 seconds)
+   **Total running time of the script:** (0 minutes 0.159 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_zipmap.py:
@@ -279,6 +284,8 @@ Let's compare prediction time
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

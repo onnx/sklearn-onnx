@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_pipeline.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_pipeline.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -32,7 +32,7 @@ Retrieve a model in JSON format
 
 That's the most simple way.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-46
+.. GENERATED FROM PYTHON SOURCE LINES 19-47
 
 .. code-block:: default
 
@@ -49,13 +49,14 @@ That's the most simple way.
     from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
 
     onnx_fct = OnnxAdd(
-        OnnxMul('X', numpy.array([2], dtype=numpy.float32),
-                op_version=12),
+        OnnxMul("X", numpy.array([2], dtype=numpy.float32), op_version=12),
         numpy.array([[1, 0], [0, 1]], dtype=numpy.float32),
-        output_names=['Y'], op_version=12)
+        output_names=["Y"],
+        op_version=12,
+    )
 
     X = numpy.array([[4, 5], [-2, 3]], dtype=numpy.float32)
-    model = onnx_fct.to_onnx({'X': X}, target_opset=12)
+    model = onnx_fct.to_onnx({"X": X}, target_opset=12)
     print(model)
 
     filename = "example1.onnx"
@@ -72,8 +73,12 @@ That's the most simple way.
  .. code-block:: none
 
     ir_version: 7
+    opset_import {
+      domain: ""
+      version: 12
+    }
     producer_name: "skl2onnx"
-    producer_version: "1.14.0"
+    producer_version: "1.15.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -97,17 +102,17 @@ That's the most simple way.
       initializer {
         dims: 1
         data_type: 1
-        float_data: 2.0
+        float_data: 2
         name: "Mu_Mulcst"
       }
       initializer {
         dims: 2
         dims: 2
         data_type: 1
-        float_data: 1.0
-        float_data: 0.0
-        float_data: 0.0
-        float_data: 1.0
+        float_data: 1
+        float_data: 0
+        float_data: 0
+        float_data: 1
         name: "Ad_Addcst"
       }
       input {
@@ -142,16 +147,12 @@ That's the most simple way.
         }
       }
     }
-    opset_import {
-      domain: ""
-      version: 12
-    }
 
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-54
+.. GENERATED FROM PYTHON SOURCE LINES 48-55
 
 Draw a model with ONNX
 ++++++++++++++++++++++
@@ -161,14 +162,14 @@ included in *onnx* package.
 We use *onnx* to load the model
 in a different way than before.
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-61
+.. GENERATED FROM PYTHON SOURCE LINES 55-62
 
 .. code-block:: default
 
 
 
     model = ModelProto()
-    with open(filename, 'rb') as fid:
+    with open(filename, "rb") as fid:
         content = fid.read()
         model.ParseFromString(content)
 
@@ -179,16 +180,20 @@ in a different way than before.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 63-64
 
 We convert it into a graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-67
+.. GENERATED FROM PYTHON SOURCE LINES 64-72
 
 .. code-block:: default
 
-    pydot_graph = GetPydotGraph(model.graph, name=model.graph.name, rankdir="TB",
-                                node_producer=GetOpNodeProducer("docstring"))
+    pydot_graph = GetPydotGraph(
+        model.graph,
+        name=model.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer("docstring"),
+    )
     pydot_graph.write_dot("graph.dot")
 
 
@@ -198,15 +203,15 @@ We convert it into a graph.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-69
+.. GENERATED FROM PYTHON SOURCE LINES 73-74
 
 Then into an image
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-71
+.. GENERATED FROM PYTHON SOURCE LINES 74-76
 
 .. code-block:: default
 
-    os.system('dot -O -Tpng graph.dot')
+    os.system("dot -O -Tpng graph.dot")
 
 
 
@@ -221,17 +226,17 @@ Then into an image
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+.. GENERATED FROM PYTHON SOURCE LINES 77-78
 
 Which we display...
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-77
+.. GENERATED FROM PYTHON SOURCE LINES 78-82
 
 .. code-block:: default
 
     image = plt.imread("graph.dot.png")
     plt.imshow(image)
-    plt.axis('off')
+    plt.axis("off")
 
 
 
@@ -251,11 +256,11 @@ Which we display...
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-79
+.. GENERATED FROM PYTHON SOURCE LINES 83-84
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-85
+.. GENERATED FROM PYTHON SOURCE LINES 84-90
 
 .. code-block:: default
 
@@ -274,10 +279,10 @@ Which we display...
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.15.0
 
 
 
@@ -285,7 +290,7 @@ Which we display...
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.124 seconds)
+   **Total running time of the script:** (0 minutes 0.429 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:
@@ -293,6 +298,8 @@ Which we display...
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python

@@ -10,7 +10,7 @@
     .. note::
         :class: sphx-glr-download-link-note
 
-        Click :ref:`here <sphx_glr_download_auto_examples_plot_convert_model.py>`
+        :ref:`Go to the end <sphx_glr_download_auto_examples_plot_convert_model.py>`
         to download the full example code
 
 .. rst-class:: sphx-glr-example-title
@@ -36,7 +36,7 @@ Train a model
 A very basic example using random forest and
 the iris dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-42
+.. GENERATED FROM PYTHON SOURCE LINES 23-43
 
 .. code-block:: default
 
@@ -52,6 +52,7 @@ the iris dataset.
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
     from sklearn.ensemble import RandomForestClassifier
+
     iris = load_iris()
     X, y = iris.data, iris.target
     X_train, X_test, y_train, y_test = train_test_split(X, y)
@@ -72,19 +73,18 @@ the iris dataset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-45
+.. GENERATED FROM PYTHON SOURCE LINES 44-46
 
 Convert a model into ONNX
 +++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-53
+.. GENERATED FROM PYTHON SOURCE LINES 46-53
 
 .. code-block:: default
 
 
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    onx = convert_sklearn(clr, initial_types=initial_type,
-                          target_opset=12)
+    initial_type = [("float_input", FloatTensorType([None, 4]))]
+    onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
     with open("rf_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
@@ -101,15 +101,14 @@ Convert a model into ONNX
 Compute the prediction with ONNX Runtime
 ++++++++++++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-63
+.. GENERATED FROM PYTHON SOURCE LINES 56-62
 
 .. code-block:: default
 
     sess = rt.InferenceSession("rf_iris.onnx", providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    pred_onx = sess.run(
-        [label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
     print(pred_onx)
 
 
@@ -120,34 +119,32 @@ Compute the prediction with ONNX Runtime
 
  .. code-block:: none
 
-    [0 2 1 0 0 2 0 0 1 0 1 0 0 0 1 1 1 0 1 0 1 1 0 2 0 2 2 2 0 1 2 1 2 0 1 2 1
-     2]
+    [0 0 0 0 1 2 1 0 0 0 1 1 1 0 1 0 1 1 2 0 1 2 2 1 2 2 2 1 1 0 0 0 2 2 0 2 2
+     0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-65
+.. GENERATED FROM PYTHON SOURCE LINES 63-64
 
 Full example with a logistic regression
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-82
+.. GENERATED FROM PYTHON SOURCE LINES 64-79
 
 .. code-block:: default
 
 
     clr = LogisticRegression()
     clr.fit(X_train, y_train)
-    initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
-    onx = convert_sklearn(clr, initial_types=initial_type,
-                          target_opset=12)
+    initial_type = [("float_input", FloatTensorType([None, X_train.shape[1]]))]
+    onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
     with open("logreg_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
 
-    sess = rt.InferenceSession("logreg_iris.onnx")
+    sess = rt.InferenceSession("logreg_iris.onnx", providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    pred_onx = sess.run([label_name],
-                        {input_name: X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
     print(pred_onx)
 
 
@@ -159,25 +156,17 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    /home/xadupre/github/scikit-learn/sklearn/linear_model/_logistic.py:458: ConvergenceWarning: lbfgs failed to converge (status=1):
-    STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
-
-    Increase the number of iterations (max_iter) or scale the data as shown in:
-        https://scikit-learn.org/stable/modules/preprocessing.html
-    Please also refer to the documentation for alternative solver options:
-        https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
-      n_iter_i = _check_optimize_result(
-    [0 2 1 0 0 2 0 0 1 0 1 0 0 0 1 1 1 0 1 0 1 1 0 2 0 2 2 2 0 1 2 1 2 0 1 2 1
-     2]
+    [0 0 0 0 1 2 1 0 0 0 1 1 1 0 1 0 1 1 2 0 1 2 2 1 2 2 2 1 1 0 0 0 2 2 0 2 2
+     0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-84
+.. GENERATED FROM PYTHON SOURCE LINES 80-81
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-90
+.. GENERATED FROM PYTHON SOURCE LINES 81-87
 
 .. code-block:: default
 
@@ -196,10 +185,10 @@ Full example with a logistic regression
  .. code-block:: none
 
     numpy: 1.23.5
-    scikit-learn: 1.3.dev0
-    onnx:  1.14.0
-    onnxruntime:  1.15.0+cpu
-    skl2onnx:  1.14.0
+    scikit-learn: 1.4.dev0
+    onnx:  1.15.0
+    onnxruntime:  1.16.0+cu118
+    skl2onnx:  1.16.0
 
 
 
@@ -207,7 +196,7 @@ Full example with a logistic regression
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.182 seconds)
+   **Total running time of the script:** (0 minutes 0.172 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_model.py:
@@ -215,6 +204,8 @@ Full example with a logistic regression
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
+
+
 
 
     .. container:: sphx-glr-download sphx-glr-download-python
