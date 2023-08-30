@@ -68,6 +68,7 @@ def my_custom_converter_add(scope, operator, container):
         operator.raw_operator.estimator_,
         initial_types=operator.inputs,
         options={"zipmap": False},
+        target_opset=TARGET_OPSET,
     )
     add_onnx_graph(scope, operator, container, onx)
 
@@ -147,7 +148,7 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             basename="SklearnPipelineScalerCustomClassifier2",
         )
 
-    def test_add_onn_graph(self):
+    def test_add_onnx_graph(self):
         data = load_iris()
         X = data.data[:, :2]
         y = data.target
