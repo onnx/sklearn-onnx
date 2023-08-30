@@ -35,6 +35,10 @@ class TestMultiOutputConverter(unittest.TestCase):
 
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_ver) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
     def test_multi_output_regressor(self):

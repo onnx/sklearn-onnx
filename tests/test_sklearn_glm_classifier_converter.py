@@ -5,7 +5,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
 import sklearn
-from sklearn import linear_model
+from sklearn import linear_model, __version__ as sklearn_version
 from sklearn.svm import LinearSVC
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.exceptions import ConvergenceWarning
@@ -33,6 +33,7 @@ from test_utils import (
 
 
 ort_version = ort_version.split("+")[0]
+skl_version = ".".join(sklearn_version.split(".")[:2])
 
 
 def _sklearn_version():
@@ -509,11 +510,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnLinearSVCBool")
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 2)
         model_onnx = convert_sklearn(
@@ -525,11 +530,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRidgeClassifierBin")
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary_nozipmap(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2
@@ -568,11 +577,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx, basename="SklearnRidgeClassifierNZMBin"
         )
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary_mispelled_zipmap(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2
@@ -591,11 +604,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
         except NameError as e:
             assert "Option 'zipmap ' not in" in str(e)
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_binary_mispelled_zipmap_wrong_value(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(max_iter=10000), 2
@@ -614,11 +631,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
         except ValueError as e:
             assert "Unexpected value ['True'] for option 'zipmap'" in str(e)
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_multi_class(self):
         model, X = fit_classification_model(linear_model.RidgeClassifier(), 5)
         model_onnx = convert_sklearn(
@@ -632,11 +653,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
             X, model, model_onnx, basename="SklearnRidgeClassifierMulti"
         )
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_int(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifier(), 5, is_int=True
@@ -650,11 +675,15 @@ class TestGLMClassifierConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRidgeClassifierInt")
 
-    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
         reason="sklearn fails on windows",
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_classifier_bool(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifier(), 4, is_bool=True
