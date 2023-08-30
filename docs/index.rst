@@ -110,6 +110,10 @@ Other converters can be found on `github/onnx <https://github.com/onnx/>`_,
 `ONNX-MXNet API <https://mxnet.incubator.apache.org/api/python/contrib/onnx.html>`_,
 `Microsoft.ML.Onnx <https://www.nuget.org/packages/Microsoft.ML.Onnx/>`_...
 
+**Change Logs**
+
+See `CHANGELOGS.md <https://github.com/onnx/sklearn-onnx/blob/main/CHANGELOGS.md>`_.
+
 **Credits**
 
 The package was started by the following engineers and data scientists at
