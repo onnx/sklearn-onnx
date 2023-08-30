@@ -18,7 +18,7 @@ try:
 except ImportError:
     # older versions of scikit-learn
     from sklearn.utils.testing import ignore_warnings
-from sklearn import datasets
+from sklearn import datasets, __version__ as sklearn_version
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import (
     KNeighborsRegressor,
@@ -67,6 +67,7 @@ def dont_test_radius():
 
 
 ort_version = ".".join(ort_version.split(".")[:2])
+skl_version = ".".join(sklearn_version.split(".")[:2])
 
 
 class TestNearestNeighbourConverter(unittest.TestCase):
@@ -795,6 +796,14 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             assert_almost_equal(ind, y[0])
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
+        reason="sklearn fails on windows",
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_default(self):
         model, X_test = fit_classification_model(
@@ -810,6 +819,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(X_test, model, model_onnx, basename="SklearnNCADefault")
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(sklearn_version) < pv.Version("1.1.0"), reason="n-d not supported"
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_identity(self):
         model, X_test = fit_classification_model(
@@ -828,6 +840,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(X_test, model, model_onnx, basename="SklearnNCAIdentity")
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(sklearn_version) < pv.Version("1.1.0"), reason="n-d not supported"
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_double(self):
         model, X_test = fit_classification_model(
@@ -845,6 +860,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         dump_data_and_model(X_test, model, model_onnx, basename="SklearnNCADouble")
 
     @unittest.skipIf(NeighborhoodComponentsAnalysis is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(sklearn_version) < pv.Version("1.1.0"), reason="n-d not supported"
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_nca_int(self):
         model, X_test = fit_classification_model(

@@ -113,7 +113,9 @@ print(model_onnx)
 ########################################
 # Let's compute prediction with it.
 
-sess = InferenceSession(model_onnx.SerializeToString())
+sess = InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 
 def predict_onnx(sess, row_indices, col_indices):

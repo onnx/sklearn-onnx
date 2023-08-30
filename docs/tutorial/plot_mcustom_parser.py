@@ -161,7 +161,7 @@ update_registered_converter(
 
 onx = to_onnx(dec, X.astype(numpy.float32), target_opset=14)
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float32))
 results = sess.run(None, {"X": X.astype(numpy.float32)})

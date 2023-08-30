@@ -4,6 +4,7 @@
 Test scikit-learn's PowerTransform
 """
 import unittest
+import packaging.version as pv
 
 import numpy as np
 
@@ -157,6 +158,9 @@ class TestSklearnPowerTransformer(unittest.TestCase):
         dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
+    @unittest.skipIf(
+        pv.Version(sklearn.__version__) < pv.Version("1.3.0"), reason="PR #26566"
+    )
     def test_powertransformer_zeros(self):
         pt = PowerTransformer()
         data = np.array([[0, 0], [0, 0]], dtype=np.float32)

@@ -112,7 +112,9 @@ print("predict_proba", pipe.predict_proba(X[:1]))
 # Predictions with onnxruntime.
 
 try:
-    sess = rt.InferenceSession("pipeline_lightgbm.onnx")
+    sess = rt.InferenceSession(
+        "pipeline_lightgbm.onnx", providers=["CPUExecutionProvider"]
+    )
 except OrtFail as e:
     print(e)
     print("The converter requires onnxmltools>=1.7.0")

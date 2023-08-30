@@ -128,7 +128,7 @@ print("predict_proba", pipe.predict_proba(X[:1]))
 ##########################
 # Predictions with onnxruntime.
 
-sess = rt.InferenceSession("pipeline_xgboost.onnx")
+sess = rt.InferenceSession("pipeline_xgboost.onnx", providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])

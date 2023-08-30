@@ -5,6 +5,7 @@
 
 import os
 import sys
+import logging
 import warnings
 import skl2onnx
 
@@ -72,16 +73,14 @@ intersphinx_mapping = {"https://docs.python.org/": None}
 
 linkcode_resolve = make_linkcode_resolve(
     "skl2onnx",
-    "https://github.com/onnx/skl2onnx/blob/{revision}/" "{package}/{path}#L{lineno}",
+    "https://github.com/onnx/skl2onnx/blob/{revision}/{package}/{path}#L{lineno}",
 )
 
 intersphinx_mapping = {
     "joblib": ("https://joblib.readthedocs.io/en/latest/", None),
     "python": ("https://docs.python.org/{.major}".format(sys.version_info), None),
     "matplotlib": ("https://matplotlib.org/", None),
-    "mlinsights": ("http://www.xavierdupre.fr/app/mlinsights/helpsphinx/", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
-    "pyquickhelper": ("http://www.xavierdupre.fr/app/pyquickhelper/helpsphinx/", None),
     "onnxruntime": ("https://onnxruntime.ai/docs/api/python/", None),
     "pandas": ("https://pandas.pydata.org/pandas-docs/stable/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
@@ -144,4 +143,14 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 def setup(app):
     # Placeholder to initialize the folder before
     # generating the documentation.
+    logger = logging.getLogger("skl2onnx")
+    logger.setLevel(logging.WARNING)
+    logger = logging.getLogger("matplotlib.font_manager")
+    logger.setLevel(logging.WARNING)
+    logger = logging.getLogger("matplotlib.ticker")
+    logger.setLevel(logging.WARNING)
+    logger = logging.getLogger("PIL.PngImagePlugin")
+    logger.setLevel(logging.WARNING)
+    logger = logging.getLogger("graphviz._tools")
+    logger.setLevel(logging.WARNING)
     return app

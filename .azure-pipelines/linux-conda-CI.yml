@@ -201,6 +201,12 @@ jobs:
       packageSpecs: 'python=$(python.version)'
 
   - script: |
+      sudo apt-get install -y language-pack-en
+      sudo locale-gen en_US.UTF-8
+      sudo update-locale LANG=en_US.UTF-8
+    displayName: 'Install packages'
+
+  - script: |
       test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
       conda config --set always_yes yes --set changeps1 no
       conda install -c conda-forge "numpy$(numpy.version)"
