@@ -66,7 +66,7 @@ lists all available converters.
 Helpers for new converters
 ==========================
 
-.. autofunction:: skl2onnx.helpers.integration.add_onnx_graph
+.. autofunction:: skl2onnx.helpers.add_onnx_graph
 
 Manipulate ONNX graphs
 ======================

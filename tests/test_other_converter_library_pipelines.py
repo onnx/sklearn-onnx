@@ -18,7 +18,7 @@ from skl2onnx.common.shape_calculator import (
 from skl2onnx.operator_converters.linear_classifier import (
     convert_sklearn_linear_classifier,
 )
-from skl2onnx.helpers.integration import add_onnx_graph
+from skl2onnx.helpers import add_onnx_graph
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
