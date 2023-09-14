@@ -81,8 +81,7 @@ def _get_ir_version(opv):
 def max_onnxruntime_opset():
     """
     See `Versioning.md
-    <https://github.com/microsoft/onnxruntime/blob/
-    master/docs/Versioning.md>`_.
+    <https://github.com/microsoft/onnxruntime/blob/main/docs/Versioning.md>`_.
     """
     vi = pv.Version(ort_version.split("+")[0])
     if vi >= pv.Version("1.14.0"):

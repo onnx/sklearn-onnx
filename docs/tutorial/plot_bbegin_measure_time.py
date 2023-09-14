@@ -55,7 +55,7 @@ ereg.fit(X_train, y_train)
 # We measure the processing time per observation whether
 # or not an observation belongs to a batch or is a single one.
 
-sizes = [(1, 50), (10, 50), (1000, 10), (10000, 5)]
+sizes = [(1, 50), (10, 50), (100, 10)]
 
 with config_context(assume_finite=True):
     obs = []

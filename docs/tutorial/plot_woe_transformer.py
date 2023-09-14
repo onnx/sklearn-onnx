@@ -80,14 +80,14 @@ df
 #
 # onehot=False
 onx1 = to_onnx(woe1, X)
-sess = InferenceSession(onx1.SerializeToString())
+sess = InferenceSession(onx1.SerializeToString(), providers=["CPUExecutionProvider"])
 print(sess.run(None, {"X": X})[0])
 
 ##################################
 # onehot=True
 
 onx2 = to_onnx(woe2, X)
-sess = InferenceSession(onx2.SerializeToString())
+sess = InferenceSession(onx2.SerializeToString(), providers=["CPUExecutionProvider"])
 print(sess.run(None, {"X": X})[0])
 
 ################################################
@@ -153,5 +153,5 @@ df
 # And the conversion to ONNX using the same instruction.
 
 onxinf = to_onnx(woe1, X)
-sess = InferenceSession(onxinf.SerializeToString())
+sess = InferenceSession(onxinf.SerializeToString(), providers=["CPUExecutionProvider"])
 print(sess.run(None, {"X": X})[0])

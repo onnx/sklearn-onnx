@@ -45,7 +45,6 @@ it is possible to enable logging:
     import logging
     logger = logging.getLogger('skl2onnx')
     logger.setLevel(logging.DEBUG)
-    logging.basicConfig(level=logging.DEBUG)
 
 Example :ref:`l-example-logging` illustrates what it looks like.
 
@@ -63,6 +62,11 @@ lists all available converters.
 .. autofunction:: skl2onnx.update_registered_converter
 
 .. autofunction:: skl2onnx.update_registered_parser
+
+Helpers for new converters
+==========================
+
+.. autofunction:: skl2onnx.helpers.add_onnx_graph
 
 Manipulate ONNX graphs
 ======================

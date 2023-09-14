@@ -68,3 +68,4 @@ docs/tutorial/*.onnx
 docs/tutorial/*.jpg
 docs/tutorial/*.png
 docs/tutorial/*.dot
+docs/tutorial/catboost_info

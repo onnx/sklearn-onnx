@@ -25,6 +25,7 @@ The tutorial was tested with following version:
 .. runpython::
     :showcode:
 
+    import catboost
     import numpy
     import scipy
     import sklearn
@@ -34,11 +35,10 @@ The tutorial was tested with following version:
     import onnxruntime
     import xgboost
     import skl2onnx
-    import pyquickhelper
 
-    mods = [numpy, scipy, sklearn, lightgbm, xgboost,
+    mods = [numpy, scipy, sklearn, lightgbm, xgboost, catboost,
             onnx, onnxmltools, onnxruntime,
-            skl2onnx, pyquickhelper]
+            skl2onnx]
     mods = [(m.__name__, m.__version__) for m in mods]
     mx = max(len(_[0]) for _ in mods) + 1
     for name, vers in sorted(mods):

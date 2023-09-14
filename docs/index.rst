@@ -69,33 +69,36 @@ to automatically check every converter with
 `onnxruntime-gpu <https://pypi.org/project/onnxruntime-gpu>`_.
 Every converter is tested with this backend.
 
+**Getting started**
+
 ::
 
-    # Train a model.
+    import numpy as np
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
     from sklearn.ensemble import RandomForestClassifier
+
     iris = load_iris()
     X, y = iris.data, iris.target
+    X = X.astype(np.float32)
     X_train, X_test, y_train, y_test = train_test_split(X, y)
     clr = RandomForestClassifier()
     clr.fit(X_train, y_train)
 
-    # Convert into ONNX format
-    from skl2onnx import convert_sklearn
-    from skl2onnx.common.data_types import FloatTensorType
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    onx = convert_sklearn(clr, initial_types=initial_type)
+    # Convert into ONNX format.
+    from skl2onnx import to_onnx
+
+    onx = to_onnx(clr, X[:1])
     with open("rf_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
 
-    # Compute the prediction with ONNX Runtime
+    # Compute the prediction with onnxruntime.
     import onnxruntime as rt
-    import numpy
+
     sess = rt.InferenceSession("rf_iris.onnx", providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run([label_name], {input_name: X_test.astype(np.float32)})[0]
 
 **Related converters**
 
@@ -106,6 +109,10 @@ Other converters can be found on `github/onnx <https://github.com/onnx/>`_,
 `torch.onnx <https://pytorch.org/docs/stable/onnx.html>`_,
 `ONNX-MXNet API <https://mxnet.incubator.apache.org/api/python/contrib/onnx.html>`_,
 `Microsoft.ML.Onnx <https://www.nuget.org/packages/Microsoft.ML.Onnx/>`_...
+
+**Change Logs**
+
+See `CHANGELOGS.md <https://github.com/onnx/sklearn-onnx/blob/main/CHANGELOGS.md>`_.
 
 **Credits**
 

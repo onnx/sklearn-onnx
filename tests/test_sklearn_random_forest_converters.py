@@ -447,7 +447,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             self.assertIsNotNone(model_onnx)
             X_test = X_test.astype(numpy.float32)[:5]
 
-            # There is a bug in onnxruntime <= 1.1.0.
+            # There is a bug in onnxruntime <= 1.11.0.
             # Raw scores are always positive.
             dump_data_and_model(
                 X_test,

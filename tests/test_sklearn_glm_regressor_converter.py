@@ -14,7 +14,7 @@ except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
-from sklearn import linear_model
+from sklearn import linear_model, __version__ as sklearn_version
 from sklearn.datasets import make_regression
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.neural_network import MLPRegressor
@@ -52,6 +52,7 @@ from test_utils import (
 
 
 ort_version = ort_version.split("+")[0]
+skl_version = ".".join(sklearn_version.split(".")[:2])
 
 
 class TestGLMRegressorConverter(unittest.TestCase):
@@ -225,7 +226,15 @@ class TestGLMRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnLinearSVRBool")
 
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
+        reason="sklearn fails on windows",
+    )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge(self):
         model, X = fit_regression_model(linear_model.Ridge())
         model_onnx = convert_sklearn(
@@ -237,7 +246,15 @@ class TestGLMRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRidge-Dec4")
 
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
+        reason="sklearn fails on windows",
+    )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_int(self):
         model, X = fit_regression_model(linear_model.Ridge(), is_int=True)
         model_onnx = convert_sklearn(
@@ -249,7 +266,15 @@ class TestGLMRegressorConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(X, model, model_onnx, basename="SklearnRidgeInt-Dec4")
 
-    @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.11.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        pv.Version(skl_version) <= pv.Version("1.1.0"),
+        reason="sklearn fails on windows",
+    )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_ridge_bool(self):
         model, X = fit_regression_model(linear_model.Ridge(), is_bool=True)
         model_onnx = convert_sklearn(

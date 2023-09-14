@@ -48,7 +48,7 @@ onx = to_onnx(clr, X_train, target_opset=12)
 # The output type for the probabilities is a list of
 # dictionaries.
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 res = sess.run(None, {"X": X_test})
 print(res[1][:2])
 print("probabilities type:", type(res[1]))
@@ -64,7 +64,9 @@ initial_type = [("float_input", FloatTensorType([None, 4]))]
 options = {id(clr): {"zipmap": False}}
 onx2 = to_onnx(clr, X_train, options=options, target_opset=12)
 
-sess2 = rt.InferenceSession(onx2.SerializeToString())
+sess2 = rt.InferenceSession(
+    onx2.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res2 = sess2.run(None, {"X": X_test})
 print(res2[1][:2])
 print("probabilities type:", type(res2[1]))
@@ -81,7 +83,9 @@ print("type for the first observations:", type(res2[1][0]))
 options = {id(clr): {"zipmap": "columns"}}
 onx3 = to_onnx(clr, X_train, options=options, target_opset=12)
 
-sess3 = rt.InferenceSession(onx3.SerializeToString())
+sess3 = rt.InferenceSession(
+    onx3.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res3 = sess3.run(None, {"X": X_test})
 for i, out in enumerate(sess3.get_outputs()):
     print(
@@ -124,7 +128,9 @@ initial_type = [("float_input", FloatTensorType([None, 4]))]
 options = {id(clr): {"zipmap": False, "output_class_labels": True}}
 onx4 = to_onnx(clr, X_train, options=options, target_opset=12)
 
-sess4 = rt.InferenceSession(onx4.SerializeToString())
+sess4 = rt.InferenceSession(
+    onx4.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res4 = sess4.run(None, {"X": X_test})
 print(res4[1][:2])
 print("probabilities type:", type(res4[1]))
@@ -159,7 +165,9 @@ print(clr)
 
 onx5 = to_onnx(clr, X_train, target_opset=12)
 
-sess5 = rt.InferenceSession(onx5.SerializeToString())
+sess5 = rt.InferenceSession(
+    onx5.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res5 = sess5.run(None, {"X": X_test[:3]})
 print(res5)
 
@@ -174,7 +182,9 @@ onx6 = to_onnx(
     options={"zipmap": False, "output_class_labels": True},
 )
 
-sess6 = rt.InferenceSession(onx6.SerializeToString())
+sess6 = rt.InferenceSession(
+    onx6.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 res6 = sess6.run(None, {"X": X_test[:3]})
 print("predicted labels", res6[0])
 print("predicted probabilies", res6[1])

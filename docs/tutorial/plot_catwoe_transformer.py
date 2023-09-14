@@ -131,7 +131,7 @@ print(enc.transform(X[:5]))
 
 
 ord_onx = to_onnx(enc, X[:1], target_opset=14)
-sess = InferenceSession(ord_onx.SerializeToString())
+sess = InferenceSession(ord_onx.SerializeToString(), providers=["CPUExecutionProvider"])
 print(sess.run(None, {"X": X[:5]})[0])
 
 ######################################
@@ -232,5 +232,5 @@ print(woe.transform(X[:5]))
 
 
 woe_onx = to_onnx(woe, X[:1], target_opset=14)
-sess = InferenceSession(woe_onx.SerializeToString())
+sess = InferenceSession(woe_onx.SerializeToString(), providers=["CPUExecutionProvider"])
 print(sess.run(None, {"X": X[:5]})[0])

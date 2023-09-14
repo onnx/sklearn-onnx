@@ -259,7 +259,9 @@ model_onnx = to_onnx(model, X_test[:1].astype(np.float32), target_opset=12)
 
 X32 = X_test[:5].astype(np.float32)
 
-sess = rt.InferenceSession(model_onnx.SerializeToString())
+sess = rt.InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 results = sess.run(None, {"X": X32})
 
 print("--labels--")

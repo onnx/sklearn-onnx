@@ -197,7 +197,7 @@ with open("pipeline_tfidf.onnx", "wb") as f:
 ##########################
 # Predictions with onnxruntime.
 
-sess = rt.InferenceSession("pipeline_tfidf.onnx")
+sess = rt.InferenceSession("pipeline_tfidf.onnx", providers=["CPUExecutionProvider"])
 print("---", train_data[0])
 inputs = {"input": train_data[:1]}
 pred_onx = sess.run(None, inputs)

@@ -69,7 +69,7 @@ onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 with open("logreg_iris.onnx", "wb") as f:
     f.write(onx.SerializeToString())
 
-sess = rt.InferenceSession("logreg_iris.onnx")
+sess = rt.InferenceSession("logreg_iris.onnx", providers=["CPUExecutionProvider"])
 input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
 pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]

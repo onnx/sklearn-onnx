@@ -160,7 +160,7 @@ update_registered_converter(
 
 onx = to_onnx(dec, X.astype(numpy.float32))
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float32))
 got = sess.run(None, {"X": X.astype(numpy.float32)})[0]
@@ -180,7 +180,7 @@ print(diff(exp, got))
 
 onx = to_onnx(dec, X.astype(numpy.float64))
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 exp = dec.transform(X.astype(numpy.float64))
 got = sess.run(None, {"X": X.astype(numpy.float64)})[0]

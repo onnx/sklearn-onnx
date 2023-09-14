@@ -46,7 +46,7 @@ initial_type = [("float_input", FloatTensorType([None, 4]))]
 onx = convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
 
-sess = rt.InferenceSession(onx.SerializeToString())
+sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 input_name = sess.get_inputs()[0].name
 label_name = sess.get_outputs()[0].name
 pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
@@ -74,7 +74,6 @@ convert_sklearn(clr, initial_types=initial_type, target_opset=12, verbose=1)
 
 logger = logging.getLogger("skl2onnx")
 logger.setLevel(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG)
 
 convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
@@ -82,10 +81,10 @@ convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 # And to disable it.
 
 logger.setLevel(logging.INFO)
-logging.basicConfig(level=logging.INFO)
 
 convert_sklearn(clr, initial_types=initial_type, target_opset=12)
 
+logger.setLevel(logging.WARNING)
 
 #################################
 # **Versions used for this example**

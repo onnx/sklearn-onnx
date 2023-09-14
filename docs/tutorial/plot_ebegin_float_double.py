@@ -147,7 +147,7 @@ def diff(p1, p2):
 
 onx = to_onnx(model, Xi_train[:1].astype(numpy.float32), target_opset=15)
 
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 
 X32 = Xi_test.astype(numpy.float32)
 
@@ -207,7 +207,7 @@ model2.fit(Xi_train, yi_train)
 
 onx2 = to_onnx(model2, Xi_train[:1].astype(numpy.float32), target_opset=15)
 
-sess2 = InferenceSession(onx2.SerializeToString())
+sess2 = InferenceSession(onx2.SerializeToString(), providers=["CPUExecutionProvider"])
 
 skl2 = model2.predict(X32)
 ort2 = sess2.run(None, {"X": X32})[0]
@@ -238,7 +238,7 @@ onx3 = to_onnx(
     target_opset=15,
 )
 
-sess3 = InferenceSession(onx3.SerializeToString())
+sess3 = InferenceSession(onx3.SerializeToString(), providers=["CPUExecutionProvider"])
 
 skl3 = model3.predict(X32)
 ort3 = sess3.run(None, {"X": X32})[0]

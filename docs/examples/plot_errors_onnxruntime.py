@@ -41,7 +41,7 @@ with open("logreg_iris.onnx", "wb") as f:
     )
 
 example2 = "logreg_iris.onnx"
-sess = rt.InferenceSession(example2)
+sess = rt.InferenceSession(example2, providers=["CPUExecutionProvider"])
 
 input_name = sess.get_inputs()[0].name
 output_name = sess.get_outputs()[0].name

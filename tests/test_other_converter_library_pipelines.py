@@ -11,13 +11,14 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 from skl2onnx.common.data_types import FloatTensorType
-from skl2onnx import convert_sklearn, update_registered_converter
+from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
 )
 from skl2onnx.operator_converters.linear_classifier import (
     convert_sklearn_linear_classifier,
 )
+from skl2onnx.helpers import add_onnx_graph
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -56,6 +57,20 @@ def my_custom_converter(scope, operator, container):
     operator.raw_operator = raw.estimator_
     convert_sklearn_linear_classifier(scope, operator, container)
     operator.raw_operator = raw
+
+
+class MyCustomClassifierAdd(MyCustomClassifier):
+    pass
+
+
+def my_custom_converter_add(scope, operator, container):
+    onx = to_onnx(
+        operator.raw_operator.estimator_,
+        initial_types=operator.inputs,
+        options={"zipmap": False},
+        target_opset=TARGET_OPSET,
+    )
+    add_onnx_graph(scope, operator, container, onx)
 
 
 class TestOtherLibrariesInPipeline(unittest.TestCase):
@@ -131,6 +146,32 @@ class TestOtherLibrariesInPipeline(unittest.TestCase):
             pipe,
             model_onnx,
             basename="SklearnPipelineScalerCustomClassifier2",
+        )
+
+    def test_add_onnx_graph(self):
+        data = load_iris()
+        X = data.data[:, :2]
+        y = data.target
+
+        model = MyCustomClassifierAdd()
+        pipe = Pipeline([("scaler", StandardScaler()), ("lgbm", model)])
+        pipe.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            pipe,
+            "pipeline",
+            [("input", FloatTensorType([None, 2]))],
+            custom_conversion_functions={
+                MyCustomClassifierAdd: my_custom_converter_add
+            },
+            custom_shape_calculators={MyCustomClassifierAdd: my_custom_shape_extractor},
+            target_opset=TARGET_OPSET,
+        )
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            pipe,
+            model_onnx,
+            basename="SklearnPipelineScalerCustomClassifierAdd",
         )
 
 

@@ -81,7 +81,7 @@ assert_almost_equal(mod1.transform(corpus).todense(), mod2.transform(corpus).tod
 # declared.
 
 onx = to_onnx(mod2, corpus)
-sess = InferenceSession(onx.SerializeToString())
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 got = sess.run(None, {"X": corpus})
 
 ###################################
