@@ -89,20 +89,22 @@ class TestIssueShapeInference(unittest.TestCase):
         )
 
         # ReferenceEvaluator
-        ref = ReferenceEvaluator(model_onnx, verbose=9)
-        res = ref.run(None, feeds)
-        self.assertEqual(1, len(res))
-        self.assertEqual(expected.shape, res[0].shape)
-        assert_almost_equal(expected, res[0])
+        with self.subTest(engine="onnx"):
+            ref = ReferenceEvaluator(model_onnx, verbose=9)
+            res = ref.run(None, feeds)
+            self.assertEqual(1, len(res))
+            self.assertEqual(expected.shape, res[0].shape)
+            assert_almost_equal(expected, res[0])
 
         # onnxruntime
-        sess = rt.InferenceSession(
-            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
-        )
-        res = sess.run(None, feeds)
-        self.assertEqual(1, len(res))
-        self.assertEqual(expected.shape, res[0].shape)
-        assert_almost_equal(expected, res[0])
+        with self.subTest(engine="onnxruntime"):
+            sess = rt.InferenceSession(
+                model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
+            res = sess.run(None, feeds)
+            self.assertEqual(1, len(res))
+            self.assertEqual(expected.shape, res[0].shape)
+            assert_almost_equal(expected, res[0])
 
 
 if __name__ == "__main__":

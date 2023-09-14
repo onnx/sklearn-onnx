@@ -97,7 +97,7 @@ def convert_sklearn_one_hot_encoder(
         if afeat:
             index_name = scope.get_unique_variable_name(name + str(index_in))
             container.add_initializer(
-                index_name, onnx_proto.TensorProto.INT64, [], [index_in]
+                index_name, onnx_proto.TensorProto.INT64, [1], [index_in]
             )
             out_name = scope.get_unique_variable_name(name + str(index_in))
             container.add_node(
