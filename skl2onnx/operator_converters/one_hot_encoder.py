@@ -171,7 +171,7 @@ def convert_sklearn_one_hot_encoder(
                 "Gather",
                 [ohe_output, indices_to_keep_name],
                 extracted_outputs_name,
-                axis=1,
+                axis=-1,
                 name=scope.get_unique_operator_name("Gather"),
             )
             ohe_output, categories = extracted_outputs_name, indices_to_keep
@@ -180,7 +180,7 @@ def convert_sklearn_one_hot_encoder(
         categories_len += len(categories)
 
     concat_result_name = scope.get_unique_variable_name("concat_result")
-    apply_concat(scope, result, concat_result_name, container, axis=2)
+    apply_concat(scope, result, concat_result_name, container, axis=-1)
 
     reshape_input = concat_result_name
     if np.issubdtype(ohe_op.dtype, np.signedinteger):
