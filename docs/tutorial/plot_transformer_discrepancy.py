@@ -16,7 +16,7 @@ This example proposes a equivalent model with no discrepancies.
 Imports, setups
 +++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and :epkg:`lightgbm`.
 """
 import pprint

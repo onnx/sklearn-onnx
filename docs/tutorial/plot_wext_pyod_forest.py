@@ -18,7 +18,7 @@ This example uses :ref:`l-plot-custom-converter` as a start.
 Trains a model
 ++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 """
 import numpy as np
