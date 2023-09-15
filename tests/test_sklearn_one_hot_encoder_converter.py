@@ -359,6 +359,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx, basename="SklearnOneHotEncoderStringDropFirst2"
         )
 
+    @unittest.skipIf(TARGET_OPSET < 18, reason="issing ReferenceEvaluator")
     @ignore_warnings(category=RuntimeWarning)
     def test_shape_inference(self):
         cat_columns_openings = ["cat_1", "cat_2"]
