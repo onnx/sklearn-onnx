@@ -7,7 +7,11 @@ import numpy
 from numpy.testing import assert_almost_equal
 from onnx.defs import onnx_opset_version
 import pandas
-from onnx.reference import ReferenceEvaluator
+
+try:
+    from onnx.reference import ReferenceEvaluator
+except ImportError:
+    ReferenceEvaluator = None
 from onnxruntime import InferenceSession, __version__ as ort_version
 from sklearn import __version__ as sklearn_version
 from sklearn.preprocessing import OneHotEncoder
@@ -360,7 +364,9 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             data, model, model_onnx, basename="SklearnOneHotEncoderStringDropFirst2"
         )
 
-    @unittest.skipIf(onnx_opset_version() < 19, reason="issing ReferenceEvaluator")
+    @unittest.skipIf(
+        onnx_opset_version() < 19, reason="missing ops in reference implementation"
+    )
     @ignore_warnings(category=RuntimeWarning)
     def test_shape_inference(self):
         cat_columns_openings = ["cat_1", "cat_2"]
