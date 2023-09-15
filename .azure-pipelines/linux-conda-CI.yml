@@ -320,8 +320,8 @@ jobs:
   - script: |
       # some of this is triggering the following error when importing scipy on python 3.10
       # ImportError: /lib/x86_64-linux-gnu/libstdc++.so.6: version `GLIBCXX_3.4.29'
-      conda install -c conda-forge "lightgbm${lgbm.version}" xgboost --no-deps
-      pip install hummingbird-ml hummingbird xgboost lightgbm
+      conda install -c conda-forge "lightgbm${lgbm.version}" "xgboost<2" --no-deps
+      pip install hummingbird-ml hummingbird "xgboost<2" lightgbm
       pip install --no-deps git+https://github.com/microsoft/onnxconverter-common.git
       pip install onnxmltools
     displayName: 'install onnxmltools'
