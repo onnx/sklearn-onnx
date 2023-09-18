@@ -124,8 +124,21 @@ def convert_sklearn_feature_hasher(
     container.add_node("Concat", [shape_not_last, mone, nf], final_shape, axis=0)
     final_reshaped = scope.get_unique_variable_name("final_reshaped")
     container.add_node("Reshape", [final, final_shape], final_reshaped)
+
+    if op.dtype == np.float32:
+        to = TensorProto.FLOAT
+    elif op.dtype == np.float64:
+        to = TensorProto.DOUBLE
+    elif op.dtype in (np.int32, np.uint32, np.int64):
+        to = TensorProto.INT64
+    else:
+        raise RuntimeError(
+            f"Converter is not implemented for FeatureHasher.dtype={op.dtype}."
+        )
+    final_reshaped_cast = scope.get_unique_variable_name("final_reshaped_cast")
+    container.add_node("Cast", [final_reshaped], final_reshaped_cast, to=to)
     container.add_node(
-        "ReduceSum", [final_reshaped, mtwo], out[0].full_name, keepdims=0
+        "ReduceSum", [final_reshaped_cast, mtwo], out[0].full_name, keepdims=0
     )
 
 

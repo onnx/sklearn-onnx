@@ -6,6 +6,7 @@ Tests scikit-learn's feature selection converters
 import unittest
 import packaging.version as pv
 import numpy as np
+from sklearn.utils._testing import assert_almost_equal
 from pandas import DataFrame
 from onnx import TensorProto
 from onnx.helper import (
@@ -18,6 +19,9 @@ from onnx.helper import (
 from onnx.checker import check_model
 from onnxruntime import __version__ as ort_version
 from sklearn.feature_extraction import FeatureHasher
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import (
     StringTensorType,
@@ -25,7 +29,11 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     DoubleTensorType,
 )
-from test_utils import TARGET_OPSET, TARGET_IR, InferenceSessionEx as InferenceSession
+from test_utils import (
+    TARGET_OPSET,
+    TARGET_IR,
+    InferenceSessionEx as InferenceSession,
+)
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
@@ -203,7 +211,6 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         model.fit(data)
         expected = model.transform(data).todense()
-        print(expected)
 
         model_onnx = to_onnx(
             model,
@@ -251,6 +258,140 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             if a != b:
                 raise AssertionError(f"Discrepancies at line {i}: {a} != {b}")
 
+    def test_feature_hasher_pipeline(self):
+        data = {
+            "Education": [
+                "a",
+                "b",
+                "d",
+                "abd",
+                "6-11yrs",
+                "6-11yrs",
+                "11-15yrs",
+                "a",
+                "b",
+                "d",
+                "abd",
+                "6-11yrs",
+                "6-11yrs",
+                "11-15yrs",
+            ],
+            "Label": [1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1],
+        }
+        df = DataFrame(data)
+
+        cat_features = ["Education"]
+        X_train = df[cat_features]
+
+        X_train["cat_features"] = df[cat_features].values.tolist()
+        X_train = X_train.drop(cat_features, axis=1)
+        y_train = df["Label"]
+
+        preprocessing_pipeline = ColumnTransformer(
+            [
+                (
+                    "cat_preprocessor",
+                    FeatureHasher(
+                        n_features=16,
+                        input_type="string",
+                        alternate_sign=False,
+                        dtype=np.float32,
+                    ),
+                    "cat_features",
+                )
+            ],
+            sparse_threshold=0.0,
+        )
+
+        complete_pipeline = Pipeline(
+            steps=[
+                ("preprocessor", preprocessing_pipeline),
+                ("classifier", DecisionTreeClassifier(max_depth=2)),
+            ],
+        )
+        complete_pipeline.fit(X_train, y_train)
+
+        # first check
+        model = FeatureHasher(
+            n_features=16,
+            input_type="string",
+            alternate_sign=False,
+            dtype=np.float32,
+        )
+        X_train_ort = X_train.values
+        model.fit(X_train_ort)
+        expected = np.asarray(model.transform(X_train_ort.ravel()).todense())
+        model_onnx = to_onnx(
+            model,
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        with open("debug_tr_0.onnx", "wb") as f:
+            f.write(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        assert_almost_equal(expected, got[0])
+
+        # check hash
+        X_train_ort = X_train.values
+        expected = np.asarray(
+            complete_pipeline.steps[0][-1]
+            .transformers_[0][1]
+            .transform(X_train.values.ravel())
+            .todense()
+        )
+        model_onnx = to_onnx(
+            complete_pipeline.steps[0][-1].transformers_[0][1],
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        with open("debug_tr_0.onnx", "wb") as f:
+            f.write(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        assert_almost_equal(expected, got[0])
+
+        # transform
+        X_train_ort = X_train.values
+        expected = complete_pipeline.steps[0][-1].transform(X_train)
+        model_onnx = to_onnx(
+            complete_pipeline.steps[0][-1],
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        with open("debug_tr.onnx", "wb") as f:
+            f.write(model_onnx.SerializeToString())
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        assert_almost_equal(expected, got[0].astype(np.float64))
+
+        # classifier
+        expected = complete_pipeline.predict_proba(X_train)
+        labels = complete_pipeline.predict(X_train)
+        model_onnx = to_onnx(
+            complete_pipeline,
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        X_train_ort = X_train.values
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        with open("debug.onnx", "wb") as f:
+            f.write(model_onnx.SerializeToString())
+        assert_almost_equal(expected, got[1].astype(np.float64))
+        assert_almost_equal(labels, got[0])
+
 
 if __name__ == "__main__":
-    unittest.main()
+    TestSklearnFeatureHasher().test_feature_hasher_pipeline()
+    unittest.main(verbosity=2)
