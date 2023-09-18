@@ -260,23 +260,8 @@ class TestSklearnFeatureHasher(unittest.TestCase):
 
     def test_feature_hasher_pipeline(self):
         data = {
-            "Education": [
-                "a",
-                "b",
-                "d",
-                "abd",
-                "6-11yrs",
-                "6-11yrs",
-                "11-15yrs",
-                "a",
-                "b",
-                "d",
-                "abd",
-                "6-11yrs",
-                "6-11yrs",
-                "11-15yrs",
-            ],
-            "Label": [1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 0, 1],
+            "Education": ["a", "b", "d", "abd"],
+            "Label": [1, 1, 0, 0],
         }
         df = DataFrame(data)
 
@@ -318,21 +303,27 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             alternate_sign=False,
             dtype=np.float32,
         )
-        X_train_ort = X_train.values
-        model.fit(X_train_ort)
-        expected = np.asarray(model.transform(X_train_ort.ravel()).todense())
+        X_train_ort1 = X_train.values.reshape((-1, 1))
+        with self.assertRaises(TypeError):
+            np.asarray(model.transform(X_train_ort1).todense())
+        input_strings = ["a", "b", "d", "abd"]
+        X_train_ort2 = np.array(input_strings, dtype=object).reshape((-1, 1))
+        model.fit(X_train_ort2)
+        # type(X_train_ort2[0, 0]) == str != list == type(X_train_ort2[0, 0])
+        expected2 = np.asarray(model.transform(X_train_ort2).todense())
         model_onnx = to_onnx(
             model,
             initial_types=[("cat_features", StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
         )
-        with open("debug_tr_0.onnx", "wb") as f:
-            f.write(model_onnx.SerializeToString())
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(None, dict(cat_features=X_train_ort))
-        assert_almost_equal(expected, got[0])
+        got2 = sess.run(None, dict(cat_features=X_train_ort2))
+        assert_almost_equal(expected2, got2[0])
+        got1 = sess.run(None, dict(cat_features=X_train_ort1))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected2, got1[0])
 
         # check hash
         X_train_ort = X_train.values
@@ -347,12 +338,13 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             initial_types=[("cat_features", StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
         )
-        with open("debug_tr_0.onnx", "wb") as f:
-            f.write(model_onnx.SerializeToString())
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         got = sess.run(None, dict(cat_features=X_train_ort))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected, got[0])
+        got = sess.run(None, dict(cat_features=X_train_ort2))
         assert_almost_equal(expected, got[0])
 
         # transform
@@ -363,12 +355,13 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             initial_types=[("cat_features", StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
         )
-        with open("debug_tr.onnx", "wb") as f:
-            f.write(model_onnx.SerializeToString())
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         got = sess.run(None, dict(cat_features=X_train_ort))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected, got[0].astype(np.float64))
+        got = sess.run(None, dict(cat_features=X_train_ort2))
         assert_almost_equal(expected, got[0].astype(np.float64))
 
         # classifier
@@ -386,9 +379,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         X_train_ort = X_train.values
         got = sess.run(None, dict(cat_features=X_train_ort))
-        with open("debug.onnx", "wb") as f:
-            f.write(model_onnx.SerializeToString())
-        assert_almost_equal(expected, got[1].astype(np.float64))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected, got[1].astype(np.float64))
+        got = sess.run(None, dict(cat_features=X_train_ort2))
         assert_almost_equal(labels, got[0])
 
 
