@@ -425,7 +425,11 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             ("cat_2", Int64TensorType([None, 1])),
         ]
 
-        model_onnx = convert_sklearn(model, initial_types=initial_type)
+        model_onnx = convert_sklearn(
+            model, initial_types=initial_type, target_opset=TARGET_OPSET
+        )
+        if TARGET_OPSET < 19:
+            model_onnx.ir_version = 8
 
         feeds = dict(
             [
