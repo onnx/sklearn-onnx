@@ -206,7 +206,7 @@ if IForest is not None:
     expected_labels = model1.predict(data)
     expected_proba = model1.predict_proba(data)
 
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
     res = sess.run(None, {"float_input": data})
 
     onx_labels = res[0]
