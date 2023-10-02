@@ -45,8 +45,21 @@ def convert_sklearn_one_hot_encoder(
 
         enum_cats = []
         index_inputs = 0
+        to_drop = ohe_op._drop_idx_after_grouping
+        if to_drop is not None:
+            # raise NotImplementedError(
+            #    f"The converter is not implemented when "
+            #    f"_drop_idx_after_grouping is not None: {to_drop}."
+            # )
+            pass
 
         for index, cats in enumerate(ohe_op.categories_):
+            filtered_cats = ohe_op._compute_transformed_categories(index)
+            if ohe_op._infrequent_enabled and "infrequent_sklearn" in filtered_cats:
+                raise NotImplementedError(
+                    f"Infrequent categories are not implemented "
+                    f"{filtered_cats} != {cats}."
+                )
             while sum(all_shapes[: index_inputs + 1]) <= index:
                 index_inputs += 1
             index_in_input = index - sum(all_shapes[:index_inputs])

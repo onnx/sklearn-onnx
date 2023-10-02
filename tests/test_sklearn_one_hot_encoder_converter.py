@@ -20,13 +20,14 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LinearRegression
-from skl2onnx import convert_sklearn
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
     Int32TensorType,
     Int64TensorType,
     StringTensorType,
     FloatTensorType,
 )
+from skl2onnx.algebra.type_helper import guess_initial_types
 
 try:
     # scikit-learn >= 0.22
@@ -455,12 +456,74 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             self.assertEqual(expected.shape, res[0].shape)
             assert_almost_equal(expected, res[0])
 
+    def test_min_frequency(self):
+        data = pandas.DataFrame(
+            [
+                dict(CAT1="a", CAT2="a", num1=0.5, num2=0.6, y=0),
+                dict(CAT1="b", CAT2="b", num1=0.4, num2=0.8, y=1),
+                dict(CAT1="a", CAT2="c", num1=0.5, num2=0.56, y=0),
+                dict(CAT1="a", CAT2="d", num1=0.55, num2=0.56, y=1),
+                dict(CAT1="a", CAT2="d", num1=0.35, num2=0.86, y=0),
+                dict(CAT1="a", CAT2="d", num1=0.5, num2=0.68, y=1),
+            ]
+        )
+        cat_cols = ["CAT1", "CAT2"]
+        train_data = data.drop("y", axis=1)
+        for c in train_data.columns:
+            if c not in cat_cols:
+                train_data[c] = train_data[c].astype(numpy.float32)
+
+        pipe = Pipeline(
+            [
+                (
+                    "preprocess",
+                    ColumnTransformer(
+                        transformers=[
+                            (
+                                "cat",
+                                Pipeline(
+                                    [
+                                        (
+                                            "onehot",
+                                            OneHotEncoder(
+                                                min_frequency=2,
+                                                sparse_output=False,
+                                                handle_unknown="ignore",
+                                            ),
+                                        )
+                                    ]
+                                ),
+                                cat_cols,
+                            )
+                        ],
+                        remainder="passthrough",
+                    ),
+                ),
+            ]
+        )
+        pipe.fit(train_data, data["y"])
+
+        init = guess_initial_types(train_data, None)
+        self.assertEqual([i[0] for i in init], "CAT1 CAT2 num1 num2".split())
+        for t in init:
+            self.assertEqual(t[1].shape, [None, 1])
+        onx2 = to_onnx(pipe, initial_types=init)
+        sess2 = InferenceSession(
+            onx2.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+
+        inputs = {c: train_data[c].values.reshape((-1, 1)) for c in train_data.columns}
+        got2 = sess2.run(None, inputs)
+
+        expected = pipe.transform(train_data)
+        assert_almost_equal(expected, got2[0])
+
 
 if __name__ == "__main__":
     import logging
 
-    for name in ["skl2onnx", "onnx-extended"]:
+    for name in ["skl2onnx"]:
         log = logging.getLogger(name)
         log.setLevel(logging.ERROR)
-    TestSklearnOneHotEncoderConverter().test_model_one_hot_encoder()
+    # TestSklearnOneHotEncoderConverter().test_min_frequency()
     unittest.main(verbosity=2)
