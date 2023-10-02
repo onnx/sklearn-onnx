@@ -1,15 +1,25 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+from textwrap import dedent
+from io import StringIO
 import numpy
+from numpy.testing import assert_almost_equal
+import pandas
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import VotingClassifier
-from skl2onnx import convert_sklearn
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.pipeline import Pipeline
+from onnxruntime import InferenceSession
+from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common._apply_operation import apply_mul
+from skl2onnx.common.data_types import guess_data_type
 from test_utils import (
     dump_multiple_classification,
     dump_binary_classification,
@@ -230,6 +240,87 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Weighted42Soft", target_opset=TARGET_OPSET
         )
 
+    def test_voting_classifier_one_more_input(self):
+        csv_x = dedent(
+            """
+        checking_status,duration,credit_history,purpose,credit_amount,savings_status,###
+        employment,installment_commitment,personal_status,other_parties,residence_since,###
+        property_magnitude,age,other_payment_plans,housing,existing_credits,job,###
+        num_dependents,own_telephone,foreign_worker
+        <0,6,critical/other existing credit,radio/tv,1169.0,no known savings,>=7,4,###
+        male single,none,4,real estate,67,none,own,2,skilled,1,yes,yes
+        0<=X<200,48,existing paid,radio/tv,5951.0,<100,1<=X<4,2,female div/dep/mar,###
+        none,2,real estate,22,none,own,1,skilled,1,none,yes
+        no checking,12,critical/other existing credit,education,2096.0,<100,4<=X<7,2,###
+        male single,none,3,real estate,49,none,own,1,unskilled resident,2,none,yes
+        <0,42,existing paid,furniture/equipment,7882.0,<100,4<=X<7,2,male single,###
+        guarantor,4,life insurance,45,none,for free,1,skilled,2,none,yes
+        <0,24,delayed previously,new car,4870.0,<100,1<=X<4,3,male single,none,4,###
+        no known property,53,none,for free,2,skilled,2,none,yes
+        no checking,36,existing paid,education,9055.0,no known savings,###
+        1<=X<4,2,male single,###
+        none,4,no known property,35,none,for free,1,unskilled resident,2,yes,yes
+        no checking,24,existing paid,furniture/equipment,2835.0,500<=X<1000,###
+        >=7,3,male single,###
+        none,4,life insurance,53,none,own,1,skilled,1,none,yes
+        0<=X<200,36,existing paid,used car,6948.0,<100,1<=X<4,2,###
+        male single,none,2,car,35,###
+        none,rent,1,high qualif/self emp/mgmt,1,yes,yes
+        no checking,12,existing paid,radio/tv,3059.0,>=1000,4<=X<7,2,###
+        male div/sep,none,4,###
+        real estate,61,none,own,1,unskilled resident,1,none,yes
+        0<=X<200,30,critical/other existing credit,new car,5234.0,<100,unemployed,4,###
+        male mar/wid,none,2,car,28,none,own,2,high qualif/self emp/mgmt,1,none,yes
+        """.replace(
+                "###\n        ", ""
+            )
+        )
+
+        X = pandas.read_csv(StringIO(csv_x))
+        self.assertEqual(X.shape, (10, 20))
+        y = [
+            "good",
+            "bad",
+            "good",
+            "good",
+            "bad",
+            "good",
+            "good",
+            "good",
+            "good",
+            "bad",
+        ]
+
+        model = VotingClassifier(
+            estimators=[
+                (
+                    "est",
+                    Pipeline(
+                        steps=[
+                            ("imputer", SimpleImputer(strategy="most_frequent")),
+                            ("encoder", OrdinalEncoder()),
+                            (
+                                "rf",
+                                RandomForestClassifier(n_estimators=10, max_depth=2),
+                            ),
+                        ],
+                    ),
+                ),
+            ],
+        )
+        model.fit(X, y)
+        expected = model.predict(X)
+        schema = guess_data_type(X)
+
+        onnx_model = to_onnx(model=model, initial_types=schema)
+
+        sess = InferenceSession(onnx_model.SerializeToString())
+        inputs = {c: X[c].to_numpy().reshape((-1, 1)) for c in X.columns}
+        got = sess.run(None, inputs)
+
+        assert_almost_equal(expected, got[0])
+
 
 if __name__ == "__main__":
-    unittest.main()
+    TestVotingClassifierConverter().test_voting_classifier_one_more_input()
+    unittest.main(verbosity=2)
