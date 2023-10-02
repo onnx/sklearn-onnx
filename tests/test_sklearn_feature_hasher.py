@@ -17,7 +17,7 @@ from onnx.helper import (
     make_opsetid,
 )
 from onnx.checker import check_model
-from onnxruntime import __version__ as ort_version
+from onnxruntime import __version__ as ort_version, SessionOptions
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -384,7 +384,65 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         got = sess.run(None, dict(cat_features=X_train_ort2))
         assert_almost_equal(labels, got[0])
 
+    def test_feature_hasher_pipeline_list(self):
+        from onnxruntime_extensions import _get_library_path
+
+        pipe_hash = Pipeline(
+            steps=[
+                (
+                    "preprocessor",
+                    ColumnTransformer(
+                        [
+                            (
+                                "cat_features",
+                                FeatureHasher(
+                                    n_features=8,
+                                    input_type="string",
+                                    alternate_sign=False,
+                                    dtype=np.float32,
+                                ),
+                                "cat_features",
+                            ),
+                        ],
+                        sparse_threshold=0.0,
+                    ),
+                ),
+            ],
+        )
+
+        df = DataFrame(
+            {
+                "Cat1": ["a", "b", "d", "abd", "e", "z", "ez"],
+                "Cat2": ["A", "B", "D", "ABD", "e", "z", "ez"],
+            }
+        )
+
+        cat_features = [c for c in df.columns if "Cat" in c]
+        X_train = df[cat_features].copy()
+        X_train["cat_features"] = df[cat_features].values.tolist()
+        X_train = X_train.drop(cat_features, axis=1)
+        pipe_hash.fit(X_train)
+
+        onx = to_onnx(
+            pipe_hash,
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            options={FeatureHasher: {"separator": "#"}},
+        )
+        expected = pipe_hash.transform(X_train)
+        so = SessionOptions()
+        so.register_custom_ops_library(_get_library_path())
+        sess = InferenceSession(
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+
+        dfx = df.copy()
+        dfx["cat_features"] = df[cat_features].agg("#".join, axis=1)
+        got = sess.run(
+            None, dict(cat_features=dfx["cat_features"].values.reshape((-1, 1)))
+        )
+        assert_almost_equal(expected, got[0])
+
 
 if __name__ == "__main__":
-    TestSklearnFeatureHasher().test_feature_hasher_pipeline()
+    TestSklearnFeatureHasher().test_feature_hasher_pipeline_list()
     unittest.main(verbosity=2)

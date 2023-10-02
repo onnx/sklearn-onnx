@@ -11,7 +11,6 @@ from ..common._container import ModelComponentContainer
 def convert_sklearn_feature_hasher(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
-    X = operator.inputs[0]
     out = operator.outputs
     op = operator.raw_operator
     if op.input_type != "string":
@@ -20,10 +19,48 @@ def convert_sklearn_feature_hasher(
             f"input_type='string' not {op.input_type!r}."
         )
 
+    # If option separator is not None, the converter assumes the input
+    # is one string column, each element is a list of strings concatenated
+    # with this separator.
+    options = container.get_options(op, dict(separator=None))
+    separator = options.get("separator", None)
+
+    if separator is not None:
+        # Let's split the columns
+        delimiter = scope.get_unique_variable_name("delimiter")
+        container.add_initializer(delimiter, TensorProto.STRING, [], [separator])
+        skip_empty = scope.get_unique_variable_name("delimiter")
+        container.add_initializer(skip_empty, TensorProto.BOOL, [], [True])
+
+        to_concat = []
+        for i, col_to_split in enumerate(operator.inputs):
+            split = scope.get_unique_variable_name(f"split{i}")
+            to_concat.append(split)
+            container.add_node(
+                "StringSplit",
+                [col_to_split.full_name, delimiter, skip_empty],
+                [split],
+                op_domain="ai.onnx.contrib",
+                op_version=1,
+            )
+        if len(to_concat) == 1:
+            input_hasher = to_concat[0]
+        else:
+            input_hasher = scope.get_unique_variable_name("concatenated")
+            container.add_node("Concat", to_concat, [input_hasher], axis=1)
+    elif len(operator.inputs) == 1:
+        X = operator.inputs[0]
+        input_hasher = X.full_name
+    else:
+        raise RuntimeError(
+            f"Only one input is expected but received "
+            f"{[i.name for i in operator.inputs]}."
+        )
+
     hashed_ = scope.get_unique_variable_name("hashed_")
     container.add_node(
         "MurmurHash3",
-        X.full_name,
+        input_hasher,
         hashed_,
         positive=0,
         seed=0,
@@ -117,7 +154,7 @@ def convert_sklearn_feature_hasher(
     # in case there is more than one column, we need to reduce over
     # the last dimension
     input_shape = scope.get_unique_variable_name("input_shape")
-    container.add_node("Shape", X.full_name, input_shape)
+    container.add_node("Shape", input_hasher, input_shape)
     shape_not_last = scope.get_unique_variable_name("shape_not_last")
     container.add_node("Slice", [input_shape, zero, mone], shape_not_last)
     final_shape = scope.get_unique_variable_name("final_last")
@@ -142,4 +179,6 @@ def convert_sklearn_feature_hasher(
     )
 
 
-register_converter("SklearnFeatureHasher", convert_sklearn_feature_hasher)
+register_converter(
+    "SklearnFeatureHasher", convert_sklearn_feature_hasher, options={"separator": None}
+)
