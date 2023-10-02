@@ -385,7 +385,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         assert_almost_equal(labels, got[0])
 
     def test_feature_hasher_pipeline_list(self):
-        from onnxruntime_extensions import _get_library_path
+        from onnxruntime_extensions import get_library_path
 
         pipe_hash = Pipeline(
             steps=[
@@ -430,7 +430,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         expected = pipe_hash.transform(X_train)
         so = SessionOptions()
-        so.register_custom_ops_library(_get_library_path())
+        so.register_custom_ops_library(get_library_path())
         sess = InferenceSession(
             onx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
