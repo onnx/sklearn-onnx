@@ -1387,7 +1387,7 @@ class TestSklearnPipeline(unittest.TestCase):
         X_train, X_test, y_train, y_test = train_test_split(X, y)
         regr = Pipeline([("std", StandardScaler()), ("reg", LinearRegression())])
         regr = regr.fit(X_train, y_train)
-        onnx_model = to_onnx(regr, X=X_train)
+        onnx_model = to_onnx(regr, X=X_train, target_opset=TARGET_OPSET)
 
         sess = InferenceSession(
             onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
