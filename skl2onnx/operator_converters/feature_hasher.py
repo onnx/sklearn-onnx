@@ -32,19 +32,49 @@ def convert_sklearn_feature_hasher(
             delimiter, TensorProto.STRING, [], [separator.encode("utf-8")]
         )
         skip_empty = scope.get_unique_variable_name("delimiter")
-        container.add_initializer(skip_empty, TensorProto.BOOL, [], [True])
+        container.add_initializer(skip_empty, TensorProto.BOOL, [], [False])
+        flat_shape = scope.get_unique_variable_name("flat_shape")
+        container.add_initializer(flat_shape, TensorProto.INT64, [1], [-1])
+        zero = scope.get_unique_variable_name("zero")
+        container.add_initializer(zero, TensorProto.INT64, [1], [0])
 
         to_concat = []
         for i, col_to_split in enumerate(operator.inputs):
-            split = scope.get_unique_variable_name(f"split{i}")
-            to_concat.append(split)
+            reshaped = scope.get_unique_variable_name(f"reshaped{i}")
+            container.add_node(
+                "Reshape", [col_to_split.full_name, flat_shape], [reshaped]
+            )
+            out_indices = scope.get_unique_variable_name(f"out_indices{i}")
+            out_text = scope.get_unique_variable_name(f"out_text{i}")
+            out_shape = scope.get_unique_variable_name(f"out_shape{i}")
             container.add_node(
                 "StringSplit",
-                [col_to_split.full_name, delimiter, skip_empty],
-                [split],
+                [reshaped, delimiter, skip_empty],
+                [out_indices, out_text, out_shape],
                 op_domain="ai.onnx.contrib",
                 op_version=1,
             )
+            shape = scope.get_unique_variable_name(f"shape{i}")
+            container.add_node("Shape", [col_to_split.full_name], [shape])
+            shape0 = scope.get_unique_variable_name(f"shape0_{i}")
+            container.add_node("Slice", [zero, shape, zero], [shape0])
+            extract = scope.get_unique_variable_name(f"extract{i}")
+            container.add_node("Slice", [out_text, shape0, zero], [extract])
+
+            flat_split = scope.get_unique_variable_name(f"flat_split{i}")
+            container.add_node(
+                "StringRaggedTensorToDense",
+                [out_indices, out_text, out_indices, extract],
+                [flat_split],
+                op_domain="ai.onnx.contrib",
+                op_version=1,
+            )
+            shape_1 = scope.get_unique_variable_name(f"shape_1{i}")
+            container.add_node("Concat", [shape, flat_shape], [shape_1], axis=0)
+
+            split = scope.get_unique_variable_name(f"split{i}")
+            to_concat.append(split)
+            container.add_node("Reshape", [flat_split, shape_1], [split])
         if len(to_concat) == 1:
             input_hasher = to_concat[0]
         else:
