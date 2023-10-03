@@ -4,7 +4,6 @@ import unittest
 from textwrap import dedent
 from io import StringIO
 import numpy
-from numpy.testing import assert_almost_equal
 import pandas
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
@@ -310,8 +309,9 @@ class TestVotingClassifierConverter(unittest.TestCase):
                                 "est",
                                 Pipeline(
                                     steps=[
-                                        # This encoder is placed before SimpleImputer because
-                                        # onnx does not support text for Imputer
+                                        # This encoder is placed before
+                                        # impleImputer because
+                                        # onnx does not support text for Imputer.
                                         ("encoder", OrdinalEncoder()),
                                         (
                                             "imputer",
