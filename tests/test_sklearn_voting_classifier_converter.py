@@ -338,7 +338,10 @@ class TestVotingClassifierConverter(unittest.TestCase):
         schema = guess_data_type(X)
 
         onnx_model = to_onnx(
-            model=model, initial_types=schema, options={"zipmap": False}
+            model=model,
+            initial_types=schema,
+            options={"zipmap": False},
+            target_opset=TARGET_OPSET,
         )
 
         sess = InferenceSession(
