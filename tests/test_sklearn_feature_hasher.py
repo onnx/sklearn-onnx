@@ -426,6 +426,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             pipe_hash,
             initial_types=[("cat_features", StringTensorType([None, 1]))],
             options={FeatureHasher: {"separator": "#"}},
+            target_opset=TARGET_OPSET,
         )
 
         from onnxruntime_extensions import get_library_path
