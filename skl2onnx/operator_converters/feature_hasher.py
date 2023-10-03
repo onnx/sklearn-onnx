@@ -28,7 +28,9 @@ def convert_sklearn_feature_hasher(
     if separator is not None:
         # Let's split the columns
         delimiter = scope.get_unique_variable_name("delimiter")
-        container.add_initializer(delimiter, TensorProto.STRING, [], [separator])
+        container.add_initializer(
+            delimiter, TensorProto.STRING, [], [separator.encode("utf-8")]
+        )
         skip_empty = scope.get_unique_variable_name("delimiter")
         container.add_initializer(skip_empty, TensorProto.BOOL, [], [True])
 

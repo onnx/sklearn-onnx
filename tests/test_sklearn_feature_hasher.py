@@ -385,8 +385,6 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         assert_almost_equal(labels, got[0])
 
     def test_feature_hasher_pipeline_list(self):
-        from onnxruntime_extensions import get_library_path
-
         pipe_hash = Pipeline(
             steps=[
                 (
@@ -422,13 +420,16 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         X_train["cat_features"] = df[cat_features].values.tolist()
         X_train = X_train.drop(cat_features, axis=1)
         pipe_hash.fit(X_train)
+        expected = pipe_hash.transform(X_train)
 
         onx = to_onnx(
             pipe_hash,
             initial_types=[("cat_features", StringTensorType([None, 1]))],
             options={FeatureHasher: {"separator": "#"}},
         )
-        expected = pipe_hash.transform(X_train)
+
+        from onnxruntime_extensions import get_library_path
+
         so = SessionOptions()
         so.register_custom_ops_library(get_library_path())
         sess = InferenceSession(
