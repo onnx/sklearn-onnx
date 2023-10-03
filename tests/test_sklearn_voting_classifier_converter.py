@@ -14,6 +14,7 @@ from sklearn.preprocessing import OrdinalEncoder
 from sklearn.impute import SimpleImputer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
 from onnxruntime import InferenceSession
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType
@@ -281,8 +282,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
         y = [
             "good",
             "bad",
-            "good",
-            "good",
+            "bad",
+            "bad",
             "bad",
             "good",
             "good",
@@ -291,34 +292,61 @@ class TestVotingClassifierConverter(unittest.TestCase):
             "bad",
         ]
 
-        model = VotingClassifier(
-            estimators=[
+        model = Pipeline(
+            steps=[
                 (
-                    "est",
-                    Pipeline(
-                        steps=[
-                            ("imputer", SimpleImputer(strategy="most_frequent")),
-                            ("encoder", OrdinalEncoder()),
+                    "concat",
+                    ColumnTransformer(
+                        [("concat", "passthrough", list(range(X.shape[1])))],
+                        sparse_threshold=0,
+                    ),
+                ),
+                (
+                    "voting",
+                    VotingClassifier(
+                        flatten_transform=False,
+                        estimators=[
                             (
-                                "rf",
-                                RandomForestClassifier(n_estimators=10, max_depth=2),
+                                "est",
+                                Pipeline(
+                                    steps=[
+                                        # This encoder is placed before SimpleImputer because
+                                        # onnx does not support text for Imputer
+                                        ("encoder", OrdinalEncoder()),
+                                        (
+                                            "imputer",
+                                            SimpleImputer(strategy="most_frequent"),
+                                        ),
+                                        (
+                                            "rf",
+                                            RandomForestClassifier(
+                                                n_estimators=4,
+                                                max_depth=4,
+                                                random_state=0,
+                                            ),
+                                        ),
+                                    ],
+                                ),
                             ),
                         ],
                     ),
                 ),
-            ],
+            ]
         )
         model.fit(X, y)
         expected = model.predict(X)
         schema = guess_data_type(X)
 
-        onnx_model = to_onnx(model=model, initial_types=schema)
+        onnx_model = to_onnx(
+            model=model, initial_types=schema, options={"zipmap": False}
+        )
 
-        sess = InferenceSession(onnx_model.SerializeToString())
+        sess = InferenceSession(
+            onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
         inputs = {c: X[c].to_numpy().reshape((-1, 1)) for c in X.columns}
         got = sess.run(None, inputs)
-
-        assert_almost_equal(expected, got[0])
+        self.assertEqual(expected.tolist(), got[0].tolist())
 
 
 if __name__ == "__main__":
