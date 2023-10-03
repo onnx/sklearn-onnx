@@ -433,7 +433,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         so = SessionOptions()
         so.register_custom_ops_library(get_library_path())
         sess = InferenceSession(
-            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+            onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
         )
 
         dfx = df.copy()
