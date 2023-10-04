@@ -33,7 +33,7 @@ def convert_sklearn_feature_hasher(
             delimiter, TensorProto.STRING, [], [separator.encode("utf-8")]
         )
         empty_string = scope.get_unique_variable_name("empty_string")
-        container.add_initializer(empty_string, TensorProto.STRING, [], [""])
+        container.add_initializer(empty_string, TensorProto.STRING, [], ["".encode("utf-8")])
         skip_empty = scope.get_unique_variable_name("delimiter")
         container.add_initializer(skip_empty, TensorProto.BOOL, [], [False])
         flat_shape = scope.get_unique_variable_name("flat_shape")
