@@ -3,8 +3,10 @@
 import unittest
 from textwrap import dedent
 from io import StringIO
+import packaging.version as pv
 import numpy
 import pandas
+from sklearn import __version__ as sklver
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -240,6 +242,10 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Weighted42Soft", target_opset=TARGET_OPSET
         )
 
+    @unittest.skipIf(
+        pv.Version(sklver) < pv.Version("1.1.0"),
+        reason="need more recent version of scikit-learn",
+    )
     def test_voting_classifier_one_more_input(self):
         csv_x = dedent(
             """
