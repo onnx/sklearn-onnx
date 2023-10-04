@@ -3,6 +3,7 @@
 import numpy as np
 from onnx import TensorProto
 from onnx.helper import make_tensor
+from onnx.numpy_helper import from_array
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -31,12 +32,16 @@ def convert_sklearn_feature_hasher(
         container.add_initializer(
             delimiter, TensorProto.STRING, [], [separator.encode("utf-8")]
         )
+        empty_string = scope.get_unique_variable_name("empty_string")
+        container.add_initializer(empty_string, TensorProto.STRING, [], [""])
         skip_empty = scope.get_unique_variable_name("delimiter")
         container.add_initializer(skip_empty, TensorProto.BOOL, [], [False])
         flat_shape = scope.get_unique_variable_name("flat_shape")
         container.add_initializer(flat_shape, TensorProto.INT64, [1], [-1])
         zero = scope.get_unique_variable_name("zero")
         container.add_initializer(zero, TensorProto.INT64, [1], [0])
+        one = scope.get_unique_variable_name("one")
+        container.add_initializer(one, TensorProto.INT64, [1], [1])
 
         to_concat = []
         for i, col_to_split in enumerate(operator.inputs):
@@ -56,25 +61,29 @@ def convert_sklearn_feature_hasher(
             )
             shape = scope.get_unique_variable_name(f"shape{i}")
             container.add_node("Shape", [col_to_split.full_name], [shape])
-            shape0 = scope.get_unique_variable_name(f"shape0_{i}")
-            container.add_node("Slice", [zero, shape, zero], [shape0])
-            extract = scope.get_unique_variable_name(f"extract{i}")
-            container.add_node("Slice", [out_text, shape0, zero], [extract])
 
+            emptyi = scope.get_unique_variable_name(f"emptyi{i}")
+            container.add_node(
+                "ConstantOfShape",
+                [out_shape],
+                [emptyi],
+                value=from_array(np.array([0], dtype=np.int64)),
+            )
+            emptyb = scope.get_unique_variable_name(f"emptyb{i}")
+            container.add_node("Cast", [emptyi], [emptyb], to=TensorProto.BOOL)
+            emptys = scope.get_unique_variable_name(f"emptys{i}")
+            container.add_node("Where", [emptyb, empty_string, empty_string], [emptys])
             flat_split = scope.get_unique_variable_name(f"flat_split{i}")
             container.add_node(
-                "StringRaggedTensorToDense",
-                [out_indices, out_text, out_indices, extract],
-                [flat_split],
-                op_domain="ai.onnx.contrib",
-                op_version=1,
+                "ScatterND", [emptys, out_indices, out_text], [flat_split]
             )
-            shape_1 = scope.get_unique_variable_name(f"shape_1{i}")
-            container.add_node("Concat", [shape, flat_shape], [shape_1], axis=0)
+            # shape_1 = scope.get_unique_variable_name(f"shape_1{i}")
+            # container.add_node("Concat", [shape, flat_shape], [shape_1], axis=0)
 
             split = scope.get_unique_variable_name(f"split{i}")
             to_concat.append(split)
-            container.add_node("Reshape", [flat_split, shape_1], [split])
+            # container.add_node("Reshape", [flat_split, shape_1], [split])
+            container.add_node("Identity", [flat_split], [split])
         if len(to_concat) == 1:
             input_hasher = to_concat[0]
         else:
@@ -135,8 +144,6 @@ def convert_sklearn_feature_hasher(
 
     new_shape = scope.get_unique_variable_name("new_shape")
     container.add_initializer(new_shape, TensorProto.INT64, [2], [-1, 1])
-    new_shape2 = scope.get_unique_variable_name("new_shape2")
-    container.add_initializer(new_shape2, TensorProto.INT64, [2], [1, -1])
 
     # values
     if op.alternate_sign:
@@ -181,7 +188,7 @@ def convert_sklearn_feature_hasher(
         "ScatterElements", [zerot, indices_reshaped, values_reshaped], final, axis=1
     )
 
-    # at this point, every string has been processed as if it was in
+    # at this point, every string has been processed as if it were in
     # in a single columns.
     # in case there is more than one column, we need to reduce over
     # the last dimension
