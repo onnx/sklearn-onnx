@@ -7,8 +7,9 @@ from ..common._container import ModelComponentContainer
 from ..common.data_types import guess_numpy_type
 
 
-def convert_quantile_transformer(scope: Scope, operator: Operator,
-                                 container: ModelComponentContainer):
+def convert_quantile_transformer(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     """Converter for QuantileTransformer"""
     # op_in = operator.inputs[0]
     # op_out = operator.outputs[0].full_name
@@ -17,10 +18,11 @@ def convert_quantile_transformer(scope: Scope, operator: Operator,
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
-    if op.output_distribution != 'uniform':
+    if op.output_distribution != "uniform":
         raise RuntimeError(
             "Conversion of QuantileTransformer with output_distribution=%r "
-            "is not supported." % op.output_distribution)
+            "is not supported." % op.output_distribution
+        )
 
     # ref = op.references_
     # quantiles = op.quantiles_
@@ -52,4 +54,4 @@ def convert_quantile_transformer(scope: Scope, operator: Operator,
     raise NotImplementedError()
 
 
-register_converter('SklearnQuantileTransformer', convert_quantile_transformer)
+register_converter("SklearnQuantileTransformer", convert_quantile_transformer)

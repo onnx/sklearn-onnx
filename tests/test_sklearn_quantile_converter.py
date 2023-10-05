@@ -14,21 +14,25 @@ from test_utils import dump_data_and_model
 
 
 class TestSklearnQuantileTransformer(unittest.TestCase):
-
-    @unittest.skipIf(StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
-                     reason="ConstantOfShape not available")
+    @unittest.skipIf(
+        StrictVersion(onnx.__version__) < StrictVersion("1.4.0"),
+        reason="ConstantOfShape not available",
+    )
     def test_quantile_transformer(self):
         X = np.empty((100, 2), dtype=np.float32)
         X[:, 0] = np.arange(X.shape[0])
         X[:, 1] = np.arange(X.shape[0]) * 2
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test",
-            [("input", FloatTensorType([None, X.shape[1]]))])
+            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+        )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            X.astype(np.float32), model, model_onnx,
-            basename="SklearnQuantileTransformer")
+            X.astype(np.float32),
+            model,
+            model_onnx,
+            basename="SklearnQuantileTransformer",
+        )
 
 
 if __name__ == "__main__":

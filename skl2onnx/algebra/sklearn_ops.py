@@ -6,6 +6,7 @@ Place holder for all ONNX operators.
 import sys
 import textwrap
 from sklearn.pipeline import Pipeline, FeatureUnion
+
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
@@ -17,16 +18,21 @@ from .onnx_subgraph_operator_mixin import OnnxSubGraphOperatorMixin
 def ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc, alias):
     from .onnx_subgraph_operator_mixin import OnnxSubGraphOperatorMixin
 
-    newclass = type(class_name, (OnnxSubGraphOperatorMixin, skl_obj),
-                    {'__doc__': doc,
-                     'operator_name': skl_obj.__name__,
-                     '_fct_converter': conv,
-                     '_fct_shape_calc': shape_calc,
-                     'input_range': [1, 1e9],
-                     'output_range': [1, 1e9],
-                     'op_version': None,
-                     'alias': alias,
-                     '__module__': __name__})
+    newclass = type(
+        class_name,
+        (OnnxSubGraphOperatorMixin, skl_obj),
+        {
+            "__doc__": doc,
+            "operator_name": skl_obj.__name__,
+            "_fct_converter": conv,
+            "_fct_shape_calc": shape_calc,
+            "input_range": [1, 1e9],
+            "output_range": [1, 1e9],
+            "op_version": None,
+            "alias": alias,
+            "__module__": __name__,
+        },
+    )
     return newclass
 
 
@@ -52,9 +58,7 @@ def dynamic_class_creation_sklearn():
         prefix = "Sklearn" if "sklearn" in str(skl_obj) else ""
         class_name = "Onnx" + prefix + skl_name
         try:
-            cl = ClassFactorySklearn(skl_obj, class_name,
-                                     doc, conv, shape_calc,
-                                     name)
+            cl = ClassFactorySklearn(skl_obj, class_name, doc, conv, shape_calc, name)
         except TypeError:
             continue
         cls[class_name] = cl
@@ -85,11 +89,15 @@ def find_class(skl_cl):
         available = sorted(filter(lambda n: prefix in n, sys.modules))
         raise RuntimeError(
             "Unable to find a class for '{}' in\n{}".format(
-                skl_cl.__name__, "\n".join(available)))
+                skl_cl.__name__, "\n".join(available)
+            )
+        )
     cl = getattr(this, full_name)
     if "automation" in str(cl):
-        raise RuntimeError("Dynamic operation issue with class "
-                           "name '{}' from '{}'.".format(cl, __name__))
+        raise RuntimeError(
+            "Dynamic operation issue with class "
+            "name '{}' from '{}'.".format(cl, __name__)
+        )
     return cl
 
 
@@ -109,8 +117,7 @@ class OnnxSklearnPipeline(Pipeline, OnnxSubGraphOperatorMixin):
 
 if ColumnTransformer is not None:
 
-    class OnnxSklearnColumnTransformer(ColumnTransformer,
-                                       OnnxSubGraphOperatorMixin):
+    class OnnxSklearnColumnTransformer(ColumnTransformer, OnnxSubGraphOperatorMixin):
         """
         Combines `ColumnTransformer
         <https://scikit-learn.org/stable/modules/generated/

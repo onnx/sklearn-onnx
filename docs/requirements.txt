@@ -1,16 +1,14 @@
 autopep8
 catboost
 category_encoders
-codecov
 coverage
 flake8
 furo
 joblib
-lightgbm
+lightgbm<4.0
 loky
 matplotlib
 mlinsights>=0.3.631
-mlprodict>=0.4.1259
 nbsphinx
 onnx
 onnxruntime
@@ -31,4 +29,4 @@ sphinx-gallery
 tabulate
 tqdm
 wheel
-xgboost
+xgboost<2

@@ -7,12 +7,20 @@ from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import (
-    OnnxReduceSumSquareApi18, OnnxGemm, OnnxMatMul,
-    OnnxAdd, OnnxArgMin, OnnxCast, OnnxSqrt, OnnxMul)
+    OnnxReduceSumSquareApi18,
+    OnnxGemm,
+    OnnxMatMul,
+    OnnxAdd,
+    OnnxArgMin,
+    OnnxCast,
+    OnnxSqrt,
+    OnnxMul,
+)
 
 
-def convert_sklearn_kmeans(scope: Scope, operator: Operator,
-                           container: ModelComponentContainer):
+def convert_sklearn_kmeans(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     """
     Computation graph of distances to all centroids for a batch of examples.
     Note that a centriod is just the center of a cluster. We use ``[]`` to
@@ -81,32 +89,29 @@ def convert_sklearn_kmeans(scope: Scope, operator: Operator,
 
     C2 = row_norms(C, squared=True).astype(dtype)
     C = C.astype(dtype)
-    rs = OnnxReduceSumSquareApi18(
-        input_name, axes=[1], keepdims=1, op_version=opv)
+    rs = OnnxReduceSumSquareApi18(input_name, axes=[1], keepdims=1, op_version=opv)
 
-    if options['gemm']:
+    if options["gemm"]:
         N = X.get_first_dimension()
         if isinstance(N, int):
-            zeros = np.zeros((N, ), dtype=dtype)
+            zeros = np.zeros((N,), dtype=dtype)
         else:
-            zeros = OnnxMul(rs, np.array([0], dtype=dtype),
-                            op_version=opv)
-        gemm_out = OnnxGemm(input_name, C, zeros, alpha=-2.,
-                            transB=1, op_version=opv)
+            zeros = OnnxMul(rs, np.array([0], dtype=dtype), op_version=opv)
+        gemm_out = OnnxGemm(input_name, C, zeros, alpha=-2.0, transB=1, op_version=opv)
     else:
-        gemm_out = OnnxMatMul(
-            input_name, (C.T * (-2)).astype(dtype), op_version=opv)
+        gemm_out = OnnxMatMul(input_name, (C.T * (-2)).astype(dtype), op_version=opv)
 
     z = OnnxAdd(rs, gemm_out, op_version=opv)
     y2 = OnnxAdd(C2, z, op_version=opv)
-    ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1],
-                    op_version=opv)
+    ll = OnnxArgMin(y2, axis=1, keepdims=0, output_names=out[:1], op_version=opv)
     y2s = OnnxSqrt(y2, output_names=out[1:], op_version=opv)
     ll.add_to(scope, container)
     y2s.add_to(scope, container)
 
 
-register_converter('SklearnKMeans', convert_sklearn_kmeans,
-                   options={'gemm': [True, False]})
-register_converter('SklearnMiniBatchKMeans', convert_sklearn_kmeans,
-                   options={'gemm': [True, False]})
+register_converter(
+    "SklearnKMeans", convert_sklearn_kmeans, options={"gemm": [True, False]}
+)
+register_converter(
+    "SklearnMiniBatchKMeans", convert_sklearn_kmeans, options={"gemm": [True, False]}
+)

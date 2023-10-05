@@ -15,20 +15,18 @@ from test_utils import TARGET_OPSET
 
 
 class TestOnnxRareHelper(unittest.TestCase):
-
     def test_kmeans_upgrade(self):
         data = load_iris()
         X = data.data
         model = KMeans(n_clusters=3)
         model.fit(X)
-        model_onnx = convert_sklearn(model, "kmeans",
-                                     [("input", FloatTensorType([None, 4]))],
-                                     target_opset=7)
+        model_onnx = convert_sklearn(
+            model, "kmeans", [("input", FloatTensorType([None, 4]))], target_opset=7
+        )
         model8 = upgrade_opset_number(model_onnx, 8)
         assert "version: 8" in str(model8)
 
-    @unittest.skipIf(onnx_opset_version() < 11,
-                     reason="Needs opset >= 11")
+    @unittest.skipIf(onnx_opset_version() < 11, reason="Needs opset >= 11")
     def test_knn_upgrade(self):
         iris = load_iris()
         X, _ = iris.data, iris.target
@@ -36,9 +34,9 @@ class TestOnnxRareHelper(unittest.TestCase):
         clr = NearestNeighbors(n_neighbors=3, radius=None)
         clr.fit(X)
 
-        model_onnx = convert_sklearn(clr, "up",
-                                     [("input", FloatTensorType([None, 4]))],
-                                     target_opset=9)
+        model_onnx = convert_sklearn(
+            clr, "up", [("input", FloatTensorType([None, 4]))], target_opset=9
+        )
         try:
             upgrade_opset_number(model_onnx, 8)
             raise AssertionError()

@@ -8,8 +8,9 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 
 
-def convert_sklearn_ransac_regressor(scope: Scope, operator: Operator,
-                                     container: ModelComponentContainer):
+def convert_sklearn_ransac_regressor(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     """
     Converter for RANSACRegressor.
     """
@@ -18,11 +19,12 @@ def convert_sklearn_ransac_regressor(scope: Scope, operator: Operator,
     this_operator = scope.declare_local_operator(op_type, ransac_op.estimator_)
     this_operator.inputs = operator.inputs
     label_name = scope.declare_local_variable(
-        'label', operator.inputs[0].type.__class__())
+        "label", operator.inputs[0].type.__class__()
+    )
     this_operator.outputs.append(label_name)
-    apply_identity(scope, label_name.full_name,
-                   operator.outputs[0].full_name, container)
+    apply_identity(
+        scope, label_name.full_name, operator.outputs[0].full_name, container
+    )
 
 
-register_converter('SklearnRANSACRegressor',
-                   convert_sklearn_ransac_regressor)
+register_converter("SklearnRANSACRegressor", convert_sklearn_ransac_regressor)

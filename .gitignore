@@ -30,6 +30,7 @@ coverage.xml
 .coverage
 __dump_data/
 junit/
+tests_dump/
 skl2onnx/algebra/_cache/*.rst
 docs/auto_examples
 docs/examples/graph*.*
@@ -67,3 +68,4 @@ docs/tutorial/*.onnx
 docs/tutorial/*.jpg
 docs/tutorial/*.png
 docs/tutorial/*.dot
+docs/tutorial/catboost_info

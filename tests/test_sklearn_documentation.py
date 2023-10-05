@@ -11,13 +11,18 @@ import numpy as np
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import fetch_20newsgroups
+
 try:
     from sklearn.datasets._twenty_newsgroups import (
-        strip_newsgroup_footer, strip_newsgroup_quoting)
+        strip_newsgroup_footer,
+        strip_newsgroup_quoting,
+    )
 except ImportError:
     # scikit-learn < 0.24
     from sklearn.datasets.twenty_newsgroups import (
-        strip_newsgroup_footer, strip_newsgroup_quoting)
+        strip_newsgroup_footer,
+        strip_newsgroup_quoting,
+    )
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import Pipeline
 
@@ -54,7 +59,7 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
             sub = ""
             for line in headers.split("\n"):
                 if line.startswith(prefix):
-                    sub = line[len(prefix):]
+                    sub = line[len(prefix) :]
                     break
             features[i, 0] = sub
 
@@ -64,18 +69,16 @@ class SubjectBodyExtractor(BaseEstimator, TransformerMixin):
 class TestSklearnDocumentation(unittest.TestCase):
     "Test example from the documentation of scikit-learn."
 
+    @unittest.skipIf(sys.platform == "win32", reason="Too long on Windows")
     @unittest.skipIf(
-        sys.platform == "win32",
-        reason="Too long on Windows")
-    @unittest.skipIf(
-        TARGET_OPSET < 10,
-        reason="Encoding issue fixed in a later version")
+        TARGET_OPSET < 10, reason="Encoding issue fixed in a later version"
+    )
     def test_pipeline_tfidf(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         try:
-            train = fetch_20newsgroups(random_state=1,
-                                       subset="test",
-                                       categories=categories)
+            train = fetch_20newsgroups(
+                random_state=1, subset="test", categories=categories
+            )
         except urllib.error.URLError:
             warnings.warn("Unit test may fail due to connectivity issue.")
             return
@@ -85,49 +88,54 @@ class TestSklearnDocumentation(unittest.TestCase):
         tfi.fit(tdata.ravel())
         extra = {
             TfidfVectorizer: {
-                "separators": [
-                    " ", "[.]", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"
-                ]
+                "separators": [" ", "[.]", "\\?", ",", ";", ":", "\\!", "\\(", "\\)"]
             }
         }
         model_onnx = convert_sklearn(
-            tfi, "tfidf",
+            tfi,
+            "tfidf",
             initial_types=[("input", StringTensorType([1]))],
-            options=extra, target_opset=TARGET_OPSET
+            options=extra,
+            target_opset=TARGET_OPSET,
         )
         dump_data_and_model(
             tdata[:5],
             tfi,
             model_onnx,
-            basename="SklearnDocumentationTfIdf-OneOff-SklCol")
+            basename="SklearnDocumentationTfIdf-OneOff-SklCol",
+        )
 
     @unittest.skipIf(
         ColumnTransformer is None,
         reason="ColumnTransformer introduced in 0.20",
     )
     @unittest.skipIf(
-        TARGET_OPSET < 10,
-        reason="Encoding issue fixed in a later version")
+        TARGET_OPSET < 10, reason="Encoding issue fixed in a later version"
+    )
     def test_pipeline_tfidf_pipeline_minmax(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         try:
-            train = fetch_20newsgroups(random_state=1,
-                                       subset="train",
-                                       categories=categories)
+            train = fetch_20newsgroups(
+                random_state=1, subset="train", categories=categories
+            )
         except urllib.error.URLError:
             warnings.warn("Unit test may fail due to connectivity issue.")
             return
         train_data = SubjectBodyExtractor().fit_transform(train.data)
-        pipeline = Pipeline([(
-            "union",
-            ColumnTransformer(
-                [
-                    ("subject", TfidfVectorizer(min_df=50), 0),
-                    ("body", TfidfVectorizer(min_df=40), 1),
-                ],
-                transformer_weights={"subject": 0.8},
-            ),
-        )])
+        pipeline = Pipeline(
+            [
+                (
+                    "union",
+                    ColumnTransformer(
+                        [
+                            ("subject", TfidfVectorizer(min_df=50), 0),
+                            ("body", TfidfVectorizer(min_df=40), 1),
+                        ],
+                        transformer_weights={"subject": 0.8},
+                    ),
+                )
+            ]
+        )
         pipeline.fit(train_data[:300])
         extra = {
             TfidfVectorizer: {
@@ -152,20 +160,25 @@ class TestSklearnDocumentation(unittest.TestCase):
             }
         }
         model_onnx = convert_sklearn(
-            pipeline, "tfidf",
+            pipeline,
+            "tfidf",
             initial_types=[("input", StringTensorType([None, 2]))],
-            options=extra, target_opset=TARGET_OPSET
+            options=extra,
+            target_opset=TARGET_OPSET,
         )
-        test_data = np.array([
-            ["Albert Einstein", "Not relatively."],
-            ["Alan turing", "Not automatically."],
-        ])
+        test_data = np.array(
+            [
+                ["Albert Einstein", "Not relatively."],
+                ["Alan turing", "Not automatically."],
+            ]
+        )
         dump_data_and_model(
             test_data,
             pipeline,
             model_onnx,
             verbose=False,
-            basename="SklearnDocumentationTfIdfUnion1")
+            basename="SklearnDocumentationTfIdfUnion1",
+        )
 
 
 if __name__ == "__main__":

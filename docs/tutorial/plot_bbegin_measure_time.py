@@ -17,14 +17,16 @@ Training a pipeline
 import numpy
 from pandas import DataFrame
 from tqdm import tqdm
+from onnx.reference import ReferenceEvaluator
 from sklearn import config_context
 from sklearn.datasets import make_regression
 from sklearn.ensemble import (
-    GradientBoostingRegressor, RandomForestRegressor,
-    VotingRegressor)
+    GradientBoostingRegressor,
+    RandomForestRegressor,
+    VotingRegressor,
+)
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-from mlprodict.onnxrt import OnnxInference
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.tutorial import measure_time
@@ -32,15 +34,14 @@ from skl2onnx.tutorial import measure_time
 
 N = 11000
 X, y = make_regression(N, n_features=10)
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, train_size=0.01)
+X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.01)
 print("Train shape", X_train.shape)
 print("Test shape", X_test.shape)
 
 reg1 = GradientBoostingRegressor(random_state=1)
 reg2 = RandomForestRegressor(random_state=1)
 reg3 = LinearRegression()
-ereg = VotingRegressor([('gb', reg1), ('rf', reg2), ('lr', reg3)])
+ereg = VotingRegressor([("gb", reg1), ("rf", reg2), ("lr", reg3)])
 ereg.fit(X_train, y_train)
 
 #################################
@@ -54,17 +55,17 @@ ereg.fit(X_train, y_train)
 # We measure the processing time per observation whether
 # or not an observation belongs to a batch or is a single one.
 
-sizes = [(1, 50), (10, 50), (1000, 10), (10000, 5)]
+sizes = [(1, 50), (10, 50), (100, 10)]
 
 with config_context(assume_finite=True):
     obs = []
     for batch_size, repeat in tqdm(sizes):
-        context = {"ereg": ereg, 'X': X_test[:batch_size]}
+        context = {"ereg": ereg, "X": X_test[:batch_size]}
         mt = measure_time(
-            "ereg.predict(X)", context, div_by_number=True,
-            number=10, repeat=repeat)
-        mt['size'] = context['X'].shape[0]
-        mt['mean_obs'] = mt['average'] / mt['size']
+            "ereg.predict(X)", context, div_by_number=True, number=10, repeat=repeat
+        )
+        mt["size"] = context["X"].shape[0]
+        mt["mean_obs"] = mt["average"] / mt["size"]
         obs.append(mt)
 
 df_skl = DataFrame(obs)
@@ -73,8 +74,7 @@ df_skl
 #####################################
 # Graphe.
 
-df_skl.set_index('size')[['mean_obs']].plot(
-    title="scikit-learn", logx=True, logy=True)
+df_skl.set_index("size")[["mean_obs"]].plot(title="scikit-learn", logx=True, logy=True)
 
 ###############################
 # ONNX runtime
@@ -83,35 +83,41 @@ df_skl.set_index('size')[['mean_obs']].plot(
 # The same is done with the two ONNX runtime
 # available.
 
-onx = to_onnx(ereg, X_train[:1].astype(numpy.float32),
-              target_opset=14)
-sess = InferenceSession(onx.SerializeToString())
-oinf = OnnxInference(onx, runtime="python_compiled")
+onx = to_onnx(ereg, X_train[:1].astype(numpy.float32), target_opset=14)
+sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
+oinf = ReferenceEvaluator(onx)
 
 obs = []
 for batch_size, repeat in tqdm(sizes):
-
     # scikit-learn
-    context = {"ereg": ereg, 'X': X_test[:batch_size].astype(numpy.float32)}
+    context = {"ereg": ereg, "X": X_test[:batch_size].astype(numpy.float32)}
     mt = measure_time(
-        "ereg.predict(X)", context, div_by_number=True,
-        number=10, repeat=repeat)
-    mt['size'] = context['X'].shape[0]
-    mt['skl'] = mt['average'] / mt['size']
+        "ereg.predict(X)", context, div_by_number=True, number=10, repeat=repeat
+    )
+    mt["size"] = context["X"].shape[0]
+    mt["skl"] = mt["average"] / mt["size"]
 
     # onnxruntime
-    context = {"sess": sess, 'X': X_test[:batch_size].astype(numpy.float32)}
+    context = {"sess": sess, "X": X_test[:batch_size].astype(numpy.float32)}
     mt2 = measure_time(
-        "sess.run(None, {'X': X})[0]", context, div_by_number=True,
-        number=10, repeat=repeat)
-    mt['ort'] = mt2['average'] / mt['size']
+        "sess.run(None, {'X': X})[0]",
+        context,
+        div_by_number=True,
+        number=10,
+        repeat=repeat,
+    )
+    mt["ort"] = mt2["average"] / mt["size"]
 
-    # mlprodict
-    context = {"oinf": oinf, 'X': X_test[:batch_size].astype(numpy.float32)}
+    # ReferenceEvaluator
+    context = {"oinf": oinf, "X": X_test[:batch_size].astype(numpy.float32)}
     mt2 = measure_time(
-        "oinf.run({'X': X})['variable']", context, div_by_number=True,
-        number=10, repeat=repeat)
-    mt['pyrt'] = mt2['average'] / mt['size']
+        "oinf.run(None, {'X': X})[0]",
+        context,
+        div_by_number=True,
+        number=10,
+        repeat=repeat,
+    )
+    mt["pyrt"] = mt2["average"] / mt["size"]
 
     # end
     obs.append(mt)
@@ -123,9 +129,9 @@ df
 #####################################
 # Graph.
 
-df.set_index('size')[['skl', 'ort', 'pyrt']].plot(
-    title="Average prediction time per runtime",
-    logx=True, logy=True)
+df.set_index("size")[["skl", "ort", "pyrt"]].plot(
+    title="Average prediction time per runtime", logx=True, logy=True
+)
 
 #####################################
 # :epkg:`ONNX` runtimes are much faster than :epkg:`scikit-learn`

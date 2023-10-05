@@ -11,8 +11,10 @@ def calculate_constant_predictor_output_shapes(operator):
     operator.outputs[1].type.shape = [N, 2]
 
 
-register_shape_calculator('Sklearn_ConstantPredictor',
-                          calculate_constant_predictor_output_shapes)
+register_shape_calculator(
+    "Sklearn_ConstantPredictor", calculate_constant_predictor_output_shapes
+)
 
-register_shape_calculator('SklearnOneVsRestClassifier',
-                          calculate_linear_classifier_output_shapes)
+register_shape_calculator(
+    "SklearnOneVsRestClassifier", calculate_linear_classifier_output_shapes
+)

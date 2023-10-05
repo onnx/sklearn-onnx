@@ -11,17 +11,20 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 def autolabel(ax, rects):
     for rect in rects:
         height = rect.get_height()
-        ax.annotate('%1.1fx' % height,
-                    xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 3),  # 3 points vertical offset
-                    textcoords="offset points",
-                    ha='center', va='bottom',
-                    fontsize=8)
+        ax.annotate(
+            "%1.1fx" % height,
+            xy=(rect.get_x() + rect.get_width() / 2, height),
+            xytext=(0, 3),  # 3 points vertical offset
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=8,
+        )
 
 
 def linear_models():
-    filename1 = os.path.join(HERE, 'bench_plot_onnxruntime_linreg.csv')
-    filename2 = os.path.join(HERE, 'bench_plot_onnxruntime_logreg.csv')
+    filename1 = os.path.join(HERE, "bench_plot_onnxruntime_linreg.csv")
+    filename2 = os.path.join(HERE, "bench_plot_onnxruntime_logreg.csv")
     if not os.path.exists(filename1) or not os.path.exists(filename2):
         return
     dfr = read_csv(filename1)
@@ -45,12 +48,12 @@ def linear_models():
             x = numpy.arange(len(labels))
             width = 0.90
 
-            rects1 = ax.bar(x, means, width, label='Speedup')
+            rects1 = ax.bar(x, means, width, label="Speedup")
 
             if pos == 0:
-                ax.set_ylabel('Speedup')
-            ax.set_title('%s %d features' % (name, nf))
-            ax.set_xlabel('batch size')
+                ax.set_ylabel("Speedup")
+            ax.set_title("%s %d features" % (name, nf))
+            ax.set_xlabel("batch size")
             ax.set_xticks(x)
             ax.set_xticklabels(labels)
             autolabel(ax, rects1)
@@ -65,20 +68,20 @@ def linear_models():
 
 
 def svm_models():
-    filename = os.path.join(HERE, 'bench_plot_onnxruntime_svm_reg.csv')
+    filename = os.path.join(HERE, "bench_plot_onnxruntime_svm_reg.csv")
     if not os.path.exists(filename):
         return
     dfr = read_csv(filename)
     dfr["speedup"] = dfr["time_skl"] / dfr["time_ort"]
     print(dfr.tail())
 
-    ncols = len(set(dfr['kernel']))
+    ncols = len(set(dfr["kernel"]))
     fig, axs = plt.subplots(1, ncols, figsize=(14, 4), sharey=True)
 
     name = "SVR"
     nf = 50
     pos = 0
-    for kernel in sorted(set(dfr['kernel'])):
+    for kernel in sorted(set(dfr["kernel"])):
         sub = dfr[(dfr.kernel == kernel) & (dfr.nfeat == nf)]
         ax = axs[pos]
         labels = sub.n_obs
@@ -87,12 +90,12 @@ def svm_models():
         x = numpy.arange(len(labels))
         width = 0.90
 
-        rects1 = ax.bar(x, means, width, label='Speedup')
+        rects1 = ax.bar(x, means, width, label="Speedup")
 
         if pos == 0:
-            ax.set_ylabel('Speedup')
-        ax.set_title('%s %s - %d features' % (name, kernel, nf))
-        ax.set_xlabel('batch size')
+            ax.set_ylabel("Speedup")
+        ax.set_title("%s %s - %d features" % (name, kernel, nf))
+        ax.set_xlabel("batch size")
         ax.set_xticks(x)
         ax.set_xticklabels(labels)
         autolabel(ax, rects1)
@@ -107,8 +110,7 @@ def svm_models():
 
 
 def rf_models():
-    filename = os.path.join(
-        HERE, 'bench_plot_onnxruntime_random_forest_reg.csv')
+    filename = os.path.join(HERE, "bench_plot_onnxruntime_random_forest_reg.csv")
     if not os.path.exists(filename):
         return
     dfr = read_csv(filename)
@@ -125,8 +127,11 @@ def rf_models():
             for est in [100, 200]:
                 for n_jobs in [4]:
                     sub = dfr[
-                        (dfr.max_depth == max_depth) & (dfr.nfeat == nf) &
-                        (dfr.n_estimators == est) & (dfr.n_jobs == n_jobs)]
+                        (dfr.max_depth == max_depth)
+                        & (dfr.nfeat == nf)
+                        & (dfr.n_estimators == est)
+                        & (dfr.n_jobs == n_jobs)
+                    ]
                     ax = axs[pos]
                     labels = sub.n_obs
                     means = sub.speedup
@@ -134,17 +139,18 @@ def rf_models():
                     x = numpy.arange(len(labels))
                     width = 0.90
 
-                    rects1 = ax.bar(x, means, width, label='Speedup')
+                    rects1 = ax.bar(x, means, width, label="Speedup")
                     if pos == 0:
-                        ax.set_yscale('log')
-                        ax.set_ylim([0.1, max(dfr['speedup'])])
+                        ax.set_yscale("log")
+                        ax.set_ylim([0.1, max(dfr["speedup"])])
 
                     if pos == 0:
-                        ax.set_ylabel('Speedup')
+                        ax.set_ylabel("Speedup")
                     ax.set_title(
-                        '%s\ndepth %d - %d features\n %d estimators %d jobs'
-                        '' % (name, max_depth, nf, est, n_jobs))
-                    ax.set_xlabel('batch size')
+                        "%s\ndepth %d - %d features\n %d estimators %d jobs"
+                        "" % (name, max_depth, nf, est, n_jobs)
+                    )
+                    ax.set_xlabel("batch size")
                     ax.set_xticks(x)
                     ax.set_xticklabels(labels)
                     autolabel(ax, rects1)

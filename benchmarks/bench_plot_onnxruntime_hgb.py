@@ -24,13 +24,13 @@ from onnxruntime import InferenceSession
 # Implementations to benchmark.
 ##############################
 
+
 def fcts_model(X, y, max_depth, n_estimators):
     "RandomForestClassifier."
-    rf = HistGradientBoostingRegressor(
-        max_depth=max_depth, max_iter=n_estimators)
+    rf = HistGradientBoostingRegressor(max_depth=max_depth, max_iter=n_estimators)
     rf.fit(X, y)
 
-    initial_types = [('X', FloatTensorType([None, X.shape[1]]))]
+    initial_types = [("X", FloatTensorType([None, X.shape[1]]))]
     onx = convert_sklearn(rf, initial_types=initial_types)
     f = BytesIO()
     f.write(onx.SerializeToString())
@@ -42,28 +42,31 @@ def fcts_model(X, y, max_depth, n_estimators):
         return rf.predict(X)
 
     def predict_onnxrt_predict(X, sess=sess):
-        return sess.run(outputs[:1], {'X': X})[0]
+        return sess.run(outputs[:1], {"X": X})[0]
 
-    return {'predict': (
-        predict_skl_predict,
-        predict_onnxrt_predict,
-        None,
-    )}
+    return {
+        "predict": (
+            predict_skl_predict,
+            predict_onnxrt_predict,
+            None,
+        )
+    }
 
 
 ##############################
 # Benchmarks
 ##############################
 
+
 def allow_configuration(**kwargs):
     return True
 
 
-def bench(n_obs, n_features, max_depths, n_estimatorss,
-          methods, repeat=10, verbose=False):
+def bench(
+    n_obs, n_features, max_depths, n_estimatorss, methods, repeat=10, verbose=False
+):
     res = []
     for nfeat in n_features:
-
         ntrain = 100000
         X_train = np.empty((ntrain, nfeat)).astype(np.float32)
         X_train[:, :] = rand(ntrain, nfeat)[:, :]
@@ -76,17 +79,24 @@ def bench(n_obs, n_features, max_depths, n_estimatorss,
 
                 for n in n_obs:
                     for method in methods:
-
                         fct1, fct2, fct3 = fcts[method]
 
-                        if not allow_configuration(n=n, nfeat=nfeat,
-                                                   max_depth=max_depth,
-                                                   n_estimator=n_estimators,
-                                                   method=method):
+                        if not allow_configuration(
+                            n=n,
+                            nfeat=nfeat,
+                            max_depth=max_depth,
+                            n_estimator=n_estimators,
+                            method=method,
+                        ):
                             continue
 
-                        obs = dict(n_obs=n, nfeat=nfeat, max_depth=max_depth,
-                                   n_estimators=n_estimators, method=method)
+                        obs = dict(
+                            n_obs=n,
+                            nfeat=nfeat,
+                            max_depth=max_depth,
+                            n_estimators=n_estimators,
+                            method=method,
+                        )
 
                         # creates different inputs to avoid caching in any ways
                         Xs = []
@@ -128,8 +138,7 @@ def bench(n_obs, n_features, max_depths, n_estimatorss,
                             if len(p1.shape) == 1 and len(p2.shape) == 2:
                                 p2 = p2.ravel()
                             try:
-                                assert_almost_equal(
-                                    p1.ravel(), p2.ravel(), decimal=5)
+                                assert_almost_equal(p1.ravel(), p2.ravel(), decimal=5)
                             except AssertionError as e:
                                 warnings.warn(str(e))
     return res
@@ -139,11 +148,11 @@ def bench(n_obs, n_features, max_depths, n_estimatorss,
 # Plots.
 ##############################
 
+
 def plot_results(df, verbose=False):
     nrows = max(len(set(df.max_depth)) * len(set(df.n_obs)), 2)
     ncols = 2
-    fig, ax = plt.subplots(nrows, ncols,
-                           figsize=(ncols * 4, nrows * 4))
+    fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     pos = 0
     row = 0
     for n_obs in sorted(set(df.n_obs)):
@@ -152,17 +161,19 @@ def plot_results(df, verbose=False):
             for n_jobs in [1]:
                 a = ax[row, pos]
                 if row == ax.shape[0] - 1:
-                    a.set_xlabel("N features", fontsize='x-small')
+                    a.set_xlabel("N features", fontsize="x-small")
                 if pos == 0:
                     a.set_ylabel(
-                        "Time (s) n_obs={}\nmax_depth={}".format(
-                            n_obs, max_depth), fontsize='x-small')
+                        "Time (s) n_obs={}\nmax_depth={}".format(n_obs, max_depth),
+                        fontsize="x-small",
+                    )
 
-                for color, n_estimators in zip(
-                        'brgyc', sorted(set(df.n_estimators))):
-                    subset = df[(df.n_obs == n_obs)
-                                & (df.max_depth == max_depth)
-                                & (df.n_estimators == n_estimators)]
+                for color, n_estimators in zip("brgyc", sorted(set(df.n_estimators))):
+                    subset = df[
+                        (df.n_obs == n_obs)
+                        & (df.max_depth == max_depth)
+                        & (df.n_estimators == n_estimators)
+                    ]
                     if subset.shape[0] == 0:
                         continue
                     subset = subset.sort_values("nfeat")
@@ -171,19 +182,43 @@ def plot_results(df, verbose=False):
 
                     label = "skl ne={}".format(n_estimators)
                     subset.plot(
-                        x="nfeat", y="time_skl", label=label, ax=a,
-                        logx=True, logy=True, c=color, style='--', lw=5)
+                        x="nfeat",
+                        y="time_skl",
+                        label=label,
+                        ax=a,
+                        logx=True,
+                        logy=True,
+                        c=color,
+                        style="--",
+                        lw=5,
+                    )
                     label = "ort ne={}".format(n_estimators)
-                    subset.plot(x="nfeat", y="time_ort", label=label, ax=a,
-                                logx=True, logy=True, c=color, lw=3)
+                    subset.plot(
+                        x="nfeat",
+                        y="time_ort",
+                        label=label,
+                        ax=a,
+                        logx=True,
+                        logy=True,
+                        c=color,
+                        lw=3,
+                    )
                     label = "lite ne={}".format(n_estimators)
                     subset.plot(
-                        x="nfeat", y="time_lite", label=label, ax=a,
-                        logx=True, logy=True, c=color, style='-.', lw=3)
+                        x="nfeat",
+                        y="time_lite",
+                        label=label,
+                        ax=a,
+                        logx=True,
+                        logy=True,
+                        c=color,
+                        style="-.",
+                        lw=3,
+                    )
 
-                a.legend(loc=0, fontsize='x-small')
+                a.legend(loc=0, fontsize="x-small")
                 if row == 0:
-                    a.set_title("---", fontsize='x-small')
+                    a.set_title("---", fontsize="x-small")
                 pos += 1
             row += 1
 
@@ -193,14 +228,21 @@ def plot_results(df, verbose=False):
 @ignore_warnings(category=FutureWarning)
 def run_bench(repeat=100, verbose=False):
     n_obs = [1, 10, 100, 1000, 10000, 100000]
-    methods = ['predict']
+    methods = ["predict"]
     n_features = [30, 100]
     max_depths = [10]
     n_estimatorss = [100, 200]
 
     start = time()
-    results = bench(n_obs, n_features, max_depths, n_estimatorss,
-                    methods, repeat=repeat, verbose=verbose)
+    results = bench(
+        n_obs,
+        n_features,
+        max_depths,
+        n_estimatorss,
+        methods,
+        repeat=repeat,
+        verbose=verbose,
+    )
     end = time()
 
     results_df = pandas.DataFrame(results)
@@ -211,21 +253,24 @@ def run_bench(repeat=100, verbose=False):
     return results_df
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     from datetime import datetime
     import sklearn
     import numpy
     import onnx
     import onnxruntime
     import skl2onnx
-    df = pandas.DataFrame([
-        {"name": "date", "version": str(datetime.now())},
-        {"name": "numpy", "version": numpy.__version__},
-        {"name": "scikit-learn", "version": sklearn.__version__},
-        {"name": "onnx", "version": onnx.__version__},
-        {"name": "onnxruntime", "version": onnxruntime.__version__},
-        {"name": "skl2onnx", "version": skl2onnx.__version__},
-    ])
+
+    df = pandas.DataFrame(
+        [
+            {"name": "date", "version": str(datetime.now())},
+            {"name": "numpy", "version": numpy.__version__},
+            {"name": "scikit-learn", "version": sklearn.__version__},
+            {"name": "onnx", "version": onnx.__version__},
+            {"name": "onnxruntime", "version": onnxruntime.__version__},
+            {"name": "skl2onnx", "version": skl2onnx.__version__},
+        ]
+    )
     df.to_csv("bench_plot_onnxruntime_hgb.time.csv", index=False)
     print(df)
     df = run_bench(verbose=True)

@@ -68,10 +68,10 @@ def ordenc_to_sklearn(op_mapping):
     "Converts OrdinalEncoder mapping to scikit-learn OrdinalEncoder."
     cats = []
     for column_map in op_mapping:
-        col = column_map['col']
+        col = column_map["col"]
         while len(cats) <= col:
             cats.append(None)
-        mapping = column_map['mapping']
+        mapping = column_map["mapping"]
         res = []
         for i in range(mapping.shape[0]):
             if np.isnan(mapping.index[i]):
@@ -88,8 +88,7 @@ def ordenc_to_sklearn(op_mapping):
 
 
 def ordinal_encoder_shape_calculator(operator):
-    check_input_and_output_numbers(
-        operator, input_count_range=1, output_count_range=1)
+    check_input_and_output_numbers(operator, input_count_range=1, output_count_range=1)
     input_type = operator.inputs[0].type.__class__
     input_dim = operator.inputs[0].get_first_dimension()
     shape = operator.inputs[0].type.shape
@@ -104,15 +103,18 @@ def ordinal_encoder_converter(scope, operator, container):
     X = operator.inputs[0]
 
     skl_ord = ordenc_to_sklearn(op.mapping)
-    cat = OnnxSubEstimator(skl_ord, X, op_version=opv,
-                           output_names=operator.outputs[:1])
+    cat = OnnxSubEstimator(
+        skl_ord, X, op_version=opv, output_names=operator.outputs[:1]
+    )
     cat.add_to(scope, container)
 
 
 update_registered_converter(
-    OrdinalEncoder, "CategoricalEncoderOrdinalEncoder",
+    OrdinalEncoder,
+    "CategoricalEncoderOrdinalEncoder",
     ordinal_encoder_shape_calculator,
-    ordinal_encoder_converter)
+    ordinal_encoder_converter,
+)
 
 
 ###################################
@@ -129,8 +131,8 @@ print(enc.transform(X[:5]))
 
 
 ord_onx = to_onnx(enc, X[:1], target_opset=14)
-sess = InferenceSession(ord_onx.SerializeToString())
-print(sess.run(None, {'X': X[:5]})[0])
+sess = InferenceSession(ord_onx.SerializeToString(), providers=["CPUExecutionProvider"])
+print(sess.run(None, {"X": X[:5]})[0])
 
 ######################################
 # That works.
@@ -149,7 +151,7 @@ def woeenc_to_sklearn(op_mapping):
     for column_map in op_mapping.items():
         col = column_map[0]
         while len(cats) <= col:
-            cats.append('passthrough')
+            cats.append("passthrough")
             ws.append(None)
         mapping = column_map[1]
         intervals = []
@@ -168,25 +170,22 @@ def woeenc_to_sklearn(op_mapping):
     return skl
 
 
-def woe_encoder_parser(
-        scope, model, inputs, custom_parsers=None):
+def woe_encoder_parser(scope, model, inputs, custom_parsers=None):
     if len(inputs) != 1:
-        raise RuntimeError(
-            "Unexpected number of inputs: %d != 1." % len(inputs))
+        raise RuntimeError("Unexpected number of inputs: %d != 1." % len(inputs))
     if inputs[0].type is None:
-        raise RuntimeError(
-            "Unexpected type: %r." % (inputs[0], ))
+        raise RuntimeError("Unexpected type: %r." % (inputs[0],))
     alias = get_model_alias(type(model))
     this_operator = scope.declare_local_operator(alias, model)
     this_operator.inputs.append(inputs[0])
     this_operator.outputs.append(
-        scope.declare_local_variable('catwoe', FloatTensorType()))
+        scope.declare_local_variable("catwoe", FloatTensorType())
+    )
     return this_operator.outputs
 
 
 def woe_encoder_shape_calculator(operator):
-    check_input_and_output_numbers(
-        operator, input_count_range=1, output_count_range=1)
+    check_input_and_output_numbers(operator, input_count_range=1, output_count_range=1)
     input_dim = operator.inputs[0].get_first_dimension()
     shape = operator.inputs[0].type.shape
     second_dim = None if len(shape) != 2 else shape[1]
@@ -199,21 +198,26 @@ def woe_encoder_converter(scope, operator, container):
     opv = container.target_opset
     X = operator.inputs[0]
 
-    sub = OnnxSubEstimator(op.ordinal_encoder, X,
-                           op_version=opv)
+    sub = OnnxSubEstimator(op.ordinal_encoder, X, op_version=opv)
     cast = OnnxCast(sub, op_version=opv, to=np.float32)
     skl_ord = woeenc_to_sklearn(op.mapping)
-    cat = OnnxSubEstimator(skl_ord, cast, op_version=opv,
-                           output_names=operator.outputs[:1],
-                           input_types=[FloatTensorType()])
+    cat = OnnxSubEstimator(
+        skl_ord,
+        cast,
+        op_version=opv,
+        output_names=operator.outputs[:1],
+        input_types=[FloatTensorType()],
+    )
     cat.add_to(scope, container)
 
 
 update_registered_converter(
-    WOEEncoder, "CategoricalEncoderWOEEncoder",
+    WOEEncoder,
+    "CategoricalEncoderWOEEncoder",
     woe_encoder_shape_calculator,
     woe_encoder_converter,
-    parser=woe_encoder_parser)
+    parser=woe_encoder_parser,
+)
 
 
 ###################################
@@ -228,5 +232,5 @@ print(woe.transform(X[:5]))
 
 
 woe_onx = to_onnx(woe, X[:1], target_opset=14)
-sess = InferenceSession(woe_onx.SerializeToString())
-print(sess.run(None, {'X': X[:5]})[0])
+sess = InferenceSession(woe_onx.SerializeToString(), providers=["CPUExecutionProvider"])
+print(sess.run(None, {"X": X[:5]})[0])

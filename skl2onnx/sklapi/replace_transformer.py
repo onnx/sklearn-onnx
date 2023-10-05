@@ -2,10 +2,13 @@
 
 import numpy as np
 from sklearn.base import TransformerMixin, BaseEstimator
+
 try:
     from sklearn.utils.validation import _deprecate_positional_args
 except ImportError:
-    def _deprecate_positional_args(x): return x  # noqa
+
+    def _deprecate_positional_args(x):
+        return x  # noqa
 
 
 class ReplaceTransformer(TransformerMixin, BaseEstimator):
@@ -29,13 +32,13 @@ class ReplaceTransformer(TransformerMixin, BaseEstimator):
         self.to_value = to_value
 
     def _replace(self, a):
-        if hasattr(a, 'todense'):
+        if hasattr(a, "todense"):
             if np.isnan(self.to_value) and self.from_value == 0:
                 # implicit
                 return a
             raise RuntimeError(
-                "Unable to replace 0 by nan one value by another "
-                "in sparse matrix.")
+                "Unable to replace 0 by nan one value by another " "in sparse matrix."
+            )
         return np.where(a == self.from_value, self.to_value, a)
 
     def fit(self, X, y=None, sample_weight=None):
