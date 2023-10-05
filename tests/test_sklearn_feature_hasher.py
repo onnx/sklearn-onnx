@@ -8,7 +8,7 @@ import packaging.version as pv
 import numpy as np
 from sklearn.utils._testing import assert_almost_equal
 from pandas import DataFrame
-from onnx import TensorProto
+from onnx import TensorProto, __version__ as onnx_version
 from onnx.helper import (
     make_model,
     make_node,
@@ -390,6 +390,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         got = sess.run(None, dict(cat_features=X_train_ort2))
         assert_almost_equal(labels, got[0])
 
+    @unittest.skipIf(
+        pv.Version(onnx_version) < pv.Version("1.11"), reason="onnx is too old"
+    )
     def test_feature_hasher_pipeline_list(self):
         pipe_hash = Pipeline(
             steps=[
@@ -548,6 +551,8 @@ class TestSklearnFeatureHasher(unittest.TestCase):
 
             ref = ReferenceEvaluator(onx, new_ops=[StringSplit, MurmurHash3])
             got_py = ref.run(None, feeds)
+        else:
+            got_py = None
 
         from onnxruntime_extensions import get_library_path
 
