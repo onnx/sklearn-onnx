@@ -17,8 +17,12 @@ from onnx.helper import (
     make_opsetid,
 )
 from onnx.checker import check_model
-from onnx.reference import ReferenceEvaluator
-from onnx.reference.op_run import OpRun
+
+try:
+    from onnx.reference import ReferenceEvaluator
+    from onnx.reference.op_run import OpRun
+except ImportError:
+    ReferenceEvaluator = None
 from onnxruntime import __version__ as ort_version, SessionOptions
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.compose import ColumnTransformer
@@ -435,109 +439,115 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         dfx["cat_features"] = df[cat_features].agg("#".join, axis=1)
         feeds = dict(cat_features=dfx["cat_features"].values.reshape((-1, 1)))
 
-        class StringSplit(OpRun):
-            op_domain = "ai.onnx.contrib"
+        if ReferenceEvaluator is not None:
 
-            def _run(self, input, separator, skip_empty, **kwargs):
-                # kwargs should be null, bug in onnx?
-                delimiter = (
-                    str(separator[0]) if len(separator.shape) > 0 else str(separator)
-                )
-                skip_empty = (
-                    bool(skip_empty[0]) if len(skip_empty.shape) else bool(skip_empty)
-                )
-                texts = []
-                indices = []
-                max_split = 0
-                for row, text in enumerate(input):
-                    if not text:
-                        continue
-                    res = text.split(delimiter)
-                    if skip_empty:
-                        res = [t for t in res if t]
-                    texts.extend(res)
-                    max_split = max(max_split, len(res))
-                    indices.extend((row, i) for i in range(len(res)))
-                return (
-                    np.array(indices, dtype=np.int64),
-                    np.array(texts),
-                    np.array([len(input), max_split], dtype=np.int64),
-                )
+            class StringSplit(OpRun):
+                op_domain = "ai.onnx.contrib"
 
-        class MurmurHash3(OpRun):
-            op_domain = "com.microsoft"
+                def _run(self, input, separator, skip_empty, **kwargs):
+                    # kwargs should be null, bug in onnx?
+                    delimiter = (
+                        str(separator[0])
+                        if len(separator.shape) > 0
+                        else str(separator)
+                    )
+                    skip_empty = (
+                        bool(skip_empty[0])
+                        if len(skip_empty.shape)
+                        else bool(skip_empty)
+                    )
+                    texts = []
+                    indices = []
+                    max_split = 0
+                    for row, text in enumerate(input):
+                        if not text:
+                            continue
+                        res = text.split(delimiter)
+                        if skip_empty:
+                            res = [t for t in res if t]
+                        texts.extend(res)
+                        max_split = max(max_split, len(res))
+                        indices.extend((row, i) for i in range(len(res)))
+                    return (
+                        np.array(indices, dtype=np.int64),
+                        np.array(texts),
+                        np.array([len(input), max_split], dtype=np.int64),
+                    )
 
-            @staticmethod
-            def rotl(num, bits):
-                bit = num & (1 << (bits - 1))
-                num <<= 1
-                if bit:
-                    num |= 1
-                num &= 2**bits - 1
-                return num
+            class MurmurHash3(OpRun):
+                op_domain = "com.microsoft"
 
-            @staticmethod
-            def fmix(h: int):
-                h ^= h >> 16
-                h = np.uint32(
-                    (int(h) * int(0x85EBCA6B)) % (int(np.iinfo(np.uint32).max) + 1)
-                )
-                h ^= h >> 13
-                h = np.uint32(
-                    (int(h) * int(0xC2B2AE35)) % (int(np.iinfo(np.uint32).max) + 1)
-                )
-                h ^= h >> 16
-                return h
+                @staticmethod
+                def rotl(num, bits):
+                    bit = num & (1 << (bits - 1))
+                    num <<= 1
+                    if bit:
+                        num |= 1
+                    num &= 2**bits - 1
+                    return num
 
-            @staticmethod
-            def MurmurHash3_x86_32(data, seed):
-                le = len(data)
-                nblocks = le // 4
-                h1 = seed
+                @staticmethod
+                def fmix(h: int):
+                    h ^= h >> 16
+                    h = np.uint32(
+                        (int(h) * int(0x85EBCA6B)) % (int(np.iinfo(np.uint32).max) + 1)
+                    )
+                    h ^= h >> 13
+                    h = np.uint32(
+                        (int(h) * int(0xC2B2AE35)) % (int(np.iinfo(np.uint32).max) + 1)
+                    )
+                    h ^= h >> 16
+                    return h
 
-                c1 = 0xCC9E2D51
-                c2 = 0x1B873593
+                @staticmethod
+                def MurmurHash3_x86_32(data, seed):
+                    le = len(data)
+                    nblocks = le // 4
+                    h1 = seed
 
-                iblock = nblocks * 4
+                    c1 = 0xCC9E2D51
+                    c2 = 0x1B873593
 
-                for i in range(-nblocks, 0):
-                    k1 = np.uint32(data[iblock + i])
-                    k1 *= c1
-                    k1 = (k1, 15)
-                    k1 *= c2
-                    h1 ^= k1
-                    h1 = MurmurHash3.rotl(h1, 13)
-                    h1 = h1 * 5 + 0xE6546B64
+                    iblock = nblocks * 4
 
-                k1 = 0
+                    for i in range(-nblocks, 0):
+                        k1 = np.uint32(data[iblock + i])
+                        k1 *= c1
+                        k1 = (k1, 15)
+                        k1 *= c2
+                        h1 ^= k1
+                        h1 = MurmurHash3.rotl(h1, 13)
+                        h1 = h1 * 5 + 0xE6546B64
 
-                if le & 3 >= 3:
-                    k1 ^= np.uint32(data[iblock + 2]) << 16
-                if le & 3 >= 2:
-                    k1 ^= np.uint32(data[iblock + 1]) << 8
-                if le & 3 >= 1:
-                    k1 ^= np.uint32(data[iblock])
-                    k1 *= c1
-                    k1 = MurmurHash3.rotl(k1, 15)
-                    k1 *= c2
-                    h1 ^= k1
+                    k1 = 0
 
-                h1 ^= le
+                    if le & 3 >= 3:
+                        k1 ^= np.uint32(data[iblock + 2]) << 16
+                    if le & 3 >= 2:
+                        k1 ^= np.uint32(data[iblock + 1]) << 8
+                    if le & 3 >= 1:
+                        k1 ^= np.uint32(data[iblock])
+                        k1 *= c1
+                        k1 = MurmurHash3.rotl(k1, 15)
+                        k1 *= c2
+                        h1 ^= k1
 
-                h1 = MurmurHash3.fmix(h1)
-                return h1
+                    h1 ^= le
 
-            def _run(self, x, positive: int = None, seed: int = None):
-                x2 = x.reshape((-1,))
-                y = np.empty(x2.shape, dtype=np.uint32)
-                for i in range(y.shape[0]):
-                    b = x2[i].encode("utf-8")
-                    h = MurmurHash3.MurmurHash3_x86_32(b, seed)
-                    y[i] = h
-                return (y.reshape(x.shape),)
+                    h1 = MurmurHash3.fmix(h1)
+                    return h1
 
-        ref = ReferenceEvaluator(onx, new_ops=[StringSplit, MurmurHash3])
-        got_py = ref.run(None, feeds)
+                def _run(self, x, positive: int = None, seed: int = None):
+                    x2 = x.reshape((-1,))
+                    y = np.empty(x2.shape, dtype=np.uint32)
+                    for i in range(y.shape[0]):
+                        b = x2[i].encode("utf-8")
+                        h = MurmurHash3.MurmurHash3_x86_32(b, seed)
+                        y[i] = h
+                    return (y.reshape(x.shape),)
+
+            ref = ReferenceEvaluator(onx, new_ops=[StringSplit, MurmurHash3])
+            got_py = ref.run(None, feeds)
 
         from onnxruntime_extensions import get_library_path
 
@@ -548,9 +558,11 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         got = sess.run(None, feeds)
         assert_almost_equal(expected, got[0])
-        # The pure python implementation does not correctly implement murmurhash3.
-        # There are issue with type int.
-        assert_almost_equal(expected.shape, got_py[0].shape)
+
+        if ReferenceEvaluator is not None:
+            # The pure python implementation does not correctly implement murmurhash3.
+            # There are issue with type int.
+            assert_almost_equal(expected.shape, got_py[0].shape)
 
 
 if __name__ == "__main__":
