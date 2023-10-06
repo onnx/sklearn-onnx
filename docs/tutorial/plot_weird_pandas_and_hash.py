@@ -10,15 +10,21 @@ A game of finding it goes wrong and there are multiple places.
 Initial example
 +++++++++++++++
 """
+import logging
 import numpy as np
 from pandas import DataFrame
-from onnxruntime import InferenceSession
+from onnxruntime import InferenceSession, SessionOptions
+from onnxruntime_extensions import get_library_path
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import GradientBoostingClassifier
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import StringTensorType
+
+log = logging.getLogger("skl2onnx")
+log.setLevel(logging.ERROR)
+
 
 df = DataFrame(
     {
@@ -80,10 +86,10 @@ sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvide
 got = sess.run(None, dict(cat_features=X_train.values))
 
 
-print("expected")
+print("expected probabilities")
 print(expected_proba)
 
-print("onnx")
+print("onnx probabilities")
 print(got[1])
 
 #########################################
@@ -129,16 +135,17 @@ sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvide
 got = sess.run(None, dict(cat_features=X_train.values))
 
 
-print("expected")
+print("expected hashed features")
 print(expected)
 
-print("onnx")
+print("onnx hashed features")
 print(got[0])
 
-
-#############################################
-# First Error
-# +++++++++++
+#######################################
+# Nothing seems to be working.
+#
+# First proposal
+# ++++++++++++++
 #
 # The instruction
 # ``X_train["cat_features"] = df[cat_features].values.tolist()``
@@ -208,10 +215,10 @@ got = sess.run(
 )
 
 
-print("expected")
+print("expected fixed hashed features")
 print(expected)
 
-print("onnx")
+print("onnx fixed hashed features")
 print(got[0])
 
 ###########################################
@@ -219,10 +226,65 @@ print(got[0])
 # but it does produce the same results.
 # One option would be to add the first 8 columns to the other 8
 # by using a custom converter.
+#
+# Second proposal
+# +++++++++++++++
+#
+# We use the same initial pipeline but we tweak the input
+# onnxruntime receives.
 
-# to be continued...
+pipe_hash = Pipeline(
+    steps=[
+        (
+            "preprocessor",
+            ColumnTransformer(
+                [
+                    (
+                        "cat_preprocessor",
+                        FeatureHasher(
+                            n_features=8,
+                            input_type="string",
+                            alternate_sign=False,
+                            dtype=np.float32,
+                        ),
+                        "cat_features",
+                    )
+                ],
+                sparse_threshold=0.0,
+            ),
+        ),
+    ],
+)
+pipe_hash.fit(X_train, y_train)
+
+onx = to_onnx(
+    pipe_hash,
+    initial_types=[("cat_features", StringTensorType([None, 1]))],
+    options={"zipmap": False, "preprocessor__cat_preprocessor__separator": "#"},
+)
+
+expected = pipe_hash.transform(X_train)
+
+
+so = SessionOptions()
+so.register_custom_ops_library(get_library_path())
+sess = InferenceSession(onx.SerializeToString(), so, providers=["CPUExecutionProvider"])
+
+# We merged both columns cat1 and cat2 into a single cat_features.
+df_fixed = DataFrame()
+df_fixed["cat_features"] = np.array([f"{a}#{b}" for a, b in X_train["cat_features"]])
+
+got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
+
+print("expected original hashed features")
+print(expected)
+
+print("onnx fixed original hashed features")
+print(got[0])
 
 ############################################
+# It works now.
+#
 # Sparsity?
 # +++++++++
 #
@@ -235,25 +297,15 @@ pipe = Pipeline(
             ColumnTransformer(
                 [
                     (
-                        "cat_preprocessor1",
+                        "cat_preprocessor",
                         FeatureHasher(
                             n_features=8,
                             input_type="string",
                             alternate_sign=False,
                             dtype=np.float32,
                         ),
-                        [0],
-                    ),
-                    (
-                        "cat_preprocessor2",
-                        FeatureHasher(
-                            n_features=8,
-                            input_type="string",
-                            alternate_sign=False,
-                            dtype=np.float32,
-                        ),
-                        [1],
-                    ),
+                        "cat_features",
+                    )
                 ],
                 # sparse_threshold=0.0,
             ),
@@ -261,46 +313,35 @@ pipe = Pipeline(
         ("classifier", GradientBoostingClassifier(n_estimators=2, max_depth=2)),
     ],
 )
+pipe.fit(X_train, y_train)
+expected = pipe.predict_proba(X_train)
 
-X_train_skl = df[cat_features].copy()
-for c in cat_features:
-    X_train_skl[c] = X_train_skl[c].values.tolist()
-
-pipe.fit(X_train_skl.values, y_train)
 
 onx = to_onnx(
     pipe,
-    initial_types=[
-        ("cat1", StringTensorType([None, 1])),
-        ("cat2", StringTensorType([None, 1])),
-    ],
-    options={"zipmap": False},
+    initial_types=[("cat_features", StringTensorType([None, 1]))],
+    options={"zipmap": False, "preprocessor__cat_preprocessor__separator": "#"},
 )
 
-
-expected = pipe.predict_proba(X_train_skl.values)
-sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
-
-
-got = sess.run(
-    None,
-    dict(
-        cat1=df["Cat1"].values.reshape((-1, 1)), cat2=df["Cat2"].values.reshape((-1, 1))
-    ),
-)
+so = SessionOptions()
+so.register_custom_ops_library(get_library_path())
+sess = InferenceSession(onx.SerializeToString(), so, providers=["CPUExecutionProvider"])
+got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
 
 
-print("expected")
+print("expected probabilies")
 print(expected)
 
-print("onnx")
+print("onnx probabilies")
 print(got[1])
 
 ###########################################
 # scikit-learn keeps the sparse outputs from
 # the FeatureHasher. onnxruntime does not support
-# dense feautres. This may have an impact on the conversion
-# if the model next to this steps makes a different between a
+# sparse features. This may have an impact on the conversion
+# if the model next to this step makes a difference between a
 # missing sparse value and zero.
+# That does not seem to be the case for this model but
+# other models or libraries may behave differently.
 
-print(pipe.steps[0][-1].transform(X_train_skl.values))
+print(pipe.steps[0][-1].transform(X_train))
