@@ -39,7 +39,7 @@ if onnx_opset_version() >= 18:
     from onnx.reference import ReferenceEvaluator
     from onnx.reference.op_run import OpRun
     from onnx.reference.ops._op import OpRunReduceNumpy
-    from onnx.reference.ops import load_op
+    from onnx.reference.ops.aionnxml import load_op
     from .reference_implementation_text import Tokenizer
 
     class CDist(OpRun):
@@ -51,10 +51,15 @@ if onnx_opset_version() >= 18:
     additional_implementations = [CDist, Tokenizer]
 
     try:
-        load_op("ai.onnx.ml", "OneHotEncoder")
+        load_op("ai.onnx.ml", "OneHotEncoder", version=1)
         add_ops = False
-    except Exception:
+    except Exception as e:
         add_ops = True
+        if onnx_opset_version() > 19:
+            raise RuntimeError(
+                f"Cannot import a kernel implementation from onnx, "
+                f"onnx_opset_version()={onnx_opset_version()}."
+            ) from e
 
     if add_ops:
         # bugs in reference implementation not covered by a backend test

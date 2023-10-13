@@ -3,6 +3,7 @@
 """
 Test scikit-learn's IsolationForest.
 """
+import logging
 import unittest
 import packaging.version as pv
 import numpy as np
@@ -109,4 +110,5 @@ class TestSklearnIsolationForest(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    logging.getLogger("skl2onnx").setLevel(logging.ERROR)
     unittest.main()
