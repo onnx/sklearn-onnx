@@ -61,223 +61,17 @@ if onnx_opset_version() >= 18:
                 f"onnx_opset_version()={onnx_opset_version()}."
             ) from e
 
-    if add_ops:
+    if add_ops or onnx_opset_version() >= 20:
         # bugs in reference implementation not covered by a backend test
         from onnx.reference.op_run import RuntimeContextError
-        from onnx.reference.ops.op_argmin import _ArgMin, _argmin
-        from onnx.reference.ops.op_argmax import _ArgMax, _argmax
-        from onnx.reference.ops.op_reduce_log_sum_exp import compute_log_sum_exp
-        from onnx.reference.ops.op_scan import Scan as _Scan
-        from .reference_implementation_ml import (
-            Binarizer,
-            DictVectorizer,
-            FeatureVectorizer,
-            FusedMatMul,
-            Imputer,
-            LabelEncoder,
-            LinearClassifier,
-            LinearRegressor,
-            Normalizer,
-            OneHotEncoder,
-            Scaler,
-        )
         from .reference_implementation_zipmap import ZipMap
-        from .reference_implementation_afe import ArrayFeatureExtractor
-        from .reference_implementation_tree import (
-            TreeEnsembleClassifier,
-            TreeEnsembleRegressor,
-        )
-        from .reference_implementation_svm import SVMClassifier, SVMRegressor
-        from .reference_implementation_text import TfIdfVectorizer
 
-        class ArgMin(_ArgMin):
-            def _run(self, data, axis=None, keepdims=None, select_last_index=None):
-                if select_last_index == 0:
-                    if keepdims == 0:
-                        return _ArgMin._run(self, data, axis=axis, keepdims=keepdims)
-                    return (_argmin(data, axis=axis, keepdims=keepdims),)
-                raise NotImplementedError("Unused in sklearn-onnx.")
-
-        class ArgMax(_ArgMax):
-            def _run(self, data, axis=None, keepdims=None, select_last_index=None):
-                if select_last_index == 0:
-                    if keepdims == 0:
-                        return _ArgMax._run(self, data, axis=axis, keepdims=keepdims)
-                    try:
-                        return (_argmax(data, axis=axis, keepdims=keepdims),)
-                    except Exception as e:
-                        raise RuntimeError(
-                            f"Issue with shape={data.shape} " f"and axis={axis}."
-                        ) from e
-                raise NotImplementedError("Unused in sklearn-onnx.")
-
-        class ReduceLogSumExp_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, **kwargs):
-                tax = tuple(axes) if axes is not None else None
-                return compute_log_sum_exp(data, tax, keepdims)
-
-        class ReduceLogSumExp_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, noop_with_empty_axes=None):
-                assert noop_with_empty_axes != 1
-                tax = tuple(axes) if axes is not None else None
-                return compute_log_sum_exp(data, tax, keepdims)
-
-        class ReduceL2_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=1, **kwargs):
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (
-                    np.sqrt(
-                        np.sum(np.square(data), axis=axes, keepdims=keepdims)
-                    ).astype(dtype=data.dtype),
-                )
-
-        class ReduceL2_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, noop_with_empty_axes=None):
-                assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (
-                    np.sqrt(
-                        np.sum(np.square(data), axis=axes, keepdims=keepdims)
-                    ).astype(dtype=data.dtype),
-                )
-
-        class ReduceMean_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, **kwargs):
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (np.mean(data, axis=axes, keepdims=keepdims).astype(data.dtype),)
-
-        class ReduceMean_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, noop_with_empty_axes=None):
-                assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (np.mean(data, axis=axes, keepdims=keepdims).astype(data.dtype),)
-
-        class ReduceMax_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, **kwargs):
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (np.max(data, axis=axes, keepdims=keepdims).astype(data.dtype),)
-
-        class ReduceMax_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, noop_with_empty_axes=None):
-                assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (np.max(data, axis=axes, keepdims=keepdims).astype(data.dtype),)
-
-        class ReduceProd_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, **kwargs):
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (np.prod(data, axis=axes, keepdims=keepdims).astype(data.dtype),)
-
-        class ReduceProd_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, noop_with_empty_axes=None):
-                assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (np.prod(data, axis=axes, keepdims=keepdims).astype(data.dtype),)
-
-        class ReduceSumSquare_1(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, **kwargs):
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (
-                    np.sum(np.square(data), axis=axes, keepdims=keepdims).astype(
-                        data.dtype
-                    ),
-                )
-
-        class ReduceSumSquare_18(OpRunReduceNumpy):
-            def _run(self, data, axes=None, keepdims=None, noop_with_empty_axes=None):
-                assert noop_with_empty_axes != 1
-                axes = tuple(axes) if axes is not None else None
-                keepdims = keepdims != 0  # type: ignore
-                return (
-                    np.sum(np.square(data), axis=axes, keepdims=keepdims).astype(
-                        data.dtype
-                    ),
-                )
-
-        class ConstantOfShape(OpRun):
-            def __init__(self, onnx_node, run_params):  # type: ignore
-                OpRun.__init__(self, onnx_node, run_params)
-                self.cst = (
-                    self.value[0] if isinstance(self.value, np.ndarray) else self.value
-                )
-                if isinstance(self.cst, int):
-                    self.cst = np.int64(self.cst)
-                elif isinstance(self.cst, float):
-                    self.cst = np.float64(self.cst)
-                elif self.cst is None:
-                    self.cst = np.float32(0)
-                if not isinstance(
-                    self.cst,
-                    (np.float32, np.float64, np.int64, np.int32, np.bool_, np.float16),
-                ):
-                    raise TypeError(f"cst must be a real not {type(self.cst)}")
-
-            def _run(self, data, value=None):
-                try:
-                    res = np.full(tuple(data), self.cst)
-                except TypeError as e:
-                    raise RuntimeError(
-                        f"Unable to create a constant of shape {data!r} "
-                        f"with value {self.cst!r} "
-                        f"(raw value={value!r})."
-                    ) from e
-                return (res,)
-
-        class Where(OpRun):
-            def _run(self, condition, x, y):  # type: ignore
-                if (
-                    x.dtype != y.dtype
-                    and x.dtype not in (np.object_,)
-                    and not (x.dtype.type is np.str_ and y.dtype.type is np.str_)
-                ):
-                    raise RuntimeError(
-                        f"x and y should share the same dtype "
-                        f"{x.dtype} != {y.dtype}"
-                    )
-                return (np.where(condition, x, y).astype(x.dtype),)
-
-        class Scan(_Scan):
-            def _extract_attribute_value(self, att, ref_att=None):
-                if att.type == AttributeProto.GRAPH:
-                    new_ops = self.run_params.get("new_ops", None)
-                    return ReferenceEvaluator(
-                        att.g,
-                        opsets=self.run_params["opsets"],
-                        verbose=max(0, self.run_params.get("verbose", 0) - 2),
-                        new_ops=None if new_ops is None else new_ops.values(),
-                    )
-                return super()._extract_attribute_value(att, ref_att)
-
-        additional_implementations.extend(
-            [
-                # ai.onnx
-                ArgMax,
-                ArgMin,
-                ConstantOfShape,
-                ReduceL2_1,
-                ReduceL2_18,
-                ReduceLogSumExp_1,
-                ReduceLogSumExp_18,
-                ReduceMax_1,
-                ReduceMax_18,
-                ReduceMean_1,
-                ReduceMean_18,
-                ReduceProd_1,
-                ReduceProd_18,
-                ReduceSumSquare_1,
-                ReduceSumSquare_18,
-                Where,
-                # ai.onnx.ml
-                ArrayFeatureExtractor,
+        if add_ops:
+            from onnx.reference.ops.op_argmin import _ArgMin, _argmin
+            from onnx.reference.ops.op_argmax import _ArgMax, _argmax
+            from onnx.reference.ops.op_reduce_log_sum_exp import compute_log_sum_exp
+            from onnx.reference.ops.op_scan import Scan as _Scan
+            from .reference_implementation_ml import (
                 Binarizer,
                 DictVectorizer,
                 FeatureVectorizer,
@@ -288,16 +82,263 @@ if onnx_opset_version() >= 18:
                 LinearRegressor,
                 Normalizer,
                 OneHotEncoder,
-                TfIdfVectorizer,
+                Scaler,
+            )
+            from .reference_implementation_afe import ArrayFeatureExtractor
+            from .reference_implementation_tree import (
                 TreeEnsembleClassifier,
                 TreeEnsembleRegressor,
-                Scaler,
-                Scan,
-                SVMClassifier,
-                SVMRegressor,
-                ZipMap,
-            ]
-        )
+            )
+            from .reference_implementation_svm import SVMClassifier, SVMRegressor
+            from .reference_implementation_text import TfIdfVectorizer
+
+            class ArgMin(_ArgMin):
+                def _run(self, data, axis=None, keepdims=None, select_last_index=None):
+                    if select_last_index == 0:
+                        if keepdims == 0:
+                            return _ArgMin._run(
+                                self, data, axis=axis, keepdims=keepdims
+                            )
+                        return (_argmin(data, axis=axis, keepdims=keepdims),)
+                    raise NotImplementedError("Unused in sklearn-onnx.")
+
+            class ArgMax(_ArgMax):
+                def _run(self, data, axis=None, keepdims=None, select_last_index=None):
+                    if select_last_index == 0:
+                        if keepdims == 0:
+                            return _ArgMax._run(
+                                self, data, axis=axis, keepdims=keepdims
+                            )
+                        try:
+                            return (_argmax(data, axis=axis, keepdims=keepdims),)
+                        except Exception as e:
+                            raise RuntimeError(
+                                f"Issue with shape={data.shape} " f"and axis={axis}."
+                            ) from e
+                    raise NotImplementedError("Unused in sklearn-onnx.")
+
+            class ReduceLogSumExp_1(OpRunReduceNumpy):
+                def _run(self, data, axes=None, keepdims=None, **kwargs):
+                    tax = tuple(axes) if axes is not None else None
+                    return compute_log_sum_exp(data, tax, keepdims)
+
+            class ReduceLogSumExp_18(OpRunReduceNumpy):
+                def _run(
+                    self, data, axes=None, keepdims=None, noop_with_empty_axes=None
+                ):
+                    assert noop_with_empty_axes != 1
+                    tax = tuple(axes) if axes is not None else None
+                    return compute_log_sum_exp(data, tax, keepdims)
+
+            class ReduceL2_1(OpRunReduceNumpy):
+                def _run(self, data, axes=None, keepdims=1, **kwargs):
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.sqrt(
+                            np.sum(np.square(data), axis=axes, keepdims=keepdims)
+                        ).astype(dtype=data.dtype),
+                    )
+
+            class ReduceL2_18(OpRunReduceNumpy):
+                def _run(
+                    self, data, axes=None, keepdims=None, noop_with_empty_axes=None
+                ):
+                    assert noop_with_empty_axes != 1
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.sqrt(
+                            np.sum(np.square(data), axis=axes, keepdims=keepdims)
+                        ).astype(dtype=data.dtype),
+                    )
+
+            class ReduceMean_1(OpRunReduceNumpy):
+                def _run(self, data, axes=None, keepdims=None, **kwargs):
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.mean(data, axis=axes, keepdims=keepdims).astype(data.dtype),
+                    )
+
+            class ReduceMean_18(OpRunReduceNumpy):
+                def _run(
+                    self, data, axes=None, keepdims=None, noop_with_empty_axes=None
+                ):
+                    assert noop_with_empty_axes != 1
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.mean(data, axis=axes, keepdims=keepdims).astype(data.dtype),
+                    )
+
+            class ReduceMax_1(OpRunReduceNumpy):
+                def _run(self, data, axes=None, keepdims=None, **kwargs):
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.max(data, axis=axes, keepdims=keepdims).astype(data.dtype),
+                    )
+
+            class ReduceMax_18(OpRunReduceNumpy):
+                def _run(
+                    self, data, axes=None, keepdims=None, noop_with_empty_axes=None
+                ):
+                    assert noop_with_empty_axes != 1
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.max(data, axis=axes, keepdims=keepdims).astype(data.dtype),
+                    )
+
+            class ReduceProd_1(OpRunReduceNumpy):
+                def _run(self, data, axes=None, keepdims=None, **kwargs):
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.prod(data, axis=axes, keepdims=keepdims).astype(data.dtype),
+                    )
+
+            class ReduceProd_18(OpRunReduceNumpy):
+                def _run(
+                    self, data, axes=None, keepdims=None, noop_with_empty_axes=None
+                ):
+                    assert noop_with_empty_axes != 1
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.prod(data, axis=axes, keepdims=keepdims).astype(data.dtype),
+                    )
+
+            class ReduceSumSquare_1(OpRunReduceNumpy):
+                def _run(self, data, axes=None, keepdims=None, **kwargs):
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.sum(np.square(data), axis=axes, keepdims=keepdims).astype(
+                            data.dtype
+                        ),
+                    )
+
+            class ReduceSumSquare_18(OpRunReduceNumpy):
+                def _run(
+                    self, data, axes=None, keepdims=None, noop_with_empty_axes=None
+                ):
+                    assert noop_with_empty_axes != 1
+                    axes = tuple(axes) if axes is not None else None
+                    keepdims = keepdims != 0  # type: ignore
+                    return (
+                        np.sum(np.square(data), axis=axes, keepdims=keepdims).astype(
+                            data.dtype
+                        ),
+                    )
+
+            class ConstantOfShape(OpRun):
+                def __init__(self, onnx_node, run_params):  # type: ignore
+                    OpRun.__init__(self, onnx_node, run_params)
+                    self.cst = (
+                        self.value[0]
+                        if isinstance(self.value, np.ndarray)
+                        else self.value
+                    )
+                    if isinstance(self.cst, int):
+                        self.cst = np.int64(self.cst)
+                    elif isinstance(self.cst, float):
+                        self.cst = np.float64(self.cst)
+                    elif self.cst is None:
+                        self.cst = np.float32(0)
+                    if not isinstance(
+                        self.cst,
+                        (
+                            np.float32,
+                            np.float64,
+                            np.int64,
+                            np.int32,
+                            np.bool_,
+                            np.float16,
+                        ),
+                    ):
+                        raise TypeError(f"cst must be a real not {type(self.cst)}")
+
+                def _run(self, data, value=None):
+                    try:
+                        res = np.full(tuple(data), self.cst)
+                    except TypeError as e:
+                        raise RuntimeError(
+                            f"Unable to create a constant of shape {data!r} "
+                            f"with value {self.cst!r} "
+                            f"(raw value={value!r})."
+                        ) from e
+                    return (res,)
+
+            class Where(OpRun):
+                def _run(self, condition, x, y):  # type: ignore
+                    if (
+                        x.dtype != y.dtype
+                        and x.dtype not in (np.object_,)
+                        and not (x.dtype.type is np.str_ and y.dtype.type is np.str_)
+                    ):
+                        raise RuntimeError(
+                            f"x and y should share the same dtype "
+                            f"{x.dtype} != {y.dtype}"
+                        )
+                    return (np.where(condition, x, y).astype(x.dtype),)
+
+            class Scan(_Scan):
+                def _extract_attribute_value(self, att, ref_att=None):
+                    if att.type == AttributeProto.GRAPH:
+                        new_ops = self.run_params.get("new_ops", None)
+                        return ReferenceEvaluator(
+                            att.g,
+                            opsets=self.run_params["opsets"],
+                            verbose=max(0, self.run_params.get("verbose", 0) - 2),
+                            new_ops=None if new_ops is None else new_ops.values(),
+                        )
+                    return super()._extract_attribute_value(att, ref_att)
+
+        additional_implementations.extend([ZipMap])
+        if add_ops:
+            additional_implementations.extend(
+                [
+                    # ai.onnx
+                    ArgMax,
+                    ArgMin,
+                    ConstantOfShape,
+                    ReduceL2_1,
+                    ReduceL2_18,
+                    ReduceLogSumExp_1,
+                    ReduceLogSumExp_18,
+                    ReduceMax_1,
+                    ReduceMax_18,
+                    ReduceMean_1,
+                    ReduceMean_18,
+                    ReduceProd_1,
+                    ReduceProd_18,
+                    ReduceSumSquare_1,
+                    ReduceSumSquare_18,
+                    Where,
+                    # ai.onnx.ml
+                    ArrayFeatureExtractor,
+                    Binarizer,
+                    DictVectorizer,
+                    FeatureVectorizer,
+                    FusedMatMul,
+                    Imputer,
+                    LabelEncoder,
+                    LinearClassifier,
+                    LinearRegressor,
+                    Normalizer,
+                    OneHotEncoder,
+                    TfIdfVectorizer,
+                    TreeEnsembleClassifier,
+                    TreeEnsembleRegressor,
+                    Scaler,
+                    Scan,
+                    SVMClassifier,
+                    SVMRegressor,
+                    ZipMap,
+                ]
+            )
 
     class ReferenceEvaluatorEx(ReferenceEvaluator):
         def __init__(self, *args, new_ops=None, **kwargs):
