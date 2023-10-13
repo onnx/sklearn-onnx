@@ -19,7 +19,7 @@ jobs:
         python.version: '3.11'  # onnxruntime cannot support python 3.11 yet
         numpy.version: '>=1.21.1'
         scipy.version: '>=1.7.0'
-        onnx.version: ''-i https://test.pypi.org/simple/ onnx==1.15.0rc1'
+        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.15.0rc1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.16.0'
         sklearn.version: '>=1.3.1'
