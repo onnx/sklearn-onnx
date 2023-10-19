@@ -102,7 +102,7 @@ if onnx_opset_version() >= 18:
                         return (_argmax(data, axis=axis, keepdims=keepdims),)
                     except Exception as e:
                         raise RuntimeError(
-                            f"Issue with shape={data.shape} " f"and axis={axis}."
+                            f"Issue with shape={data.shape} and axis={axis}."
                         ) from e
                 raise NotImplementedError("Unused in sklearn-onnx.")
 
@@ -407,7 +407,7 @@ if onnx_opset_version() >= 18:
                 elements = a.ravel().tolist()
                 if len(elements) > 5:
                     elements = elements[:5]
-                    return f"{a.dtype}:{a.shape}:" f"{','.join(map(str, elements))}..."
+                    return f"{a.dtype}:{a.shape}:{','.join(map(str, elements))}..."
                 return f"{a.dtype}:{a.shape}:{elements}"
             if hasattr(a, "append"):
                 return ", ".join(map(self._log_arg, a))

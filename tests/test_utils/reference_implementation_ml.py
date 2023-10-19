@@ -235,7 +235,7 @@ if onnx_opset_version() >= 18:
                             res[a, i, j] = 1.0
             else:
                 raise RuntimeError(
-                    f"This operator is not implemented " f"for " f"shape {x.shape}."
+                    f"This operator is not implemented for shape {x.shape}."
                 )
 
             if not self.zeros:
