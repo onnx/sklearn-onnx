@@ -288,7 +288,7 @@ def convert_sklearn_text_vectorizer(
     for w in stop_words:
         if not isinstance(w, str):
             raise TypeError(
-                f"One stop word is not a string {w!r} " f"in stop_words={stop_words}."
+                f"One stop word is not a string {w!r} in stop_words={stop_words}."
             )
 
     if op.lowercase or stop_words:

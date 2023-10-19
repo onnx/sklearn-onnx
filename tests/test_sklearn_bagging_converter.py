@@ -386,9 +386,8 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnBaggingConverter().
-    # test_bagging_classifier_sgd_multiclass_decision_function()
     import logging
 
     logging.getLogger("skl2onnx").setLevel(logging.ERROR)
+    TestSklearnBaggingConverter().test_bagging_regressor_gradient_boosting()
     unittest.main(verbosity=2)

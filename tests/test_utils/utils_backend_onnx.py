@@ -39,8 +39,16 @@ if onnx_opset_version() >= 18:
     from onnx.reference import ReferenceEvaluator
     from onnx.reference.op_run import OpRun, RuntimeContextError
     from onnx.reference.ops._op import OpRunReduceNumpy
-    from onnx.reference.ops.aionnxml import load_op
+
+    try:
+        from onnx.reference.ops.aionnxml import load_op
+    except ImportError:
+        load_op = None
     from .reference_implementation_text import Tokenizer
+    from .reference_implementation_tree import (
+        TreeEnsembleClassifier,
+        TreeEnsembleRegressor,
+    )
     from .reference_implementation_zipmap import ZipMap
 
     class CDist(OpRun):
@@ -49,18 +57,27 @@ if onnx_opset_version() >= 18:
         def _run(self, x, y, metric="euclidean"):
             return (cdist(x, y, metric=metric).astype(x.dtype),)
 
-    additional_implementations = [CDist, Tokenizer, ZipMap]
+    additional_implementations = [
+        CDist,
+        Tokenizer,
+        ZipMap,
+        TreeEnsembleClassifier,
+        TreeEnsembleRegressor,
+    ]
 
-    try:
-        load_op("ai.onnx.ml", "OneHotEncoder", version=1)
-        add_ops = False
-    except Exception as e:
+    if load_op is None:
         add_ops = True
-        if onnx_opset_version() > 19:
-            raise RuntimeError(
-                f"Cannot import a kernel implementation from onnx, "
-                f"onnx_opset_version()={onnx_opset_version()}."
-            ) from e
+    else:
+        try:
+            load_op("ai.onnx.ml", "OneHotEncoder", version=1)
+            add_ops = False
+        except Exception as e:
+            add_ops = True
+            if onnx_opset_version() > 19:
+                raise RuntimeError(
+                    f"Cannot import a kernel implementation from onnx, "
+                    f"onnx_opset_version()={onnx_opset_version()}."
+                ) from e
 
     if add_ops or onnx_opset_version() >= 20:
         # bugs in reference implementation not covered by a backend test
@@ -84,10 +101,6 @@ if onnx_opset_version() >= 18:
                 Scaler,
             )
             from .reference_implementation_afe import ArrayFeatureExtractor
-            from .reference_implementation_tree import (
-                TreeEnsembleClassifier,
-                TreeEnsembleRegressor,
-            )
             from .reference_implementation_svm import SVMClassifier, SVMRegressor
             from .reference_implementation_text import TfIdfVectorizer
 
@@ -112,7 +125,7 @@ if onnx_opset_version() >= 18:
                             return (_argmax(data, axis=axis, keepdims=keepdims),)
                         except Exception as e:
                             raise RuntimeError(
-                                f"Issue with shape={data.shape} " f"and axis={axis}."
+                                f"Issue with shape={data.shape} and axis={axis}."
                             ) from e
                     raise NotImplementedError("Unused in sklearn-onnx.")
 
@@ -328,8 +341,6 @@ if onnx_opset_version() >= 18:
                     Normalizer,
                     OneHotEncoder,
                     TfIdfVectorizer,
-                    TreeEnsembleClassifier,
-                    TreeEnsembleRegressor,
                     Scaler,
                     Scan,
                     SVMClassifier,
@@ -450,7 +461,7 @@ if onnx_opset_version() >= 18:
                 elements = a.ravel().tolist()
                 if len(elements) > 5:
                     elements = elements[:5]
-                    return f"{a.dtype}:{a.shape}:" f"{','.join(map(str, elements))}..."
+                    return f"{a.dtype}:{a.shape}:{','.join(map(str, elements))}..."
                 return f"{a.dtype}:{a.shape}:{elements}"
             if hasattr(a, "append"):
                 return ", ".join(map(self._log_arg, a))

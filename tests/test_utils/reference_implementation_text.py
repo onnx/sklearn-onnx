@@ -99,7 +99,7 @@ if onnx_opset_version() >= 18:
                 res = np.array(res)
             else:
                 raise RuntimeError(  # pragma: no cover
-                    f"Only vector or matrices are supported " f"not shape {text.shape}."
+                    f"Only vector or matrices are supported not shape {text.shape}."
                 )
             return (res,)
 
