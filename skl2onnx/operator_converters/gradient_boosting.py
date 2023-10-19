@@ -146,7 +146,10 @@ def convert_sklearn_gradient_boosting_regressor(
     elif op.init is None:
         # constant_ was introduced in scikit-learn 0.21.
         if hasattr(op.init_, "constant_"):
-            cst = [float(x) for x in op.init_.constant_]
+            if len(op.init_.constant_.shape) == 0:
+                cst = [float(op.init_.constant_)]
+            else:
+                cst = [float(x) for x in op.init_.constant_.ravel().tolist()]
         elif op.loss == "ls":
             cst = [op.init_.mean]
         else:

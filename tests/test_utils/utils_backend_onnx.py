@@ -37,10 +37,11 @@ from .utils_backend import (
 
 if onnx_opset_version() >= 18:
     from onnx.reference import ReferenceEvaluator
-    from onnx.reference.op_run import OpRun
+    from onnx.reference.op_run import OpRun, RuntimeContextError
     from onnx.reference.ops._op import OpRunReduceNumpy
     from onnx.reference.ops.aionnxml import load_op
     from .reference_implementation_text import Tokenizer
+    from .reference_implementation_zipmap import ZipMap
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
@@ -48,7 +49,7 @@ if onnx_opset_version() >= 18:
         def _run(self, x, y, metric="euclidean"):
             return (cdist(x, y, metric=metric).astype(x.dtype),)
 
-    additional_implementations = [CDist, Tokenizer]
+    additional_implementations = [CDist, Tokenizer, ZipMap]
 
     try:
         load_op("ai.onnx.ml", "OneHotEncoder", version=1)
@@ -63,8 +64,6 @@ if onnx_opset_version() >= 18:
 
     if add_ops or onnx_opset_version() >= 20:
         # bugs in reference implementation not covered by a backend test
-        from onnx.reference.op_run import RuntimeContextError
-        from .reference_implementation_zipmap import ZipMap
 
         if add_ops:
             from onnx.reference.ops.op_argmin import _ArgMin, _argmin
@@ -296,7 +295,6 @@ if onnx_opset_version() >= 18:
                         )
                     return super()._extract_attribute_value(att, ref_att)
 
-        additional_implementations.extend([ZipMap])
         if add_ops:
             additional_implementations.extend(
                 [
@@ -336,7 +334,6 @@ if onnx_opset_version() >= 18:
                     Scan,
                     SVMClassifier,
                     SVMRegressor,
-                    ZipMap,
                 ]
             )
 
@@ -1149,7 +1146,8 @@ def _compare_expected(
                 # ReferenceEvaluator
                 res = sess.replay_run()
                 raise OnnxRuntimeAssertionError(
-                    f"Unexpected output\n---\n{res}\n----\n{msg}"
+                    f"Unexpected output\nexpected={expected.ravel()[:5]}"
+                    f"...\n---\n{res}\n----\n{msg}"
                 )
             elif verbose:
                 raise OnnxRuntimeAssertionError(
