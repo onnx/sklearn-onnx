@@ -54,13 +54,18 @@ def convert_sklearn_feature_hasher(
             out_indices = scope.get_unique_variable_name(f"out_indices{i}")
             out_text = scope.get_unique_variable_name(f"out_text{i}")
             out_shape = scope.get_unique_variable_name(f"out_shape{i}")
-            container.add_node(
-                "StringSplit",
-                [reshaped, delimiter, skip_empty],
-                [out_indices, out_text, out_shape],
-                op_domain="ai.onnx.contrib",
-                op_version=1,
-            )
+            if len(delimiter) <= 1:
+                container.add_node(
+                    "StringSplit",
+                    [reshaped, delimiter, skip_empty],
+                    [out_indices, out_text, out_shape],
+                    op_domain="ai.onnx.contrib",
+                    op_version=1,
+                )
+            else:
+                raise RuntimeError(
+                    f"Only character separator are supported but delimiter is {delimiter!r}."
+                )
             shape = scope.get_unique_variable_name(f"shape{i}")
             container.add_node("Shape", [col_to_split.full_name], [shape])
 
