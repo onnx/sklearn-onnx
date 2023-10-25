@@ -5,7 +5,7 @@ from scipy.sparse import coo_matrix
 from onnx.defs import onnx_opset_version
 
 
-if onnx_opset_version() >= 18:
+if 19 >= onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
 
     class FusedMatMul(OpRun):

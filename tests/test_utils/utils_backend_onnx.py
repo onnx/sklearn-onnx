@@ -37,10 +37,15 @@ from .utils_backend import (
 
 if onnx_opset_version() >= 18:
     from onnx.reference import ReferenceEvaluator
-    from onnx.reference.op_run import OpRun
+    from onnx.reference.op_run import OpRun, RuntimeContextError
     from onnx.reference.ops._op import OpRunReduceNumpy
-    from onnx.reference.ops import load_op
+
+    try:
+        from onnx.reference.ops.aionnxml import load_op
+    except ImportError:
+        load_op = None
     from .reference_implementation_text import Tokenizer
+    from .reference_implementation_zipmap import ZipMap
 
     class CDist(OpRun):
         op_domain = "com.microsoft"
@@ -48,17 +53,15 @@ if onnx_opset_version() >= 18:
         def _run(self, x, y, metric="euclidean"):
             return (cdist(x, y, metric=metric).astype(x.dtype),)
 
-    additional_implementations = [CDist, Tokenizer]
+    additional_implementations = [
+        CDist,
+        Tokenizer,
+        ZipMap,
+    ]
 
-    try:
-        load_op("ai.onnx.ml", "OneHotEncoder")
-        add_ops = False
-    except Exception:
-        add_ops = True
-
-    if add_ops:
+    if onnx_opset_version() < 20:
         # bugs in reference implementation not covered by a backend test
-        from onnx.reference.op_run import RuntimeContextError
+
         from onnx.reference.ops.op_argmin import _ArgMin, _argmin
         from onnx.reference.ops.op_argmax import _ArgMax, _argmax
         from onnx.reference.ops.op_reduce_log_sum_exp import compute_log_sum_exp
@@ -76,14 +79,13 @@ if onnx_opset_version() >= 18:
             OneHotEncoder,
             Scaler,
         )
-        from .reference_implementation_zipmap import ZipMap
         from .reference_implementation_afe import ArrayFeatureExtractor
+        from .reference_implementation_svm import SVMClassifier, SVMRegressor
+        from .reference_implementation_text import TfIdfVectorizer
         from .reference_implementation_tree import (
             TreeEnsembleClassifier,
             TreeEnsembleRegressor,
         )
-        from .reference_implementation_svm import SVMClassifier, SVMRegressor
-        from .reference_implementation_text import TfIdfVectorizer
 
         class ArgMin(_ArgMin):
             def _run(self, data, axis=None, keepdims=None, select_last_index=None):
@@ -212,7 +214,14 @@ if onnx_opset_version() >= 18:
                     self.cst = np.float32(0)
                 if not isinstance(
                     self.cst,
-                    (np.float32, np.float64, np.int64, np.int32, np.bool_, np.float16),
+                    (
+                        np.float32,
+                        np.float64,
+                        np.int64,
+                        np.int32,
+                        np.bool_,
+                        np.float16,
+                    ),
                 ):
                     raise TypeError(f"cst must be a real not {type(self.cst)}")
 
@@ -284,13 +293,12 @@ if onnx_opset_version() >= 18:
                 Normalizer,
                 OneHotEncoder,
                 TfIdfVectorizer,
-                TreeEnsembleClassifier,
-                TreeEnsembleRegressor,
                 Scaler,
                 Scan,
                 SVMClassifier,
                 SVMRegressor,
-                ZipMap,
+                TreeEnsembleClassifier,
+                TreeEnsembleRegressor,
             ]
         )
 
@@ -1103,7 +1111,8 @@ def _compare_expected(
                 # ReferenceEvaluator
                 res = sess.replay_run()
                 raise OnnxRuntimeAssertionError(
-                    f"Unexpected output\n---\n{res}\n----\n{msg}"
+                    f"Unexpected output\nexpected={expected.ravel()[:5]}"
+                    f"...\n---\n{res}\n----\n{msg}"
                 )
             elif verbose:
                 raise OnnxRuntimeAssertionError(
