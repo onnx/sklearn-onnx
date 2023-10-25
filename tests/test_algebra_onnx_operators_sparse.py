@@ -53,9 +53,10 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
         reason="fails with onnxruntime < %s" % THRESHOLD,
     )
     def test_onnx_init_sparse_coo(self):
-        row = np.array([0, 0, 1, 3, 1], dtype=np.float32)
-        col = np.array([0, 2, 1, 3, 1], dtype=np.float32)
+        row = np.array([0, 0, 1, 3, 2], dtype=np.int64)
+        col = np.array([0, 2, 1, 3, 1], dtype=np.int64)
         data = np.array([1, 1, 1, 1, 1], dtype=np.float32)
+        # numpy and onnxruntime behave differently when there are duplicated indices.
         X = coo_matrix((data, (row, col)), shape=(4, 4))
 
         node = OnnxAdd("X", X, output_names=["Y"], op_version=TARGET_OPSET)
@@ -70,14 +71,14 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
             # Sparse tensor is not supported for constant.
             return
         try:
-            res = sess.run(None, {"X": X})[0]
+            res = sess.run(None, {"X": X.todense()})[0]
         except RuntimeError as e:
             # Sparse tensor is not supported for constant.
             warnings.warn(
                 "Unable to run with %r\n---\n%s\n%s" % ({"X": X}, model_def, e)
             )
             return
-        assert_almost_equal(X + X, res)
+        assert_almost_equal((X + X).todense(), res)
 
 
 if __name__ == "__main__":

@@ -13,123 +13,122 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
-      Py310-Onnx15rc2-Rt160-Skl131:
-        python.version: '3.11'  # onnxruntime cannot support python 3.11 yet
+      Py310-Onnx150-Rt161-Skl131:
+        python.version: '3.11'
         onnx.version: '-i https://test.pypi.org/simple/ onnx==1.15.0rc2'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.16.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxrt.version: 'onnxruntime==1.16.1'
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '>=1.3.1'
-
       Py310-Onnx141-Rt160-Skl131:
-        python.version: '3.11'  # onnxruntime cannot support python 3.11 yet
-        onnx.version: 'onnx==1.14.1' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
+        python.version: '3.11'
+        onnx.version: 'onnx==1.14.1'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.16.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '>=1.3.1'
       Py310-Onnx140-Rt151-Skl130:
-        python.version: '3.11'  # onnxruntime cannot support python 3.11 yet
-        onnx.version: 'onnx==1.14.0' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
+        python.version: '3.11'
+        onnx.version: 'onnx==1.14.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.15.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.3.0'
       Py310-Onnx140-Rt140-Skl122:
-        python.version: '3.10'  # onnxruntime cannot support python 3.11 yet
-        onnx.version: 'onnx==1.14.1' # '-i https://test.pypi.org/simple/ onnx==1.14.0rc3'
+        python.version: '3.10'
+        onnx.version: 'onnx==1.14.1'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.14.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.2.2'
       Py310-Onnx130-Rt140-Skl121:
         python.version: '3.10'
-        onnx.version:  'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.version:  'onnx==1.13.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.14.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.2.2'
       Py310-Onnx130-Rt131-Skl120:
         python.version: '3.10'
-        onnx.version:  'onnx==1.13.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.version:  'onnx==1.13.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.13.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.2.0'
       Py310-Onnx120-Rt131-Skl120:
         python.version: '3.10'
-        onnx.version:  'onnx==1.12.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.version:  'onnx==1.12.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.13.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.2.0'
       Py310-Onnx120-Rt120-Skl11:
         python.version: '3.10'
-        onnx.version:  'onnx==1.12.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.version:  'onnx==1.12.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.12.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.1.3'
       Py39-Onnx120-Rt1111-Skl11:
         python.version: '3.9'
-        onnx.version:  'onnx==1.12.0' #'-i https://test.pypi.org/simple/ onnx==1.12.0rc4'
+        onnx.version:  'onnx==1.12.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.11.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.1.3'
       Py39-Onnx1110-Rt1111-Skl11:
         python.version: '3.9'
-        onnx.version:  'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
+        onnx.version:  'onnx==1.11.0'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.11.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.1.3'
       Py39-Onnx1110-Rt1111-Skl10:
         python.version: '3.9'
-        onnx.version:  'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
+        onnx.version:  'onnx==1.11.0'
         onnx.target_opset: ''
         numpy.version: 'numpy==1.23.5'
         scipy.version: 'scipy'
         onnxrt.version: 'onnxruntime==1.11.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.0.2'
       Py39-Onnx1110-Rt1100-Skl10:
         python.version: '3.9'
-        onnx.version:  'onnx==1.11.0' # '-i https://test.pypi.org/simple/ onnx==1.11.0rc2'
+        onnx.version:  'onnx==1.11.0'
         onnx.target_opset: ''
         numpy.version: 'numpy==1.23.5'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.10.0'  # -i https://test.pypi.org/simple/ ort-nightly'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxrt.version: 'onnxruntime==1.10.0'
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.0.2'
       Py39-Onnx1102-Rt1100-Skl10:
         python.version: '3.9'
-        onnx.version: 'onnx==1.10.2'  # -i https://test.pypi.org/simple/ onnx'
+        onnx.version: 'onnx==1.10.2'
         onnx.target_opset: ''
         numpy.version: 'numpy==1.23.5'
         scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.10.0'  # -i https://test.pypi.org/simple/ ort-nightly'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'  # git+https://github.com/microsoft/onnxconverter-common.git
+        onnxrt.version: 'onnxruntime==1.10.0'
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.0.2'
 
     maxParallel: 3
