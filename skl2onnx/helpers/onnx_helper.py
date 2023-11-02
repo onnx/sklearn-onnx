@@ -156,6 +156,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
         model.graph.input,
         var_out,
         model.graph.initializer,
+        model.graph.sparse_initializer,
     )
     onnx_model = make_model(graph)
     onnx_model.ir_version = model.ir_version
@@ -312,6 +313,7 @@ def change_onnx_domain(model, ops):
         model.graph.input,
         model.graph.output,
         model.graph.initializer,
+        model.graph.sparse_initializer,
     )
     onnx_model = make_model(graph)
     onnx_model.ir_version = model.ir_version

@@ -547,14 +547,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
             cached_name = self.initializers_strings.get(content, None)
             if cached_name is None:
                 self.initializers_strings[content] = name
-                self.add_node(
-                    "Constant",
-                    [],
-                    [name],
-                    sparse_value=sparse_tensor,
-                    op_version=self.target_opset,
-                    name=name + "_op",
-                )
+                self.initializers.append(sparse_tensor)
                 return sparse_tensor
 
             self.add_node(
@@ -872,7 +865,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
             name = inp.name
             order[name] = 0
         for inp in self.initializers:
-            name = inp.name
+            name = (inp.name if hasattr(inp, "name") else inp.values.name)
             order[name] = 0
 
         n_iter = 0

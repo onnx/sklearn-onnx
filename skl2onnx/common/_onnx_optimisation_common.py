@@ -181,7 +181,14 @@ def _rename_graph_output(graph, old_name, new_name):
             outputs.append(value_info)
     nodes = list(graph.node)
     nodes.append(_make_node("Identity", [old_name], [new_name]))
-    new_graph = make_graph(nodes, graph.name, graph.input, outputs, graph.initializer)
+    new_graph = make_graph(
+        nodes,
+        graph.name,
+        graph.input,
+        outputs,
+        graph.initializer,
+        graph.sparse_initializer,
+    )
     new_graph.value_info.extend(graph.value_info)
     return new_graph
 
@@ -207,7 +214,14 @@ def _rename_graph_input(graph, old_name, new_name):
             inputs.append(value_info)
     nodes = list(graph.node)
     nodes.append(_make_node("Identity", [new_name], [old_name]))
-    new_graph = make_graph(nodes, graph.name, inputs, graph.output, graph.initializer)
+    new_graph = make_graph(
+        nodes,
+        graph.name,
+        inputs,
+        graph.output,
+        graph.initializer,
+        graph.sparse_initializer,
+    )
     new_graph.value_info.extend(graph.value_info)
     return new_graph
 
