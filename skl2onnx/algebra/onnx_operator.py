@@ -7,7 +7,7 @@ from onnx import GraphProto
 from onnx.helper import make_graph, make_model
 from onnx.numpy_helper import from_array
 from scipy.sparse import coo_matrix
-from ..proto import TensorProto
+from ..proto import SparseTensorProto, TensorProto
 from ..common.data_types import _guess_type_proto_str, _guess_type_proto_str_inv
 from ..common._topology import (
     Variable,
@@ -1099,7 +1099,10 @@ class OnnxOperator:
             model_name,
             container.inputs,
             container.outputs,
-            container.initializers,
+            [i for i in container.initializers if isinstance(i, TensorProto)],
+            sparse_initializer=[
+                i for i in container.initializers if isinstance(i, SparseTensorProto)
+            ],
         )
         onnx_model = make_model(graph)
 

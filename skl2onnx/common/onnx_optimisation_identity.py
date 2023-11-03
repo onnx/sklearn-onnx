@@ -169,7 +169,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
         onnx_model.input,
         onnx_model.output,
         onnx_model.initializer,
-        onnx_model.sparse_initializer,
+        sparse_initializer=onnx_model.sparse_initializer,
     )
 
     graph.value_info.extend(onnx_model.value_info)

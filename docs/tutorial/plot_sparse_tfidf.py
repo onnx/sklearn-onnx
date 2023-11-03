@@ -14,9 +14,7 @@ The pipeline
 """
 import os
 import pickle
-from typing import Any
 import numpy as np
-from numpy import ndarray
 import scipy
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
@@ -25,6 +23,14 @@ from sklearn.decomposition import TruncatedSVD
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx, update_registered_converter
 from skl2onnx.common.data_types import StringTensorType
+from skl2onnx.common._topology import Scope, Operator
+from skl2onnx.common._container import ModelComponentContainer
+from skl2onnx.common.data_types import (
+    DoubleTensorType,
+    FloatTensorType,
+    guess_proto_type,
+)
+
 
 X_train = np.array(
     [
@@ -196,14 +202,6 @@ print(f"Average absolute difference for the probabilities: {diff.max(axis=1)}")
 # We use the converter for TruncatedSVD as a base and a sparse matrix multiplication
 # implemented in onnxruntime (see `OperatorKernels.md
 # <https://github.com/microsoft/onnxruntime/blob/main/docs/OperatorKernels.md>`_).
-
-from skl2onnx.common._topology import Scope, Operator
-from skl2onnx.common._container import ModelComponentContainer
-from skl2onnx.common.data_types import (
-    DoubleTensorType,
-    FloatTensorType,
-    guess_proto_type,
-)
 
 
 def calculate_sparse_sklearn_truncated_svd_output_shapes(operator):

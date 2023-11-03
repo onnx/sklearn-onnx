@@ -59,7 +59,7 @@ def upgrade_opset_number(model, new_opsets):
         model.graph.input,
         model.graph.input,
         model.graph.initializer,
-        model.graph.sparse_initializer,
+        sparse_initializer=model.graph.sparse_initializer,
     )
     onnx_model = make_model(graph)
     onnx_model.ir_version = model.ir_version

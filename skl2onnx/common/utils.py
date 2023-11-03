@@ -4,6 +4,7 @@ import pprint
 from collections import OrderedDict
 import hashlib
 import numpy as np
+from onnx import helper, TensorProto
 from onnx.numpy_helper import from_array
 from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed  # noqa
 from onnxconverter_common.utils import is_numeric_type, is_string_type  # noqa
@@ -169,10 +170,33 @@ def get_column_indices(indices, inputs, multiple):
         return onnx_var, onnx_is
 
 
+def from_coo_matrix(content, name):
+    onnx_type = helper.np_dtype_to_tensor_dtype(content.dtype)
+    values_tensor = helper.make_tensor(
+        name + "_v",
+        data_type=onnx_type,
+        dims=(len(content.data),),
+        vals=content.data,
+    )
+    indices = [i * content.shape[1] + j for i, j in zip(content.row, content.col)]
+    indices_tensor = helper.make_tensor(
+        name=name + "_i",
+        data_type=TensorProto.INT64,
+        dims=(len(indices),),
+        vals=indices,
+    )
+    dense_shape = list(content.shape)
+    sparse_tensor = helper.make_sparse_tensor(
+        values_tensor, indices_tensor, dense_shape
+    )
+    return sparse_tensor
+
+
 def hash_array(value, length=15):
     "Computes a hash identifying the value."
+    cvt = from_array if isinstance(value, np.ndarray) else from_coo_matrix
     try:
-        onx = from_array(value)
+        onx = cvt(value, "")
     except AttributeError as e:
         # sparse matrix for example
         if hasattr(value, "tocoo"):

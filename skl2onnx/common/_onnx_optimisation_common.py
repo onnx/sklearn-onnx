@@ -187,7 +187,7 @@ def _rename_graph_output(graph, old_name, new_name):
         graph.input,
         outputs,
         graph.initializer,
-        graph.sparse_initializer,
+        sparse_initializer=graph.sparse_initializer,
     )
     new_graph.value_info.extend(graph.value_info)
     return new_graph
@@ -220,7 +220,7 @@ def _rename_graph_input(graph, old_name, new_name):
         inputs,
         graph.output,
         graph.initializer,
-        graph.sparse_initializer,
+        sparse_initializer=graph.sparse_initializer,
     )
     new_graph.value_info.extend(graph.value_info)
     return new_graph

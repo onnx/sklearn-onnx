@@ -1360,7 +1360,8 @@ class Topology:
                         {
                             (i.name if hasattr(i, "name") else i.values.name): i
                             for i in container.initializers
-                            if (i.name if hasattr(i, "name") else i.values.name) not in fed_variables
+                            if (i.name if hasattr(i, "name") else i.values.name)
+                            not in fed_variables
                         }
                     )
                     self._propagate_status(
@@ -1577,7 +1578,9 @@ def convert_topology(
             container.inputs + extra_inputs,
             container.outputs,
             [i for i in container.initializers if isinstance(i, TensorProto)],
-            [i for i in container.initializers if isinstance(i, SparseTensorProto)],
+            sparse_initializer=[
+                i for i in container.initializers if isinstance(i, SparseTensorProto)
+            ],
         )
     else:
         # In ONNX opset 9 and above, initializers are included as
@@ -1588,7 +1591,10 @@ def convert_topology(
             model_name,
             container.inputs,
             container.outputs,
-            container.initializers,
+            [i for i in container.initializers if isinstance(i, TensorProto)],
+            sparse_initializer=[
+                i for i in container.initializers if isinstance(i, SparseTensorProto)
+            ],
         )
 
     # Add extra information related to the graph

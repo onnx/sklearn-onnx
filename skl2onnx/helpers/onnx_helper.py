@@ -10,6 +10,7 @@ from onnx.helper import (
     make_tensor,
     make_node,
     make_tensor_value_info,
+    make_sparse_tensor_value_info,
     make_graph,
     make_model,
 )
@@ -156,7 +157,7 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
         model.graph.input,
         var_out,
         model.graph.initializer,
-        model.graph.sparse_initializer,
+        sparse_initializer=model.graph.sparse_initializer,
     )
     onnx_model = make_model(graph)
     onnx_model.ir_version = model.ir_version
@@ -238,6 +239,13 @@ def infer_outputs(
                 input.name, input.data_type.real, list(d for d in input.dims)
             )
             onnx_inputs.append(v)
+        elif isinstance(input, onnx.SparseTensorProto):
+            v = make_sparse_tensor_value_info(
+                input.values.name,
+                input.values.data_type.real,
+                list(d for d in input.dims),
+            )
+            onnx_inputs.append(v)
         elif isinstance(input, onnx.AttributeProto):
             value_info = ValueInfoProto()
             value_info.name = input.name
@@ -313,7 +321,7 @@ def change_onnx_domain(model, ops):
         model.graph.input,
         model.graph.output,
         model.graph.initializer,
-        model.graph.sparse_initializer,
+        sparse_initializer=model.graph.sparse_initializer,
     )
     onnx_model = make_model(graph)
     onnx_model.ir_version = model.ir_version
@@ -428,7 +436,12 @@ def add_output_initializer(model_onnx, name, value, suffix="_init"):
         nodes.append(make_node("Identity", [name_init], [name_output]))
 
     graph = make_graph(
-        nodes, model_onnx.graph.name, model_onnx.graph.input, outputs, inits
+        nodes,
+        model_onnx.graph.name,
+        model_onnx.graph.input,
+        outputs,
+        inits,
+        sparse_initializer=model_onnx.graph.sparse_initializer,
     )
 
     onnx_model = make_model(graph)
