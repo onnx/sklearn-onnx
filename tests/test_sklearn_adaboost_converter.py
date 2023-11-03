@@ -368,5 +368,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnAdaBoostModels().test_ada_boost_classifier_samme()
+    # TestSklearnAdaBoostModels().test_ada_boost_classifier_samme()
+    import logging
+
+    logging.getLogger("skl2onnx").setLevel(logging.ERROR)
     unittest.main(verbosity=2)

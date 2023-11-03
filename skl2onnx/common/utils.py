@@ -197,7 +197,7 @@ def hash_array(value, length=15):
     cvt = from_array if isinstance(value, np.ndarray) else from_coo_matrix
     try:
         onx = cvt(value, "")
-    except AttributeError as e:
+    except (AttributeError, TypeError) as e:
         # sparse matrix for example
         if hasattr(value, "tocoo"):
             coo = value.tocoo()
