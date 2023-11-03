@@ -123,6 +123,10 @@ class TestSklearnCountVectorizer(unittest.TestCase):
             corpus, vect, model_onnx, basename="SklearnCountVectorizer13-OneOff-SklCol"
         )
 
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="ReferenceEvaluator does not support tfidf with strings",
+    )
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_binary(self):
         corpus = numpy.array(
