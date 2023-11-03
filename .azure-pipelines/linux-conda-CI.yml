@@ -290,9 +290,9 @@ jobs:
   - script: |
       if [ '$(onnxcc.version)' == 'git' ]
       then
-        pip install git+https://github.com/microsoft/onnxconverter-common
+        pip install git+https://github.com/microsoft/onnxconverter-common --no-deps
       else
-        pip install onnxconverter-common$(onnxcc.version)
+        pip install onnxconverter-common$(onnxcc.version) --no-deps
       fi
     displayName: 'install onnxconverter-common'
 

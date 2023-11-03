@@ -181,7 +181,7 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      pip install $(onnxcc.version)
+      pip install $(onnxcc.version) --no-deps
     displayName: 'install onnxconverter-common'
 
   - script: |
