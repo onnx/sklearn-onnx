@@ -111,6 +111,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11NoL-OneOff-SklCol",
+            backend=BACKEND,
         )
 
         sess = InferenceSession(
@@ -210,6 +211,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11EmptyString-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -245,6 +247,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11OutVocab-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -268,7 +271,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol"
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer22-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -285,7 +292,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22S-OneOff-SklCol"
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer22S-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -309,7 +320,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer22-OneOff-SklCol"
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer22-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -336,6 +351,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer22L1-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -363,6 +379,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer22L2-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -386,7 +403,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer13-OneOff-SklCol"
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer13-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -421,6 +442,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisClass-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -466,6 +488,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisId-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -493,6 +516,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizerBinary-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -664,6 +688,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
                 vect,
                 model_onnx,
                 basename="SklearnTfidfVectorizer11Locale-OneOff-SklCol",
+                backend=BACKEND,
             )
 
             sess = InferenceSession(
