@@ -4,11 +4,20 @@
 Tests scikit-learn's tfidf converter.
 """
 import unittest
+import packaging.version as pv
 import numpy
+import onnx
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
@@ -40,6 +49,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11Regex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -99,6 +109,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11Regex4-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -127,6 +138,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11EmptyStringRegex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -162,6 +174,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11OutVocabRegex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -189,6 +202,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer22Regex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -214,6 +228,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer12SRegex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -241,6 +256,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer12Regex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -267,6 +283,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer12L1Regex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -294,6 +311,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer12L2Regex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -321,6 +339,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer13Regex-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -356,6 +375,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisClassRegex-" "OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -409,6 +429,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11ParenthesisIdRegex-" "OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -457,9 +478,9 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizerIssue-OneOff-SklCol",
+            backend=BACKEND,
         )
 
 
 if __name__ == "__main__":
-    TestSklearnTfidfVectorizerRegex().test_model_tfidf_vectorizer_issue()
-    unittest.main()
+    unittest.main(verbosity=2)
