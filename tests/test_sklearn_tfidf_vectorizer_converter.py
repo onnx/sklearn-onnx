@@ -9,6 +9,7 @@ import sys
 import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 
@@ -33,6 +34,12 @@ from test_utils import (
 
 
 ort_version = ".".join(ort_version.split(".")[:2])
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnTfidfVectorizer(unittest.TestCase):
@@ -63,7 +70,11 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            corpus, vect, model_onnx, basename="SklearnTfidfVectorizer11-OneOff-SklCol"
+            corpus,
+            vect,
+            model_onnx,
+            basename="SklearnTfidfVectorizer11-OneOff-SklCol",
+            backend=BACKEND,
         )
 
         sess = InferenceSession(
@@ -170,6 +181,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11EmptyStringSepCase1-" "OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
@@ -511,6 +523,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer1164-OneOff-SklCol",
+            backend=BACKEND,
         )
 
         sess = InferenceSession(
@@ -614,6 +627,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizer11CustomVocab-OneOff-SklCol",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
