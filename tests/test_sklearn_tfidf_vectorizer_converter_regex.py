@@ -80,7 +80,13 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             self.assertTrue(model_onnx is not None)
             if opset >= 10:
                 name = "SklearnTfidfVectorizer11Rx%d-OneOff-SklCol" % opset
-                dump_data_and_model(corpus, vect, model_onnx, basename=name)
+                dump_data_and_model(
+                    corpus,
+                    vect,
+                    model_onnx,
+                    basename=name,
+                    backend=BACKEND,
+                )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_tfidf_vectorizer11_word4(self):
