@@ -145,7 +145,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
     @unittest.skipIf(
-        pv.Version(ort_version) < pv.Version("1.8.0"), reason="produces nan values"
+        pv.Version(ort_version) < pv.Version("1.12.0"), reason="produces nan values"
     )
     @ignore_warnings(category=DeprecationWarning)
     def test_model_knn_regressor_radius(self):
