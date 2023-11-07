@@ -67,6 +67,7 @@ from . import tfidf_vectoriser
 from . import voting_classifier
 from . import voting_regressor
 from . import zip_map
+from . import proglearn
 
 __all__ = [
     ada_boost,
@@ -133,4 +134,5 @@ __all__ = [
     voting_classifier,
     voting_regressor,
     zip_map,
+    proglearn,
 ]
