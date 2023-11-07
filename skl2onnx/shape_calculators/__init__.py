@@ -51,6 +51,8 @@ from . import tfidf_transformer
 from . import voting_classifier
 from . import voting_regressor
 from . import zip_map
+from . import proglearn
+
 
 __all__ = [
     array_feature_extractor,
@@ -101,4 +103,5 @@ __all__ = [
     voting_classifier,
     voting_regressor,
     zip_map,
+    proglearn,
 ]
