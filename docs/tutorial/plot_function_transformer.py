@@ -88,7 +88,8 @@ class OverpriceCalculator(BaseEstimator, TransformerMixin):
 
 mapper = ColumnTransformer(
     transformers=[
-        ("c", OverpriceCalculator(), ["a", "b"]),
+        ("ab", FunctionTransformer(), ["a", "b"]),  # We keep the first column.
+        ("c", OverpriceCalculator(), ["a", "b"]),  # We add a new one.
     ],
     remainder="passthrough",
     verbose_feature_names_out=False,
@@ -100,6 +101,10 @@ pipe_tr.fit(data, y)
 #############################
 # Both pipelines return the same output.
 assert_allclose(pipe.predict_proba(data), pipe_tr.predict_proba(data))
+
+#############################
+# Let's check it produces the same number of features.
+assert_allclose(pipe.steps[0][-1].transform(data), pipe_tr.steps[0][-1].transform(data))
 
 #############################
 # But the conversion still fails with a different error message.
@@ -166,15 +171,19 @@ onx = to_onnx(pipe_tr, data[:1], target_opset=18, options={"zipmap": False})
 # Let's check there is no discrepancies
 # +++++++++++++++++++++++++++++++++++++
 #
-# First with :class:`onnx.reference.ReferenceEvaluator`.
+# First the expected values
 
 expected = (pipe_tr.predict(data), pipe_tr.predict_proba(data))
+print(expected)
+
+##############################
+# Then let's check with :class:`onnx.reference.ReferenceEvaluator`.
+
 feeds = {
     "a": data["a"].values.reshape((-1, 1)),
     "b": data["b"].values.reshape((-1, 1)),
     "f": data["f"].values.reshape((-1, 1)),
 }
-print(feeds)
 
 # verbose=10 to show intermediate results
 ref = ReferenceEvaluator(onx, verbose=0)
@@ -191,3 +200,7 @@ got = ref.run(None, feeds)
 
 assert_allclose(expected[0], got[0])
 assert_allclose(expected[1], got[1])
+
+#######################################
+# Finally.
+print("done")
