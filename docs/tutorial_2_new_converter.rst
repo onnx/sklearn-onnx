@@ -42,6 +42,7 @@ an example.
 
     auto_tutorial/plot_icustom_converter
     auto_tutorial/plot_jcustom_syntax
+    auto_tutorial/plot_function_transformer
     auto_tutorial/plot_kcustom_converter_wrapper
     auto_tutorial/plot_lcustom_options
     auto_tutorial/plot_mcustom_parser
