@@ -119,7 +119,7 @@ jobs:
       Py39-Onnx120-Rt1111-Skl11:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.21.0,<1.25.0'
+        numpy.version: '>=1.21.0,<1.23.0'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.12.0'
         onnx.target_opset: ''
@@ -131,7 +131,7 @@ jobs:
       Py39-Onnx1110-Rt1111-Skl11:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.21.0,<1.25.0'
+        numpy.version: '>=1.21.0,<1.23.0'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.11.0'
         onnx.target_opset: ''
@@ -143,7 +143,7 @@ jobs:
       Py39-Onnx1110-Rt1111-Skl10:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.21.0,<1.25.0'
+        numpy.version: '>=1.21.0,<1.23.0'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.11.0'
         onnx.target_opset: ''
@@ -155,7 +155,7 @@ jobs:
       Py39-Onnx1110-Rt1100-Skl10:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.21.0,<1.25.0'
+        numpy.version: '>=1.21.0,<1.23.0'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.11.0'
         onnx.target_opset: ''
@@ -167,7 +167,7 @@ jobs:
       Py39-Onnx1101-Rt190-Skl10:
         do.bench: '0'
         python.version: '3.9'
-        numpy.version: '>=1.21.0,<1.25.0'
+        numpy.version: '>=1.21.0,<1.23.0'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.10.1'
         onnx.target_opset: ''
