@@ -14,7 +14,7 @@ jobs:
   strategy:
     matrix:
 
-      Py311-Onnx150-Rt161-Skl131:
+      Py311-Onnx150-Rt161-Skl132:
         do.bench: '0'
         python.version: '3.11'
         numpy.version: '>=1.21.1'
@@ -22,7 +22,7 @@ jobs:
         onnx.version: 'onnx==1.15.0'  # -i https://test.pypi.org/simple/ onnx==1.15.0rc2'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.16.1'
-        sklearn.version: '>=1.3.1'
+        sklearn.version: '>=1.3.2'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '1'
@@ -35,7 +35,7 @@ jobs:
         onnx.version: 'onnx==1.14.1'
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.16.0'
-        sklearn.version: '>=1.3.1'
+        sklearn.version: '==1.3.1'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '1'
@@ -255,37 +255,8 @@ jobs:
     displayName: 'install scikit-learn'
 
   - script: |
-      if [ '$(onnx.version)' == 'git' ]
-        then
-          pip install typing-extensions>=3.6.2.1
-          git clone https://github.com/onnx/onnx.git --recursive
-          export ONNX_ML=1
-          cd onnx
-          python setup.py install
-          cd ..
-        else
-          if [ '$(onnx.version)' == 'test' ]
-          then
-            pip install typing-extensions>=3.6.2.1
-            pip install -i https://test.pypi.org/simple/ onnx
-          else
-            pip install typing-extensions>=3.6.2.1
-            pip install $(onnx.version)
-          fi
-      fi
-    displayName: 'install onnx'
-
-  - script: |
-      pip show onnx
-    displayName: 'onnx version'
-
-  - script: |
-      pip install $(onnxrt.version)
-    displayName: 'install onnxruntime'
-
-  - script: |
-      pip show onnx
-    displayName: 'onnx version'
+      pip install $(onnx.version) $(onnxrt.version)
+    displayName: 'install onnxruntime, onnx'
 
   - script: |
       if [ '$(onnxcc.version)' == 'git' ]
@@ -297,10 +268,6 @@ jobs:
     displayName: 'install onnxconverter-common'
 
   - script: |
-      pip show onnx
-    displayName: 'onnx version'
-
-  - script: |
       pip install -r requirements.txt
       pip install -r requirements-dev.txt
     displayName: 'install requirements'
@@ -308,6 +275,10 @@ jobs:
   - script: |
       pip show onnx
     displayName: 'onnx version'
+
+  - script: |
+      pip install $(onnx.version) $(onnxrt.version) numpy$(numpy.version) scikit-learn$(sklearn.version)
+    displayName: install onnxruntime, onnx, numpy, scikit-learn again  # to make sure the proper version is installed
 
   - script: |
       pip install -e .
