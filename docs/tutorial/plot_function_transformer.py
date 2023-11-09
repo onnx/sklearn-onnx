@@ -15,6 +15,7 @@ A very simple pipeline and the first attempt to convert it into ONNX.
 """
 import numpy as np
 from numpy.testing import assert_allclose
+from onnx.version_converter import convert_version
 from pandas import DataFrame
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.tree import DecisionTreeClassifier
@@ -27,20 +28,23 @@ from skl2onnx import to_onnx
 from skl2onnx import update_registered_converter
 from skl2onnx.common.utils import check_input_and_output_numbers
 from skl2onnx.algebra.onnx_ops import OnnxSlice, OnnxSub, OnnxDiv, OnnxMul, OnnxCastLike
+from skl2onnx.helpers import add_onnx_graph
+import onnxscript
+from onnxscript import opset18 as op
 
 # To check discrepancies
 from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
 
 
-def calculate(df):
+def calculate_growth(df):
     df["c"] = 100 * (df["a"] - df["b"]) / df["b"]
     return df
 
 
 mapper = ColumnTransformer(
     transformers=[
-        ("c", FunctionTransformer(calculate), ["a", "b"]),
+        ("c", FunctionTransformer(calculate_growth), ["a", "b"]),
     ],
     remainder="passthrough",
     verbose_feature_names_out=False,
@@ -51,11 +55,13 @@ pipe = Pipeline([("mapper", mapper), ("classifier", DecisionTreeClassifier())])
 
 data = DataFrame(
     [
-        dict(a=1, b=2, f=5),
-        dict(a=4, b=5, f=10),
+        dict(a=2, b=1, f=5),
+        dict(a=50, b=4, f=10),
+        dict(a=5, b=2, f=4),
+        dict(a=100, b=6, f=20),
     ]
 )
-y = np.array([0, 1], dtype=np.int64)
+y = np.array([0, 1, 0, 1], dtype=np.int64)
 pipe.fit(data, y)
 
 try:
@@ -71,25 +77,25 @@ except Exception as e:
 # is implemented as a custom transformer.
 
 
-class OverpriceCalculator(BaseEstimator, TransformerMixin):
+class GrowthCalculator(BaseEstimator, TransformerMixin):
     def __init__(self):
         pass
 
-    def calculate_overprice(self, x, y):
+    def calculate_growth(self, x, y):
         return 100 * (x - y) / y
 
     def fit(self, X, y=None):
         return self
 
     def transform(self, X, y=None):
-        x = X.apply(lambda x: self.calculate_overprice(x.a, x.b), axis=1)
+        x = X.apply(lambda x: self.calculate_growth(x.a, x.b), axis=1)
         return x.values.reshape((-1, 1))
 
 
 mapper = ColumnTransformer(
     transformers=[
         ("ab", FunctionTransformer(), ["a", "b"]),  # We keep the first column.
-        ("c", OverpriceCalculator(), ["a", "b"]),  # We add a new one.
+        ("c", GrowthCalculator(), ["a", "b"]),  # We add a new one.
     ],
     remainder="passthrough",
     verbose_feature_names_out=False,
@@ -119,11 +125,11 @@ except Exception as e:
 # Custom converter
 # ++++++++++++++++
 #
-# We need to implement the method `calculate_overprice` in ONNX.
+# We need to implement the method `calculate_growth` in ONNX.
 # The first function returns the expected type and shape.
 
 
-def overprice_shape_calculator(operator):
+def growth_shape_calculator(operator):
     check_input_and_output_numbers(operator, input_count_range=1, output_count_range=1)
     # Gets the input type, the transformer works on any numerical type.
     input_type = operator.inputs[0].type.__class__
@@ -132,7 +138,7 @@ def overprice_shape_calculator(operator):
     operator.outputs[0].type = input_type([input_dim, 1])
 
 
-def overprice_converter(scope, operator, container):
+def growth_converter(scope, operator, container):
     # No need to retrieve the fitted estimator, it is not trained.
     # op = operator.raw_operator
     opv = container.target_opset
@@ -158,10 +164,10 @@ def overprice_converter(scope, operator, container):
 
 
 update_registered_converter(
-    OverpriceCalculator,
-    "AliasOverpriceCalculator",
-    overprice_shape_calculator,
-    overprice_converter,
+    GrowthCalculator,
+    "AliasGrowthCalculator",
+    growth_shape_calculator,
+    growth_converter,
 )
 
 
@@ -201,6 +207,86 @@ got = ref.run(None, feeds)
 assert_allclose(expected[0], got[0])
 assert_allclose(expected[1], got[1])
 
+#################################
+# Custom converter with onnxscript
+# ++++++++++++++++++++++++++++++++
+#
+# `onnxscript <https://github.com/microsoft/onnxscript>`_
+# offers a less verbose API than what onnx package implements.
+# Let's see how to use it to write the converters.
+
+
+@onnxscript.script()
+def calculate_onnxscript_verbose(X):
+    # onnxscript must define an opset. We use an identity node
+    # from a specific opset to set it (otherwise it fails).
+    x0 = op.Slice(X, [0], [1], [1])
+    x1 = op.Slice(X, [1], [2], [1])
+    return op.Mul(op.Div(op.Sub(x0, x1), x1), 100)
+
+
+#########################################
+# This version uses the strict definition of ONNX operators.
+# The code can be more simple if regular python operators are used.
+# They may not be converted into ONNX but an error message
+# is raised in that case.
+
+
+@onnxscript.script()
+def calculate_onnxscript(X):
+    # onnxscript must define an opset. We use an identity node
+    # from a specific opset to set it (otherwise it fails).
+    xi = op.Identity(X)
+    x0 = xi[:, :1]
+    x1 = xi[:, 1:]
+    return (x0 - x1) / x1 * 100
+
+
+#########################################
+# We can also check that it is equivalent to the python implementation.
+f_expected = calculate_growth(data)["c"].values
+f_got = calculate_onnxscript(data[["a", "b"]].values.astype(np.float32))
+assert_allclose(f_expected.ravel(), f_got.ravel(), atol=1e-6)
+
+#########################################
+# Let's use it in the converter.
+
+
+def growth_converter_onnxscript(scope, operator, container):
+    # No need to retrieve the fitted estimator, it is not trained.
+    # op = operator.raw_operator
+    opv = container.target_opset
+
+    # 100 * (x-y)/y  --> 100 * (X[0] - X[1]) / X[1]
+    proto = calculate_onnxscript.to_model_proto()
+    # The function is written with opset 18, it needs to be converted
+    # to the opset required by the user when the conversion starts.
+    proto_version = convert_version(proto, opv)
+    add_onnx_graph(scope, operator, container, proto_version)
+
+
+update_registered_converter(
+    GrowthCalculator,
+    "AliasGrowthCalculator",
+    growth_shape_calculator,
+    growth_converter_onnxscript,
+)
+
+###################################
+# Let's check it works.
+
+onx = to_onnx(pipe_tr, data[:1], target_opset=18, options={"zipmap": False})
+
+
+###################################
+# And again the discrepancies.
+
+ref = ReferenceEvaluator(onx, verbose=0)
+got = ref.run(None, feeds)
+assert_allclose(expected[0], got[0])
+assert_allclose(expected[1], got[1])
+
+
 #######################################
 # Finally.
-print("done")
+print("done.")
