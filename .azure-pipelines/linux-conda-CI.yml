@@ -277,7 +277,7 @@ jobs:
     displayName: 'onnx version'
 
   - script: |
-      pip install $(onnx.version) $(onnxrt.version) "numpy$(numpy.version)" scikit-learn$(sklearn.version)
+      pip install $(onnx.version) $(onnxrt.version) "numpy$(numpy.version)" scikit-learn$(sklearn.version) scipy$(scipy.version)
     displayName: install onnxruntime, onnx, numpy, scikit-learn again  # to make sure the proper version is installed
 
   - script: |
