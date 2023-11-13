@@ -302,7 +302,18 @@ class TestVotingClassifierConverter(unittest.TestCase):
                 (
                     "concat",
                     ColumnTransformer(
-                        [("concat", "passthrough", list(range(X.shape[1])))],
+                        [("concat", Pipeline(
+                            steps=[
+                                # This encoder is placed before
+                                # simpleImputer because
+                                # onnx does not support text for Imputer.
+                                ("encoder", OrdinalEncoder()),
+                                (
+                                    "imputer",
+                                    SimpleImputer(strategy="most_frequent"),
+                                ),
+                            ],
+                        ), list(range(X.shape[1])))],
                         sparse_threshold=0,
                     ),
                 ),
@@ -313,25 +324,10 @@ class TestVotingClassifierConverter(unittest.TestCase):
                         estimators=[
                             (
                                 "est",
-                                Pipeline(
-                                    steps=[
-                                        # This encoder is placed before
-                                        # impleImputer because
-                                        # onnx does not support text for Imputer.
-                                        ("encoder", OrdinalEncoder()),
-                                        (
-                                            "imputer",
-                                            SimpleImputer(strategy="most_frequent"),
-                                        ),
-                                        (
-                                            "rf",
-                                            RandomForestClassifier(
-                                                n_estimators=4,
-                                                max_depth=4,
-                                                random_state=0,
-                                            ),
-                                        ),
-                                    ],
+                                RandomForestClassifier(
+                                    n_estimators=4,
+                                    max_depth=4,
+                                    random_state=0,
                                 ),
                             ),
                         ],

@@ -2,11 +2,13 @@
 
 
 import numpy as np
+
 from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
-from ..common.data_types import Int64TensorType, StringTensorType
+from ..common._container import ModelComponentContainer
+from ..common.data_types import DoubleTensorType, Int32TensorType, \
+    Int16TensorType
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
-from ..common._container import ModelComponentContainer
 from ..proto import onnx_proto
 
 
@@ -46,6 +48,21 @@ def convert_sklearn_ordinal_encoder(
             if dimension_idx == current_input.get_second_dimension():
                 dimension_idx = 0
                 input_idx += 1
+
+        to = None
+        if isinstance(current_input.type, DoubleTensorType):
+            to = onnx_proto.TensorProto.FLOAT
+        if isinstance(current_input.type, (Int16TensorType, Int32TensorType)):
+            to = onnx_proto.TensorProto.INT64
+        if to is not None:
+            casted_feature_column_name = scope.get_unique_variable_name(
+                'casted_feature_column')
+
+            apply_cast(
+                scope, feature_column_name, casted_feature_column_name,
+                container, to=to)
+
+            feature_column_name = casted_feature_column_name
 
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
         if (
