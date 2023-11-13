@@ -23,6 +23,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.16.1'
         sklearn.version: '>=1.3.2'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '1'
@@ -36,6 +37,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.16.0'
         sklearn.version: '==1.3.1'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '1'
@@ -49,6 +51,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.15.1'
         sklearn.version: '==1.3.0'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -62,6 +65,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.14.0'
         sklearn.version: '==1.2.2'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -75,6 +79,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.14.0'
         sklearn.version: '==1.2.1'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -88,6 +93,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.13.1'
         sklearn.version: '==1.2.0'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -101,6 +107,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.13.1'
         sklearn.version: '==1.2.0'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -113,6 +120,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.12.1'
         sklearn.version: '==1.1.3'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -125,6 +133,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.11.1'
         sklearn.version: '==1.1.3'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -137,6 +146,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.11.1'
         sklearn.version: '==1.1.3'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -149,6 +159,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.11.1'
         sklearn.version: '==1.0.2'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -161,6 +172,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.10.0'
         sklearn.version: '==1.0.2'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -173,6 +185,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.9.0'
         sklearn.version: '==1.0.2'
+        pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -185,6 +198,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime==1.9.0'
         sklearn.version: '==0.24.2'
+        pandas.version: '<1.0'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -197,6 +211,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime>=1.8.1'
         sklearn.version: '==0.24.2'
+        pandas.version: '<1.0'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -209,6 +224,7 @@ jobs:
         onnx.target_opset: ''
         onnxrt.version: 'onnxruntime>=1.8.1'
         sklearn.version: '==0.23.2'
+        pandas.version: '<1.0'
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
         run.example: '0'
@@ -277,8 +293,8 @@ jobs:
     displayName: 'onnx version'
 
   - script: |
-      pip install $(onnx.version) $(onnxrt.version) "numpy$(numpy.version)" scikit-learn$(sklearn.version) scipy$(scipy.version)
-    displayName: install onnxruntime, onnx, numpy, scikit-learn again  # to make sure the proper version is installed
+      pip install $(onnx.version) $(onnxrt.version) "numpy$(numpy.version)" scikit-learn$(sklearn.version) scipy$(scipy.version) "pandas${pandas.version}"
+    displayName: install onnxruntime, onnx, numpy, scikit-learn, pandas again  # to make sure the proper version is installed
 
   - script: |
       pip install -e .
@@ -287,6 +303,8 @@ jobs:
   - script: |
       echo "---------------"
       pip show numpy
+      echo "---------------"
+      pip show pandas
       echo "---------------"
       pip show scipy
       echo "---------------"
@@ -311,6 +329,7 @@ jobs:
       fi
       cd tests
       python -c "from numpy import __version__;print('numpy', __version__)"
+      python -c "from pandas import __version__;print('pandas', __version__)"
       python -c "from scipy import __version__;print('scipy', __version__)"
       python -c "from sklearn import __version__;print('sklearn', __version__)"
       python -c "from onnxruntime import __version__;print('onnxruntime', __version__)"
