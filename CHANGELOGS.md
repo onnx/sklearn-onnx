@@ -3,7 +3,8 @@
 ## 1.16.0
 
 * Add an example on how to handle FunctionTransformer
-  [#1042](https://github.com/onnx/sklearn-onnx/pull/1042)
+  [#1042](https://github.com/onnx/sklearn-onnx/pull/1042),
+  Versions of `scikit-learn < 1.0` are not tested any more.
 * FeatureHasher, raise an error when the delimiter length is > 1,
   [#1036](https://github.com/onnx/sklearn-onnx/pull/1036)
 * skl2onnx works with onnx==1.15.0,
