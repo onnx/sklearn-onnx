@@ -6,6 +6,7 @@ Tests examples from scikit-learn's documentation.
 """
 import packaging.version as pv
 import unittest
+import onnx
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
@@ -13,6 +14,12 @@ import onnxruntime as ort
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
@@ -51,6 +58,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
             text_clf,
             model_onnx,
             basename="SklearnPipelineTfidfTransformer",
+            backend=BACKEND,
         )
 
 

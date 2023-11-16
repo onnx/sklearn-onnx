@@ -15,7 +15,7 @@ jobs:
     matrix:
       Py310-Onnx150-Rt161-Skl131:
         python.version: '3.11'
-        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.15.0rc2'
+        onnx.version: 'onnx==1.15.0'  # '-i https://test.pypi.org/simple/ onnx==1.15.0rc2'
         onnx.target_opset: ''
         numpy.version: 'numpy>=1.22.3'
         scipy.version: 'scipy'
@@ -181,7 +181,7 @@ jobs:
 
   - script: |
       call activate skl2onnxEnvironment
-      pip install $(onnxcc.version)
+      pip install $(onnxcc.version) --no-deps
     displayName: 'install onnxconverter-common'
 
   - script: |

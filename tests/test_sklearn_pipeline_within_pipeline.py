@@ -6,7 +6,9 @@ Tests pipeline within pipelines.
 from textwrap import dedent
 import unittest
 from io import StringIO
+import packaging.version as pv
 import numpy as np
+import onnx
 import pandas
 
 try:
@@ -32,6 +34,12 @@ from sklearn.feature_extraction.text import CountVectorizer
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnPipelineWithinPipeline(unittest.TestCase):
@@ -362,7 +370,11 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
             preprocessor, initial_types=initial_type, target_opset=TARGET_OPSET
         )
         dump_data_and_model(
-            X_train, preprocessor, onx, basename="SklearnPipelineComplex"
+            X_train,
+            preprocessor,
+            onx,
+            basename="SklearnPipelineComplex",
+            backend=BACKEND,
         )
 
 

@@ -50,6 +50,7 @@ class TestSklearnScalerConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnStandardScalerInt64",
+            backend="onnxruntime",
         )
 
     @ignore_warnings(category=DeprecationWarning)
