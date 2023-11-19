@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
-
+import copy
 
 import numpy as np
 
 from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
 from ..common._container import ModelComponentContainer
-from ..common.data_types import DoubleTensorType, Int32TensorType, \
-    Int16TensorType
+from ..common.data_types import DoubleTensorType, FloatTensorType, \
+    Int64TensorType, Int32TensorType, Int16TensorType
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..proto import onnx_proto
@@ -25,7 +25,7 @@ def convert_sklearn_ordinal_encoder(
 
         current_input = operator.inputs[input_idx]
         if current_input.get_second_dimension() == 1:
-            feature_column_name = current_input.onnx_name
+            feature_column = current_input
             input_idx += 1
         else:
             index_name = scope.get_unique_variable_name("index")
@@ -33,13 +33,14 @@ def convert_sklearn_ordinal_encoder(
                 index_name, onnx_proto.TensorProto.INT64, [], [dimension_idx]
             )
 
-            feature_column_name = scope.get_unique_variable_name(
-                "feature_column")
+            feature_column = scope.declare_local_variable(
+                "feature_column", current_input.type.__class__([current_input.get_first_dimension(), 1])
+            )
 
             container.add_node(
                 "ArrayFeatureExtractor",
                 [current_input.onnx_name, index_name],
-                feature_column_name,
+                feature_column.onnx_name,
                 op_domain="ai.onnx.ml",
                 name=scope.get_unique_operator_name("ArrayFeatureExtractor"),
             )
@@ -55,27 +56,22 @@ def convert_sklearn_ordinal_encoder(
         if isinstance(current_input.type, (Int16TensorType, Int32TensorType)):
             to = onnx_proto.TensorProto.INT64
         if to is not None:
-            casted_feature_column_name = scope.get_unique_variable_name(
-                'casted_feature_column')
+            dtype = Int64TensorType if to == onnx_proto.TensorProto.INT64 else FloatTensorType
+            casted_feature_column = scope.declare_local_variable(
+                "casted_feature_column", dtype(copy.copy(feature_column.type.shape))
+            )
 
             apply_cast(
-                scope, feature_column_name, casted_feature_column_name,
+                scope, feature_column.onnx_name, casted_feature_column.onnx_name,
                 container, to=to)
 
-            feature_column_name = casted_feature_column_name
+            feature_column = casted_feature_column
 
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
-        if (
-                np.issubdtype(categories.dtype, np.floating)
-                or categories.dtype == np.bool_
-                or isinstance(categories[0], float)
-        ):
-            attrs["keys_floats"] = categories
-        elif (
-                np.issubdtype(categories.dtype, np.signedinteger)
-                or isinstance(categories[0], int)
-        ):
-            attrs["keys_int64s"] = categories
+        if isinstance(feature_column.type, FloatTensorType):
+            attrs["keys_floats"] = np.array([float(s) for s in categories], dtype=np.float32)
+        elif isinstance(feature_column.type, Int64TensorType):
+            attrs["keys_int64s"] = np.array([int(s) for s in categories], dtype=np.int64)
         else:
             attrs["keys_strings"] = np.array(
                 [str(s).encode("utf-8") for s in categories]
@@ -88,7 +84,7 @@ def convert_sklearn_ordinal_encoder(
 
         container.add_node(
             "LabelEncoder",
-            feature_column_name,
+            feature_column.onnx_name,
             label_encoder_output,
             op_domain="ai.onnx.ml",
             op_version=2,

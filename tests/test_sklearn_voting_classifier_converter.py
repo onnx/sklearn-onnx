@@ -297,7 +297,50 @@ class TestVotingClassifierConverter(unittest.TestCase):
             "bad",
         ]
 
-        model = Pipeline(
+        model1 = Pipeline(
+            steps=[
+                (
+                    "concat",
+                    ColumnTransformer(
+                        [("concat", "passthrough", list(range(X.shape[1])))],
+                        sparse_threshold=0,
+                    ),
+                ),
+                (
+                    "voting",
+                    VotingClassifier(
+                        flatten_transform=False,
+                        estimators=[
+                            (
+                                "est",
+                                Pipeline(
+                                    steps=[
+                                        # This encoder is placed before
+                                        # SimpleImputer because
+                                        # onnx does not support text for Imputer.
+                                        ("encoder", OrdinalEncoder()),
+                                        (
+                                            "imputer",
+                                            SimpleImputer(strategy="most_frequent"),
+                                        ),
+                                        (
+                                            "rf",
+                                            RandomForestClassifier(
+                                                n_estimators=4,
+                                                max_depth=4,
+                                                random_state=0,
+                                            ),
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ]
+        )
+
+        model2 = Pipeline(
             steps=[
                 (
                     "concat",
@@ -335,23 +378,26 @@ class TestVotingClassifierConverter(unittest.TestCase):
                 ),
             ]
         )
-        model.fit(X, y)
-        expected = model.predict(X)
-        schema = guess_data_type(X)
 
-        onnx_model = to_onnx(
-            model=model,
-            initial_types=schema,
-            options={"zipmap": False},
-            target_opset=TARGET_OPSET,
-        )
+        models = [model1, model2]
+        for model in models:
+            model.fit(X, y)
+            expected = model.predict(X)
+            schema = guess_data_type(X)
 
-        sess = InferenceSession(
-            onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
-        )
-        inputs = {c: X[c].to_numpy().reshape((-1, 1)) for c in X.columns}
-        got = sess.run(None, inputs)
-        self.assertEqual(expected.tolist(), got[0].tolist())
+            onnx_model = to_onnx(
+                model=model,
+                initial_types=schema,
+                options={"zipmap": False},
+                target_opset=TARGET_OPSET,
+            )
+
+            sess = InferenceSession(
+                onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
+            inputs = {c: X[c].to_numpy().reshape((-1, 1)) for c in X.columns}
+            got = sess.run(None, inputs)
+            self.assertEqual(expected.tolist(), got[0].tolist())
 
 
 if __name__ == "__main__":
