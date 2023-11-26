@@ -79,6 +79,7 @@ __all__ = [
     local_outlier_factor,
     mixture,
     multioutput,
+    multiply,
     nearest_neighbours,
     one_hot_encoder,
     ordinal_encoder,
