@@ -10,7 +10,7 @@ from .._parse import _parse_sklearn
 
 
 def convert_pipeline(
-        scope: Scope, operator: Operator, container: ModelComponentContainer
+    scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
     model = operator.raw_operator
     inputs = operator.inputs
@@ -36,13 +36,20 @@ def convert_pipeline(
             )
         else:
             # If Pipeline output types are different with last stage output type
-            apply_cast(scope, fr.full_name, to.full_name, container,
-                       operator_name=scope.get_unique_operator_name("Cast" + operator.onnx_name),
-                       to=guess_proto_type(to.type))
+            apply_cast(
+                scope,
+                fr.full_name,
+                to.full_name,
+                container,
+                operator_name=scope.get_unique_operator_name(
+                    "Cast" + operator.onnx_name
+                ),
+                to=guess_proto_type(to.type),
+            )
 
 
 def convert_feature_union(
-        scope: Scope, operator: Operator, container: ModelComponentContainer
+    scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
     raise NotImplementedError(
         "This converter not needed so far. It is usually handled " "during parsing."
@@ -50,7 +57,7 @@ def convert_feature_union(
 
 
 def convert_column_transformer(
-        scope: Scope, operator: Operator, container: ModelComponentContainer
+    scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
     raise NotImplementedError(
         "This converter not needed so far. It is usually handled " "during parsing."

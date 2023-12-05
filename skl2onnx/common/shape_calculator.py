@@ -82,7 +82,7 @@ def _infer_linear_classifier_output_types(operator):
             shape = (
                 [len(op.classes_), N, max([len(x) for x in op.classes_])]
                 if isinstance(op.classes_, list)
-                   and isinstance(op.classes_[0], np.ndarray)
+                and isinstance(op.classes_[0], np.ndarray)
                 else [N, number_of_classes]
             )
             operator.outputs[1].type.shape = shape

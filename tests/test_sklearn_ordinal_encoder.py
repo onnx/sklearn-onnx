@@ -85,20 +85,23 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
     )
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_ordinal_encoder_mixed_string_int_pandas(self):
-        col1 = 'col1'
-        col2 = 'col2'
-        col3 = 'col3'
-        data_pd = pd.DataFrame({
-            col1: np.array(["c0.4", "c1.4", "c0.2", "c0.2", "c0.2", "c0.2"]),
-            col2: np.array(["c0.2", "c1.2", "c2.2", "c2.2", "c2.2", "c2.2"]),
-            col3: np.array([3, 0, 1, 1, 1, 1]),
-        })
-        test_pd = pd.DataFrame({
-            col1: np.array(["c0.2"]),
-            col2: np.array(["c2.2"]),
-            col3: np.array([1]),
-
-        })
+        col1 = "col1"
+        col2 = "col2"
+        col3 = "col3"
+        data_pd = pd.DataFrame(
+            {
+                col1: np.array(["c0.4", "c1.4", "c0.2", "c0.2", "c0.2", "c0.2"]),
+                col2: np.array(["c0.2", "c1.2", "c2.2", "c2.2", "c2.2", "c2.2"]),
+                col3: np.array([3, 0, 1, 1, 1, 1]),
+            }
+        )
+        test_pd = pd.DataFrame(
+            {
+                col1: np.array(["c0.2"]),
+                col2: np.array(["c2.2"]),
+                col3: np.array([1]),
+            }
+        )
         model = OrdinalEncoder(categories="auto")
         model.fit(data_pd)
         inputs = [
@@ -110,7 +113,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            test_pd, model, model_onnx, basename="SklearnOrdinalEncoderMixedStringIntPandas"
+            test_pd,
+            model,
+            model_onnx,
+            basename="SklearnOrdinalEncoderMixedStringIntPandas",
         )
 
     @unittest.skipIf(

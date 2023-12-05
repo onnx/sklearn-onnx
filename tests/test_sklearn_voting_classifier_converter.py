@@ -345,18 +345,24 @@ class TestVotingClassifierConverter(unittest.TestCase):
                 (
                     "concat",
                     ColumnTransformer(
-                        [("concat", Pipeline(
-                            steps=[
-                                # This encoder is placed before
-                                # simpleImputer because
-                                # onnx does not support text for Imputer.
-                                ("encoder", OrdinalEncoder()),
-                                (
-                                    "imputer",
-                                    SimpleImputer(strategy="most_frequent"),
+                        [
+                            (
+                                "concat",
+                                Pipeline(
+                                    steps=[
+                                        # This encoder is placed before
+                                        # simpleImputer because
+                                        # onnx does not support text for Imputer.
+                                        ("encoder", OrdinalEncoder()),
+                                        (
+                                            "imputer",
+                                            SimpleImputer(strategy="most_frequent"),
+                                        ),
+                                    ],
                                 ),
-                            ],
-                        ), list(range(X.shape[1])))],
+                                list(range(X.shape[1])),
+                            )
+                        ],
                         sparse_threshold=0,
                     ),
                 ),

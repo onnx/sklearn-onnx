@@ -65,7 +65,9 @@ from .common.utils_sklearn import _process_options
 
 
 do_not_merge_columns = tuple(
-    filter(lambda op: op is not None, [OrdinalEncoder, OneHotEncoder, ColumnTransformer])
+    filter(
+        lambda op: op is not None, [OrdinalEncoder, OneHotEncoder, ColumnTransformer]
+    )
 )
 
 

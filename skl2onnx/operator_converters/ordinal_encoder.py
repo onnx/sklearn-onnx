@@ -5,15 +5,20 @@ import numpy as np
 
 from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
 from ..common._container import ModelComponentContainer
-from ..common.data_types import DoubleTensorType, FloatTensorType, \
-    Int64TensorType, Int32TensorType, Int16TensorType
+from ..common.data_types import (
+    DoubleTensorType,
+    FloatTensorType,
+    Int64TensorType,
+    Int32TensorType,
+    Int16TensorType,
+)
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..proto import onnx_proto
 
 
 def convert_sklearn_ordinal_encoder(
-        scope: Scope, operator: Operator, container: ModelComponentContainer
+    scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
     ordinal_op = operator.raw_operator
     result = []
@@ -34,7 +39,8 @@ def convert_sklearn_ordinal_encoder(
             )
 
             feature_column = scope.declare_local_variable(
-                "feature_column", current_input.type.__class__([current_input.get_first_dimension(), 1])
+                "feature_column",
+                current_input.type.__class__([current_input.get_first_dimension(), 1]),
             )
 
             container.add_node(
@@ -56,22 +62,34 @@ def convert_sklearn_ordinal_encoder(
         if isinstance(current_input.type, (Int16TensorType, Int32TensorType)):
             to = onnx_proto.TensorProto.INT64
         if to is not None:
-            dtype = Int64TensorType if to == onnx_proto.TensorProto.INT64 else FloatTensorType
+            dtype = (
+                Int64TensorType
+                if to == onnx_proto.TensorProto.INT64
+                else FloatTensorType
+            )
             casted_feature_column = scope.declare_local_variable(
                 "casted_feature_column", dtype(copy.copy(feature_column.type.shape))
             )
 
             apply_cast(
-                scope, feature_column.onnx_name, casted_feature_column.onnx_name,
-                container, to=to)
+                scope,
+                feature_column.onnx_name,
+                casted_feature_column.onnx_name,
+                container,
+                to=to,
+            )
 
             feature_column = casted_feature_column
 
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
         if isinstance(feature_column.type, FloatTensorType):
-            attrs["keys_floats"] = np.array([float(s) for s in categories], dtype=np.float32)
+            attrs["keys_floats"] = np.array(
+                [float(s) for s in categories], dtype=np.float32
+            )
         elif isinstance(feature_column.type, Int64TensorType):
-            attrs["keys_int64s"] = np.array([int(s) for s in categories], dtype=np.int64)
+            attrs["keys_int64s"] = np.array(
+                [int(s) for s in categories], dtype=np.int64
+            )
         else:
             attrs["keys_strings"] = np.array(
                 [str(s).encode("utf-8") for s in categories]
@@ -79,8 +97,7 @@ def convert_sklearn_ordinal_encoder(
         attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
 
         result.append(scope.get_unique_variable_name("ordinal_output"))
-        label_encoder_output = scope.get_unique_variable_name(
-            "label_encoder")
+        label_encoder_output = scope.get_unique_variable_name("label_encoder")
 
         container.add_node(
             "LabelEncoder",
@@ -106,8 +123,7 @@ def convert_sklearn_ordinal_encoder(
         else onnx_proto.TensorProto.INT64
     )
     apply_cast(
-        scope, concat_result_name, operator.output_full_names, container,
-        to=cast_type
+        scope, concat_result_name, operator.output_full_names, container, to=cast_type
     )
 
 
