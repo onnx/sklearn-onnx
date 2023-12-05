@@ -111,7 +111,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         model_onnx = convert_sklearn(
             model, "ordinal encoder", inputs, target_opset=TARGET_OPSET
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             test_pd,
             model,
