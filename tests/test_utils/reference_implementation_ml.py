@@ -5,7 +5,7 @@ from scipy.sparse import coo_matrix
 from onnx.defs import onnx_opset_version
 
 
-if onnx_opset_version() >= 18:
+if 19 >= onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
 
     class FusedMatMul(OpRun):
@@ -235,7 +235,7 @@ if onnx_opset_version() >= 18:
                             res[a, i, j] = 1.0
             else:
                 raise RuntimeError(
-                    f"This operator is not implemented " f"for " f"shape {x.shape}."
+                    f"This operator is not implemented for shape {x.shape}."
                 )
 
             if not self.zeros:

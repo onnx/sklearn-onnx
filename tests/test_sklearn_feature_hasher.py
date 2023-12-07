@@ -6,8 +6,9 @@ Tests scikit-learn's feature selection converters
 import unittest
 import packaging.version as pv
 import numpy as np
+from sklearn.utils._testing import assert_almost_equal
 from pandas import DataFrame
-from onnx import TensorProto
+from onnx import TensorProto, __version__ as onnx_version
 from onnx.helper import (
     make_model,
     make_node,
@@ -16,8 +17,17 @@ from onnx.helper import (
     make_opsetid,
 )
 from onnx.checker import check_model
-from onnxruntime import __version__ as ort_version
+
+try:
+    from onnx.reference import ReferenceEvaluator
+    from onnx.reference.op_run import OpRun
+except ImportError:
+    ReferenceEvaluator = None
+from onnxruntime import __version__ as ort_version, SessionOptions
 from sklearn.feature_extraction import FeatureHasher
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.tree import DecisionTreeClassifier
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import (
     StringTensorType,
@@ -25,7 +35,11 @@ from skl2onnx.common.data_types import (
     FloatTensorType,
     DoubleTensorType,
 )
-from test_utils import TARGET_OPSET, TARGET_IR, InferenceSessionEx as InferenceSession
+from test_utils import (
+    TARGET_OPSET,
+    TARGET_IR,
+    InferenceSessionEx as InferenceSession,
+)
 
 
 class TestSklearnFeatureHasher(unittest.TestCase):
@@ -203,7 +217,6 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         model.fit(data)
         expected = model.transform(data).todense()
-        print(expected)
 
         model_onnx = to_onnx(
             model,
@@ -251,6 +264,319 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             if a != b:
                 raise AssertionError(f"Discrepancies at line {i}: {a} != {b}")
 
+    def test_feature_hasher_pipeline(self):
+        data = {
+            "Education": ["a", "b", "d", "abd"],
+            "Label": [1, 1, 0, 0],
+        }
+        df = DataFrame(data)
+
+        cat_features = ["Education"]
+        X_train = df[cat_features]
+
+        X_train["cat_features"] = df[cat_features].values.tolist()
+        X_train = X_train.drop(cat_features, axis=1)
+        y_train = df["Label"]
+
+        preprocessing_pipeline = ColumnTransformer(
+            [
+                (
+                    "cat_preprocessor",
+                    FeatureHasher(
+                        n_features=16,
+                        input_type="string",
+                        alternate_sign=False,
+                        dtype=np.float32,
+                    ),
+                    "cat_features",
+                )
+            ],
+            sparse_threshold=0.0,
+        )
+
+        complete_pipeline = Pipeline(
+            steps=[
+                ("preprocessor", preprocessing_pipeline),
+                ("classifier", DecisionTreeClassifier(max_depth=2)),
+            ],
+        )
+        complete_pipeline.fit(X_train, y_train)
+
+        # first check
+        model = FeatureHasher(
+            n_features=16,
+            input_type="string",
+            alternate_sign=False,
+            dtype=np.float32,
+        )
+        X_train_ort1 = X_train.values.reshape((-1, 1))
+        with self.assertRaises(TypeError):
+            np.asarray(model.transform(X_train_ort1).todense())
+        input_strings = ["a", "b", "d", "abd"]
+        X_train_ort2 = np.array(input_strings, dtype=object).reshape((-1, 1))
+        model.fit(X_train_ort2)
+        # type(X_train_ort2[0, 0]) == str != list == type(X_train_ort2[0, 0])
+        expected2 = np.asarray(model.transform(X_train_ort2).todense())
+        model_onnx = to_onnx(
+            model,
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got2 = sess.run(None, dict(cat_features=X_train_ort2))
+        assert_almost_equal(expected2, got2[0])
+        got1 = sess.run(None, dict(cat_features=X_train_ort1))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected2, got1[0])
+
+        # check hash
+        X_train_ort = X_train.values
+        expected = np.asarray(
+            complete_pipeline.steps[0][-1]
+            .transformers_[0][1]
+            .transform(X_train.values.ravel())
+            .todense()
+        )
+        model_onnx = to_onnx(
+            complete_pipeline.steps[0][-1].transformers_[0][1],
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected, got[0])
+        got = sess.run(None, dict(cat_features=X_train_ort2))
+        assert_almost_equal(expected, got[0])
+
+        # transform
+        X_train_ort = X_train.values
+        expected = complete_pipeline.steps[0][-1].transform(X_train)
+        model_onnx = to_onnx(
+            complete_pipeline.steps[0][-1],
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected, got[0].astype(np.float64))
+        got = sess.run(None, dict(cat_features=X_train_ort2))
+        assert_almost_equal(expected, got[0].astype(np.float64))
+
+        # classifier
+        expected = complete_pipeline.predict_proba(X_train)
+        labels = complete_pipeline.predict(X_train)
+        model_onnx = to_onnx(
+            complete_pipeline,
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        X_train_ort = X_train.values
+        got = sess.run(None, dict(cat_features=X_train_ort))
+        with self.assertRaises(AssertionError):
+            assert_almost_equal(expected, got[1].astype(np.float64))
+        got = sess.run(None, dict(cat_features=X_train_ort2))
+        assert_almost_equal(labels, got[0])
+
+    @unittest.skipIf(
+        pv.Version(onnx_version) < pv.Version("1.11"), reason="onnx is too old"
+    )
+    def test_feature_hasher_pipeline_list(self):
+        pipe_hash = Pipeline(
+            steps=[
+                (
+                    "preprocessor",
+                    ColumnTransformer(
+                        [
+                            (
+                                "cat_features",
+                                FeatureHasher(
+                                    n_features=8,
+                                    input_type="string",
+                                    alternate_sign=False,
+                                    dtype=np.float32,
+                                ),
+                                "cat_features",
+                            ),
+                        ],
+                        sparse_threshold=0.0,
+                    ),
+                ),
+            ],
+        )
+
+        df = DataFrame(
+            {
+                "Cat1": ["a", "b", "d", "abd", "e", "z", "ez"],
+                "Cat2": ["A", "B", "D", "ABD", "e", "z", "ez"],
+            }
+        )
+
+        cat_features = [c for c in df.columns if "Cat" in c]
+        X_train = df[cat_features].copy()
+        X_train["cat_features"] = df[cat_features].values.tolist()
+        X_train = X_train.drop(cat_features, axis=1)
+        pipe_hash.fit(X_train)
+        expected = pipe_hash.transform(X_train)
+
+        onx = to_onnx(
+            pipe_hash,
+            initial_types=[("cat_features", StringTensorType([None, 1]))],
+            options={FeatureHasher: {"separator": "#"}},
+            target_opset=TARGET_OPSET,
+        )
+
+        dfx = df.copy()
+        dfx["cat_features"] = df[cat_features].agg("#".join, axis=1)
+        feeds = dict(cat_features=dfx["cat_features"].values.reshape((-1, 1)))
+
+        if ReferenceEvaluator is not None:
+
+            class StringSplit(OpRun):
+                op_domain = "ai.onnx.contrib"
+
+                def _run(self, input, separator, skip_empty, **kwargs):
+                    # kwargs should be null, bug in onnx?
+                    delimiter = (
+                        str(separator[0])
+                        if len(separator.shape) > 0
+                        else str(separator)
+                    )
+                    skip_empty = (
+                        bool(skip_empty[0])
+                        if len(skip_empty.shape)
+                        else bool(skip_empty)
+                    )
+                    texts = []
+                    indices = []
+                    max_split = 0
+                    for row, text in enumerate(input):
+                        if not text:
+                            continue
+                        res = text.split(delimiter)
+                        if skip_empty:
+                            res = [t for t in res if t]
+                        texts.extend(res)
+                        max_split = max(max_split, len(res))
+                        indices.extend((row, i) for i in range(len(res)))
+                    return (
+                        np.array(indices, dtype=np.int64),
+                        np.array(texts),
+                        np.array([len(input), max_split], dtype=np.int64),
+                    )
+
+            class MurmurHash3(OpRun):
+                op_domain = "com.microsoft"
+
+                @staticmethod
+                def rotl(num, bits):
+                    bit = num & (1 << (bits - 1))
+                    num <<= 1
+                    if bit:
+                        num |= 1
+                    num &= 2**bits - 1
+                    return num
+
+                @staticmethod
+                def fmix(h: int):
+                    h ^= h >> 16
+                    h = np.uint32(
+                        (int(h) * int(0x85EBCA6B)) % (int(np.iinfo(np.uint32).max) + 1)
+                    )
+                    h ^= h >> 13
+                    h = np.uint32(
+                        (int(h) * int(0xC2B2AE35)) % (int(np.iinfo(np.uint32).max) + 1)
+                    )
+                    h ^= h >> 16
+                    return h
+
+                @staticmethod
+                def MurmurHash3_x86_32(data, seed):
+                    le = len(data)
+                    nblocks = le // 4
+                    h1 = seed
+
+                    c1 = 0xCC9E2D51
+                    c2 = 0x1B873593
+
+                    iblock = nblocks * 4
+
+                    for i in range(-nblocks, 0):
+                        k1 = np.uint32(data[iblock + i])
+                        k1 *= c1
+                        k1 = (k1, 15)
+                        k1 *= c2
+                        h1 ^= k1
+                        h1 = MurmurHash3.rotl(h1, 13)
+                        h1 = h1 * 5 + 0xE6546B64
+
+                    k1 = 0
+
+                    if le & 3 >= 3:
+                        k1 ^= np.uint32(data[iblock + 2]) << 16
+                    if le & 3 >= 2:
+                        k1 ^= np.uint32(data[iblock + 1]) << 8
+                    if le & 3 >= 1:
+                        k1 ^= np.uint32(data[iblock])
+                        k1 *= c1
+                        k1 = MurmurHash3.rotl(k1, 15)
+                        k1 *= c2
+                        h1 ^= k1
+
+                    h1 ^= le
+
+                    h1 = MurmurHash3.fmix(h1)
+                    return h1
+
+                def _run(self, x, positive: int = None, seed: int = None):
+                    x2 = x.reshape((-1,))
+                    y = np.empty(x2.shape, dtype=np.uint32)
+                    for i in range(y.shape[0]):
+                        b = x2[i].encode("utf-8")
+                        h = MurmurHash3.MurmurHash3_x86_32(b, seed)
+                        y[i] = h
+                    return (y.reshape(x.shape),)
+
+            ref = ReferenceEvaluator(onx, new_ops=[StringSplit, MurmurHash3])
+            got_py = ref.run(None, feeds)
+        else:
+            got_py = None
+
+        from onnxruntime_extensions import get_library_path
+
+        so = SessionOptions()
+        so.register_custom_ops_library(get_library_path())
+        sess = InferenceSession(
+            onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, feeds)
+        assert_almost_equal(expected, got[0])
+
+        if ReferenceEvaluator is not None:
+            # The pure python implementation does not correctly implement murmurhash3.
+            # There are issue with type int.
+            assert_almost_equal(expected.shape, got_py[0].shape)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    import logging
+
+    logger = logging.getLogger("skl2onnx")
+    logger.setLevel(logging.ERROR)
+    logger = logging.getLogger("onnx-extended")
+    logger.setLevel(logging.ERROR)
+
+    TestSklearnFeatureHasher().test_feature_hasher_pipeline_list()
+    unittest.main(verbosity=2)

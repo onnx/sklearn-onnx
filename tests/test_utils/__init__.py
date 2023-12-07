@@ -54,10 +54,9 @@ def InferenceSessionEx(onx, *args, verbose=0, **kwargs):
 def create_tensor(N, C, H=None, W=None):
     if H is None and W is None:
         return np.random.rand(N, C).astype(np.float32, copy=False)
-    elif H is not None and W is not None:
+    if H is not None and W is not None:
         return np.random.rand(N, C, H, W).astype(np.float32, copy=False)
-    else:
-        raise ValueError("This function only produce 2-D or 4-D tensor.")
+    raise ValueError("This function only produce 2-D or 4-D tensor.")
 
 
 def _get_ir_version(opv):

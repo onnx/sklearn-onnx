@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-@brief      test log(time=10s)
-"""
+
 import unittest
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn import __version__ as skl_version, __file__ as skl_file
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from skl2onnx import to_onnx
@@ -12,6 +12,12 @@ from skl2onnx.sklapi import TraceableTfidfVectorizer, TraceableCountVectorizer
 from skl2onnx.sklapi.sklearn_text_onnx import register
 from skl2onnx.common.data_types import StringTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnText(unittest.TestCase):
@@ -297,6 +303,7 @@ class TestSklearnText(unittest.TestCase):
             vect,
             model_onnx,
             basename="SklearnTfidfVectorizerIssue-OneOff-SklCol",
+            backend=BACKEND,
         )
 
 
