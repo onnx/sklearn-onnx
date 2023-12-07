@@ -4,8 +4,10 @@
 Tests scikit-learn's count vectorizer converter.
 """
 import unittest
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
+import onnx
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
@@ -22,6 +24,10 @@ from test_utils.reference_implementation_text import Tokenizer
 
 
 class TestSklearnCountVectorizerBug(unittest.TestCase):
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="ReferenceEvaluator does not support tfidf with strings",
+    )
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_custom_tokenizer(self):
         corpus = numpy.array(
@@ -57,6 +63,10 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
             basename="SklearnTfidfVectorizer11CustomTokenizer-OneOff-SklCol",
         )
 
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="ReferenceEvaluator does not support tfidf with strings",
+    )
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_model_count_vectorizer_wrong_ngram(self):
         corpus = numpy.array(

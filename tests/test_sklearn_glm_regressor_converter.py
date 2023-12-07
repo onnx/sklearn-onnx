@@ -4,6 +4,7 @@
 
 import unittest
 import packaging.version as pv
+import onnx
 import numpy
 from numpy.testing import assert_almost_equal
 
@@ -53,6 +54,12 @@ from test_utils import (
 
 ort_version = ort_version.split("+")[0]
 skl_version = ".".join(sklearn_version.split(".")[:2])
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestGLMRegressorConverter(unittest.TestCase):
@@ -778,6 +785,7 @@ class TestGLMRegressorConverter(unittest.TestCase):
             model_onnx,
             verbose=False,
             basename="SklearnRANSACRegressorTree-Dec3",
+            backend=BACKEND,
         )
 
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))

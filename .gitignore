@@ -23,6 +23,7 @@ build/
 *.bat
 
 # test generated files
+*.onnx
 .pytest_cache
 .cache
 htmlcov

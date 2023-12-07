@@ -73,16 +73,7 @@ jobs:
     displayName: 'install scikit-learn'
 
   - script: |
-      if [ '$(onnx.version)' == 'git' ]
-        then
-          git clone https://github.com/onnx/onnx.git --recursive
-          export ONNX_ML=1
-          cd onnx
-          python setup.py install
-          cd ..
-        else
-          pip install onnx$(onnx.version)
-      fi
+      pip install onnx$(onnx.version)
     displayName: 'install onnx'
 
   - script: |

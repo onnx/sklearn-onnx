@@ -409,7 +409,11 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx, basename="SklearnOVRClassificationFloatBinEnsemble"
+            X,
+            model,
+            model_onnx,
+            basename="SklearnOVRClassificationFloatBinEnsemble",
+            backend="onnxruntime",
         )
 
     @ignore_warnings(category=warnings_to_skip)

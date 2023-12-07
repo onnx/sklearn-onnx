@@ -7,7 +7,9 @@ import sys
 import unittest
 import urllib.error
 import warnings
+import packaging.version as pv
 import numpy as np
+import onnx
 
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import fetch_20newsgroups
@@ -73,6 +75,10 @@ class TestSklearnDocumentation(unittest.TestCase):
     @unittest.skipIf(
         TARGET_OPSET < 10, reason="Encoding issue fixed in a later version"
     )
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="ReferenceEvaluator does not support tfidf with strings",
+    )
     def test_pipeline_tfidf(self):
         categories = ["alt.atheism", "talk.religion.misc"]
         try:
@@ -111,6 +117,10 @@ class TestSklearnDocumentation(unittest.TestCase):
     )
     @unittest.skipIf(
         TARGET_OPSET < 10, reason="Encoding issue fixed in a later version"
+    )
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="ReferenceEvaluator does not support tfidf with strings",
     )
     def test_pipeline_tfidf_pipeline_minmax(self):
         categories = ["alt.atheism", "talk.religion.misc"]

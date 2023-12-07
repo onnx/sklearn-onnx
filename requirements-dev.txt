@@ -1,5 +1,6 @@
 # tests
 black
+onnxruntime-extensions
 pandas
 py-cpuinfo
 pybind11
@@ -10,6 +11,7 @@ wheel
 
 # docs
 furo
+onnxscript
 sphinx
 sphinxcontrib-blockdiag
 tqdm
