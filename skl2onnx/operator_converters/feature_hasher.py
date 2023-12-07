@@ -64,7 +64,7 @@ def convert_sklearn_feature_hasher(
                 )
             else:
                 raise RuntimeError(
-                    f"Only one character separator are supported but delimiter is {separator!r}."
+                    f"Only one character separators are supported but delimiter is {separator!r}."
                 )
             shape = scope.get_unique_variable_name(f"shape{i}")
             container.add_node("Shape", [col_to_split.full_name], [shape])
