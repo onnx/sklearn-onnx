@@ -2,6 +2,8 @@
 
 ## 1.16.0
 
+* Supports cosine distance (LocalOutlierFactor, ...)
+  [#1050](https://github.com/onnx/sklearn-onnx/pull/1050),
 * Add an example on how to handle FunctionTransformer
   [#1042](https://github.com/onnx/sklearn-onnx/pull/1042),
   Versions of `scikit-learn < 1.0` are not tested any more.
