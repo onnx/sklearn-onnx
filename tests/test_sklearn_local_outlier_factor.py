@@ -295,6 +295,31 @@ class TestSklearnLocalOutlierForest(unittest.TestCase):
         assert_almost_equal(expected_label, got[0].ravel())
         assert_almost_equal(expected_decif, got[1].ravel(), decimal=5)
 
+    @unittest.skipIf(LocalOutlierFactor is None, reason="old scikit-learn")
+    def test_local_outlier_factor_cosine(self):
+        lof = LocalOutlierFactor(n_neighbors=2, novelty=True, metric="cosine")
+        data = np.array(
+            [[-1.1, -1.2], [0.3, 0.2], [0.5, 0.4], [100.0, 99.0]], dtype=np.float32
+        )
+        model = lof.fit(data)
+        model_onnx = to_onnx(model, data, target_opset=TARGET_OPSET)
+        self.assertNotIn("CDist", str(model_onnx))
+
+        data = data.copy()
+        data[:, 0] += 0.1
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        names = [o.name for o in sess.get_outputs()]
+        self.assertEqual(names, ["label", "scores"])
+        got = sess.run(None, {"X": data})
+        self.assertEqual(len(got), 2)
+        expected_label = lof.predict(data)
+        expected_decif = lof.decision_function(data)
+        assert_almost_equal(expected_label, got[0].ravel())
+        assert_almost_equal(expected_decif, got[1].ravel(), decimal=4)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

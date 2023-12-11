@@ -2,6 +2,8 @@
 
 ## 1.16.0
 
+* Supports cosine distance (LocalOutlierFactor, ...)
+  [#1050](https://github.com/onnx/sklearn-onnx/pull/1050),
 * Supports multiple columns for OrdinalEncoder
   [#1044](https://github.com/onnx/sklearn-onnx/pull/1044) (by @max-509)
 * Add an example on how to handle FunctionTransformer
