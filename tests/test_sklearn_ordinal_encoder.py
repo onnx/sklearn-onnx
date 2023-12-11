@@ -34,6 +34,11 @@ def ordinal_encoder_support():
     return pv.Version(vers) >= pv.Version("0.20.0")
 
 
+def set_output_support():
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
     @unittest.skipIf(
         not ordinal_encoder_support(),
@@ -177,6 +182,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(
+        not set_output_support(),
+        reason="'ColumnTransformer' object has no attribute 'set_output'",
+    )
+    @unittest.skipIf(
         not ordinal_encoder_support(),
         reason="OrdinalEncoder was not available before 0.20",
     )
@@ -212,6 +221,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
         assert_almost_equal(expected, got[0].ravel())
 
+    @unittest.skipIf(
+        not set_output_support(),
+        reason="'ColumnTransformer' object has no attribute 'set_output'",
+    )
     @unittest.skipIf(
         not ordinal_encoder_support(),
         reason="OrdinalEncoder was not available before 0.20",
