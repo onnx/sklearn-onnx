@@ -2,10 +2,13 @@
 
 ## 1.16.0
 
+* Supports multiple columns for OrdinalEncoder
+  [#1044](https://github.com/onnx/sklearn-onnx/pull/1044) (by @max-509)
 * Add an example on how to handle FunctionTransformer
   [#1042](https://github.com/onnx/sklearn-onnx/pull/1042),
   Versions of `scikit-learn < 1.0` are not tested any more.
-* FeatureHasher, raise an error when the delimiter length is > 1,
+* Supports lists of strings as inputs for FeatureHasher
+  [#1025](https://github.com/onnx/sklearn-onnx/pull/1036),
   [#1036](https://github.com/onnx/sklearn-onnx/pull/1036)
 * skl2onnx works with onnx==1.15.0,
   [#1034](https://github.com/onnx/sklearn-onnx/pull/1034)
