@@ -524,6 +524,39 @@ class TestOnnxOperatorsScan(unittest.TestCase):
         exp = scipy_cdist(x * 2, x, metric="sqeuclidean")
         assert_almost_equal(exp, res[0], decimal=4)
 
+    @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version(THRESHOLD2),
+        reason="fails with onnxruntime 0.4.0",
+    )
+    @ignore_warnings(category=DeprecationWarning)
+    def test_onnx_example_cdist_in_cosine(self):
+        x = np.array([1, 2, 4, 5, 5, 4]).astype(np.float32).reshape((3, 2))
+        x2 = (
+            np.array([1.1, 2.1, 4.01, 5.01, 5.001, 4.001, 0, 0])
+            .astype(np.float32)
+            .reshape((4, 2))
+        )
+        opv = _TARGET_OPSET_
+        cop = OnnxAdd("input", "input", op_version=opv)
+        cop2 = OnnxIdentity(
+            onnx_cdist(cop, x2, dtype=np.float32, metric="cosine", op_version=opv),
+            output_names=["cdist"],
+            op_version=opv,
+        )
+
+        model_def = cop2.to_onnx(
+            inputs=[("input", FloatTensorType([None, None]))],
+            outputs=[("cdist", FloatTensorType())],
+        )
+
+        sess = InferenceSession(
+            model_def.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": x})
+        exp = scipy_cdist(x * 2, x2, metric="cosine")
+        assert_almost_equal(exp, res[0], decimal=5)
+
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
