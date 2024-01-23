@@ -14,6 +14,20 @@ jobs:
   strategy:
     matrix:
 
+      Py311-Onnx150-Rt117-Skl132:
+        do.bench: '0'
+        python.version: '3.11'
+        numpy.version: '>=1.21.1'
+        scipy.version: '>=1.7.0'
+        onnx.version: 'onnx==1.15.0'  # -i https://test.pypi.org/simple/ onnx==1.15.0rc2'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.17.0.dev20240118001'
+        sklearn.version: '>=1.3.2'
+        pandas.version: ''
+        lgbm.version: ''
+        onnxcc.version: '>=1.8.1'
+        run.example: '1'
+
       Py311-Onnx150-Rt161-Skl132:
         do.bench: '0'
         python.version: '3.11'
