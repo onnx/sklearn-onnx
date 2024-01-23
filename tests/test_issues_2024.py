@@ -4,11 +4,11 @@ import unittest
 
 class TestInvestigate(unittest.TestCase):
     def test_issue_1053(self):
-        import onnxruntime as rt
         from sklearn.datasets import load_iris
         from sklearn.linear_model import LogisticRegression
         from sklearn.model_selection import train_test_split
         from sklearn.tree import DecisionTreeClassifier
+        import onnxruntime as rt
         from skl2onnx.common.data_types import FloatTensorType
         from skl2onnx import convert_sklearn
 
@@ -38,6 +38,72 @@ class TestInvestigate(unittest.TestCase):
                     0
                 ]  # Select a single sample.
                 self.assertEqual(len(pred_onx.tolist()), 1)
+
+    def test_issue_1055(self):
+        import numpy as np
+        from numpy.testing import assert_almost_equal
+        import sklearn.feature_extraction.text
+        import sklearn.linear_model
+        import sklearn.pipeline
+        import onnxruntime as rt
+        import skl2onnx.common.data_types
+
+        lr = sklearn.linear_model.LogisticRegression(
+            C=100,
+            multi_class="multinomial",
+            solver="sag",
+            class_weight="balanced",
+            n_jobs=-1,
+        )
+        tf = sklearn.feature_extraction.text.TfidfVectorizer(
+            token_pattern="\\w+|[^\\w\\s]+",
+            ngram_range=(1, 1),
+            max_df=1.0,
+            min_df=1,
+            sublinear_tf=True,
+        )
+
+        pipe = sklearn.pipeline.Pipeline([("transformer", tf), ("logreg", lr)])
+
+        corpus = [
+            "This is the first document.",
+            "This document is the second document.",
+            "And this is the third one.",
+            "Is this the first document?",
+            "more text",
+            "$words",
+            "I keep writing things",
+            "how many documents now?",
+            "this is a really long setence",
+            "is this a final document?",
+        ]
+        labels = ["1", "2", "1", "2", "1", "2", "1", "2", "1", "2"]
+
+        pipe.fit(corpus, labels)
+
+        onx = skl2onnx.convert_sklearn(
+            pipe,
+            "a model",
+            initial_types=[
+                ("input", skl2onnx.common.data_types.StringTensorType([None, 1]))
+            ],
+            target_opset=19,
+            options={"zipmap": False},
+        )
+        for d in onx.opset_import:
+            if d.domain == "":
+                self.assertEqual(d.version, 19)
+            elif d.domain == "com.microsoft":
+                self.assertEqual(d.version, 1)
+            elif d.domain == "ai.onnx.ml":
+                self.assertEqual(d.version, 1)
+
+        expected = pipe.predict_proba(corpus)
+        sess = rt.InferenceSession(
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"input": np.array(corpus).reshape((-1, 1))})
+        assert_almost_equal(expected, got[1], decimal=2)
 
 
 if __name__ == "__main__":
