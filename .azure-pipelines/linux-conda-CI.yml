@@ -40,7 +40,7 @@ jobs:
         pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
-        run.example: '1'
+        run.example: '0'
 
       Py311-Onnx141-Rt160-Skl131:
         do.bench: '0'

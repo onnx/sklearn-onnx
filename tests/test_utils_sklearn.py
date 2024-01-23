@@ -149,7 +149,7 @@ class TestUtilsSklearn(unittest.TestCase):
 
         categorical_transformer = Pipeline(
             steps=[
-                ("onehot", OneHotEncoder(sparse=True, handle_unknown="ignore")),
+                ("onehot", OneHotEncoder(sparse_output=True, handle_unknown="ignore")),
                 ("tsvd", TruncatedSVD(n_components=1, algorithm="arpack", tol=1e-4)),
             ]
         )

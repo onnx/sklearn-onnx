@@ -110,7 +110,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_model_one_hot_encoder_int32_scaler(self):
         model = make_pipeline(
-            OneHotEncoder(categories="auto", sparse=False), RobustScaler()
+            OneHotEncoder(categories="auto", sparse_output=False), RobustScaler()
         )
         data = numpy.array(
             [[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]], dtype=numpy.int32
@@ -238,7 +238,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_model_one_hot_encoder_list_sparse(self):
         model = OneHotEncoder(
-            categories=[[0, 1, 4, 5], [1, 2, 3, 5], [0, 3, 4, 6]], sparse=True
+            categories=[[0, 1, 4, 5], [1, 2, 3, 5], [0, 3, 4, 6]], sparse_output=True
         )
         data = numpy.array(
             [[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]], dtype=numpy.int64
@@ -265,7 +265,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_model_one_hot_encoder_list_dense(self):
         model = OneHotEncoder(
-            categories=[[0, 1, 4, 5], [1, 2, 3, 5], [0, 3, 4, 6]], sparse=False
+            categories=[[0, 1, 4, 5], [1, 2, 3, 5], [0, 3, 4, 6]], sparse_output=False
         )
         data = numpy.array(
             [[1, 2, 3], [4, 3, 0], [0, 1, 4], [0, 5, 6]], dtype=numpy.int64

@@ -186,7 +186,7 @@ class TestStackingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_issue_786_exc(self):
         pipeline = make_pipeline(
-            OneHotEncoder(handle_unknown="ignore", sparse=False),
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
             StackingClassifier(
                 estimators=[
                     ("rf", RandomForestClassifier(n_estimators=10, random_state=42)),
@@ -230,7 +230,7 @@ class TestStackingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_issue_786(self):
         pipeline = make_pipeline(
-            OneHotEncoder(handle_unknown="ignore", sparse=False),
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
             StackingClassifier(
                 estimators=[
                     ("rf", RandomForestClassifier(n_estimators=10, random_state=42)),

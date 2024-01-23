@@ -284,7 +284,9 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
         dfx_train, dfx_test, dfy_train, dfy_test = train_test_split(dfx, dfy)
 
         cat_features = ["CAT1", "CAT2"]
-        categorical_transformer = OneHotEncoder(handle_unknown="ignore", sparse=True)
+        categorical_transformer = OneHotEncoder(
+            handle_unknown="ignore", sparse_output=True
+        )
         textual_feature = "TEXT"
         count_vect_transformer = Pipeline(
             steps=[

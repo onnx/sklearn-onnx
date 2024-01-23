@@ -34,7 +34,7 @@ class TestSklearnArrayFeatureExtractor(unittest.TestCase):
         num_attributes_clustering = [3, 4]  # this is of length 12 in reality
         gmm = GaussianMixture(n_components=2, random_state=1)
         ohe_cat = [
-            OneHotEncoder(categories="auto", sparse=False, drop=None)
+            OneHotEncoder(categories="auto", sparse_output=False, drop=None)
             for i in cat_attributes_clustering
         ]
         ct_cat = ColumnTransformer(

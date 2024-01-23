@@ -264,7 +264,7 @@ class TestSklearnPipeline(unittest.TestCase):
             steps=[
                 (
                     "onehot",
-                    OneHotEncoder(sparse=True, handle_unknown="ignore"),
+                    OneHotEncoder(sparse_output=True, handle_unknown="ignore"),
                 ),
                 (
                     "tsvd",

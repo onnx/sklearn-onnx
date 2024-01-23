@@ -46,7 +46,7 @@ train_data = data.drop("y", axis=1)
 
 
 categorical_transformer = Pipeline(
-    [("onehot", OneHotEncoder(sparse=False, handle_unknown="ignore"))]
+    [("onehot", OneHotEncoder(sparse_output=False, handle_unknown="ignore"))]
 )
 preprocessor = ColumnTransformer(
     transformers=[("cat", categorical_transformer, cat_cols)], remainder="passthrough"
