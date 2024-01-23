@@ -412,6 +412,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     )
     @unittest.skipIf(StackingClassifier is None, reason="scikit-learn too old")
     @ignore_warnings(category=warnings_to_skip)
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_calibration_sigmoid_64(self):
         self._common_classifier(
             [
