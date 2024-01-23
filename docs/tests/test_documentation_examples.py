@@ -73,6 +73,8 @@ class TestDocumentationExamples(unittest.TestCase):
                 if not name.endswith(".py") or not name.startswith("plot_"):
                     continue
                 reason = None
+                if name in {"plot_woe_transformer.py"}:
+                    reason = "dot not available"
 
                 if reason:
 

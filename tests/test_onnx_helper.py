@@ -31,6 +31,12 @@ def one_hot_encoder_supports_string():
     return pv.Version(vers) >= pv.Version("0.20.0")
 
 
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class TestOnnxHelper(unittest.TestCase):
     def get_model(self, model):
         try:
@@ -73,6 +79,7 @@ class TestOnnxHelper(unittest.TestCase):
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_onnx_helper_load_save_init(self):
         model = make_pipeline(
             Binarizer(),
@@ -105,6 +112,7 @@ class TestOnnxHelper(unittest.TestCase):
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_onnx_helper_load_save_init_meta(self):
         model = make_pipeline(
             Binarizer(), OneHotEncoder(sparse_output=False), StandardScaler()

@@ -18,7 +18,6 @@ pandas
 pydot
 pyinstrument
 pyod
-pyquickhelper>=1.11.3762
 pytest
 pytest-cov
 scikit-learn>=1.1
@@ -26,6 +25,7 @@ skl2onnx
 sphinx
 sphinxcontrib-blockdiag
 sphinx-gallery
+sphinx-runpython
 tabulate
 tqdm
 wheel

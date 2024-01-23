@@ -15,17 +15,14 @@ A dataset with categories
 +++++++++++++++++++++++++
 
 """
-from mlinsights.plotting import pipeline2dot
 import numpy
 import pprint
-from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
 from pandas import DataFrame
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
-from pyquickhelper.helpgen.graphviz_helper import plot_graphviz
 from skl2onnx import to_onnx
 from skl2onnx.algebra.type_helper import guess_initial_types
 
@@ -54,14 +51,6 @@ preprocessor = ColumnTransformer(
 pipe = Pipeline([("preprocess", preprocessor), ("rf", RandomForestClassifier())])
 pipe.fit(train_data, data["y"])
 
-#####################################
-# Display.
-
-dot = pipeline2dot(pipe, train_data)
-ax = plot_graphviz(dot)
-ax.get_xaxis().set_visible(False)
-ax.get_yaxis().set_visible(False)
-
 #######################################
 # Conversion to ONNX
 # ++++++++++++++++++
@@ -84,24 +73,6 @@ try:
 except Exception as e:
     print(e)
 
-###########################
-# Let's use a shortcut
-
-oinf = ReferenceEvaluator(onx)
-got = oinf.run(None, train_data)
-print(pipe.predict(train_data))
-print(got["label"])
-
-#################################
-# And probilities.
-
-print(pipe.predict_proba(train_data))
-print(got["probabilities"])
-
-######################################
-# It looks ok. Let's dig into the details to
-# directly use *onnxruntime*.
-#
 # Unhide conversion logic with a dataframe
 # ++++++++++++++++++++++++++++++++++++++++
 #

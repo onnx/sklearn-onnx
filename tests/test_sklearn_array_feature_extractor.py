@@ -6,6 +6,7 @@ import packaging.version as pv
 import pandas as pd
 import numpy as np
 from onnxruntime import __version__ as ort_version
+from sklearn import __version__ as sklearn_version
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import OneHotEncoder
 
@@ -20,11 +21,18 @@ from sklearn.pipeline import Pipeline
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class TestSklearnArrayFeatureExtractor(unittest.TestCase):
     @unittest.skipIf(
         ColumnTransformer is None or pv.Version(ort_version) <= pv.Version("0.4.0"),
         reason="onnxruntime too old",
     )
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_array_feature_extractor(self):
         data_to_cluster = pd.DataFrame(
             [[1, 2, 3.5, 4.5], [1, 2, 1.7, 4.0], [2, 4, 2.4, 4.3], [2, 4, 2.5, 4.0]],

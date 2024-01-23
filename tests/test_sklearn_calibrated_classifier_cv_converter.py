@@ -9,6 +9,7 @@ import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import __version__ as ort_version
+from sklearn import __version__ as sklearn_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -47,6 +48,12 @@ from test_utils import (
 )
 
 ort_version = ort_version.split("+")[0]
+
+
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
@@ -186,6 +193,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_logistic_regression(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -210,6 +218,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_rf(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -234,6 +243,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_gbt(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -259,6 +269,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_hgbt(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -308,6 +319,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_svc(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -330,6 +342,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_linearsvc(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -354,6 +367,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_linearsvc2(self):
         data = load_iris()
         X, y = data.data, data.target
