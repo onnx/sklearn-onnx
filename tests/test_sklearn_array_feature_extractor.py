@@ -28,10 +28,10 @@ class TestSklearnArrayFeatureExtractor(unittest.TestCase):
     def test_array_feature_extractor(self):
         data_to_cluster = pd.DataFrame(
             [[1, 2, 3.5, 4.5], [1, 2, 1.7, 4.0], [2, 4, 2.4, 4.3], [2, 4, 2.5, 4.0]],
-            columns=[1, 2, 3, 4],
+            columns=["x1", "x2", "x3", "x4"],
         )
-        cat_attributes_clustering = [1, 2]
-        num_attributes_clustering = [3, 4]  # this is of length 12 in reality
+        cat_attributes_clustering = ["x1", "x2"]
+        num_attributes_clustering = ["x3", "x4"]  # this is of length 12 in reality
         gmm = GaussianMixture(n_components=2, random_state=1)
         ohe_cat = [
             OneHotEncoder(categories="auto", sparse_output=False, drop=None)
@@ -44,11 +44,7 @@ class TestSklearnArrayFeatureExtractor(unittest.TestCase):
             ],
             remainder="passthrough",
         )
-        onehotencoding_pipeline = Pipeline(
-            [
-                ("columnTransformer", ct_cat),
-            ]
-        )
+        onehotencoding_pipeline = Pipeline([("columnTransformer", ct_cat)])
         clustering_pipeline = Pipeline(
             [("onehotencoder_and_scaler", onehotencoding_pipeline), ("clustering", gmm)]
         )

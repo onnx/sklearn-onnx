@@ -191,7 +191,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=LogisticRegression(), method="sigmoid"
+            estimator=LogisticRegression(), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -215,7 +215,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=RandomForestClassifier(n_estimators=2), method="sigmoid"
+            estimator=RandomForestClassifier(n_estimators=2), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -239,7 +239,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=GradientBoostingClassifier(n_estimators=2), method="sigmoid"
+            estimator=GradientBoostingClassifier(n_estimators=2), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -264,7 +264,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=HistGradientBoostingClassifier(max_iter=4), method="sigmoid"
+            estimator=HistGradientBoostingClassifier(max_iter=4), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -288,7 +288,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=DecisionTreeClassifier(), method="sigmoid"
+            estimator=DecisionTreeClassifier(), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -311,7 +311,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     def test_model_calibrated_classifier_cv_svc(self):
         data = load_iris()
         X, y = data.data, data.target
-        model = CalibratedClassifierCV(base_estimator=SVC(), method="sigmoid").fit(X, y)
+        model = CalibratedClassifierCV(estimator=SVC(), method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
             "unused",
@@ -333,9 +333,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     def test_model_calibrated_classifier_cv_linearsvc(self):
         data = load_iris()
         X, y = data.data, data.target
-        model = CalibratedClassifierCV(
-            base_estimator=LinearSVC(), method="sigmoid"
-        ).fit(X, y)
+        model = CalibratedClassifierCV(estimator=LinearSVC(), method="sigmoid").fit(
+            X, y
+        )
         model_onnx = convert_sklearn(
             model,
             "unused",
@@ -359,9 +359,9 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         X, y = data.data, data.target
         y[y == 2] = 0
         self.assertEqual(len(set(y)), 2)
-        model = CalibratedClassifierCV(
-            base_estimator=LinearSVC(), method="sigmoid"
-        ).fit(X, y)
+        model = CalibratedClassifierCV(estimator=LinearSVC(), method="sigmoid").fit(
+            X, y
+        )
         model_onnx = convert_sklearn(
             model,
             "unused",
@@ -391,7 +391,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model_sub.fit(X, y)
             with self.subTest(model=model_sub):
                 model = CalibratedClassifierCV(
-                    base_estimator=model_sub, cv=2, method="sigmoid"
+                    estimator=model_sub, cv=2, method="sigmoid"
                 ).fit(X, y)
                 model_onnx = convert_sklearn(
                     model,
