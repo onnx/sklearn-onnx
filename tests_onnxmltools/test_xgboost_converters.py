@@ -74,7 +74,7 @@ class TestXGBoostModels(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        pv.Version(onnxmltools.__version__) < pv.Version("1.12"),
+        pv.Version(onnxmltools.__version__) < pv.Version("1.13"),
         reason="converter for xgboost is too old",
     )
     def test_xgb_regressor(self):
