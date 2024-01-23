@@ -192,6 +192,7 @@ class TestStackingConverter(unittest.TestCase):
 
     @unittest.skipIf(StackingClassifier is None, reason="new in 0.22")
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_issue_786_exc(self):
         pipeline = make_pipeline(
             OneHotEncoder(handle_unknown="ignore", sparse_output=False),
