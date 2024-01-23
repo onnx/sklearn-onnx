@@ -294,6 +294,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_tree(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -394,6 +395,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_svc2_binary(self):
         data = load_iris()
         X, y = data.data, data.target

@@ -2,11 +2,13 @@
 
 import unittest
 import random
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
 from onnxruntime.capi.onnxruntime_pybind11_state import Fail
 import pandas
+from sklearn import __version__ as sklearn_version
 
 try:
     # scikit-learn >= 0.22
@@ -25,6 +27,12 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 from skl2onnx import to_onnx
 from test_utils import TARGET_OPSET
+
+
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
 
 
 class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
@@ -311,6 +319,7 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="SequenceConstruct not available")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_issue_712_svc_binary(self):
         pipe, dfx_test = TestSklearnPipelineConcatTfIdf.get_pipeline()
         expected = pipe.transform(dfx_test)
@@ -348,6 +357,7 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="SequenceConstruct not available")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_issue_712_svc_binary_empty(self):
         pipe, dfx_test = TestSklearnPipelineConcatTfIdf.get_pipeline()
         expected = pipe.transform(dfx_test)

@@ -49,6 +49,12 @@ def one_hot_encoder_supports_drop():
     return pv.Version(vers) >= pv.Version("0.21.0")
 
 
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("0.4.0"), reason="issues with shapes"
@@ -108,6 +114,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_model_one_hot_encoder_int32_scaler(self):
         model = make_pipeline(
             OneHotEncoder(categories="auto", sparse_output=False), RobustScaler()
@@ -236,6 +243,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         reason="OneHotEncoder does not support this in 0.19",
     )
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_model_one_hot_encoder_list_sparse(self):
         model = OneHotEncoder(
             categories=[[0, 1, 4, 5], [1, 2, 3, 5], [0, 3, 4, 6]], sparse_output=True
@@ -263,6 +271,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         reason="OneHotEncoder does not support this in 0.19",
     )
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_model_one_hot_encoder_list_dense(self):
         model = OneHotEncoder(
             categories=[[0, 1, 4, 5], [1, 2, 3, 5], [0, 3, 4, 6]], sparse_output=False
