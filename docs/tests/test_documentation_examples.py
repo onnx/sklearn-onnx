@@ -64,8 +64,8 @@ class TestDocumentationExamples(unittest.TestCase):
     def add_test_methods(cls):
         this = os.path.abspath(os.path.dirname(__file__))
         folds = [
-            os.path.normpath(os.path.join(this, "..", "docs", "examples")),
-            os.path.normpath(os.path.join(this, "..", "docs", "tutorial")),
+            os.path.normpath(os.path.join(this, "..", "examples")),
+            os.path.normpath(os.path.join(this, "..", "tutorial")),
         ]
         for fold in folds:
             found = os.listdir(fold)

@@ -396,7 +396,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_lbfgs(self):
-        penalty = "l2" if _sklearn_version() < pv.Version("0.21.0") else "none"
+        penalty = "l2"
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
                 solver="lbfgs", penalty=penalty, max_iter=10000

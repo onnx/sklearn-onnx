@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
+import packaging.version as pv
+from onnxruntime import __version__ as ort_version
 
 
 class TestInvestigate(unittest.TestCase):
@@ -39,6 +41,10 @@ class TestInvestigate(unittest.TestCase):
                 ]  # Select a single sample.
                 self.assertEqual(len(pred_onx.tolist()), 1)
 
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.16.0"),
+        reason="opset 19 not implemented",
+    )
     def test_issue_1055(self):
         import numpy as np
         from numpy.testing import assert_almost_equal

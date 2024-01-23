@@ -409,7 +409,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
         self._common_classifier(
             [
                 lambda: CalibratedClassifierCV(
-                    base_estimator=LogisticRegression(), method="sigmoid"
+                    estimator=LogisticRegression(), method="sigmoid"
                 )
             ],
             "CalibratedClassifierCV",
