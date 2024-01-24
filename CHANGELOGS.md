@@ -1,5 +1,13 @@
 # Change Logs
 
+## 1.17.0
+
+* Add support for scikti-learn 1.4.0,
+  [#1058](https://github.com/onnx/sklearn-onnx/pull/1058),
+  fixes issues [Many examples in the gallery are showing "broken"](https://github.com/onnx/sklearn-onnx/pull/1057),
+  [TFIDF vectorizer target_opset issue](https://github.com/onnx/sklearn-onnx/pull/1055),
+  [Tfidfvectorizer with sublinear_tf fails, despite opset version set to greater than 11](https://github.com/onnx/sklearn-onnx/pull/996).
+
 ## 1.16.0
 
 * Supports cosine distance (LocalOutlierFactor, ...)
