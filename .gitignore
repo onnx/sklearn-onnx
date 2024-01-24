@@ -37,6 +37,7 @@ docs/auto_examples
 docs/examples/graph*.*
 docs/examples/*.onnx
 docs/examples/pipeline*.dot*
+docs/sg_execution_times.rst
 tests/TESTDUMP
 tests/tests_dump
 tests/graph.dot*
