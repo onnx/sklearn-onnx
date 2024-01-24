@@ -246,7 +246,8 @@ jobs:
     displayName: 'install scikit-learn'
 
   - script: |
-      pip install $(onnx.version) $(onnxrt.version)
+      pip install $(onnx.version)
+      pip install $(onnxrt.version)
     displayName: 'install onnxruntime, onnx'
 
   - script: |
