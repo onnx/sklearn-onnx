@@ -1,6 +1,6 @@
 # Change Logs
 
-## 1.17.0
+## 1.17.0 (development)
 
 * Add support for scikti-learn 1.4.0,
   [#1058](https://github.com/onnx/sklearn-onnx/pull/1058),
