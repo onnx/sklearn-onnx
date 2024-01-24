@@ -437,6 +437,23 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline including a FunctionTransformer cannot be automatically converted into onnx because ...">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_jfunction_transformer_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_tutorial_plot_jfunction_transformer.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Issues with FunctionTransformer</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer usually creates sparse data. If the data is sparse enough, matrices usually sta...">
 
 .. only:: html
@@ -449,6 +466,23 @@ Examples
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">TfIdf and sparse matrices</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A game of finding it goes wrong and there are multiple places.">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_weird_pandas_and_hash_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_tutorial_plot_weird_pandas_and_hash.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">FeatureHasher, pandas values and unexpected discrepancies</div>
     </div>
 
 
@@ -485,7 +519,9 @@ Examples
    /auto_tutorial/plot_icustom_converter
    /auto_tutorial/plot_wext_pyod_forest
    /auto_tutorial/plot_catwoe_transformer
+   /auto_tutorial/plot_jfunction_transformer
    /auto_tutorial/plot_usparse_xgboost
+   /auto_tutorial/plot_weird_pandas_and_hash
 
 
 .. only:: html

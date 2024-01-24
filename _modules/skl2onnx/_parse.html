@@ -1,11 +1,11 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="../../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.08.19 -->
-        <title>skl2onnx._parse - sklearn-onnx 1.16.0 documentation</title>
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>skl2onnx._parse - sklearn-onnx 1.17.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">sklearn-onnx 1.16.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">sklearn-onnx 1.17.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -154,7 +154,7 @@
     <img class="sidebar-logo" src="../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.16.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.17.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -189,6 +189,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
@@ -299,7 +300,7 @@
 <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span><span class="p">,</span> <span class="n">LocalOutlierFactor</span>
 <span class="kn">from</span> <span class="nn">sklearn.mixture</span> <span class="kn">import</span> <span class="n">GaussianMixture</span><span class="p">,</span> <span class="n">BayesianGaussianMixture</span>
 <span class="kn">from</span> <span class="nn">sklearn.multioutput</span> <span class="kn">import</span> <span class="n">MultiOutputClassifier</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">OrdinalEncoder</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">NuSVC</span><span class="p">,</span> <span class="n">SVC</span>
 
@@ -339,7 +340,9 @@
 
 
 <span class="n">do_not_merge_columns</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-    <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">op</span><span class="p">:</span> <span class="n">op</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">ColumnTransformer</span><span class="p">])</span>
+    <span class="nb">filter</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">op</span><span class="p">:</span> <span class="n">op</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="p">[</span><span class="n">OrdinalEncoder</span><span class="p">,</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">ColumnTransformer</span><span class="p">]</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 
 
@@ -708,14 +711,18 @@
 
 
 <span class="k">def</span> <span class="nf">_parse_sklearn_random_trees_embedding</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="n">parse_sklearn</span><span class="p">(</span>
-        <span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">base_estimator_</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;estimator_&quot;</span><span class="p">):</span>
+        <span class="n">est</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">estimator_</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;base_estimator_&quot;</span><span class="p">):</span>
+        <span class="n">est</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">base_estimator_</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Model </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2"> was not trained (unable to find the estimator </span><span class="si">{</span><span class="nb">dir</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="si">}</span><span class="s2">).&quot;</span>
+        <span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">parse_sklearn</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">est</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="n">custom_parsers</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;A regressor only produces one output not </span><span class="si">%r</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="n">res</span><span class="p">)</span>
-    <span class="n">scope</span><span class="o">.</span><span class="n">replace_raw_operator</span><span class="p">(</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">base_estimator_</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="s2">&quot;SklearnRandomTreesEmbedding&quot;</span>
-    <span class="p">)</span>
+    <span class="n">scope</span><span class="o">.</span><span class="n">replace_raw_operator</span><span class="p">(</span><span class="n">est</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="s2">&quot;SklearnRandomTreesEmbedding&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">res</span>
 
 
@@ -959,7 +966,9 @@
     <span class="k">return</span> <span class="n">outputs</span>
 
 
-<div class="viewcode-block" id="parse_sklearn"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.parse_sklearn">[docs]</a><span class="k">def</span> <span class="nf">parse_sklearn</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="parse_sklearn">
+<a class="viewcode-back" href="../../api_summary.html#skl2onnx.parse_sklearn">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_sklearn</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">custom_parsers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">final_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a delegate function. It does nothing but invokes the</span>
 <span class="sd">    correct parsing function according to the input model&#39;s type.</span>
@@ -1021,7 +1030,10 @@
     <span class="k">return</span> <span class="n">res</span></div>
 
 
-<div class="viewcode-block" id="parse_sklearn_model"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.parse_sklearn_model">[docs]</a><span class="k">def</span> <span class="nf">parse_sklearn_model</span><span class="p">(</span>
+
+<div class="viewcode-block" id="parse_sklearn_model">
+<a class="viewcode-back" href="../../api_summary.html#skl2onnx.parse_sklearn_model">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_sklearn_model</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span>
     <span class="n">initial_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1120,6 +1132,7 @@
     <span class="k">return</span> <span class="n">topology</span></div>
 
 
+
 <span class="k">def</span> <span class="nf">build_sklearn_parsers_map</span><span class="p">():</span>
     <span class="n">map_parser</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">pipeline</span><span class="o">.</span><span class="n">Pipeline</span><span class="p">:</span> <span class="n">_parse_sklearn_pipeline</span><span class="p">,</span>
@@ -1139,7 +1152,9 @@
     <span class="k">return</span> <span class="n">map_parser</span>
 
 
-<div class="viewcode-block" id="update_registered_parser"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.update_registered_parser">[docs]</a><span class="k">def</span> <span class="nf">update_registered_parser</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">parser_fct</span><span class="p">):</span>
+<div class="viewcode-block" id="update_registered_parser">
+<a class="viewcode-back" href="../../api_summary.html#skl2onnx.update_registered_parser">[docs]</a>
+<span class="k">def</span> <span class="nf">update_registered_parser</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">parser_fct</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Registers or updates a parser for a new model.</span>
 <span class="sd">    A parser returns the expected output of a model.</span>
@@ -1150,6 +1165,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">check_signature</span><span class="p">(</span><span class="n">parser_fct</span><span class="p">,</span> <span class="n">_parse_sklearn_classifier</span><span class="p">)</span>
     <span class="n">sklearn_parsers_map</span><span class="p">[</span><span class="n">model</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser_fct</span></div>
+
 
 
 <span class="c1"># registered parsers</span>
@@ -1186,9 +1202,9 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=9a8fb93a"></script>
+</div><script src="../../_static/documentation_options.js?v=937f4017"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

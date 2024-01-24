@@ -1,16 +1,16 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.08.19 -->
-        <title>Computation times - sklearn-onnx 1.16.0 documentation</title>
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>Computation times - sklearn-onnx 1.17.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=92fd9be5" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
-    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -129,7 +129,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.16.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.17.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -155,7 +155,7 @@
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.16.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.17.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -190,6 +190,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
@@ -274,113 +275,132 @@
         </div>
         <article role="main">
           <section id="computation-times">
-<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Permalink to this heading">#</a></h1>
-<p><strong>00:02.873</strong> total execution time for <strong>auto_examples</strong> files:</p>
-<div class="table-wrapper docutils container">
-<table class="docutils align-default">
+<span id="sphx-glr-auto-examples-sg-execution-times"></span><h1>Computation times<a class="headerlink" href="#computation-times" title="Link to this heading">#</a></h1>
+<p><strong>00:03.547</strong> total execution time for 25 files <strong>from auto_examples</strong>:</p>
+<div class="docutils container">
+<style scoped>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+</style>
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script type="text/javascript" class="init">
+$(document).ready( function () {
+    $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+} );
+</script><div class="table-wrapper table table-striped sg-datatable docutils container">
+<table class="table table-striped sg-datatable docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Example</p></th>
+<th class="head"><p>Time</p></th>
+<th class="head"><p>Mem (MB)</p></th>
+</tr>
+</thead>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_backend.html#sphx-glr-auto-examples-plot-backend-py"><span class="std std-ref">ONNX Runtime Backend for ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_backend.py</span></code>)</p></td>
-<td><p>00:02.873</p></td>
-<td><p>0.0 MB</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_backend.html#sphx-glr-auto-examples-plot-backend-py"><span class="std std-ref">ONNX Runtime Backend for ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_backend.py</span></code>)</p></td>
+<td><p>00:03.547</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_benchmark_cdist.html#sphx-glr-auto-examples-plot-benchmark-cdist-py"><span class="std std-ref">Compare CDist with scipy</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_cdist.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_benchmark_cdist.html#sphx-glr-auto-examples-plot-benchmark-cdist-py"><span class="std std-ref">Compare CDist with scipy</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_cdist.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_benchmark_pipeline.html#sphx-glr-auto-examples-plot-benchmark-pipeline-py"><span class="std std-ref">Benchmark a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_pipeline.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_benchmark_pipeline.html#sphx-glr-auto-examples-plot-benchmark-pipeline-py"><span class="std std-ref">Benchmark a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_benchmark_pipeline.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_black_op.html#sphx-glr-auto-examples-plot-black-op-py"><span class="std std-ref">Convert a model with a reduced list of operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_black_op.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_black_op.html#sphx-glr-auto-examples-plot-black-op-py"><span class="std std-ref">Convert a model with a reduced list of operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_black_op.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_cast_transformer.html#sphx-glr-auto-examples-plot-cast-transformer-py"><span class="std std-ref">Discrepencies with StandardScaler</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_cast_transformer.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_cast_transformer.html#sphx-glr-auto-examples-plot-cast-transformer-py"><span class="std std-ref">Discrepencies with StandardScaler</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_cast_transformer.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_complex_pipeline.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_complex_pipeline.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_decision_function.html#sphx-glr-auto-examples-plot-convert-decision-function-py"><span class="std std-ref">Probabilities or raw scores</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_decision_function.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_decision_function.html#sphx-glr-auto-examples-plot-convert-decision-function-py"><span class="std std-ref">Probabilities or raw scores</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_decision_function.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_model.html#sphx-glr-auto-examples-plot-convert-model-py"><span class="std std-ref">Train, convert and predict a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_model.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_model.html#sphx-glr-auto-examples-plot-convert-model-py"><span class="std std-ref">Train, convert and predict a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_model.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_syntax.html#sphx-glr-auto-examples-plot-convert-syntax-py"><span class="std std-ref">Different ways to convert a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_syntax.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_syntax.html#sphx-glr-auto-examples-plot-convert-syntax-py"><span class="std std-ref">Different ways to convert a model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_syntax.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_zipmap.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_convert_zipmap.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_model.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_model.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_parser.html#sphx-glr-auto-examples-plot-custom-parser-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_parser.html#sphx-glr-auto-examples-plot-custom-parser-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_custom_parser_alternative.html#sphx-glr-auto-examples-plot-custom-parser-alternative-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor (alternative)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser_alternative.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_custom_parser_alternative.html#sphx-glr-auto-examples-plot-custom-parser-alternative-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor (alternative)</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_custom_parser_alternative.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_errors_onnxruntime.html#sphx-glr-auto-examples-plot-errors-onnxruntime-py"><span class="std std-ref">Errors with onnxruntime</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_errors_onnxruntime.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_errors_onnxruntime.html#sphx-glr-auto-examples-plot-errors-onnxruntime-py"><span class="std std-ref">Errors with onnxruntime</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_errors_onnxruntime.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_gpr.html#sphx-glr-auto-examples-plot-gpr-py"><span class="std std-ref">Discrepencies with GaussianProcessorRegressor: use of double</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_gpr.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_gpr.html#sphx-glr-auto-examples-plot-gpr-py"><span class="std std-ref">Discrepencies with GaussianProcessorRegressor: use of double</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_gpr.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_intermediate_outputs.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_intermediate_outputs.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_investigate_pipeline.html#sphx-glr-auto-examples-plot-investigate-pipeline-py"><span class="std std-ref">Investigate a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_investigate_pipeline.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_investigate_pipeline.html#sphx-glr-auto-examples-plot-investigate-pipeline-py"><span class="std std-ref">Investigate a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_investigate_pipeline.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_logging.html#sphx-glr-auto-examples-plot-logging-py"><span class="std std-ref">Logging, verbose</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_logging.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_logging.html#sphx-glr-auto-examples-plot-logging-py"><span class="std std-ref">Logging, verbose</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_logging.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_metadata.html#sphx-glr-auto-examples-plot-metadata-py"><span class="std std-ref">Metadata</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_metadata.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_metadata.html#sphx-glr-auto-examples-plot-metadata-py"><span class="std std-ref">Metadata</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_metadata.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_nmf.html#sphx-glr-auto-examples-plot-nmf-py"><span class="std std-ref">Custom Operator for NMF Decomposition</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_nmf.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_nmf.html#sphx-glr-auto-examples-plot-nmf-py"><span class="std std-ref">Custom Operator for NMF Decomposition</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_nmf.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_onnx_operators.html#sphx-glr-auto-examples-plot-onnx-operators-py"><span class="std std-ref">Play with ONNX operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_onnx_operators.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_onnx_operators.html#sphx-glr-auto-examples-plot-onnx-operators-py"><span class="std std-ref">Play with ONNX operators</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_onnx_operators.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Draw a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Draw a pipeline</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_lightgbm.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_lightgbm.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="plot_pipeline_xgboost.html#sphx-glr-auto-examples-plot-pipeline-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_xgboost.py</span></code>)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="plot_pipeline_xgboost.html#sphx-glr-auto-examples-plot-pipeline-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_pipeline_xgboost.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tfidfvectorizer.py</span></code>)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a> (<code class="docutils literal notranslate"><span class="pre">plot_tfidfvectorizer.py</span></code>)</p></td>
 <td><p>00:00.000</p></td>
-<td><p>0.0 MB</p></td>
+<td><p>0.0</p></td>
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 </section>
 
@@ -415,9 +435,9 @@
       
     </aside>
   </div>
-</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=9a8fb93a"></script>
+</div><script src="../_static/documentation_options.js?v=937f4017"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
-    <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

@@ -18,8 +18,6 @@
 .. _sphx_glr_auto_examples_plot_pipeline_xgboost.py:
 
 
-.. _example-xgboost:
-
 Convert a pipeline with a XGBoost model
 ========================================
 
@@ -35,9 +33,9 @@ a *XGBClassifier*. Let's see how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-78
+.. GENERATED FROM PYTHON SOURCE LINES 20-76
 
-.. code-block:: default
+.. code-block:: Python
 
     import os
     import numpy
@@ -120,7 +118,7 @@ Train a XGBoost classifier
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-90
+.. GENERATED FROM PYTHON SOURCE LINES 77-88
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -134,17 +132,17 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-93
+.. GENERATED FROM PYTHON SOURCE LINES 90-91
 
 Then we import the converter and shape calculator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-96
+.. GENERATED FROM PYTHON SOURCE LINES 93-94
 
 Let's register the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-104
+.. GENERATED FROM PYTHON SOURCE LINES 94-102
 
-.. code-block:: default
+.. code-block:: Python
 
     update_registered_converter(
         XGBClassifier,
@@ -161,14 +159,14 @@ Let's register the new converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-107
+.. GENERATED FROM PYTHON SOURCE LINES 103-105
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-119
+.. GENERATED FROM PYTHON SOURCE LINES 105-117
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_onnx = convert_sklearn(
@@ -189,16 +187,16 @@ Convert again
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-124
+.. GENERATED FROM PYTHON SOURCE LINES 118-122
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-128
+.. GENERATED FROM PYTHON SOURCE LINES 122-126
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("predict", pipe.predict(X[:5]))
@@ -212,19 +210,19 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [1 0 2 0 1]
-    predict_proba [[0.15089607 0.44885972 0.40024427]]
+    predict [2 2 2 0 0]
+    predict_proba [[0.17929651 0.23665468 0.5840488 ]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-130
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-136
+.. GENERATED FROM PYTHON SOURCE LINES 128-134
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = rt.InferenceSession("pipeline_xgboost.onnx", providers=["CPUExecutionProvider"])
@@ -240,20 +238,20 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 0 2 0 1]
-    predict_proba [{0: 0.1508960723876953, 1: 0.44885972142219543, 2: 0.40024426579475403}]
+    predict [2 2 2 0 0]
+    predict_proba [{0: 0.17929650843143463, 1: 0.23665468394756317, 2: 0.5840488076210022}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-139
+.. GENERATED FROM PYTHON SOURCE LINES 135-137
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-157
+.. GENERATED FROM PYTHON SOURCE LINES 137-155
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -291,13 +289,13 @@ Display the ONNX graph
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-159
+.. GENERATED FROM PYTHON SOURCE LINES 156-157
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-167
+.. GENERATED FROM PYTHON SOURCE LINES 157-165
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -315,13 +313,13 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.16.0
-    onnxmltools:  1.11.2
-    xgboost:  1.7.6
+    numpy: 1.26.2
+    scikit-learn: 1.5.dev0
+    onnx:  1.16.0
+    onnxruntime:  1.17.0+cu118
+    skl2onnx:  1.17.0
+    onnxmltools:  1.13.0
+    xgboost:  2.0.3
 
 
 
@@ -329,7 +327,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.335 seconds)
+   **Total running time of the script:** (0 minutes 2.227 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_xgboost.py:
@@ -338,16 +336,13 @@ Display the ONNX graph
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_pipeline_xgboost.ipynb <plot_pipeline_xgboost.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_pipeline_xgboost.py <plot_pipeline_xgboost.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_pipeline_xgboost.ipynb <plot_pipeline_xgboost.ipynb>`
 
 
 .. only:: html

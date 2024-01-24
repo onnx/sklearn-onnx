@@ -35,12 +35,12 @@ This example proposes a equivalent model with no discrepancies.
 Imports, setups
 +++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and :epkg:`lightgbm`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 22-59
 
-.. code-block:: default
+.. code-block:: Python
 
     import pprint
     import numpy
@@ -73,7 +73,7 @@ and :epkg:`lightgbm`.
     def diff(a, b):
         if a.shape != b.shape:
             raise ValueError(
-                f"Cannot compare matrices with different shapes " f"{a.shape} != {b.shape}."
+                f"Cannot compare matrices with different shapes {a.shape} != {b.shape}."
             )
         d = numpy.abs(a - b).sum() / a.size
         return d
@@ -95,7 +95,7 @@ Iris + a text column.
 
 .. GENERATED FROM PYTHON SOURCE LINES 64-81
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -141,7 +141,7 @@ Fit a TfIdfVectorizer
 
 .. GENERATED FROM PYTHON SOURCE LINES 84-87
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tfidf = Pipeline([("pre", ColumnTransformer([("tfidf", TfidfVectorizer(), 0)]))])
@@ -159,7 +159,7 @@ We leave a couple of strings out of the training set.
 
 .. GENERATED FROM PYTHON SOURCE LINES 89-97
 
-.. code-block:: default
+.. code-block:: Python
 
 
     tfidf.fit(strings[:-2])
@@ -196,7 +196,7 @@ Conversion to ONNX
 
 .. GENERATED FROM PYTHON SOURCE LINES 100-104
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(tfidf, strings)
@@ -216,7 +216,7 @@ Execution with ONNX
 
 .. GENERATED FROM PYTHON SOURCE LINES 107-112
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
@@ -246,7 +246,7 @@ Execution with ONNX
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.031 seconds)
+   **Total running time of the script:** (0 minutes 0.066 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py:
@@ -255,16 +255,13 @@ Execution with ONNX
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_transformer_discrepancy.ipynb <plot_transformer_discrepancy.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_transformer_discrepancy.py <plot_transformer_discrepancy.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_transformer_discrepancy.ipynb <plot_transformer_discrepancy.ipynb>`
 
 
 .. only:: html

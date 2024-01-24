@@ -18,7 +18,7 @@ This example uses :ref:`l-plot-custom-converter` as a start.
 Trains a model
 ++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 """
 import numpy as np
@@ -206,7 +206,7 @@ if IForest is not None:
     expected_labels = model1.predict(data)
     expected_proba = model1.predict_proba(data)
 
-    sess = InferenceSession(onx.SerializeToString())
+    sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
     res = sess.run(None, {"float_input": data})
 
     onx_labels = res[0]
