@@ -56,7 +56,8 @@ onnx nodes.
 .. runpython::
     :showcode:
     
-    from skl2onnx import __max_supported_opset__
+    from skl2onnx import __max_supported_opset__, __version__
+    print("documentation for version:", __version__)
     print("Last supported opset:", __max_supported_opset__)
 
 **Backend**
@@ -125,3 +126,7 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
 **License**
 
 It is licensed with `Apache License v2.0 <../LICENSE>`_.
+
+**Older versions**
+
+* `1.16.0 <versions/v1.16.0/>`
