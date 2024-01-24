@@ -104,6 +104,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
     def _fit_model(self, model, n_targets=1, label_int=False, n_informative=10):
         X, y = self._get_reg_data(20, 4, n_targets, n_informative)
+        X /= 100
         if label_int:
             y = y.astype(numpy.int64)
         model.fit(X, y)
@@ -218,9 +219,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.7.0"),
         reason="nan may happen during computation",
     )
-    @ignore_warnings(category=DeprecationWarning)
+    @ignore_warnings(category=(DeprecationWarning, RuntimeWarning, UserWarning))
     def test_model_knn_regressor_double_radius(self):
-        model, X = self._fit_model(RadiusNeighborsRegressor())
+        model, X = self._fit_model(RadiusNeighborsRegressor(radius=2.0))
         model_onnx = convert_sklearn(
             model,
             "KNN regressor",
@@ -263,9 +264,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(dont_test_radius(), reason="not available")
-    @ignore_warnings(category=DeprecationWarning)
+    @ignore_warnings(category=(DeprecationWarning, RuntimeWarning))
     def test_model_knn_regressor_yint_radius(self):
-        model, X = self._fit_model(RadiusNeighborsRegressor(), label_int=True)
+        model, X = self._fit_model(RadiusNeighborsRegressor(radius=2.0), label_int=True)
         model_onnx = convert_sklearn(
             model,
             "KNN regressor",
@@ -1123,5 +1124,4 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestNearestNeighbourConverter().test_model_knn_classifier_multilabel()
-    unittest.main()
+    unittest.main(verbosity=2)
