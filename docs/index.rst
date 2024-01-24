@@ -129,4 +129,4 @@ It is licensed with `Apache License v2.0 <../LICENSE>`_.
 
 **Older versions**
 
-* `1.16.0 <versions/v1.16.0/>`
+* `1.16.0 <versions/v1.16.0/>`_
