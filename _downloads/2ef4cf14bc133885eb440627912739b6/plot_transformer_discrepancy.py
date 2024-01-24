@@ -16,7 +16,7 @@ This example proposes a equivalent model with no discrepancies.
 Imports, setups
 +++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and :epkg:`lightgbm`.
 """
 import pprint
@@ -50,7 +50,7 @@ def print_sparse_matrix(m):
 def diff(a, b):
     if a.shape != b.shape:
         raise ValueError(
-            f"Cannot compare matrices with different shapes " f"{a.shape} != {b.shape}."
+            f"Cannot compare matrices with different shapes {a.shape} != {b.shape}."
         )
     d = numpy.abs(a - b).sum() / a.size
     return d

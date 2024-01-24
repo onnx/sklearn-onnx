@@ -1,16 +1,16 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Implement a new converter" href="auto_tutorial/plot_icustom_converter.html" /><link rel="prev" title="Convert a pipeline with a CatBoost classifier" href="auto_tutorial/plot_gexternal_catboost.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.08.19 -->
-        <title>A custom converter for a custom model - sklearn-onnx 1.16.0 documentation</title>
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>A custom converter for a custom model - sklearn-onnx 1.17.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
-    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css?v=7f9a90b1" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -129,7 +129,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">sklearn-onnx 1.16.0 documentation</div></a>
+      <a href="index.html"><div class="brand">sklearn-onnx 1.17.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -155,7 +155,7 @@
     <img class="sidebar-logo" src="_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.16.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.17.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -190,6 +190,7 @@
 <li class="toctree-l2 current has-children current-page"><a class="current reference internal" href="#">A custom converter for a custom model</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
@@ -274,7 +275,7 @@
         </div>
         <article role="main">
           <section id="a-custom-converter-for-a-custom-model">
-<h1>A custom converter for a custom model<a class="headerlink" href="#a-custom-converter-for-a-custom-model" title="Permalink to this heading">#</a></h1>
+<h1>A custom converter for a custom model<a class="headerlink" href="#a-custom-converter-for-a-custom-model" title="Link to this heading">#</a></h1>
 <p>When <a class="reference external" href="https://github.com/onnx/sklearn-onnx">sklearn-onnx</a> converts a <a class="reference external" href="https://scikit-learn.org/stable/">scikit-learn</a>
 pipeline, it looks into every transformer and predictor
 and fetches the associated converter. The resulting
@@ -299,7 +300,7 @@ it displays an error message telling it misses a converter.</p>
 </pre></div>
 </div>
 <p>&gt;&gt;&gt;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">shape</span> <span class="n">calculator</span> <span class="k">for</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">pyquickhelper</span><span class="o">.</span><span class="n">sphinxext</span><span class="o">.</span><span class="n">sphinx_runpython_extension</span><span class="o">.</span><span class="n">run_python_script_139931926803008</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">MyLogisticRegression</span><span class="s1">&#39;&gt;&#39;</span><span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">shape</span> <span class="n">calculator</span> <span class="k">for</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">sphinx_runpython</span><span class="o">.</span><span class="n">runpython</span><span class="o">.</span><span class="n">sphinx_runpython_extension</span><span class="o">.</span><span class="n">run_python_script_139750068154240</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">MyLogisticRegression</span><span class="s1">&#39;&gt;&#39;</span><span class="o">.</span>
     <span class="n">It</span> <span class="n">usually</span> <span class="n">means</span> <span class="n">the</span> <span class="n">pipeline</span> <span class="n">being</span> <span class="n">converted</span> <span class="n">contains</span> <span class="n">a</span>
     <span class="n">transformer</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">predictor</span> <span class="k">with</span> <span class="n">no</span> <span class="n">corresponding</span> <span class="n">converter</span>
     <span class="n">implemented</span> <span class="ow">in</span> <span class="n">sklearn</span><span class="o">-</span><span class="n">onnx</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">converted</span> <span class="ow">is</span> <span class="n">implemented</span>
@@ -324,6 +325,7 @@ an example.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l1"><a class="reference internal" href="auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
@@ -380,9 +382,9 @@ an example.</p>
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=9a8fb93a"></script>
+</div><script src="_static/documentation_options.js?v=937f4017"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

@@ -34,7 +34,7 @@ of a simple logistic regression model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 20-32
 
-.. code-block:: default
+.. code-block:: Python
 
     import skl2onnx
     import onnxruntime
@@ -61,7 +61,7 @@ Let's create an ONNX graph first.
 
 .. GENERATED FROM PYTHON SOURCE LINES 34-43
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data = load_iris()
@@ -85,11 +85,11 @@ Let's use ONNX backend API to test it.
 
 .. GENERATED FROM PYTHON SOURCE LINES 45-56
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model = onnx.load(name)
-    rep = backend.prepare(model, "CPU")
+    rep = backend.prepare(model)
     x = np.array(
         [[-1.0, -2.0, 5.0, 6.0], [-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, 7.0, 8.0]],
         dtype=np.float32,
@@ -100,18 +100,14 @@ Let's use ONNX backend API to test it.
 
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/home/xadupre/github/sklearn-onnx/docs/examples/plot_backend.py", line 47, in <module>
-        rep = backend.prepare(model, "CPU")
-      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/backend/backend.py", line 143, in prepare
-        return cls.prepare(bin, device, **kwargs)
-      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/backend/backend.py", line 124, in prepare
-        raise RuntimeError(f"Incompatible device expected '{device}', got '{get_device()}'")
-    RuntimeError: Incompatible device expected 'CPU', got 'GPU'
+    label=[2 0 2]
+    probabilities=[{0: 0.0, 1: 0.0, 2: 1.0}, {0: 1.0, 1: 1.9515885113950192e-38, 2: 0.0}, {0: 0.0, 1: 0.0, 2: 1.0}]
 
 
 
@@ -123,9 +119,21 @@ GPU or CPU.
 
 .. GENERATED FROM PYTHON SOURCE LINES 59-61
 
-.. code-block:: default
+.. code-block:: Python
 
     print(get_device())
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    GPU
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 62-64
@@ -135,10 +143,10 @@ without using *onnx*.
 
 .. GENERATED FROM PYTHON SOURCE LINES 64-74
 
-.. code-block:: default
+.. code-block:: Python
 
 
-    rep = backend.prepare(name, "CPU")
+    rep = backend.prepare(name)
     x = np.array(
         [[-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, -3.0, -4.0], [-1.0, -2.0, -3.0, -4.0]],
         dtype=np.float32,
@@ -146,6 +154,19 @@ without using *onnx*.
     label, proba = rep.run(x)
     print("label={}".format(label))
     print("probabilities={}".format(proba))
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    label=[0 0 0]
+    probabilities=[{0: 1.0, 1: 1.9515885113950192e-38, 2: 0.0}, {0: 1.0, 1: 1.9515885113950192e-38, 2: 0.0}, {0: 1.0, 1: 1.9515885113950192e-38, 2: 0.0}]
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 75-78
@@ -160,7 +181,7 @@ with the same API.
 
 .. GENERATED FROM PYTHON SOURCE LINES 81-87
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -170,9 +191,25 @@ with the same API.
     print("skl2onnx: ", skl2onnx.__version__)
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    numpy: 1.26.2
+    scikit-learn: 1.5.dev0
+    onnx:  1.16.0
+    onnxruntime:  1.17.0+cu118
+    skl2onnx:  1.17.0
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.873 seconds)
+   **Total running time of the script:** (0 minutes 3.547 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:
@@ -181,16 +218,13 @@ with the same API.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_backend.ipynb <plot_backend.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_backend.py <plot_backend.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_backend.ipynb <plot_backend.ipynb>`
 
 
 .. only:: html

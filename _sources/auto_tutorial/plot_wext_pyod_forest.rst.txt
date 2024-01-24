@@ -35,12 +35,12 @@ This example uses :ref:`l-plot-custom-converter` as a start.
 Trains a model
 ++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 
 .. GENERATED FROM PYTHON SOURCE LINES 24-77
 
-.. code-block:: default
+.. code-block:: Python
 
     import numpy as np
     import pandas as pd
@@ -114,7 +114,7 @@ We check that the conversion fails as expected.
 
 .. GENERATED FROM PYTHON SOURCE LINES 79-87
 
-.. code-block:: default
+.. code-block:: Python
 
 
     if IForest is not None:
@@ -142,7 +142,7 @@ The shape calculator defines their dimensions.
 
 .. GENERATED FROM PYTHON SOURCE LINES 94-120
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -183,7 +183,7 @@ Then the converter.
 
 .. GENERATED FROM PYTHON SOURCE LINES 122-178
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -254,7 +254,7 @@ Finally the registration.
 
 .. GENERATED FROM PYTHON SOURCE LINES 180-191
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -280,7 +280,7 @@ And the conversion.
 
 .. GENERATED FROM PYTHON SOURCE LINES 193-199
 
-.. code-block:: default
+.. code-block:: Python
 
 
     if IForest is not None:
@@ -302,7 +302,7 @@ Checking discrepencies
 
 .. GENERATED FROM PYTHON SOURCE LINES 202-222
 
-.. code-block:: default
+.. code-block:: Python
 
 
     if IForest is not None:
@@ -311,7 +311,7 @@ Checking discrepencies
         expected_labels = model1.predict(data)
         expected_proba = model1.predict_proba(data)
 
-        sess = InferenceSession(onx.SerializeToString())
+        sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
         res = sess.run(None, {"float_input": data})
 
         onx_labels = res[0]
@@ -343,16 +343,13 @@ Checking discrepencies
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_wext_pyod_forest.ipynb <plot_wext_pyod_forest.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_wext_pyod_forest.py <plot_wext_pyod_forest.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_wext_pyod_forest.ipynb <plot_wext_pyod_forest.ipynb>`
 
 
 .. only:: html

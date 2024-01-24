@@ -1,11 +1,11 @@
 <!doctype html>
-<html class="no-js" lang="en" data-content_root="">
+<html class="no-js" lang="en" data-content_root="../../">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2023.08.19 -->
-        <title>onnxconverter_common.utils - sklearn-onnx 1.16.0 documentation</title>
+    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
+        <title>onnxconverter_common.utils - sklearn-onnx 1.17.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=92fd9be5" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
@@ -128,7 +128,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">sklearn-onnx 1.16.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">sklearn-onnx 1.17.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -154,7 +154,7 @@
     <img class="sidebar-logo" src="../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.16.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.17.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -189,6 +189,7 @@
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
@@ -532,15 +533,20 @@
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Unable to flatten variable&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="check_input_and_output_numbers"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.common.utils.check_input_and_output_numbers">[docs]</a><span class="k">def</span> <span class="nf">check_input_and_output_numbers</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">input_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="check_input_and_output_numbers">
+<a class="viewcode-back" href="../../api_summary.html#skl2onnx.common.utils.check_input_and_output_numbers">[docs]</a>
+<span class="k">def</span> <span class="nf">check_input_and_output_numbers</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">input_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">output_count_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Check if the number of input(s)/output(s) is correct</span>
 
 <span class="sd">    :param operator: A Operator object</span>
-<span class="sd">    :param input_count_range: A list of two integers or an integer. If it&#39;s a list the first/second element is the</span>
-<span class="sd">    minimal/maximal number of inputs. If it&#39;s an integer, it is equivalent to specify that number twice in a list. For</span>
-<span class="sd">    infinite ranges like 5 to infinity, you need to use [5, None].</span>
-<span class="sd">    :param output_count_range: A list of two integers or an integer. See input_count_range for its format.</span>
+<span class="sd">    :param input_count_range: A list of two integers or an integer.</span>
+<span class="sd">        If it&#39;s a list the first/second element is the</span>
+<span class="sd">        minimal/maximal number of inputs. If it&#39;s an integer,</span>
+<span class="sd">        it is equivalent to specify that number twice in a list. For</span>
+<span class="sd">        infinite ranges like 5 to infinity, you need to use [5, None].</span>
+<span class="sd">    :param output_count_range: A list of two integers or an integer.</span>
+<span class="sd">        See input_count_range for its format.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_count_range</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">min_input_count</span> <span class="o">=</span> <span class="n">input_count_range</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -581,14 +587,19 @@
             <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">max_output_count</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">),</span> <span class="n">operator</span><span class="o">.</span><span class="n">output_full_names</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="check_input_and_output_types"><a class="viewcode-back" href="../../api_summary.html#skl2onnx.common.utils.check_input_and_output_types">[docs]</a><span class="k">def</span> <span class="nf">check_input_and_output_types</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">good_input_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">good_output_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+<div class="viewcode-block" id="check_input_and_output_types">
+<a class="viewcode-back" href="../../api_summary.html#skl2onnx.common.utils.check_input_and_output_types">[docs]</a>
+<span class="k">def</span> <span class="nf">check_input_and_output_types</span><span class="p">(</span><span class="n">operator</span><span class="p">,</span> <span class="n">good_input_types</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">good_output_types</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Check if the type(s) of input(s)/output(s) is(are) correct</span>
 
 <span class="sd">    :param operator: A Operator object</span>
-<span class="sd">    :param good_input_types: A list of allowed input types (e.g., [FloatTensorType, Int64TensorType]) or None. None</span>
-<span class="sd">    means that we skip the check of the input types.</span>
-<span class="sd">    :param good_output_types: A list of allowed output types. See good_input_types for its format.</span>
+<span class="sd">    :param good_input_types: A list of allowed input types</span>
+<span class="sd">        (e.g., [FloatTensorType, Int64TensorType]) or None. None</span>
+<span class="sd">        means that we skip the check of the input types.</span>
+<span class="sd">    :param good_output_types: A list of allowed output types.</span>
+<span class="sd">        See good_input_types for its format.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">if</span> <span class="n">good_input_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">:</span>
@@ -603,6 +614,7 @@
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Operator </span><span class="si">%s</span><span class="s1"> (type: </span><span class="si">%s</span><span class="s1">) got an output </span><span class="si">%s</span><span class="s1"> with a wrong type </span><span class="si">%s</span><span class="s1">. Only </span><span class="si">%s</span><span class="s1"> are allowed&#39;</span>
                                    <span class="o">%</span> <span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="n">operator</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="p">),</span>
                                       <span class="n">good_output_types</span><span class="p">))</span></div>
+
 </pre></div>
         </article>
       </div>
@@ -635,9 +647,9 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=9a8fb93a"></script>
+</div><script src="../../_static/documentation_options.js?v=937f4017"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=32e29ea5"></script>
     </body>
 </html>

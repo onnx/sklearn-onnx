@@ -18,8 +18,6 @@
 .. _sphx_glr_auto_tutorial_plot_gexternal_xgboost.py:
 
 
-.. _example-xgboost:
-
 Convert a pipeline with a XGBoost model
 ========================================
 
@@ -36,9 +34,9 @@ how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-72
+.. GENERATED FROM PYTHON SOURCE LINES 21-70
 
-.. code-block:: default
+.. code-block:: Python
 
     import numpy
     import onnxruntime as rt
@@ -93,28 +91,10 @@ Train a XGBoost classifier
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Unable to find a shape calculator for type '<class 'xgboost.sklearn.XGBClassifier'>'.
-    It usually means the pipeline being converted contains a
-    transformer or a predictor with no corresponding converter
-    implemented in sklearn-onnx. If the converted is implemented
-    in another library, you need to register
-    the converted so that it can be used by sklearn-onnx (function
-    update_registered_converter). If the model is not yet covered
-    by sklearn-onnx, you may raise an issue to
-    https://github.com/onnx/sklearn-onnx/issues
-    to get the converter implemented or even contribute to the
-    project. If the model is a custom model, a new converter must
-    be implemented. Examples can be found in the gallery.
 
 
 
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 73-84
+.. GENERATED FROM PYTHON SOURCE LINES 71-82
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -128,9 +108,9 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-93
+.. GENERATED FROM PYTHON SOURCE LINES 82-91
 
-.. code-block:: default
+.. code-block:: Python
 
 
     update_registered_converter(
@@ -148,14 +128,14 @@ xgboost/shape_calculators/Classifier.py>`_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-96
+.. GENERATED FROM PYTHON SOURCE LINES 92-94
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-108
+.. GENERATED FROM PYTHON SOURCE LINES 94-106
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_onnx = convert_sklearn(
@@ -176,16 +156,16 @@ Convert again
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-113
+.. GENERATED FROM PYTHON SOURCE LINES 107-111
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-117
+.. GENERATED FROM PYTHON SOURCE LINES 111-115
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("predict", pipe.predict(X[:5]))
@@ -199,19 +179,19 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [0 2 2 1 0]
-    predict_proba [[0.6735462  0.16588391 0.16056988]]
+    predict [1 0 2 1 1]
+    predict_proba [[0.17581303 0.44687837 0.37730864]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-119
+.. GENERATED FROM PYTHON SOURCE LINES 116-117
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-125
+.. GENERATED FROM PYTHON SOURCE LINES 117-123
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = rt.InferenceSession("pipeline_xgboost.onnx", providers=["CPUExecutionProvider"])
@@ -227,20 +207,20 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [0 2 2 1 0]
-    predict_proba [{0: 0.6735461950302124, 1: 0.16588392853736877, 2: 0.16056989133358002}]
+    predict [1 0 2 1 1]
+    predict_proba [{0: 0.17581303417682648, 1: 0.4468783736228943, 2: 0.37730860710144043}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-128
+.. GENERATED FROM PYTHON SOURCE LINES 124-126
 
 Same example with XGBRegressor
 ++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-147
+.. GENERATED FROM PYTHON SOURCE LINES 126-145
 
-.. code-block:: default
+.. code-block:: Python
 
 
     update_registered_converter(
@@ -269,18 +249,18 @@ Same example with XGBRegressor
 
  .. code-block:: none
 
-    predict [ 50.63668 139.96634  89.57979  92.50203  34.25794]
+    predict [141.24936 123.93109 105.4013  121.97575 201.67772]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-149
+.. GENERATED FROM PYTHON SOURCE LINES 146-147
 
 ONNX
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-158
+.. GENERATED FROM PYTHON SOURCE LINES 147-156
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(
@@ -299,17 +279,17 @@ ONNX
 
  .. code-block:: none
 
-    predict [ 50.63668 139.96634  89.57979  92.50203  34.25794]
+    predict [141.24937 123.93109 105.4013  121.97575 201.67772]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-161
+.. GENERATED FROM PYTHON SOURCE LINES 157-159
 
 Some discrepencies may appear. In that case,
 you should read :ref:`l-example-discrepencies-float-double`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 163-169
+.. GENERATED FROM PYTHON SOURCE LINES 161-167
 
 Same with a Booster
 +++++++++++++++++++
@@ -318,9 +298,9 @@ A booster cannot be inserted in a pipeline. It requires
 a different conversion function because it does not
 follow :epkg:`scikit-learn` API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-197
+.. GENERATED FROM PYTHON SOURCE LINES 167-195
 
-.. code-block:: default
+.. code-block:: Python
 
 
     x, y = make_classification(
@@ -358,7 +338,7 @@ follow :epkg:`scikit-learn` API.
 
  .. code-block:: none
 
-    [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 0 1 1 1
+    [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 1 1 1 1
      0 1 1 1 0 0 1 1 0 0 0 1 0]
 
 
@@ -367,7 +347,7 @@ follow :epkg:`scikit-learn` API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.185 seconds)
+   **Total running time of the script:** (0 minutes 0.138 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py:
@@ -376,16 +356,13 @@ follow :epkg:`scikit-learn` API.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_gexternal_xgboost.ipynb <plot_gexternal_xgboost.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gexternal_xgboost.py <plot_gexternal_xgboost.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_gexternal_xgboost.ipynb <plot_gexternal_xgboost.ipynb>`
 
 
 .. only:: html

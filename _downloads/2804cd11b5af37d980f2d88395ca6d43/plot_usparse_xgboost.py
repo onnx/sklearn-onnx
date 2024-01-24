@@ -20,7 +20,7 @@ when converter into ONNX. This example looks into several configurations.
 Imports, setups
 +++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 """
 import warnings

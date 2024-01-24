@@ -37,12 +37,12 @@ when converter into ONNX. This example looks into several configurations.
 Imports, setups
 +++++++++++++++
 
-All imports. It also registered onnx converters for :epgk:`xgboost`
+All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 
 .. GENERATED FROM PYTHON SOURCE LINES 26-68
 
-.. code-block:: default
+.. code-block:: Python
 
     import warnings
     import numpy
@@ -102,7 +102,7 @@ Iris + a text column.
 
 .. GENERATED FROM PYTHON SOURCE LINES 73-91
 
-.. code-block:: default
+.. code-block:: Python
 
 
     cst = ["class zero", "class one", "class two"]
@@ -140,7 +140,7 @@ sparse matrices to be converted into dense matrices.
 
 .. GENERATED FROM PYTHON SOURCE LINES 98-232
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -284,9 +284,7 @@ sparse matrices to be converted into dense matrices.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     25%|██▌       | 1/4 [00:00<00:00,  7.64it/s]/home/xadupre/.local/lib/python3.10/site-packages/xgboost/sklearn.py:1395: UserWarning: `use_label_encoder` is deprecated in 1.7.0.
-      warnings.warn("`use_label_encoder` is deprecated in 1.7.0.")
-     75%|███████▌  | 3/4 [00:00<00:00, 10.97it/s][LightGBM] [Warning] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000091 seconds.
+      0%|          | 0/4 [00:00<?, ?it/s]     75%|███████▌  | 3/4 [00:00<00:00, 13.14it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.002602 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
@@ -308,11 +306,11 @@ sparse matrices to be converted into dense matrices.
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    100%|██████████| 4/4 [00:00<00:00,  9.98it/s]
+    100%|██████████| 4/4 [00:00<00:00, 11.75it/s]
                                 model  discrepencies
-    0          RandomForestClassifier       0.827463
+    0          RandomForestClassifier       0.700004
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier      13.422219
+    2                   XGBClassifier      28.331459
     3                  LGBMClassifier       0.000009
 
 
@@ -346,19 +344,19 @@ sparse matrices to be converted into dense matrices.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>0.827463</td>
+          <td>0.700004</td>
           <td>NaN</td>
         </tr>
         <tr>
           <th>1</th>
           <td>HistGradientBoostingClassifier</td>
           <td>NaN</td>
-          <td>A sparse matrix was passed, but dense data is ...</td>
+          <td>Sparse data was passed for X, but dense data i...</td>
         </tr>
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>13.422219</td>
+          <td>28.331459</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -385,7 +383,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
 
 .. GENERATED FROM PYTHON SOURCE LINES 239-247
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -403,9 +401,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     50%|█████     | 2/4 [00:00<00:00, 11.22it/s]/home/xadupre/.local/lib/python3.10/site-packages/xgboost/sklearn.py:1395: UserWarning: `use_label_encoder` is deprecated in 1.7.0.
-      warnings.warn("`use_label_encoder` is deprecated in 1.7.0.")
-    [LightGBM] [Warning] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000057 seconds.
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|█████     | 2/4 [00:00<00:00, 17.40it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000029 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
@@ -427,7 +423,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    100%|██████████| 4/4 [00:00<00:00, 12.79it/s]    100%|██████████| 4/4 [00:00<00:00, 12.51it/s]
+    100%|██████████| 4/4 [00:00<00:00, 20.51it/s]
 
 
 .. raw:: html
@@ -459,7 +455,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>0.000005</td>
+          <td>0.733338</td>
         </tr>
         <tr>
           <th>1</th>
@@ -469,7 +465,7 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>0.000006</td>
+          <td>2.967510</td>
         </tr>
         <tr>
           <th>3</th>
@@ -490,7 +486,7 @@ applies on the data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 250-257
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("sparse")
@@ -548,7 +544,7 @@ replace null values by nan in the onnx graph.
 
 .. GENERATED FROM PYTHON SOURCE LINES 277-285
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data_dense = make_pipelines(df, y, sparse_threshold=1.0, replace_nan=True)
@@ -566,9 +562,7 @@ replace null values by nan in the onnx graph.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/.local/lib/python3.10/site-packages/xgboost/sklearn.py:1395: UserWarning: `use_label_encoder` is deprecated in 1.7.0.
-      warnings.warn("`use_label_encoder` is deprecated in 1.7.0.")
-     75%|███████▌  | 3/4 [00:00<00:00, 19.89it/s][LightGBM] [Warning] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000043 seconds.
+      0%|          | 0/4 [00:00<?, ?it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000032 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
@@ -590,11 +584,11 @@ replace null values by nan in the onnx graph.
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    100%|██████████| 4/4 [00:00<00:00, 18.95it/s]
+    100%|██████████| 4/4 [00:00<00:00, 29.40it/s]    100%|██████████| 4/4 [00:00<00:00, 29.34it/s]
                                 model  discrepencies
-    0          RandomForestClassifier      37.981630
+    0          RandomForestClassifier      40.908293
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier       0.000006
+    2                   XGBClassifier       2.967510
     3                  LGBMClassifier       0.000009
 
 
@@ -628,19 +622,19 @@ replace null values by nan in the onnx graph.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>37.981630</td>
+          <td>40.908293</td>
           <td>NaN</td>
         </tr>
         <tr>
           <th>1</th>
           <td>HistGradientBoostingClassifier</td>
           <td>NaN</td>
-          <td>A sparse matrix was passed, but dense data is ...</td>
+          <td>Sparse data was passed for X, but dense data i...</td>
         </tr>
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>0.000006</td>
+          <td>2.967510</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -670,7 +664,7 @@ more explicit.
 
 .. GENERATED FROM PYTHON SOURCE LINES 295-304
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data_dense = make_pipelines(
@@ -689,9 +683,7 @@ more explicit.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     25%|██▌       | 1/4 [00:00<00:00,  8.54it/s]/home/xadupre/.local/lib/python3.10/site-packages/xgboost/sklearn.py:1395: UserWarning: `use_label_encoder` is deprecated in 1.7.0.
-      warnings.warn("`use_label_encoder` is deprecated in 1.7.0.")
-     75%|███████▌  | 3/4 [00:00<00:00, 11.98it/s][LightGBM] [Warning] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000095 seconds.
+      0%|          | 0/4 [00:00<?, ?it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000024 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
@@ -713,11 +705,11 @@ more explicit.
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    100%|██████████| 4/4 [00:00<00:00, 10.25it/s]
+    100%|██████████| 4/4 [00:00<00:00, 36.10it/s]    100%|██████████| 4/4 [00:00<00:00, 36.01it/s]
                                 model  discrepencies
-    0          RandomForestClassifier      27.790689
+    0          RandomForestClassifier      41.729285
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier       0.000006
+    2                   XGBClassifier       2.967510
     3                  LGBMClassifier       0.000009
 
 
@@ -751,19 +743,19 @@ more explicit.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>27.790689</td>
+          <td>41.729285</td>
           <td>NaN</td>
         </tr>
         <tr>
           <th>1</th>
           <td>HistGradientBoostingClassifier</td>
           <td>NaN</td>
-          <td>A sparse matrix was passed, but dense data is ...</td>
+          <td>Sparse data was passed for X, but dense data i...</td>
         </tr>
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>0.000006</td>
+          <td>2.967510</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -791,7 +783,7 @@ tuned depending on the model which follows the TfIdf preprocessing.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.606 seconds)
+   **Total running time of the script:** (0 minutes 0.992 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_usparse_xgboost.py:
@@ -800,16 +792,13 @@ tuned depending on the model which follows the TfIdf preprocessing.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_usparse_xgboost.ipynb <plot_usparse_xgboost.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_usparse_xgboost.py <plot_usparse_xgboost.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_usparse_xgboost.ipynb <plot_usparse_xgboost.ipynb>`
 
 
 .. only:: html
