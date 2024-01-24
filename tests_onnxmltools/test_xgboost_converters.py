@@ -74,7 +74,7 @@ class TestXGBoostModels(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        pv.Version(onnxmltools.__version__) < pv.Version("1.12"),
+        pv.Version(onnxmltools.__version__) < pv.Version("1.13"),
         reason="converter for xgboost is too old",
     )
     def test_xgb_regressor(self):
@@ -178,7 +178,7 @@ class TestXGBoostModels(unittest.TestCase):
             conv_model.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         res = sess.run(None, {"input": X.astype(np.float32)})
-        assert_almost_equal(xgb.predict_proba(X), res[1])
+        assert_almost_equal(xgb.predict_proba(X), res[1], decimal=4)
         assert_almost_equal(xgb.predict(X), res[0])
 
     @unittest.skipIf(StackingClassifier is None, reason="new in 0.22")

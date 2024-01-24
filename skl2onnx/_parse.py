@@ -436,14 +436,18 @@ def _parse_sklearn_grid_search_cv(scope, model, inputs, custom_parsers=None):
 
 
 def _parse_sklearn_random_trees_embedding(scope, model, inputs, custom_parsers=None):
-    res = parse_sklearn(
-        scope, model.base_estimator_, inputs, custom_parsers=custom_parsers
-    )
+    if hasattr(model, "estimator_"):
+        est = model.estimator_
+    elif hasattr(model, "base_estimator_"):
+        est = model.base_estimator_
+    else:
+        raise RuntimeError(
+            f"Model {model} was not trained (unable to find the estimator {dir(model)})."
+        )
+    res = parse_sklearn(scope, est, inputs, custom_parsers=custom_parsers)
     if len(res) != 1:
         raise RuntimeError("A regressor only produces one output not %r." % res)
-    scope.replace_raw_operator(
-        model.base_estimator_, model, "SklearnRandomTreesEmbedding"
-    )
+    scope.replace_raw_operator(est, model, "SklearnRandomTreesEmbedding")
     return res
 
 
