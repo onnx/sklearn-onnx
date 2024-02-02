@@ -25,9 +25,11 @@ class TestSklearnClassifiersExtreme(unittest.TestCase):
         onx = to_onnx(cl, x, target_opset=TARGET_OPSET, options={"zipmap": False})
 
         for cls in [
-            (lambda onx: ReferenceEvaluator(onx, verbose=0))
-            if ReferenceEvaluator is not None
-            else None,
+            (
+                (lambda onx: ReferenceEvaluator(onx, verbose=0))
+                if ReferenceEvaluator is not None
+                else None
+            ),
             lambda onx: InferenceSession(
                 onx.SerializeToString(), providers=["CPUExecutionProvider"]
             ),

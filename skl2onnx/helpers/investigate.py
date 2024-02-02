@@ -107,9 +107,9 @@ class BaseEstimatorDebugInformation:
             model.decision_function
         ):  # noqa
             model._debug_decision_function = model.decision_function  # noqa
-            self.methods[
-                "decision_function"
-            ] = lambda model, X: model._debug_decision_function(X)
+            self.methods["decision_function"] = (
+                lambda model, X: model._debug_decision_function(X)
+            )
 
     def __repr__(self):
         """
