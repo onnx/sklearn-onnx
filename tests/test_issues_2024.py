@@ -111,6 +111,189 @@ class TestInvestigate(unittest.TestCase):
         got = sess.run(None, {"input": np.array(corpus).reshape((-1, 1))})
         assert_almost_equal(expected, got[1], decimal=2)
 
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.16.0"),
+        reason="opset 19 not implemented",
+    )
+    def test_issue_1069(self):
+        import math
+        from typing import Any
+        import numpy
+        import pandas
+        import skl2onnx
+        from sklearn import (
+            base,
+            compose,
+            ensemble,
+            linear_model,
+            pipeline,
+            preprocessing,
+            datasets,
+        )
+        from sklearn.model_selection import train_test_split
+        import lightgbm
+        import onnxruntime
+        from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
+            convert_lightgbm,
+        )
+        from skl2onnx import update_registered_converter, to_onnx
+        from skl2onnx.common import data_types, shape_calculator
+
+        class FLAGS:
+            classes = 7
+            samples = 1000
+            timesteps = 5
+            trajectories = int(1000 / 5)
+            features = 10
+            seed = 10
+
+        columns = [
+            f"facelandmark{i}" for i in range(1, int(FLAGS.features / 2) + 1)
+        ] + [f"poselandmark{i}" for i in range(1, int(FLAGS.features / 2) + 1)]
+
+        X, y = datasets.make_classification(
+            n_classes=FLAGS.classes,
+            n_informative=math.ceil(math.log2(FLAGS.classes * 2)),
+            n_samples=FLAGS.samples,
+            n_features=FLAGS.features,
+            random_state=FLAGS.seed,
+        )
+
+        X = pandas.DataFrame(X, columns=columns)
+
+        X["trajectory"] = numpy.repeat(
+            numpy.arange(FLAGS.trajectories), FLAGS.timesteps
+        )
+        X["timestep"] = numpy.tile(numpy.arange(FLAGS.timesteps), FLAGS.trajectories)
+
+        trajectory_train, trajectory_test = train_test_split(
+            X["trajectory"].unique(),
+            test_size=0.25,
+            random_state=FLAGS.seed,
+        )
+
+        trajectory_train, trajectory_test = set(trajectory_train), set(trajectory_test)
+
+        X_train, X_test = (
+            X[X["trajectory"].isin(trajectory_train)],
+            X[X["trajectory"].isin(trajectory_test)],
+        )
+        y_train, _ = y[X_train.index], y[X_test.index]
+
+        def augment_with_lag_timesteps(X, k, columns):
+            augmented = X.copy()
+
+            for i in range(1, k + 1):
+                shifted = X[columns].groupby(X["trajectory"]).shift(i)
+                shifted.columns = [f"{x}_lag{i}" for x in shifted.columns]
+
+                augmented = pandas.concat([augmented, shifted], axis=1)
+
+            return augmented
+
+        X_train = augment_with_lag_timesteps(X_train, k=3, columns=X.columns[:-2])
+        X_test = augment_with_lag_timesteps(X_test, k=3, columns=X.columns[:-2])
+
+        X_train.drop(columns=["trajectory", "timestep"], inplace=True)
+        X_test.drop(columns=["trajectory", "timestep"], inplace=True)
+
+        def abc_Embedder() -> list[tuple[str, Any]]:
+            return [
+                ("cast64", skl2onnx.sklapi.CastTransformer(dtype=numpy.float64)),
+                ("scaler", preprocessing.StandardScaler()),
+                ("cast32", skl2onnx.sklapi.CastTransformer()),
+                ("basemodel", lightgbm.LGBMClassifier(max_iter=10, max_depth=2)),
+            ]
+
+        def Classifier(features: list[str]) -> base.BaseEstimator:
+            feats = [i for i, x in enumerate(features) if x.startswith("facelandmark")]
+
+            classifier = ensemble.StackingClassifier(
+                estimators=[
+                    (
+                        "facepipeline",
+                        pipeline.Pipeline(
+                            [
+                                (
+                                    "preprocessor",
+                                    compose.ColumnTransformer(
+                                        [("identity", "passthrough", feats)]
+                                    ),
+                                ),
+                                ("embedder", pipeline.Pipeline(steps=abc_Embedder())),
+                            ]
+                        ),
+                    ),
+                    (
+                        "posepipeline",
+                        pipeline.Pipeline(
+                            [
+                                (
+                                    "preprocessor",
+                                    compose.ColumnTransformer(
+                                        [("identity", "passthrough", feats)]
+                                    ),
+                                ),
+                                ("embedder", pipeline.Pipeline(steps=abc_Embedder())),
+                            ]
+                        ),
+                    ),
+                ],
+                final_estimator=linear_model.LogisticRegression(
+                    multi_class="multinomial"
+                ),
+            )
+
+            return classifier
+
+        model = Classifier(list(X_train.columns))
+        model.fit(X_train, y_train)
+
+        def dataframe_schema_to_data_types(
+            X: pandas.DataFrame, drop: set[str] | None = None
+        ) -> list[tuple[str, data_types.DataType]]:
+            """It converts a dataframe schema to ONNX-compatible data types"""
+            input_data_types = []
+
+            for k, v in zip(X.columns, X.dtypes):
+                if drop and k in drop:
+                    continue
+
+                if v == "int64":
+                    t = data_types.Int64TensorType([None, 1])
+                elif v == "float64":
+                    t = data_types.FloatTensorType([None, 1])
+                else:
+                    t = data_types.StringTensorType([None, 1])
+
+                input_data_types.append((k, t))
+
+            return input_data_types
+
+        update_registered_converter(
+            lightgbm.LGBMClassifier,
+            "LightGbmLGBMClassifier",
+            shape_calculator.calculate_linear_classifier_output_shapes,
+            convert_lightgbm,
+            options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
+        )
+        sample = X_train[:1].astype(numpy.float32)
+
+        for m in [model.estimators_[0].steps[0][-1], model.estimators_[0], model]:
+            with self.subTest(model=type(m)):
+                exported = to_onnx(
+                    model,
+                    X=numpy.asarray(sample),
+                    name="classifier",
+                    target_opset={"": 12, "ai.onnx.ml": 2},
+                    options={id(model): {"zipmap": False}},
+                )
+
+                modelengine = onnxruntime.InferenceSession(
+                    exported.SerializeToString(), providers=["CPUExecutionProvider"]
+                )
+                assert modelengine is not None
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -52,7 +52,7 @@ def convert_feature_union(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
     raise NotImplementedError(
-        "This converter not needed so far. It is usually handled " "during parsing."
+        "This converter not needed so far. It is usually handled during parsing."
     )
 
 
@@ -60,7 +60,7 @@ def convert_column_transformer(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
     raise NotImplementedError(
-        "This converter not needed so far. It is usually handled " "during parsing."
+        "This converter not needed so far. It is usually handled during parsing."
     )
 
 
