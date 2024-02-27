@@ -126,12 +126,12 @@ def convert_gaussian_process_regressor(
         if len(mean_y.shape) == 1:
             mean_y = mean_y.reshape(mean_y.shape + (1,))
 
-        if not hasattr(op, "_y_train_std") or op._y_train_std == 1:
+        if not hasattr(op, "_y_train_std") or np.all(op._y_train_std == 1):
             if isinstance(y_mean_b, (np.float32, np.float64)):
                 y_mean_b = np.array([y_mean_b])
             if isinstance(mean_y, (np.float32, np.float64)):
                 mean_y = np.array([mean_y])
-            y_mean = OnnxAdd(y_mean_b, mean_y, op_version=opv)
+            y_mean = OnnxAdd(y_mean_b, mean_y.T, op_version=opv)
         else:
             # A bug was fixed in 0.23 and it changed
             # the predictions when return_std is True.
@@ -145,13 +145,13 @@ def convert_gaussian_process_regressor(
             if isinstance(mean_y, (np.float32, np.float64)):
                 mean_y = np.array([mean_y])
             y_mean = OnnxAdd(
-                OnnxMul(y_mean_b, var_y, op_version=opv), mean_y, op_version=opv
+                OnnxMul(y_mean_b, var_y.T, op_version=opv), mean_y.T, op_version=opv
             )
 
         y_mean.set_onnx_name_prefix("gpr")
         y_mean_reshaped = OnnxReshapeApi13(
             y_mean,
-            np.array([-1, 1], dtype=np.int64),
+            np.array([-1, mean_y.shape[0]], dtype=np.int64),
             op_version=opv,
             output_names=out[:1],
         )
@@ -192,12 +192,13 @@ def convert_gaussian_process_regressor(
             #     y_var[y_var_negative] = 0.0
             ys0_var = OnnxMax(ys_var, np.array([0], dtype=dtype), op_version=opv)
 
-            if hasattr(op, "_y_train_std") and op._y_train_std != 1:
+            if hasattr(op, "_y_train_std"):
                 # y_var = y_var * self._y_train_std**2
-                ys0_var = OnnxMul(ys0_var, var_y**2, op_version=opv)
+                ys0_var = OnnxMul(var_y**2, ys0_var, op_version=opv)
 
             # var = np.sqrt(ys0_var)
-            var = OnnxSqrt(ys0_var, output_names=out[1:], op_version=opv)
+            var = OnnxSqrt(ys0_var, op_version=opv)
+            var = OnnxTranspose(var, output_names=out[1:], op_version=opv)
             var.set_onnx_name_prefix("gprv")
             outputs.append(var)
 
