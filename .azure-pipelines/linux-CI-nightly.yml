@@ -16,6 +16,13 @@ jobs:
       Py39-Onnx1102-SkLatest:
         python.version: '3.9'
         numpy.version: '>=1.18.3'
+        onnx.version: '-i https://test.pypi.org/simple/ onnx==1.16.0rc1'
+        onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
+        sklearn.version: '>=1.0'
+
+      Py39-Onnx1102-SkLatest:
+        python.version: '3.9'
+        numpy.version: '>=1.18.3'
         onnx.version: '==1.10.2'
         onnxrt.version: '-i https://test.pypi.org/simple/ ort-nightly'
         sklearn.version: '>=1.0'
