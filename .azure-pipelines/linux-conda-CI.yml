@@ -243,7 +243,7 @@ jobs:
     displayName: 'Install environment'
 
   - script: |
-      conda install "numpy$(numpy.version)" "scipy$(scipy.version)"
+      conda install -c conda-forge "numpy$(numpy.version)" "scipy$(scipy.version)"
     displayName: 'install numpy, scipy'
 
   - script: |
