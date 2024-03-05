@@ -239,11 +239,14 @@ jobs:
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
-  - task: CondaEnvironment@1
-    inputs:
-      createCustomEnvironment: true
-      environmentName: 'py$(python.version)'
-      packageSpecs: 'python=$(python.version)'
+  - script: conda create --yes --quiet --name 'py$(python.version)'
+    displayName: Create Anaconda environment
+
+  # - task: CondaEnvironment@1
+  #   inputs:
+  #     createCustomEnvironment: true
+  #     environmentName: 'py$(python.version)'
+  #     packageSpecs: 'python=$(python.version)'
 
   - script: |
       sudo apt-get install -y language-pack-en
