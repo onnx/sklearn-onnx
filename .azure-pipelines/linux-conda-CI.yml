@@ -225,7 +225,8 @@ jobs:
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
-  - script: conda create --yes --quiet --name 'py$(python.version)' python=$(python.version)
+  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) "$(scipy.version)" python=$(python.version)
+#  - script: conda create --yes --quiet --name 'py$(python.version)' python=$(python.version)
     displayName: Create Anaconda environment
 
   - script: |
@@ -242,9 +243,9 @@ jobs:
       python -m pip install --upgrade pip
     displayName: 'Install environment'
 
-  - script: |
-      conda install -c conda-forge "numpy$(numpy.version)" "scipy$(scipy.version)"
-    displayName: 'install numpy, scipy'
+  # - script: |
+  #     conda install -c conda-forge "numpy$(numpy.version)" "scipy$(scipy.version)"
+  #   displayName: 'install numpy, scipy'
 
   - script: |
       if [ '$(sklearn.version)' == 'git' ]
