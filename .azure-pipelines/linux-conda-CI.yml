@@ -225,7 +225,7 @@ jobs:
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
-  - script: conda create --yes --quiet --name skl2onnxEnvironment $(numpy.version) "$(scipy.version)" python=$(python.version)
+  - script: conda create --yes --quiet --name skl2onnxEnvironment "numpy$(numpy.version)" "scipy$(scipy.version)" python=$(python.version)
 #  - script: conda create --yes --quiet --name 'py$(python.version)' python=$(python.version)
     displayName: Create Anaconda environment
 
