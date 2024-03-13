@@ -233,7 +233,7 @@ jobs:
     displayName: 'Use Python $(python.version)'
 #  - script: conda create --yes --quiet --name skl2onnxEnvironment "numpy$(numpy.version)" "scipy$(scipy.version)" python=$(python.version)
 #  - script: conda create --yes --quiet --name 'py$(python.version)' python=$(python.version)
-    displayName: Create Anaconda environment
+#    displayName: Create Anaconda environment
 
   - script: |
       sudo apt-get install -y language-pack-en
