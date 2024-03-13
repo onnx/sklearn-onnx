@@ -257,15 +257,26 @@ jobs:
   #     conda install -c conda-forge "numpy$(numpy.version)" "scipy$(scipy.version)"
   #   displayName: 'install numpy, scipy'
 
+  # - script: |
+  #     if [ '$(sklearn.version)' == 'git' ]
+  #       then
+  #         git clone https://github.com/scikit-learn/scikit-learn.git --recursive
+  #         python setup.py install
+  #       else
+  #         conda install -c conda-forge "scikit-learn$(sklearn.version)"
+  #     fi
+  #   displayName: 'install scikit-learn'
+
   - script: |
       if [ '$(sklearn.version)' == 'git' ]
         then
           git clone https://github.com/scikit-learn/scikit-learn.git --recursive
           python setup.py install
         else
-          conda install -c conda-forge "scikit-learn$(sklearn.version)"
+          pip install "scikit-learn$(sklearn.version)"
       fi
     displayName: 'install scikit-learn'
+
 
   - script: |
       pip install $(onnx.version) $(onnxrt.version)
