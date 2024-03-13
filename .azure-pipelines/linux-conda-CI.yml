@@ -225,7 +225,13 @@ jobs:
       sudo install -d -m 0777 /home/vsts/.conda/envs
     displayName: Fix Conda permissions
 
-  - script: conda create --yes --quiet --name skl2onnxEnvironment "numpy$(numpy.version)" "scipy$(scipy.version)" python=$(python.version)
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+      addToPath: true
+      architecture: 'x64'
+    displayName: 'Use Python $(python.version)'
+#  - script: conda create --yes --quiet --name skl2onnxEnvironment "numpy$(numpy.version)" "scipy$(scipy.version)" python=$(python.version)
 #  - script: conda create --yes --quiet --name 'py$(python.version)' python=$(python.version)
     displayName: Create Anaconda environment
 
@@ -236,10 +242,13 @@ jobs:
     displayName: 'Install packages'
 
   - script: |
-      test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
-      conda config --set always_yes yes --set changeps1 no
-      conda install -c conda-forge "numpy$(numpy.version)"
-      conda install protobuf
+#      test '$(python.version)' == '3.7' && apt-get install protobuf-compiler libprotoc-dev
+#      conda config --set always_yes yes --set changeps1 no
+#      conda install -c conda-forge "numpy$(numpy.version)"
+#      conda install protobuf
+      pip install "numpy$(numpy.version)"
+      pip install "scipy$(scipy.version)"
+      pip install protobuf
       python -m pip install --upgrade pip
     displayName: 'Install environment'
 
