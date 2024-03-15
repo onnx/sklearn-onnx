@@ -2,6 +2,8 @@
 
 ## 1.17.0 (development)
 
+* Fix unexpected type for intercept in PoissonRegressor and GammaRegressor
+  [#1070](https://github.com/onnx/sklearn-onnx/pull/1070)
 * Add support for scikti-learn 1.4.0,
   [#1058](https://github.com/onnx/sklearn-onnx/pull/1058),
   fixes issues [Many examples in the gallery are showing "broken"](https://github.com/onnx/sklearn-onnx/pull/1057),
