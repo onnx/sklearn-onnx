@@ -13,6 +13,15 @@ jobs:
     vmImage: 'windows-latest'
   strategy:
     matrix:
+      Py311-Onnx160-Rt171-Skl140:
+        python.version: '3.11'  # onnxruntime-extensions needs to be update to switch to 3.12
+        onnx.version: 'onnx==1.16.0'  # '-i https://test.pypi.org/simple/ onnx==1.15.0rc2'
+        onnx.target_opset: ''
+        numpy.version: 'numpy>=1.22.3'
+        scipy.version: 'scipy'
+        onnxrt.version: 'onnxruntime==1.17.1'
+        onnxcc.version: 'onnxconverter-common>=1.8.1'
+        sklearn.version: '>=1.4.0'
       Py311-Onnx150-Rt170-Skl140:
         python.version: '3.11'  # onnxruntime-extensions needs to be update to switch to 3.12
         onnx.version: 'onnx==1.15.0'  # '-i https://test.pypi.org/simple/ onnx==1.15.0rc2'
@@ -121,33 +130,6 @@ jobs:
         onnxrt.version: 'onnxruntime==1.11.1'
         onnxcc.version: 'onnxconverter-common>=1.8.1'
         sklearn.version: '==1.1.3'
-      Py39-Onnx1110-Rt1111-Skl10:
-        python.version: '3.9'
-        onnx.version:  'onnx==1.11.0'
-        onnx.target_opset: ''
-        numpy.version: 'numpy==1.23.5'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.11.1'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'
-        sklearn.version: '==1.0.2'
-      Py39-Onnx1110-Rt1100-Skl10:
-        python.version: '3.9'
-        onnx.version:  'onnx==1.11.0'
-        onnx.target_opset: ''
-        numpy.version: 'numpy==1.23.5'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.10.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'
-        sklearn.version: '==1.0.2'
-      Py39-Onnx1102-Rt1100-Skl10:
-        python.version: '3.9'
-        onnx.version: 'onnx==1.10.2'
-        onnx.target_opset: ''
-        numpy.version: 'numpy==1.23.5'
-        scipy.version: 'scipy'
-        onnxrt.version: 'onnxruntime==1.10.0'
-        onnxcc.version: 'onnxconverter-common>=1.8.1'
-        sklearn.version: '==1.0.2'
 
     maxParallel: 3
 
