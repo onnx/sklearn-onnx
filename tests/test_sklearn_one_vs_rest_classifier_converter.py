@@ -383,7 +383,11 @@ class TestOneVsRestClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=warnings_to_skip)
     def test_ovr_classification_int_ensemble(self):
         model, X = fit_classification_model(
-            OneVsRestClassifier(GradientBoostingClassifier()), 5, is_int=True
+            OneVsRestClassifier(GradientBoostingClassifier()),
+            5,
+            is_int=True,
+            n_features=5,
+            n_samples=100,
         )
         model_onnx = convert_sklearn(
             model,

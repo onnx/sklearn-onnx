@@ -326,6 +326,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="Depends on PR #1015 onnxruntime.",
     )
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_gradient_boosting_regressor_learning_rate(self):
         X, y = make_classification(
             n_features=100, n_samples=1000, n_classes=2, n_informative=8
