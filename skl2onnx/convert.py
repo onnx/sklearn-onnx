@@ -122,8 +122,6 @@ def convert_sklearn(
         in input data and the ONNX graph
         (defined by parameter *initial_types*), only integers are supported.
 
-    .. _l-conv-options:
-
     Converters options
     ++++++++++++++++++
 

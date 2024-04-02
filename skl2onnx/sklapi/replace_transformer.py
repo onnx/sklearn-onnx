@@ -12,7 +12,6 @@ except ImportError:
 
 
 class ReplaceTransformer(TransformerMixin, BaseEstimator):
-
     """
     Replaces a value by another one.
     It can be used to replace 0 by nan.

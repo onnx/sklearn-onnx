@@ -12,7 +12,6 @@ except ImportError:
 
 
 class CastTransformer(TransformerMixin, BaseEstimator):
-
     """
     Cast features into a specific types.
     This should be used to minimize the conversion

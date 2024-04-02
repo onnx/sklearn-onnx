@@ -74,6 +74,12 @@ def check_scikit_version():
     return pv.Version(skl_version) >= pv.Version("0.22")
 
 
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(skl_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class PipeConcatenateInput:
     def __init__(self, pipe):
         self.pipe = pipe
@@ -233,6 +239,7 @@ class TestSklearnPipeline(unittest.TestCase):
         pv.Version(ort_version) <= pv.Version("0.4.0"), reason="issues with shapes"
     )
     @ignore_warnings(category=(RuntimeWarning, FutureWarning))
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_pipeline_column_transformer(self):
         iris = datasets.load_iris()
         X = iris.data[:, :3]
@@ -264,7 +271,7 @@ class TestSklearnPipeline(unittest.TestCase):
             steps=[
                 (
                     "onehot",
-                    OneHotEncoder(sparse=True, handle_unknown="ignore"),
+                    OneHotEncoder(sparse_output=True, handle_unknown="ignore"),
                 ),
                 (
                     "tsvd",

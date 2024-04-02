@@ -27,7 +27,7 @@ produces this part of the graph but there exist two options.
 The first one is using *Scan* operator, the second one is
 using a dedicated operator called *CDist* which is not part
 of the regular ONNX operator until issue
-`2442 <https://github.com/onnx/onnx/issues/2442>`_
+`#2442 <https://github.com/onnx/onnx/issues/2442>`_
 is addressed. By default, *Scan* is used, *CDist* can be used
 by giving:
 
@@ -58,7 +58,7 @@ ZipMap
 
 The operator *ZipMap* produces a list of dictionaries.
 It repeats class names or ids but that's not necessary
-(see issue `2149 <https://github.com/onnx/onnx/issues/2149>`_).
+(see issue `#2149 <https://github.com/onnx/onnx/issues/2149>`_).
 By default, ZipMap operator is added, it can be deactivated by using:
 
 ::

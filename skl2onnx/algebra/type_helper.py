@@ -90,7 +90,7 @@ def _guess_type(given_type):
     )
 
 
-def guess_initial_types(X, initial_types):
+def guess_initial_types(X, initial_types=None):
     if X is None and initial_types is None:
         raise NotImplementedError("Initial types must be specified.")
     if initial_types is None:

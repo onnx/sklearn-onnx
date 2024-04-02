@@ -3,11 +3,13 @@
 """Tests StackingClassifier and StackingRegressor converter."""
 
 import unittest
+import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
 from onnx import TensorProto
 import pandas
 from onnxruntime import InferenceSession
+from sklearn import __version__ as sklearn_version
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
@@ -39,6 +41,12 @@ from test_utils import (
     fit_classification_model,
     TARGET_OPSET,
 )
+
+
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
 
 
 def model_to_test_reg(passthrough=False):
@@ -184,9 +192,10 @@ class TestStackingConverter(unittest.TestCase):
 
     @unittest.skipIf(StackingClassifier is None, reason="new in 0.22")
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_issue_786_exc(self):
         pipeline = make_pipeline(
-            OneHotEncoder(handle_unknown="ignore", sparse=False),
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
             StackingClassifier(
                 estimators=[
                     ("rf", RandomForestClassifier(n_estimators=10, random_state=42)),
@@ -228,9 +237,10 @@ class TestStackingConverter(unittest.TestCase):
 
     @unittest.skipIf(StackingClassifier is None, reason="new in 0.22")
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_issue_786(self):
         pipeline = make_pipeline(
-            OneHotEncoder(handle_unknown="ignore", sparse=False),
+            OneHotEncoder(handle_unknown="ignore", sparse_output=False),
             StackingClassifier(
                 estimators=[
                     ("rf", RandomForestClassifier(n_estimators=10, random_state=42)),

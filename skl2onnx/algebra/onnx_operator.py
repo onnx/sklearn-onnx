@@ -586,9 +586,11 @@ class OnnxOperator:
         return "{}({} in) -> {}".format(
             self.__class__.__name__,
             len(self.inputs) if self.inputs is not None else 0,
-            [str(o) for o in self.output_names]
-            if self.output_names is not None
-            else "?",
+            (
+                [str(o) for o in self.output_names]
+                if self.output_names is not None
+                else "?"
+            ),
         )
 
     def set_onnx_name_prefix(self, onnx_prefix_name):

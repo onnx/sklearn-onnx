@@ -183,12 +183,6 @@ def convert_sklearn_text_vectorizer(
     Regular expression ``[^\\\\\\\\n]`` is used to split
     a sentance into character (and not works) if ``analyser=='char'``.
     The mode ``analyser=='char_wb'`` is not implemented.
-
-    .. versionchanged:: 1.6
-        Parameters have been renamed: *sep* into *separators*,
-        *regex* into *tokenexp*.
-    ````
-
     """  # noqa
     op = operator.raw_operator
 

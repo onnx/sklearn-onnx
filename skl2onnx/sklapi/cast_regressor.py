@@ -12,7 +12,6 @@ except ImportError:
 
 
 class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
-
     """
     Cast predictions into a specific types.
     This should be used to minimize the conversion

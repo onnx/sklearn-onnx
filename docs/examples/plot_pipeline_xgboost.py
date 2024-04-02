@@ -2,8 +2,6 @@
 
 
 """
-.. _example-xgboost:
-
 Convert a pipeline with a XGBoost model
 ========================================
 
