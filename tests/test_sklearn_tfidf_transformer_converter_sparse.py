@@ -1,11 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
-
-# coding: utf-8
 """
 Tests examples from scikit-learn's documentation.
 """
 import packaging.version as pv
 import unittest
+import sys
 import onnx
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -28,10 +27,12 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
         # issue with encoding
         reason="https://github.com/onnx/onnx/pull/1734",
     )
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     @unittest.skipIf(
         pv.Version(ort.__version__) <= pv.Version("0.2.1"),
         reason="sparse not supported",
     )
+    @unittest.skipIf(sys.platform != "linux", reason="too long")
     def test_model_tfidf_transform_bug(self):
         categories = [
             "alt.atheism",
