@@ -123,7 +123,6 @@ class TestInvestigate(unittest.TestCase):
         from typing import Any
         import numpy
         import pandas
-        import skl2onnx
         from sklearn import (
             base,
             compose,
@@ -137,7 +136,7 @@ class TestInvestigate(unittest.TestCase):
         from sklearn.tree import DecisionTreeClassifier
         import onnxruntime
         from skl2onnx import to_onnx
-        from skl2onnx.common import data_types
+        from skl2onnx.sklapi import CastTransformer
 
         class FLAGS:
             classes = 7
@@ -199,9 +198,9 @@ class TestInvestigate(unittest.TestCase):
 
         def abc_Embedder() -> list[tuple[str, Any]]:
             return [
-                ("cast64", skl2onnx.sklapi.CastTransformer(dtype=numpy.float64)),
+                ("cast64", CastTransformer(dtype=numpy.float64)),
                 ("scaler", preprocessing.StandardScaler()),
-                ("cast32", skl2onnx.sklapi.CastTransformer()),
+                ("cast32", CastTransformer()),
                 ("basemodel", DecisionTreeClassifier(max_depth=2)),
             ]
 
@@ -248,27 +247,6 @@ class TestInvestigate(unittest.TestCase):
 
         model = Classifier(list(X_train.columns))
         model.fit(X_train, y_train)
-
-        def dataframe_schema_to_data_types(
-            X: pandas.DataFrame, drop: set[str] | None = None
-        ) -> list[tuple[str, data_types.DataType]]:
-            """It converts a dataframe schema to ONNX-compatible data types"""
-            input_data_types = []
-
-            for k, v in zip(X.columns, X.dtypes):
-                if drop and k in drop:
-                    continue
-
-                if v == "int64":
-                    t = data_types.Int64TensorType([None, 1])
-                elif v == "float64":
-                    t = data_types.FloatTensorType([None, 1])
-                else:
-                    t = data_types.StringTensorType([None, 1])
-
-                input_data_types.append((k, t))
-
-            return input_data_types
 
         sample = X_train[:1].astype(numpy.float32)
 
