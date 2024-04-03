@@ -673,7 +673,6 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None, alias=None):
         outputs = _parse_sklearn_simple_model(
             scope, model, inputs, custom_parsers=custom_parsers, alias=alias
         )
-        print("EEE", outputs)
         return outputs
 
     tmodel = type(model)
