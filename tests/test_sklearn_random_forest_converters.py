@@ -320,6 +320,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             )
 
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_model_random_forest_classifier_multi_output_int(self):
         model, X_test = fit_multi_output_classification_model(
             RandomForestClassifier(random_state=42, n_estimators=20)

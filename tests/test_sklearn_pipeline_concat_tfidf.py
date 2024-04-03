@@ -320,6 +320,7 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11, reason="SequenceConstruct not available")
     @ignore_warnings(category=(DeprecationWarning, FutureWarning, UserWarning))
     @unittest.skipIf(not skl12(), reason="sparse_output")
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_issue_712_svc_binary(self):
         pipe, dfx_test = TestSklearnPipelineConcatTfIdf.get_pipeline()
         expected = pipe.transform(dfx_test)

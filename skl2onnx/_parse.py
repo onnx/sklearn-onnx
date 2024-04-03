@@ -288,6 +288,9 @@ def _parse_sklearn_pipeline(scope, model, inputs, custom_parsers=None):
     :return: A list of output variables produced by the input pipeline
     """
     for step in model.steps:
+        if is_classifier(step[1]):
+            options = scope.get_options(model, {"zipmap": True})
+            scope.add_options(id(step[1]), options)
         inputs = _parse_sklearn(scope, step[1], inputs, custom_parsers=custom_parsers)
     return inputs
 
@@ -543,7 +546,7 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
 
     if options.get("output_class_labels", False):
         raise RuntimeError(
-            "Option 'output_class_labels' is not compatible with option " "'zipmap'."
+            "Option 'output_class_labels' is not compatible with option 'zipmap'."
         )
 
     return _apply_zipmap(
@@ -670,6 +673,7 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None, alias=None):
         outputs = _parse_sklearn_simple_model(
             scope, model, inputs, custom_parsers=custom_parsers, alias=alias
         )
+        print("EEE", outputs)
         return outputs
 
     tmodel = type(model)

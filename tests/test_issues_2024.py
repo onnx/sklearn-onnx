@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
 import packaging.version as pv
+from sklearn.utils._testing import ignore_warnings
+from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import __version__ as ort_version
 
 
@@ -45,6 +47,7 @@ class TestInvestigate(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.16.0"),
         reason="opset 19 not implemented",
     )
+    @ignore_warnings(category=(ConvergenceWarning,))
     def test_issue_1055(self):
         import numpy as np
         from numpy.testing import assert_almost_equal
@@ -131,13 +134,10 @@ class TestInvestigate(unittest.TestCase):
             datasets,
         )
         from sklearn.model_selection import train_test_split
-        import lightgbm
+        from sklearn.tree import DecisionTreeClassifier
         import onnxruntime
-        from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
-            convert_lightgbm,
-        )
-        from skl2onnx import update_registered_converter, to_onnx
-        from skl2onnx.common import data_types, shape_calculator
+        from skl2onnx import to_onnx
+        from skl2onnx.common import data_types
 
         class FLAGS:
             classes = 7
@@ -202,7 +202,7 @@ class TestInvestigate(unittest.TestCase):
                 ("cast64", skl2onnx.sklapi.CastTransformer(dtype=numpy.float64)),
                 ("scaler", preprocessing.StandardScaler()),
                 ("cast32", skl2onnx.sklapi.CastTransformer()),
-                ("basemodel", lightgbm.LGBMClassifier(max_iter=10, max_depth=2)),
+                ("basemodel", DecisionTreeClassifier(max_depth=2)),
             ]
 
         def Classifier(features: list[str]) -> base.BaseEstimator:
@@ -270,13 +270,6 @@ class TestInvestigate(unittest.TestCase):
 
             return input_data_types
 
-        update_registered_converter(
-            lightgbm.LGBMClassifier,
-            "LightGbmLGBMClassifier",
-            shape_calculator.calculate_linear_classifier_output_shapes,
-            convert_lightgbm,
-            options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
-        )
         sample = X_train[:1].astype(numpy.float32)
 
         for m in [model.estimators_[0].steps[0][-1], model.estimators_[0], model]:

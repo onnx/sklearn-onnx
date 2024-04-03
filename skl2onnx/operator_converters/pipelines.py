@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from sklearn.base import is_classifier
+from sklearn.pipeline import Pipeline
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
@@ -16,7 +17,7 @@ def convert_pipeline(
     inputs = operator.inputs
     for step in model.steps:
         step_model = step[1]
-        if is_classifier(step_model):
+        if is_classifier(step_model) or isinstance(step_model, Pipeline):
             scope.add_options(id(step_model), options={"zipmap": False})
             container.add_options(id(step_model), options={"zipmap": False})
         outputs = _parse_sklearn(scope, step_model, inputs, custom_parsers=None)
@@ -64,6 +65,15 @@ def convert_column_transformer(
     )
 
 
-register_converter("SklearnPipeline", convert_pipeline)
+register_converter(
+    "SklearnPipeline",
+    convert_pipeline,
+    options={
+        "zipmap": [True, False, "columns"],
+        "nocl": [True, False],
+        "output_class_labels": [False, True],
+        "raw_scores": [True, False],
+    },
+)
 register_converter("SklearnFeatureUnion", convert_feature_union)
 register_converter("SklearnColumnTransformer", convert_column_transformer)
