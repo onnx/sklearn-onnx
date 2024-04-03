@@ -289,7 +289,8 @@ def _parse_sklearn_pipeline(scope, model, inputs, custom_parsers=None):
     """
     for step in model.steps:
         if (
-            scope.options is None or id(step[1]) not in scope.options
+            scope.options is None
+            or (id(step[1]) not in scope.options and type(step[1]) not in scope.options)
         ) and is_classifier(step[1]):
             options = scope.get_options(model, {"zipmap": True})
             scope.add_options(id(step[1]), options)
