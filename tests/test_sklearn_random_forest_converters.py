@@ -632,7 +632,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             pipe,
             model_onnx,
             methods=["predict"],
-            basename="SklearnBostonPCARF-Dec4",
+            basename="SklearnBostonPCARF-Dec3",
         )
 
     @ignore_warnings(category=FutureWarning)
