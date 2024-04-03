@@ -288,7 +288,9 @@ def _parse_sklearn_pipeline(scope, model, inputs, custom_parsers=None):
     :return: A list of output variables produced by the input pipeline
     """
     for step in model.steps:
-        if is_classifier(step[1]):
+        if (
+            scope.options is None or id(step[1]) not in scope.options
+        ) and is_classifier(step[1]):
             options = scope.get_options(model, {"zipmap": True})
             scope.add_options(id(step[1]), options)
         inputs = _parse_sklearn(scope, step[1], inputs, custom_parsers=custom_parsers)
