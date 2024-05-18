@@ -1495,6 +1495,23 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         m1 = res
         m2 = ker(x, x)
         assert_almost_equal(m2, m1, decimal=5)
+    
+    def test_issue_1073(self):
+        # multioutput gpr
+        n_samples, n_features, n_targets = 1000, 8, 3
+        X, y = make_regression(n_samples, n_features, n_targets=n_targets)
+        tx1, vx1, ty1, vy1 = train_test_split(X, y)
+        model = GaussianProcessRegressor()
+        model.fit(tx1, ty1)
+        initial_type = [("data_in", DoubleTensorType([None, X.shape[1]]))]
+        onx = to_onnx(model, initial_types=initial_type, target_opset=_TARGET_OPSET_)
+        sess = InferenceSession(
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        pred = sess.run(None, {"data_in": vx1.astype(np.float64)})
+        assert_almost_equal(
+            model.predict(vx1.astype(np.float64)).ravel(), pred[0].ravel()
+        )
 
 
 if __name__ == "__main__":
