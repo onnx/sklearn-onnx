@@ -1376,6 +1376,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         self.assertTrue(model_onnx is not None)
         self.check_outputs(gp, model_onnx, X_test, {})
 
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_x_issue_789(self):
         n_samples, n_features = 10000, 10
         X, y = make_regression(n_samples, n_features)
@@ -1393,6 +1394,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             pipe.predict(vx1.astype(np.float64)).ravel(), pred[0].ravel()
         )
 
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_x_issue_789_cdist(self):
         n_samples, n_features = 10000, 10
         X, y = make_regression(n_samples, n_features)

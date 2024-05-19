@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 
 try:
-    from sklearn.linear_model import GammaRegressor
+    from sklearn.linear_model import GammaRegressor, PoissonRegressor
 except ImportError:
     GammaRegressor = None
 from onnxruntime import __version__ as ort_version
@@ -89,6 +89,38 @@ class TestGammaRegressorConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnGammaRegressor",
         )
+
+    @unittest.skipIf(GammaRegressor is None, reason="scikit-learn<1.0")
+    def test_poisson_without_intercept(self):
+        # Poisson
+        model = PoissonRegressor(fit_intercept=False)
+        X = np.array([[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 3.0]])
+        y = np.array([19.0, 26.0, 33.0, 30.0])
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn Poisson Regressor without Intercept",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+
+        self.assertIsNotNone(model_onnx is not None)
+
+    @unittest.skipIf(GammaRegressor is None, reason="scikit-learn<1.0")
+    def test_gamma_without_intercept(self):
+        # Gamma
+        model = GammaRegressor(fit_intercept=False)
+        X = np.array([[1.0, 2.0], [2.0, 3.0], [3.0, 4.0], [4.0, 3.0]])
+        y = np.array([19.0, 26.0, 33.0, 30.0])
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn Gamma Regressor without Intercept",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+        )
+
+        self.assertIsNotNone(model_onnx is not None)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ import packaging.version as pv
 import numpy
 import pandas
 from onnxruntime import __version__ as ort_version
+from sklearn.utils._testing import ignore_warnings
 from sklearn import __version__ as skl_version
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
@@ -128,6 +129,7 @@ class TestUtilsSklearn(unittest.TestCase):
         pv.Version(ort_version) <= pv.Version("0.4.0"), reason="onnxruntime too old"
     )
     @unittest.skipIf(not skl12(), reason="sparse_output")
+    @ignore_warnings(category=(RuntimeWarning,))
     def test_pipeline_column_transformer(self):
         iris = load_iris()
         X = iris.data[:, :3]
@@ -264,4 +266,4 @@ class TestUtilsSklearn(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)

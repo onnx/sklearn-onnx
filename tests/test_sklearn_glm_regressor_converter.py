@@ -770,7 +770,9 @@ class TestGLMRegressorConverter(unittest.TestCase):
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_ransac_regressor_tree(self):
         model, X = fit_regression_model(
-            linear_model.RANSACRegressor(GradientBoostingRegressor(), min_samples=5)
+            linear_model.RANSACRegressor(GradientBoostingRegressor(), min_samples=5),
+            n_features=5,
+            n_samples=100,
         )
         model_onnx = convert_sklearn(
             model,
