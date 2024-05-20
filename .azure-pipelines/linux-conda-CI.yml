@@ -26,7 +26,7 @@ jobs:
         pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
-        run.example: '1'
+        run.example: '0'
 
       Py311-Onnx160-Rt173-Skl140:
         do.bench: '0'
@@ -40,7 +40,7 @@ jobs:
         pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
-        run.example: '0'
+        run.example: '1'
 
       Py311-Onnx150-Rt170-Skl140:
         do.bench: '0'
