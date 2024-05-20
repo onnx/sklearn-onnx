@@ -265,6 +265,75 @@ class TestInvestigate(unittest.TestCase):
                 )
                 assert modelengine is not None
 
+    def test_issue_1089(self):
+        import pandas
+        from onnx.helper import make_tensor
+        from onnx import TensorProto
+        from onnx.version_converter import convert_version
+        import onnxscript
+        from onnxscript.onnx_types import FLOAT
+        from onnxscript import opset18 as op
+        from skl2onnx import update_registered_converter, to_onnx
+        from sklearn import pipeline
+        from skl2onnx.helpers import add_onnx_graph
+
+        df = pandas.DataFrame(
+            [
+                ["car", 0.1, 0.2, 0.3, 0.4, 0.5],
+                ["car", 0.1, 0.2, 0.3, 0.4, 0.5],
+                ["suv", 0.1, 0.2, 0.3, 0.4, 0.5],
+            ],
+            columns=[
+                "vehicleType",
+                "features_car",
+                "features_suv",
+                "features_truck",
+                "features_van",
+                "features_minivan",
+            ],
+        )
+
+        @onnxscript.script()
+        def converter_function(X) -> FLOAT[1, 1]:
+            zero_constant = op.Constant(
+                value=make_tensor("zero_constant", TensorProto.FLOAT, [1, 1], [0.0])
+            )
+            car_constant = op.Constant(
+                value=make_tensor(
+                    name="car_constant",
+                    data_type=TensorProto.STRING,
+                    dims=[1, 1],
+                    vals=["car"],
+                )
+            )
+            vehicle = op.Slice(X, [0], [1], [1])
+            x1 = op.Slice(X, [1], [2], [1])
+            isVehicleTypeCar = vehicle == car_constant
+            if isVehicleTypeCar:
+                result = x1
+            else:
+                result = zero_constant
+            return result
+
+        def get_score_transformer_converter(scope, operator, container):  # type: ignore
+            """Convert overprice sklearn custom transformer to onnx."""
+            opv = container.target_opset
+            proto = converter_function().to_model_proto()
+            proto_version = convert_version(proto, opv)
+            add_onnx_graph(scope, operator, container, proto_version)
+
+        update_registered_converter(
+            GetScore,
+            "GetScore",
+            get_score_transformer_shape_calculator,
+            get_score_transformer_converter,
+        )
+
+        model_onnx = to_onnx(
+            pipeline, df[:1], target_opset=18, options={"zipmap": False}
+        )
+        assert model_onnx is not None
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
