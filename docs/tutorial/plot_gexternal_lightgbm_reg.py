@@ -69,11 +69,11 @@ reg.fit(X, y)
 #
 # The converter is implemented in :epkg:`onnxmltools`:
 # `onnxmltools...LightGbm.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # lightgbm/operator_converters/LightGbm.py>`_.
 # and the shape calculator:
 # `onnxmltools...Regressor.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # lightgbm/shape_calculators/Regressor.py>`_.
 
 

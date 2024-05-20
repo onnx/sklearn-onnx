@@ -164,9 +164,9 @@ def dynamic_class_creation(cache=False):
     Automatically generates classes for each of the operators
     module *onnx* defines and described at
     `Operators
-    <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_
+    <https://github.com/onnx/onnx/blob/main/docs/Operators.md>`_
     and `Operators
-    <https://github.com/onnx/onnx/blob/master/docs/
+    <https://github.com/onnx/onnx/blob/main/docs/
     Operators-ml.md>`_.
     """
     cache_dir = cache_folder()

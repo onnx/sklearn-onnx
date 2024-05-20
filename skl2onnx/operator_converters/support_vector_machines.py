@@ -39,7 +39,7 @@ def convert_sklearn_svm_regressor(
     *onnxruntime* and *scikit-learn* do not return the same raw
     scores. *scikit-learn* returns aggregated scores
     as a *matrix[N, C]* coming from `_ovr_decision_function
-    <https://github.com/scikit-learn/scikit-learn/blob/master/
+    <https://github.com/scikit-learn/scikit-learn/blob/main/
     sklearn/utils/multiclass.py#L402>`_. *onnxruntime* returns
     the raw score from *svm* algorithm as a *matrix[N, (C(C-1)/2]*.
     """
@@ -167,7 +167,7 @@ def convert_sklearn_svm_classifier(
     *onnxruntime* and *scikit-learn* do not return the same raw
     scores. *scikit-learn* returns aggregated scores
     as a *matrix[N, C]* coming from `_ovr_decision_function
-    <https://github.com/scikit-learn/scikit-learn/blob/master/
+    <https://github.com/scikit-learn/scikit-learn/blob/main/
     sklearn/utils/multiclass.py#L402>`_. *onnxruntime* returns
     the raw score from *svm* algorithm as a *matrix[N, (C(C-1)/2]*.
     """
@@ -285,7 +285,7 @@ def convert_sklearn_svm_classifier(
     ):
         # Applies _ovr_decision_function.
         # See https://github.com/scikit-learn/scikit-learn/blob/
-        # master/sklearn/utils/multiclass.py#L407:
+        # main/sklearn/utils/multiclass.py#L407:
         # ::
         #     _ovr_decision_function(dec < 0, -dec, len(self.classes_))
 
