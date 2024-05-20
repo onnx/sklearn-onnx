@@ -14,19 +14,33 @@ jobs:
   strategy:
     matrix:
 
-      Py311-Onnx160-Rt171-Skl140:
+      Py312-Onnx160-Rt180-Skl142:
+        do.bench: '0'
+        python.version: '3.12'  # onnxruntime-extensions needs to be update to switch to 3.12
+        numpy.version: '>=1.21.1'
+        scipy.version: '>=1.7.0'
+        onnx.version: 'onnx==1.16.0'  # -i https://test.pypi.org/simple/ onnx==1.15.0rc2'
+        onnx.target_opset: ''
+        onnxrt.version: 'onnxruntime==1.18.0'
+        sklearn.version: '>=1.4.2'
+        pandas.version: ''
+        lgbm.version: ''
+        onnxcc.version: '>=1.8.1'
+        run.example: '1'
+
+      Py311-Onnx160-Rt173-Skl140:
         do.bench: '0'
         python.version: '3.11'  # onnxruntime-extensions needs to be update to switch to 3.12
         numpy.version: '>=1.21.1'
         scipy.version: '>=1.7.0'
         onnx.version: 'onnx==1.16.0'  # -i https://test.pypi.org/simple/ onnx==1.15.0rc2'
         onnx.target_opset: ''
-        onnxrt.version: 'onnxruntime==1.17.1'
-        sklearn.version: '>=1.4.0'
+        onnxrt.version: 'onnxruntime==1.17.3'
+        sklearn.version: '==1.4.0'
         pandas.version: ''
         lgbm.version: ''
         onnxcc.version: '>=1.8.1'
-        run.example: '1'
+        run.example: '0'
 
       Py311-Onnx150-Rt170-Skl140:
         do.bench: '0'
