@@ -87,7 +87,7 @@ jobs:
   
       - name: Run tests
         run: |
-          pytest tests --maxfail=10 --durations=10 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
+          pytest tests --maxfail=10 --durations=10
 
       - name: Run documentation tests
         if: matrix.documentation == 1
