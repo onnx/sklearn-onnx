@@ -6,15 +6,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python_version: ['3.12', '3.11', '3.10', '3.9']
+        os: [windows-latest, macos-latest]
+        python_version: ['3.11', '3.10', '3.9']
         include:
-          - python_version: '3.12'
-            numpy_version: '>=1.21.1'
-            scipy_version: '>=1.7.0'
-            onnx_version: 'onnx==1.16.0'
-            onnxrt_version: 'onnxruntime==1.18.0'
-            sklearn_version: '>=1.4.2'
           - python_version: '3.11'
             numpy_version: '>=1.21.1'
             scipy_version: '>=1.7.0'
@@ -38,10 +32,6 @@ jobs:
           python-version: ${{ matrix.python_version }}
 
       - uses: tlylt/install-graphviz@v1
-
-      - name: Install pandoc
-        if: matrix.documentation == 1
-        run: sudo apt-get install -y pandoc
 
       - name: Install requirements
         run: python -m pip install -r requirements.txt
