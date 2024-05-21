@@ -1,13 +1,5 @@
 name: CI Linux
-
-on:
-  push:
-  pull_request:
-    types:
-      - closed
-    branches:
-      - main
-
+on: [push, pull_request]
 jobs:
   run:
     name: CI ${{ matrix.os }}
