@@ -2,7 +2,7 @@ name: CI Win/Mac
 on: [push, pull_request]
 jobs:
   run:
-    name: ${{ matrix.os }} Py==${{ matrix.python_version }} - sklearn==${{ matrix.sklearn_version }} - ${{ matrix.onnxrt_version }}
+    name: ${{ matrix.os }} py==${{ matrix.python_version }} - sklearn==${{ matrix.sklearn_version }} - ${{ matrix.onnxrt_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -18,8 +18,14 @@ jobs:
           - python_version: '3.10'
             numpy_version: '>=1.21.1'
             scipy_version: '>=1.7.0'
-            onnx_version: 'onnx==1.14.1'
-            onnxrt_version: 'onnxruntime==1.16.0'
+            onnx_version: 'onnx<1.15'
+            onnxrt_version: 'onnxruntime<1.17.0'
+            sklearn_version: '==1.2.2'
+          - python_version: '3.9'
+            numpy_version: '>=1.21.1'
+            scipy_version: '>=1.7.0'
+            onnx_version: 'onnx<1.14'
+            onnxrt_version: 'onnxruntime<1.16.0'
             sklearn_version: '==1.2.2'
 
     steps:
