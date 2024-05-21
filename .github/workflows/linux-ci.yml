@@ -2,7 +2,7 @@ name: CI Linux
 on: [push, pull_request]
 jobs:
   run:
-    name: CI ${{ matrix.os }}
+    name: Python ${{ matrix.python_version }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -69,7 +69,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install specific versions
-        run: pip install ${{ matrix.onnx_version }} ${{ matrix.onnxrt_version }} "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}"
+        run: pip install "${{ matrix.onnx_version }}" "${{ matrix.onnxrt_version }}" "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}"
 
       - name: Install
         run: pip install -e .
