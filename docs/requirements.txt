@@ -11,6 +11,7 @@ matplotlib
 mlinsights>=0.3.631
 nbsphinx
 onnx
+onnxmltools
 onnxruntime
 pillow
 py-spy

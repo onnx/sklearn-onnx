@@ -1,4 +1,4 @@
-name: CI Linux
+name: CI Win/Mac
 on: [push, pull_request]
 jobs:
   run:
