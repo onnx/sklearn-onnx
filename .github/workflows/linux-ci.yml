@@ -10,14 +10,14 @@ jobs:
         python_version: ['3.12', '3.11', '3.10', '3.9']
         include:
           - python_version: '3.12'
-            documentation: 1
+            documentation: 0
             numpy_version: '>=1.21.1'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.16.0'
             onnxrt_version: 'onnxruntime==1.18.0'
             sklearn_version: '>=1.4.2'
           - python_version: '3.11'
-            documentation: 0
+            documentation: 1
             numpy_version: '>=1.21.1'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx<1.16.0'
@@ -85,12 +85,12 @@ jobs:
           python -c "from skl2onnx import __max_supported_opset__;print('__max_supported_opset__', __max_supported_opset__)"
           python -c "import onnx.defs;print('onnx_opset_version', onnx.defs.onnx_opset_version())"
   
-      - name: Generate coverage report
-        if: matrix.documentation == 1
+      - name: Run tests
         run: |
           pytest tests --maxfail=10 --durations=10 --basetemp=temp --doctest-modules --junitxml=junit/test-results.xml
 
-      - name: documentation test
+      - name: Run documentation tests
+        if: matrix.documentation == 1
         run: |
           pip install -r docs/requirements.txt
           pytest docs/tests --durations=10 --basetemp=temp --doctest-modules -v -v --maxfail=5
