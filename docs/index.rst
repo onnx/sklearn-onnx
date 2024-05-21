@@ -9,10 +9,10 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
     :widths: 5 5
     * - Linux
       - Windows
-    * - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=main
-            :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=main
-      - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=main
-            :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=main
+    * - .. image:: https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg
+            :target: https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml
+      - .. image:: https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml/badge.svg
+            :target: https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml
 
 
 *sklearn-onnx* enables you to convert models from
