@@ -11,32 +11,32 @@ jobs:
         include:
           - python_version: '3.12'
             documentation: 1
-            numpy.version: '>=1.21.1'
-            scipy.version: '>=1.7.0'
-            onnx.version: 'onnx==1.16.0'
-            onnxrt.version: 'onnxruntime==1.18.0'
-            sklearn.version: '>=1.4.2'
+            numpy_version: '>=1.21.1'
+            scipy_version: '>=1.7.0'
+            onnx_version: 'onnx==1.16.0'
+            onnxrt_version: 'onnxruntime==1.18.0'
+            sklearn_version: '>=1.4.2'
           - python_version: '3.11'
             documentation: 0
-            numpy.version: '>=1.21.1'
-            scipy.version: '>=1.7.0'
-            onnx.version: 'onnx<1.16.0'
-            onnxrt.version: 'onnxruntime==1.17.3'
-            sklearn.version: '==1.3.2'
+            numpy_version: '>=1.21.1'
+            scipy_version: '>=1.7.0'
+            onnx_version: 'onnx<1.16.0'
+            onnxrt_version: 'onnxruntime==1.17.3'
+            sklearn_version: '==1.3.2'
           - python_version: '3.10'
             documentation: 0
-            numpy.version: '>=1.21.1'
-            scipy.version: '>=1.7.0'
-            onnx.version: 'onnx==1.14.1'
-            onnxrt.version: 'onnxruntime==1.16.0'
-            sklearn.version: '==1.2.2'
+            numpy_version: '>=1.21.1'
+            scipy_version: '>=1.7.0'
+            onnx_version: 'onnx==1.14.1'
+            onnxrt_version: 'onnxruntime==1.16.0'
+            sklearn_version: '==1.2.2'
           - python_version: '3.9'
             documentation: 0
-            numpy.version: '>=1.21.1'
-            scipy.version: '>=1.7.0'
-            onnx.version: 'onnx==1.13.0'
-            onnxrt.version: 'onnxruntime==1.14.0'
-            sklearn.version: '==1.1.3'
+            numpy_version: '>=1.21.1'
+            scipy_version: '>=1.7.0'
+            onnx_version: 'onnx==1.13.0'
+            onnxrt_version: 'onnxruntime==1.14.0'
+            sklearn_version: '==1.1.3'
 
     steps:
       - name: Checkout repository
@@ -69,7 +69,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install specific versions
-        run: pip install ${{ matrix.onnx.version }} ${{ matrix.onnxrt.version }} "numpy${{ matrix.numpy.version }}" "scikit-learn${{ matrix.sklearn.version}}" "scipy${{ matrix.scipy.version }}"
+        run: pip install ${{ matrix.onnx_version }} ${{ matrix.onnxrt_version }} "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}"
 
       - name: Install
         run: pip install -e .
