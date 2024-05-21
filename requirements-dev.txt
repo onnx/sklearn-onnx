@@ -1,6 +1,7 @@
 # tests
 black
 onnxruntime-extensions
+onnxscript
 pandas
 py-cpuinfo
 pybind11
@@ -9,13 +10,7 @@ pytest-cov
 ruff
 wheel
 
-# docs
-furo
-onnxscript
-sphinx
-sphinxcontrib-blockdiag
-tqdm
-
 # docs/examples
-lightgbm<4.0
+xgboost
+lightgbm
 matplotlib

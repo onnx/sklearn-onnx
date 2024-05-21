@@ -5,7 +5,7 @@ coverage
 flake8
 furo
 joblib
-lightgbm<4.0
+lightgbm
 loky
 matplotlib
 mlinsights>=0.3.631
@@ -20,7 +20,6 @@ pyinstrument
 pyod
 pytest
 pytest-cov
-scikit-learn>=1.1
 skl2onnx
 sphinx
 sphinxcontrib-blockdiag
@@ -29,4 +28,4 @@ sphinx-runpython
 tabulate
 tqdm
 wheel
-xgboost<2
+xgboost
