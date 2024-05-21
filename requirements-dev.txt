@@ -12,5 +12,5 @@ wheel
 
 # docs/examples
 xgboost
-lightgbm
+lightgbm; sys_platform != 'darwin'
 matplotlib
