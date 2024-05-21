@@ -69,7 +69,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install specific versions
-        run: pip install $(onnx.version) $(onnxrt.version) "numpy$(numpy.version)" scikit-learn$(sklearn.version) scipy$(scipy.version) "pandas$(pandas.version)"
+        run: pip install ${{ onnx.version }} ${{ onnxrt.version }} "numpy${{ numpy.version }}" "scikit-learn${{ sklearn.version}}" "scipy${{ scipy.version }}"
 
       - name: Install
         run: pip install -e .
