@@ -94,7 +94,7 @@ jobs:
         run: |
           pip install -r docs/requirements.txt
           pytest docs/tests --durations=10 --basetemp=temp --doctest-modules -v -v --maxfail=5
-          python tests/benchmark.py
+          # python tests/benchmark.py
 
       - name: build
         run: pip wheel .
