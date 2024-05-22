@@ -103,7 +103,7 @@ for opset in range(6, onnx_opset_version() + 1):
 ########################################
 # It shows that the model cannot be converted for opset
 # below 5. Operator `Reshape <https://github.com/onnx/
-# onnx/blob/master/docs/Operators.md#Reshape>`_ changed in
+# onnx/blob/main/docs/Operators.md#Reshape>`_ changed in
 # opset 5: a parameter became an input. The converter
 # does not support *opset < 5* because runtimes usually do not.
 #
