@@ -11,7 +11,7 @@ ONNX Runtime Backend for ONNX
 .. index:: backend
 
 *ONNX Runtime* extends the
-`onnx backend API <https://github.com/onnx/onnx/blob/master/docs/
+`onnx backend API <https://github.com/onnx/onnx/blob/main/docs/
 ImplementingAnOnnxBackend.md>`_
 to run predictions using this runtime.
 Let's use the API to compute the prediction

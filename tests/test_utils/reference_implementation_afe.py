@@ -49,7 +49,7 @@ if onnx_opset_version() >= 18:
                 the output has still two like a matrix with one row.
                 The implementation follows what :epkg:`onnxruntime` does in
                 `array_feature_extractor.cc
-                <https://github.com/microsoft/onnxruntime/blob/master/
+                <https://github.com/microsoft/onnxruntime/blob/main/
                 onnxruntime/core/providers/cpu/ml/array_feature_extractor.cc#L84>`_.
             """
             res = _array_feature_extrator(data, indices)

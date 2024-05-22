@@ -1507,7 +1507,7 @@ def convert_topology(
         raise RuntimeError(
             "Parameter target_opset {} > {} is higher than the "
             "version of the installed onnx package. See "
-            "https://github.com/onnx/onnx/blob/master/docs/"
+            "https://github.com/onnx/onnx/blob/main/docs/"
             "Versioning.md#released-versions"
             ".".format(onnx_target_opset, found)
         )

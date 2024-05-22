@@ -113,7 +113,7 @@ ax.axis("off")
 # by ``(x / y)`` and this division must happen in double.
 # By default, the *sklearn-onnx* assumes every
 # computer should happen in float. `ONNX 1.7 specifications
-# <https://github.com/onnx/onnx/blob/master/docs/
+# <https://github.com/onnx/onnx/blob/main/docs/
 # Operators-ml.md#ai.onnx.ml.Scaler>`_
 # does not support double scaling (input and output does,
 # but not the parameters). The solution needs to

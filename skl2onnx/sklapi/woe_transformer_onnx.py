@@ -224,7 +224,7 @@ class Tree:
     def onnx_attributes(self):
         """
         See `TreeEnsembleRegressor
-        <https://github.com/onnx/onnx/blob/master/docs/
+        <https://github.com/onnx/onnx/blob/main/docs/
         Operators-ml.md#ai.onnx.ml.TreeEnsembleRegressor>`_.
         """
         atts = dict(
