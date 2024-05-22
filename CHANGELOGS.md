@@ -2,6 +2,8 @@
 
 ## 1.17.0 (development)
 
+* Minor fixes to support scikit-learn==1.5.0
+  [#1095](https://github.com/onnx/sklearn-onnx/pull/1095)
 * Fix the conversion of pipeline including pipelines,
   issue [#1069](https://github.com/onnx/sklearn-onnx/pull/1069),
   [#1072](https://github.com/onnx/sklearn-onnx/pull/1072)
