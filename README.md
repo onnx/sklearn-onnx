@@ -2,9 +2,9 @@
 
 <p align="center"><img width="50%" src="docs/logo_main.png" /></p>
 
-[![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status%2Fonnx.sklearn-onnx.linux.CI?branchName=refs%2Fpull%2F1020%2Fmerge)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=21&branchName=refs%2Fpull%2F1020%2Fmerge)
+[![Linux](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml)
 
-[![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status%2Fonnx.sklearn-onnx.win.CI?branchName=refs%2Fpull%2F1020%2Fmerge)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=22&branchName=refs%2Fpull%2F1020%2Fmerge)
+[![Windows/Macos](https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 

@@ -24,6 +24,7 @@ build/
 
 # test generated files
 *.onnx
+*.whl
 .pytest_cache
 .cache
 htmlcov

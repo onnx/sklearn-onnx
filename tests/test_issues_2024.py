@@ -115,7 +115,7 @@ class TestInvestigate(unittest.TestCase):
         assert_almost_equal(expected, got[1], decimal=2)
 
     @unittest.skipIf(
-        pv.Version(ort_version) < pv.Version("1.16.0"),
+        pv.Version(ort_version) < pv.Version("1.17.3"),
         reason="opset 19 not implemented",
     )
     def test_issue_1069(self):
