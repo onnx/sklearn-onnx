@@ -93,15 +93,24 @@ def convert_sklearn_linear_classifier(
     ):
         classifier_attrs["post_transform"] = "NONE"
     elif isinstance(op, LogisticRegression):
+        # See https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/linear_model/_logistic.py#L1423
         classifier_attrs["post_transform"] = (
             "LOGISTIC"
             if (
                 use_ovr
                 or op.solver == "liblinear"
                 or (
-                    multi_class == 0
-                    and (len(op.coef_.shape) <= 1)
-                    or min(op.coef_.shape) == 1
+                    hasattr(op, "multi_class")
+                    and op.multi_class in ("auto", "deprecated")
+                    and (
+                        op.classes_.size <= 2
+                        or op.solver in ("liblinear", "newton-cholesky")
+                    )
+                )
+                or (
+                    getattr(op, "multi_class", "auto") in ("auto", "deprecated")
+                    and multi_class == 0
+                    and (len(op.coef_.shape) <= 1 or min(op.coef_.shape) == 1)
                 )
             )
             else "SOFTMAX"
