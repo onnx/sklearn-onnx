@@ -9,6 +9,13 @@ from ..common.data_types import Int64TensorType, guess_numpy_type, guess_proto_t
 from ..algebra.onnx_ops import OnnxAdd, OnnxCast, OnnxDiv, OnnxMatMul, OnnxSub
 
 
+def _skl150() -> bool:
+    import sklearn
+    import packaging.version as pv
+
+    return pv.Version(sklearn.__version__) >= pv.Version("1.5.0")
+
+
 def convert_pls_regression(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
@@ -27,8 +34,9 @@ def convert_pls_regression(
 
     coefs = op.x_mean_ if hasattr(op, "x_mean_") else op._x_mean
     std = op.x_std_ if hasattr(op, "x_std_") else op._x_std
-    if hasattr(op, "intercept_"):
+    if hasattr(op, "intercept_") and _skl150():
         # scikit-learn==1.5.0
+        # https://github.com/scikit-learn/scikit-learn/pull/28612
         ym = op.intercept_
         centered_x = OnnxSub(X, coefs.astype(dtype), op_version=opv)
         coefs = op.coef_.T.astype(dtype)
