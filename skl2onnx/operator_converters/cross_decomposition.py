@@ -27,19 +27,27 @@ def convert_pls_regression(
 
     coefs = op.x_mean_ if hasattr(op, "x_mean_") else op._x_mean
     std = op.x_std_ if hasattr(op, "x_std_") else op._x_std
-    ym = op.y_mean_ if hasattr(op, "x_mean_") else op._y_mean
-
-    norm_x = OnnxDiv(
-        OnnxSub(X, coefs.astype(dtype), op_version=opv),
-        std.astype(dtype),
-        op_version=opv,
-    )
-    if hasattr(op, "set_predict_request"):
-        # new in 1.3
+    if hasattr(op, "intercept_"):
+        # scikit-learn==1.5.0
+        ym = op.intercept_
+        centered_x = OnnxSub(X, coefs.astype(dtype), op_version=opv)
         coefs = op.coef_.T.astype(dtype)
+        dot = OnnxMatMul(centered_x, coefs, op_version=opv)
     else:
-        coefs = op.coef_.astype(dtype)
-    dot = OnnxMatMul(norm_x, coefs, op_version=opv)
+        ym = op.y_mean_ if hasattr(op, "x_mean_") else op._y_mean
+
+        norm_x = OnnxDiv(
+            OnnxSub(X, coefs.astype(dtype), op_version=opv),
+            std.astype(dtype),
+            op_version=opv,
+        )
+        if hasattr(op, "set_predict_request"):
+            # new in 1.3
+            coefs = op.coef_.T.astype(dtype)
+        else:
+            coefs = op.coef_.astype(dtype)
+        dot = OnnxMatMul(norm_x, coefs, op_version=opv)
+
     pred = OnnxAdd(dot, ym.astype(dtype), op_version=opv, output_names=operator.outputs)
     pred.add_to(scope, container)
 
