@@ -94,12 +94,23 @@ def convert_sklearn_linear_classifier(
         classifier_attrs["post_transform"] = "NONE"
     elif isinstance(op, LogisticRegression):
         classifier_attrs["post_transform"] = (
-            "LOGISTIC" if (use_ovr or multi_class == 0) else "SOFTMAX"
+            "LOGISTIC"
+            if (use_ovr or (multi_class == 0 and op.intercept_.size <= 1))
+            else "SOFTMAX"
         )
     else:
         classifier_attrs["post_transform"] = (
             "LOGISTIC" if multi_class > 2 else "SOFTMAX"
         )
+
+    print(
+        "***",
+        multi_class,
+        classifier_attrs["post_transform"],
+        type(op),
+        number_of_classes,
+        op.__dict__,
+    )
 
     if all(isinstance(i, str) for i in classes):
         class_labels = [str(i) for i in classes]
