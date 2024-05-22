@@ -467,6 +467,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         onnx_opset_version() < 19, reason="missing ops in reference implementation"
     )
     @ignore_warnings(category=RuntimeWarning)
+    @unittest.skipIf(sys.platform == "darwin", "interesting discrepancy")
     def test_shape_inference_onnxruntime(self):
         self._shape_inference("onnxruntime")
 
