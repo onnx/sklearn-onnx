@@ -11,6 +11,7 @@ import onnx
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
+from sklearn.utils._testing import ignore_warnings
 
 try:
     from onnx.reference import ReferenceEvaluator
@@ -23,12 +24,20 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 from test_utils.reference_implementation_text import Tokenizer
 
 
+def _skl150() -> bool:
+    import sklearn
+    import packaging.version as pv
+
+    return pv.Version(sklearn.__version__) >= pv.Version("1.5.0")
+
+
 class TestSklearnCountVectorizerBug(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(onnx.__version__) < pv.Version("1.16.0"),
         reason="ReferenceEvaluator does not support tfidf with strings",
     )
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @ignore_warnings(category=(UserWarning,))
     def test_model_count_vectorizer_custom_tokenizer(self):
         corpus = numpy.array(
             [
@@ -97,6 +106,9 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
         )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
+    @unittest.skipIf(
+        not _skl150(), reason="This issue is solved by using scikit-learn>=1.5.0"
+    )
     def test_model_count_vectorizer_short_length(self):
         corpus = [
             "This is the first document.",
@@ -180,5 +192,4 @@ if __name__ == "__main__":
 
     logger = logging.getLogger("skl2onnx")
     logger.setLevel(logging.ERROR)
-    TestSklearnCountVectorizerBug().test_model_count_vectorizer_short_length()
     unittest.main(verbosity=2)
