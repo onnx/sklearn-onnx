@@ -60,10 +60,26 @@ def convert_sklearn_linear_classifier(
         intercepts = list(map(lambda x: -1 * x, intercepts)) + intercepts
 
     multi_class = 0
+    use_ovr = False
     if hasattr(op, "multi_class"):
         if op.multi_class == "ovr":
             multi_class = 1
-        else:
+        elif number_of_classes > 2:
+            # See https://scikit-learn.org/dev/modules/generated/
+            # sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression
+            # multi_class attribute is deprecated.
+            # OVR is not supported anymore.
+            multi_class = 2
+        use_ovr = op.multi_class in ["ovr", "warn"] or (
+            op.multi_class == "auto"
+            and (op.classes_.size <= 2 or op.solver == "liblinear")
+        )
+    else:
+        # See https://scikit-learn.org/dev/modules/generated/
+        # sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression
+        # multi_class attribute is deprecated.
+        # OVR is not supported anymore.
+        if number_of_classes > 2:
             multi_class = 2
 
     classifier_type = "LinearClassifier"
@@ -77,11 +93,28 @@ def convert_sklearn_linear_classifier(
     ):
         classifier_attrs["post_transform"] = "NONE"
     elif isinstance(op, LogisticRegression):
-        ovr = op.multi_class in ["ovr", "warn"] or (
-            op.multi_class == "auto"
-            and (op.classes_.size <= 2 or op.solver == "liblinear")
+        # See https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/linear_model/_logistic.py#L1423
+        classifier_attrs["post_transform"] = (
+            "LOGISTIC"
+            if (
+                use_ovr
+                or op.solver == "liblinear"
+                or (
+                    hasattr(op, "multi_class")
+                    and op.multi_class in ("auto", "deprecated")
+                    and (
+                        op.classes_.size <= 2
+                        or op.solver in ("liblinear", "newton-cholesky")
+                    )
+                )
+                or (
+                    getattr(op, "multi_class", "auto") in ("auto", "deprecated")
+                    and multi_class == 0
+                    and (len(op.coef_.shape) <= 1 or min(op.coef_.shape) == 1)
+                )
+            )
+            else "SOFTMAX"
         )
-        classifier_attrs["post_transform"] = "LOGISTIC" if ovr else "SOFTMAX"
     else:
         classifier_attrs["post_transform"] = (
             "LOGISTIC" if multi_class > 2 else "SOFTMAX"

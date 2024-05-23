@@ -40,7 +40,7 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
             model_onnx,
             methods=["predict"],
             basename="SklearnPLSRegression",
-            verbose=10,
+            verbose=0,
         )
 
     def test_model_pls_regression64(self):
@@ -91,4 +91,4 @@ class TestSklearnPLSRegressionConverters(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
