@@ -175,8 +175,12 @@ class TestSklearnText(unittest.TestCase):
                     raise AssertionError(
                         f"{mod1.token_pattern!r} != {mod2.token_pattern!r}"
                     )
-                if len(mod1.stop_words_) != len(mod2.stop_words_):
-                    raise AssertionError(f"{mod1.stop_words_} != {mod2.stop_words_}")
+
+                if hasattr(mod1, "stop_words_"):
+                    if len(mod1.stop_words_) != len(mod2.stop_words_):
+                        raise AssertionError(
+                            f"{mod1.stop_words_} != {mod2.stop_words_}"
+                        )
                 if len(mod1.vocabulary_) != len(mod2.vocabulary_):
                     raise AssertionError(
                         f"skl_version={skl_version!r}, "
@@ -228,8 +232,11 @@ class TestSklearnText(unittest.TestCase):
                     raise AssertionError(
                         f"{mod1.token_pattern!r} != {mod2.token_pattern!r}"
                     )
-                if len(mod1.stop_words_) != len(mod2.stop_words_):
-                    raise AssertionError(f"{mod1.stop_words_} != {mod2.stop_words_}")
+                if hasattr(mod1, "stop_words_"):
+                    if len(mod1.stop_words_) != len(mod2.stop_words_):
+                        raise AssertionError(
+                            f"{mod1.stop_words_} != {mod2.stop_words_}"
+                        )
                 if len(mod1.vocabulary_) != len(mod2.vocabulary_):
                     raise AssertionError(
                         f"skl_version={skl_version!r}, "
