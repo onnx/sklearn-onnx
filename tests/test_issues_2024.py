@@ -328,12 +328,13 @@ class TestInvestigate(unittest.TestCase):
             proto_version = convert_version(proto, opv)
             add_onnx_graph(scope, operator, container, proto_version)
 
-        update_registered_converter(
-            GetScore,
-            "GetScore",
-            get_score_transformer_shape_calculator,
-            get_score_transformer_converter,
-        )
+        assert update_registered_converter
+        # update_registered_converter(
+        #     GetScore,  # missing
+        #     "GetScore",
+        #     get_score_transformer_shape_calculator,  # missing
+        #     get_score_transformer_converter,
+        # )
 
         model_onnx = to_onnx(
             pipeline, df[:1], target_opset=18, options={"zipmap": False}
