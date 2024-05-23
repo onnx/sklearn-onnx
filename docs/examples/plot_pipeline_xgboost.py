@@ -79,11 +79,11 @@ except Exception as e:
 #
 # The converter is implemented in *onnxmltools*:
 # `onnxmltools...XGBoost.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # xgboost/operator_converters/XGBoost.py>`_.
 # and the shape calculator:
 # `onnxmltools...Classifier.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # xgboost/shape_calculators/Classifier.py>`_.
 
 ##############################################

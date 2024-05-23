@@ -302,6 +302,24 @@ if onnx_opset_version() >= 18:
             ]
         )
 
+    else:
+
+        from onnx.reference.ops.op_scan import Scan as _Scan
+
+        class Scan(_Scan):
+            def _extract_attribute_value(self, att, ref_att=None):
+                if att.type == AttributeProto.GRAPH:
+                    new_ops = self.run_params.get("new_ops", None)
+                    return ReferenceEvaluator(
+                        att.g,
+                        opsets=self.run_params["opsets"],
+                        verbose=max(0, self.run_params.get("verbose", 0) - 2),
+                        new_ops=None if new_ops is None else new_ops.values(),
+                    )
+                return super()._extract_attribute_value(att, ref_att)
+
+        additional_implementations.extend([Scan])
+
     class ReferenceEvaluatorEx(ReferenceEvaluator):
         def __init__(self, *args, new_ops=None, **kwargs):
             # filter out new_ops
@@ -465,6 +483,7 @@ if onnx_opset_version() >= 18:
             return "\n".join(classes)
 
 else:
+
     ReferenceEvaluatorEx = None
 
 

@@ -46,6 +46,7 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     @unittest.skipIf(
         sys.platform.startswith("win"), reason="onnx schema are incorrect on Windows"
     )
+    @unittest.skipIf(TARGET_OPSET <= 20, reason="not available")
     def test_doc_onnx(self):
         rst = get_rst_doc()
         assert "**Summary**" in rst
@@ -53,6 +54,7 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     @unittest.skipIf(
         sys.platform.startswith("win"), reason="onnx schema are incorrect on Windows"
     )
+    @unittest.skipIf(TARGET_OPSET <= 20, reason="not available")
     def test_doc_sklearn(self):
         try:
             rst = get_rst_doc_sklearn()
