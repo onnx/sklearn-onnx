@@ -24,7 +24,7 @@ We reuse the pipeline implemented in example
 <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py>`_.
 There is one change because
 `ONNX-ML Imputer
-<https://github.com/onnx/onnx/blob/master/docs/
+<https://github.com/onnx/onnx/blob/main/docs/
 Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
@@ -50,40 +50,50 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx.common.data_types import Int64TensorType
 
-titanic_url = ('https://raw.githubusercontent.com/amueller/'
-               'scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv')
+titanic_url = (
+    "https://raw.githubusercontent.com/amueller/"
+    "scipy-2017-sklearn/091d371/notebooks/datasets/titanic3.csv"
+)
 data = pd.read_csv(titanic_url)
-X = data.drop('survived', axis=1)
-y = data['survived']
+X = data.drop("survived", axis=1)
+y = data["survived"]
 print(data.dtypes)
 
 # SimpleImputer on string is not available for
 # string in ONNX-ML specifications.
 # So we do it beforehand.
-for cat in ['embarked', 'sex', 'pclass']:
-    X[cat].fillna('missing', inplace=True)
+for cat in ["embarked", "sex", "pclass"]:
+    X[cat].fillna("missing", inplace=True)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-numeric_features = ['age', 'fare']
-numeric_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='median')),
-    ('scaler', StandardScaler())])
+numeric_features = ["age", "fare"]
+numeric_transformer = Pipeline(
+    steps=[("imputer", SimpleImputer(strategy="median")), ("scaler", StandardScaler())]
+)
 
-categorical_features = ['embarked', 'sex', 'pclass']
-categorical_transformer = Pipeline(steps=[
-    # --- SimpleImputer is not available for strings in ONNX-ML specifications.
-    # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))])
+categorical_features = ["embarked", "sex", "pclass"]
+categorical_transformer = Pipeline(
+    steps=[
+        # --- SimpleImputer is not available for strings in ONNX-ML specifications.
+        # ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+        ("onehot", OneHotEncoder(handle_unknown="ignore"))
+    ]
+)
 
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', numeric_transformer, numeric_features),
-        ('cat', categorical_transformer, categorical_features),
-    ])
+        ("num", numeric_transformer, numeric_features),
+        ("cat", categorical_transformer, categorical_features),
+    ]
+)
 
-clf = Pipeline(steps=[('preprocessor', preprocessor),
-                      ('classifier', LogisticRegression(solver='lbfgs'))])
+clf = Pipeline(
+    steps=[
+        ("preprocessor", preprocessor),
+        ("classifier", LogisticRegression(solver="lbfgs")),
+    ]
+)
 
 
 clf.fit(X_train, y_train)
@@ -106,9 +116,9 @@ def convert_dataframe_schema(df, drop=None):
     for k, v in zip(df.columns, df.dtypes):
         if drop is not None and k in drop:
             continue
-        if v == 'int64':
+        if v == "int64":
             t = Int64TensorType([None, 1])
-        elif v == 'float64':
+        elif v == "float64":
             t = FloatTensorType([None, 1])
         else:
             t = StringTensorType([None, 1])
@@ -130,8 +140,9 @@ pprint.pprint(initial_inputs)
 # ++++++++++++++++++++++++++++++
 
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                                 target_opset=12)
+    model_onnx = convert_sklearn(
+        clf, "pipeline_titanic", initial_inputs, target_opset=12
+    )
 except Exception as e:
     print(e)
 
@@ -140,12 +151,12 @@ except Exception as e:
 # That's why the converter checks that there is no unused input.
 # They need to be removed from the graph inputs.
 
-to_drop = {'parch', 'sibsp', 'cabin', 'ticket',
-           'name', 'body', 'home.dest', 'boat'}
+to_drop = {"parch", "sibsp", "cabin", "ticket", "name", "body", "home.dest", "boat"}
 initial_inputs = convert_dataframe_schema(X_train, to_drop)
 try:
-    model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                                 target_opset=12)
+    model_onnx = convert_sklearn(
+        clf, "pipeline_titanic", initial_inputs, target_opset=12
+    )
 except Exception as e:
     print(e)
 
@@ -156,8 +167,7 @@ except Exception as e:
 
 initial_inputs = convert_dataframe_schema(X_train, to_drop)
 
-model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                             target_opset=12)
+model_onnx = convert_sklearn(clf, "pipeline_titanic", initial_inputs, target_opset=12)
 
 
 # And save.
@@ -196,8 +206,7 @@ for k in inputs:
 ################################
 # We are ready to run *onnxruntime*.
 
-sess = rt.InferenceSession("pipeline_titanic.onnx",
-                           providers=["CPUExecutionProvider"])
+sess = rt.InferenceSession("pipeline_titanic.onnx", providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
 print("predict_proba", pred_onx[1][:2])
@@ -207,14 +216,19 @@ print("predict_proba", pred_onx[1][:2])
 # Let's swith to an array but that requires to convert again with
 # an additional option zipmap.
 
-model_onnx = convert_sklearn(clf, 'pipeline_titanic', initial_inputs,
-                             target_opset=12,
-                             options={id(clf): {'zipmap': False}})
+model_onnx = convert_sklearn(
+    clf,
+    "pipeline_titanic",
+    initial_inputs,
+    target_opset=12,
+    options={id(clf): {"zipmap": False}},
+)
 with open("pipeline_titanic_nozipmap.onnx", "wb") as f:
     f.write(model_onnx.SerializeToString())
 
-sess = rt.InferenceSession("pipeline_titanic_nozipmap.onnx",
-                           providers=["CPUExecutionProvider"])
+sess = rt.InferenceSession(
+    "pipeline_titanic_nozipmap.onnx", providers=["CPUExecutionProvider"]
+)
 pred_onx = sess.run(None, inputs)
 print("predict", pred_onx[0][:5])
 print("predict_proba", pred_onx[1][:2])
@@ -231,20 +245,22 @@ assert_almost_equal(clf.predict_proba(X_test), pred_onx[1])
 #
 # Finally, let's see the graph converted with *sklearn-onnx*.
 
-pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name,
-                            rankdir="TB",
-                            node_producer=GetOpNodeProducer("docstring",
-                                                            color="yellow",
-                                                            fillcolor="yellow",
-                                                            style="filled"))
+pydot_graph = GetPydotGraph(
+    model_onnx.graph,
+    name=model_onnx.graph.name,
+    rankdir="TB",
+    node_producer=GetOpNodeProducer(
+        "docstring", color="yellow", fillcolor="yellow", style="filled"
+    ),
+)
 pydot_graph.write_dot("pipeline_titanic.dot")
 
-os.system('dot -O -Gdpi=300 -Tpng pipeline_titanic.dot')
+os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic.dot")
 
 image = plt.imread("pipeline_titanic.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
 ax.imshow(image)
-ax.axis('off')
+ax.axis("off")
 
 #################################
 # **Versions used for this example**

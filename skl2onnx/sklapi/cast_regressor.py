@@ -2,14 +2,16 @@
 
 import numpy as np
 from sklearn.base import RegressorMixin, BaseEstimator
+
 try:
     from sklearn.utils.validation import _deprecate_positional_args
 except ImportError:
-    def _deprecate_positional_args(x): return x  # noqa
+
+    def _deprecate_positional_args(x):
+        return x  # noqa
 
 
 class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
-
     """
     Cast predictions into a specific types.
     This should be used to minimize the conversion
@@ -34,8 +36,8 @@ class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
             a2 = a.astype(self.dtype)
         except ValueError:
             raise ValueError(
-                "Unable to cast {} from {} into {}.".format(
-                    name, a.dtype, self.dtype))
+                "Unable to cast {} from {} into {}.".format(name, a.dtype, self.dtype)
+            )
         return a2
 
     def fit(self, X, y=None, sample_weight=None):
@@ -49,15 +51,15 @@ class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
         """
         Predicts and casts the prediction.
         """
-        return self._cast(self.estimator.predict(X), 'predict(X)')
+        return self._cast(self.estimator.predict(X), "predict(X)")
 
     def decision_function(self, X, y=None):
         """
         Calls *decision_function* and casts the outputs.
         """
-        if not hasattr(self.estimator, 'decision_function'):
+        if not hasattr(self.estimator, "decision_function"):
             raise AttributeError(
-                "%r object has no attribute 'decision_function'." %
-                self.estimator.__class__.__name__)
-        return self._cast(self.estimator.decision_function(X),
-                          'decision_function(X)')
+                "%r object has no attribute 'decision_function'."
+                % self.estimator.__class__.__name__
+            )
+        return self._cast(self.estimator.decision_function(X), "decision_function(X)")

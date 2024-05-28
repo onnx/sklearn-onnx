@@ -45,15 +45,20 @@ from tqdm import tqdm
 from lightgbm import LGBMRegressor
 from onnxruntime import InferenceSession
 from skl2onnx import to_onnx, update_registered_converter
-from skl2onnx.common.shape_calculator import calculate_linear_regressor_output_shapes  # noqa
+from skl2onnx.common.shape_calculator import (
+    calculate_linear_regressor_output_shapes,
+)  # noqa
 from onnxmltools import __version__ as oml_version
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm  # noqa
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
+    convert_lightgbm,
+)  # noqa
 
 
 N = 1000
 X = numpy.random.randn(N, 20)
-y = (numpy.random.randn(N) +
-     numpy.random.randn(N) * 100 * numpy.random.randint(0, 1, 1000))
+y = numpy.random.randn(N) + numpy.random.randn(N) * 100 * numpy.random.randint(
+    0, 1, 1000
+)
 
 reg = LGBMRegressor(n_estimators=1000)
 reg.fit(X, y)
@@ -64,32 +69,35 @@ reg.fit(X, y)
 #
 # The converter is implemented in :epkg:`onnxmltools`:
 # `onnxmltools...LightGbm.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # lightgbm/operator_converters/LightGbm.py>`_.
 # and the shape calculator:
 # `onnxmltools...Regressor.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # lightgbm/shape_calculators/Regressor.py>`_.
 
 
 def skl2onnx_convert_lightgbm(scope, operator, container):
     options = scope.get_options(operator.raw_operator)
-    if 'split' in options:
-        if pv.Version(oml_version) < pv.Version('1.9.2'):
+    if "split" in options:
+        if pv.Version(oml_version) < pv.Version("1.9.2"):
             warnings.warn(
                 "Option split was released in version 1.9.2 but %s is "
-                "installed. It will be ignored." % oml_version)
-        operator.split = options['split']
+                "installed. It will be ignored." % oml_version
+            )
+        operator.split = options["split"]
     else:
         operator.split = None
     convert_lightgbm(scope, operator, container)
 
 
 update_registered_converter(
-    LGBMRegressor, 'LightGbmLGBMRegressor',
+    LGBMRegressor,
+    "LightGbmLGBMRegressor",
     calculate_linear_regressor_output_shapes,
     skl2onnx_convert_lightgbm,
-    options={'split': None})
+    options={"split": None},
+)
 
 ##################################
 # Convert
@@ -99,30 +107,37 @@ update_registered_converter(
 # TreeEnsembleRegressor node, or more. *split* parameter is the number of
 # trees per node TreeEnsembleRegressor.
 
-model_onnx = to_onnx(reg, X[:1].astype(numpy.float32),
-                     target_opset={'': 14, 'ai.onnx.ml': 2})
-model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32),
-                           target_opset={'': 14, 'ai.onnx.ml': 2},
-                           options={'split': 100})
+model_onnx = to_onnx(
+    reg, X[:1].astype(numpy.float32), target_opset={"": 14, "ai.onnx.ml": 2}
+)
+model_onnx_split = to_onnx(
+    reg,
+    X[:1].astype(numpy.float32),
+    target_opset={"": 14, "ai.onnx.ml": 2},
+    options={"split": 100},
+)
 
 ##########################
 # Discrepancies
 # +++++++++++++
 
-sess = InferenceSession(model_onnx.SerializeToString())
-sess_split = InferenceSession(model_onnx_split.SerializeToString())
+sess = InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
+sess_split = InferenceSession(
+    model_onnx_split.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 
 X32 = X.astype(numpy.float32)
 expected = reg.predict(X32)
-got = sess.run(None, {'X': X32})[0].ravel()
-got_split = sess_split.run(None, {'X': X32})[0].ravel()
+got = sess.run(None, {"X": X32})[0].ravel()
+got_split = sess_split.run(None, {"X": X32})[0].ravel()
 
 disp = numpy.abs(got - expected).sum()
 disp_split = numpy.abs(got_split - expected).sum()
 
 print("sum of discrepancies 1 node", disp)
-print("sum of discrepancies split node",
-      disp_split, "ratio:", disp / disp_split)
+print("sum of discrepancies split node", disp_split, "ratio:", disp / disp_split)
 
 ######################################
 # The sum of the discrepancies were reduced 4, 5 times.
@@ -140,12 +155,14 @@ print("max discrepancies split node", disc_split, "ratio:", disc / disc_split)
 #
 # The processing time is slower but not much.
 
-print("processing time no split",
-      timeit.timeit(
-          lambda: sess.run(None, {'X': X32})[0], number=150))
-print("processing time split",
-      timeit.timeit(
-          lambda: sess_split.run(None, {'X': X32})[0], number=150))
+print(
+    "processing time no split",
+    timeit.timeit(lambda: sess.run(None, {"X": X32})[0], number=150),
+)
+print(
+    "processing time split",
+    timeit.timeit(lambda: sess_split.run(None, {"X": X32})[0], number=150),
+)
 
 #############################################
 # Split influence
@@ -156,23 +173,29 @@ print("processing time split",
 
 res = []
 for i in tqdm(list(range(20, 170, 20)) + [200, 300, 400, 500]):
-    model_onnx_split = to_onnx(reg, X[:1].astype(numpy.float32),
-                               target_opset={'': 14, 'ai.onnx.ml': 2},
-                               options={'split': i})
-    sess_split = InferenceSession(model_onnx_split.SerializeToString())
-    got_split = sess_split.run(None, {'X': X32})[0].ravel()
+    model_onnx_split = to_onnx(
+        reg,
+        X[:1].astype(numpy.float32),
+        target_opset={"": 14, "ai.onnx.ml": 2},
+        options={"split": i},
+    )
+    sess_split = InferenceSession(
+        model_onnx_split.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    got_split = sess_split.run(None, {"X": X32})[0].ravel()
     disc_split = numpy.abs(got_split - expected).max()
     res.append(dict(split=i, disc=disc_split))
 
-df = DataFrame(res).set_index('split')
+df = DataFrame(res).set_index("split")
 df["baseline"] = disc
 print(df)
 
 ##########################################
 # Graph.
 _, ax = plt.subplots(1, 1)
-df.plot(title="Sum of discrepancies against split\n"
-              "split = number of tree per node",
-        ax=ax)
+df.plot(
+    title="Sum of discrepancies against split\n" "split = number of tree per node",
+    ax=ax,
+)
 
 # plt.show()

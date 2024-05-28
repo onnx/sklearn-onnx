@@ -8,8 +8,9 @@ from ..common._container import ModelComponentContainer
 from ..algebra.onnx_ops import OnnxMatMul
 
 
-def convert_random_projection(scope: Scope, operator: Operator,
-                              container: ModelComponentContainer):
+def convert_random_projection(
+    scope: Scope, operator: Operator, container: ModelComponentContainer
+):
     """Converter for PowerTransformer"""
     op_in = operator.inputs[0]
     op_out = operator.outputs[0].full_name
@@ -19,10 +20,10 @@ def convert_random_projection(scope: Scope, operator: Operator,
     if dtype != np.float64:
         dtype = np.float32
 
-    y = OnnxMatMul(op_in, op.components_.T.astype(dtype),
-                   op_version=opv, output_names=[op_out])
+    y = OnnxMatMul(
+        op_in, op.components_.T.astype(dtype), op_version=opv, output_names=[op_out]
+    )
     y.add_to(scope, container)
 
 
-register_converter(
-    'SklearnGaussianRandomProjection', convert_random_projection)
+register_converter("SklearnGaussianRandomProjection", convert_random_projection)

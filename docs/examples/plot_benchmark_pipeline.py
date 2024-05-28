@@ -15,7 +15,7 @@ We reuse the pipeline implemented in example
 `Pipelining: chaining a PCA and a logistic regression
 <https://scikit-learn.org/stable/auto_examples/compose/plot_digits_pipe.html>`_.
 There is one change because
-`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/master/
+`ONNX-ML Imputer <https://github.com/onnx/onnx/blob/main/
 docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
@@ -40,7 +40,7 @@ from sklearn.pipeline import Pipeline
 
 logistic = LogisticRegression()
 pca = PCA()
-pipe = Pipeline(steps=[('pca', pca), ('logistic', logistic)])
+pipe = Pipeline(steps=[("pca", pca), ("logistic", logistic)])
 
 digits = datasets.load_digits()
 X_digits = digits.data[:1000]
@@ -53,15 +53,15 @@ pipe.fit(X_digits, y_digits)
 # ++++++++++++++++++
 
 
-initial_types = [('input', FloatTensorType((None, X_digits.shape[1])))]
-model_onnx = convert_sklearn(pipe, initial_types=initial_types,
-                             target_opset=12)
+initial_types = [("input", FloatTensorType((None, X_digits.shape[1])))]
+model_onnx = convert_sklearn(pipe, initial_types=initial_types, target_opset=12)
 
-sess = rt.InferenceSession(model_onnx.SerializeToString(),
-                           providers=["CPUExecutionProvider"])
+sess = rt.InferenceSession(
+    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+)
 print("skl predict_proba")
 print(pipe.predict_proba(X_digits[:2]))
-onx_pred = sess.run(None, {'input': X_digits[:2].astype(np.float32)})[1]
+onx_pred = sess.run(None, {"input": X_digits[:2].astype(np.float32)})[1]
 df = pd.DataFrame(onx_pred)
 print("onnx predict_proba")
 print(df.values)
@@ -78,11 +78,15 @@ compare_objects(pipe.predict_proba(X_digits[:2]), onx_pred)
 # ++++++++++
 
 print("scikit-learn")
-print(timeit("pipe.predict_proba(X_digits[:1])",
-             number=10000, globals=globals()))
+print(timeit("pipe.predict_proba(X_digits[:1])", number=10000, globals=globals()))
 print("onnxruntime")
-print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
-             number=10000, globals=globals()))
+print(
+    timeit(
+        "sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
+        number=10000,
+        globals=globals(),
+    )
+)
 
 ###############################################
 # Intermediate steps
@@ -95,34 +99,47 @@ print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})[1]",
 # an smaller ONNX graph for every operator.
 
 
-steps = collect_intermediate_steps(
-    pipe, "pipeline", initial_types)
+steps = collect_intermediate_steps(pipe, "pipeline", initial_types)
 
 assert len(steps) == 2
 
 pipe.predict_proba(X_digits[:2])
 
 for i, step in enumerate(steps):
-    onnx_step = step['onnx_step']
-    sess = rt.InferenceSession(onnx_step.SerializeToString(),
-                               providers=["CPUExecutionProvider"])
-    onnx_outputs = sess.run(None, {'input': X_digits[:2].astype(np.float32)})
-    skl_outputs = step['model']._debug.outputs
-    if 'transform' in skl_outputs:
-        compare_objects(skl_outputs['transform'], onnx_outputs[0])
-        print("benchmark", step['model'].__class__)
+    onnx_step = step["onnx_step"]
+    sess = rt.InferenceSession(
+        onnx_step.SerializeToString(), providers=["CPUExecutionProvider"]
+    )
+    onnx_outputs = sess.run(None, {"input": X_digits[:2].astype(np.float32)})
+    skl_outputs = step["model"]._debug.outputs
+    if "transform" in skl_outputs:
+        compare_objects(skl_outputs["transform"], onnx_outputs[0])
+        print("benchmark", step["model"].__class__)
         print("scikit-learn")
-        print(timeit("step['model'].transform(X_digits[:1])",
-                     number=10000, globals=globals()))
+        print(
+            timeit(
+                "step['model'].transform(X_digits[:1])", number=10000, globals=globals()
+            )
+        )
     else:
-        compare_objects(skl_outputs['predict_proba'], onnx_outputs[1])
-        print("benchmark", step['model'].__class__)
+        compare_objects(skl_outputs["predict_proba"], onnx_outputs[1])
+        print("benchmark", step["model"].__class__)
         print("scikit-learn")
-        print(timeit("step['model'].predict_proba(X_digits[:1])",
-                     number=10000, globals=globals()))
+        print(
+            timeit(
+                "step['model'].predict_proba(X_digits[:1])",
+                number=10000,
+                globals=globals(),
+            )
+        )
     print("onnxruntime")
-    print(timeit("sess.run(None, {'input': X_digits[:1].astype(np.float32)})",
-                 number=10000, globals=globals()))
+    print(
+        timeit(
+            "sess.run(None, {'input': X_digits[:1].astype(np.float32)})",
+            number=10000,
+            globals=globals(),
+        )
+    )
 
 #################################
 # **Versions used for this example**

@@ -5,6 +5,7 @@ import numpy
 from numpy.testing import assert_almost_equal
 from sklearn.preprocessing import StandardScaler
 from skl2onnx.algebra.onnx_ops import OnnxMatMul, OnnxExp, OnnxAdd, OnnxDiv
+
 try:
     from skl2onnx.algebra.sklearn_ops import OnnxSklearnStandardScaler
     from skl2onnx import wrap_as_onnx_mixin
@@ -14,12 +15,12 @@ from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 class TestAlgebraConverters(unittest.TestCase):
-
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
-    @unittest.skipIf(OnnxSklearnStandardScaler is None,
-                     reason="Cannot infer operators with current ONNX")
+    @unittest.skipIf(
+        OnnxSklearnStandardScaler is None,
+        reason="Cannot infer operators with current ONNX",
+    )
     def test_algebra_converter(self):
-
         X = numpy.array([[1, 2], [2, 3]])
         op = OnnxSklearnStandardScaler()
         op.fit(X)
@@ -28,13 +29,13 @@ class TestAlgebraConverters(unittest.TestCase):
 
         try:
             sess = InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
+                onx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
         except RuntimeError as e:
             raise RuntimeError("Unable to read\n{}".format(onx)) from e
         X = numpy.array([[0, 1], [-1, -2]])
         try:
-            Y = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+            Y = sess.run(None, {"X": X.astype(numpy.float32)})[0]
         except RuntimeError as e:
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, op.transform(X))
@@ -51,13 +52,13 @@ class TestAlgebraConverters(unittest.TestCase):
 
         try:
             sess = InferenceSession(
-                onx.SerializeToString(),
-                providers=["CPUExecutionProvider"])
+                onx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
         except RuntimeError as e:
             raise RuntimeError("Unable to read\n{}".format(onx)) from e
         X = numpy.array([[0, 1], [-1, -2]])
         try:
-            Y = sess.run(None, {'X': X.astype(numpy.float32)})[0]
+            Y = sess.run(None, {"X": X.astype(numpy.float32)})[0]
         except RuntimeError as e:
             raise RuntimeError("Unable to run\n{}".format(onx)) from e
         assert_almost_equal(Y, op.transform(X))
@@ -68,12 +69,12 @@ class TestAlgebraConverters(unittest.TestCase):
         beta = numpy.array([1, 2, 3, 4]) / 10
         beta32 = beta.astype(numpy.float32)
         onnxExpM = OnnxExp(
-            OnnxMatMul('X', beta32, op_version=TARGET_OPSET),
-            op_version=TARGET_OPSET)
+            OnnxMatMul("X", beta32, op_version=TARGET_OPSET), op_version=TARGET_OPSET
+        )
         cst = numpy.ones((1, 3), dtype=numpy.float32)
         onnxExpM1 = OnnxAdd(onnxExpM, cst, op_version=TARGET_OPSET)
         onnxPred = OnnxDiv(onnxExpM, onnxExpM1, op_version=TARGET_OPSET)
-        inputs = {'X': X[:1].astype(numpy.float32)}
+        inputs = {"X": X[:1].astype(numpy.float32)}
         model_onnx = onnxPred.to_onnx(inputs, target_opset=TARGET_OPSET)
         s1 = str(model_onnx)
         model_onnx = onnxPred.to_onnx(inputs, target_opset=TARGET_OPSET)
@@ -88,14 +89,13 @@ class TestAlgebraConverters(unittest.TestCase):
 
     def test_add_12(self):
         idi = numpy.identity(2, dtype=numpy.float32)
-        onx = OnnxAdd('X', idi, output_names=['Y'], op_version=12)
-        model_def = onx.to_onnx({'X': idi.astype(numpy.float32)},
-                                target_opset=12)
+        onx = OnnxAdd("X", idi, output_names=["Y"], op_version=12)
+        model_def = onx.to_onnx({"X": idi.astype(numpy.float32)}, target_opset=12)
         X = numpy.array([[1, 2], [3, 4]], dtype=numpy.float32)
         sess = InferenceSession(
-            model_def.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        got = sess.run(None, {'X': X})
+            model_def.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"X": X})
         exp = idi + X
         self.assertEqual(exp.shape, got[0].shape)
         self.assertEqual(list(exp.ravel()), list(got[0].ravel()))

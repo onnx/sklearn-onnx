@@ -3,10 +3,17 @@
 
 from ..common._registration import register_shape_calculator
 from ..common.data_types import (
-    FloatType, Int64Type, StringType, TensorType,
-    DoubleType, BooleanTensorType, FloatTensorType,
-    Int64TensorType, StringTensorType,
-    DoubleTensorType)
+    FloatType,
+    Int64Type,
+    StringType,
+    TensorType,
+    DoubleType,
+    BooleanTensorType,
+    FloatTensorType,
+    Int64TensorType,
+    StringTensorType,
+    DoubleTensorType,
+)
 from ..common.utils import check_input_and_output_numbers
 
 
@@ -27,8 +34,7 @@ def calculate_sklearn_concat(operator):
                     C = None
                 else:
                     C += i.type.shape[1]
-            elif isinstance(i.type, (
-                    Int64Type, FloatType, StringType, DoubleType)):
+            elif isinstance(i.type, (Int64Type, FloatType, StringType, DoubleType)):
                 C += 1
             else:
                 C = None
@@ -41,19 +47,28 @@ def calculate_sklearn_concat(operator):
                 raise RuntimeError(
                     "Cannot merge columns with types {} and {}."
                     "Inputs:\n{}\nOutputs:\n{}".format(
-                        t1, t2, operator.inputs, operator.outputs))
-            for ts in [StringTensorType, DoubleTensorType, FloatTensorType,
-                       Int64TensorType, BooleanTensorType]:
+                        t1, t2, operator.inputs, operator.outputs
+                    )
+                )
+            for ts in [
+                StringTensorType,
+                DoubleTensorType,
+                FloatTensorType,
+                Int64TensorType,
+                BooleanTensorType,
+            ]:
                 if isinstance(t1, ts) or isinstance(t2, ts):
                     return ts
             raise RuntimeError(
                 "Cannot merge columns with types {} and {}."
                 "Inputs:\n{}\nOutputs:\n{}".format(
-                    t1, t2, operator.inputs, operator.outputs))
+                    t1, t2, operator.inputs, operator.outputs
+                )
+            )
         raise NotImplementedError(
             "Columns must be tensors."
-            "Inputs:\n{}\nOutputs:\n{}".format(
-                operator.inputs, operator.outputs))
+            "Inputs:\n{}\nOutputs:\n{}".format(operator.inputs, operator.outputs)
+        )
 
     # Let's determine the resulting type
     final_type = None
@@ -69,24 +84,22 @@ def calculate_sklearn_concat(operator):
         raise NotImplementedError(
             "Columns must be tensors.\n"
             "- Inputs: {}\n- Outputs: {}\n- types: {}"
-            "".format(
-                operator.inputs, operator.outputs, seen_types))
+            "".format(operator.inputs, operator.outputs, seen_types)
+        )
     if final_type != operator.outputs[0].type:
         operator.outputs[0].type = type(final_type)([N, C])
     else:
         operator.outputs[0].type.shape = [N, C]
 
 
-register_shape_calculator('SklearnConcat', calculate_sklearn_concat)
-register_shape_calculator('SklearnGenericUnivariateSelect',
-                          calculate_sklearn_concat)
-register_shape_calculator('SklearnMultiply', calculate_sklearn_concat)
-register_shape_calculator('SklearnRFE', calculate_sklearn_concat)
-register_shape_calculator('SklearnRFECV', calculate_sklearn_concat)
-register_shape_calculator('SklearnSelectFdr', calculate_sklearn_concat)
-register_shape_calculator('SklearnSelectFpr', calculate_sklearn_concat)
-register_shape_calculator('SklearnSelectFromModel', calculate_sklearn_concat)
-register_shape_calculator('SklearnSelectFwe', calculate_sklearn_concat)
-register_shape_calculator('SklearnSelectKBest', calculate_sklearn_concat)
-register_shape_calculator('SklearnSelectPercentile', calculate_sklearn_concat)
-register_shape_calculator('SklearnVarianceThreshold', calculate_sklearn_concat)
+register_shape_calculator("SklearnConcat", calculate_sklearn_concat)
+register_shape_calculator("SklearnGenericUnivariateSelect", calculate_sklearn_concat)
+register_shape_calculator("SklearnRFE", calculate_sklearn_concat)
+register_shape_calculator("SklearnRFECV", calculate_sklearn_concat)
+register_shape_calculator("SklearnSelectFdr", calculate_sklearn_concat)
+register_shape_calculator("SklearnSelectFpr", calculate_sklearn_concat)
+register_shape_calculator("SklearnSelectFromModel", calculate_sklearn_concat)
+register_shape_calculator("SklearnSelectFwe", calculate_sklearn_concat)
+register_shape_calculator("SklearnSelectKBest", calculate_sklearn_concat)
+register_shape_calculator("SklearnSelectPercentile", calculate_sklearn_concat)
+register_shape_calculator("SklearnVarianceThreshold", calculate_sklearn_concat)

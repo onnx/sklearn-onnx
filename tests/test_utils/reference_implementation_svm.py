@@ -28,8 +28,7 @@ def _attribute_value(attr):
         return list(attr.ints)
     if attr.strings:
         return list(map(_to_str, attr.strings))
-    raise NotImplementedError(
-        "Unable to return a value for attribute %r." % attr)
+    raise NotImplementedError("Unable to return a value for attribute %r." % attr)
 
 
 class SVMAttributes:
@@ -37,8 +36,8 @@ class SVMAttributes:
         self._names = []
 
     def add(self, name, value):
-        if isinstance(value, list) and name not in {'kernel_params'}:
-            if name in {'vectors_per_class'}:
+        if isinstance(value, list) and name not in {"kernel_params"}:
+            if name in {"vectors_per_class"}:
                 value = np.array(value, dtype=np.int64)
             else:
                 value = np.array(value, dtype=np.float32)
@@ -67,13 +66,12 @@ class SVMCommon:
             self.coef0_ = self.atts.kernel_params[1]
             self.degree_ = int(self.atts.kernel_params[2])
         else:
-            self.gamma_ = 0.
-            self.coef0_ = 0.
+            self.gamma_ = 0.0
+            self.coef0_ = 0.0
             self.degree_ = 0
 
     def __str__(self):
-        rows = ["TreeEnsemble",
-                f"root_index={self.root_index}", str(self.atts)]
+        rows = ["TreeEnsemble", f"root_index={self.root_index}", str(self.atts)]
         return "\n".join(rows)
 
     def kernel_dot(self, pA, pB, kernel):
@@ -81,7 +79,7 @@ class SVMCommon:
         if k == "poly":
             s = np.dot(pA, pB)
             s = s * self.gamma_ + self.coef0_
-            return s ** self.degree_
+            return s**self.degree_
         if k == "sigmoid":
             s = np.dot(pA, pB)
             s = s * self.gamma_ + self.coef0_
@@ -95,7 +93,6 @@ class SVMCommon:
         raise ValueError(f"Unexpected kernel={kernel!r}.")
 
     def run(self, X):
-
         if self.atts.n_supports > 0:
             # length of each support vector
             mode_ = "SVM_SVC"
@@ -107,7 +104,7 @@ class SVMCommon:
 
         z = np.empty((X.shape[0], 1), dtype=X.dtype)
         for n in range(X.shape[0]):
-            s = 0.
+            s = 0.0
 
             if mode_ == "SVM_SVC":
                 for j in range(self.atts.n_supports):
@@ -127,31 +124,38 @@ class SVMCommon:
 
 if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
+
     try:
         from .reference_implementation_helper import (
-            write_scores, set_score_svm, multiclass_probability,
-            sigmoid_probability)
+            write_scores,
+            set_score_svm,
+            multiclass_probability,
+            sigmoid_probability,
+        )
     except ImportError:
         from reference_implementation_helper import (
-            write_scores, set_score_svm, multiclass_probability,
-            sigmoid_probability)
+            write_scores,
+            set_score_svm,
+            multiclass_probability,
+            sigmoid_probability,
+        )
 
     class SVMRegressor(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(
-                self,
-                X,
-                coefficients=None,
-                kernel_params=None,
-                kernel_type=None,
-                n_targets=None,
-                n_supports=None,
-                one_class=None,
-                post_transform=None,
-                rho=None,
-                support_vectors=None):
+            self,
+            X,
+            coefficients=None,
+            kernel_params=None,
+            kernel_type=None,
+            n_targets=None,
+            n_supports=None,
+            one_class=None,
+            post_transform=None,
+            rho=None,
+            support_vectors=None,
+        ):
             svm = SVMCommon(
                 coefficients=coefficients,
                 kernel_params=kernel_params,
@@ -161,17 +165,18 @@ if onnx_opset_version() >= 18:
                 one_class=one_class,
                 post_transform=post_transform,
                 rho=rho,
-                support_vectors=support_vectors)
+                support_vectors=support_vectors,
+            )
             self._svm = svm
             res = svm.run(X)
 
             if post_transform in (None, "NONE"):
                 return (res,)
             raise NotImplementedError(
-                f"post_transform={post_transform!r} not implemented.")
+                f"post_transform={post_transform!r} not implemented."
+            )
 
     class SVMClassifier(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run_linear(self, X, coefs, class_count_, kernel_type_):
@@ -182,8 +187,16 @@ if onnx_opset_version() >= 18:
                 scores.append(score)
             return np.array(scores, dtype=X.dtype)
 
-        def _run_svm(self, X, sv, vector_count_, kernel_type_,
-                     class_count_, starting_vector_, coefs):
+        def _run_svm(
+            self,
+            X,
+            sv,
+            vector_count_,
+            kernel_type_,
+            class_count_,
+            starting_vector_,
+            coefs,
+        ):
             evals = 0
 
             kernels = []
@@ -201,10 +214,14 @@ if onnx_opset_version() >= 18:
                     si_j = starting_vector_[j]
                     class_j_sc = self._svm.atts.vectors_per_class[j]
 
-                    s1 = np.dot(coefs[j - 1, si_i: si_i+class_i_sc],
-                                kernels[si_i: si_i+class_i_sc])
-                    s2 = np.dot(coefs[i, si_j: si_j+class_j_sc],
-                                kernels[si_j: si_j+class_j_sc])
+                    s1 = np.dot(
+                        coefs[j - 1, si_i : si_i + class_i_sc],
+                        kernels[si_i : si_i + class_i_sc],
+                    )
+                    s2 = np.dot(
+                        coefs[i, si_j : si_j + class_j_sc],
+                        kernels[si_j : si_j + class_j_sc],
+                    )
 
                     s = self._svm.atts.rho[evals] + s1 + s2
                     scores.append(s)
@@ -216,15 +233,16 @@ if onnx_opset_version() >= 18:
             return votes, np.array(scores, dtype=X.dtype)
 
         def _probabilities(self, scores, class_count_):
-            probsp2 = np.zeros((class_count_, class_count_),
-                               dtype=scores.dtype)
+            probsp2 = np.zeros((class_count_, class_count_), dtype=scores.dtype)
 
             index = 0
             for i in range(class_count_):
                 for j in range(i + 1, class_count_):
-                    val1 = sigmoid_probability(scores[index],
-                                               self._svm.atts.prob_a[index],
-                                               self._svm.atts.prob_b[index])
+                    val1 = sigmoid_probability(
+                        scores[index],
+                        self._svm.atts.prob_a[index],
+                        self._svm.atts.prob_b[index],
+                    )
                     val2 = max(val1, 1.0e-7)
                     val2 = min(val2, (1 - 1.0e-7))
                     probsp2[i, j] = val2
@@ -232,10 +250,9 @@ if onnx_opset_version() >= 18:
                     index += 1
             return multiclass_probability(class_count_, probsp2)
 
-        def _compute_final_scores(self, votes, scores,
-                                  weights_are_all_positive_,
-                                  has_proba, classlabels_ints):
-
+        def _compute_final_scores(
+            self, votes, scores, weights_are_all_positive_, has_proba, classlabels_ints
+        ):
             max_weight = 0
             if len(votes):
                 max_class = np.argmax(votes)
@@ -247,33 +264,44 @@ if onnx_opset_version() >= 18:
             write_additional_scores = -1
             if self._svm.atts.rho.size == 1:
                 label, write_additional_scores = set_score_svm(
-                    max_weight, max_class, 0,
-                    self._svm.atts.post_transform, has_proba,
-                    weights_are_all_positive_, classlabels_ints, 1, 0)
+                    max_weight,
+                    max_class,
+                    0,
+                    self._svm.atts.post_transform,
+                    has_proba,
+                    weights_are_all_positive_,
+                    classlabels_ints,
+                    1,
+                    0,
+                )
             elif classlabels_ints is not None and len(classlabels_ints) > 0:
                 label = classlabels_ints[max_class]
             else:
                 label = max_class
 
-            new_scores = write_scores(scores.size, scores,
-                                      self._svm.atts.post_transform,
-                                      write_additional_scores)
+            new_scores = write_scores(
+                scores.size,
+                scores,
+                self._svm.atts.post_transform,
+                write_additional_scores,
+            )
             return label, new_scores
 
         def _run(
-                self,
-                X,
-                classlabels_ints=None,
-                classlabels_strings=None,
-                coefficients=None,
-                kernel_params=None,
-                kernel_type=None,
-                post_transform=None,
-                prob_a=None,
-                prob_b=None,
-                rho=None,
-                support_vectors=None,
-                vectors_per_class=None):
+            self,
+            X,
+            classlabels_ints=None,
+            classlabels_strings=None,
+            coefficients=None,
+            kernel_params=None,
+            kernel_type=None,
+            post_transform=None,
+            prob_a=None,
+            prob_b=None,
+            rho=None,
+            support_vectors=None,
+            vectors_per_class=None,
+        ):
             svm = SVMCommon(
                 coefficients=coefficients,
                 kernel_params=kernel_params,
@@ -283,7 +311,8 @@ if onnx_opset_version() >= 18:
                 prob_b=prob_b,
                 rho=rho,
                 support_vectors=support_vectors,
-                vectors_per_class=vectors_per_class)
+                vectors_per_class=vectors_per_class,
+            )
             self._svm = svm
 
             vector_count_ = 0
@@ -293,8 +322,7 @@ if onnx_opset_version() >= 18:
                 starting_vector_.append(vector_count_)
                 vector_count_ += vc
 
-            class_count_ = max(len(classlabels_ints or
-                               classlabels_strings or []), 1)
+            class_count_ = max(len(classlabels_ints or classlabels_strings or []), 1)
             if vector_count_ > 0:
                 # length of each support vector
                 mode_ = "SVM_SVC"
@@ -313,25 +341,32 @@ if onnx_opset_version() >= 18:
             if vector_count_ == 0 and mode_ == "SVM_LINEAR":
                 res = np.empty((X.shape[0], class_count_), dtype=X.dtype)
                 for n in range(X.shape[0]):
-                    scores = self._run_linear(
-                        X[n], coefs, class_count_, kernel_type_)
+                    scores = self._run_linear(X[n], coefs, class_count_, kernel_type_)
                     res[n, :] = scores
             else:
                 res = np.empty(
-                    (X.shape[0], class_count_ * (class_count_ - 1) // 2),
-                    dtype=X.dtype)
+                    (X.shape[0], class_count_ * (class_count_ - 1) // 2), dtype=X.dtype
+                )
                 votes = np.empty((X.shape[0], class_count_), dtype=X.dtype)
                 for n in range(X.shape[0]):
                     vote, scores = self._run_svm(
-                        X[n], sv, vector_count_, kernel_type_, class_count_,
-                        starting_vector_, coefs)
+                        X[n],
+                        sv,
+                        vector_count_,
+                        kernel_type_,
+                        class_count_,
+                        starting_vector_,
+                        coefs,
+                    )
                     res[n, :] = scores
                     votes[n, :] = vote
 
             # proba
-            if (self._svm.atts.prob_a is not None and
-                    len(self._svm.atts.prob_a) > 0 and
-                    mode_ == "SVM_SVC"):
+            if (
+                self._svm.atts.prob_a is not None
+                and len(self._svm.atts.prob_a) > 0
+                and mode_ == "SVM_SVC"
+            ):
                 scores = np.empty((res.shape[0], class_count_), dtype=X.dtype)
                 for n in range(scores.shape[0]):
                     s = self._probabilities(res[n], class_count_)
@@ -346,65 +381,23 @@ if onnx_opset_version() >= 18:
             labels = []
             for n in range(scores.shape[0]):
                 label, new_scores = self._compute_final_scores(
-                    votes[n], scores[n], weights_are_all_positive_,
-                    has_proba, classlabels_ints)
+                    votes[n],
+                    scores[n],
+                    weights_are_all_positive_,
+                    has_proba,
+                    classlabels_ints,
+                )
                 if final_scores is None:
-                    final_scores = np.empty((X.shape[0], new_scores.size),
-                                            dtype=X.dtype)
+                    final_scores = np.empty(
+                        (X.shape[0], new_scores.size), dtype=X.dtype
+                    )
                 final_scores[n, :] = new_scores
                 labels.append(label)
 
             # labels
-            if (classlabels_strings is not None and
-                    len(classlabels_strings) > 0):
-                return (np.array([classlabels_strings[i]
-                                  for i in labels]),
-                        final_scores)
+            if classlabels_strings is not None and len(classlabels_strings) > 0:
+                return (
+                    np.array([classlabels_strings[i] for i in labels]),
+                    final_scores,
+                )
             return (np.array(labels, dtype=np.int64), final_scores)
-
-    if __name__ == "__main__":
-        from onnx.reference import ReferenceEvaluator
-        from onnx.reference.ops.op_argmax import ArgMax_12 as _ArgMax
-        from sklearn.datasets import make_regression, make_classification
-        from sklearn.svm import SVR, SVC
-        from skl2onnx import to_onnx
-        from reference_implementation_afe import ArrayFeatureExtractor
-
-        class ArgMax(_ArgMax):
-            def _run(self, data, axis=None, keepdims=None,
-                     select_last_index=None):
-                if select_last_index == 0:  # type: ignore
-                    return _ArgMax._run(
-                        self, data, axis=axis, keepdims=keepdims)
-                raise NotImplementedError("Unused in sklearn-onnx.")
-
-        # classification 1
-        X, y = make_classification(
-            100, n_features=6, n_classes=4, n_informative=3, n_redundant=0)
-        y[:50] = 0
-        y[50:] = 1
-        model = SVC(probability=False).fit(X, y)
-        onx = to_onnx(model, X.astype(np.float32),
-                      options={"zipmap": False})
-        tr = ReferenceEvaluator(
-            onx, new_ops=[SVMClassifier,
-                          ArrayFeatureExtractor, ArgMax])
-        print("-----------------------")
-        print(tr.run(None, {"X": X[:4].astype(np.float32)}))
-        print("--")
-        from mlprodict.onnxrt import OnnxInference
-        oinf = OnnxInference(onx)
-        print(oinf.run({"X": X[:4].astype(np.float32)}))
-        print("--")
-        print(model.predict(X[:4].astype(np.float32)))
-        print(model.decision_function(X[:4].astype(np.float32)))
-        print(model.predict_proba(X[:4].astype(np.float32)))
-        print("-----------------------")
-
-        # regression
-        X, y = make_regression(100, n_features=4)
-        model = SVR().fit(X, y)
-        onx = to_onnx(model, X.astype(np.float32))
-        tr = ReferenceEvaluator(onx, new_ops=[SVMRegressor])
-        print(tr.run(None, {"X": X[:5].astype(np.float32)}))
-        print(model.predict(X[:5].astype(np.float32)))

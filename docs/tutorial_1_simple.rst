@@ -6,10 +6,10 @@ The easy case
 
 The easy case is when the machine learned model
 can be converter into ONNX with a converting library
-without writing nay specific code. That means that a converter
+without writing any specific code. That means that a converter
 exists for the model or each piece of the model,
 the converter produces an ONNX graph where every node
-is part of the existing ONNX specifications, the runtime
+is part of the existing ONNX specifications, and the runtime
 used to compute the predictions implements every node
 used in the ONNX graph.
 
@@ -27,4 +27,3 @@ used in the ONNX graph.
     auto_tutorial/plot_gbegin_cst
     auto_tutorial/plot_gbegin_dataframe
     auto_tutorial/plot_gconverting
-    auto_tutorial/plot_gbegin_transfer_learning

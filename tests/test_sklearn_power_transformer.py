@@ -4,6 +4,7 @@
 Test scikit-learn's PowerTransform
 """
 import unittest
+import packaging.version as pv
 
 import numpy as np
 
@@ -39,9 +40,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_yeo_johnson_negative_without_scaler(self):
@@ -55,9 +54,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_yeo_johnson_combined_without_scaler(self):
@@ -71,9 +68,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_box_cox_without_scaler(self):
@@ -87,9 +82,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_yeo_johnson_positive_with_scaler(self):
@@ -103,9 +96,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_with_scaler_blacklist(self):
@@ -136,9 +127,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_yeo_johnson_combined_with_scaler(self):
@@ -152,9 +141,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_box_cox_with_scaler(self):
@@ -168,11 +155,12 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
+    @unittest.skipIf(
+        pv.Version(sklearn.__version__) < pv.Version("1.3.0"), reason="PR #26566"
+    )
     def test_powertransformer_zeros(self):
         pt = PowerTransformer()
         data = np.array([[0, 0], [0, 0]], dtype=np.float32)
@@ -184,9 +172,7 @@ class TestSklearnPowerTransformer(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            data, model, model_onnx, basename="PowerTransformer"
-        )
+        dump_data_and_model(data, model, model_onnx, basename="PowerTransformer")
 
 
 if __name__ == "__main__":

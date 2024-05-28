@@ -15,8 +15,7 @@ from test_utils import TARGET_OPSET
 
 
 class DecorrelateTransformer(TransformerMixin, BaseEstimator):
-
-    def __init__(self, alpha=0.):
+    def __init__(self, alpha=0.0):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
         self.alpha = alpha
@@ -54,13 +53,14 @@ def decorrelate_transformer_converter(scope, operator, container):
 
 
 class TestOnnxDeprecation(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         update_registered_converter(
-            DecorrelateTransformer, "SklearnDecorrelateTransformer",
+            DecorrelateTransformer,
+            "SklearnDecorrelateTransformer",
             decorrelate_transformer_shape_calculator,
-            decorrelate_transformer_converter)
+            decorrelate_transformer_converter,
+        )
 
     def test_decorrelate_transformer(self):
         data = load_iris()
@@ -71,7 +71,7 @@ class TestOnnxDeprecation(unittest.TestCase):
         pred = dec.transform(X)
         cov = pred.T @ pred
         for i in range(cov.shape[0]):
-            cov[i, i] = 1.
+            cov[i, i] = 1.0
         assert_almost_equal(np.identity(4), cov)
 
         st = BytesIO()
@@ -80,7 +80,6 @@ class TestOnnxDeprecation(unittest.TestCase):
         assert_almost_equal(dec.transform(X), dec2.transform(X))
 
     def test_sub_operator(self):
-
         data = load_iris()
         X = data.data
 
@@ -89,22 +88,23 @@ class TestOnnxDeprecation(unittest.TestCase):
 
         with warnings.catch_warnings(record=True) as ws:
             warnings.simplefilter("always")
-            onx = to_onnx(dec, X.astype(np.float32),
-                          target_opset=TARGET_OPSET)
+            onx = to_onnx(dec, X.astype(np.float32), target_opset=TARGET_OPSET)
         mes = None
         for w in ws:
-            if (w.category == DeprecationWarning and
-                    'numpy' not in str(w.message).lower()):
+            if (
+                w.category == DeprecationWarning
+                and "numpy" not in str(w.message).lower()
+            ):
                 mes = w.message
         self.assertTrue(mes is not None)
-        self.assertIn('will be removed', str(mes))
+        self.assertIn("will be removed", str(mes))
 
         sess = InferenceSession(
-            onx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
 
         exp = dec.transform(X.astype(np.float32))
-        got = sess.run(None, {'X': X.astype(np.float32)})[0]
+        got = sess.run(None, {"X": X.astype(np.float32)})[0]
 
         def diff(p1, p2):
             p1 = p1.ravel()

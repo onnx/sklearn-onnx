@@ -26,24 +26,27 @@ from .tests_helper import (  # noqa
     binary_array_to_string,
     path_to_leaf,
 )
+
 try:
     from .utils_backend_onnx import ReferenceEvaluatorEx
 except ImportError:
+
     def ReferenceEvaluatorEx(*args, **kwargs):
         raise NotImplementedError(
             "onnx package does not implement class ReferenceEvaluator. "
-            "Update to onnx>=1.13.0.")
+            "Update to onnx>=1.13.0."
+        )
 
 
 def InferenceSessionEx(onx, *args, verbose=0, **kwargs):
     from onnxruntime import InferenceSession
+
     if "providers" not in kwargs:
         kwargs["providers"] = ["CPUExecutionProvider"]
     try:
         return InferenceSession(onx, *args, **kwargs)
     except Exception as e:
-        if (TARGET_OPSET >= 18 and
-                "support for domain ai.onnx is till opset" in str(e)):
+        if TARGET_OPSET >= 18 and "support for domain ai.onnx is till opset" in str(e):
             return ReferenceEvaluatorEx(onx, verbose=verbose)
         raise e
 
@@ -51,10 +54,9 @@ def InferenceSessionEx(onx, *args, verbose=0, **kwargs):
 def create_tensor(N, C, H=None, W=None):
     if H is None and W is None:
         return np.random.rand(N, C).astype(np.float32, copy=False)
-    elif H is not None and W is not None:
+    if H is not None and W is not None:
         return np.random.rand(N, C, H, W).astype(np.float32, copy=False)
-    else:
-        raise ValueError("This function only produce 2-D or 4-D tensor.")
+    raise ValueError("This function only produce 2-D or 4-D tensor.")
 
 
 def _get_ir_version(opv):
@@ -78,10 +80,11 @@ def _get_ir_version(opv):
 def max_onnxruntime_opset():
     """
     See `Versioning.md
-    <https://github.com/microsoft/onnxruntime/blob/
-    master/docs/Versioning.md>`_.
+    <https://github.com/microsoft/onnxruntime/blob/main/docs/Versioning.md>`_.
     """
     vi = pv.Version(ort_version.split("+")[0])
+    if vi >= pv.Version("1.16.0"):
+        return 19
     if vi >= pv.Version("1.14.0"):
         return 18
     if vi >= pv.Version("1.12.0"):

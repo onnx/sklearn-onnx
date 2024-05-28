@@ -1,18 +1,16 @@
 # tests
-flatbuffers
+black
+onnxruntime-extensions
+onnxscript
 pandas
 py-cpuinfo
 pybind11
 pytest
 pytest-cov
+ruff
 wheel
 
-# docs
-sphinx
-sphinx_modern_theme_modified
-sphinxcontrib-blockdiag
-tqdm
-
 # docs/examples
-lightgbm
+xgboost
+lightgbm; sys_platform != 'darwin'
 matplotlib

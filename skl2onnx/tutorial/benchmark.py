@@ -38,8 +38,14 @@ def measure_time(stmt, context, repeat=10, number=50, div_by_number=False):
     if div_by_number:
         res /= number
     mean = numpy.mean(res)
-    dev = numpy.mean(res ** 2)
+    dev = numpy.mean(res**2)
     dev = (dev - mean**2) ** 0.5
-    mes = dict(average=mean, deviation=dev, min_exec=numpy.min(res),
-               max_exec=numpy.max(res), repeat=repeat, number=number)
+    mes = dict(
+        average=mean,
+        deviation=dev,
+        min_exec=numpy.min(res),
+        max_exec=numpy.max(res),
+        repeat=repeat,
+        number=number,
+    )
     return mes

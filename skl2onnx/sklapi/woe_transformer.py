@@ -2,14 +2,16 @@
 
 import numpy as np
 from sklearn.base import TransformerMixin, BaseEstimator
+
 try:
     from sklearn.utils.validation import _deprecate_positional_args
 except ImportError:
-    def _deprecate_positional_args(x): return x  # noqa
+
+    def _deprecate_positional_args(x):
+        return x  # noqa
 
 
 class WOETransformer(TransformerMixin, BaseEstimator):
-
     """
     This transformer cannot be trained. It takes a list of intervals,
     one list per columns, and returns for every feature the list
@@ -70,7 +72,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 dim += 1
                 continue
             intervals = self.intervals[i]
-            if intervals == 'passthrough':
+            if intervals == "passthrough":
                 self.intervals_.append(None)
                 self.weights_.append(None)
                 self.indices_.append((dim, dim + 1))
@@ -78,18 +80,19 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 continue
             if not isinstance(intervals, list):
                 raise TypeError(
-                    "Intervals for column %d must be a list not %r."
-                    "" % (i, intervals))
+                    "Intervals for column %d must be a list not %r." "" % (i, intervals)
+                )
             inlist = []
             inweight = []
             for index, interval in enumerate(intervals):
                 if not isinstance(interval, tuple):
                     raise TypeError(
-                        "Interval %d is not a tuple but %r." % (i, interval))
+                        "Interval %d is not a tuple but %r." % (i, interval)
+                    )
                 if len(interval) < 2:
                     raise ValueError(
-                        "Interval %d should have at least two values "
-                        "%r." % interval)
+                        "Interval %d should have at least two values " "%r." % interval
+                    )
                 res = []
                 for j in range(0, 2):
                     try:
@@ -97,13 +100,15 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                     except (TypeError, ValueError) as e:
                         raise TypeError(
                             "Value at index %d in %r must be a float."
-                            "" % (j, interval)) from e
+                            "" % (j, interval)
+                        ) from e
                     res.append(fv)
                 if len(interval) >= 3:
                     if not isinstance(interval[2], bool):
                         raise TypeError(
                             "Value at index %i in %r must be a boolean."
-                            "" % (2, interval))
+                            "" % (2, interval)
+                        )
                     res.append(interval[2])
                 else:
                     res.append(False)
@@ -111,13 +116,17 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                     if not isinstance(interval[3], bool):
                         raise TypeError(
                             "Value at index %i in %r must be a boolean."
-                            "" % (3, interval))
+                            "" % (3, interval)
+                        )
                     res.append(interval[3])
                 else:
                     res.append(True)
                 inlist.append(tuple(res))
-                if (self.weights is None or i >= len(self.weights) or
-                        index >= len(self.weights[i])):
+                if (
+                    self.weights is None
+                    or i >= len(self.weights)
+                    or index >= len(self.weights[i])
+                ):
                     inweight.append(1)
                 else:
                     inweight.append(self.weights[i][index])
@@ -147,8 +156,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 right = col <= interval[1]
             else:
                 right = col < interval[1]
-            res[:, i] = ((left * right).astype(X.dtype) *
-                         self.weights_[column_index][i])
+            res[:, i] = (left * right).astype(X.dtype) * self.weights_[column_index][i]
         if self.onehot:
             return res
         return res.sum(axis=1, keepdims=0)
@@ -164,7 +172,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
         for i in range(X.shape[1]):
             a, b = self.indices_[i]
             if self.onehot:
-                res[:, a: b] = self._transform_column(X, i)
+                res[:, a:b] = self._transform_column(X, i)
             else:
                 res[:, i] = self._transform_column(X, i)
         return res
@@ -181,8 +189,11 @@ class WOETransformer(TransformerMixin, BaseEstimator):
             for interval in intervals:
                 name = [
                     "[" if interval[2] else "]",
-                    str(interval[0]), ",", str(interval[1]),
-                    "]" if interval[3] else "["]
+                    str(interval[0]),
+                    ",",
+                    str(interval[1]),
+                    "]" if interval[3] else "[",
+                ]
                 names.append("".join(name))
         return names
 

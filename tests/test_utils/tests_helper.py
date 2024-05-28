@@ -42,9 +42,7 @@ def _has_decision_function(model):
     return hasattr(model, "decision_function")
 
 
-disable_dump = (
-    os.environ.get("AZURE_HTTP_USER_AGENT", "undefined") != "undefined"
-)
+disable_dump = os.environ.get("AZURE_HTTP_USER_AGENT", "undefined") != "undefined"
 
 
 def _has_transform_model(model):
@@ -66,11 +64,12 @@ def fit_classification_model(
     n_repeated=None,
     cls_dtype=None,
     is_double=False,
+    n_samples=250,
 ):
     X, y = make_classification(
         n_classes=n_classes,
         n_features=n_features,
-        n_samples=250,
+        n_samples=n_samples,
         random_state=random_state,
         n_informative=min(7, n_features),
         n_redundant=n_redundant or min(2, n_features - min(7, n_features)),
@@ -86,9 +85,7 @@ def fit_classification_model(
         X = numpy.abs(X)
     if is_bool:
         X = X.astype(bool)
-    X_train, X_test, y_train, _ = train_test_split(
-        X, y, test_size=0.5, random_state=42
-    )
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5, random_state=42)
     model.fit(X_train, y_train)
     return model, X_test
 
@@ -137,9 +134,7 @@ def fit_multilabel_classification_model(
         random_state=42,
     )
     X = X.astype(numpy.int64) if is_int else X.astype(numpy.float32)
-    X_train, X_test, y_train, _ = train_test_split(
-        X, y, test_size=0.5, random_state=42
-    )
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5, random_state=42)
     model.fit(X_train, y_train)
     return model, X_test
 
@@ -153,9 +148,7 @@ def fit_multi_output_classification_model(
     n_outputs=2,
 ):
     numpy.random.seed(0)
-    X_train = numpy.random.randint(
-        0, n_informative, size=(n_samples, n_features)
-    )
+    X_train = numpy.random.randint(0, n_informative, size=(n_samples, n_features))
     y_train = numpy.random.randint(0, n_classes, size=(n_samples, n_outputs))
     model = RandomForestClassifier()
     model.fit(X_train, y_train)
@@ -184,9 +177,7 @@ def fit_regression_model(
     X = X.astype(numpy.int64) if is_int or is_bool else X.astype(numpy.float32)
     if is_bool:
         X = X.astype(bool)
-    X_train, X_test, y_train, _ = train_test_split(
-        X, y, test_size=0.5, random_state=42
-    )
+    X_train, X_test, y_train, _ = train_test_split(X, y, test_size=0.5, random_state=42)
     model.fit(X_train, y_train)
     return model, X_test
 
@@ -332,9 +323,7 @@ def dump_data_and_model(
             scores = scores.reshape(-1, 1)
         if len(scores.shape) != 2 or scores.shape[1] != 1:
             raise RuntimeError(
-                "Unexpected shape {} for a binary classifiation".format(
-                    scores.shape
-                )
+                "Unexpected shape {} for a binary classifiation".format(scores.shape)
             )
         return numpy.hstack([-scores, scores])
 
@@ -351,9 +340,10 @@ def dump_data_and_model(
                     call = getattr(model, method)
                 except AttributeError as e:
                     if method == "decision_function_binary":
+
                         def call(X, model=model):
-                            return _raw_score_binary_classification(
-                                model, X)
+                            return _raw_score_binary_classification(model, X)
+
                     else:
                         raise e
             if callable(call):
@@ -364,9 +354,7 @@ def dump_data_and_model(
                     return call(dataone)  # noqa
 
             else:
-                raise RuntimeError(
-                    "Method '{0}' is not callable.".format(method)
-                )
+                raise RuntimeError("Method '{0}' is not callable.".format(method))
     else:
         if hasattr(model, "predict"):
             if _has_predict_proba(model):
@@ -383,9 +371,9 @@ def dump_data_and_model(
                     model.decision_function(data),
                 ]
 
-                def lambda_original(): return model.decision_function(
-                    dataone
-                )  # noqa
+                def lambda_original():
+                    return model.decision_function(dataone)  # noqa
+
             elif _has_transform_model(model):
                 # clustering
                 try:
@@ -433,9 +421,7 @@ def dump_data_and_model(
 
         else:
             raise TypeError(
-                "Model has no predict or transform method: {0}".format(
-                    type(model)
-                )
+                "Model has no predict or transform method: {0}".format(type(model))
             )
 
     runtime_test["expected"] = prediction
@@ -547,9 +533,7 @@ def dump_data_and_model(
 
             if output is not None:
                 if not disable_dump:
-                    dest = os.path.join(
-                        folder, basename + ".backend.{0}.pkl".format(b)
-                    )
+                    dest = os.path.join(folder, basename + ".backend.{0}.pkl".format(b))
                     names.append(dest)
                     with open(dest, "wb") as f:
                         pickle.dump(output, f)
@@ -560,8 +544,8 @@ def dump_data_and_model(
                     ):
                         # run a benchmark
                         obs = compute_benchmark(
-                            {"onnxrt": lambda_onnx,
-                             "original": lambda_original})
+                            {"onnxrt": lambda_onnx, "original": lambda_original}
+                        )
                         df = pandas.DataFrame(obs)
                         df["input_size"] = sys.getsizeof(dataone)
                         dest = os.path.join(folder, basename + ".bench")
@@ -589,9 +573,7 @@ def convert_model(model, name, input_types, target_opset=None):
         "Sklearn",
     )
     if model is None:
-        raise RuntimeError(
-            "Unable to convert model of type '{0}'.".format(type(model))
-        )
+        raise RuntimeError("Unable to convert model of type '{0}'.".format(type(model)))
     return model, prefix
 
 
@@ -726,9 +708,7 @@ def dump_multiple_classification(
     y = [i + first_class for i in y]
     if label_string:
         if label_uint8:
-            raise AssertionError(
-                "label_string and label_uint8 cannot be both True"
-            )
+            raise AssertionError("label_string and label_uint8 cannot be both True")
         y = ["l%d" % i for i in y]
         suffix += "String"
     elif label_uint8:
@@ -737,9 +717,7 @@ def dump_multiple_classification(
     model.fit(X, y)
     if verbose:
         print(
-            "[dump_multiple_classification] model '{}'".format(
-                model.__class__.__name__
-            )
+            "[dump_multiple_classification] model '{}'".format(model.__class__.__name__)
         )
     model_onnx, prefix = convert_model(
         model,
@@ -767,9 +745,7 @@ def dump_multiple_classification(
     model.fit(X, y)
     if verbose:
         print(
-            "[dump_multiple_classification] model '{}'".format(
-                model.__class__.__name__
-            )
+            "[dump_multiple_classification] model '{}'".format(model.__class__.__name__)
         )
     model_onnx, prefix = convert_model(
         model,
@@ -862,8 +838,7 @@ def dump_multilabel_classification(
             )
         )
     model_onnx, prefix = convert_model(
-        model, "multi-class classifier", [("input",
-                                           FloatTensorType([None, 2]))]
+        model, "multi-class classifier", [("input", FloatTensorType([None, 2]))]
     )
     if verbose:
         print("[make_multilabel_classification] model was converted")
@@ -880,13 +855,14 @@ def dump_multilabel_classification(
 
 
 def dump_multiple_regression(
-        model,
-        suffix="",
-        folder=None,
-        allow_failure=None,
-        comparable_outputs=None,
-        verbose=False,
-        target_opset=None):
+    model,
+    suffix="",
+    folder=None,
+    allow_failure=None,
+    comparable_outputs=None,
+    verbose=False,
+    target_opset=None,
+):
     """
     Trains and dumps a model for a multi regression problem.
     The function trains a model and calls
@@ -903,7 +879,8 @@ def dump_multiple_regression(
         model,
         "multi-regressor",
         [("input", FloatTensorType([None, 2]))],
-        target_opset=target_opset)
+        target_opset=target_opset,
+    )
     dump_data_and_model(
         X,
         model,
@@ -912,16 +889,18 @@ def dump_multiple_regression(
         allow_failure=allow_failure,
         basename=prefix + "MRg" + model.__class__.__name__ + suffix,
         verbose=verbose,
-        comparable_outputs=comparable_outputs)
+        comparable_outputs=comparable_outputs,
+    )
 
 
 def dump_single_regression(
-        model,
-        suffix="",
-        folder=None,
-        allow_failure=None,
-        comparable_outputs=None,
-        target_opset=None):
+    model,
+    suffix="",
+    folder=None,
+    allow_failure=None,
+    comparable_outputs=None,
+    target_opset=None,
+):
     """
     Trains and dumps a model for a regression problem.
     The function trains a model and calls
@@ -938,7 +917,8 @@ def dump_single_regression(
         model,
         "single regressor",
         [("input", FloatTensorType([None, 2]))],
-        target_opset=target_opset)
+        target_opset=target_opset,
+    )
     dump_data_and_model(
         X,
         model,
@@ -946,7 +926,8 @@ def dump_single_regression(
         folder=folder,
         allow_failure=allow_failure,
         basename=prefix + "Reg" + model.__class__.__name__ + suffix,
-        comparable_outputs=comparable_outputs)
+        comparable_outputs=comparable_outputs,
+    )
 
 
 def timeit_repeat(fct, number, repeat):
@@ -994,7 +975,8 @@ def timeexec(fct, number, repeat):
         repeat=repeat,
         min5=mini,
         max5=maxi,
-        run=number)
+        run=number,
+    )
 
 
 def compute_benchmark(fcts, number=10, repeat=100):
@@ -1125,8 +1107,8 @@ def make_report_backend(folder, as_df=False, verbose=0):
 
     if benched == 0:
         raise RuntimeError(
-            "No benchmark files in '{0}', found:\n{1}".format(
-                folder, "\n".join(files)))
+            "No benchmark files in '{0}', found:\n{1}".format(folder, "\n".join(files))
+        )
 
     def dict_update(d, u):
         d.update(u)
@@ -1170,8 +1152,7 @@ def make_report_backend(folder, as_df=False, verbose=0):
                 # execution failed
                 pass
             try:
-                row["ratio_nodes"] = (
-                    row["nb_onnx_nodes"] / row["nb_estimators"])
+                row["ratio_nodes"] = row["nb_onnx_nodes"] / row["nb_estimators"]
             except KeyError:
                 # execution failed
                 pass
@@ -1195,8 +1176,7 @@ def binary_array_to_string(mat):
 def path_to_leaf(tree, mat, tree_indices=None):
     if tree_indices is None:
         # single tree
-        leave = set([i for i in range(tree.node_count)
-                     if tree.children_left[i] <= i])
+        leave = set([i for i in range(tree.node_count) if tree.children_left[i] <= i])
         res = []
         for row in range(mat.shape[0]):
             leaf = None
@@ -1211,7 +1191,7 @@ def path_to_leaf(tree, mat, tree_indices=None):
 
     leaves = []
     for i in range(0, len(tree)):
-        mm = mat[:, tree_indices[i]: tree_indices[i + 1]]
+        mm = mat[:, tree_indices[i] : tree_indices[i + 1]]
         tt = tree[i].tree_ if hasattr(tree[i], "tree_") else tree[i]
         res = path_to_leaf(tt, mm)
         leaves.append(numpy.array(res, dtype=numpy.int64))

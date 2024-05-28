@@ -28,8 +28,7 @@ def _array_feature_extrator(data, indices):
     try:
         tem = data[..., index]
     except IndexError as e:
-        raise RuntimeError(
-            f"data.shape={data.shape}, indices={indices}") from e
+        raise RuntimeError(f"data.shape={data.shape}, indices={indices}") from e
     res = tem.reshape(new_shape)
     return res
 
@@ -38,7 +37,6 @@ if onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
 
     class ArrayFeatureExtractor(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(self, data, indices):
@@ -51,7 +49,7 @@ if onnx_opset_version() >= 18:
                 the output has still two like a matrix with one row.
                 The implementation follows what :epkg:`onnxruntime` does in
                 `array_feature_extractor.cc
-                <https://github.com/microsoft/onnxruntime/blob/master/
+                <https://github.com/microsoft/onnxruntime/blob/main/
                 onnxruntime/core/providers/cpu/ml/array_feature_extractor.cc#L84>`_.
             """
             res = _array_feature_extrator(data, indices)

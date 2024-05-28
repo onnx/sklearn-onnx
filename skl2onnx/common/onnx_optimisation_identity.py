@@ -8,11 +8,14 @@ opset < 9.
 from logging import getLogger
 from onnx.helper import make_graph
 from ._onnx_optimisation_common import (
-    _rename_node_input, _rename_node_output,
-    _apply_optimisation_on_graph, _apply_remove_node_fct_node)
+    _rename_node_input,
+    _rename_node_output,
+    _apply_optimisation_on_graph,
+    _apply_remove_node_fct_node,
+)
 
 
-logger = getLogger('skl2onnx')
+logger = getLogger("skl2onnx")
 
 
 def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
@@ -30,15 +33,17 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
     :return: new onnx model
     """
     if debug_info is None:
-        debug_info = [str(type(onnx_model)).split('.')[-1].strip("'>")]
+        debug_info = [str(type(onnx_model)).split(".")[-1].strip("'>")]
     else:
-        debug_info = debug_info + \
-            [str(type(onnx_model)).split('.')[-1].strip("'>")]
+        debug_info = debug_info + [str(type(onnx_model)).split(".")[-1].strip("'>")]
 
-    if hasattr(onnx_model, 'graph'):
+    if hasattr(onnx_model, "graph"):
         return _apply_optimisation_on_graph(
-            onnx_remove_node_identity, onnx_model,
-            recursive=recursive, debug_info=debug_info)
+            onnx_remove_node_identity,
+            onnx_model,
+            recursive=recursive,
+            debug_info=debug_info,
+        )
 
     graph = onnx_model
 
@@ -50,7 +55,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
         for i, exnode in enumerate(existing_nodes):
             if exnode is None:
                 continue
-            if exnode.op_type == 'Identity':
+            if exnode.op_type == "Identity":
                 input = exnode.input[0]
                 output = exnode.output[0]
                 idnodes.append((i, exnode, input, output))
@@ -106,38 +111,40 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                     if out in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], out, inp)
                         logger.debug(
-                            '[VarId-a] rename node input %r into %r' % (
-                                out, inp))
+                            "[VarId-a] rename node input %r into %r" % (out, inp)
+                        )
                         rem += 1
-                        if nodes[j].op_type == 'Identity':
+                        if nodes[j].op_type == "Identity":
                             restart = True
-                logger.debug('[NodeId-a] remove %r' % nodes[i])
+                logger.debug("[NodeId-a] remove %r" % nodes[i])
                 nodes[i] = None
                 rem += 1
                 continue
-            if (not restart and inp not in inputs and inp not in outputs and
-                    out not in outputs):
+            if (
+                not restart
+                and inp not in inputs
+                and inp not in outputs
+                and out not in outputs
+            ):
                 # We cannot change an input name or an output name.
                 for j in range(len(nodes)):
                     if nodes[j] is None:
                         continue
                     if inp in nodes[j].output:
                         nodes[j] = _rename_node_output(nodes[j], inp, out)
-                        logger.debug(
-                            '[Var] rename node output %r into %r' % (
-                                out, inp))
+                        logger.debug("[Var] rename node output %r into %r" % (out, inp))
                         rem += 1
-                        if nodes[j].op_type == 'Identity':
+                        if nodes[j].op_type == "Identity":
                             restart = True
                     if inp in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], inp, out)
                         logger.debug(
-                            '[VarId-b] rename node input %r into %r' % (
-                                out, inp))
+                            "[VarId-b] rename node input %r into %r" % (out, inp)
+                        )
                         rem += 1
-                        if nodes[j].op_type == 'Identity':
+                        if nodes[j].op_type == "Identity":
                             restart = True
-                logger.debug('[NodeId-b] remove %r' % nodes[i])
+                logger.debug("[NodeId-b] remove %r" % nodes[i])
                 nodes[i] = None
                 rem += 1
 
@@ -149,13 +156,20 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                 continue
             nodes[i] = _apply_remove_node_fct_node(
                 onnx_remove_node_identity,
-                node, recursive=True, debug_info=debug_info + [node.name])
+                node,
+                recursive=True,
+                debug_info=debug_info + [node.name],
+            )
 
     # Finally create the new graph.
     nodes = list(filter(lambda n: n is not None, nodes))
-    graph = make_graph(nodes, onnx_model.name,
-                       onnx_model.input, onnx_model.output,
-                       onnx_model.initializer)
+    graph = make_graph(
+        nodes,
+        onnx_model.name,
+        onnx_model.input,
+        onnx_model.output,
+        onnx_model.initializer,
+    )
 
     graph.value_info.extend(onnx_model.value_info)
     return graph

@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
+
 try:
     from pandas import DataFrame
 except ImportError:
@@ -18,17 +19,18 @@ from ..common.data_types import (
     FloatType,
     FloatTensorType,
     Int64Type,
-    Int64TensorType, Int32TensorType,
-    StringTensorType)
-from ..common.data_types import (
-    Int8TensorType, UInt8TensorType,
-    UInt8Type, Int8Type)
+    Int64TensorType,
+    Int32TensorType,
+    StringTensorType,
+)
+from ..common.data_types import Int8TensorType, UInt8TensorType, UInt8Type, Int8Type
 
 
 def _guess_type(given_type):
     """
     Returns the proper type of an input.
     """
+
     def _guess_dim(value):
         if value == 0:
             return None
@@ -41,22 +43,32 @@ def _guess_type(given_type):
             return _guess_numpy_type(given_type.dtype, tuple())
         shape[0] = None
         return _guess_numpy_type(given_type.dtype, shape)
-    if isinstance(given_type, (FloatTensorType, Int64TensorType,
-                               Int32TensorType, StringTensorType,
-                               BooleanTensorType, DoubleTensorType,
-                               Int8TensorType, UInt8TensorType)):
+    if isinstance(
+        given_type,
+        (
+            FloatTensorType,
+            Int64TensorType,
+            Int32TensorType,
+            StringTensorType,
+            BooleanTensorType,
+            DoubleTensorType,
+            Int8TensorType,
+            UInt8TensorType,
+        ),
+    ):
         return given_type
     if isinstance(given_type, Variable):
         return given_type.type
     if isinstance(given_type, DataType):
         return given_type
     if isinstance(given_type, TensorProto):
-        return _guess_type_proto(given_type.data_type,
-                                 given_type.dims)
+        return _guess_type_proto(given_type.data_type, given_type.dims)
     if isinstance(given_type, ValueInfoProto):
         ttype = given_type.type.tensor_type
-        dims = [_guess_dim(ttype.shape.dim[i].dim_value)
-                for i in range(len(ttype.shape.dim))]
+        dims = [
+            _guess_dim(ttype.shape.dim[i].dim_value)
+            for i in range(len(ttype.shape.dim))
+        ]
         return _guess_type_proto(ttype.elem_type, dims)
     if isinstance(given_type, np.int64):
         return Int64Type()
@@ -74,17 +86,18 @@ def _guess_type(given_type):
     raise NotImplementedError(
         "Unsupported type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(type(given_type)))
+        "".format(type(given_type))
+    )
 
 
-def guess_initial_types(X, initial_types):
+def guess_initial_types(X, initial_types=None):
     if X is None and initial_types is None:
         raise NotImplementedError("Initial types must be specified.")
     if initial_types is None:
         if isinstance(X, np.ndarray):
             X = X[:1]
             gt = _guess_type(X)
-            initial_types = [('X', gt)]
+            initial_types = [("X", gt)]
         elif DataFrame is not None and isinstance(X, DataFrame):
             X = X[:1]
             initial_types = []
@@ -98,6 +111,5 @@ def guess_initial_types(X, initial_types):
         elif isinstance(X, list):
             initial_types = X
         else:
-            raise TypeError(
-                "Unexpected type %r, unable to guess type." % type(X))
+            raise TypeError("Unexpected type %r, unable to guess type." % type(X))
     return initial_types

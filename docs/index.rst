@@ -9,10 +9,10 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
     :widths: 5 5
     * - Linux
       - Windows
-    * - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master
-            :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
-      - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master
-            :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
+    * - .. image:: https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg
+            :target: https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml
+      - .. image:: https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml/badge.svg
+            :target: https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml
 
 
 *sklearn-onnx* enables you to convert models from
@@ -43,7 +43,7 @@ or submit a new one. Sources are available on
 The converter can convert a model for a specific version of ONNX.
 Every ONNX release is labelled with an opset number
 returned by function `onnx_opset_version
-<https://github.com/onnx/onnx/blob/master/onnx/defs/__init__.py#L22>`_.
+<https://github.com/onnx/onnx/blob/main/onnx/defs/__init__.py#L22>`_.
 This function returns the default value for parameter
 target opset (parameter *target_opset*) if it is not specified
 when converting the model. Every operator is versioned.
@@ -56,7 +56,8 @@ onnx nodes.
 .. runpython::
     :showcode:
     
-    from skl2onnx import __max_supported_opset__
+    from skl2onnx import __max_supported_opset__, __version__
+    print("documentation for version:", __version__)
     print("Last supported opset:", __max_supported_opset__)
 
 **Backend**
@@ -69,33 +70,36 @@ to automatically check every converter with
 `onnxruntime-gpu <https://pypi.org/project/onnxruntime-gpu>`_.
 Every converter is tested with this backend.
 
+**Getting started**
+
 ::
 
-    # Train a model.
+    import numpy as np
     from sklearn.datasets import load_iris
     from sklearn.model_selection import train_test_split
     from sklearn.ensemble import RandomForestClassifier
+
     iris = load_iris()
     X, y = iris.data, iris.target
+    X = X.astype(np.float32)
     X_train, X_test, y_train, y_test = train_test_split(X, y)
     clr = RandomForestClassifier()
     clr.fit(X_train, y_train)
 
-    # Convert into ONNX format
-    from skl2onnx import convert_sklearn
-    from skl2onnx.common.data_types import FloatTensorType
-    initial_type = [('float_input', FloatTensorType([None, 4]))]
-    onx = convert_sklearn(clr, initial_types=initial_type)
+    # Convert into ONNX format.
+    from skl2onnx import to_onnx
+
+    onx = to_onnx(clr, X[:1])
     with open("rf_iris.onnx", "wb") as f:
         f.write(onx.SerializeToString())
 
-    # Compute the prediction with ONNX Runtime
+    # Compute the prediction with onnxruntime.
     import onnxruntime as rt
-    import numpy
+
     sess = rt.InferenceSession("rf_iris.onnx", providers=["CPUExecutionProvider"])
     input_name = sess.get_inputs()[0].name
     label_name = sess.get_outputs()[0].name
-    pred_onx = sess.run([label_name], {input_name: X_test.astype(numpy.float32)})[0]
+    pred_onx = sess.run([label_name], {input_name: X_test.astype(np.float32)})[0]
 
 **Related converters**
 
@@ -106,6 +110,10 @@ Other converters can be found on `github/onnx <https://github.com/onnx/>`_,
 `torch.onnx <https://pytorch.org/docs/stable/onnx.html>`_,
 `ONNX-MXNet API <https://mxnet.incubator.apache.org/api/python/contrib/onnx.html>`_,
 `Microsoft.ML.Onnx <https://www.nuget.org/packages/Microsoft.ML.Onnx/>`_...
+
+**Change Logs**
+
+See `CHANGELOGS.md <https://github.com/onnx/sklearn-onnx/blob/main/CHANGELOGS.md>`_.
 
 **Credits**
 
@@ -118,3 +126,7 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
 **License**
 
 It is licensed with `Apache License v2.0 <../LICENSE>`_.
+
+**Older versions**
+
+* `1.16.0 <versions/v1.16.0/>`_

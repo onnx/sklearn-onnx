@@ -20,14 +20,21 @@ from skl2onnx.helpers.onnx_helper import (
     change_onnx_domain,
     add_output_initializer,
     get_initializers,
-    update_onnx_initializers)
+    update_onnx_initializers,
+)
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
 
 def one_hot_encoder_supports_string():
     # pv.Version does not work with development versions
-    vers = '.'.join(sklearn_version.split('.')[:2])
+    vers = ".".join(sklearn_version.split(".")[:2])
     return pv.Version(vers) >= pv.Version("0.20.0")
+
+
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
 
 
 class TestOnnxHelper(unittest.TestCase):
@@ -40,17 +47,20 @@ class TestOnnxHelper(unittest.TestCase):
         from onnxruntime import InferenceSession
 
         session = InferenceSession(
-            save_onnx_model(model),
-            providers=["CPUExecutionProvider"])
+            save_onnx_model(model), providers=["CPUExecutionProvider"]
+        )
         return lambda X: session.run(None, {"input": X})[0]
 
     def test_onnx_helper_load_save(self):
         model = make_pipeline(StandardScaler(), Binarizer(threshold=0.5))
         X = numpy.array([[0.1, 1.1], [0.2, 2.2]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "binarizer",
-                                     [("input", FloatTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            model,
+            "binarizer",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
         filename = "temp_onnx_helper_load_save.onnx"
         save_onnx_model(model_onnx, filename)
         model = load_onnx_model(filename)
@@ -69,16 +79,21 @@ class TestOnnxHelper(unittest.TestCase):
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_onnx_helper_load_save_init(self):
         model = make_pipeline(
             Binarizer(),
-            OneHotEncoder(sparse=False, handle_unknown='ignore'),
-            StandardScaler())
+            OneHotEncoder(sparse_output=False, handle_unknown="ignore"),
+            StandardScaler(),
+        )
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            model,
+            "pipe3",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
         filename = "temp_onnx_helper_load_save.onnx"
         save_onnx_model(model_onnx, filename)
         model = load_onnx_model(filename)
@@ -97,15 +112,20 @@ class TestOnnxHelper(unittest.TestCase):
         not one_hot_encoder_supports_string(),
         reason="OneHotEncoder did not have categories_ before 0.20",
     )
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_onnx_helper_load_save_init_meta(self):
-        model = make_pipeline(Binarizer(), OneHotEncoder(sparse=False),
-                              StandardScaler())
+        model = make_pipeline(
+            Binarizer(), OneHotEncoder(sparse_output=False), StandardScaler()
+        )
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
-        meta = {'pA': 'one', 'pB': 'two'}
+        model_onnx = convert_sklearn(
+            model,
+            "pipe3",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        meta = {"pA": "one", "pB": "two"}
         onnx.helper.set_model_props(model_onnx, meta)
         new_model = select_model_inputs_outputs(model_onnx, "variable")
         vals = {p.key: p.value for p in new_model.metadata_props}
@@ -115,11 +135,13 @@ class TestOnnxHelper(unittest.TestCase):
         model = make_pipeline(StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", FloatTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
-        model_onnx = change_onnx_domain(
-            model_onnx, {'Scaler': ('ScalerNew', 'ML2')})
+        model_onnx = convert_sklearn(
+            model,
+            "pipe3",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        model_onnx = change_onnx_domain(model_onnx, {"Scaler": ("ScalerNew", "ML2")})
         self.assertIn('domain: "ML2"', str(model_onnx))
         self.assertIn('op_type: "ScalerNew"', str(model_onnx))
 
@@ -128,34 +150,37 @@ class TestOnnxHelper(unittest.TestCase):
         cst = numpy.array([0.5, 0.7, 0.8], dtype=numpy.int32)
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", DoubleTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
-        new_model_onnx = add_output_initializer(
-            model_onnx, "new_output", cst)
+        model_onnx = convert_sklearn(
+            model,
+            "pipe3",
+            [("input", DoubleTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        new_model_onnx = add_output_initializer(model_onnx, "new_output", cst)
 
         sess = InferenceSession(
-            new_model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X})
+            new_model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X})
         self.assertEqual(len(res), 2)
         assert_almost_equal(cst, res[1])
         self.assertEqual(model_onnx.domain, new_model_onnx.domain)
         names = [o.name for o in sess.get_outputs()]
-        self.assertEqual(['variable', 'new_output'], names)
+        self.assertEqual(["variable", "new_output"], names)
 
         new_model_onnx = add_output_initializer(
-            model_onnx, ["new_output1", "new_output2"], [cst, cst + 1])
+            model_onnx, ["new_output1", "new_output2"], [cst, cst + 1]
+        )
 
         sess = InferenceSession(
-            new_model_onnx.SerializeToString(),
-            providers=["CPUExecutionProvider"])
-        res = sess.run(None, {'input': X})
+            new_model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        res = sess.run(None, {"input": X})
         self.assertEqual(len(res), 3)
         assert_almost_equal(cst, res[1])
         assert_almost_equal(cst + 1, res[2])
         names = [o.name for o in sess.get_outputs()]
-        self.assertEqual(['variable', 'new_output1', 'new_output2'], names)
+        self.assertEqual(["variable", "new_output1", "new_output2"], names)
 
         with self.assertRaises(ValueError):
             add_output_initializer(model_onnx, "input", cst)
@@ -173,30 +198,35 @@ class TestOnnxHelper(unittest.TestCase):
         model = make_pipeline(StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", DoubleTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            model,
+            "pipe3",
+            [("input", DoubleTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
         init = get_initializers(model_onnx)
         self.assertEqual(len(init), 2)
-        assert_almost_equal(init['Di_Divcst'],
-                            numpy.array([0.10897247, 0.51173724]))
-        assert_almost_equal(init['Su_Subcst'], numpy.array([0.225, 1.975]))
+        assert_almost_equal(init["Di_Divcst"], numpy.array([0.10897247, 0.51173724]))
+        assert_almost_equal(init["Su_Subcst"], numpy.array([0.225, 1.975]))
 
     def test_update_onnx_initializers(self):
         model = make_pipeline(StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
         model.fit(X)
-        model_onnx = convert_sklearn(model, "pipe3",
-                                     [("input", DoubleTensorType([None, 2]))],
-                                     target_opset=TARGET_OPSET)
+        model_onnx = convert_sklearn(
+            model,
+            "pipe3",
+            [("input", DoubleTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
         init = get_initializers(model_onnx)
         self.assertEqual(len(init), 2)
         for v in init.values():
             v[:] = 1.5
         update_onnx_initializers(model_onnx, init)
         init = get_initializers(model_onnx)
-        assert_almost_equal(init['Di_Divcst'], numpy.array([1.5, 1.5]))
-        assert_almost_equal(init['Su_Subcst'], numpy.array([1.5, 1.5]))
+        assert_almost_equal(init["Di_Divcst"], numpy.array([1.5, 1.5]))
+        assert_almost_equal(init["Su_Subcst"], numpy.array([1.5, 1.5]))
 
 
 if __name__ == "__main__":

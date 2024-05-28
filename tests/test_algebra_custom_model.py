@@ -18,9 +18,7 @@ from skl2onnx.algebra.onnx_ops import OnnxDiv, OnnxSub
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
-class CustomOpTransformer(BaseEstimator, TransformerMixin,
-                          OnnxOperatorMixin):
-
+class CustomOpTransformer(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
     def __init__(self, op_version=None):
         BaseEstimator.__init__(self)
         TransformerMixin.__init__(self)
@@ -35,23 +33,28 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin,
     def transform(self, X):
         return (X - self.W_) / self.S_
 
-    def to_onnx_operator(self, inputs=None, outputs=None,
-                         target_opset=None, **kwargs):
+    def to_onnx_operator(self, inputs=None, outputs=None, target_opset=None, **kwargs):
         if inputs is None:
             raise RuntimeError("inputs should contain one name")
         i0 = self.get_inputs(inputs, 0)
         W = self.W_.astype(np.float32)
         S = self.S_.astype(np.float32)
         # case if there are multiple output nodes
-        return OnnxDiv(OnnxSub(i0, W, op_version=self.op_version), S,
-                       output_names=outputs, op_version=self.op_version)
+        return OnnxDiv(
+            OnnxSub(i0, W, op_version=self.op_version),
+            S,
+            output_names=outputs,
+            op_version=self.op_version,
+        )
 
 
 class CustomOpTransformerShape(CustomOpTransformer):
     def onnx_shape_calculator(self):
         def shape_calculator(operator):
             operator.outputs[0].type = FloatTensorType(
-                shape=operator.inputs[0].type.shape)
+                shape=operator.inputs[0].type.shape
+            )
+
         return shape_calculator
 
 
@@ -60,7 +63,6 @@ class CustomOpScaler(StandardScaler, OnnxOperatorMixin):
 
 
 class TestCustomModelAlgebra(unittest.TestCase):
-
     def test_base_api(self):
         model = CustomOpScaler()
         data = [[0, 0, 3], [1, 1, 0], [0, 2, 1], [1, 0, 2]]
@@ -73,7 +75,7 @@ class TestCustomModelAlgebra(unittest.TestCase):
 
     @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_custom_scaler(self):
-        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+        mat = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]])
         tr = CustomOpTransformerShape(op_version=TARGET_OPSET)
         tr.fit(mat)
         z = tr.transform(mat)
@@ -83,15 +85,15 @@ class TestCustomModelAlgebra(unittest.TestCase):
         model_onnx = tr.to_onnx(matf)
         onnx.checker.check_model(model_onnx)
         dump_data_and_model(
-            mat.astype(np.float32), tr, model_onnx,
-            basename="CustomTransformerAlgebra")
+            mat.astype(np.float32), tr, model_onnx, basename="CustomTransformerAlgebra"
+        )
 
     @unittest.skipIf(TARGET_OPSET < 12, reason="not available")
     def test_custom_scaler_pipeline_right(self):
         pipe = make_pipeline(
-            StandardScaler(),
-            CustomOpTransformerShape(op_version=TARGET_OPSET))
-        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+            StandardScaler(), CustomOpTransformerShape(op_version=TARGET_OPSET)
+        )
+        mat = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]])
         pipe.fit(mat)
         z = pipe.transform(mat)
         assert z is not None
@@ -100,15 +102,18 @@ class TestCustomModelAlgebra(unittest.TestCase):
         model_onnx = to_onnx(pipe, matf, target_opset=TARGET_OPSET)
         onnx.checker.check_model(model_onnx)
         dump_data_and_model(
-            mat.astype(np.float32), pipe, model_onnx,
-            basename="CustomTransformerPipelineRightAlgebra")
+            mat.astype(np.float32),
+            pipe,
+            model_onnx,
+            basename="CustomTransformerPipelineRightAlgebra",
+        )
 
     @unittest.skipIf(TARGET_OPSET < 8, reason="not available")
     def test_custom_scaler_pipeline_left(self):
         pipe = make_pipeline(
-            CustomOpTransformer(op_version=TARGET_OPSET),
-            StandardScaler())
-        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+            CustomOpTransformer(op_version=TARGET_OPSET), StandardScaler()
+        )
+        mat = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]])
         pipe.fit(mat)
         z = pipe.transform(mat)
 
@@ -120,9 +125,9 @@ class TestCustomModelAlgebra(unittest.TestCase):
             assert "inputs should contain one name" in str(e)
 
         pipe = make_pipeline(
-            CustomOpTransformerShape(op_version=TARGET_OPSET),
-            StandardScaler())
-        mat = np.array([[0., 1.], [0., 1.], [2., 2.]])
+            CustomOpTransformerShape(op_version=TARGET_OPSET), StandardScaler()
+        )
+        mat = np.array([[0.0, 1.0], [0.0, 1.0], [2.0, 2.0]])
         pipe.fit(mat)
         z = pipe.transform(mat)
         assert z is not None
@@ -136,8 +141,11 @@ class TestCustomModelAlgebra(unittest.TestCase):
             onnx.checker.check_model(model_onnx)
 
         dump_data_and_model(
-            mat.astype(np.float32), pipe, model_onnx,
-            basename="CustomTransformerPipelineLeftAlgebra")
+            mat.astype(np.float32),
+            pipe,
+            model_onnx,
+            basename="CustomTransformerPipelineLeftAlgebra",
+        )
 
 
 if __name__ == "__main__":

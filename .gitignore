@@ -23,6 +23,8 @@ build/
 *.bat
 
 # test generated files
+*.onnx
+*.whl
 .pytest_cache
 .cache
 htmlcov
@@ -36,6 +38,7 @@ docs/auto_examples
 docs/examples/graph*.*
 docs/examples/*.onnx
 docs/examples/pipeline*.dot*
+docs/sg_execution_times.rst
 tests/TESTDUMP
 tests/tests_dump
 tests/graph.dot*
@@ -68,3 +71,4 @@ docs/tutorial/*.onnx
 docs/tutorial/*.jpg
 docs/tutorial/*.png
 docs/tutorial/*.dot
+docs/tutorial/catboost_info

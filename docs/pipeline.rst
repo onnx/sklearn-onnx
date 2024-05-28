@@ -8,7 +8,7 @@ Convert a pipeline
 *skl2onnx* converts any machine learning pipeline into
 *ONNX* pipelines. Every transformer or predictors is converted
 into one or multiple nodes into the *ONNX* graph.
-Any `ONNX backend <https://github.com/onnx/onnx/blob/master/docs/ImplementingAnOnnxBackend.md>`_
+Any `ONNX backend <https://github.com/onnx/onnx/blob/main/docs/ImplementingAnOnnxBackend.md>`_
 can then use this graph to compute equivalent outputs for the same inputs.
 
 .. _l-complex-pipeline:
@@ -41,7 +41,7 @@ useful to build complex pipelines such as the following one:
     ])
 
     categorical_transformer = Pipeline(steps=[
-        ('onehot', OneHotEncoder(sparse=True, handle_unknown='ignore')),
+        ('onehot', OneHotEncoder(sparse_output=True, handle_unknown='ignore')),
         ('tsvd', TruncatedSVD(n_components=1, algorithm='arpack', tol=1e-4))
     ])
 
@@ -148,8 +148,8 @@ order:
 * **converter(scope, operator, container):**
   The converter converts the transformers or predictors into
   *ONNX* nodes. Each node can an *ONNX*
-  `operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
-  `ML operator <https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_ or
+  `operator <https://github.com/onnx/onnx/blob/main/docs/Operators.md>`_ or
+  `ML operator <https://github.com/onnx/onnx/blob/main/docs/Operators.md>`_ or
   custom *ONNX* operators.
 
 As *sklearn-onnx* may convert pipelines with model coming from other libraries,
@@ -228,7 +228,7 @@ isolate the source of the differences. The function
 may then be used to investigate each component independently.
 The following piece of code is extracted from unit test
 `test_investigate.py <https://github.com/onnx/sklearn-onnx/
-blob/master/tests/test_investigate.py>`_ and converts
+blob/main/tests/test_investigate.py>`_ and converts
 a pipeline and each of its components independently.
 
 ::

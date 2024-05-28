@@ -3,7 +3,9 @@
 
 import unittest
 import packaging.version as pv
+import onnx
 import onnxruntime
+
 try:
     # scikit-learn >= 0.22
     from sklearn.utils._testing import ignore_warnings
@@ -14,310 +16,374 @@ from sklearn.ensemble import (
     BaggingClassifier,
     BaggingRegressor,
     GradientBoostingClassifier,
-    GradientBoostingRegressor)
+    GradientBoostingRegressor,
+)
 from sklearn.linear_model import SGDClassifier, SGDRegressor
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
-    Int64TensorType)
+    Int64TensorType,
+)
 from test_utils import (
     dump_data_and_model,
     fit_classification_model,
     fit_regression_model,
-    TARGET_OPSET)
+    TARGET_OPSET,
+)
 
 
 class TestSklearnBaggingConverter(unittest.TestCase):
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_default_binary_int(self):
-        model, X = fit_classification_model(
-            BaggingClassifier(), 2, is_int=True)
+        model, X = fit_classification_model(BaggingClassifier(), 2, is_int=True)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnBaggingClassifierDefaultBinary")
+            X, model, model_onnx, basename="SklearnBaggingClassifierDefaultBinary"
+        )
 
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_default_multiclass_int(self):
-        model, X = fit_classification_model(
-            BaggingClassifier(), 4, is_int=True)
+        model, X = fit_classification_model(BaggingClassifier(), 4, is_int=True)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", Int64TensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnBaggingClassifierDefaultMulticlass"
+        )
+
+    @ignore_warnings(category=FutureWarning)
+    def test_bagging_classifier_default_binary(self):
+        model, X = fit_classification_model(BaggingClassifier(), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierDefaultMulticlass")
+            verbose=False,
+            basename="SklearnBaggingClassifierDefaultBinary",
+        )
 
     @ignore_warnings(category=FutureWarning)
-    def test_bagging_classifier_default_binary(self):
-        model, X = fit_classification_model(
-            BaggingClassifier(), 2)
+    def test_bagging_classifier_max_features(self):
+        model, X = fit_classification_model(BaggingClassifier(max_features=0.5), 2)
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
-            model_onnx, verbose=False,
-            basename="SklearnBaggingClassifierDefaultBinary")
-
-    @ignore_warnings(category=FutureWarning)
-    def test_bagging_classifier_max_features(self):
-        model, X = fit_classification_model(
-            BaggingClassifier(max_features=0.5), 2)
-        model_onnx = convert_sklearn(
-            model, "bagging classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X, model, model_onnx, verbose=False,
-            basename="SklearnBaggingClassifierMaxFeatures")
+            model_onnx,
+            verbose=False,
+            basename="SklearnBaggingClassifierMaxFeatures",
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_bootstrap_features(self):
         model, X = fit_classification_model(
-            BaggingClassifier(bootstrap_features=True), 2)
-        model_onnx = convert_sklearn(
-            model, "bagging classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X[:5], model, model_onnx, verbose=False,
-            basename="SklearnBaggingClassifierBootstrapFeatures")
-
-    @ignore_warnings(category=FutureWarning)
-    def test_bagging_classifier_default_binary_nozipmap(self):
-        model, X = fit_classification_model(
-            BaggingClassifier(), 2)
-        model_onnx = convert_sklearn(
-            model, "bagging classifier",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET,
-            options={id(model): {'zipmap': False}})
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnBaggingClassifierDefaultBinaryNoZipMap")
-
-    @ignore_warnings(category=FutureWarning)
-    def test_bagging_classifier_default_multiclass(self):
-        model, X = fit_classification_model(
-            BaggingClassifier(), 3)
+            BaggingClassifier(bootstrap_features=True), 2
+        )
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X[:5],
+            model,
+            model_onnx,
+            verbose=False,
+            basename="SklearnBaggingClassifierBootstrapFeatures",
+        )
+
+    @ignore_warnings(category=FutureWarning)
+    def test_bagging_classifier_default_binary_nozipmap(self):
+        model, X = fit_classification_model(BaggingClassifier(), 2)
+        model_onnx = convert_sklearn(
+            model,
+            "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={id(model): {"zipmap": False}},
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBaggingClassifierDefaultBinaryNoZipMap",
+        )
+
+    @ignore_warnings(category=FutureWarning)
+    def test_bagging_classifier_default_multiclass(self):
+        model, X = fit_classification_model(BaggingClassifier(), 3)
+        model_onnx = convert_sklearn(
+            model,
+            "bagging classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X[:10],
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierDefaultMulticlass")
+            basename="SklearnBaggingClassifierDefaultMulticlass",
+        )
 
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_sgd_binary(self):
         model, X = fit_classification_model(
             BaggingClassifier(
-                SGDClassifier(loss='modified_huber', random_state=42),
-                random_state=42), 2)
+                SGDClassifier(loss="modified_huber", random_state=42), random_state=42
+            ),
+            2,
+        )
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBaggingClassifierSGDBinary")
+            X, model, model_onnx, basename="SklearnBaggingClassifierSGDBinary"
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_sgd_binary_decision_function(self):
         model, X = fit_classification_model(
-            BaggingClassifier(SGDClassifier(random_state=42),
-                              random_state=42), 2)
-        options = {id(model): {'raw_scores': True}}
+            BaggingClassifier(SGDClassifier(random_state=42), random_state=42), 2
+        )
+        options = {id(model): {"raw_scores": True}}
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options,
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:5], model, model_onnx,
+            X[:5],
+            model,
+            model_onnx,
             basename="SklearnBaggingClassifierSGDBinaryDecisionFunction-Dec3",
-            methods=['predict', 'decision_function_binary'])
+            methods=["predict", "decision_function_binary"],
+        )
 
-    @unittest.skipIf(pv.Version(onnxruntime.__version__)
-                     <= pv.Version("0.4.0"),
-                     reason="Not implemented.")
+    @unittest.skipIf(
+        pv.Version(onnxruntime.__version__) <= pv.Version("0.4.0"),
+        reason="Not implemented.",
+    )
     @ignore_warnings(category=(FutureWarning, DeprecationWarning))
     def test_bagging_classifier_sgd_multiclass(self):
         model, X = fit_classification_model(
             BaggingClassifier(
-                SGDClassifier(loss='modified_huber', random_state=42),
-                random_state=42), 5)
+                SGDClassifier(loss="modified_huber", random_state=42), random_state=42
+            ),
+            5,
+        )
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:5], model, model_onnx,
-            basename="SklearnBaggingClassifierSGDMulticlass-Dec3")
+            X[:5],
+            model,
+            model_onnx,
+            basename="SklearnBaggingClassifierSGDMulticlass-Dec3",
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_sgd_multiclass_decision_function(self):
         model, X = fit_classification_model(
             BaggingClassifier(
                 GradientBoostingClassifier(random_state=42, n_estimators=4),
-                random_state=42), 4, n_features=10)
-        options = {id(model): {'raw_scores': True, "zipmap": False}}
+                random_state=42,
+            ),
+            4,
+            n_features=10,
+        )
+        options = {id(model): {"raw_scores": True, "zipmap": False}}
         model_onnx = convert_sklearn(
-            model, "bagging classifier",
+            model,
+            "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             options=options,
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X[:15], model, model_onnx,
+            X[:15],
+            model,
+            model_onnx,
             basename="SklearnBaggingClassifierSGDMultiDecisionFunction-Dec3",
-            methods=['predict', 'decision_function'])
+            methods=["predict", "decision_function"],
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_binary(self):
         model, X = fit_classification_model(
-            BaggingClassifier(
-                GradientBoostingClassifier(n_estimators=10)), 2)
+            BaggingClassifier(GradientBoostingClassifier(n_estimators=5)),
+            2,
+            n_samples=100,
+            n_features=5,
+        )
         model_onnx = convert_sklearn(
             model,
             "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
-            options={"zipmap": False})
+            options={"zipmap": False},
+        )
 
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingClassifierGradientBoostingBinary")
+            basename="SklearnBaggingClassifierGradientBoostingBinary",
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(
-                GradientBoostingClassifier(n_estimators=10)), 3)
+            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)),
+            3,
+            n_samples=100,
+            n_features=5,
+        )
         model_onnx = convert_sklearn(
-            model, "bagging classifier",
+            model,
+            "bagging classifier",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
-            options={"zipmap": False})
+            options={"zipmap": False},
+        )
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnBaggingClassifierGradientBoostingMulticlass")
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBaggingClassifierGradientBoostingMulticlass",
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_default(self):
-        model, X = fit_regression_model(
-            BaggingRegressor())
+        model, X = fit_regression_model(BaggingRegressor())
         model_onnx = convert_sklearn(
             model,
             "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnBaggingRegressorDefault-Dec4"
+        )
+
+    @ignore_warnings(category=FutureWarning)
+    def test_bagging_regressor_max_features(self):
+        model, X = fit_regression_model(
+            BaggingRegressor(max_features=0.5, n_estimators=3)
+        )
+        model_onnx = convert_sklearn(
+            model,
+            "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingRegressorDefault-Dec4")
-
-    @ignore_warnings(category=FutureWarning)
-    def test_bagging_regressor_max_features(self):
-        model, X = fit_regression_model(
-            BaggingRegressor(max_features=0.5, n_estimators=3))
-        model_onnx = convert_sklearn(
-            model, "bagging regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X, model, model_onnx, verbose=False,
-            basename="SklearnBaggingRegressorMaxFeatures-Dec4")
+            verbose=False,
+            basename="SklearnBaggingRegressorMaxFeatures-Dec4",
+        )
 
     def test_bagging_regressor_bootstrap_features(self):
-        model, X = fit_regression_model(
-            BaggingRegressor(bootstrap_features=False))
+        model, X = fit_regression_model(BaggingRegressor(bootstrap_features=False))
         model_onnx = convert_sklearn(
-            model, "bagging regressor",
+            model,
+            "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
-        self.assertIsNotNone(model_onnx)
-        dump_data_and_model(
-            X, model, model_onnx, verbose=False,
-            basename="SklearnBaggingRegressorBootstrapFeatures-Dec4")
-
-    @ignore_warnings(category=FutureWarning)
-    def test_bagging_regressor_sgd(self):
-        model, X = fit_regression_model(
-            BaggingRegressor(SGDRegressor()))
-        model_onnx = convert_sklearn(
-            model, "bagging regressor",
-            [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X,
             model,
             model_onnx,
-            basename="SklearnBaggingRegressorSGD-Dec4")
+            verbose=False,
+            basename="SklearnBaggingRegressorBootstrapFeatures-Dec4",
+        )
 
+    @ignore_warnings(category=FutureWarning)
+    def test_bagging_regressor_sgd(self):
+        model, X = fit_regression_model(BaggingRegressor(SGDRegressor()))
+        model_onnx = convert_sklearn(
+            model,
+            "bagging regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnBaggingRegressorSGD-Dec4"
+        )
+
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="Fixed issue in more recent versions",
+    )
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_gradient_boosting(self):
         model, X = fit_regression_model(
-            BaggingRegressor(
-                GradientBoostingRegressor(n_estimators=10)))
+            BaggingRegressor(GradientBoostingRegressor(n_estimators=10))
+        )
         model_onnx = convert_sklearn(
-            model, "bagging regressor",
+            model,
+            "bagging regressor",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=TARGET_OPSET)
+            target_opset=TARGET_OPSET,
+        )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx,
-            basename="SklearnBaggingRegressorGradientBoosting-Dec4")
+            X,
+            model,
+            model_onnx,
+            basename="SklearnBaggingRegressorGradientBoosting-Dec4",
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_bool(self):
-        model, X = fit_regression_model(
-            BaggingRegressor(), is_bool=True)
+        model, X = fit_regression_model(BaggingRegressor(), is_bool=True)
         model_onnx = convert_sklearn(
             model,
             "bagging regressor",
@@ -326,13 +392,12 @@ class TestSklearnBaggingConverter(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X,
-            model,
-            model_onnx,
-            basename="SklearnBaggingRegressorBool-Dec4")
+            X, model, model_onnx, basename="SklearnBaggingRegressorBool-Dec4"
+        )
 
 
 if __name__ == "__main__":
-    # TestSklearnBaggingConverter().
-    # test_bagging_classifier_sgd_multiclass_decision_function()
+    import logging
+
+    logging.getLogger("skl2onnx").setLevel(logging.ERROR)
     unittest.main(verbosity=2)

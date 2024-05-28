@@ -11,4 +11,5 @@ def calculate_local_outlier_factor_output_shapes(operator):
 
 
 register_shape_calculator(
-    'SklearnLocalOutlierFactor', calculate_local_outlier_factor_output_shapes)
+    "SklearnLocalOutlierFactor", calculate_local_outlier_factor_output_shapes
+)

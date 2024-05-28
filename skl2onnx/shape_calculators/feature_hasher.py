@@ -2,8 +2,11 @@
 
 import numpy as np
 from ..common.data_types import (
-    StringTensorType, Int64TensorType, FloatTensorType,
-    DoubleTensorType)
+    StringTensorType,
+    Int64TensorType,
+    FloatTensorType,
+    DoubleTensorType,
+)
 from ..common._registration import register_shape_calculator
 from ..common.utils import check_input_and_output_numbers
 from ..common.utils import check_input_and_output_types
@@ -12,7 +15,8 @@ from ..common.utils import check_input_and_output_types
 def calculate_sklearn_feature_hasher(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
     check_input_and_output_types(
-        operator, good_input_types=[StringTensorType, Int64TensorType])
+        operator, good_input_types=[StringTensorType, Int64TensorType]
+    )
 
     N = operator.inputs[0].get_first_dimension()
     model = operator.raw_operator
@@ -25,9 +29,8 @@ def calculate_sklearn_feature_hasher(operator):
         operator.outputs[0].type = Int64TensorType(shape=shape)
     else:
         raise RuntimeError(
-            f"Converter is not implemented for "
-            f"FeatureHasher.dtype={model.dtype}.")
+            f"Converter is not implemented for FeatureHasher.dtype={model.dtype}."
+        )
 
 
-register_shape_calculator('SklearnFeatureHasher',
-                          calculate_sklearn_feature_hasher)
+register_shape_calculator("SklearnFeatureHasher", calculate_sklearn_feature_hasher)

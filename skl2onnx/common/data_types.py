@@ -2,18 +2,29 @@
 
 import numpy as np
 from onnxconverter_common.data_types import (  # noqa
-    DataType, Int64Type, FloatType,  # noqa
-    StringType, TensorType,  # noqa
-    Int64TensorType, Int32TensorType, BooleanTensorType,  # noqa
-    FloatTensorType, StringTensorType, DoubleTensorType,  # noqa
-    DictionaryType, SequenceType)  # noqa
+    DataType,
+    Int64Type,
+    FloatType,  # noqa
+    StringType,
+    TensorType,  # noqa
+    Int64TensorType,
+    Int32TensorType,
+    BooleanTensorType,  # noqa
+    FloatTensorType,
+    StringTensorType,
+    DoubleTensorType,  # noqa
+    DictionaryType,
+    SequenceType,
+)  # noqa
+
 try:
     from onnxconverter_common.data_types import (  # noqa
-        Complex64TensorType, Complex128TensorType)
+        Complex64TensorType,
+        Complex128TensorType,
+    )
 except ImportError:
     Complex64TensorType = None
     Complex128TensorType = None
-from onnxconverter_common.data_types import find_type_conversion, onnx_built_with_ml  # noqa
 from ..proto import TensorProto, onnx_proto
 
 
@@ -22,7 +33,7 @@ try:
 except ImportError:
 
     class DoubleType(DataType):
-        def __init__(self, doc_string=''):
+        def __init__(self, doc_string=""):
             super(DoubleType, self).__init__([1, 1], doc_string)
 
         def to_onnx_type(self):
@@ -41,7 +52,7 @@ try:
 except ImportError:
 
     class Float16TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(Float16TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -53,7 +64,7 @@ try:
 except ImportError:
 
     class Int8TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(Int8TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -65,7 +76,7 @@ try:
 except ImportError:
 
     class Int16TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(Int16TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -77,7 +88,7 @@ try:
 except ImportError:
 
     class UInt16TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(UInt16TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -89,7 +100,7 @@ try:
 except ImportError:
 
     class UInt32TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(UInt32TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -101,7 +112,7 @@ try:
 except ImportError:
 
     class UInt64TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(UInt64TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -113,7 +124,7 @@ try:
 except ImportError:
 
     class UInt8TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=''):
+        def __init__(self, shape=None, doc_string=""):
             super(UInt8TensorType, self).__init__(shape, doc_string)
 
         def _get_element_onnx_type(self):
@@ -125,7 +136,7 @@ try:
 except ImportError:
 
     class UInt8Type(DataType):
-        def __init__(self, doc_string=''):
+        def __init__(self, doc_string=""):
             super(UInt8Type, self).__init__([1, 1], doc_string)
 
         def to_onnx_type(self):
@@ -144,7 +155,7 @@ try:
 except ImportError:
 
     class Int8Type(DataType):
-        def __init__(self, doc_string=''):
+        def __init__(self, doc_string=""):
             super(Int8Type, self).__init__([1, 1], doc_string)
 
         def to_onnx_type(self):
@@ -162,8 +173,7 @@ def copy_type(vtype, empty=True):
     if isinstance(vtype, SequenceType):
         return vtype.__class__(copy_type(vtype.element_type))
     if isinstance(vtype, DictionaryType):
-        return vtype.__class__(copy_type(vtype.key_type),
-                               copy_type(vtype.value_type))
+        return vtype.__class__(copy_type(vtype.key_type), copy_type(vtype.value_type))
     return vtype.__class__()
 
 
@@ -171,9 +181,7 @@ def _guess_type_proto(data_type, dims):
     # This could be moved to onnxconverter_common.
     for d in dims:
         if d == 0:
-            raise RuntimeError(
-                "Dimension should not be null: {}.".format(
-                    list(dims)))
+            raise RuntimeError("Dimension should not be null: {}.".format(list(dims)))
     if data_type == onnx_proto.TensorProto.FLOAT:
         return FloatTensorType(dims)
     if data_type == onnx_proto.TensorProto.DOUBLE:
@@ -198,7 +206,8 @@ def _guess_type_proto(data_type, dims):
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(data_type))
+        "".format(data_type)
+    )
 
 
 def _guess_type_proto_str(data_type, dims):
@@ -227,7 +236,8 @@ def _guess_type_proto_str(data_type, dims):
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(data_type))
+        "".format(data_type)
+    )
 
 
 def _guess_type_proto_str_inv(data_type):
@@ -247,7 +257,8 @@ def _guess_type_proto_str_inv(data_type):
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "".format(data_type))
+        "".format(data_type)
+    )
 
 
 def _guess_numpy_type(data_type, dims):
@@ -256,13 +267,15 @@ def _guess_numpy_type(data_type, dims):
         return FloatTensorType(dims)
     if data_type == np.float64:
         return DoubleTensorType(dims)
-    if data_type in (np.str_, str, object) or str(data_type) in ('<U1', ) or (
-            hasattr(data_type, 'type') and data_type.type is np.str_):  # noqa
+    if (
+        data_type in (np.str_, str, object)
+        or str(data_type) in ("<U1",)
+        or (hasattr(data_type, "type") and data_type.type is np.str_)
+    ):  # noqa
         return StringTensorType(dims)
-    if data_type in (np.int64, ) or str(data_type) == '<U6':
+    if data_type in (np.int64,) or str(data_type) == "<U6":
         return Int64TensorType(dims)
-    if data_type in (np.int32, ) or str(
-        data_type) in ('<U4', ):  # noqa
+    if data_type in (np.int32,) or str(data_type) in ("<U4",):  # noqa
         return Int32TensorType(dims)
     if data_type == np.uint8:
         return UInt8TensorType(dims)
@@ -290,7 +303,8 @@ def _guess_numpy_type(data_type, dims):
     raise NotImplementedError(
         "Unsupported data_type %r (type=%r). You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."
-        "" % (data_type, type(data_type)))
+        "" % (data_type, type(data_type))
+    )
 
 
 def guess_data_type(type_, shape=None):
@@ -301,28 +315,40 @@ def guess_data_type(type_, shape=None):
         return _guess_type_proto(type, shape)
     if isinstance(type_, str):
         return _guess_type_proto_str(type_, shape)
-    if hasattr(type_, 'columns') and hasattr(type_, 'dtypes'):
+    if hasattr(type_, "columns") and hasattr(type_, "dtypes"):
         # DataFrame
-        return [(name, _guess_numpy_type(dt, [None, 1]))
-                for name, dt in zip(type_.columns, type_.dtypes)]
-    if hasattr(type_, 'name') and hasattr(type_, 'dtype'):
+        return [
+            (name, _guess_numpy_type(dt, [None, 1]))
+            for name, dt in zip(type_.columns, type_.dtypes)
+        ]
+    if hasattr(type_, "name") and hasattr(type_, "dtype"):
         # Series
         return [(type_.name, _guess_numpy_type(type_.dtype, [None, 1]))]
-    if hasattr(type_, 'shape') and hasattr(type_, 'dtype'):
+    if hasattr(type_, "shape") and hasattr(type_, "dtype"):
         # array
-        return [('input', _guess_numpy_type(type_.dtype, type_.shape))]
-    raise TypeError("Type {} cannot be converted into a "
-                    "DataType. You may raise an issue at "
-                    "https://github.com/onnx/sklearn-onnx/issues."
-                    "".format(type(type_)))
+        return [("input", _guess_numpy_type(type_.dtype, type_.shape))]
+    raise TypeError(
+        "Type {} cannot be converted into a "
+        "DataType. You may raise an issue at "
+        "https://github.com/onnx/sklearn-onnx/issues."
+        "".format(type(type_))
+    )
 
 
 def guess_numpy_type(data_type):
     """
     Guess the corresponding numpy type based on data_type.
     """
-    if data_type in (np.float64, np.float32, np.int8, np.uint8,
-                     np.str_, np.bool_, np.int32, np.int64):
+    if data_type in (
+        np.float64,
+        np.float32,
+        np.int8,
+        np.uint8,
+        np.str_,
+        np.bool_,
+        np.int32,
+        np.int64,
+    ):
         return data_type
     if data_type == str:
         return np.str_
@@ -347,8 +373,7 @@ def guess_numpy_type(data_type):
             return np.complex64
         if isinstance(data_type, Complex128TensorType):
             return np.complex128
-    raise NotImplementedError(
-        "Unsupported data_type '{}'.".format(data_type))
+    raise NotImplementedError("Unsupported data_type '{}'.".format(data_type))
 
 
 def guess_proto_type(data_type):
@@ -376,8 +401,7 @@ def guess_proto_type(data_type):
             return onnx_proto.TensorProto.COMPLEX64
         if isinstance(data_type, Complex128TensorType):
             return onnx_proto.TensorProto.COMPLEX128
-    raise NotImplementedError(
-        "Unsupported data_type '{}'.".format(data_type))
+    raise NotImplementedError("Unsupported data_type '{}'.".format(data_type))
 
 
 def guess_tensor_type(data_type):
@@ -393,11 +417,20 @@ def guess_tensor_type(data_type):
     if Complex64TensorType is not None:
         if isinstance(data_type, (Complex64TensorType, Complex128TensorType)):
             return data_type.__class__()
-    if not isinstance(data_type, (
-            Int64TensorType, Int32TensorType, BooleanTensorType,
-            FloatTensorType, StringTensorType, DoubleTensorType,
-            Int8TensorType, UInt8TensorType)):
+    if not isinstance(
+        data_type,
+        (
+            Int64TensorType,
+            Int32TensorType,
+            BooleanTensorType,
+            FloatTensorType,
+            StringTensorType,
+            DoubleTensorType,
+            Int8TensorType,
+            UInt8TensorType,
+        ),
+    ):
         raise TypeError(
-            "data_type is not a tensor type but '{}'.".format(
-                type(data_type)))
+            "data_type is not a tensor type but '{}'.".format(type(data_type))
+        )
     return FloatTensorType()

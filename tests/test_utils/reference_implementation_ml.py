@@ -5,11 +5,10 @@ from scipy.sparse import coo_matrix
 from onnx.defs import onnx_opset_version
 
 
-if onnx_opset_version() >= 18:
+if 19 >= onnx_opset_version() >= 18:
     from onnx.reference.op_run import OpRun
 
     class FusedMatMul(OpRun):
-
         @staticmethod
         def _fmatmul00(a, b, alpha):
             return np.matmul(a, b) * alpha
@@ -38,15 +37,20 @@ if onnx_opset_version() >= 18:
                 x = np.transpose(x, perm)
             return x
 
-        def _run(self, a, b, alpha=None, transA=None, transB=None,
-                 transBatchA=None, transBatchB=None):
-
+        def _run(
+            self,
+            a,
+            b,
+            alpha=None,
+            transA=None,
+            transB=None,
+            transBatchA=None,
+            transBatchB=None,
+        ):
             if transA:
-                _meth = (FusedMatMul._fmatmul11 if transB
-                         else FusedMatMul._fmatmul10)
+                _meth = FusedMatMul._fmatmul11 if transB else FusedMatMul._fmatmul10
             else:
-                _meth = (FusedMatMul._fmatmul01 if transB
-                         else FusedMatMul._fmatmul00)
+                _meth = FusedMatMul._fmatmul01 if transB else FusedMatMul._fmatmul00
             _meth = lambda a, b: _meth(a, b, alpha)  # noqa
             # more recent versions of the operator
             if transBatchA is None:
@@ -54,12 +58,11 @@ if onnx_opset_version() >= 18:
             if transBatchB is None:
                 transBatchB = 0
 
-            if (transBatchA or transBatchB or
-                    len(a.shape) != 2 or len(b.shape) != 2):
+            if transBatchA or transBatchB or len(a.shape) != 2 or len(b.shape) != 2:
                 ta = self._transpose(a, transA, transBatchA)
                 tb = self._transpose(b, transB, transBatchB)
                 try:
-                    return (np.matmul(ta, tb) * alpha, )
+                    return (np.matmul(ta, tb) * alpha,)
                 except ValueError as e:
                     raise ValueError(
                         f"Unable to multiply shape {a.shape}x{b.shape} "
@@ -68,9 +71,10 @@ if onnx_opset_version() >= 18:
                         f"transB={transB}, "
                         f"transBatchA={transBatchA}, "
                         f"transBatchB={transBatchB}, "
-                        f"meth={_meth}.") from e
+                        f"meth={_meth}."
+                    ) from e
             try:
-                return (_meth(a, b), )
+                return (_meth(a, b),)
             except ValueError as e:
                 raise ValueError(
                     f"Unable to multiply shape {a.shape}x{b.shape} "
@@ -78,10 +82,10 @@ if onnx_opset_version() >= 18:
                     f"transB={transB}, "
                     f"transBatchA={transBatchA}, "
                     f"transBatchB={transBatchB}, "
-                    f"meth={_meth}.") from e
+                    f"meth={_meth}."
+                ) from e
 
     class Scaler(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(self, x, offset=None, scale=None):
@@ -89,12 +93,10 @@ if onnx_opset_version() >= 18:
             return (dx * scale,)
 
     class LinearClassifier(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         @staticmethod
-        def _post_process_predicted_label(label, scores,
-                                          classlabels_ints_string):
+        def _post_process_predicted_label(label, scores, classlabels_ints_string):
             """
             Replaces int64 predicted labels by the corresponding
             strings.
@@ -104,21 +106,21 @@ if onnx_opset_version() >= 18:
             return label, scores
 
         def _run(
-                self,
-                x,
-                classlabels_ints=None,
-                classlabels_strings=None,
-                coefficients=None,
-                intercepts=None,
-                multi_class=None,
-                post_transform=None):
+            self,
+            x,
+            classlabels_ints=None,
+            classlabels_strings=None,
+            coefficients=None,
+            intercepts=None,
+            multi_class=None,
+            post_transform=None,
+        ):
             dtype = x.dtype
             if dtype != np.float64:
                 x = x.astype(np.float32)
             coefficients = np.array(coefficients).astype(x.dtype)
             intercepts = np.array(intercepts).astype(x.dtype)
-            n_class = max(
-                len(classlabels_ints or []), len(classlabels_strings or []))
+            n_class = max(len(classlabels_ints or []), len(classlabels_strings or []))
             n = coefficients.shape[0] // n_class
             coefficients = coefficients.reshape(n_class, n).T
             scores = np.dot(x, coefficients)
@@ -130,13 +132,13 @@ if onnx_opset_version() >= 18:
             elif post_transform == "LOGISTIC":
                 scores = expit(scores)
             elif post_transform == "SOFTMAX":
-                np.subtract(
-                    scores, scores.max(axis=1)[:, np.newaxis], out=scores)
+                np.subtract(scores, scores.max(axis=1)[:, np.newaxis], out=scores)
                 scores = np.exp(scores)
                 scores = np.divide(scores, scores.sum(axis=1)[:, np.newaxis])
             else:
                 raise NotImplementedError(  # pragma: no cover
-                    f"Unknown post_transform: '{post_transform}'.")
+                    f"Unknown post_transform: '{post_transform}'."
+                )
 
             if coefficients.shape[1] == 1:
                 labels = np.zeros((scores.shape[0],), dtype=x.dtype)
@@ -144,23 +146,17 @@ if onnx_opset_version() >= 18:
             else:
                 labels = np.argmax(scores, axis=1)
             if classlabels_ints is not None:
-                labels = np.array(
-                    [classlabels_ints[i] for i in labels], dtype=np.int64)
+                labels = np.array([classlabels_ints[i] for i in labels], dtype=np.int64)
             elif classlabels_strings is not None:
                 labels = np.array([classlabels_strings[i] for i in labels])
             return (labels, scores)
 
     class LinearRegressor(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(
-                self,
-                x,
-                coefficients=None,
-                intercepts=None,
-                targets=1,
-                post_transform=None):
+            self, x, coefficients=None, intercepts=None, targets=1, post_transform=None
+        ):
             coefficients = np.array(coefficients).astype(x.dtype)
             intercepts = np.array(intercepts).astype(x.dtype)
             n = coefficients.shape[0] // targets
@@ -172,11 +168,11 @@ if onnx_opset_version() >= 18:
                 pass
             else:
                 raise NotImplementedError(
-                    f"Unknown post_transform: '{self.post_transform}'.")
+                    f"Unknown post_transform: '{self.post_transform}'."
+                )
             return (score,)
 
     class Normalizer(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         @staticmethod
@@ -213,7 +209,6 @@ if onnx_opset_version() >= 18:
             return (_norm(x),)
 
     class OneHotEncoder(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(self, x, cats_int64s=None, cats_strings=None, zeros=None):
@@ -240,8 +235,8 @@ if onnx_opset_version() >= 18:
                             res[a, i, j] = 1.0
             else:
                 raise RuntimeError(
-                    f"This operator is not implemented "
-                    f"for " f"shape {x.shape}.")
+                    f"This operator is not implemented for shape {x.shape}."
+                )
 
             if not self.zeros:
                 red = res.sum(axis=len(res.shape) - 1)
@@ -267,7 +262,6 @@ if onnx_opset_version() >= 18:
             return (res,)
 
     class Binarizer(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(self, x, threshold=None):
@@ -279,40 +273,39 @@ if onnx_opset_version() >= 18:
             return (X,)
 
     class FeatureVectorizer(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _preprocess(self, a, axis):
             if axis >= len(a.shape):
-                new_shape = a.shape + (1, ) * (axis + 1 - len(a.shape))
+                new_shape = a.shape + (1,) * (axis + 1 - len(a.shape))
                 return a.reshape(new_shape)
             return a
 
         def _run(self, *args, inputdimensions=None):
-            args = [self._preprocess(a, axis)
-                    for a, axis in zip(args, inputdimensions)]
+            args = [self._preprocess(a, axis) for a, axis in zip(args, inputdimensions)]
             dimensions = set(inputdimensions)
             if len(set(dimensions)) == 1:
                 res = np.concatenate(args, axis=inputdimensions[0])
-                return (res, )
+                return (res,)
             raise RuntimeError(
-                f"inputdimensions={inputdimensions} is not supported yet.")
+                f"inputdimensions={inputdimensions} is not supported yet."
+            )
 
     class Imputer(OpRun):
-
         op_domain = "ai.onnx.ml"
 
-        def _run(self, x,
-                 imputed_value_floats=None,
-                 imputed_value_int64s=None,
-                 replaced_value_float=None,
-                 replaced_value_int64=None):
-            if (imputed_value_floats is not None and
-                    len(imputed_value_floats) > 0):
+        def _run(
+            self,
+            x,
+            imputed_value_floats=None,
+            imputed_value_int64s=None,
+            replaced_value_float=None,
+            replaced_value_int64=None,
+        ):
+            if imputed_value_floats is not None and len(imputed_value_floats) > 0:
                 values = imputed_value_floats
                 replace = replaced_value_float
-            elif (imputed_value_int64s is not None and
-                    len(imputed_value_int64s) > 0):
+            elif imputed_value_int64s is not None and len(imputed_value_int64s) > 0:
                 values = imputed_value_int64s
                 replace = replaced_value_int64
             else:
@@ -321,11 +314,11 @@ if onnx_opset_version() >= 18:
             if isinstance(values, list):
                 values = np.array(values)
             if len(x.shape) != 2:
-                raise TypeError(
-                    f"x must be a matrix but shape is {x.shape}")
+                raise TypeError(f"x must be a matrix but shape is {x.shape}")
             if values.shape[0] not in (x.shape[1], 1):
                 raise TypeError(  # pragma: no cover
-                    f"Dimension mismatch {values.shape[0]} != {x.shape[1]}")
+                    f"Dimension mismatch {values.shape[0]} != {x.shape[1]}"
+                )
             x = x.copy()
             if np.isnan(replace):
                 for i in range(0, x.shape[1]):
@@ -336,22 +329,24 @@ if onnx_opset_version() >= 18:
                     val = values[min(i, values.shape[0] - 1)]
                     x[x[:, i] == replace, i] = val
 
-            return (x, )
+            return (x,)
 
     class LabelEncoder(OpRun):
-
         op_domain = "ai.onnx.ml"
 
-        def _run(self, x,
-                 default_float=None,
-                 default_int64=None,
-                 default_string=None,
-                 keys_floats=None,
-                 keys_int64s=None,
-                 keys_strings=None,
-                 values_floats=None,
-                 values_int64s=None,
-                 values_strings=None):
+        def _run(
+            self,
+            x,
+            default_float=None,
+            default_int64=None,
+            default_string=None,
+            keys_floats=None,
+            keys_int64s=None,
+            keys_strings=None,
+            values_floats=None,
+            values_int64s=None,
+            values_strings=None,
+        ):
             keys = keys_floats or keys_int64s or keys_strings
             values = values_floats or values_int64s or values_strings
             classes = {k: v for k, v in zip(keys, values)}
@@ -370,7 +365,7 @@ if onnx_opset_version() >= 18:
             else:
                 defval = default_string
                 if not isinstance(defval, str):
-                    defval = ''
+                    defval = ""
                 dtype = np.str_
             shape = x.shape
             if len(x.shape) > 1:
@@ -379,16 +374,13 @@ if onnx_opset_version() >= 18:
             for i in range(0, x.shape[0]):
                 v = classes.get(cast(x[i]), defval)
                 res.append(v)
-            return (np.array(res, dtype=dtype).reshape(shape), )
+            return (np.array(res, dtype=dtype).reshape(shape),)
 
     class DictVectorizer(OpRun):
-
         op_domain = "ai.onnx.ml"
 
         def _run(self, x, int64_vocabulary=None, string_vocabulary=None):
-
             if isinstance(x, (np.ndarray, list)):
-
                 dict_labels = {}
                 if int64_vocabulary:
                     for i, v in enumerate(int64_vocabulary):
@@ -399,7 +391,8 @@ if onnx_opset_version() >= 18:
                 if len(dict_labels) == 0:
                     raise RuntimeError(
                         "int64_vocabulary and string_vocabulary "
-                        "cannot be both empty.")
+                        "cannot be both empty."
+                    )
 
                 values = []
                 rows = []
@@ -412,16 +405,17 @@ if onnx_opset_version() >= 18:
                 values = np.array(values)
                 rows = np.array(rows)
                 cols = np.array(cols)
-                return (coo_matrix(
-                    (values, (rows, cols)),
-                    shape=(len(x), len(dict_labels))).todense(), )
+                return (
+                    coo_matrix(
+                        (values, (rows, cols)), shape=(len(x), len(dict_labels))
+                    ).todense(),
+                )
 
             if isinstance(x, dict):
                 keys = int64_vocabulary or string_vocabulary
                 res = []
                 for k in keys:
                     res.append(x.get(k, 0))
-                return (np.array(res), )
+                return (np.array(res),)
 
-            raise TypeError(  # pragma: no cover
-                f"x must be iterable not {type(x)}.")
+            raise TypeError(f"x must be iterable not {type(x)}.")  # pragma: no cover

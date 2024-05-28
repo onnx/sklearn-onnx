@@ -5,6 +5,7 @@ import warnings
 from types import MethodType
 import numpy
 from numpy.testing import assert_almost_equal
+
 try:
     from scipy.sparse import csr_matrix
 except ImportError:
@@ -12,6 +13,7 @@ except ImportError:
 from sklearn.base import TransformerMixin, ClassifierMixin
 from sklearn.base import RegressorMixin, BaseEstimator
 from sklearn.pipeline import Pipeline, FeatureUnion
+
 try:
     from sklearn.compose import ColumnTransformer, TransformedTargetRegressor
 except ImportError:
@@ -27,15 +29,16 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
     if coor is None:
         coor = (0,)
     yield coor, pipe, vs
-    if hasattr(pipe, 'transformer_and_mapper_list') and len(
-            pipe.transformer_and_mapper_list):
+    if hasattr(pipe, "transformer_and_mapper_list") and len(
+        pipe.transformer_and_mapper_list
+    ):
         # azureml DataTransformer
         raise NotImplementedError("Unable to handle this specific case.")
-    elif hasattr(pipe, 'mapper') and pipe.mapper:
+    elif hasattr(pipe, "mapper") and pipe.mapper:
         # azureml DataTransformer
         for couple in enumerate_pipeline_models(pipe.mapper, coor + (0,)):
             yield couple
-    elif hasattr(pipe, 'built_features'):
+    elif hasattr(pipe, "built_features"):
         # sklearn_pandas.dataframe_mapper.DataFrameMapper
         for i, (columns, transformers, _) in enumerate(pipe.built_features):
             if isinstance(columns, str):
@@ -43,9 +46,9 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
             if transformers is None:
                 yield (coor + (i,)), None, columns
             else:
-                for couple in enumerate_pipeline_models(transformers,
-                                                        coor + (i,),
-                                                        columns):
+                for couple in enumerate_pipeline_models(
+                    transformers, coor + (i,), columns
+                ):
                     yield couple
     elif isinstance(pipe, Pipeline):
         for i, (_, model) in enumerate(pipe.steps):
@@ -54,16 +57,17 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
     elif ColumnTransformer is not None and isinstance(pipe, ColumnTransformer):
         for i, (_, fitted_transformer, column) in enumerate(pipe.transformers):
             for couple in enumerate_pipeline_models(
-                    fitted_transformer, coor + (i,), column):
+                fitted_transformer, coor + (i,), column
+            ):
                 yield couple
     elif isinstance(pipe, FeatureUnion):
         for i, (_, model) in enumerate(pipe.transformer_list):
             for couple in enumerate_pipeline_models(model, coor + (i,)):
                 yield couple
     elif TransformedTargetRegressor is not None and isinstance(
-            pipe, TransformedTargetRegressor):
-        raise NotImplementedError(
-            "Not yet implemented for TransformedTargetRegressor.")
+        pipe, TransformedTargetRegressor
+    ):
+        raise NotImplementedError("Not yet implemented for TransformedTargetRegressor.")
     elif isinstance(pipe, (TransformerMixin, ClassifierMixin, RegressorMixin)):
         pass
     elif isinstance(pipe, BaseEstimator):
@@ -71,7 +75,9 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
     else:
         raise TypeError(
             "Parameter pipe is not a scikit-learn object: {}\n{}".format(
-                type(pipe), pipe))
+                type(pipe), pipe
+            )
+        )
 
 
 class BaseEstimatorDebugInformation:
@@ -88,20 +94,22 @@ class BaseEstimatorDebugInformation:
         self.methods = {}
         if hasattr(model, "transform") and callable(model.transform):
             model._debug_transform = model.transform
-            self.methods["transform"] = \
-                lambda model, X: model._debug_transform(X)
+            self.methods["transform"] = lambda model, X: model._debug_transform(X)
         if hasattr(model, "predict") and callable(model.predict):
             model._debug_predict = model.predict
             self.methods["predict"] = lambda model, X: model._debug_predict(X)
         if hasattr(model, "predict_proba") and callable(model.predict_proba):
             model._debug_predict_proba = model.predict_proba
-            self.methods["predict_proba"] = \
-                lambda model, X: model._debug_predict_proba(X)
+            self.methods["predict_proba"] = lambda model, X: model._debug_predict_proba(
+                X
+            )
         if hasattr(model, "decision_function") and callable(
-            model.decision_function):  # noqa
+            model.decision_function
+        ):  # noqa
             model._debug_decision_function = model.decision_function  # noqa
-            self.methods["decision_function"] = \
+            self.methods["decision_function"] = (
                 lambda model, X: model._debug_decision_function(X)
+            )
 
     def __repr__(self):
         """
@@ -113,21 +121,21 @@ class BaseEstimatorDebugInformation:
         """
         Tries to produce a readable message.
         """
-        rows = ['BaseEstimatorDebugInformation({})'.format(
-            self.model.__class__.__name__)]
+        rows = [
+            "BaseEstimatorDebugInformation({})".format(self.model.__class__.__name__)
+        ]
         for k in sorted(self.inputs):
             if k in self.outputs:
-                rows.append('  ' + k + '(')
+                rows.append("  " + k + "(")
                 self.display(self.inputs[k], nrows)
-                rows.append(textwrap.indent(
-                    self.display(self.inputs[k], nrows), '   '))
-                rows.append('  ) -> (')
-                rows.append(textwrap.indent(
-                    self.display(self.outputs[k], nrows), '   '))
-                rows.append('  )')
+                rows.append(textwrap.indent(self.display(self.inputs[k], nrows), "   "))
+                rows.append("  ) -> (")
+                rows.append(
+                    textwrap.indent(self.display(self.outputs[k], nrows), "   ")
+                )
+                rows.append("  )")
             else:
-                raise KeyError(
-                    "Unable to find output for method '{}'.".format(k))
+                raise KeyError("Unable to find output for method '{}'.".format(k))
         return "\n".join(rows)
 
     def display(self, data, nrows):
@@ -135,11 +143,11 @@ class BaseEstimatorDebugInformation:
         Displays the first
         """
         text = str(data)
-        rows = text.split('\n')
+        rows = text.split("\n")
         if len(rows) > nrows:
             rows = rows[:nrows]
-            rows.append('...')
-        if hasattr(data, 'shape'):
+            rows.append("...")
+        if hasattr(data, "shape"):
             rows.insert(0, "shape={}".format(data.shape))
         return "\n".join(rows)
 
@@ -156,40 +164,42 @@ def _alter_model_for_debugging(skl_model, recursive=False):
     """
 
     def transform(self, X, *args, **kwargs):
-        self._debug.inputs['transform'] = X
-        y = self._debug.methods['transform'](self, X, *args, **kwargs)
-        self._debug.outputs['transform'] = y
+        self._debug.inputs["transform"] = X
+        y = self._debug.methods["transform"](self, X, *args, **kwargs)
+        self._debug.outputs["transform"] = y
         return y
 
     def predict(self, X, *args, **kwargs):
-        self._debug.inputs['predict'] = X
-        y = self._debug.methods['predict'](self, X, *args, **kwargs)
-        self._debug.outputs['predict'] = y
+        self._debug.inputs["predict"] = X
+        y = self._debug.methods["predict"](self, X, *args, **kwargs)
+        self._debug.outputs["predict"] = y
         return y
 
     def predict_proba(self, X, *args, **kwargs):
-        self._debug.inputs['predict_proba'] = X
-        y = self._debug.methods['predict_proba'](self, X, *args, **kwargs)
-        self._debug.outputs['predict_proba'] = y
+        self._debug.inputs["predict_proba"] = X
+        y = self._debug.methods["predict_proba"](self, X, *args, **kwargs)
+        self._debug.outputs["predict_proba"] = y
         return y
 
     def decision_function(self, X, *args, **kwargs):
-        self._debug.inputs['decision_function'] = X
-        y = self._debug.methods['decision_function'](self, X, *args, **kwargs)
-        self._debug.outputs['decision_function'] = y
+        self._debug.inputs["decision_function"] = X
+        y = self._debug.methods["decision_function"](self, X, *args, **kwargs)
+        self._debug.outputs["decision_function"] = y
         return y
 
     new_methods = {
-        'decision_function': decision_function,
-        'transform': transform,
-        'predict': predict,
-        'predict_proba': predict_proba,
+        "decision_function": decision_function,
+        "transform": transform,
+        "predict": predict,
+        "predict_proba": predict_proba,
     }
 
-    if hasattr(skl_model, '_debug'):
-        raise RuntimeError("The same operator cannot be used twice in "
-                           "the same pipeline or this method was called "
-                           "a second time.")
+    if hasattr(skl_model, "_debug"):
+        raise RuntimeError(
+            "The same operator cannot be used twice in "
+            "the same pipeline or this method was called "
+            "a second time."
+        )
 
     if recursive:
         for model_ in enumerate_pipeline_models(skl_model):
@@ -199,16 +209,20 @@ def _alter_model_for_debugging(skl_model, recursive=False):
                 try:
                     setattr(model, k, MethodType(new_methods[k], model))
                 except AttributeError:
-                    warnings.warn("Unable to overwrite method '{}' for class "
-                                  "{}.".format(k, type(model)))
+                    warnings.warn(
+                        "Unable to overwrite method '{}' for class "
+                        "{}.".format(k, type(model))
+                    )
     else:
         skl_model._debug = BaseEstimatorDebugInformation(skl_model)
         for k in skl_model._debug.methods:
             try:
                 setattr(skl_model, k, MethodType(new_methods[k], skl_model))
             except AttributeError:
-                warnings.warn("Unable to overwrite method '{}' for class "
-                              "{}.".format(k, type(skl_model)))
+                warnings.warn(
+                    "Unable to overwrite method '{}' for class "
+                    "{}.".format(k, type(skl_model))
+                )
 
 
 def collect_intermediate_steps(model, *args, **kwargs):
@@ -225,17 +239,19 @@ def collect_intermediate_steps(model, *args, **kwargs):
     This function is used to check every intermediate model in
     a pipeline.
     """
-    if 'intermediate' in kwargs:
-        if not kwargs['intermediate']:
+    if "intermediate" in kwargs:
+        if not kwargs["intermediate"]:
             raise ValueError("Parameter intermediate must be true.")
-        del kwargs['intermediate']
+        del kwargs["intermediate"]
 
     from .. import convert_sklearn
     from ..helpers.onnx_helper import select_model_inputs_outputs
     from ..common import MissingShapeCalculator, MissingConverter
+
     try:
         model_onnx, topology = convert_sklearn(
-            model, *args, intermediate=True, **kwargs)
+            model, *args, intermediate=True, **kwargs
+        )
     except (MissingShapeCalculator, MissingConverter):
         # The model cannot be converted.
         raise
@@ -247,14 +263,15 @@ def collect_intermediate_steps(model, *args, **kwargs):
         _alter_model_for_debugging(operator.raw_operator)
         inputs = [i.full_name for i in operator.inputs]
         outputs = [o.full_name for o in operator.outputs]
-        steps.append({
-            'model': operator.raw_operator,
-            'model_onnx': model_onnx,
-            'inputs': inputs,
-            'outputs': outputs,
-            'onnx_step': select_model_inputs_outputs(
-                model_onnx, outputs=outputs)
-        })
+        steps.append(
+            {
+                "model": operator.raw_operator,
+                "model_onnx": model_onnx,
+                "inputs": inputs,
+                "outputs": outputs,
+                "onnx_step": select_model_inputs_outputs(model_onnx, outputs=outputs),
+            }
+        )
     return steps
 
 
@@ -314,16 +331,16 @@ def compare_objects(o1, o2, decimal=4):
     if isinstance(c1, list) and isinstance(c2, list):
         try:
             res = c1 == c2
-            reason = 'list-equal'
+            reason = "list-equal"
         except ValueError:  # lgtm [py/unreachable-statement]
             res = False
-            reason = 'list'
+            reason = "list"
     elif isinstance(c1, numpy.ndarray) and isinstance(c2, numpy.ndarray):
         try:
             assert_almost_equal(c1, c2, decimal=decimal)
             res = True
         except (AssertionError, TypeError):
-            reason = 'array'
+            reason = "array"
             cc1 = c1.ravel()
             cc2 = c2.ravel()
             try:
@@ -331,7 +348,7 @@ def compare_objects(o1, o2, decimal=4):
                 res = True
             except (AssertionError, TypeError) as e:
                 res = False
-                reason = 'array-ravel' + str(e)
+                reason = "array-ravel" + str(e)
     else:
         raise TypeError("Types {} and {}".format(type(c1), type(c2)))
     if not res:
