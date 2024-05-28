@@ -1463,8 +1463,6 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         model_onnx = onx.to_onnx(
             inputs=[("X", FloatTensorType([None, None]))], target_opset=TARGET_OPSET
         )
-        with open("debug.onnx", "wb") as f:
-            f.write(model_onnx.SerializeToString())
 
         x = np.random.randn(4, 3)
         x[0, 0] = x[1, 1] = x[2, 2] = 10.0
@@ -1505,10 +1503,10 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
 
         # X, X
         onx = convert_kernel(
-            ker, "X", output_names=["Y"], dtype=np.float32, op_version=_TARGET_OPSET_
+            ker, "X", output_names=["Y"], dtype=np.float64, op_version=_TARGET_OPSET_
         )
         model_onnx = onx.to_onnx(
-            inputs=[("X", FloatTensorType([None, None]))], target_opset=TARGET_OPSET
+            inputs=[("X", DoubleTensorType([None, None]))], target_opset=TARGET_OPSET
         )
         with open("debug.onnx", "wb") as f:
             f.write(model_onnx.SerializeToString())
@@ -1517,10 +1515,18 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         x[0, 0] = x[1, 1] = x[2, 2] = 2.0
         x[3, 2] = 1.5
 
+        from onnx.reference import ReferenceEvaluator
+
+        ref = ReferenceEvaluator(model_onnx, verbose=0)
+        res = ref.run(None, {"X": x.astype(np.float64)})[0]
+        m1 = res
+        m2 = ker(x)
+        assert_almost_equal(m2, m1, decimal=3)
+
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        res = sess.run(None, {"X": x.astype(np.float32)})[0]
+        res = sess.run(None, {"X": x.astype(np.float64)})[0]
         m1 = res
         m2 = ker(x)
         assert_almost_equal(m2, m1, decimal=3)
@@ -1531,24 +1537,24 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             "X",
             x_train=x,
             output_names=["Y"],
-            dtype=np.float32,
+            dtype=np.float64,
             op_version=_TARGET_OPSET_,
         )
         model_onnx = onx.to_onnx(
-            inputs=[("X", FloatTensorType([None, None]))], target_opset=TARGET_OPSET
+            inputs=[("X", DoubleTensorType([None, None]))], target_opset=TARGET_OPSET
         )
 
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        res = sess.run(None, {"X": x.astype(np.float32)})[0]
+        res = sess.run(None, {"X": x.astype(np.float64)})[0]
         m1 = res
         m2 = ker(x, x)
         assert_almost_equal(m2, m1, decimal=5)
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_kernel_matern_kernel_nu(self):
-        for nu in [0.5, 1.5, 2.5]:
+        for nu in [0.5, 1.5, 2.5, np.inf]:
             with self.subTest(nu=nu):
                 ker = Matern()
 
@@ -1557,15 +1563,13 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                     ker,
                     "X",
                     output_names=["Y"],
-                    dtype=np.float32,
+                    dtype=np.float64,
                     op_version=_TARGET_OPSET_,
                 )
                 model_onnx = onx.to_onnx(
-                    inputs=[("X", FloatTensorType([None, None]))],
+                    inputs=[("X", DoubleTensorType([None, None]))],
                     target_opset=TARGET_OPSET,
                 )
-                with open("debug.onnx", "wb") as f:
-                    f.write(model_onnx.SerializeToString())
 
                 x = np.random.randn(4, 3)
                 x[0, 0] = x[1, 1] = x[2, 2] = 10.0
@@ -1574,7 +1578,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                 sess = InferenceSession(
                     model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
                 )
-                res = sess.run(None, {"X": x.astype(np.float32)})[0]
+                res = sess.run(None, {"X": x.astype(np.float64)})[0]
                 m1 = res
                 m2 = ker(x)
                 assert_almost_equal(m2, m1, decimal=3)
@@ -1585,18 +1589,18 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                     "X",
                     x_train=x,
                     output_names=["Y"],
-                    dtype=np.float32,
+                    dtype=np.float64,
                     op_version=_TARGET_OPSET_,
                 )
                 model_onnx = onx.to_onnx(
-                    inputs=[("X", FloatTensorType([None, None]))],
+                    inputs=[("X", DoubleTensorType([None, None]))],
                     target_opset=TARGET_OPSET,
                 )
 
                 sess = InferenceSession(
                     model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
                 )
-                res = sess.run(None, {"X": x.astype(np.float32)})[0]
+                res = sess.run(None, {"X": x.astype(np.float64)})[0]
                 m1 = res
                 m2 = ker(x, x)
                 assert_almost_equal(m2, m1, decimal=5)
