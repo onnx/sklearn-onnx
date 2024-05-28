@@ -560,7 +560,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         res = sess.run(None, {"X": Xtest_.astype(np.float32)})[0]
         m1 = res
         m2 = ker.diag(Xtest_)
-        assert_almost_equal(m1, m2, decimal=4)
+        assert_almost_equal(m2, m1, decimal=4)
 
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version(THRESHOLD),

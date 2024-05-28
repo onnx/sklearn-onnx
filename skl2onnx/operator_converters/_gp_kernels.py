@@ -546,13 +546,21 @@ def _zero_vector_of_size(
     shape = OnnxShape(X, op_version=op_version)
     if axis == 0:
         dim = OnnxGather(shape, np.array([0], dtype=np.int64), op_version=op_version)
-        new_shape = OnnxConcat(
-            dim, np.array([1], dtype=np.int64), axis=0, op_version=op_version
+        new_shape = (
+            OnnxConcat(
+                dim, np.array([1], dtype=np.int64), axis=0, op_version=op_version
+            )
+            if keepdims
+            else dim
         )
     else:
         dim = OnnxGather(shape, np.array([1], dtype=np.int64), op_version=op_version)
-        new_shape = OnnxConcat(
-            np.array([1], dtype=np.int64), dim, axis=0, op_version=op_version
+        new_shape = (
+            OnnxConcat(
+                np.array([1], dtype=np.int64), dim, axis=0, op_version=op_version
+            )
+            if keepdims
+            else dim
         )
 
     return OnnxConstantOfShape(
