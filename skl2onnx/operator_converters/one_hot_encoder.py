@@ -65,7 +65,7 @@ def convert_sklearn_one_hot_encoder(
             index_in_input = index - sum(all_shapes[:index_inputs])
 
             inp = operator.inputs[index_inputs]
-            if not isinstance(
+            assert isinstance(
                 inp.type,
                 (
                     Int64TensorType,
@@ -74,13 +74,11 @@ def convert_sklearn_one_hot_encoder(
                     FloatTensorType,
                     DoubleTensorType,
                 ),
-            ):
-                raise NotImplementedError(
-                    "{} input datatype not yet supported. "
-                    "You may raise an issue at "
-                    "https://github.com/onnx/sklearn-onnx/issues"
-                    "".format(type(inp.type))
-                )
+            ), (
+                f"{type(inp.type)} input datatype not yet supported. "
+                f"You may raise an issue at "
+                f"https://github.com/onnx/sklearn-onnx/issues"
+            )
 
             if all_shapes[index_inputs] == 1:
                 assert index_in_input == 0
@@ -90,10 +88,30 @@ def convert_sklearn_one_hot_encoder(
             enum_cats.append((afeat, index_in_input, inp.full_name, cats, inp.type))
     else:
         inp = operator.inputs[0]
-        enum_cats = [
-            (True, i, inp.full_name, cats, inp.type)
-            for i, cats in enumerate(ohe_op.categories_)
-        ]
+        assert isinstance(
+            inp.type,
+            (
+                Int64TensorType,
+                StringTensorType,
+                Int32TensorType,
+                FloatTensorType,
+                DoubleTensorType,
+            ),
+        ), (
+            f"{type(inp.type)} input datatype not yet supported. "
+            f"You may raise an issue at "
+            f"https://github.com/onnx/sklearn-onnx/issues"
+        )
+
+        enum_cats = []
+        for index, cats in enumerate(ohe_op.categories_):
+            filtered_cats = ohe_op._compute_transformed_categories(index)
+            if ohe_op._infrequent_enabled and "infrequent_sklearn" in filtered_cats:
+                raise NotImplementedError(
+                    f"Infrequent categories are not implemented "
+                    f"{filtered_cats} != {cats}."
+                )
+            enum_cats.append((True, index, inp.full_name, cats, inp.type))
 
     result, categories_len = [], 0
     for index, enum_c in enumerate(enum_cats):

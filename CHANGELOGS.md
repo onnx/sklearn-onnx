@@ -2,8 +2,8 @@
 
 ## 1.17.0 (development)
 
-* Supports infrequent category with OneHotEncoder
-  [#1029](https://github.com/onnx/sklearn-onnx/pull/1029)
+* Fix for multidimensional gaussian process
+  [#1097](https://github.com/onnx/sklearn-onnx/pull/1097)
 * Minor fixes to support scikit-learn==1.5.0
   [#1095](https://github.com/onnx/sklearn-onnx/pull/1095)
 * Fix the conversion of pipeline including pipelines,
