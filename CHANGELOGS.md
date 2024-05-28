@@ -2,6 +2,12 @@
 
 ## 1.17.0 (development)
 
+* Upgrade the maximum supported opset to 21,
+  update requirements to scikit-learn>=1.1,
+  older versions are not tested anymore,
+  [#1098](https://github.com/onnx/sklearn-onnx/pull/1098)
+* Support infrequent categories for OneHotEncoder
+  [#1029](https://github.com/onnx/sklearn-onnx/pull/1029)
 * Support kernel Matern in Gaussian Process
   [#978](https://github.com/onnx/sklearn-onnx/pull/978)
 * Fix for multidimensional gaussian process
