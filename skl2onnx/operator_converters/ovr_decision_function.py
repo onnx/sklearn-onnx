@@ -25,7 +25,7 @@ def convert_sklearn_ovr_decision_function(
 ):
     # Applies _ovr_decision_function.
     # See https://github.com/scikit-learn/scikit-learn/blob/
-    # master/sklearn/utils/multiclass.py#L407:
+    # main/sklearn/utils/multiclass.py#L407:
     # ::
     #     def _ovr_decision_function(predictions, confidences, n_classes):
     #

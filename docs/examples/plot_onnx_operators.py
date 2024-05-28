@@ -15,12 +15,12 @@ requires some time to add it to ONNX specifications and then to
 the backend used to compute the predictions. It is better to look
 first if the existing operators can be used. The list is available
 on *github* and gives the `basic operators
-<https://github.com/onnx/onnx/blob/master/docs/Operators.md>`_
+<https://github.com/onnx/onnx/blob/main/docs/Operators.md>`_
 and others `dedicated to machine learning
-<https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md>`_.
+<https://github.com/onnx/onnx/blob/main/docs/Operators-ml.md>`_.
 *ONNX* has a Python API which can be used to define an *ONNX*
 graph: `PythonAPIOverview.md
-<https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md>`_.
+<https://github.com/onnx/onnx/blob/main/docs/PythonAPIOverview.md>`_.
 But it is quite verbose and makes it difficult to describe big graphs.
 *sklearn-onnx* implements a nicer way to test *ONNX* operators.
 
@@ -29,11 +29,11 @@ ONNX Python API
 
 Let's try the example given by ONNX documentation:
 `ONNX Model Using Helper Functions
-<https://github.com/onnx/onnx/blob/master/docs/PythonAPIOverview.md
+<https://github.com/onnx/onnx/blob/main/docs/PythonAPIOverview.md
 #creating-an-onnx-model-using-helper-functions>`_.
 It relies on *protobuf* whose definition can be found
 on github `onnx.proto
-<https://github.com/onnx/onnx/blob/master/onnx/onnx.proto>`_.
+<https://github.com/onnx/onnx/blob/main/onnx/onnx.proto>`_.
 """
 import onnxruntime
 import numpy

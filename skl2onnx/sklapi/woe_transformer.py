@@ -12,7 +12,6 @@ except ImportError:
 
 
 class WOETransformer(TransformerMixin, BaseEstimator):
-
     """
     This transformer cannot be trained. It takes a list of intervals,
     one list per columns, and returns for every feature the list

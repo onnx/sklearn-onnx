@@ -34,7 +34,7 @@ def convert_sklearn_gamma_regressor(
 
     intercept = (
         op.intercept_.astype(dtype)
-        if len(op.intercept_.shape) > 0
+        if isinstance(op.intercept_, np.ndarray) and len(op.intercept_.shape) > 0
         else np.array([op.intercept_], dtype=dtype)
     )
     eta = OnnxAdd(

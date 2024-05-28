@@ -913,7 +913,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
 
             def nstr(name):
                 if name in order:
-                    return "%s#%d" % (name, order[name])
+                    return "%s -- #%d" % (name, order[name])
                 return name
 
             rows = [
@@ -933,17 +933,91 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 "%s|%s(%s) -> [%s]"
                 % (
                     n.op_type,
-                    n.name or n.op_type,
+                    n.name or "",
                     ", ".join(map(nstr, n.input)),
                     ", ".join(n.output),
                 )
                 for n in self.nodes
             )
+            rows.append("--")
+            rows.append("--full-marked-nodes-with-output--")
+            rows.append("--")
+            set_name = set(order)
+            for n in self.nodes:
+                if set(n.input) & set_name == set(n.input) and set(
+                    n.output
+                ) & set_name == set(n.output):
+                    rows.append(
+                        "%s|%s(%s) -> [%s]"
+                        % (
+                            n.op_type,
+                            n.name or "",
+                            ", ".join(map(nstr, n.input)),
+                            ", ".join(n.output),
+                        )
+                    )
+            rows.append("--")
+            rows.append("--full-marked-nodes-only-input--")
+            rows.append("--")
+            set_name = set(order)
+            for n in self.nodes:
+                if set(n.input) & set_name == set(n.input) and set(
+                    n.output
+                ) & set_name != set(n.output):
+                    rows.append(
+                        "%s|%s(%s) -> [%s]"
+                        % (
+                            n.op_type,
+                            n.name or "",
+                            ", ".join(map(nstr, n.input)),
+                            ", ".join(n.output),
+                        )
+                    )
+            rows.append("--")
+            rows.append("--not-fully-marked-nodes--")
+            rows.append("--")
+            set_name = set(order)
+            for n in self.nodes:
+                if (set(n.input) & set_name) and set(n.input) & set_name != set(
+                    n.input
+                ):
+                    rows.append(
+                        "%s|%s(%s) -> [%s]"
+                        % (
+                            n.op_type,
+                            n.name or "",
+                            ", ".join(map(nstr, n.input)),
+                            ", ".join(n.output),
+                        )
+                    )
+            rows.append("--")
+            rows.append("--unmarked-nodes--")
+            rows.append("--")
+            for n in self.nodes:
+                if not (set(n.input) & set_name):
+                    rows.append(
+                        "%s|%s(%s) -> [%s]"
+                        % (
+                            n.op_type,
+                            n.name or "",
+                            ", ".join(map(nstr, n.input)),
+                            ", ".join(n.output),
+                        )
+                    )
+
             raise RuntimeError(
                 "After %d iterations for %d nodes, still unable "
                 "to sort names %r. The graph may be disconnected. "
-                "List of operators: %s"
-                % (n_iter, len(self.nodes), missing_names, "\n".join(rows))
+                "List of operators:\n---------%s\n-------"
+                "\n-- ORDER--\n%s\n-- MISSING --\n%s"
+                % (
+                    n_iter,
+                    len(self.nodes),
+                    missing_names,
+                    "\n".join(rows),
+                    pprint.pformat(list(sorted([(v, k) for k, v in order.items()]))),
+                    pprint.pformat(set(order.values()) & set(missing_names)),
+                )
             )
 
         # Update order

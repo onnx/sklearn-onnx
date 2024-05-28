@@ -21,13 +21,15 @@ def _fetch_scores(
         container.add_options(id(model), {"raw_scores": raw_scores})
     this_operator.inputs.append(inputs)
     if is_regressor:
-        output_proba = scope.declare_local_variable("variable", inputs.type.__class__())
+        output_proba = scope.declare_local_variable(
+            "sv_variable", inputs.type.__class__()
+        )
         this_operator.outputs.append(output_proba)
     else:
-        label_name = scope.declare_local_variable("label", Int64TensorType())
+        label_name = scope.declare_local_variable("sv_label", Int64TensorType())
         this_operator.outputs.append(label_name)
         output_proba = scope.declare_local_variable(
-            "probability_tensor", inputs.type.__class__()
+            "sv_prob_tensor", inputs.type.__class__()
         )
         this_operator.outputs.append(output_proba)
 
@@ -43,7 +45,9 @@ def _add_passthrough_connection(operator, predictions):
 
 
 def _transform_regressor(scope, operator, container, model):
-    merged_prob_tensor = scope.get_unique_variable_name("merged_probability_tensor")
+    merged_prob_tensor = scope.get_unique_variable_name(
+        "stack_tr_reg_merged_probability_tensor"
+    )
 
     predictions = [
         _fetch_scores(scope, container, est, operator.inputs[0], is_regressor=True)
@@ -57,7 +61,7 @@ def _transform_regressor(scope, operator, container, model):
 
 
 def _transform(scope, operator, container, model):
-    merged_prob_tensor = scope.get_unique_variable_name("merged_probability_tensor")
+    merged_prob_tensor = scope.get_unique_variable_name("stack_tra_merged_prob_tensor")
 
     predictions = [
         _fetch_scores(
@@ -77,18 +81,18 @@ def _transform(scope, operator, container, model):
         for est_idx in range(0, len(op.estimators_))
     )
     if select_lact_column:
-        column_index_name = scope.get_unique_variable_name("column_index")
+        column_index_name = scope.get_unique_variable_name("stack_tr_column_index")
         container.add_initializer(
             column_index_name, onnx_proto.TensorProto.INT64, [], [1]
         )
         new_predictions = []
         for ipred, pred in enumerate(predictions):
-            prob1 = scope.get_unique_variable_name("stack_prob%d" % ipred)
+            prob1 = scope.get_unique_variable_name("stack_tr_prob%d" % ipred)
             container.add_node(
                 "ArrayFeatureExtractor",
                 [pred, column_index_name],
                 prob1,
-                name=scope.get_unique_operator_name("ArrayFeatureExtractor"),
+                name=scope.get_unique_operator_name("SV_AFE"),
                 op_domain="ai.onnx.ml",
             )
             new_predictions.append(prob1)
@@ -124,18 +128,16 @@ def convert_sklearn_stacking_classifier(
     else:
         classes = np.array([s.encode("utf-8") for s in classes])
 
-    classes_name = scope.get_unique_variable_name("classes")
-    argmax_output_name = scope.get_unique_variable_name("argmax_output")
-    reshaped_result_name = scope.get_unique_variable_name("reshaped_result")
-    array_feature_extractor_result_name = scope.get_unique_variable_name(
-        "array_feature_extractor_result"
-    )
+    classes_name = scope.get_unique_variable_name("stack_classes")
+    argmax_output_name = scope.get_unique_variable_name("stack_argmax_output")
+    reshaped_result_name = scope.get_unique_variable_name("stack_reshaped_result")
+    array_feature_extractor_result_name = scope.get_unique_variable_name("stack_result")
 
     container.add_initializer(classes_name, class_type, classes.shape, classes)
 
     merged_proba_tensor = _transform(scope, operator, container, stacking_op)
     merge_proba = scope.declare_local_variable(
-        "merged_stacked_proba", operator.inputs[0].type.__class__()
+        "stack_merge_proba", operator.inputs[0].type.__class__()
     )
     container.add_node("Identity", [merged_proba_tensor], [merge_proba.onnx_name])
     prob = _fetch_scores(
@@ -149,13 +151,13 @@ def convert_sklearn_stacking_classifier(
         "Identity",
         prob,
         operator.outputs[1].onnx_name,
-        name=scope.get_unique_operator_name("OpProb"),
+        name=scope.get_unique_operator_name("Identity_OpProb"),
     )
     container.add_node(
         "ArgMax",
         prob,
         argmax_output_name,
-        name=scope.get_unique_operator_name("ArgMax"),
+        name=scope.get_unique_operator_name("AFE_ArgMax"),
         axis=1,
     )
     container.add_node(
@@ -163,7 +165,7 @@ def convert_sklearn_stacking_classifier(
         [classes_name, argmax_output_name],
         array_feature_extractor_result_name,
         op_domain="ai.onnx.ml",
-        name=scope.get_unique_operator_name("ArrayFeatureExtractor"),
+        name=scope.get_unique_operator_name("SC_AFE_Stack"),
     )
 
     if class_type == onnx_proto.TensorProto.INT32:

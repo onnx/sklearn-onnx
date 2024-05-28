@@ -242,7 +242,7 @@ def convert_calibrated_classifier_base_estimator(
     # In the following graph, variable names are in lower case characters only
     # and operator names are in upper case characters. We borrow operator names
     # from the official ONNX spec:
-    # https://github.com/onnx/onnx/blob/master/docs/Operators.md
+    # https://github.com/onnx/onnx/blob/main/docs/Operators.md
     # All variables are followed by their shape in [].
     #
     # Symbols:
@@ -473,7 +473,7 @@ def convert_sklearn_calibrated_classifier_cv(
     # In the following graph, variable names are in lower case characters only
     # and operator names are in upper case characters. We borrow operator names
     # from the official ONNX spec:
-    # https://github.com/onnx/onnx/blob/master/docs/Operators.md
+    # https://github.com/onnx/onnx/blob/main/docs/Operators.md
     # All variables are followed by their shape in [].
     #
     # Symbols:

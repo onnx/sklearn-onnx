@@ -9,10 +9,10 @@ sklearn-onnx: Convert your scikit-learn model into ONNX
     :widths: 5 5
     * - Linux
       - Windows
-    * - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-linux-conda-ci?branchName=master
-            :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
-      - .. image:: https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status/sklearn-onnx-win32-conda-ci?branchName=master
-            :target: https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=5?branchName=master
+    * - .. image:: https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg
+            :target: https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml
+      - .. image:: https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml/badge.svg
+            :target: https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml
 
 
 *sklearn-onnx* enables you to convert models from
@@ -43,7 +43,7 @@ or submit a new one. Sources are available on
 The converter can convert a model for a specific version of ONNX.
 Every ONNX release is labelled with an opset number
 returned by function `onnx_opset_version
-<https://github.com/onnx/onnx/blob/master/onnx/defs/__init__.py#L22>`_.
+<https://github.com/onnx/onnx/blob/main/onnx/defs/__init__.py#L22>`_.
 This function returns the default value for parameter
 target opset (parameter *target_opset*) if it is not specified
 when converting the model. Every operator is versioned.
@@ -56,7 +56,8 @@ onnx nodes.
 .. runpython::
     :showcode:
     
-    from skl2onnx import __max_supported_opset__
+    from skl2onnx import __max_supported_opset__, __version__
+    print("documentation for version:", __version__)
     print("Last supported opset:", __max_supported_opset__)
 
 **Backend**
@@ -125,3 +126,7 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
 **License**
 
 It is licensed with `Apache License v2.0 <../LICENSE>`_.
+
+**Older versions**
+
+* `1.16.0 <versions/v1.16.0/>`_

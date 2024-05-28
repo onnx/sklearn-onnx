@@ -20,7 +20,7 @@ def _intelligent_split(text, op, tokenizer, existing):
     to name ngrams. ``'a  b'`` could be ``('a ', 'b')``
     or ``('a', ' b')``.
     See `ngram sequence
-    <https://github.com/scikit-learn/scikit-learn/blob/master/
+    <https://github.com/scikit-learn/scikit-learn/blob/main/
     sklearn/feature_extraction/text.py#L169>`_.
     """
     if op.analyzer == "word":
@@ -173,7 +173,7 @@ def convert_sklearn_text_vectorizer(
     to a custom tokenizer based on
     `python wrapper for re2 <https://pypi.org/project/re2/>`_
     or its sources `pyre2 <https://github.com/facebook/pyre2>`_
-    (`syntax <https://github.com/google/re2/blob/master/doc/syntax.txt>`_).
+    (`syntax <https://github.com/google/re2/blob/main/doc/syntax.txt>`_).
     If the regular expression is not specified and if
     the instance of TfidfVectorizer is using the default
     pattern ``(?u)\\\\b\\\\w\\\\w+\\\\b``, it is replaced by
@@ -183,12 +183,6 @@ def convert_sklearn_text_vectorizer(
     Regular expression ``[^\\\\\\\\n]`` is used to split
     a sentance into character (and not works) if ``analyser=='char'``.
     The mode ``analyser=='char_wb'`` is not implemented.
-
-    .. versionchanged:: 1.6
-        Parameters have been renamed: *sep* into *separators*,
-        *regex* into *tokenexp*.
-    ````
-
     """  # noqa
     op = operator.raw_operator
 
