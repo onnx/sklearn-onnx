@@ -475,12 +475,13 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     def test_min_frequency(self):
         data = pandas.DataFrame(
             [
-                dict(CAT1="a", CAT2="a", num1=0.5, num2=0.6, y=0),
-                dict(CAT1="b", CAT2="b", num1=0.4, num2=0.8, y=1),
-                dict(CAT1="a", CAT2="c", num1=0.5, num2=0.56, y=0),
-                dict(CAT1="a", CAT2="d", num1=0.55, num2=0.56, y=1),
-                dict(CAT1="a", CAT2="d", num1=0.35, num2=0.86, y=0),
-                dict(CAT1="a", CAT2="d", num1=0.5, num2=0.68, y=1),
+                dict(CAT1="aa", CAT2="ba", num1=0.5, num2=0.6, y=0),
+                dict(CAT1="ab", CAT2="bb", num1=0.4, num2=0.8, y=1),
+                dict(CAT1="ac", CAT2="bb", num1=0.4, num2=0.8, y=1),
+                dict(CAT1="ab", CAT2="bc", num1=0.5, num2=0.56, y=0),
+                dict(CAT1="ab", CAT2="bd", num1=0.55, num2=0.56, y=1),
+                dict(CAT1="ab", CAT2="bd", num1=0.35, num2=0.86, y=0),
+                dict(CAT1="ab", CAT2="bd", num1=0.5, num2=0.68, y=1),
             ]
         )
         cat_cols = ["CAT1", "CAT2"]
@@ -524,6 +525,8 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         for t in init:
             self.assertEqual(t[1].shape, [None, 1])
         onx2 = to_onnx(pipe, initial_types=init)
+        with open("kkkk.onnx", "wb") as f:
+            f.write(onx2.SerializeToString())
         sess2 = InferenceSession(
             onx2.SerializeToString(), providers=["CPUExecutionProvider"]
         )
