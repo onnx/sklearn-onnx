@@ -64,11 +64,11 @@ pipe.fit(X, y)
 #
 # The converter is implemented in *onnxmltools*:
 # `onnxmltools...LightGbm.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # lightgbm/operator_converters/LightGbm.py>`_.
 # and the shape calculator:
 # `onnxmltools...Classifier.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # lightgbm/shape_calculators/Classifier.py>`_.
 
 ##############################################

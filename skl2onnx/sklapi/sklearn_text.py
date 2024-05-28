@@ -2,6 +2,7 @@
 @file
 @brief Overloads :epkg:`TfidfVectorizer` and :epkg:`CountVectorizer`.
 """
+
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 
 try:
@@ -14,7 +15,7 @@ except ImportError:  # pragma: no cover
 class NGramsMixin(VectorizerMixin):
     """
     Overloads method `_word_ngrams
-    <https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/text.py#L148>`_
+    <https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/feature_extraction/text.py#L148>`_
     to get tuples instead of string in member `vocabulary_
     <https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html>`_.
     of `TfidfVectorizer` or :epkg:`CountVectorizer`.
@@ -103,7 +104,7 @@ class NGramsMixin(VectorizerMixin):
 class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
     """
     Inherits from :class:`NGramsMixin` which overloads method `_word_ngrams
-    <https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/text.py#L148>`_
+    <https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/feature_extraction/text.py#L148>`_
     to keep more information about n-grams but still produces the same
     outputs than `CountVectorizer`.
 
@@ -162,7 +163,7 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
         self.same_ = same
         if self.stop_words != same.stop_words:
             raise AssertionError(
-                f"Different stop_words {self.stop_words} " f"!= {same.stop_words}."
+                f"Different stop_words {self.stop_words} != {same.stop_words}."
             )
         update, dups = self._fix_vocabulary(same.vocabulary_, self.vocabulary_)
         self.updated_vocabulary_ = update
@@ -177,7 +178,7 @@ class TraceableCountVectorizer(CountVectorizer, NGramsMixin):
 class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
     """
     Inherits from :class:`NGramsMixin` which overloads method `_word_ngrams
-    <https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/text.py#L148>`_
+    <https://github.com/scikit-learn/scikit-learn/blob/main/sklearn/feature_extraction/text.py#L148>`_
     to keep more information about n-grams but still produces the same
     outputs than `TfidfVectorizer`.
 
@@ -228,7 +229,7 @@ class TraceableTfidfVectorizer(TfidfVectorizer, NGramsMixin):
         self.same_ = same
         if self.stop_words != same.stop_words:
             raise AssertionError(
-                f"Different stop_words {self.stop_words} " f"!= {same.stop_words}."
+                f"Different stop_words {self.stop_words} != {same.stop_words}."
             )
         update, dups = self._fix_vocabulary(same.vocabulary_, self.vocabulary_)
         self.updated_vocabulary_ = update

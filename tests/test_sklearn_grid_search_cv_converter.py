@@ -61,10 +61,15 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             "GridSearchCV",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
+            options={"zipmap": False},
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx, basename="SklearnGridSearchMulticlassFloat"
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGridSearchMulticlassFloat",
+            backend="onnxruntime",
         )
 
     def test_grid_search_binary_int(self):

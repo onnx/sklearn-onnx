@@ -3,6 +3,7 @@
 
 import unittest
 import packaging.version as pv
+import onnx
 import onnxruntime
 
 try:
@@ -249,7 +250,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_binary(self):
         model, X = fit_classification_model(
-            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)), 2
+            BaggingClassifier(GradientBoostingClassifier(n_estimators=5)),
+            2,
+            n_samples=100,
+            n_features=5,
         )
         model_onnx = convert_sklearn(
             model,
@@ -270,7 +274,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)), 3
+            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)),
+            3,
+            n_samples=100,
+            n_features=5,
         )
         model_onnx = convert_sklearn(
             model,
@@ -351,6 +358,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
             X, model, model_onnx, basename="SklearnBaggingRegressorSGD-Dec4"
         )
 
+    @unittest.skipIf(
+        pv.Version(onnx.__version__) < pv.Version("1.16.0"),
+        reason="Fixed issue in more recent versions",
+    )
     @ignore_warnings(category=FutureWarning)
     def test_bagging_regressor_gradient_boosting(self):
         model, X = fit_regression_model(
@@ -386,6 +397,7 @@ class TestSklearnBaggingConverter(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    # TestSklearnBaggingConverter().
-    # test_bagging_classifier_sgd_multiclass_decision_function()
+    import logging
+
+    logging.getLogger("skl2onnx").setLevel(logging.ERROR)
     unittest.main(verbosity=2)

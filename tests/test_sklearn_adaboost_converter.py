@@ -208,7 +208,11 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_lr(self):
         model, X_test = fit_classification_model(
-            AdaBoostClassifier(learning_rate=0.3, random_state=42), 3, is_int=True
+            AdaBoostClassifier(learning_rate=0.3, random_state=42),
+            3,
+            is_int=True,
+            n_samples=100,
+            n_features=10,
         )
         model_onnx = convert_sklearn(
             model,
@@ -224,7 +228,11 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_classifier_bool(self):
         model, X_test = fit_classification_model(
-            AdaBoostClassifier(random_state=42), 3, is_bool=True
+            AdaBoostClassifier(random_state=42),
+            3,
+            is_bool=True,
+            n_samples=100,
+            n_features=10,
         )
         model_onnx = convert_sklearn(
             model,
@@ -301,7 +309,9 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
     def test_ada_boost_regressor_lr10(self):
         model, X = fit_regression_model(
-            AdaBoostRegressor(learning_rate=0.5, random_state=42)
+            AdaBoostRegressor(learning_rate=0.5, random_state=42),
+            n_features=5,
+            n_samples=100,
         )
         model_onnx = convert_sklearn(
             model,
@@ -368,5 +378,8 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    TestSklearnAdaBoostModels().test_ada_boost_classifier_samme()
+    # TestSklearnAdaBoostModels().test_ada_boost_classifier_samme()
+    import logging
+
+    logging.getLogger("skl2onnx").setLevel(logging.ERROR)
     unittest.main(verbosity=2)

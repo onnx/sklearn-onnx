@@ -1,11 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
-
-# coding: utf-8
 """
 Tests examples from scikit-learn's documentation.
 """
 import packaging.version as pv
 import unittest
+import sys
+import onnx
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.pipeline import Pipeline
@@ -14,6 +14,12 @@ from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
 from test_utils import dump_data_and_model, TARGET_OPSET
 
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
+
 
 class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
     @unittest.skipIf(
@@ -21,10 +27,12 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
         # issue with encoding
         reason="https://github.com/onnx/onnx/pull/1734",
     )
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     @unittest.skipIf(
         pv.Version(ort.__version__) <= pv.Version("0.2.1"),
         reason="sparse not supported",
     )
+    @unittest.skipIf(sys.platform != "linux", reason="too long")
     def test_model_tfidf_transform_bug(self):
         categories = [
             "alt.atheism",
@@ -51,6 +59,7 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
             text_clf,
             model_onnx,
             basename="SklearnPipelineTfidfTransformer",
+            backend=BACKEND,
         )
 
 

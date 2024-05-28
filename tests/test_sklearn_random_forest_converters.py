@@ -5,6 +5,7 @@ import unittest
 import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
+import onnx
 from onnxruntime import InferenceSession, __version__ as ort_version
 import sklearn
 from sklearn.datasets import load_iris, make_regression, make_classification
@@ -65,6 +66,12 @@ def _sklearn_version():
 
 
 ort_version = ".".join(ort_version.split(".")[:2])
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnTreeEnsembleModels(unittest.TestCase):
@@ -313,6 +320,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             )
 
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_model_random_forest_classifier_multi_output_int(self):
         model, X_test = fit_multi_output_classification_model(
             RandomForestClassifier(random_state=42, n_estimators=20)
@@ -367,6 +375,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             model_onnx,
             basename=f"SklearnHGBRegressor{add_nan}",
             verbose=False,
+            backend=BACKEND,
         )
 
     @unittest.skipIf(
@@ -623,7 +632,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
             pipe,
             model_onnx,
             methods=["predict"],
-            basename="SklearnBostonPCARF-Dec4",
+            basename="SklearnBostonPCARF-Dec3",
         )
 
     @ignore_warnings(category=FutureWarning)

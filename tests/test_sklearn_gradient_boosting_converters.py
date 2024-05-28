@@ -1,9 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 
-
 import packaging.version as pv
 import unittest
 import numpy as np
+import onnx
 from pandas import DataFrame
 from sklearn import __version__ as skl_version
 from sklearn.datasets import make_classification
@@ -29,6 +29,12 @@ from test_utils import (
 
 ort_version = ort_version.split("+")[0]
 skl_version = skl_version.split("+")[0]
+
+BACKEND = (
+    "onnxruntime"
+    if pv.Version(onnx.__version__) < pv.Version("1.16.0")
+    else "onnx;onnxruntime"
+)
 
 
 class TestSklearnGradientBoostingModels(unittest.TestCase):
@@ -215,7 +221,11 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx, basename="SklearnGradientBoostingRegressionLsLoss"
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingRegressionLsLoss",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(
@@ -233,7 +243,11 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx, basename="SklearnGradientBoostingRegressionLadLoss"
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingRegressionLadLoss",
+            backend=BACKEND,
         )
 
     def test_gradient_boosting_regressor_huber_loss(self):
@@ -248,7 +262,11 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
-            X, model, model_onnx, basename="SklearnGradientBoostingRegressionHuberLoss"
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingRegressionHuberLoss",
+            backend=BACKEND,
         )
 
     def test_gradient_boosting_regressor_quantile_loss(self):
@@ -267,6 +285,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingRegressionQuantileLoss-Dec4",
+            backend=BACKEND,
         )
 
     def test_gradient_boosting_regressor_int(self):
@@ -300,12 +319,14 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingRegressionZeroInit-Dec4",
+            backend=BACKEND,
         )
 
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("0.5.0"),
         reason="Depends on PR #1015 onnxruntime.",
     )
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_gradient_boosting_regressor_learning_rate(self):
         X, y = make_classification(
             n_features=100, n_samples=1000, n_classes=2, n_informative=8

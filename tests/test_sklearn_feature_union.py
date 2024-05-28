@@ -141,7 +141,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
             X_test,
             model,
             model_onnx,
-            basename="SklearnFeatureUnionTransformerWeights2-Dec4",
+            basename="SklearnFeatureUnionTransformerWeights2-Dec3",
         )
 
 

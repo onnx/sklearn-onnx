@@ -297,7 +297,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
             "bad",
         ]
 
-        model = Pipeline(
+        model1 = Pipeline(
             steps=[
                 (
                     "concat",
@@ -316,7 +316,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
                                 Pipeline(
                                     steps=[
                                         # This encoder is placed before
-                                        # impleImputer because
+                                        # SimpleImputer because
                                         # onnx does not support text for Imputer.
                                         ("encoder", OrdinalEncoder()),
                                         (
@@ -339,23 +339,71 @@ class TestVotingClassifierConverter(unittest.TestCase):
                 ),
             ]
         )
-        model.fit(X, y)
-        expected = model.predict(X)
-        schema = guess_data_type(X)
 
-        onnx_model = to_onnx(
-            model=model,
-            initial_types=schema,
-            options={"zipmap": False},
-            target_opset=TARGET_OPSET,
+        model2 = Pipeline(
+            steps=[
+                (
+                    "concat",
+                    ColumnTransformer(
+                        [
+                            (
+                                "concat",
+                                Pipeline(
+                                    steps=[
+                                        # This encoder is placed before
+                                        # simpleImputer because
+                                        # onnx does not support text for Imputer.
+                                        ("encoder", OrdinalEncoder()),
+                                        (
+                                            "imputer",
+                                            SimpleImputer(strategy="most_frequent"),
+                                        ),
+                                    ],
+                                ),
+                                list(range(X.shape[1])),
+                            )
+                        ],
+                        sparse_threshold=0,
+                    ),
+                ),
+                (
+                    "voting",
+                    VotingClassifier(
+                        flatten_transform=False,
+                        estimators=[
+                            (
+                                "est",
+                                RandomForestClassifier(
+                                    n_estimators=4,
+                                    max_depth=4,
+                                    random_state=0,
+                                ),
+                            ),
+                        ],
+                    ),
+                ),
+            ]
         )
 
-        sess = InferenceSession(
-            onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
-        )
-        inputs = {c: X[c].to_numpy().reshape((-1, 1)) for c in X.columns}
-        got = sess.run(None, inputs)
-        self.assertEqual(expected.tolist(), got[0].tolist())
+        models = [model1, model2]
+        for model in models:
+            model.fit(X, y)
+            expected = model.predict(X)
+            schema = guess_data_type(X)
+
+            onnx_model = to_onnx(
+                model=model,
+                initial_types=schema,
+                options={"zipmap": False},
+                target_opset=TARGET_OPSET,
+            )
+
+            sess = InferenceSession(
+                onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
+            inputs = {c: X[c].to_numpy().reshape((-1, 1)) for c in X.columns}
+            got = sess.run(None, inputs)
+            self.assertEqual(expected.tolist(), got[0].tolist())
 
 
 if __name__ == "__main__":

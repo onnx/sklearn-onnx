@@ -101,9 +101,11 @@ class Tree:
                 "Node(%s, is_left=%r, is_leaf=%r, feature=%r, "
                 "threshold=%r, value=%r, index=%r)%s"
                 % (
-                    self.parent
-                    if isinstance(self.parent, int)
-                    else "id%r" % id(self.parent),
+                    (
+                        self.parent
+                        if isinstance(self.parent, int)
+                        else "id%r" % id(self.parent)
+                    ),
                     self.is_left,
                     self.is_leaf,
                     self.feature,
@@ -115,15 +117,21 @@ class Tree:
                         self.onnx_mode,
                         self.onnx_threshold,
                         self.onnx_value,
-                        " -- %r" % self.intervals_
-                        if hasattr(self, "intervals_")
-                        else "",
-                        " LL %r" % self.intervals_left_
-                        if hasattr(self, "intervals_left_")
-                        else "",
-                        " RR %r" % self.intervals_right_
-                        if hasattr(self, "intervals_right_")
-                        else "",
+                        (
+                            " -- %r" % self.intervals_
+                            if hasattr(self, "intervals_")
+                            else ""
+                        ),
+                        (
+                            " LL %r" % self.intervals_left_
+                            if hasattr(self, "intervals_left_")
+                            else ""
+                        ),
+                        (
+                            " RR %r" % self.intervals_right_
+                            if hasattr(self, "intervals_right_")
+                            else ""
+                        ),
                     ),
                 )
             )
@@ -216,7 +224,7 @@ class Tree:
     def onnx_attributes(self):
         """
         See `TreeEnsembleRegressor
-        <https://github.com/onnx/onnx/blob/master/docs/
+        <https://github.com/onnx/onnx/blob/main/docs/
         Operators-ml.md#ai.onnx.ml.TreeEnsembleRegressor>`_.
         """
         atts = dict(
