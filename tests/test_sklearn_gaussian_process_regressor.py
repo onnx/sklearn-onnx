@@ -25,13 +25,7 @@ from sklearn.gaussian_process.kernels import (
     WhiteKernel,
 )
 from sklearn.model_selection import train_test_split
-
-try:
-    # scikit-learn >= 0.22
-    from sklearn.utils._testing import ignore_warnings
-except ImportError:
-    # scikit-learn < 0.22
-    from sklearn.utils.testing import ignore_warnings
+from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
 from skl2onnx import to_onnx
@@ -1020,6 +1014,9 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             model_onnx,
             verbose=False,
             basename="SklearnGaussianProcessExpSineSquaredStdF-Out0-Dec3",
+            # operator MatMul gets replaced by FusedMatMul but onnxruntime does not check
+            # the availability of the kernel for double.
+            disable_optimisation=True,
         )
         self.check_outputs(
             gp,
@@ -1419,6 +1416,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             pipe.predict(vx1.astype(np.float64)).ravel(), pred[0].ravel()
         )
 
+    @ignore_warnings(category=ConvergenceWarning)
     def test_white_kernel_float(self):
         X, y = make_friedman2(n_samples=500, noise=0, random_state=0)
         tx1, vx1, ty1, vy1 = train_test_split(X, y)
@@ -1437,6 +1435,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             gpr.predict(vx1.astype(np.float32)).ravel(), pred[0].ravel(), rtol=1e-3
         )
 
+    @ignore_warnings(category=ConvergenceWarning)
     def test_white_kernel_double(self):
         X, y = make_friedman2(n_samples=500, noise=0, random_state=0)
         tx1, vx1, ty1, vy1 = train_test_split(X, y)
@@ -1605,6 +1604,23 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                 m2 = ker(x, x)
                 assert_almost_equal(m2, m1, decimal=5)
 
+    def test_issue_1073_multidimension_process(self):
+        # multioutput gpr
+        n_samples, n_features, n_targets = 1000, 8, 3
+        X, y = make_regression(n_samples, n_features, n_targets=n_targets)
+        tx1, vx1, ty1, vy1 = train_test_split(X, y)
+        model = GaussianProcessRegressor()
+        model.fit(tx1, ty1)
+        initial_type = [("data_in", DoubleTensorType([None, X.shape[1]]))]
+        onx = to_onnx(model, initial_types=initial_type, target_opset=_TARGET_OPSET_)
+        sess = InferenceSession(
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        pred = sess.run(None, {"data_in": vx1.astype(np.float64)})
+        assert_almost_equal(
+            model.predict(vx1.astype(np.float64)).ravel(), pred[0].ravel()
+        )
+
 
 if __name__ == "__main__":
     # import logging
@@ -1612,4 +1628,5 @@ if __name__ == "__main__":
     # log.setLevel(logging.DEBUG)
     # logging.basicConfig(level=logging.DEBUG)
     # TestSklearnGaussianProcessRegressor().test_kernel_white_kernel()
+    # TestSklearnGaussianProcessRegressor().test_issue_1073()
     unittest.main(verbosity=2)
