@@ -174,6 +174,19 @@ class SupportedSklearnOpsDirective(Directive):
 
         rows.append("")
         for name in sorted_keys:
+            if name in {
+                "OnnxDecorrelateTransformer",
+                "OnnxGrowthCalculator",
+                "OnnxPredictableTSNE",
+                "OnnxSklearnLGBMClassifier",
+                "OnnxSklearnLGBMRegressor",
+                "OnnxSklearnXGBClassifier",
+                "OnnxSklearnXGBRegressor",
+                "OnnxSklearnPipeline",
+                "OnnxSklearnColumnTransformer",
+                "OnnxSklearnFeatureUnion",
+            }:
+                continue
             rows = []
             cl = cls[name]
             rows.append(".. _l-sklops-{}:".format(cl.__name__))
