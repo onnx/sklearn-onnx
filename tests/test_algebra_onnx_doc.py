@@ -49,21 +49,18 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET <= 20, reason="not available")
     def test_doc_onnx(self):
         rst = get_rst_doc()
-        assert "**Summary**" in rst
+        assert "**Summary**" in rst, f"Unable to find **Summary** in\n{rst}"
 
     @unittest.skipIf(
         sys.platform.startswith("win"), reason="onnx schema are incorrect on Windows"
     )
     @unittest.skipIf(TARGET_OPSET <= 20, reason="not available")
     def test_doc_sklearn(self):
-        try:
-            rst = get_rst_doc_sklearn()
-            assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
-        except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(
-                e
-            ) or "SklearnGaussianProcessClassifier" in str(e)
+        rst = get_rst_doc_sklearn()
+        assert (
+            ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
+        ), f"Unable to find a substring in\n{rst}"
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
