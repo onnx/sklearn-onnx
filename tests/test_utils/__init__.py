@@ -126,6 +126,7 @@ TARGET_OPSET = int(
     )
 )
 
+# opset-ml == 4 still not implemented in onnxruntime
 value_ml = 3
 if TARGET_OPSET <= 16:
     # TreeEnsemble* for opset-ml == 3 is implemented in onnxruntime==1.12.0

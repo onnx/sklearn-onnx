@@ -472,6 +472,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
     def test_shape_inference_onnxruntime(self):
         self._shape_inference("onnxruntime")
 
+    @unittest.skipIf(not skl12(), reason="sparse output not available")
     def test_min_frequency(self):
         data = pandas.DataFrame(
             [
