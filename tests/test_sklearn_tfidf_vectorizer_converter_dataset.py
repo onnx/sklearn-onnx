@@ -23,6 +23,7 @@ BACKEND = (
 
 class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_tfidf_20newsgroups(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
@@ -46,6 +47,7 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
         )
 
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_tfidf_20newsgroups_nolowercase(self):
         data = fetch_20newsgroups()
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]

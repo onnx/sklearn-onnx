@@ -354,7 +354,7 @@ def predictable_tsne_converter(scope, operator, container):
     name = scope.get_unique_operator_name("Scaler")
 
     # The parameter follows the specifications of ONNX
-    # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
+    # https://github.com/onnx/onnx/blob/main/docs/Operators-ml.md#ai.onnx.ml.Scaler
     attrs = dict(
         name=name,
         scale=op.inv_std_.ravel().astype(numpy.float32),

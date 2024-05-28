@@ -64,11 +64,12 @@ def fit_classification_model(
     n_repeated=None,
     cls_dtype=None,
     is_double=False,
+    n_samples=250,
 ):
     X, y = make_classification(
         n_classes=n_classes,
         n_features=n_features,
-        n_samples=250,
+        n_samples=n_samples,
         random_state=random_state,
         n_informative=min(7, n_features),
         n_redundant=n_redundant or min(2, n_features - min(7, n_features)),

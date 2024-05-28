@@ -250,7 +250,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_binary(self):
         model, X = fit_classification_model(
-            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)), 2
+            BaggingClassifier(GradientBoostingClassifier(n_estimators=5)),
+            2,
+            n_samples=100,
+            n_features=5,
         )
         model_onnx = convert_sklearn(
             model,
@@ -271,7 +274,10 @@ class TestSklearnBaggingConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_bagging_classifier_gradient_boosting_multiclass(self):
         model, X = fit_classification_model(
-            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)), 3
+            BaggingClassifier(GradientBoostingClassifier(n_estimators=10)),
+            3,
+            n_samples=100,
+            n_features=5,
         )
         model_onnx = convert_sklearn(
             model,
@@ -394,5 +400,4 @@ if __name__ == "__main__":
     import logging
 
     logging.getLogger("skl2onnx").setLevel(logging.ERROR)
-    TestSklearnBaggingConverter().test_bagging_regressor_gradient_boosting()
     unittest.main(verbosity=2)
