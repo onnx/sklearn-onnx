@@ -1,5 +1,20 @@
 # Change Logs
 
+## 1.17.0 (development)
+
+* Minor fixes to support scikit-learn==1.5.0
+  [#1095](https://github.com/onnx/sklearn-onnx/pull/1095)
+* Fix the conversion of pipeline including pipelines,
+  issue [#1069](https://github.com/onnx/sklearn-onnx/pull/1069),
+  [#1072](https://github.com/onnx/sklearn-onnx/pull/1072)
+* Fix unexpected type for intercept in PoissonRegressor and GammaRegressor
+  [#1070](https://github.com/onnx/sklearn-onnx/pull/1070)
+* Add support for scikit-learn 1.4.0,
+  [#1058](https://github.com/onnx/sklearn-onnx/pull/1058),
+  fixes issues [Many examples in the gallery are showing "broken"](https://github.com/onnx/sklearn-onnx/pull/1057),
+  [TFIDF vectorizer target_opset issue](https://github.com/onnx/sklearn-onnx/pull/1055),
+  [Tfidfvectorizer with sublinear_tf fails, despite opset version set to greater than 11](https://github.com/onnx/sklearn-onnx/pull/996).
+
 ## 1.16.0
 
 * Supports cosine distance (LocalOutlierFactor, ...)

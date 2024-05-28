@@ -42,6 +42,12 @@ def _sklearn_version():
     return pv.Version(v)
 
 
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class TestGLMClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class_boolean(self):
@@ -396,7 +402,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_lbfgs(self):
-        penalty = "l2" if _sklearn_version() < pv.Version("0.21.0") else "none"
+        penalty = "l2"
         model, X = fit_classification_model(
             linear_model.LogisticRegression(
                 solver="lbfgs", penalty=penalty, max_iter=10000
@@ -461,6 +467,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
         )
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    @unittest.skipIf(not skl12(), reason="sparse_output")
     def test_model_linear_svc_binary_class(self):
         model, X = fit_classification_model(LinearSVC(max_iter=10000), 2)
         model_onnx = convert_sklearn(

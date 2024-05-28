@@ -139,12 +139,17 @@ class TestOnnxOperatorsToOnnx(unittest.TestCase):
         opsets = list(range(start, TARGET_OPSET + 1))
         for opv in [{"": TARGET_OPSET}] + opsets:
             with self.subTest(opv=opv):
+                main_opset = opv
                 if isinstance(opv, dict):
                     if opv[""] > get_latest_tested_opset_version():
                         continue
+                    main_opset = opv[""]
                 elif opv is not None and opv > get_latest_tested_opset_version():
                     continue
                 for i, nbnode in enumerate((1, 2, 3, 100)):
+                    if nbnode == 100 and main_opset < TARGET_OPSET:
+                        # too long
+                        continue
                     onx = generate_onnx_graph(opv=opv)
                     if opv == {"": TARGET_OPSET}:
                         for im in onx.opset_import:

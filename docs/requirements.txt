@@ -5,12 +5,13 @@ coverage
 flake8
 furo
 joblib
-lightgbm<4.0
+lightgbm; sys_platform != 'darwin'
 loky
 matplotlib
 mlinsights>=0.3.631
 nbsphinx
 onnx
+onnxmltools
 onnxruntime
 pillow
 py-spy
@@ -18,15 +19,14 @@ pandas
 pydot
 pyinstrument
 pyod
-pyquickhelper>=1.11.3762
 pytest
 pytest-cov
-scikit-learn>=1.1
 skl2onnx
 sphinx
 sphinxcontrib-blockdiag
 sphinx-gallery
+sphinx-runpython
 tabulate
 tqdm
 wheel
-xgboost<2
+xgboost

@@ -2,9 +2,9 @@
 
 <p align="center"><img width="50%" src="docs/logo_main.png" /></p>
 
-[![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status%2Fonnx.sklearn-onnx.linux.CI?branchName=refs%2Fpull%2F1020%2Fmerge)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=21&branchName=refs%2Fpull%2F1020%2Fmerge)
+[![Linux](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml)
 
-[![Build Status](https://dev.azure.com/onnxmltools/sklearn-onnx/_apis/build/status%2Fonnx.sklearn-onnx.win.CI?branchName=refs%2Fpull%2F1020%2Fmerge)](https://dev.azure.com/onnxmltools/sklearn-onnx/_build/latest?definitionId=22&branchName=refs%2Fpull%2F1020%2Fmerge)
+[![Windows/Macos](https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml)
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -18,7 +18,7 @@ including models or transformers coming from external libraries.
 ## Documentation
 Full documentation including tutorials is available at [https://onnx.ai/sklearn-onnx/](https://onnx.ai/sklearn-onnx/).
 [Supported scikit-learn Models](https://onnx.ai/sklearn-onnx/supported.html)
-Last supported opset is 15.
+Last supported opset is 19.
 
 You may also find answers in [existing issues](https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue)
 or submit a new one.

@@ -36,24 +36,15 @@ def convert_sklearn_tfidf_transformer(
         # code scikit-learn
         # np.log(X.data, X.data) --> does not apply on null coefficient
         # X.data += 1
-        # ONNX does not support sparse tensors before opset < 11
-        # approximated by X.data += 1 --> np.log(X.data, X.data)
-        if operator.target_opset < 11:
-            plus1 = scope.get_unique_variable_name("plus1")
-            C = operator.inputs[0].type.shape[1]
-            ones = scope.get_unique_variable_name("ones")
-            cst = np.ones((C,), dtype=float_type)
-            container.add_initializer(ones, proto_dtype, [C], cst.flatten())
-            apply_add(scope, data + [ones], plus1, container, broadcast=1)
-            plus1logged = scope.get_unique_variable_name("plus1logged")
-            apply_log(scope, plus1, plus1logged, container)
-            data = [plus1logged]
-        else:
-            # sparse containers have not yet been implemented.
-            raise RuntimeError(
-                "ONNX does not support sparse tensors before opset < 11, "
-                "sublinear_tf must be False."
-            )
+        plus1 = scope.get_unique_variable_name("plus1")
+        C = operator.inputs[0].type.shape[1]
+        ones = scope.get_unique_variable_name("ones")
+        cst = np.ones((C,), dtype=float_type)
+        container.add_initializer(ones, proto_dtype, [C], cst.flatten())
+        apply_add(scope, data + [ones], plus1, container, broadcast=1)
+        plus1logged = scope.get_unique_variable_name("plus1logged")
+        apply_log(scope, plus1, plus1logged, container)
+        data = [plus1logged]
 
     if op.use_idf:
         cst = op.idf_.astype(float_type)

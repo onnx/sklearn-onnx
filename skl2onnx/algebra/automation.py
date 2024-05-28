@@ -192,7 +192,7 @@ def get_rst_doc(op_name=None):
         if doc is None:
             doc = ""
         doc = textwrap.dedent(doc)
-        main_docs_url = "https://github.com/onnx/onnx/blob/master/"
+        main_docs_url = "https://github.com/onnx/onnx/blob/main/"
         rep = {
             "[the doc](IR.md)": "`ONNX <{0}docs/IR.md>`_",
             "[the doc](Broadcasting.md)": (
@@ -227,7 +227,7 @@ def get_rst_doc(op_name=None):
         return "\n".join(lines)
 
     def build_doc_url(sch):
-        doc_url = "https://github.com/onnx/onnx/blob/master/docs/Operators"
+        doc_url = "https://github.com/onnx/onnx/blob/main/docs/Operators"
         if "ml" in sch.domain:
             doc_url += "-ml"
         doc_url += ".md"

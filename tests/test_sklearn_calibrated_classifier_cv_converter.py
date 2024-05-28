@@ -9,6 +9,7 @@ import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import __version__ as ort_version
+from sklearn import __version__ as sklearn_version
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.datasets import load_digits, load_iris
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
@@ -47,6 +48,12 @@ from test_utils import (
 )
 
 ort_version = ort_version.split("+")[0]
+
+
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
 
 
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
@@ -186,12 +193,13 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_logistic_regression(self):
         data = load_iris()
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=LogisticRegression(), method="sigmoid"
+            estimator=LogisticRegression(), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -210,12 +218,13 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_rf(self):
         data = load_iris()
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=RandomForestClassifier(n_estimators=2), method="sigmoid"
+            estimator=RandomForestClassifier(n_estimators=2), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -234,12 +243,13 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_gbt(self):
         data = load_iris()
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=GradientBoostingClassifier(n_estimators=2), method="sigmoid"
+            estimator=GradientBoostingClassifier(n_estimators=2), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -259,12 +269,13 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_hgbt(self):
         data = load_iris()
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=HistGradientBoostingClassifier(max_iter=4), method="sigmoid"
+            estimator=HistGradientBoostingClassifier(max_iter=4), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -283,12 +294,13 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_tree(self):
         data = load_iris()
         X, y = data.data, data.target
         y[y > 1] = 1
         model = CalibratedClassifierCV(
-            base_estimator=DecisionTreeClassifier(), method="sigmoid"
+            estimator=DecisionTreeClassifier(), method="sigmoid"
         ).fit(X, y)
         model_onnx = convert_sklearn(
             model,
@@ -308,10 +320,11 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_svc(self):
         data = load_iris()
         X, y = data.data, data.target
-        model = CalibratedClassifierCV(base_estimator=SVC(), method="sigmoid").fit(X, y)
+        model = CalibratedClassifierCV(estimator=SVC(), method="sigmoid").fit(X, y)
         model_onnx = convert_sklearn(
             model,
             "unused",
@@ -330,12 +343,13 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_linearsvc(self):
         data = load_iris()
         X, y = data.data, data.target
-        model = CalibratedClassifierCV(
-            base_estimator=LinearSVC(), method="sigmoid"
-        ).fit(X, y)
+        model = CalibratedClassifierCV(estimator=LinearSVC(), method="sigmoid").fit(
+            X, y
+        )
         model_onnx = convert_sklearn(
             model,
             "unused",
@@ -354,14 +368,15 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_linearsvc2(self):
         data = load_iris()
         X, y = data.data, data.target
         y[y == 2] = 0
         self.assertEqual(len(set(y)), 2)
-        model = CalibratedClassifierCV(
-            base_estimator=LinearSVC(), method="sigmoid"
-        ).fit(X, y)
+        model = CalibratedClassifierCV(estimator=LinearSVC(), method="sigmoid").fit(
+            X, y
+        )
         model_onnx = convert_sklearn(
             model,
             "unused",
@@ -380,6 +395,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     )
     @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_svc2_binary(self):
         data = load_iris()
         X, y = data.data, data.target
@@ -391,7 +407,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
             model_sub.fit(X, y)
             with self.subTest(model=model_sub):
                 model = CalibratedClassifierCV(
-                    base_estimator=model_sub, cv=2, method="sigmoid"
+                    estimator=model_sub, cv=2, method="sigmoid"
                 ).fit(X, y)
                 model_onnx = convert_sklearn(
                     model,

@@ -2,8 +2,6 @@
 
 
 """
-.. _example-xgboost:
-
 Convert a pipeline with a XGBoost model
 ========================================
 
@@ -75,11 +73,11 @@ except Exception as e:
 #
 # The converter is implemented in :epkg:`onnxmltools`:
 # `onnxmltools...XGBoost.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # xgboost/operator_converters/XGBoost.py>`_.
 # and the shape calculator:
 # `onnxmltools...Classifier.py
-# <https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+# <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 # xgboost/shape_calculators/Classifier.py>`_.
 
 update_registered_converter(

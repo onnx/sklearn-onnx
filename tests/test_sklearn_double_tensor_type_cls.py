@@ -51,6 +51,12 @@ onnx_version = ".".join(onnx_version.split(".")[:2])
 LOG_LOSS = "log_loss" if pv.Version(skl_version) >= pv.Version("1.1") else "log"
 
 
+def skl12():
+    # pv.Version does not work with development versions
+    vers = ".".join(skl_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.2")
+
+
 class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     def _common_classifier(
         self,
@@ -318,6 +324,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
         reason="ArgMax, Tanh are missing",
     )
     @ignore_warnings(category=warnings_to_skip)
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_svc_sigmoid_64(self):
         self._common_classifier(
             [lambda: SVC(kernel="sigmoid")], "SVCsigmoid", raw_scores=False
@@ -405,11 +412,12 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
     )
     @unittest.skipIf(StackingClassifier is None, reason="scikit-learn too old")
     @ignore_warnings(category=warnings_to_skip)
+    @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_calibration_sigmoid_64(self):
         self._common_classifier(
             [
                 lambda: CalibratedClassifierCV(
-                    base_estimator=LogisticRegression(), method="sigmoid"
+                    estimator=LogisticRegression(), method="sigmoid"
                 )
             ],
             "CalibratedClassifierCV",
