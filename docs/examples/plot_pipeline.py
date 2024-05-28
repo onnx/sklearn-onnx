@@ -48,7 +48,7 @@ with open(filename, "wb") as f:
 # Draw a model with ONNX
 # ++++++++++++++++++++++
 # We use `net_drawer.py
-# <https://github.com/onnx/onnx/blob/master/onnx/tools/net_drawer.py>`_
+# <https://github.com/onnx/onnx/blob/main/onnx/tools/net_drawer.py>`_
 # included in *onnx* package.
 # We use *onnx* to load the model
 # in a different way than before.

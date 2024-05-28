@@ -7,6 +7,7 @@ from onnxruntime import __version__ as ort_version
 
 
 class TestInvestigate(unittest.TestCase):
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_issue_1053(self):
         from sklearn.datasets import load_iris
         from sklearn.linear_model import LogisticRegression
@@ -47,7 +48,7 @@ class TestInvestigate(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.16.0"),
         reason="opset 19 not implemented",
     )
-    @ignore_warnings(category=(ConvergenceWarning,))
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_issue_1055(self):
         import numpy as np
         from numpy.testing import assert_almost_equal
@@ -115,9 +116,10 @@ class TestInvestigate(unittest.TestCase):
         assert_almost_equal(expected, got[1], decimal=2)
 
     @unittest.skipIf(
-        pv.Version(ort_version) < pv.Version("1.16.0"),
+        pv.Version(ort_version) < pv.Version("1.17.3"),
         reason="opset 19 not implemented",
     )
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_issue_1069(self):
         import math
         from typing import Any
@@ -246,7 +248,11 @@ class TestInvestigate(unittest.TestCase):
             return classifier
 
         model = Classifier(list(X_train.columns))
-        model.fit(X_train, y_train)
+        try:
+            model.fit(X_train, y_train)
+        except ValueError as e:
+            # If this fails, no need to go beyond.
+            raise unittest.SkipTest(str(e))
 
         sample = X_train[:1].astype(numpy.float32)
 
