@@ -63,6 +63,7 @@ def _default_OPSET_TO_IR_VERSION():
         18: 8,
         19: 9,
         20: 9,
+        21: 10,
     }
 
 

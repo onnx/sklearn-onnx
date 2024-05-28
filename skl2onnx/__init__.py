@@ -9,7 +9,7 @@ __producer__ = "skl2onnx"
 __producer_version__ = __version__
 __domain__ = "ai.onnx"
 __model_version__ = 0
-__max_supported_opset__ = 19  # Converters are tested up to this version.
+__max_supported_opset__ = 21  # Converters are tested up to this version.
 
 
 from .convert import convert_sklearn, to_onnx, wrap_as_onnx_mixin  # noqa
