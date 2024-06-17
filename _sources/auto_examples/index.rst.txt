@@ -12,6 +12,7 @@ Gallery of examples
 
     <div class="sphx-glr-thumbnails">
 
+.. thumbnail-parent-div-open
 
 .. raw:: html
 
@@ -437,6 +438,8 @@ Gallery of examples
       <div class="sphx-glr-thumbnail-title">Write your own converter for your own model</div>
     </div>
 
+
+.. thumbnail-parent-div-close
 
 .. raw:: html
 

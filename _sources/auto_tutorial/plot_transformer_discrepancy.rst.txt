@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -38,9 +38,10 @@ Imports, setups
 All imports. It also registered onnx converters for :epkg:`xgboost`
 and :epkg:`lightgbm`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-59
+.. GENERATED FROM PYTHON SOURCE LINES 22-60
 
 .. code-block:: Python
+
 
     import pprint
     import numpy
@@ -86,14 +87,14 @@ and :epkg:`lightgbm`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-64
+.. GENERATED FROM PYTHON SOURCE LINES 61-65
 
 Artificial datasets
 +++++++++++++++++++
 
 Iris + a text column.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-81
+.. GENERATED FROM PYTHON SOURCE LINES 65-82
 
 .. code-block:: Python
 
@@ -134,12 +135,12 @@ Iris + a text column.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-84
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
 Fit a TfIdfVectorizer
 +++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-87
+.. GENERATED FROM PYTHON SOURCE LINES 85-88
 
 .. code-block:: Python
 
@@ -153,11 +154,11 @@ Fit a TfIdfVectorizer
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-89
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 We leave a couple of strings out of the training set.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-97
+.. GENERATED FROM PYTHON SOURCE LINES 90-98
 
 .. code-block:: Python
 
@@ -189,12 +190,12 @@ We leave a couple of strings out of the training set.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-100
+.. GENERATED FROM PYTHON SOURCE LINES 99-101
 
 Conversion to ONNX
 ++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-104
+.. GENERATED FROM PYTHON SOURCE LINES 101-105
 
 .. code-block:: Python
 
@@ -209,12 +210,12 @@ Conversion to ONNX
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-107
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 Execution with ONNX
 +++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-112
+.. GENERATED FROM PYTHON SOURCE LINES 108-113
 
 .. code-block:: Python
 
@@ -246,7 +247,7 @@ Execution with ONNX
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.066 seconds)
+   **Total running time of the script:** (0 minutes 0.039 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py:

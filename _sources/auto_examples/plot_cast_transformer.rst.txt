@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_cast_transformer.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -46,7 +46,7 @@ based on the assumption ``(x / y)`` is usually different from
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-48
 
-.. code-block:: default
+.. code-block:: Python
 
     import onnxruntime
     import onnx
@@ -78,7 +78,7 @@ The weird data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 50-61
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X, y = make_regression(10000, 10, random_state=3)
@@ -104,7 +104,7 @@ A simple model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 63-70
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model1 = Pipeline(
@@ -126,7 +126,7 @@ Conversion into ONNX.
 
 .. GENERATED FROM PYTHON SOURCE LINES 72-75
 
-.. code-block:: default
+.. code-block:: Python
 
     onx1 = to_onnx(model1, X_train[:1].astype(np.float32), target_opset=15)
     sess1 = InferenceSession(onx1.SerializeToString(), providers=["CPUExecutionProvider"])
@@ -144,7 +144,7 @@ And the maximum difference.
 
 .. GENERATED FROM PYTHON SOURCE LINES 77-88
 
-.. code-block:: default
+.. code-block:: Python
 
     got1 = sess1.run(None, {"X": Xi_test})[0]
 
@@ -176,7 +176,7 @@ The graph.
 
 .. GENERATED FROM PYTHON SOURCE LINES 90-108
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -223,7 +223,7 @@ Fixing the conversion requires to replace ``(x * (1 / y)``
 by ``(x / y)`` and this division must happen in double.
 By default, the *sklearn-onnx* assumes every
 computer should happen in float. `ONNX 1.7 specifications
-<https://github.com/onnx/onnx/blob/master/docs/
+<https://github.com/onnx/onnx/blob/main/docs/
 Operators-ml.md#ai.onnx.ml.Scaler>`_
 does not support double scaling (input and output does,
 but not the parameters). The solution needs to
@@ -233,7 +233,7 @@ Cast.
 
 .. GENERATED FROM PYTHON SOURCE LINES 123-149
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model2 = Pipeline(
@@ -280,7 +280,7 @@ The graph.
 
 .. GENERATED FROM PYTHON SOURCE LINES 151-169
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -324,7 +324,7 @@ The graph.
 
 .. GENERATED FROM PYTHON SOURCE LINES 171-181
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import sklearn  # noqa
@@ -344,11 +344,11 @@ The graph.
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.15.0
+    numpy: 1.26.4
+    scikit-learn: 1.6.dev0
+    onnx:  1.17.0
+    onnxruntime:  1.18.0+cu118
+    skl2onnx:  1.17.0
 
 
 
@@ -356,7 +356,7 @@ The graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.250 seconds)
+   **Total running time of the script:** (0 minutes 4.086 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_cast_transformer.py:
@@ -365,16 +365,13 @@ The graph.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_cast_transformer.ipynb <plot_cast_transformer.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_cast_transformer.py <plot_cast_transformer.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_cast_transformer.ipynb <plot_cast_transformer.ipynb>`
 
 
 .. only:: html

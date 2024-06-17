@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_pipeline.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -34,7 +34,7 @@ That's the most simple way.
 
 .. GENERATED FROM PYTHON SOURCE LINES 19-47
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import skl2onnx
@@ -78,7 +78,7 @@ That's the most simple way.
       version: 12
     }
     producer_name: "skl2onnx"
-    producer_version: "1.15.0"
+    producer_version: "1.17.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -157,14 +157,14 @@ That's the most simple way.
 Draw a model with ONNX
 ++++++++++++++++++++++
 We use `net_drawer.py
-<https://github.com/onnx/onnx/blob/master/onnx/tools/net_drawer.py>`_
+<https://github.com/onnx/onnx/blob/main/onnx/tools/net_drawer.py>`_
 included in *onnx* package.
 We use *onnx* to load the model
 in a different way than before.
 
 .. GENERATED FROM PYTHON SOURCE LINES 55-62
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -186,7 +186,7 @@ We convert it into a graph.
 
 .. GENERATED FROM PYTHON SOURCE LINES 64-72
 
-.. code-block:: default
+.. code-block:: Python
 
     pydot_graph = GetPydotGraph(
         model.graph,
@@ -209,7 +209,7 @@ Then into an image
 
 .. GENERATED FROM PYTHON SOURCE LINES 74-76
 
-.. code-block:: default
+.. code-block:: Python
 
     os.system("dot -O -Tpng graph.dot")
 
@@ -232,7 +232,7 @@ Which we display...
 
 .. GENERATED FROM PYTHON SOURCE LINES 78-82
 
-.. code-block:: default
+.. code-block:: Python
 
     image = plt.imread("graph.dot.png")
     plt.imshow(image)
@@ -262,7 +262,7 @@ Which we display...
 
 .. GENERATED FROM PYTHON SOURCE LINES 84-90
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -278,11 +278,11 @@ Which we display...
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.15.0
+    numpy: 1.26.4
+    scikit-learn: 1.6.dev0
+    onnx:  1.17.0
+    onnxruntime:  1.18.0+cu118
+    skl2onnx:  1.17.0
 
 
 
@@ -290,7 +290,7 @@ Which we display...
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.429 seconds)
+   **Total running time of the script:** (0 minutes 0.652 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:
@@ -299,16 +299,13 @@ Which we display...
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_pipeline.ipynb <plot_pipeline.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_pipeline.py <plot_pipeline.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_pipeline.ipynb <plot_pipeline.ipynb>`
 
 
 .. only:: html

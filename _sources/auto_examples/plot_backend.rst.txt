@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_backend.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -26,7 +26,7 @@ ONNX Runtime Backend for ONNX
 .. index:: backend
 
 *ONNX Runtime* extends the
-`onnx backend API <https://github.com/onnx/onnx/blob/master/docs/
+`onnx backend API <https://github.com/onnx/onnx/blob/main/docs/
 ImplementingAnOnnxBackend.md>`_
 to run predictions using this runtime.
 Let's use the API to compute the prediction
@@ -197,10 +197,10 @@ with the same API.
 
  .. code-block:: none
 
-    numpy: 1.26.2
-    scikit-learn: 1.5.dev0
-    onnx:  1.16.0
-    onnxruntime:  1.17.0+cu118
+    numpy: 1.26.4
+    scikit-learn: 1.6.dev0
+    onnx:  1.17.0
+    onnxruntime:  1.18.0+cu118
     skl2onnx:  1.17.0
 
 
@@ -209,7 +209,7 @@ with the same API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.547 seconds)
+   **Total running time of the script:** (0 minutes 17.934 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:
