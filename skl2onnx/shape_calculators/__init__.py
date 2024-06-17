@@ -48,6 +48,7 @@ from . import sgd_oneclass_svm
 from . import svd
 from . import support_vector_machines
 from . import text_vectorizer
+from . import tuned_threshold_classifier
 from . import tfidf_transformer
 from . import voting_classifier
 from . import voting_regressor
@@ -100,6 +101,7 @@ __all__ = [
     support_vector_machines,
     text_vectorizer,
     tfidf_transformer,
+    tuned_threshold_classifier,
     voting_classifier,
     voting_regressor,
     zip_map,
