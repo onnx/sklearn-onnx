@@ -17,7 +17,7 @@ We reuse the pipeline implemented in example
 compose/plot_digits_pipe.html>`_.
 There is one change because
 `ONNX-ML Imputer
-<https://github.com/onnx/onnx/blob/master/docs/
+<https://github.com/onnx/onnx/blob/main/docs/
 Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.

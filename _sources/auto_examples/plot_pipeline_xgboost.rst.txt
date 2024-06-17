@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_pipeline_xgboost.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -125,11 +125,11 @@ Register the converter for XGBClassifier
 
 The converter is implemented in *onnxmltools*:
 `onnxmltools...XGBoost.py
-<https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+<https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/operator_converters/XGBoost.py>`_.
 and the shape calculator:
 `onnxmltools...Classifier.py
-<https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+<https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
 .. GENERATED FROM PYTHON SOURCE LINES 90-91
@@ -210,8 +210,8 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [2 2 2 0 0]
-    predict_proba [[0.17929651 0.23665468 0.5840488 ]]
+    predict [0 2 2 1 1]
+    predict_proba [[0.69600695 0.1526681  0.15132491]]
 
 
 
@@ -238,8 +238,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [2 2 2 0 0]
-    predict_proba [{0: 0.17929650843143463, 1: 0.23665468394756317, 2: 0.5840488076210022}]
+    predict [0 2 2 1 1]
+    predict_proba [{0: 0.6960069537162781, 1: 0.15266810357570648, 2: 0.15132491290569305}]
 
 
 
@@ -313,10 +313,10 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.26.2
-    scikit-learn: 1.5.dev0
-    onnx:  1.16.0
-    onnxruntime:  1.17.0+cu118
+    numpy: 1.26.4
+    scikit-learn: 1.6.dev0
+    onnx:  1.17.0
+    onnxruntime:  1.18.0+cu118
     skl2onnx:  1.17.0
     onnxmltools:  1.13.0
     xgboost:  2.0.3
@@ -327,7 +327,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.227 seconds)
+   **Total running time of the script:** (0 minutes 2.180 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_xgboost.py:

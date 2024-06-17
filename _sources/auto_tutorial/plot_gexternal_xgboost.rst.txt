@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -101,11 +101,11 @@ Register the converter for XGBClassifier
 
 The converter is implemented in :epkg:`onnxmltools`:
 `onnxmltools...XGBoost.py
-<https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+<https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/operator_converters/XGBoost.py>`_.
 and the shape calculator:
 `onnxmltools...Classifier.py
-<https://github.com/onnx/onnxmltools/blob/master/onnxmltools/convert/
+<https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
 .. GENERATED FROM PYTHON SOURCE LINES 82-91
@@ -179,8 +179,8 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [1 0 2 1 1]
-    predict_proba [[0.17581303 0.44687837 0.37730864]]
+    predict [0 2 1 1 2]
+    predict_proba [[0.69600695 0.1526681  0.15132491]]
 
 
 
@@ -207,8 +207,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 0 2 1 1]
-    predict_proba [{0: 0.17581303417682648, 1: 0.4468783736228943, 2: 0.37730860710144043}]
+    predict [0 2 1 1 2]
+    predict_proba [{0: 0.6960069537162781, 1: 0.15266810357570648, 2: 0.15132491290569305}]
 
 
 
@@ -249,7 +249,7 @@ Same example with XGBRegressor
 
  .. code-block:: none
 
-    predict [141.24936 123.93109 105.4013  121.97575 201.67772]
+    predict [167.95638 209.4882  112.31891 127.7238  126.65028]
 
 
 
@@ -279,7 +279,7 @@ ONNX
 
  .. code-block:: none
 
-    predict [141.24937 123.93109 105.4013  121.97575 201.67772]
+    predict [167.95638 209.4882  112.31891 127.7238  126.65028]
 
 
 
@@ -347,7 +347,7 @@ follow :epkg:`scikit-learn` API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.138 seconds)
+   **Total running time of the script:** (0 minutes 0.126 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py:

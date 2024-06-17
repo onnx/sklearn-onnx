@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_jcustom_syntax.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -26,9 +26,9 @@ Two ways to implement a converter
 There are two ways to write a converter. The first one
 is less verbose and easier to understand
 (see `k_means.py <https://github.com/onnx/sklearn-onnx/blob/
-master/skl2onnx/operator_converters/k_means.py>`_).
+main/skl2onnx/operator_converters/k_means.py>`_).
 The other is very verbose (see `ada_boost.py <https://github.com/onnx/
-sklearn-onnx/blob/master/skl2onnx/operator_converters/ada_boost.py>`_
+sklearn-onnx/blob/main/skl2onnx/operator_converters/ada_boost.py>`_
 for an example).
 
 The first way is used in :ref:`l-plot-custom-converter`.
@@ -43,7 +43,7 @@ It basically copies what is in example
 
 .. GENERATED FROM PYTHON SOURCE LINES 27-83
 
-.. code-block:: default
+.. code-block:: Python
 
     from skl2onnx.common.data_types import guess_proto_type
     from onnxconverter_common.onnx_ops import apply_sub
@@ -127,7 +127,7 @@ The shape calculator does not change.
 
 .. GENERATED FROM PYTHON SOURCE LINES 88-101
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -155,7 +155,7 @@ The converter is different.
 
 .. GENERATED FROM PYTHON SOURCE LINES 103-143
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -210,7 +210,7 @@ We need to let *skl2onnx* know about the new converter.
 
 .. GENERATED FROM PYTHON SOURCE LINES 145-171
 
-.. code-block:: default
+.. code-block:: Python
 
 
     update_registered_converter(
@@ -257,7 +257,7 @@ Let's check it works as well with double.
 
 .. GENERATED FROM PYTHON SOURCE LINES 173-182
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(dec, X.astype(numpy.float64))
@@ -288,7 +288,7 @@ The differences are smaller with double as expected.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.073 seconds)
+   **Total running time of the script:** (0 minutes 0.043 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_jcustom_syntax.py:
@@ -297,16 +297,13 @@ The differences are smaller with double as expected.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_jcustom_syntax.ipynb <plot_jcustom_syntax.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_jcustom_syntax.py <plot_jcustom_syntax.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_jcustom_syntax.ipynb <plot_jcustom_syntax.ipynb>`
 
 
 .. only:: html

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_custom_model.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -58,7 +58,7 @@ And to predict on a test set:
 
 .. GENERATED FROM PYTHON SOURCE LINES 43-213
 
-.. code-block:: default
+.. code-block:: Python
 
     import inspect
     import os
@@ -246,7 +246,7 @@ Let's fit t-SNE...
 
 .. GENERATED FROM PYTHON SOURCE LINES 218-269
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -327,7 +327,7 @@ Just to check it is working.
 
 .. GENERATED FROM PYTHON SOURCE LINES 274-286
 
-.. code-block:: default
+.. code-block:: Python
 
 
     ptsne_knn = PredictableTSNE()
@@ -366,7 +366,7 @@ We check on test set.
 
 .. GENERATED FROM PYTHON SOURCE LINES 288-298
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -410,7 +410,7 @@ conversion of the model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 307-321
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -440,7 +440,7 @@ reuse existing converter.
 
 .. GENERATED FROM PYTHON SOURCE LINES 324-376
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -475,7 +475,7 @@ reuse existing converter.
         name = scope.get_unique_operator_name("Scaler")
 
         # The parameter follows the specifications of ONNX
-        # https://github.com/onnx/onnx/blob/master/docs/Operators-ml.md#ai.onnx.ml.Scaler
+        # https://github.com/onnx/onnx/blob/main/docs/Operators-ml.md#ai.onnx.ml.Scaler
         attrs = dict(
             name=name,
             scale=op.inv_std_.ravel().astype(numpy.float32),
@@ -507,7 +507,7 @@ We now need to declare the new converter.
 
 .. GENERATED FROM PYTHON SOURCE LINES 378-387
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -535,7 +535,7 @@ to convert.
 
 .. GENERATED FROM PYTHON SOURCE LINES 393-405
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_onnx = convert_sklearn(
@@ -562,7 +562,7 @@ We now compare the prediction.
 
 .. GENERATED FROM PYTHON SOURCE LINES 407-410
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("ptsne_knn.tranform\n", ptsne_knn.transform(X_test[:2]))
@@ -576,8 +576,8 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[-0.7351301   1.2556596 ]
-     [ 0.00878066  0.44443586]]
+     [[-0.87237126  1.222756  ]
+     [ 0.13582209  0.6264854 ]]
 
 
 
@@ -588,7 +588,7 @@ Predictions with onnxruntime.
 
 .. GENERATED FROM PYTHON SOURCE LINES 412-418
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = rt.InferenceSession("predictable_tsne.onnx", providers=["CPUExecutionProvider"])
@@ -604,7 +604,7 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[-0.7351301  1.2556596]]
+    transform [[-0.8723713  1.222756 ]]
 
 
 
@@ -617,7 +617,7 @@ which does not allow multiple predictions at a time. Let's call
 
 .. GENERATED FROM PYTHON SOURCE LINES 422-426
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pred_onx = sess.run(None, {"input": X_test[1:2].astype(numpy.float32)})
@@ -631,7 +631,7 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[0.00878066 0.44443586]]
+    transform [[0.13582209 0.6264854 ]]
 
 
 
@@ -643,7 +643,7 @@ Display the ONNX graph
 
 .. GENERATED FROM PYTHON SOURCE LINES 429-447
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -687,7 +687,7 @@ Display the ONNX graph
 
 .. GENERATED FROM PYTHON SOURCE LINES 449-455
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -703,11 +703,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.16.0
+    numpy: 1.26.4
+    scikit-learn: 1.6.dev0
+    onnx:  1.17.0
+    onnxruntime:  1.18.0+cu118
+    skl2onnx:  1.17.0
 
 
 
@@ -715,7 +715,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 14.886 seconds)
+   **Total running time of the script:** (0 minutes 10.217 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:
@@ -724,16 +724,13 @@ Display the ONNX graph
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_custom_model.ipynb <plot_custom_model.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_custom_model.py <plot_custom_model.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: plot_custom_model.ipynb <plot_custom_model.ipynb>`
 
 
 .. only:: html

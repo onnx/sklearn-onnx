@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_jfunction_transformer.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -32,9 +32,10 @@ Initial try
 
 A very simple pipeline and the first attempt to convert it into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-72
+.. GENERATED FROM PYTHON SOURCE LINES 16-73
 
 .. code-block:: Python
+
 
     import numpy as np
     from numpy.testing import assert_allclose
@@ -105,7 +106,7 @@ A very simple pipeline and the first attempt to convert it into ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-78
+.. GENERATED FROM PYTHON SOURCE LINES 74-79
 
 Use of custom transformer
 +++++++++++++++++++++++++
@@ -113,7 +114,7 @@ Use of custom transformer
 It is easier to write a custom converter if the FunctionTransformer
 is implemented as a custom transformer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-107
+.. GENERATED FROM PYTHON SOURCE LINES 79-108
 
 .. code-block:: Python
 
@@ -154,7 +155,7 @@ is implemented as a custom transformer.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-2 {
+    <style>#sk-container-id-8 {
       /* Definition of color scheme common for light and dark mode */
       --sklearn-color-text: black;
       --sklearn-color-line: gray;
@@ -184,15 +185,15 @@ is implemented as a custom transformer.
       }
     }
 
-    #sk-container-id-2 {
+    #sk-container-id-8 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-2 pre {
+    #sk-container-id-8 pre {
       padding: 0;
     }
 
-    #sk-container-id-2 input.sk-hidden--visually {
+    #sk-container-id-8 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -204,7 +205,7 @@ is implemented as a custom transformer.
       width: 1px;
     }
 
-    #sk-container-id-2 div.sk-dashed-wrapped {
+    #sk-container-id-8 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -212,7 +213,7 @@ is implemented as a custom transformer.
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-2 div.sk-container {
+    #sk-container-id-8 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -222,7 +223,7 @@ is implemented as a custom transformer.
       position: relative;
     }
 
-    #sk-container-id-2 div.sk-text-repr-fallback {
+    #sk-container-id-8 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -238,14 +239,14 @@ is implemented as a custom transformer.
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-2 div.sk-parallel-item::after {
+    #sk-container-id-8 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-2 div.sk-parallel {
+    #sk-container-id-8 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -253,28 +254,28 @@ is implemented as a custom transformer.
       position: relative;
     }
 
-    #sk-container-id-2 div.sk-parallel-item {
+    #sk-container-id-8 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-2 div.sk-parallel-item:first-child::after {
+    #sk-container-id-8 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-2 div.sk-parallel-item:last-child::after {
+    #sk-container-id-8 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-2 div.sk-parallel-item:only-child::after {
+    #sk-container-id-8 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-2 div.sk-serial {
+    #sk-container-id-8 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -292,14 +293,14 @@ is implemented as a custom transformer.
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-2 div.sk-toggleable {
+    #sk-container-id-8 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-2 label.sk-toggleable__label {
+    #sk-container-id-8 label.sk-toggleable__label {
       cursor: pointer;
       display: block;
       width: 100%;
@@ -309,7 +310,7 @@ is implemented as a custom transformer.
       text-align: center;
     }
 
-    #sk-container-id-2 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-8 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -317,13 +318,13 @@ is implemented as a custom transformer.
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-2 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-8 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-2 div.sk-toggleable__content {
+    #sk-container-id-8 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -332,12 +333,12 @@ is implemented as a custom transformer.
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-2 div.sk-toggleable__content.fitted {
+    #sk-container-id-8 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-2 div.sk-toggleable__content pre {
+    #sk-container-id-8 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -345,79 +346,79 @@ is implemented as a custom transformer.
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-2 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-8 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-2 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-8 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-2 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-8 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-2 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-2 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-2 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-2 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-2 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-2 div.sk-label label {
+    #sk-container-id-8 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-8 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-2 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-2 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-8 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-2 div.sk-label label {
+    #sk-container-id-8 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-2 div.sk-label-container {
+    #sk-container-id-8 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-2 div.sk-estimator {
+    #sk-container-id-8 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -427,18 +428,18 @@ is implemented as a custom transformer.
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-2 div.sk-estimator.fitted {
+    #sk-container-id-8 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-2 div.sk-estimator:hover {
+    #sk-container-id-8 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-2 div.sk-estimator.fitted:hover {
+    #sk-container-id-8 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -525,7 +526,7 @@ is implemented as a custom transformer.
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-2 a.estimator_doc_link {
+    #sk-container-id-8 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -540,51 +541,51 @@ is implemented as a custom transformer.
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-2 a.estimator_doc_link.fitted {
+    #sk-container-id-8 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-2 a.estimator_doc_link:hover {
+    #sk-container-id-8 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-2 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-8 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-2" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;mapper&#x27;,
+    </style><div id="sk-container-id-8" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;mapper&#x27;,
                      ColumnTransformer(remainder=&#x27;passthrough&#x27;,
                                        transformers=[(&#x27;ab&#x27;, FunctionTransformer(),
                                                       [&#x27;a&#x27;, &#x27;b&#x27;]),
                                                      (&#x27;c&#x27;, GrowthCalculator(),
                                                       [&#x27;a&#x27;, &#x27;b&#x27;])],
                                        verbose_feature_names_out=False)),
-                    (&#x27;classifier&#x27;, DecisionTreeClassifier())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-8" type="checkbox" ><label for="sk-estimator-id-8" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;mapper&#x27;,
+                    (&#x27;classifier&#x27;, DecisionTreeClassifier())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-30" type="checkbox" ><label for="sk-estimator-id-30" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;mapper&#x27;,
                      ColumnTransformer(remainder=&#x27;passthrough&#x27;,
                                        transformers=[(&#x27;ab&#x27;, FunctionTransformer(),
                                                       [&#x27;a&#x27;, &#x27;b&#x27;]),
                                                      (&#x27;c&#x27;, GrowthCalculator(),
                                                       [&#x27;a&#x27;, &#x27;b&#x27;])],
                                        verbose_feature_names_out=False)),
-                    (&#x27;classifier&#x27;, DecisionTreeClassifier())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox" ><label for="sk-estimator-id-9" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;mapper: ColumnTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for mapper: ColumnTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(remainder=&#x27;passthrough&#x27;,
+                    (&#x27;classifier&#x27;, DecisionTreeClassifier())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-31" type="checkbox" ><label for="sk-estimator-id-31" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;mapper: ColumnTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for mapper: ColumnTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(remainder=&#x27;passthrough&#x27;,
                       transformers=[(&#x27;ab&#x27;, FunctionTransformer(), [&#x27;a&#x27;, &#x27;b&#x27;]),
                                     (&#x27;c&#x27;, GrowthCalculator(), [&#x27;a&#x27;, &#x27;b&#x27;])],
-                      verbose_feature_names_out=False)</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-10" type="checkbox" ><label for="sk-estimator-id-10" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">ab</label><div class="sk-toggleable__content fitted"><pre>[&#x27;a&#x27;, &#x27;b&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-11" type="checkbox" ><label for="sk-estimator-id-11" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;FunctionTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html">?<span>Documentation for FunctionTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>FunctionTransformer()</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-12" type="checkbox" ><label for="sk-estimator-id-12" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">c</label><div class="sk-toggleable__content fitted"><pre>[&#x27;a&#x27;, &#x27;b&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-13" type="checkbox" ><label for="sk-estimator-id-13" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">GrowthCalculator</label><div class="sk-toggleable__content fitted"><pre>GrowthCalculator()</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-14" type="checkbox" ><label for="sk-estimator-id-14" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">remainder</label><div class="sk-toggleable__content fitted"><pre>[&#x27;f&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" ><label for="sk-estimator-id-15" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">passthrough</label><div class="sk-toggleable__content fitted"><pre>passthrough</pre></div> </div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox" ><label for="sk-estimator-id-16" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;DecisionTreeClassifier<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeClassifier.html">?<span>Documentation for DecisionTreeClassifier</span></a></label><div class="sk-toggleable__content fitted"><pre>DecisionTreeClassifier()</pre></div> </div></div></div></div></div></div>
+                      verbose_feature_names_out=False)</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-32" type="checkbox" ><label for="sk-estimator-id-32" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">ab</label><div class="sk-toggleable__content fitted"><pre>[&#x27;a&#x27;, &#x27;b&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-33" type="checkbox" ><label for="sk-estimator-id-33" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;FunctionTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.FunctionTransformer.html">?<span>Documentation for FunctionTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>FunctionTransformer()</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-34" type="checkbox" ><label for="sk-estimator-id-34" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">c</label><div class="sk-toggleable__content fitted"><pre>[&#x27;a&#x27;, &#x27;b&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-35" type="checkbox" ><label for="sk-estimator-id-35" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">GrowthCalculator</label><div class="sk-toggleable__content fitted"><pre>GrowthCalculator()</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-36" type="checkbox" ><label for="sk-estimator-id-36" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">remainder</label><div class="sk-toggleable__content fitted"><pre>[&#x27;f&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-37" type="checkbox" ><label for="sk-estimator-id-37" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">passthrough</label><div class="sk-toggleable__content fitted"><pre>passthrough</pre></div> </div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-38" type="checkbox" ><label for="sk-estimator-id-38" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;DecisionTreeClassifier<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.tree.DecisionTreeClassifier.html">?<span>Documentation for DecisionTreeClassifier</span></a></label><div class="sk-toggleable__content fitted"><pre>DecisionTreeClassifier()</pre></div> </div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+.. GENERATED FROM PYTHON SOURCE LINES 109-110
 
 Both pipelines return the same output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 110-112
 
 .. code-block:: Python
 
@@ -597,11 +598,11 @@ Both pipelines return the same output.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-113
+.. GENERATED FROM PYTHON SOURCE LINES 113-114
 
 Let's check it produces the same number of features.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-115
+.. GENERATED FROM PYTHON SOURCE LINES 114-116
 
 .. code-block:: Python
 
@@ -614,11 +615,11 @@ Let's check it produces the same number of features.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-117
+.. GENERATED FROM PYTHON SOURCE LINES 117-118
 
 But the conversion still fails with a different error message.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-124
+.. GENERATED FROM PYTHON SOURCE LINES 118-125
 
 .. code-block:: Python
 
@@ -654,7 +655,7 @@ But the conversion still fails with a different error message.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-130
+.. GENERATED FROM PYTHON SOURCE LINES 126-131
 
 Custom converter
 ++++++++++++++++
@@ -662,7 +663,7 @@ Custom converter
 We need to implement the method `calculate_growth` in ONNX.
 The first function returns the expected type and shape.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-176
+.. GENERATED FROM PYTHON SOURCE LINES 131-177
 
 .. code-block:: Python
 
@@ -719,14 +720,14 @@ The first function returns the expected type and shape.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 177-181
+.. GENERATED FROM PYTHON SOURCE LINES 178-182
 
 Let's check there is no discrepancies
 +++++++++++++++++++++++++++++++++++++
 
 First the expected values
 
-.. GENERATED FROM PYTHON SOURCE LINES 181-185
+.. GENERATED FROM PYTHON SOURCE LINES 182-186
 
 .. code-block:: Python
 
@@ -750,11 +751,11 @@ First the expected values
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-187
+.. GENERATED FROM PYTHON SOURCE LINES 187-188
 
 Then let's check with :class:`onnx.reference.ReferenceEvaluator`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-201
+.. GENERATED FROM PYTHON SOURCE LINES 188-202
 
 .. code-block:: Python
 
@@ -779,11 +780,11 @@ Then let's check with :class:`onnx.reference.ReferenceEvaluator`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-203
+.. GENERATED FROM PYTHON SOURCE LINES 203-204
 
 Then with the runtime used to deploy, onnxruntime for example.
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-210
+.. GENERATED FROM PYTHON SOURCE LINES 204-211
 
 .. code-block:: Python
 
@@ -801,7 +802,7 @@ Then with the runtime used to deploy, onnxruntime for example.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-217
+.. GENERATED FROM PYTHON SOURCE LINES 212-218
 
 Custom converter with onnxscript
 ++++++++++++++++++++++++++++++++
@@ -810,7 +811,7 @@ Custom converter with onnxscript
 offers a less verbose API than what onnx package implements.
 Let's see how to use it to write the converters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-228
+.. GENERATED FROM PYTHON SOURCE LINES 218-229
 
 .. code-block:: Python
 
@@ -832,14 +833,14 @@ Let's see how to use it to write the converters.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-233
+.. GENERATED FROM PYTHON SOURCE LINES 230-234
 
 This version uses the strict definition of ONNX operators.
 The code can be more simple if regular python operators are used.
 They may not be converted into ONNX but an error message
 is raised in that case.
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-245
+.. GENERATED FROM PYTHON SOURCE LINES 234-246
 
 .. code-block:: Python
 
@@ -862,11 +863,11 @@ is raised in that case.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 246-247
+.. GENERATED FROM PYTHON SOURCE LINES 247-248
 
 We can also check that it is equivalent to the python implementation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-251
+.. GENERATED FROM PYTHON SOURCE LINES 248-252
 
 .. code-block:: Python
 
@@ -881,11 +882,11 @@ We can also check that it is equivalent to the python implementation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 252-253
+.. GENERATED FROM PYTHON SOURCE LINES 253-254
 
 Let's use it in the converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-275
+.. GENERATED FROM PYTHON SOURCE LINES 254-276
 
 .. code-block:: Python
 
@@ -918,11 +919,11 @@ Let's use it in the converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 276-277
+.. GENERATED FROM PYTHON SOURCE LINES 277-278
 
 Let's check it works.
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-281
+.. GENERATED FROM PYTHON SOURCE LINES 278-282
 
 .. code-block:: Python
 
@@ -937,11 +938,11 @@ Let's check it works.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-283
+.. GENERATED FROM PYTHON SOURCE LINES 283-284
 
 And again the discrepancies.
 
-.. GENERATED FROM PYTHON SOURCE LINES 283-290
+.. GENERATED FROM PYTHON SOURCE LINES 284-291
 
 .. code-block:: Python
 
@@ -959,11 +960,11 @@ And again the discrepancies.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 291-292
+.. GENERATED FROM PYTHON SOURCE LINES 292-293
 
 Finally.
 
-.. GENERATED FROM PYTHON SOURCE LINES 292-293
+.. GENERATED FROM PYTHON SOURCE LINES 293-294
 
 .. code-block:: Python
 
@@ -984,7 +985,7 @@ Finally.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.270 seconds)
+   **Total running time of the script:** (0 minutes 0.222 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_jfunction_transformer.py:
