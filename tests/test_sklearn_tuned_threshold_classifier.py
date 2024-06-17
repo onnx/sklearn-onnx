@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import TunedThresholdClassifierCV, train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.utils._testing import ignore_warnings
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
@@ -26,6 +26,8 @@ class TestSklearnTunedThresholdClassifierConverter(unittest.TestCase):
     )
     @ignore_warnings(category=FutureWarning)
     def test_tuned_threshold_classifier(self):
+        from sklearn.model_selection import TunedThresholdClassifierCV
+
         X, y = make_classification(
             n_samples=1_000, weights=[0.9, 0.1], class_sep=0.8, random_state=42
         )
