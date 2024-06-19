@@ -276,9 +276,7 @@ class TestInvestigate(unittest.TestCase):
         from onnx.helper import make_tensor
         from onnx import TensorProto
         from onnx.version_converter import convert_version
-        import onnxscript
-        from onnxscript.onnx_types import FLOAT
-        from onnxscript import opset18 as op
+        from onnxscript import opset18 as op, script
         from skl2onnx import update_registered_converter, to_onnx
         from sklearn import pipeline
         from skl2onnx.helpers import add_onnx_graph
@@ -299,8 +297,9 @@ class TestInvestigate(unittest.TestCase):
             ],
         )
 
-        @onnxscript.script()
-        def converter_function(X) -> FLOAT[1, 1]:
+        # use the latest
+        @script()
+        def converter_function(X):
             zero_constant = op.Constant(
                 value=make_tensor("zero_constant", TensorProto.FLOAT, [1, 1], [0.0])
             )
