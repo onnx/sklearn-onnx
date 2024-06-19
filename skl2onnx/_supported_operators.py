@@ -131,6 +131,11 @@ from sklearn.gaussian_process import GaussianProcessClassifier, GaussianProcessR
 # GridSearchCV
 from sklearn.model_selection import GridSearchCV
 
+try:
+    from sklearn.model_selection import TunedThresholdClassifierCV
+except ImportError:
+    TunedThresholdClassifierCV = None
+
 # MultiOutput
 from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 
@@ -462,6 +467,7 @@ def build_sklearn_operator_name_map():
             TfidfVectorizer,
             TfidfTransformer,
             TruncatedSVD,
+            TunedThresholdClassifierCV,
             TweedieRegressor,
             VarianceThreshold,
             VotingClassifier,

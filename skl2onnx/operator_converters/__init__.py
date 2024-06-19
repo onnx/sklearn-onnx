@@ -64,6 +64,7 @@ from . import support_vector_machines
 from . import text_vectoriser
 from . import tfidf_transformer
 from . import tfidf_vectoriser
+from . import tuned_threshold_classifier
 from . import voting_classifier
 from . import voting_regressor
 from . import zip_map
@@ -130,6 +131,7 @@ __all__ = [
     text_vectoriser,
     tfidf_transformer,
     tfidf_vectoriser,
+    tuned_threshold_classifier,
     voting_classifier,
     voting_regressor,
     zip_map,
