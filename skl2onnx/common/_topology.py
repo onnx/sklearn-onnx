@@ -7,7 +7,7 @@ import pprint
 from logging import getLogger
 from collections import OrderedDict
 import numpy as np
-from onnx import onnx_pb as onnx_proto
+from onnx import onnx_pb as onnx_proto, TensorProto, SparseTensorProto
 from onnx.helper import make_graph, make_model, make_tensor_value_info
 from onnxconverter_common.data_types import (  # noqa
     DataType,
@@ -1359,9 +1359,10 @@ class Topology:
                             fed_variables[variable.onnx_name] = variable
                     fed_variables.update(
                         {
-                            i.name: i
+                            (i.name if hasattr(i, "name") else i.values.name): i
                             for i in container.initializers
-                            if i.name not in fed_variables
+                            if (i.name if hasattr(i, "name") else i.values.name)
+                            not in fed_variables
                         }
                     )
                     self._propagate_status(
@@ -1577,7 +1578,10 @@ def convert_topology(
             model_name,
             container.inputs + extra_inputs,
             container.outputs,
-            container.initializers,
+            [i for i in container.initializers if isinstance(i, TensorProto)],
+            sparse_initializer=[
+                i for i in container.initializers if isinstance(i, SparseTensorProto)
+            ],
         )
     else:
         # In ONNX opset 9 and above, initializers are included as
@@ -1588,7 +1592,10 @@ def convert_topology(
             model_name,
             container.inputs,
             container.outputs,
-            container.initializers,
+            [i for i in container.initializers if isinstance(i, TensorProto)],
+            sparse_initializer=[
+                i for i in container.initializers if isinstance(i, SparseTensorProto)
+            ],
         )
 
     # Add extra information related to the graph
