@@ -6,7 +6,7 @@ from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import __version__ as ort_version
 
 
-class TestInvestigate(unittest.TestCase):
+class TestInvestigateOnnxmltools(unittest.TestCase):
 
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("1.17.3"),
@@ -74,6 +74,15 @@ class TestInvestigate(unittest.TestCase):
 
         sess = onnxruntime.InferenceSession(
             exported.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, dict(X=sample))[0]
+        numpy.testing.assert_allclose(expected, got, 1e-4)
+
+        with open("dump_model.onnx", "wb") as f:
+            f.write(exported.SerializeToString())
+
+        sess = onnxruntime.InferenceSession(
+            "dump_model.onnx", providers=["CPUExecutionProvider"]
         )
         got = sess.run(None, dict(X=sample))[0]
         numpy.testing.assert_allclose(expected, got, 1e-4)
