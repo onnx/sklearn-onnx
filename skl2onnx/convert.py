@@ -2,6 +2,9 @@
 
 import warnings
 from uuid import uuid4
+from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
+import numpy as np
+import sklearn.base
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
 from .common.utils_sklearn import _process_options
@@ -233,19 +236,21 @@ def convert_sklearn(
 
 
 def to_onnx(
-    model,
-    X=None,
-    name=None,
-    initial_types=None,
-    target_opset=None,
-    options=None,
-    white_op=None,
-    black_op=None,
-    final_types=None,
-    dtype=None,
-    naming=None,
-    model_optim=True,
-    verbose=0,
+    model: sklearn.base.BaseEstimator,
+    X: Optional[np.array] = None,
+    name: Optional[str] = None,
+    initial_types: Optional[
+        List[Tuple[str, Sequence[Optional[Union[int, str]]]]]
+    ] = None,
+    target_opset: Optional[Union[Dict[str, int], int]] = None,
+    options: Optional[Dict] = None,
+    white_op: Optional[Set[str]] = None,
+    black_op: Optional[Set[str]] = None,
+    final_types: Optional[List[Tuple[str, Sequence[Optional[Union[int, str]]]]]] = None,
+    dtype: Optional[np.dtype] = None,
+    naming: Callable = None,
+    model_optim: bool = True,
+    verbose: int = 0,
 ):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
@@ -286,6 +291,10 @@ def to_onnx(
 
     .. versionchanged:: 1.10.0
         Parameter *naming* was added.
+
+    .. versionchanged:: 1.18.0
+        The main opset is now equal to target_opset and not a value equal or less
+        than the given value.
     """
     from .algebra.onnx_operator_mixin import OnnxOperatorMixin
     from .algebra.type_helper import guess_initial_types
@@ -301,7 +310,7 @@ def to_onnx(
     initial_types = guess_initial_types(X, initial_types)
     if verbose >= 1:
         print("[to_onnx] initial_types=%r" % initial_types)
-    return convert_sklearn(
+    model = convert_sklearn(
         model,
         initial_types=initial_types,
         target_opset=target_opset,
@@ -315,6 +324,23 @@ def to_onnx(
         naming=naming,
         model_optim=model_optim,
     )
+    new_target_model = None
+    for op in model.opset_import:
+        if op.domain == "":
+            new_target_model = op.version
+            break
+
+    expected_target = (
+        target_opset
+        if not isinstance(target_opset, dict)
+        else target_opset.get("", None)
+    )
+    if expected_target is not None and new_target_model != expected_target:
+        for op in model.opset_import:
+            if op.domain == "":
+                op.version = expected_target
+                break
+    return model
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):

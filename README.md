@@ -18,7 +18,7 @@ including models or transformers coming from external libraries.
 ## Documentation
 Full documentation including tutorials is available at [https://onnx.ai/sklearn-onnx/](https://onnx.ai/sklearn-onnx/).
 [Supported scikit-learn Models](https://onnx.ai/sklearn-onnx/supported.html)
-Last supported opset is 19.
+Last supported opset is 21.
 
 You may also find answers in [existing issues](https://github.com/onnx/sklearn-onnx/issues?utf8=%E2%9C%93&q=is%3Aissue)
 or submit a new one.

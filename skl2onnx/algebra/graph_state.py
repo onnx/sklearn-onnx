@@ -496,7 +496,7 @@ class GraphState:
                     expected_outputs = None
 
             logger.debug(
-                "[State.run] id=%d op_name=%r is_model=%r " "expected_outputs=%r",
+                "[State.run] id=%d op_name=%r is_model=%r expected_outputs=%r",
                 id(self),
                 self.operator_name,
                 self.is_model,

@@ -1,7 +1,25 @@
 # Change Logs
 
+## 1.18.0
+
+* Function ``to_onnx`` now forces the main opset to be equal to the
+  value speficied by the user (parameter ``target_opset``),
+  [#1109](https://github.com/onnx/sklearn-onnx/pull/1109)  
+* Add converter for TunedThresholdClassifierCV,
+  [#1107](https://github.com/onnx/sklearn-onnx/pull/1107)
+
 ## 1.17.0 (development)
 
+* Upgrade the maximum supported opset to 21,
+  update requirements to scikit-learn>=1.1,
+  older versions are not tested anymore,
+  [#1098](https://github.com/onnx/sklearn-onnx/pull/1098)
+* Support infrequent categories for OneHotEncoder
+  [#1029](https://github.com/onnx/sklearn-onnx/pull/1029)
+* Support kernel Matern in Gaussian Process
+  [#978](https://github.com/onnx/sklearn-onnx/pull/978)
+* Fix for multidimensional gaussian process
+  [#1097](https://github.com/onnx/sklearn-onnx/pull/1097)
 * Minor fixes to support scikit-learn==1.5.0
   [#1095](https://github.com/onnx/sklearn-onnx/pull/1095)
 * Fix the conversion of pipeline including pipelines,

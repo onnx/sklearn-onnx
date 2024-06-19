@@ -47,12 +47,19 @@ def convert_sklearn_one_hot_encoder(
         index_inputs = 0
 
         for index, cats in enumerate(ohe_op.categories_):
+            filtered_cats = ohe_op._compute_transformed_categories(index)
+            n_cats = None
+            if ohe_op._infrequent_enabled and "infrequent_sklearn" in filtered_cats:
+                n_cats = len(filtered_cats) - 1
+                cats = np.hstack(
+                    [filtered_cats[:-1], [c for c in cats if c not in filtered_cats]]
+                )
             while sum(all_shapes[: index_inputs + 1]) <= index:
                 index_inputs += 1
             index_in_input = index - sum(all_shapes[:index_inputs])
 
             inp = operator.inputs[index_inputs]
-            if not isinstance(
+            assert isinstance(
                 inp.type,
                 (
                     Int64TensorType,
@@ -61,30 +68,50 @@ def convert_sklearn_one_hot_encoder(
                     FloatTensorType,
                     DoubleTensorType,
                 ),
-            ):
-                raise NotImplementedError(
-                    "{} input datatype not yet supported. "
-                    "You may raise an issue at "
-                    "https://github.com/onnx/sklearn-onnx/issues"
-                    "".format(type(inp.type))
-                )
+            ), (
+                f"{type(inp.type)} input datatype not yet supported. "
+                f"You may raise an issue at "
+                f"https://github.com/onnx/sklearn-onnx/issues"
+            )
 
             if all_shapes[index_inputs] == 1:
                 assert index_in_input == 0
                 afeat = False
             else:
                 afeat = True
-            enum_cats.append((afeat, index_in_input, inp.full_name, cats, inp.type))
+            enum_cats.append(
+                (afeat, index_in_input, inp.full_name, cats, inp.type, n_cats)
+            )
     else:
         inp = operator.inputs[0]
-        enum_cats = [
-            (True, i, inp.full_name, cats, inp.type)
-            for i, cats in enumerate(ohe_op.categories_)
-        ]
+        assert isinstance(
+            inp.type,
+            (
+                Int64TensorType,
+                StringTensorType,
+                Int32TensorType,
+                FloatTensorType,
+                DoubleTensorType,
+            ),
+        ), (
+            f"{type(inp.type)} input datatype not yet supported. "
+            f"You may raise an issue at "
+            f"https://github.com/onnx/sklearn-onnx/issues"
+        )
+
+        enum_cats = []
+        for index, cats in enumerate(ohe_op.categories_):
+            filtered_cats = ohe_op._compute_transformed_categories(index)
+            if ohe_op._infrequent_enabled and "infrequent_sklearn" in filtered_cats:
+                raise NotImplementedError(
+                    f"Infrequent categories are not implemented "
+                    f"{filtered_cats} != {cats}."
+                )
+            enum_cats.append((True, index, inp.full_name, cats, inp.type, None))
 
     result, categories_len = [], 0
     for index, enum_c in enumerate(enum_cats):
-        afeat, index_in, name, categories, inp_type = enum_c
+        afeat, index_in, name, categories, inp_type, n_cats = enum_c
         container.debug(
             "[conv.OneHotEncoder] cat %r/%r name=%r type=%r",
             index + 1,
@@ -138,8 +165,8 @@ def convert_sklearn_one_hot_encoder(
             attrs["cats_int64s"] = categories.astype(np.int64)
         else:
             raise RuntimeError(
-                "Input type {} is not supported for OneHotEncoder. "
-                "Ideally, it should either be integer or strings.".format(inp_type)
+                f"Input type {inp_type} is not supported for OneHotEncoder. "
+                f"Ideally, it should either be integer or strings."
             )
 
         ohe_output = scope.get_unique_variable_name(name + "out")
@@ -155,11 +182,15 @@ def convert_sklearn_one_hot_encoder(
         container.add_node(
             "OneHotEncoder", name, ohe_output, op_domain="ai.onnx.ml", **attrs
         )
+
         if (
             hasattr(ohe_op, "drop_idx_")
             and ohe_op.drop_idx_ is not None
             and ohe_op.drop_idx_[index] is not None
         ):
+            assert (
+                n_cats is None
+            ), "drop_idx_ not implemented where there infrequent_categories"
             extracted_outputs_name = scope.get_unique_variable_name("extracted_outputs")
             indices_to_keep_name = scope.get_unique_variable_name("indices_to_keep")
             indices_to_keep = np.delete(
@@ -179,6 +210,30 @@ def convert_sklearn_one_hot_encoder(
                 name=scope.get_unique_operator_name("Gather"),
             )
             ohe_output, categories = extracted_outputs_name, indices_to_keep
+        elif n_cats is not None:
+            split_name = scope.get_unique_variable_name("split_name")
+            container.add_initializer(
+                split_name,
+                onnx_proto.TensorProto.INT64,
+                [2],
+                [n_cats, len(categories) - n_cats],
+            )
+
+            spl1 = scope.get_unique_variable_name("split1")
+            spl2 = scope.get_unique_variable_name("split2")
+
+            # let's sum every counts after n_cats
+            container.add_node("Split", [ohe_output, split_name], [spl1, spl2], axis=-1)
+            axis_name = scope.get_unique_variable_name("axis_name")
+            container.add_initializer(
+                axis_name, onnx_proto.TensorProto.INT64, [1], [-1]
+            )
+            red_name = scope.get_unique_variable_name("red_name")
+            container.add_node("ReduceSum", [spl2, axis_name], red_name, keepdims=1)
+            conc_name = scope.get_unique_variable_name("conc_name")
+            container.add_node("Concat", [spl1, red_name], conc_name, axis=-1)
+            ohe_output = conc_name
+            categories = categories[: n_cats + 1]
 
         result.append(ohe_output)
         categories_len += len(categories)

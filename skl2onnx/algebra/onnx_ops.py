@@ -4,7 +4,6 @@
 Place holder for all ONNX operators.
 """
 import sys
-import os
 import numpy as np
 
 try:
@@ -14,8 +13,6 @@ except ImportError:
 import onnx
 from ..common.data_types import DataType
 from ..common._topology import Variable
-from .automation import get_rst_doc
-from ._cache import cache_folder
 
 
 def ClassFactory(
@@ -169,7 +166,6 @@ def dynamic_class_creation(cache=False):
     <https://github.com/onnx/onnx/blob/main/docs/
     Operators-ml.md>`_.
     """
-    cache_dir = cache_folder()
     res = {}
     for schema in onnx.defs.get_all_schemas_with_history():
         if schema.support_level == schema.SupportType.EXPERIMENTAL:
@@ -199,22 +195,8 @@ def dynamic_class_creation(cache=False):
         outputs = [_c(o, "O", i) for i, o in enumerate(schema.outputs)]
         args = [p for p in schema.attributes]
 
-        if "_" in name:
-            class_name = "Onnx" + name
-        else:
-            class_name = "Onnx" + schema.name
-
-        filename = os.path.join(
-            cache_dir, schema.name + "_" + str(schema.since_version) + ".rst"
-        )
-        if not cache and os.path.exists(filename):
-            with open(filename, "r", encoding="utf-8") as f:
-                doc = f.read()
-        else:
-            doc = get_rst_doc(schema)
-            if cache:
-                with open(filename, "w", encoding="utf-8") as f:
-                    f.write(doc)
+        class_name = "Onnx" + (name if "_" in name else schema.name)
+        doc = f"See `{name} <https://onnx.ai/onnx/operators/onnx__{name}.html>`_."
 
         cl = ClassFactory(
             class_name,

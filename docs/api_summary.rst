@@ -124,6 +124,6 @@ Topology
 --------
 
 .. autoclass:: skl2onnx.common._topology.Topology
-    :members: compile, topological_operator_iterator
+    :members:
 
 .. autofunction:: skl2onnx.common._topology.convert_topology

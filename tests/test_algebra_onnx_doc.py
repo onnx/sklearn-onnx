@@ -6,7 +6,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
 from skl2onnx.algebra.onnx_ops import dynamic_class_creation
-from skl2onnx.algebra.automation import get_rst_doc_sklearn, get_rst_doc
+from skl2onnx.algebra.automation import get_rst_doc_sklearn
 from test_utils import TARGET_OPSET
 
 
@@ -47,23 +47,12 @@ class TestAlgebraOnnxDoc(unittest.TestCase):
         sys.platform.startswith("win"), reason="onnx schema are incorrect on Windows"
     )
     @unittest.skipIf(TARGET_OPSET <= 20, reason="not available")
-    def test_doc_onnx(self):
-        rst = get_rst_doc()
-        assert "**Summary**" in rst
-
-    @unittest.skipIf(
-        sys.platform.startswith("win"), reason="onnx schema are incorrect on Windows"
-    )
-    @unittest.skipIf(TARGET_OPSET <= 20, reason="not available")
     def test_doc_sklearn(self):
-        try:
-            rst = get_rst_doc_sklearn()
-            assert ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
-        except KeyError as e:
-            assert "SklearnGaussianProcessRegressor" in str(
-                e
-            ) or "SklearnGaussianProcessClassifier" in str(e)
+        rst = get_rst_doc_sklearn()
+        assert (
+            ".. _l-sklops-OnnxSklearnBernoulliNB:" in rst
+        ), f"Unable to find a substring in {rst}"
 
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(verbosity=2)
