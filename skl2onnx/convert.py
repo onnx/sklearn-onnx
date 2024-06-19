@@ -242,7 +242,7 @@ def to_onnx(
     initial_types: Optional[
         List[Tuple[str, Sequence[Optional[Union[int, str]]]]]
     ] = None,
-    target_opset: Optional[Dict[str, int] | int] = None,
+    target_opset: Optional[Union[Dict[str, int], int]] = None,
     options: Optional[Dict] = None,
     white_op: Optional[Set[str]] = None,
     black_op: Optional[Set[str]] = None,
