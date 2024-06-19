@@ -1,5 +1,13 @@
 # Change Logs
 
+## 1.18.0
+
+* Function ``to_onnx`` now forces the main opset to be equal to the
+  value speficied by the user (parameter ``target_opset``),
+  [#1109](https://github.com/onnx/sklearn-onnx/pull/1109)  
+* Add converter for TunedThresholdClassifierCV,
+  [#1107](https://github.com/onnx/sklearn-onnx/pull/1107)
+
 ## 1.17.0 (development)
 
 * Upgrade the maximum supported opset to 21,
