@@ -301,7 +301,7 @@ def to_onnx(
     initial_types = guess_initial_types(X, initial_types)
     if verbose >= 1:
         print("[to_onnx] initial_types=%r" % initial_types)
-    return convert_sklearn(
+    model = convert_sklearn(
         model,
         initial_types=initial_types,
         target_opset=target_opset,
@@ -315,6 +315,18 @@ def to_onnx(
         naming=naming,
         model_optim=model_optim,
     )
+    new_target_model = None
+    for op in model.opset_import:
+        if op.domain == "":
+            new_target_model = op.version
+            break
+    assert (
+        new_target_model is None or new_target_model <= target_opset
+    ), f"Checking model opset={new_target_model} <= target_opset={target_opset}"
+    assert (
+        new_target_model == target_opset
+    ), f"target_opset={target_opset} but opset={new_target_model}"
+    return model
 
 
 def wrap_as_onnx_mixin(model, target_opset=None):
