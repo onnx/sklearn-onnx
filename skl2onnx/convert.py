@@ -2,7 +2,7 @@
 
 import warnings
 from uuid import uuid4
-from typing import Callable, Optional, Sequence
+from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 import numpy as np
 import sklearn.base
 from .proto import get_latest_tested_opset_version
@@ -239,12 +239,14 @@ def to_onnx(
     model: sklearn.base.BaseEstimator,
     X: Optional[np.array] = None,
     name: Optional[str] = None,
-    initial_types: Optional[list[tuple[str, Sequence[int | str | None]]]] = None,
-    target_opset: Optional[dict[str, int] | int] = None,
-    options: Optional[dict] = None,
-    white_op: Optional[set[str]] = None,
-    black_op: Optional[set[str]] = None,
-    final_types: Optional[list[tuple[str, Sequence[int | str | None]]]] = None,
+    initial_types: Optional[
+        List[Tuple[str, Sequence[Optional[Union[int, str]]]]]
+    ] = None,
+    target_opset: Optional[Dict[str, int] | int] = None,
+    options: Optional[Dict] = None,
+    white_op: Optional[Set[str]] = None,
+    black_op: Optional[Set[str]] = None,
+    final_types: Optional[List[Tuple[str, Sequence[Optional[Union[int, str]]]]]] = None,
     dtype: Optional[np.dtype] = None,
     naming: Callable = None,
     model_optim: bool = True,
