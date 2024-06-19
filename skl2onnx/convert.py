@@ -2,6 +2,9 @@
 
 import warnings
 from uuid import uuid4
+from typing import Callable, Optional, Sequence
+import numpy as np
+import sklearn.base
 from .proto import get_latest_tested_opset_version
 from .common._topology import convert_topology
 from .common.utils_sklearn import _process_options
@@ -233,19 +236,19 @@ def convert_sklearn(
 
 
 def to_onnx(
-    model,
-    X=None,
-    name=None,
-    initial_types=None,
-    target_opset=None,
-    options=None,
-    white_op=None,
-    black_op=None,
-    final_types=None,
-    dtype=None,
-    naming=None,
-    model_optim=True,
-    verbose=0,
+    model: sklearn.base.BaseEstimator,
+    X: Optional[np.array] = None,
+    name: Optional[str] = None,
+    initial_types: Optional[list[tuple[str, Sequence[int | str | None]]]] = None,
+    target_opset: Optional[dict[str, int] | int] = None,
+    options: Optional[dict] = None,
+    white_op: Optional[set[str]] = None,
+    black_op: Optional[set[str]] = None,
+    final_types: Optional[list[tuple[str, Sequence[int | str | None]]]] = None,
+    dtype: Optional[np.dtype] = None,
+    naming: Callable = None,
+    model_optim: bool = True,
+    verbose: int = 0,
 ):
     """
     Calls :func:`convert_sklearn` with simplified parameters.
@@ -286,6 +289,10 @@ def to_onnx(
 
     .. versionchanged:: 1.10.0
         Parameter *naming* was added.
+
+    .. versionchanged:: 1.18.0
+        The main opset is now equal to target_opset and not a value equal or less
+        than the given value.
     """
     from .algebra.onnx_operator_mixin import OnnxOperatorMixin
     from .algebra.type_helper import guess_initial_types
@@ -320,12 +327,17 @@ def to_onnx(
         if op.domain == "":
             new_target_model = op.version
             break
-    assert (
-        new_target_model is None or new_target_model <= target_opset
-    ), f"Checking model opset={new_target_model} <= target_opset={target_opset}"
-    assert (
-        new_target_model == target_opset
-    ), f"target_opset={target_opset} but opset={new_target_model}"
+
+    expected_target = (
+        target_opset
+        if not isinstance(target_opset, dict)
+        else target_opset.get("", None)
+    )
+    if expected_target is not None and new_target_model != expected_target:
+        for op in model.opset_import:
+            if op.domain == "":
+                op.version = expected_target
+                break
     return model
 
 
