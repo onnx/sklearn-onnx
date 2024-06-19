@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
 import packaging.version as pv
+import onnx
 from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import __version__ as ort_version
@@ -67,6 +68,7 @@ class TestInvestigateOnnxmltools(unittest.TestCase):
             target_opset={"": 19, "ai.onnx.ml": 2},
         )
         expected = model.predict(sample)
+        onnx.shape_inference.infer_shapes(exported)
 
         ref = ReferenceEvaluator(exported)
         got = ref.run(None, dict(X=sample))[0]
