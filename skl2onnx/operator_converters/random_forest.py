@@ -671,12 +671,7 @@ register_converter(
 register_converter(
     "SklearnHistGradientBoostingClassifier",
     convert_sklearn_random_forest_classifier,
-    options={
-        "zipmap": [True, False, "columns"],
-        "raw_scores": [True, False],
-        "output_class_labels": [False, True],
-        "nocl": [True, False],
-    },
+    options={"raw_scores": [True, False]},
 )
 register_converter(
     "SklearnHistGradientBoostingRegressor",
