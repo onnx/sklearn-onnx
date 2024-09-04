@@ -212,12 +212,13 @@ class OnnxOperatorMixin:
                         target_opset=op_version, outputs=outputs, options=options
                     )
             except TypeError:
-                warning.warn(
+                warnings.warn(
                     "Signature should be to_onnx_operator(self, inputs=None, "
                     "outputs=None, target_opset=None, **kwargs). "
                     "This will be the case in version 1.11, class=%r."
                     "" % type(self),
                     DeprecationWarning,
+                    stacklevel=0,
                 )
                 try:
                     if inputs:

@@ -1507,10 +1507,11 @@ def convert_topology(
             ".".format(onnx_target_opset, found)
         )
     if onnx_target_opset > get_latest_tested_opset_version():
-        warning.warn(
+        warnings.warn(
             "Parameter target_opset {} > {} is higher than the "
             "the latest tested version"
-            ".".format(onnx_target_opset, get_latest_tested_opset_version())
+            ".".format(onnx_target_opset, get_latest_tested_opset_version()),
+            stacklevel=0,
         )
 
     container = ModelComponentContainer(

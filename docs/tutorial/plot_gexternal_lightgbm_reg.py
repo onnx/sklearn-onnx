@@ -82,9 +82,10 @@ def skl2onnx_convert_lightgbm(scope, operator, container):
     options = scope.get_options(operator.raw_operator)
     if "split" in options:
         if pv.Version(oml_version) < pv.Version("1.9.2"):
-            warning.warn(
+            warnings.warn(
                 "Option split was released in version 1.9.2 but %s is "
-                "installed. It will be ignored." % oml_version
+                "installed. It will be ignored." % oml_version,
+                stacklevel=0,
             )
         operator.split = options["split"]
     else:

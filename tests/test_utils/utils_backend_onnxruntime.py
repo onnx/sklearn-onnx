@@ -125,7 +125,7 @@ def compare_runtime(
     try:
         import onnxruntime
     except ImportError:
-        warning.warn("Unable to import onnxruntime.")
+        warnings.warn("Unable to import onnxruntime.")
         return None
 
     if verbose:

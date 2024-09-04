@@ -37,7 +37,7 @@ def run_all_tests(folder=None, verbose=True):
     try:
         import onnxmltools  # noqa: F401
     except ImportError:
-        warning.warn("Cannot import onnxmltools. Some tests won't work.")
+        warnings.warn("Cannot import onnxmltools. Some tests won't work.")
 
     this = os.path.abspath(os.path.dirname(__file__))
     subs = [this]

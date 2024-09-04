@@ -200,12 +200,13 @@ def convert_sklearn_text_vectorizer(
             "https://github.com/onnx/sklearn-onnx/issues."
         )
     if op.analyzer == "char":
-        warning.warn(
+        warnings.warn(
             "The conversion of CountVectorizer may not work. "
             "only tokenizer='word' is fully supported. "
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.",
             UserWarning,
+            stacklevel=0,
         )
     if op.strip_accents is not None:
         raise NotImplementedError(

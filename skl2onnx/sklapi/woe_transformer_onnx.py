@@ -267,7 +267,7 @@ class Tree:
             )
         )
         if len(atts["target_weights"]) != len(set(atts["target_weights"])):
-            warning.warn(
+            warnings.warn(
                 "All targets should be unique %r." % atts["target_weights"],
                 stacklevel=0,
             )

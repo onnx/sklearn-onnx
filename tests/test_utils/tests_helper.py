@@ -515,7 +515,7 @@ def dump_data_and_model(
                 except OnnxRuntimeMissingNewOnnxOperatorException as e:
                     if fail_evenif_notimplemented:
                         raise e
-                    warning.warn(str(e))
+                    warnings.warn(str(e))
                     continue
                 except AssertionError as e:
                     if dump_error_log:
@@ -523,7 +523,7 @@ def dump_data_and_model(
                             f.write(str(e) + "\n--------------\n")
                             traceback.print_exc(file=f)
                     if isinstance(allow, bool) and allow:
-                        warning.warn(
+                        warnings.warn(
                             "Issue with '{0}' due to {1}".format(
                                 basename, str(e).replace("\n", " -- ")
                             )

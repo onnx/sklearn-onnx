@@ -74,7 +74,7 @@ class TestOnnxOperatorsSparse(unittest.TestCase):
             res = sess.run(None, {"X": X.todense()})[0]
         except RuntimeError as e:
             # Sparse tensor is not supported for constant.
-            warning.warn(
+            warnings.warn(
                 "Unable to run with %r\n---\n%s\n%s" % ({"X": X}, model_def, e)
             )
             return

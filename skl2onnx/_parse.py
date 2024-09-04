@@ -134,12 +134,13 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None, alias
             try:
                 names = parser_names(scope=scope, inputs=inputs)
             except TypeError as e:
-                warning.warn(
+                warnings.warn(
                     "Calling parser %r for model type %r failed due to %r. "
                     "This warnings will become an exception in version 1.11. "
                     "The parser signature should parser(scope=None, "
                     "inputs=None)." % (parser_names, e, type(model)),
                     DeprecationWarning,
+                    stacklevel=0,
                 )
                 names = parser_names()
             if names is not None:
@@ -560,11 +561,12 @@ def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
 def _parse_sklearn_multi_output_classifier(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(model, dict(zipmap=True))
     if options["zipmap"]:
-        warning.warn(
+        warnings.warn(
             "Option zipmap is ignored for model %r. "
             "Set option zipmap to False to "
             "remove this message." % type(model),
             UserWarning,
+            stacklevel=0,
         )
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)

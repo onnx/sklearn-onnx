@@ -17,7 +17,7 @@ try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
     from skl2onnx.algebra.onnx_ops import OnnxSplitApi18, OnnxScaler
 except ImportError:
-    warning.warn("Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.")
+    warnings.warn("Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.")
     OnnxAbs = None
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 

@@ -178,9 +178,10 @@ def convert_sklearn(
     if name is None:
         name = str(uuid4().hex)
     if dtype is not None:
-        warning.warn(
+        warnings.warn(
             "Parameter dtype is no longer supported. It will be removed in 1.9.0.",
             DeprecationWarning,
+            stacklevel=0,
         )
 
     target_opset = target_opset if target_opset else get_latest_tested_opset_version()

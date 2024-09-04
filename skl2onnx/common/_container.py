@@ -767,9 +767,10 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 # avoid a not necessarily necessary warning
                 vers = 1
             else:
-                warning.warn(
+                warnings.warn(
                     "Unable to find operator '{}' in domain '{}' in ONNX, "
-                    "op_version is forced to 1.".format(op_type, domain)
+                    "op_version is forced to 1.".format(op_type, domain),
+                    stacklevel=0,
                 )
             vers = [1]
         highest = self.target_opset_any_domain(domain)

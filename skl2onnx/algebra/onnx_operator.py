@@ -1332,10 +1332,11 @@ class OnnxSubOperator(OnnxSubEstimator):
 
     def __init__(self, *args, **kwargs):
         OnnxSubEstimator.__init__(self, *args, **kwargs)
-        warning.warn(
+        warnings.warn(
             (
                 "Class OnnxSubOperator will be removed in 1.10. "
                 "It should be replaced by OnnxSubEstimator."
             ),
             DeprecationWarning,
+            stacklevel=0,
         )

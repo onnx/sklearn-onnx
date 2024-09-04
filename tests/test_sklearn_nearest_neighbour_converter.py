@@ -343,7 +343,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 # One broadcasted multiplication unexpectedly produces nan.
                 whole = "\n".join(rows)
                 if "[        nan" in whole:
-                    warning.warn(whole)
+                    warnings.warn(whole)
                     return
                 raise AssertionError(whole)
             if ort_version.startswith("1.3.") and sys.platform == "win32":
