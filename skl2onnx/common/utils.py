@@ -15,6 +15,7 @@ from onnxconverter_common.utils import (  # noqa: F401
     convert_to_python_default_value,
     convert_to_list,
     check_input_and_output_numbers,
+    check_input_and_output_types,
 )
 from .data_types import TensorType
 
