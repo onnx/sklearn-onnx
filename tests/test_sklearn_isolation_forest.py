@@ -3,6 +3,7 @@
 """
 Test scikit-learn's IsolationForest.
 """
+
 import logging
 import unittest
 import packaging.version as pv

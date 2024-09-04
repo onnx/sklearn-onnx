@@ -282,11 +282,12 @@ class TestOnnxOperators(unittest.TestCase):
 
         for opset in [TARGET_OPSET]:
             for value in [5, np.float32(5)]:
-                with self.subTest(opset=opset, value=value):
-                    with self.assertRaises(TypeError):
-                        OnnxConstantOfShape(
-                            "X", value=value, op_version=opset, output_names=["Y"]
-                        )
+                with self.subTest(opset=opset, value=value), self.assertRaises(
+                    TypeError
+                ):
+                    OnnxConstantOfShape(
+                        "X", value=value, op_version=opset, output_names=["Y"]
+                    )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_onnx_reversed_order(self):

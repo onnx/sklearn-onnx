@@ -25,6 +25,7 @@ Iris and scoring
 A new class is created, it trains any classifier and implements
 the method *validate* mentioned above.
 """
+
 import inspect
 import numpy as np
 import skl2onnx

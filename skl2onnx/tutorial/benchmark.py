@@ -3,6 +3,7 @@
 """
 Tools to help benchmarking.
 """
+
 from timeit import Timer
 import numpy
 

@@ -14,7 +14,7 @@ def enumerate_model_names(model, prefix="", short=True):
     """
     if isinstance(model, (list, tuple)):
         if all(map(lambda x: isinstance(x, tuple) and len(x) in (2, 3), model)):
-            for i, named_mod in enumerate(model):
+            for _i, named_mod in enumerate(model):
                 name, mod = named_mod[:2]
                 p = name if short and prefix == "" else "{}__{}".format(prefix, name)
                 for t in enumerate_model_names(mod, p, short=short):
@@ -131,7 +131,7 @@ def _process_pipeline_options(model, options):
     """
     new_options = None
     names = dict(enumerate_model_names(model))
-    for k, v in names.items():
+    for _k, v in names.items():
         if id(v) in options and isinstance(v, Pipeline):
             opts = options[id(v)]
             last = v.steps[-1][1]

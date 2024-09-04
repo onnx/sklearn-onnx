@@ -106,12 +106,12 @@ def _samme_r_proba(scope, container, proba_name, n_classes, dtype, pdtype):
 
     try:
         cst_min = np.finfo(np.float64).eps.astype(dtype)
-    except TypeError:
+    except TypeError as e:
         raise TypeError(
             "Unable to convert {} (type {}) into {}.".format(
                 np.finfo(float).eps, type(np.finfo(float).eps), dtype
             )
-        )
+        ) from e
 
     apply_clip(
         scope,

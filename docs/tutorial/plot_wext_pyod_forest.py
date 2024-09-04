@@ -21,6 +21,7 @@ Trains a model
 All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 """
+
 import numpy as np
 import pandas as pd
 from onnxruntime import InferenceSession

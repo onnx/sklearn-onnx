@@ -44,11 +44,7 @@ ort_version = ".".join(ort_version.split(".")[:2])
 class TestSklearnDoubleTensorTypeTransformer(unittest.TestCase):
     def _common_transform(self, model_cls_set, name_root=None, debug=False):
         for model_cls in model_cls_set:
-            if name_root is None:
-                name = model_cls.__name__
-            else:
-                name = name_root
-
+            name = model_cls.__name__ if name_root is None else name_root
             model = model_cls()
             X = np.random.randn(100, 4).astype(np.float64)
             model.fit(X)

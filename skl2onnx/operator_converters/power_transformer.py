@@ -42,14 +42,10 @@ def convert_powertransformer(
 
     # logical masks for input
     less_than_zero = OnnxLess(op_in, zeros_, op_version=opv)
-    less_mask = OnnxCast(
-        less_than_zero, to=getattr(TensorProto, "FLOAT"), op_version=opv
-    )
+    less_mask = OnnxCast(less_than_zero, to=TensorProto.FLOAT, op_version=opv)
 
     greater_than_zero = OnnxNot(less_than_zero, op_version=opv)
-    greater_mask = OnnxCast(
-        greater_than_zero, to=getattr(TensorProto, "FLOAT"), op_version=opv
-    )
+    greater_mask = OnnxCast(greater_than_zero, to=TensorProto.FLOAT, op_version=opv)
 
     # logical masks for lambdas
     lambda_zero_mask = np.float32(lambdas == 0)

@@ -22,7 +22,7 @@ def get_tensor_shape(obj: Union[ValueInfoProto, TypeProto]) -> Tuple[int, ...]:
     if len(shape) == 0:
         shape = None
     else:
-        shape = list(None if s == 0 else s for s in shape)
+        shape = [None if s == 0 else s for s in shape]
     return shape
 
 

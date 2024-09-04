@@ -65,7 +65,7 @@ def kernel_pca_converter(
     #         X, Y, metric=self.kernel, filter_params=True, **params)
     if callable(op.kernel):
         raise RuntimeError(
-            "Unable to converter KernelPCA with a custom kernel %r." "" % op.kernel
+            "Unable to converter KernelPCA with a custom kernel %r." % op.kernel
         )
     if op.kernel == "precomputed":
         raise RuntimeError(

@@ -50,7 +50,9 @@ def convert_sklearn_dict_vectorizer(
     elif all(
         isinstance(feature_name, numbers.Integral) for feature_name in op.feature_names_
     ):
-        attrs["int64_vocabulary"] = list(int(i) for i in op.feature_names_)
+        attrs["int64_vocabulary"] = list(  # noqa: C400
+            int(i) for i in op.feature_names_
+        )
     else:
         raise ValueError("Keys must be all integers or all strings.")
 
@@ -59,7 +61,7 @@ def convert_sklearn_dict_vectorizer(
         operator.input_full_names,
         operator.output_full_names,
         op_domain="ai.onnx.ml",
-        **attrs
+        **attrs,
     )
 
 

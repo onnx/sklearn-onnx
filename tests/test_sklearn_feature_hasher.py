@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
-# coding: utf-8
 """
 Tests scikit-learn's feature selection converters
 """
+
 import unittest
+from typing import Optional
 import packaging.version as pv
 import numpy as np
 from sklearn.utils._testing import assert_almost_equal
@@ -540,7 +541,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
                     h1 = MurmurHash3.fmix(h1)
                     return h1
 
-                def _run(self, x, positive: int = None, seed: int = None):
+                def _run(
+                    self, x, positive: Optional[int] = None, seed: Optional[int] = None
+                ):
                     x2 = x.reshape((-1,))
                     y = np.empty(x2.shape, dtype=np.uint32)
                     for i in range(y.shape[0]):

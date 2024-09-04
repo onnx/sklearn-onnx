@@ -92,7 +92,7 @@ class TestOnnxDeprecation(unittest.TestCase):
         mes = None
         for w in ws:
             if (
-                w.category == DeprecationWarning
+                w.category is DeprecationWarning
                 and "numpy" not in str(w.message).lower()
             ):
                 mes = w.message

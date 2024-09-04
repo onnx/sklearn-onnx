@@ -8,10 +8,10 @@ try:
 except ImportError:
 
     def _deprecate_positional_args(x):
-        return x  # noqa
+        return x
 
 
-class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
+class CastRegressor(RegressorMixin, BaseEstimator):
     """
     Cast predictions into a specific types.
     This should be used to minimize the conversion
@@ -24,7 +24,7 @@ class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
         wrapped regressor
     dtype : numpy type,
         output are cast into that type
-    """  # noqa
+    """
 
     @_deprecate_positional_args
     def __init__(self, estimator, *, dtype=np.float32):
@@ -34,10 +34,10 @@ class CastRegressor(RegressorMixin, BaseEstimator):  # noqa
     def _cast(self, a, name):
         try:
             a2 = a.astype(self.dtype)
-        except ValueError:
+        except ValueError as e:
             raise ValueError(
                 "Unable to cast {} from {} into {}.".format(name, a.dtype, self.dtype)
-            )
+            ) from e
         return a2
 
     def fit(self, X, y=None, sample_weight=None):

@@ -4,6 +4,7 @@
 """
 Benchmark of onnxruntime on DecisionTree.
 """
+
 # Authors: Xavier Dupré (benchmark)
 from io import BytesIO
 from time import perf_counter as time
@@ -101,7 +102,7 @@ def bench(n_obs, n_features, max_depths, methods, repeat=10, verbose=False):
 
                     # creates different inputs to avoid caching in any ways
                     Xs = []
-                    for r in range(repeat):
+                    for _r in range(repeat):
                         x = np.empty((n, nfeat))
                         x[:, :] = rand(n, nfeat)[:, :]
                         Xs.append(x.astype(np.float32))
@@ -123,7 +124,7 @@ def bench(n_obs, n_features, max_depths, methods, repeat=10, verbose=False):
                     r2 = 0
                     for X in Xs:
                         p2 = fct2(X)
-                        r2 += 1
+                        r2 += 1  # noqa: SIM113
                         if r2 >= repeated:
                             break
                     end = time()

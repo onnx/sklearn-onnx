@@ -31,7 +31,6 @@ class TestMultiOutputConverter(unittest.TestCase):
             log.disabled = True
             # log.setLevel(logging.DEBUG)
             # logging.basicConfig(level=logging.DEBUG)
-            pass
 
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.11.0"),

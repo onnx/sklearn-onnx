@@ -22,7 +22,7 @@ def convert_sklearn_grid_search_cv(
     scope.add_options(id(best_estimator), opts)
     grid_search_operator.inputs = operator.inputs
 
-    for i, o in enumerate(operator.outputs):
+    for _i, o in enumerate(operator.outputs):
         v = scope.declare_local_variable(o.onnx_name, type=o.type)
         grid_search_operator.outputs.append(v)
         apply_identity(scope, v.full_name, o.full_name, container)

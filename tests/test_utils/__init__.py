@@ -7,14 +7,14 @@ import onnx
 from onnxruntime import __version__ as ort_version
 from skl2onnx import __max_supported_opset__ as max_opset
 from skl2onnx.common._topology import OPSET_TO_IR_VERSION
-from .tests_helper import dump_data_and_model  # noqa
-from .tests_helper import (  # noqa
+from .tests_helper import dump_data_and_model
+from .tests_helper import (
     dump_one_class_classification,
     dump_binary_classification,
     dump_multilabel_classification,
     dump_multiple_classification,
 )
-from .tests_helper import (  # noqa
+from .tests_helper import (
     dump_multiple_regression,
     dump_single_regression,
     convert_model,

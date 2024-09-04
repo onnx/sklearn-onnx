@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+
 import unittest
 import pandas
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
@@ -13,7 +14,7 @@ from skl2onnx import convert_sklearn
 
 def has_scikit_pandas():
     try:
-        import sklearn_pandas  # noqa
+        import sklearn_pandas  # noqa: F401
 
         return True
     except ImportError:
@@ -45,7 +46,7 @@ class TestOtherLibrariesInPipelineScikitPandas(unittest.TestCase):
         )
 
         try:
-            model_onnx = convert_sklearn(  # noqa
+            convert_sklearn(
                 mapper,
                 "predictable_tsne",
                 [("input", FloatTensorType([None, df.shape[1]]))],

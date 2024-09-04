@@ -16,6 +16,7 @@ Predict with onnxruntime
 Simple function to check the converted model
 works fine.
 """
+
 import onnxruntime
 import onnx
 import numpy
@@ -121,7 +122,7 @@ class CustomOpTransformer(BaseEstimator, TransformerMixin, OnnxOperatorMixin):
         self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
     ):
         if inputs is None:
-            raise RuntimeError("Parameter inputs should contain at least " "one name.")
+            raise RuntimeError("Parameter inputs should contain at least one name.")
         opv = target_opset or self.op_version
         i0 = self.get_inputs(inputs, 0)
         W = self.W_.astype(np.float32)
@@ -185,7 +186,7 @@ print(predict_with_onnxruntime(onx, X))
 #
 # Finally, let's see the graph converted with *sklearn-onnx*.
 
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer  # noqa
+from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 pydot_graph = GetPydotGraph(
     onx.graph,
@@ -197,11 +198,11 @@ pydot_graph = GetPydotGraph(
 )
 pydot_graph.write_dot("pipeline_onnx_mixin.dot")
 
-import os  # noqa
+import os
 
 os.system("dot -O -Gdpi=300 -Tpng pipeline_onnx_mixin.dot")
 
-import matplotlib.pyplot as plt  # noqa
+import matplotlib.pyplot as plt
 
 image = plt.imread("pipeline_onnx_mixin.dot.png")
 fig, ax = plt.subplots(figsize=(40, 20))
@@ -211,11 +212,11 @@ ax.axis("off")
 #################################
 # **Versions used for this example**
 
-import sklearn  # noqa
+import sklearn
 
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import skl2onnx  # noqa
+import skl2onnx
 
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)

@@ -11,8 +11,8 @@ from .common.utils_sklearn import _process_options
 from ._parse import parse_sklearn_model
 
 # Invoke the registration of all our converters and shape calculators.
-from . import shape_calculators  # noqa
-from . import operator_converters  # noqa
+from . import shape_calculators  # noqa: F401
+from . import operator_converters  # noqa: F401
 
 
 def convert_sklearn(
@@ -179,8 +179,9 @@ def convert_sklearn(
         name = str(uuid4().hex)
     if dtype is not None:
         warnings.warn(
-            "Parameter dtype is no longer supported. " "It will be removed in 1.9.0.",
+            "Parameter dtype is no longer supported. It will be removed in 1.9.0.",
             DeprecationWarning,
+            stacklevel=0,
         )
 
     target_opset = target_opset if target_opset else get_latest_tested_opset_version()
@@ -248,7 +249,7 @@ def to_onnx(
     black_op: Optional[Set[str]] = None,
     final_types: Optional[List[Tuple[str, Sequence[Optional[Union[int, str]]]]]] = None,
     dtype: Optional[np.dtype] = None,
-    naming: Callable = None,
+    naming: Optional[Callable] = None,
     model_optim: bool = True,
     verbose: int = 0,
 ):

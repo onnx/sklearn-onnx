@@ -18,6 +18,7 @@ ONNX Graph with CDist
 generated/scipy.spatial.distance.cdist.html>`_
 function computes pairwise distances.
 """
+
 from pprint import pprint
 from timeit import Timer
 import numpy as np

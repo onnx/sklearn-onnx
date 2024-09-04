@@ -17,6 +17,7 @@ a *XGBClassifier*. Let's see how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
+
 import os
 import numpy
 import matplotlib.pyplot as plt
@@ -34,11 +35,11 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
-)  # noqa
+)
 import onnxmltools
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
     convert_xgboost,
-)  # noqa
+)
 import onnxmltools.convert.common.data_types
 
 data = load_iris()

@@ -1,24 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
-from onnxconverter_common.data_types import (  # noqa
+from onnxconverter_common.data_types import (  # noqa: F401
     DataType,
     Int64Type,
-    FloatType,  # noqa
+    FloatType,
     StringType,
-    TensorType,  # noqa
+    TensorType,
     Int64TensorType,
     Int32TensorType,
-    BooleanTensorType,  # noqa
+    BooleanTensorType,
     FloatTensorType,
     StringTensorType,
-    DoubleTensorType,  # noqa
+    DoubleTensorType,
     DictionaryType,
     SequenceType,
-)  # noqa
+)
 
 try:
-    from onnxconverter_common.data_types import (  # noqa
+    from onnxconverter_common.data_types import (
         Complex64TensorType,
         Complex128TensorType,
     )
@@ -271,11 +271,11 @@ def _guess_numpy_type(data_type, dims):
         data_type in (np.str_, str, object)
         or str(data_type) in ("<U1",)
         or (hasattr(data_type, "type") and data_type.type is np.str_)
-    ):  # noqa
+    ):
         return StringTensorType(dims)
     if data_type in (np.int64,) or str(data_type) == "<U6":
         return Int64TensorType(dims)
-    if data_type in (np.int32,) or str(data_type) in ("<U4",):  # noqa
+    if data_type in (np.int32,) or str(data_type) in ("<U4",):
         return Int32TensorType(dims)
     if data_type == np.uint8:
         return UInt8TensorType(dims)
@@ -350,9 +350,9 @@ def guess_numpy_type(data_type):
         np.int64,
     ):
         return data_type
-    if data_type == str:
+    if data_type == str:  # noqa: E721
         return np.str_
-    if data_type == bool:
+    if data_type == bool:  # noqa: E721
         return np.bool_
     if isinstance(data_type, FloatTensorType):
         return np.float32
@@ -414,9 +414,10 @@ def guess_tensor_type(data_type):
         return DoubleTensorType()
     if isinstance(data_type, DictionaryType):
         return guess_tensor_type(data_type.value_type)
-    if Complex64TensorType is not None:
-        if isinstance(data_type, (Complex64TensorType, Complex128TensorType)):
-            return data_type.__class__()
+    if Complex64TensorType is not None and isinstance(
+        data_type, (Complex64TensorType, Complex128TensorType)
+    ):
+        return data_type.__class__()
     if not isinstance(
         data_type,
         (

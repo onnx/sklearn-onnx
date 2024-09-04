@@ -54,7 +54,7 @@ def _intelligent_split(text, op, tokenizer, existing):
                     # Usually, ' ' is not part of any token.
                     pass
             elif len(spl) == 3:
-                stok = (all([s in op.vocabulary_ for s in spl]), spl)
+                stok = (all(s in op.vocabulary_ for s in spl), spl)
                 spl12 = (
                     spl[2] in op.vocabulary_
                     and (spl[0] + " " + spl[1]) in op.vocabulary_,
@@ -183,7 +183,7 @@ def convert_sklearn_text_vectorizer(
     Regular expression ``[^\\\\\\\\n]`` is used to split
     a sentance into character (and not works) if ``analyser=='char'``.
     The mode ``analyser=='char_wb'`` is not implemented.
-    """  # noqa
+    """
     op = operator.raw_operator
 
     if container.target_opset is not None and container.target_opset < 9:
@@ -206,6 +206,7 @@ def convert_sklearn_text_vectorizer(
             "You may raise an issue at "
             "https://github.com/onnx/sklearn-onnx/issues.",
             UserWarning,
+            stacklevel=0,
         )
     if op.strip_accents is not None:
         raise NotImplementedError(
@@ -250,9 +251,7 @@ def convert_sklearn_text_vectorizer(
             default_separators = options["separators"]
     else:
         if options["separators"] != "DEFAULT":
-            raise RuntimeError(
-                "Option separators has no effect " "if analyser != 'word'."
-            )
+            raise RuntimeError("Option separators has no effect if analyser != 'word'.")
         regex = options["tokenexp"] if options["tokenexp"] else "."
         default_separators = None
 

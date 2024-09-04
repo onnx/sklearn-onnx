@@ -22,6 +22,7 @@ checks that every of them belongs to two intervals,
 (left-right-closed). The first interval is associated
 to weight 55 and and the second one to 107.
 """
+
 import os
 import numpy as np
 import pandas as pd
@@ -32,7 +33,7 @@ from skl2onnx import to_onnx
 from skl2onnx.sklapi import WOETransformer
 
 # automatically registers the converter for WOETransformer
-import skl2onnx.sklapi.register  # noqa
+import skl2onnx.sklapi.register  # noqa: F401
 
 X = np.arange(10).astype(np.float32).reshape((-1, 1))
 

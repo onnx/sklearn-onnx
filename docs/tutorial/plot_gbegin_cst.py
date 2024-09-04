@@ -17,6 +17,7 @@ Train and convert a model
 We download one model from the :epkg:`ONNX Zoo` but the model
 could be trained and produced by another converter library.
 """
+
 import pprint
 import numpy
 from onnx import load

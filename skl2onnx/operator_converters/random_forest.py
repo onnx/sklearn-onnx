@@ -127,7 +127,7 @@ def convert_sklearn_random_forest_classifier(
         options = container.get_options(op, dict(raw_scores=False))
     else:
         raise NotImplementedError(
-            "Model should have attribute 'n_outputs_' or " "'n_trees_per_iteration_'."
+            "Model should have attribute 'n_outputs_' or 'n_trees_per_iteration_'."
         )
 
     use_raw_scores = options["raw_scores"]
@@ -270,7 +270,7 @@ def convert_sklearn_random_forest_classifier(
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
             op_domain=op_domain,
             op_version=op_version,
-            **attr_pairs
+            **attr_pairs,
         )
 
         if not options.get("decision_path", False) and not options.get(
@@ -457,7 +457,7 @@ def convert_sklearn_random_forest_regressor_converter(
         attrs["n_targets"] = op.n_trees_per_iteration_
     else:
         raise NotImplementedError(
-            "Model should have attribute 'n_outputs_' or " "'n_trees_per_iteration_'."
+            "Model should have attribute 'n_outputs_' or 'n_trees_per_iteration_'."
         )
 
     if hasattr(op, "estimators_"):
@@ -528,7 +528,7 @@ def convert_sklearn_random_forest_regressor_converter(
         operator.outputs[0].full_name,
         op_domain=op_domain,
         op_version=op_version,
-        **attrs
+        **attrs,
     )
 
     if hasattr(op, "n_trees_per_iteration_"):

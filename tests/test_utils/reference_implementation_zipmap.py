@@ -2,6 +2,7 @@
 """
 Helpers to test runtimes.
 """
+
 import numpy
 from onnx.defs import onnx_opset_version
 
@@ -74,7 +75,6 @@ if onnx_opset_version() >= 18:
 
         def __setitem__(self, pos, value):
             "unused but used by pickle"
-            pass
 
         def __len__(self):
             """

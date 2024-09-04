@@ -4,6 +4,7 @@
 """
 Benchmark of onnxruntime on RandomForestRegressor.
 """
+
 import sys
 import warnings
 from io import BytesIO
@@ -137,7 +138,7 @@ def bench(
                             # creates different inputs to avoid caching
                             # in any ways
                             Xs = []
-                            for r in range(repeat):
+                            for _r in range(repeat):
                                 x = np.empty((n, nfeat))
                                 x[:, :] = rand(n, nfeat)[:, :]
                                 Xs.append(x.astype(np.float32))
@@ -159,7 +160,7 @@ def bench(
                             r2 = 0
                             for X in Xs:
                                 p2 = fct2(X)
-                                r2 += 1
+                                r2 += 1  # noqa: SIM113
                                 if r2 >= repeated:
                                     break
                             end = time()
@@ -191,7 +192,7 @@ def bench(
                                         p1.ravel(), p2.ravel(), decimal=5
                                     )
                                 except AssertionError as e:
-                                    warnings.warn(str(e))
+                                    warnings.warn(str(e), stacklevel=0)
     return res
 
 

@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
+
 import sys
 import warnings
 import unittest
@@ -202,7 +203,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             )
         except OrtImpl as e:
             if (
-                "Could not find an implementation for the node " "To_TopK:TopK(11)"
+                "Could not find an implementation for the node To_TopK:TopK(11)"
             ) in str(e):
                 # onnxruntime does not declare TopK(11) for double
                 return

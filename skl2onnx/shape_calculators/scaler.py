@@ -27,7 +27,7 @@ def calculate_sklearn_scaler_output_shapes(operator):
     # Inputs: multiple float- and integer-tensors
     # Output: one float tensor
     for variable in operator.inputs:
-        if len(set(variable.get_first_dimension() for variable in operator.inputs)) > 1:
+        if len({variable.get_first_dimension() for variable in operator.inputs}) > 1:
             raise RuntimeError("Batch size must be identical across inputs.")
 
     N = operator.inputs[0].get_first_dimension()

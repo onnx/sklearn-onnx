@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """Tests scikit-learn's OrdinalEncoder converter."""
+
 import unittest
 from numpy.testing import assert_almost_equal
 import packaging.version as pv

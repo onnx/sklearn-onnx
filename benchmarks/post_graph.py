@@ -103,7 +103,7 @@ def svm_models():
             tick.label.set_fontsize(8)
         for tick in ax.yaxis.get_major_ticks():
             tick.label.set_fontsize(8)
-        pos += 1
+        pos += 1  # noqa: SIM113
 
     fig.tight_layout()
     fig.savefig("svm_model.png", dpi=1000)

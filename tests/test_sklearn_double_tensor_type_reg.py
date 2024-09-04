@@ -81,7 +81,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
 
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("1.7.0"),
-        reason="onnxruntime misses implementation for " "ReduceMean for double",
+        reason="onnxruntime misses implementation for ReduceMean for double",
     )
     @ignore_warnings(category=warnings_to_skip)
     def test_bagging_regressor_sgd_64(self):
@@ -146,7 +146,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
 
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("1.7.0"),
-        reason="onnxruntime misses implementation for " "TopK for double",
+        reason="onnxruntime misses implementation for TopK for double",
     )
     @ignore_warnings(category=warnings_to_skip)
     def test_model_knn_regressor_double(self):
@@ -169,7 +169,7 @@ class TestSklearnDoubleTensorTypeRegressor(unittest.TestCase):
     @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("1.7.0"),
-        reason="onnxruntime misses implementation for " "Sum for double",
+        reason="onnxruntime misses implementation for Sum for double",
     )
     @ignore_warnings(category=warnings_to_skip)
     def test_model_voting_regression(self):

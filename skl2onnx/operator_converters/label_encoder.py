@@ -35,7 +35,7 @@ def convert_sklearn_label_encoder(
         operator.output_full_names,
         op_domain="ai.onnx.ml",
         op_version=2,
-        **attrs
+        **attrs,
     )
 
 

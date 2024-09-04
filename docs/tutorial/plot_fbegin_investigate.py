@@ -27,6 +27,7 @@ through every step of the pipeline. If the pipeline
 has *n* steps, it converts the pipeline with step 1,
 then the pipeline with steps 1, 2, then 1, 2, 3...
 """
+
 import numpy
 from onnx.reference import ReferenceEvaluator
 from onnxruntime import InferenceSession
