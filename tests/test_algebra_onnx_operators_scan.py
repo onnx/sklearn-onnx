@@ -228,7 +228,7 @@ class TestOnnxOperatorsScan(unittest.TestCase):
             onnx.checker.check_model(model_def)
         except ValidationError as e:
             if pv.Version(onnx__version__) <= pv.Version("1.5.0"):
-                warnings.warning(e)
+                warning.warn(e)
             else:
                 raise e
 

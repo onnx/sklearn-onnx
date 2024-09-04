@@ -87,7 +87,7 @@ class TestSklearnDocumentation(unittest.TestCase):
                 random_state=1, subset="test", categories=categories
             )
         except urllib.error.URLError:
-            warnings.warning("Unit test may fail due to connectivity issue.")
+            warning.warn("Unit test may fail due to connectivity issue.")
             return
         train_data = SubjectBodyExtractor().fit_transform(train.data)
         tfi = TfidfVectorizer(min_df=30)
@@ -130,7 +130,7 @@ class TestSklearnDocumentation(unittest.TestCase):
                 random_state=1, subset="train", categories=categories
             )
         except urllib.error.URLError:
-            warnings.warning("Unit test may fail due to connectivity issue.")
+            warning.warn("Unit test may fail due to connectivity issue.")
             return
         train_data = SubjectBodyExtractor().fit_transform(train.data)
         pipeline = Pipeline(

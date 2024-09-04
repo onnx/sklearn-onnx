@@ -568,7 +568,7 @@ def update_registered_converter(
         and model in sklearn_operator_name_map
         and alias != sklearn_operator_name_map[model]
     ):
-        warnings.warning(
+        warning.warn(
             "Model '{0}' was already registered under alias "
             "'{1}'.".format(model, sklearn_operator_name_map[model])
         )

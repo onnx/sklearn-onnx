@@ -488,7 +488,7 @@ class TestOnnxOperators(unittest.TestCase):
         try:
             assert_almost_equal(exp, got[0])
         except AssertionError as e:
-            warnings.warning(e)
+            warning.warn(e)
 
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]], dtype=np.float32)
         pads = np.array([0, 2, 0, 0], dtype=np.int64)

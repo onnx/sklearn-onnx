@@ -207,7 +207,7 @@ def _alter_model_for_debugging(skl_model, recursive=False):
                 try:
                     setattr(model, k, MethodType(new_methods[k], model))
                 except AttributeError:
-                    warnings.warning(
+                    warning.warn(
                         "Unable to overwrite method '{}' for class "
                         "{}.".format(k, type(model))
                     )
@@ -217,7 +217,7 @@ def _alter_model_for_debugging(skl_model, recursive=False):
             try:
                 setattr(skl_model, k, MethodType(new_methods[k], skl_model))
             except AttributeError:
-                warnings.warning(
+                warning.warn(
                     "Unable to overwrite method '{}' for class "
                     "{}.".format(k, type(skl_model))
                 )

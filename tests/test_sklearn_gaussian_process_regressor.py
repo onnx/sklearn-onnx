@@ -1042,7 +1042,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             gp.fit(Xtrain_, Ytrain_)
         except (AttributeError, TypeError) as e:
             # unstable issue fixed with scikit-learn>=0.24
-            warnings.warning(
+            warning.warn(
                 "Training did not converge but fails at raising a warning: %r." % e
             )
             return

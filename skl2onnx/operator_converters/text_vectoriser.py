@@ -200,7 +200,7 @@ def convert_sklearn_text_vectorizer(
             "https://github.com/onnx/sklearn-onnx/issues."
         )
     if op.analyzer == "char":
-        warnings.warning(
+        warning.warn(
             "The conversion of CountVectorizer may not work. "
             "only tokenizer='word' is fully supported. "
             "You may raise an issue at "

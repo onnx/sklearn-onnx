@@ -767,7 +767,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 # avoid a not necessarily necessary warning
                 vers = 1
             else:
-                warnings.warning(
+                warning.warn(
                     "Unable to find operator '{}' in domain '{}' in ONNX, "
                     "op_version is forced to 1.".format(op_type, domain)
                 )

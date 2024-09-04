@@ -192,7 +192,7 @@ def bench(
                                         p1.ravel(), p2.ravel(), decimal=5
                                     )
                                 except AssertionError as e:
-                                    warnings.warning(str(e))
+                                    warning.warn(str(e))
     return res
 
 

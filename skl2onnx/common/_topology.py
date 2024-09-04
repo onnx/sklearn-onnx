@@ -1507,7 +1507,7 @@ def convert_topology(
             ".".format(onnx_target_opset, found)
         )
     if onnx_target_opset > get_latest_tested_opset_version():
-        warnings.warning(
+        warning.warn(
             "Parameter target_opset {} > {} is higher than the "
             "the latest tested version"
             ".".format(onnx_target_opset, get_latest_tested_opset_version())

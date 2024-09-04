@@ -53,7 +53,7 @@ def convert_sklearn_local_outlier_factor(
     kwargs = {}
     if op.p != 2:
         if options["optim"] == "cdist":
-            warnings.warning(
+            warning.warn(
                 "Option p=%r may not be compatible with the runtime. "
                 "See https://github.com/microsoft/onnxruntime/blob/main/"
                 "docs/ContribOperators.md#com.microsoft.CDist."

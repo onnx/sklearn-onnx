@@ -342,7 +342,7 @@ class TestSklearnPipeline(unittest.TestCase):
             data = pandas.read_csv(titanic_url)
         except url_error.URLError:
             # Do not fail the test if the data cannot be fetched.
-            warnings.warning("Unable to fetch titanic data.")
+            warning.warn("Unable to fetch titanic data.")
             return
         X = data.drop("survived", axis=1)
         y = data["survived"]
