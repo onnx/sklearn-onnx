@@ -18,6 +18,7 @@ from skl2onnx.algebra.onnx_ops import OnnxCast, OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.sklapi import WOETransformer
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
+import skl2onnx.sklapi.register  # noqa: F401
 
 
 class OrdinalWOETransformer(BaseEstimator, TransformerMixin):
