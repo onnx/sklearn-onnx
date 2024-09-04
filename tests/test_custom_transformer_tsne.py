@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+
 import unittest
 import inspect
 import numpy
@@ -31,7 +32,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         estimator=None,
         normalize=True,
         keep_tsne_outputs=False,
-        **kwargs
+        **kwargs,
     ):
         TransformerMixin.__init__(self)
         BaseEstimator.__init__(self)
@@ -147,7 +148,7 @@ def predictable_tsne_converter(scope, operator, container):
         [knn_output.onnx_name],
         [output.full_name],
         op_domain="ai.onnx.ml",
-        **attrs
+        **attrs,
     )
 
 

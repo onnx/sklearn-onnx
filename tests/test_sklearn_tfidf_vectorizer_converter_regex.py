@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's tfidf converter.
 """
+
 import unittest
 import packaging.version as pv
 import numpy
@@ -380,7 +381,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11ParenthesisClassRegex-" "OneOff-SklCol",
+            basename="SklearnTfidfVectorizer11ParenthesisClassRegex-OneOff-SklCol",
             backend=BACKEND,
         )
 
@@ -434,7 +435,7 @@ class TestSklearnTfidfVectorizerRegex(unittest.TestCase):
             corpus,
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11ParenthesisIdRegex-" "OneOff-SklCol",
+            basename="SklearnTfidfVectorizer11ParenthesisIdRegex-OneOff-SklCol",
             backend=BACKEND,
         )
 

@@ -288,7 +288,7 @@ class OnnxOperator:
         domain=None,
         global_context=None,
         clear_subgraph_inputs=False,
-        **kwargs
+        **kwargs,
     ):
         if output_names is None and self.__class__.__name__.startswith("OnnxScan"):
             raise NotImplementedError(
@@ -303,7 +303,7 @@ class OnnxOperator:
         elif isinstance(output_names, Operator):
             if len(output_names.outputs) == 0:
                 raise ValueError(
-                    "output_names cannot be empty (operator %r)." "" % output_names
+                    "output_names cannot be empty (operator %r)." % output_names
                 )
             output_names = output_names.outputs.copy()
         elif isinstance(output_names, Operator.OperatorList):
@@ -424,22 +424,21 @@ class OnnxOperator:
                         )
                     )
 
-        if self.inputs is not None:
-            if (
-                len(self.inputs) < self.input_range[0]
-                or len(self.inputs) > self.input_range[1]
-            ):
-                raise RuntimeError(
-                    "Operator '{}' expects a number of inputs "
-                    "in [{}, {}] not {} (expected opset={}, "
-                    "class opset={})".format(
-                        self.operator_name,
-                        *self.input_range,
-                        len(self.inputs),
-                        op_version,
-                        self.op_version
-                    )
+        if self.inputs is not None and (
+            len(self.inputs) < self.input_range[0]
+            or len(self.inputs) > self.input_range[1]
+        ):
+            raise RuntimeError(
+                "Operator '{}' expects a number of inputs "
+                "in [{}, {}] not {} (expected opset={}, "
+                "class opset={})".format(
+                    self.operator_name,
+                    *self.input_range,
+                    len(self.inputs),
+                    op_version,
+                    self.op_version,
                 )
+            )
         # global context
         if global_context is None:
             self.global_context = None
@@ -501,7 +500,7 @@ class OnnxOperator:
                     inp = (inp, None)
                 elif hasattr(inp, "add_to"):
                     # OnnxOperator
-                    existing = set(_[0] for _ in self.expected_inputs)
+                    existing = {_[0] for _ in self.expected_inputs}
                     i = 10
                     name = "input%d" % (10 + i)
                     while name in existing:
@@ -541,7 +540,7 @@ class OnnxOperator:
             self.graph_algebra = graph_algebra
 
         if clear_subgraph_inputs:
-            for k, v in self.kwargs.items():
+            for _k, v in self.kwargs.items():
                 if isinstance(v, GraphProto):
                     del v.input[:]
 
@@ -640,9 +639,7 @@ class OnnxOperator:
         if self.output_names_ is not None:
             res = self.output_names_[i]
             if not isinstance(res, (tuple, Variable)):
-                raise RuntimeError(
-                    "Unable to retrieve output %r from %r." "" % (i, self)
-                )
+                raise RuntimeError("Unable to retrieve output %r from %r." % (i, self))
             return res
 
     def _set_output_names_(self, scope, operator):
@@ -715,7 +712,7 @@ class OnnxOperator:
                         map(lambda o: "'%s'" % o.onnx_name, operator.inputs)
                     )
                     raise RuntimeError(
-                        "Unable to find variable " "{} in {}.".format(input, vars)
+                        "Unable to find variable {} in {}.".format(input, vars)
                     )
             else:
                 inputs.append(input)
@@ -776,7 +773,7 @@ class OnnxOperator:
                 output_range=self.output_range,
                 operator=operator,
                 run_converters=run_converters,
-                **kwargs
+                **kwargs,
             )
             self.state.run()
         self._verify_add_to_()
@@ -843,7 +840,7 @@ class OnnxOperator:
                     continue
                 given[i] = dt.type
         rev = {}
-        for i, (name, v) in enumerate(expected_inputs):
+        for i, (_name, v) in enumerate(expected_inputs):
             if v in rev:
                 rev[v].append(i)
             else:
@@ -964,7 +961,7 @@ class OnnxOperator:
         if inputs is None:
             raise NotImplementedError("inputs must be specified.")
         if isinstance(inputs, dict):
-            inputs = [(k, v) for k, v in inputs.items()]
+            inputs = list(inputs.items())
         new_inputs = []
         for obj in inputs:
             if isinstance(obj, Variable):
@@ -1038,7 +1035,7 @@ class OnnxOperator:
         # infer shapes
         if outputs:
             if isinstance(outputs, dict):
-                outputs = [(k, v) for k, v in outputs.items()]
+                outputs = list(outputs.items())
             shapes = []
             for o in outputs:
                 if isinstance(o, Variable):
@@ -1050,7 +1047,7 @@ class OnnxOperator:
                         type_shape = o[1]
                     shapes.append(Variable(o[0], o[0], None, type_shape))
                 else:
-                    raise TypeError("Outputs must be Variable or " "tuple(name, type).")
+                    raise TypeError("Outputs must be Variable or tuple(name, type).")
             logger.debug(
                 "[Ops.to_onnx] %s id=%d outputs=%r",
                 self.__class__.__name__,
@@ -1067,10 +1064,10 @@ class OnnxOperator:
                 target_opset=target_opset,
             )
             if self.output_names:
-                set_names = set(
+                set_names = {
                     v.onnx_name if hasattr(v, "onnx_name") else v
                     for v in self.output_names
-                )
+                }
                 shapes = [shape for shape in shapes if shape.onnx_name in set_names]
 
         logger.debug(
@@ -1190,7 +1187,7 @@ class OnnxSubEstimator(OnnxOperator):
         domain=None,
         options=None,
         input_types=None,
-        **kwargs
+        **kwargs,
     ):
         OnnxOperator.__init__(
             self,
@@ -1198,7 +1195,7 @@ class OnnxSubEstimator(OnnxOperator):
             op_version=op_version,
             output_names=output_names,
             domain=domain,
-            **kwargs
+            **kwargs,
         )
         self.operator_instance = skl_op
         self.options = options
@@ -1288,7 +1285,7 @@ class OnnxSubEstimator(OnnxOperator):
                             map(lambda o: "'%s'" % o.onnx_name, operator.inputs)
                         )
                         raise RuntimeError(
-                            "Unable to find variable " "{} in {}.".format(input, vars)
+                            "Unable to find variable {} in {}.".format(input, vars)
                         )
                 elif isinstance(input, tuple) and len(input) == 2:
                     if scope is not None and input[0] in scope.variables:
@@ -1315,7 +1312,7 @@ class OnnxSubEstimator(OnnxOperator):
                 options=self.options,
                 run_converters=run_converters,
                 input_types=self.input_types,
-                **kwargs
+                **kwargs,
             )
             self.state.run()
 
@@ -1335,7 +1332,7 @@ class OnnxSubOperator(OnnxSubEstimator):
 
     def __init__(self, *args, **kwargs):
         OnnxSubEstimator.__init__(self, *args, **kwargs)
-        warnings.warn(
+        warnings.warning(
             (
                 "Class OnnxSubOperator will be removed in 1.10. "
                 "It should be replaced by OnnxSubEstimator."

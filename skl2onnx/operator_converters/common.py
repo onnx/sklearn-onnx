@@ -21,7 +21,7 @@ def concatenate_variables(scope, variables, container, main_type=None):
         main_type = variables[0].type.__class__
 
     # Check if it's possible to concatenate those inputs.
-    type_set = set(type(variable.type) for variable in variables)
+    type_set = {type(variable.type) for variable in variables}
     number_type_set = {
         FloatTensorType,
         Int64TensorType,
@@ -30,7 +30,7 @@ def concatenate_variables(scope, variables, container, main_type=None):
     }
     if any(itype not in number_type_set for itype in type_set):
         raise RuntimeError(
-            "Numerical tensor(s) and string tensor(s) " "cannot be concatenated."
+            "Numerical tensor(s) and string tensor(s) cannot be concatenated."
         )
     # input variables' names we want to concatenate
     input_names = []

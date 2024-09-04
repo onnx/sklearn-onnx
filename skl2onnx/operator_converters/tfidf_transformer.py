@@ -41,7 +41,7 @@ def convert_sklearn_tfidf_transformer(
         ones = scope.get_unique_variable_name("ones")
         cst = np.ones((C,), dtype=float_type)
         container.add_initializer(ones, proto_dtype, [C], cst.flatten())
-        apply_add(scope, data + [ones], plus1, container, broadcast=1)
+        apply_add(scope, [*data, ones], plus1, container, broadcast=1)
         plus1logged = scope.get_unique_variable_name("plus1logged")
         apply_log(scope, plus1, plus1logged, container)
         data = [plus1logged]
@@ -54,7 +54,7 @@ def convert_sklearn_tfidf_transformer(
         shape = [len(cst)]
         idfcst = scope.get_unique_variable_name("idfcst")
         container.add_initializer(idfcst, proto_dtype, shape, cst)
-        apply_mul(scope, data + [idfcst], output_name, container, broadcast=1)
+        apply_mul(scope, [*data, idfcst], output_name, container, broadcast=1)
     else:
         output_name = data[0]
 

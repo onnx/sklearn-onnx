@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's cast transformer converter.
 """
+
 import unittest
 import numpy
 from sklearn.pipeline import Pipeline

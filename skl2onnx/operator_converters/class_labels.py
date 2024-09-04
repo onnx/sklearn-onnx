@@ -13,7 +13,7 @@ def convert_sklearn_class_labels(
         classes = operator.classes
         if not isinstance(classes, list):
             raise RuntimeError(
-                "classes must be a list of numpy arrays but is %r." "" % type(classes)
+                "classes must be a list of numpy arrays but is %r." % type(classes)
             )
         names = []
         if classes[0].dtype in (np.int64, np.int32):

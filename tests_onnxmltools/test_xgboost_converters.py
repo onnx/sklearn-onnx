@@ -21,15 +21,13 @@ except ImportError:
 from skl2onnx import update_registered_converter, convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.shape_calculator import (
-    calculate_linear_classifier_output_shapes,  # noqa
+    calculate_linear_classifier_output_shapes,
     calculate_linear_regressor_output_shapes,
 )
 from skl2onnx._parse import _parse_sklearn_classifier
 from xgboost import XGBRegressor, XGBClassifier
 import onnxmltools
-from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
-    convert_xgboost,  # noqa
-)
+from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 
 try:
     from test_utils import dump_single_regression

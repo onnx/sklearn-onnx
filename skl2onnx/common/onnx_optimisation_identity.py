@@ -5,6 +5,7 @@ Optimization of :epkg:`ONNX` graphs.
 Functions in *onnxconverter-common* do not support
 opset < 9.
 """
+
 from logging import getLogger
 from onnx.helper import make_graph
 from ._onnx_optimisation_common import (
@@ -35,7 +36,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
     if debug_info is None:
         debug_info = [str(type(onnx_model)).split(".")[-1].strip("'>")]
     else:
-        debug_info = debug_info + [str(type(onnx_model)).split(".")[-1].strip("'>")]
+        debug_info = [*debug_info, str(type(onnx_model)).split(".")[-1].strip("'>")]
 
     if hasattr(onnx_model, "graph"):
         return _apply_optimisation_on_graph(
@@ -47,8 +48,8 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
 
     graph = onnx_model
 
-    inputs = set(i.name for i in graph.input)
-    outputs = set(o.name for o in graph.output)
+    inputs = {i.name for i in graph.input}
+    outputs = {o.name for o in graph.output}
 
     def retrieve_idnodes(graph, existing_nodes):
         idnodes = []
@@ -63,7 +64,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
 
     def retrieve_local_variables_subgraphs(graph):
         local = set()
-        existing = set(i.name for i in graph.input)
+        existing = {i.name for i in graph.input}
         for node in graph.node:
             for i in node.input:
                 if i not in existing:
@@ -110,13 +111,11 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                         continue
                     if out in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], out, inp)
-                        logger.debug(
-                            "[VarId-a] rename node input %r into %r" % (out, inp)
-                        )
+                        logger.debug("[VarId-a] rename node input %r into %r", out, inp)
                         rem += 1
                         if nodes[j].op_type == "Identity":
                             restart = True
-                logger.debug("[NodeId-a] remove %r" % nodes[i])
+                logger.debug("[NodeId-a] remove %r", nodes[i])
                 nodes[i] = None
                 rem += 1
                 continue
@@ -132,19 +131,17 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                         continue
                     if inp in nodes[j].output:
                         nodes[j] = _rename_node_output(nodes[j], inp, out)
-                        logger.debug("[Var] rename node output %r into %r" % (out, inp))
+                        logger.debug("[Var] rename node output %r into %r", out, inp)
                         rem += 1
                         if nodes[j].op_type == "Identity":
                             restart = True
                     if inp in nodes[j].input:
                         nodes[j] = _rename_node_input(nodes[j], inp, out)
-                        logger.debug(
-                            "[VarId-b] rename node input %r into %r" % (out, inp)
-                        )
+                        logger.debug("[VarId-b] rename node input %r into %r", out, inp)
                         rem += 1
                         if nodes[j].op_type == "Identity":
                             restart = True
-                logger.debug("[NodeId-b] remove %r" % nodes[i])
+                logger.debug("[NodeId-b] remove %r", nodes[i])
                 nodes[i] = None
                 rem += 1
 
@@ -158,7 +155,7 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
                 onnx_remove_node_identity,
                 node,
                 recursive=True,
-                debug_info=debug_info + [node.name],
+                debug_info=[*debug_info, node.name],
             )
 
     # Finally create the new graph.

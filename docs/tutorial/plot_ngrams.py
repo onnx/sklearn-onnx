@@ -22,7 +22,7 @@ from onnxruntime import InferenceSession
 from sklearn.feature_extraction.text import TfidfVectorizer
 from skl2onnx import to_onnx
 from skl2onnx.sklapi import TraceableTfidfVectorizer
-import skl2onnx.sklapi.register  # noqa
+import skl2onnx.sklapi.register  # noqa: F401
 
 corpus = numpy.array(
     [

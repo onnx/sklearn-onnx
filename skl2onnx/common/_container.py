@@ -36,9 +36,9 @@ def _get_operation_list(use_shortlist=True):
     else:
         shortlist = None
     regs = [
-        re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', " "\\[?input_name"),
-        re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', " "\\[\\]"),
-        re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', " "inputs"),
+        re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', \\[?input_name"),
+        re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', \\[\\]"),
+        re.compile("container.add_node[(]'([A-Z][a-zA-Z0-9]*)', inputs"),
         re.compile("scope, '([A-Z][a-zA-Z0-9]*)', \\[?input_name"),
         re.compile("op_type = '([A-Z][a-zA-Z0-9]*)'"),
     ]
@@ -118,14 +118,10 @@ class _WhiteBlackContainer:
         Checks a node type is allowed according to white
         and black lists.
         """
-        if self._white_op:
-            if node_type not in self._white_op:
-                raise RuntimeError(
-                    "Operator '{}' is not white listed.".format(node_type)
-                )
-        if self._black_op:
-            if node_type in self._black_op:
-                raise RuntimeError("Operator '{}' is black listed.".format(node_type))
+        if self._white_op and node_type not in self._white_op:
+            raise RuntimeError("Operator '{}' is not white listed.".format(node_type))
+        if self._black_op and node_type in self._black_op:
+            raise RuntimeError("Operator '{}' is black listed.".format(node_type))
 
     def debug(self, *args, **kwargs):
         """
@@ -342,7 +338,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
             if modified:
                 if node.op_type in exc_list:
                     raise NotImplementedError(
-                        "Unable to handle subgraphs for node type %r." "" % node.op_type
+                        "Unable to handle subgraphs for node type %r." % node.op_type
                     )
                 node.input[:] = new_input[:]
                 node.output[:] = new_output[:]
@@ -633,7 +629,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
             )
         if name is None or not isinstance(name, str) or name == "":
             name = f"N{len(self.nodes)}"
-        existing_names = set(n.name for n in self.nodes)
+        existing_names = {n.name for n in self.nodes}
         if name in existing_names:
             name += f"-N{len(self.nodes)}"
 
@@ -668,12 +664,12 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 "with name '{}'.".format(common, op_type, name)
             )
         if not isinstance(inputs, list) or not all(isinstance(s, str) for s in inputs):
-            type_list = ",".join(list(str(type(s)) for s in inputs))
+            type_list = ",".join([str(type(s)) for s in inputs])
             raise ValueError("Inputs must be a list of string but get [%s]" % type_list)
         if not isinstance(outputs, list) or not all(
             isinstance(s, str) for s in outputs
         ):
-            type_list = ",".join(list(str(type(s)) for s in outputs))
+            type_list = ",".join([str(type(s)) for s in outputs])
             raise ValueError(
                 "Outputs must be a list of string but get [%s]" % type_list
             )
@@ -736,7 +732,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
     def target_opset_any_domain(self, domain):
         target_opset = self.target_opset_all
         if isinstance(target_opset, dict):
-            if domain in target_opset:
+            if domain in target_opset:  # noqa: SIM401
                 to = target_opset[domain]
             else:
                 to = None
@@ -771,7 +767,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 # avoid a not necessarily necessary warning
                 vers = 1
             else:
-                warnings.warn(
+                warnings.warning(
                     "Unable to find operator '{}' in domain '{}' in ONNX, "
                     "op_version is forced to 1.".format(op_type, domain)
                 )

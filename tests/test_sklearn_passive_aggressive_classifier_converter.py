@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """Tests scikit-learn's Passive Aggressive Classifier converter."""
+
 import unittest
 from sklearn.linear_model import PassiveAggressiveClassifier
 from skl2onnx import convert_sklearn

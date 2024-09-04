@@ -22,6 +22,7 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
+
 import skl2onnx
 import onnx
 import sklearn
@@ -82,7 +83,7 @@ assert len(steps) == 2
 
 pipe.predict_proba(X_digits[:2])
 
-for i, step in enumerate(steps):
+for _i, step in enumerate(steps):
     onnx_step = step["onnx_step"]
     sess = rt.InferenceSession(
         onnx_step.SerializeToString(), providers=["CPUExecutionProvider"]

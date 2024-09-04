@@ -17,7 +17,7 @@ try:
     from skl2onnx.algebra.onnx_ops import OnnxAbs, OnnxNormalizer, OnnxArgMin
     from skl2onnx.algebra.onnx_ops import OnnxSplitApi18, OnnxScaler
 except ImportError:
-    warnings.warn("Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.")
+    warnings.warning("Unable to test OnnxAbs, OnnxNormalizer, OnnxArgMin, OnnxSplit.")
     OnnxAbs = None
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
@@ -167,7 +167,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
             matrices = []
             scale = list(numpy.ones((1, dim)).ravel())
             i1 = input_name
-            for i in range(nbnode - 1):
+            for _i in range(nbnode - 1):
                 i2 = list(rand(1, dim).ravel())
                 matrices.append(i2)
                 node = OnnxScaler(i1, offset=i2, scale=scale)

@@ -24,6 +24,7 @@ Let's take the `Iris dataset
 <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html>`_.
 Every feature is converter into integer.
 """
+
 import numpy as np
 from onnxruntime import InferenceSession
 from sklearn.datasets import load_iris
@@ -35,7 +36,7 @@ from skl2onnx.common.utils import check_input_and_output_numbers
 from skl2onnx.algebra.onnx_ops import OnnxCast
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.sklapi import WOETransformer
-import skl2onnx.sklapi.register  # noqa
+import skl2onnx.sklapi.register  # noqa: F401
 
 data = load_iris()
 X, y = data.data, data.target

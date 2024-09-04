@@ -77,10 +77,7 @@ class TestSklearnGaussianProcessClassifier(unittest.TestCase):
         gp, X = self.fit_classification_model(gp, n_classes=n_classes)
 
         # return_cov=False, return_std=False
-        if dtype == np.float32:
-            cls = FloatTensorType
-        else:
-            cls = DoubleTensorType
+        cls = FloatTensorType if dtype == np.float32 else DoubleTensorType
         model_onnx = to_onnx(
             gp,
             initial_types=[("X", cls([None, None]))],

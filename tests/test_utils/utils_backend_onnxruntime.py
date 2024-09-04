@@ -3,6 +3,7 @@
 """
 Helpers to test runtimes.
 """
+
 import numpy
 import pandas
 import warnings
@@ -115,10 +116,7 @@ def compare_runtime(
 
     onx = test["onnx"]
     if options is None:
-        if isinstance(onx, str):
-            options = extract_options(onx)
-        else:
-            options = {}
+        options = extract_options(onx) if isinstance(onx, str) else {}
     elif options is None:
         options = {}
     elif not isinstance(options, dict):
@@ -127,7 +125,7 @@ def compare_runtime(
     try:
         import onnxruntime
     except ImportError:
-        warnings.warn("Unable to import onnxruntime.")
+        warnings.warning("Unable to import onnxruntime.")
         return None
 
     if verbose:
@@ -230,7 +228,7 @@ def compare_runtime(
                 if shape == array_input.shape[1]:
                     inputs = {}
                     c = 0
-                    for i, n in enumerate(inp):
+                    for _i, n in enumerate(inp):
                         d = c + n.shape[1]
                         inputs[n.name] = _create_column(
                             [row[c:d] for row in input], n.type
@@ -255,7 +253,7 @@ def compare_runtime(
                 if shape == array_input.shape[1]:
                     inputs = {}
                     c = 0
-                    for i, n in enumerate(inp):
+                    for _i, n in enumerate(inp):
                         d = c + n.shape[1]
                         inputs[n.name] = _create_column(input.iloc[:, c:d], n.type)
                         c = d
@@ -296,8 +294,8 @@ def compare_runtime(
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
 
-                        def lambda_onnx():
-                            return sess.run(None, {name: input})  # noqa
+                        def lambda_onnx(input=input):
+                            return sess.run(None, {name: input})
 
                     if verbose:
                         import pprint
@@ -329,14 +327,14 @@ def compare_runtime(
 
             t = list(inputs.items())[0]
             res = []
-            for i in range(0, len(t[1])):
+            for i in range(len(t[1])):
                 iii = {k: to_array(v[i]) for k, v in inputs.items()}
                 try:
                     one = sess.run(None, iii)
                     if lambda_onnx is None:
 
-                        def lambda_onnx():
-                            return sess.run(None, iii)  # noqa
+                        def lambda_onnx(iii=iii):
+                            return sess.run(None, iii)
 
                     if verbose:
                         import pprint
@@ -394,7 +392,7 @@ def compare_runtime(
             output = sess.run(None, inputs, run_options)
 
             def lambda_onnx():
-                return sess.run(None, inputs)  # noqa
+                return sess.run(None, inputs)
 
             if verbose:
                 import pprint
@@ -407,7 +405,7 @@ def compare_runtime(
                 _display_intermediate_steps(onx, inputs, disable_optimisation)
             if "-Fail" in onx:
                 raise ExpectedAssertionError(
-                    "onnxruntime cannot compute the " "prediction for '{0}'".format(onx)
+                    "onnxruntime cannot compute the prediction for '{0}'".format(onx)
                 )
             else:
                 if verbose:

@@ -105,7 +105,7 @@ def convert_sklearn_ordinal_encoder(
             label_encoder_output,
             op_domain="ai.onnx.ml",
             op_version=2,
-            **attrs
+            **attrs,
         )
         apply_reshape(
             scope,

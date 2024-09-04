@@ -1,6 +1,4 @@
 # SPDX-License-Identifier: Apache-2.0
-# -*- coding: utf-8 -*-
-#
 # Configuration file for the Sphinx documentation builder.
 
 import os
@@ -10,7 +8,7 @@ import warnings
 import skl2onnx
 
 sys.path.append(os.path.abspath("exts"))
-from github_link import make_linkcode_resolve  # noqa
+from github_link import make_linkcode_resolve
 
 
 # -- Project information -----------------------------------------------------

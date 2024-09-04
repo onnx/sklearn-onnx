@@ -153,7 +153,7 @@ def convert_sklearn_one_hot_encoder(
                 try:
                     ci = int(c)
                 except TypeError:
-                    raise RuntimeError(
+                    raise RuntimeError(  # noqa: B904
                         "Category '{}' cannot be casted into int.".format(c)
                     )
                 if ci != c:

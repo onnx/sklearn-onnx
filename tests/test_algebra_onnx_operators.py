@@ -282,11 +282,12 @@ class TestOnnxOperators(unittest.TestCase):
 
         for opset in [TARGET_OPSET]:
             for value in [5, np.float32(5)]:
-                with self.subTest(opset=opset, value=value):
-                    with self.assertRaises(TypeError):
-                        OnnxConstantOfShape(
-                            "X", value=value, op_version=opset, output_names=["Y"]
-                        )
+                with self.subTest(opset=opset, value=value), self.assertRaises(
+                    TypeError
+                ):
+                    OnnxConstantOfShape(
+                        "X", value=value, op_version=opset, output_names=["Y"]
+                    )
 
     @unittest.skipIf(TARGET_OPSET < 10, reason="not available")
     def test_onnx_reversed_order(self):
@@ -487,7 +488,7 @@ class TestOnnxOperators(unittest.TestCase):
         try:
             assert_almost_equal(exp, got[0])
         except AssertionError as e:
-            warnings.warn(e)
+            warnings.warning(e)
 
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]], dtype=np.float32)
         pads = np.array([0, 2, 0, 0], dtype=np.int64)

@@ -8,7 +8,7 @@ try:
 except ImportError:
 
     def _deprecate_positional_args(x):
-        return x  # noqa
+        return x
 
 
 class WOETransformer(TransformerMixin, BaseEstimator):
@@ -80,7 +80,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                 continue
             if not isinstance(intervals, list):
                 raise TypeError(
-                    "Intervals for column %d must be a list not %r." "" % (i, intervals)
+                    "Intervals for column %d must be a list not %r." % (i, intervals)
                 )
             inlist = []
             inweight = []
@@ -91,7 +91,7 @@ class WOETransformer(TransformerMixin, BaseEstimator):
                     )
                 if len(interval) < 2:
                     raise ValueError(
-                        "Interval %d should have at least two values " "%r." % interval
+                        "Interval %d should have at least two values %r." % interval
                     )
                 res = []
                 for j in range(0, 2):

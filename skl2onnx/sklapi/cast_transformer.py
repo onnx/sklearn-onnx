@@ -8,7 +8,7 @@ try:
 except ImportError:
 
     def _deprecate_positional_args(x):
-        return x  # noqa
+        return x
 
 
 class CastTransformer(TransformerMixin, BaseEstimator):
@@ -21,7 +21,7 @@ class CastTransformer(TransformerMixin, BaseEstimator):
     ----------
     dtype : numpy type,
         output are cast into that type
-    """  # noqa
+    """
 
     @_deprecate_positional_args
     def __init__(self, *, dtype=np.float32):
@@ -36,10 +36,10 @@ class CastTransformer(TransformerMixin, BaseEstimator):
                 raise TypeError("{} must be a numpy array or a dataframe.".format(name))
         try:
             a2 = a.astype(self.dtype)
-        except ValueError:
+        except ValueError as e:
             raise ValueError(
                 "Unable to cast {} from {} into {}.".format(name, a.dtype, self.dtype)
-            )
+            ) from e
         return a2
 
     def fit(self, X, y=None, sample_weight=None):

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import warnings
-from typing import List
+from typing import List, Optional
 import numpy as np
 from onnx.helper import (
     make_node,
@@ -49,7 +49,7 @@ def woe_parser(
     scope: Scope,
     model: BaseEstimator,
     inputs: List[Variable],
-    custom_parsers: dict = None,
+    custom_parsers: Optional[dict] = None,
 ):
     "ONNX parser for WOETransformer: defines the output type."
     alias = _get_sklearn_operator_name(type(model))
@@ -234,7 +234,7 @@ class Tree:
             nodes_featureids=[n.feature for n in self.nodes],
             nodes_missing_value_tracks_true=[0 for n in self.nodes],
             nodes_modes=[n.onnx_mode for n in self.nodes],
-            nodes_nodeids=[i for i in range(len(self.nodes))],
+            nodes_nodeids=list(range(len(self.nodes))),
             nodes_treeids=[0 for n in self.nodes],
             nodes_values=[float(n.onnx_threshold) for n in self.nodes],
             post_transform="NONE",
@@ -267,7 +267,10 @@ class Tree:
             )
         )
         if len(atts["target_weights"]) != len(set(atts["target_weights"])):
-            warnings.warn("All targets should be unique %r." % atts["target_weights"])
+            warnings.warning(
+                "All targets should be unique %r." % atts["target_weights"],
+                stacklevel=0,
+            )
         return atts
 
     def mapping(self, intervals):
@@ -321,7 +324,7 @@ class Tree:
                 if hasattr(node, at):
                     delattr(node, at)
 
-        d_intervals = {i: t for i, t in enumerate(intervals)}
+        d_intervals = dict(enumerate(intervals))
         changes = 1
         while changes > 0:
             changes = 0
@@ -501,7 +504,7 @@ def woe_converter(scope: Scope, operator: Operator, container: ModelComponentCon
             node = OnnxTreeEnsembleRegressor_1(
                 X, op_version=1, domain="ai.onnx.ml", **atts
             )
-            cats = list(sorted(set(int(n.onnx_value) for n in tree.nodes if n.is_leaf)))
+            cats = list(sorted({int(n.onnx_value) for n in tree.nodes if n.is_leaf}))
             mat_mapping = _mapping2matrix(mapping, cats, op.weights_[i], dtype)
             if verbose > 1:
                 print("[woe_converter] mapping=%r" % mapping)
@@ -599,7 +602,7 @@ def woe_transformer_to_onnx(op, opset=None):
                     **atts
                 )
             )
-            cats = list(sorted(set(int(n.onnx_value) for n in tree.nodes if n.is_leaf)))
+            cats = list(sorted({int(n.onnx_value) for n in tree.nodes if n.is_leaf}))
             mat_mapping = _mapping2matrix(mapping, cats, op.weights_[i], np.float32)
             nodes.append(
                 make_node("Reshape", ["rf%d" % i, "vector_shape"], ["resh%d" % i])

@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's cast transformer converter.
 """
+
 import unittest
 import numpy
 from numpy.testing import assert_almost_equal
@@ -17,7 +18,6 @@ except ImportError:
     ColumnTransformer = None
 from skl2onnx.sklapi import WOETransformer
 from skl2onnx.sklapi.woe_transformer_onnx import woe_transformer_to_onnx
-import skl2onnx.sklapi.register  # noqa
 from skl2onnx import to_onnx
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 

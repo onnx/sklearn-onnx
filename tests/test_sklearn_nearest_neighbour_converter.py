@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's KNeighbours Classifier and Regressor converters.
 """
+
 import sys
 import warnings
 import unittest
@@ -202,7 +203,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             )
         except OrtImpl as e:
             if (
-                "Could not find an implementation for the node " "To_TopK:TopK(11)"
+                "Could not find an implementation for the node To_TopK:TopK(11)"
             ) in str(e):
                 # onnxruntime does not declare TopK(11) for double
                 return
@@ -342,7 +343,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 # One broadcasted multiplication unexpectedly produces nan.
                 whole = "\n".join(rows)
                 if "[        nan" in whole:
-                    warnings.warn(whole)
+                    warnings.warning(whole)
                     return
                 raise AssertionError(whole)
             if ort_version.startswith("1.3.") and sys.platform == "win32":

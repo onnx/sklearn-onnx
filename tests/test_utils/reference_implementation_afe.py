@@ -2,6 +2,7 @@
 """
 Helpers to test runtimes.
 """
+
 from onnx.defs import onnx_opset_version
 
 
@@ -21,10 +22,7 @@ def _array_feature_extrator(data, indices):
         for s in indices.shape:
             add *= s
         index = indices.ravel().tolist()
-    if len(data.shape) == 1:
-        new_shape = (1, add)
-    else:
-        new_shape = list(data.shape[:-1]) + [add]
+    new_shape = (1, add) if len(data.shape) == 1 else list(data.shape[:-1]) + [add]
     try:
         tem = data[..., index]
     except IndexError as e:

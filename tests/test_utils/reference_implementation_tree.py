@@ -2,8 +2,9 @@
 """
 Helpers to test runtimes.
 """
+
 import numpy as np
-from onnx import numpy_helper  # noqa
+from onnx import numpy_helper
 from onnx.defs import onnx_opset_version
 
 

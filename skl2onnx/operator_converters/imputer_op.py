@@ -23,12 +23,10 @@ def convert_sklearn_imputer(
         and op.fill_value.lower() != "nan"
     ):
         raise RuntimeError(
-            "Imputer cannot fill missing values with a " "string '%s'." % op.fill_value
+            "Imputer cannot fill missing values with a string '%s'." % op.fill_value
         )
     if not hasattr(op, "statistics_"):
-        raise RuntimeError(
-            "Member statistics_ is not present, was the " "model fitted?"
-        )
+        raise RuntimeError("Member statistics_ is not present, was the model fitted?")
 
     if isinstance(operator.inputs[0].type, StringTensorType):
         if not isinstance(op.missing_values, (str, np.str_)):
@@ -124,7 +122,7 @@ def convert_sklearn_imputer(
             concatenated_feature,
             operator.outputs[0].full_name,
             op_domain="ai.onnx.ml",
-            **attrs
+            **attrs,
         )
 
 

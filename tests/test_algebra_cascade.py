@@ -108,7 +108,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
         def generate_onnx_graph(dim, nbnode, input_name="X1", opv=1):
             i1 = input_name
             scale = list(np.ones((1, dim)).ravel())
-            for i in range(nbnode - 1):
+            for _i in range(nbnode - 1):
                 i2 = list(map(float, np.ones((1, dim)).astype(np.float32).ravel()))
                 node = OnnxScaler(i1, offset=i2, scale=scale, op_version=opv)
                 i1 = node
@@ -173,7 +173,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     onx = to_onnx(st, X.astype(np.float32), target_opset=opv)
                 except RuntimeError as e:
                     if (
-                        "is higher than the number of the " "installed onnx package"
+                        "is higher than the number of the installed onnx package"
                     ) in str(e):
                         continue
                     raise e
@@ -233,7 +233,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                     )
                 except RuntimeError as e:
                     if (
-                        "is higher than the number of the " "installed onnx package"
+                        "is higher than the number of the installed onnx package"
                     ) in str(e):
                         continue
                     raise e
@@ -247,9 +247,7 @@ class TestOnnxOperatorsCascade(unittest.TestCase):
                         continue
                     if opv >= onnx_opset_version():
                         continue
-                    if ("No suitable kernel definition found for " "op Cast(9)") in str(
-                        e
-                    ):
+                    if ("No suitable kernel definition found for op Cast(9)") in str(e):
                         # too old onnxruntime
                         continue
                     raise AssertionError(

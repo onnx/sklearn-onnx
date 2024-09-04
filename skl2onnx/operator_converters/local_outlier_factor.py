@@ -35,7 +35,7 @@ def convert_sklearn_local_outlier_factor(
     op = operator.raw_operator
     if not op.novelty:
         raise RuntimeError(
-            "The converter only converts the model %r is novelty is True." "" % type(op)
+            "The converter only converts the model %r is novelty is True." % type(op)
         )
     outputs = operator.outputs
     opv = container.target_opset
@@ -53,7 +53,7 @@ def convert_sklearn_local_outlier_factor(
     kwargs = {}
     if op.p != 2:
         if options["optim"] == "cdist":
-            warnings.warn(
+            warnings.warning(
                 "Option p=%r may not be compatible with the runtime. "
                 "See https://github.com/microsoft/onnxruntime/blob/main/"
                 "docs/ContribOperators.md#com.microsoft.CDist."
@@ -69,7 +69,7 @@ def convert_sklearn_local_outlier_factor(
         op_version=opv,
         keep_distances=True,
         optim=options.get("optim", None),
-        **kwargs
+        **kwargs,
     )
 
     # dist_k = self._distances_fit_X_[neighbors_indices, self.n_neighbors_ - 1]

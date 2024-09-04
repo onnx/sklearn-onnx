@@ -3,6 +3,7 @@
 """
 Tests on functions in *onnx_helper*.
 """
+
 import unittest
 import packaging.version as pv
 import numpy
@@ -40,7 +41,7 @@ def skl12():
 class TestOnnxHelper(unittest.TestCase):
     def get_model(self, model):
         try:
-            import onnxruntime  # noqa
+            import onnxruntime  # noqa: F401
         except ImportError:
             return None
 

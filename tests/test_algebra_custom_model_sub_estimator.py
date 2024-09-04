@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+
 import unittest
 import warnings
 import numpy as np

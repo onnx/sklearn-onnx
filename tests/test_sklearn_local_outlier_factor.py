@@ -3,6 +3,7 @@
 """
 Test scikit-learn's LocalOutlierFactor.
 """
+
 import unittest
 import packaging.version as pv
 import numpy as np

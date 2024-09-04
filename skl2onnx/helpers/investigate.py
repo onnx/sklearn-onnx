@@ -36,7 +36,7 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
         raise NotImplementedError("Unable to handle this specific case.")
     elif hasattr(pipe, "mapper") and pipe.mapper:
         # azureml DataTransformer
-        for couple in enumerate_pipeline_models(pipe.mapper, coor + (0,)):
+        for couple in enumerate_pipeline_models(pipe.mapper, (*coor, 0)):
             yield couple
     elif hasattr(pipe, "built_features"):
         # sklearn_pandas.dataframe_mapper.DataFrameMapper
@@ -44,25 +44,25 @@ def enumerate_pipeline_models(pipe, coor=None, vs=None):
             if isinstance(columns, str):
                 columns = (columns,)
             if transformers is None:
-                yield (coor + (i,)), None, columns
+                yield ((*coor, i)), None, columns
             else:
                 for couple in enumerate_pipeline_models(
-                    transformers, coor + (i,), columns
+                    transformers, (*coor, i), columns
                 ):
                     yield couple
     elif isinstance(pipe, Pipeline):
         for i, (_, model) in enumerate(pipe.steps):
-            for couple in enumerate_pipeline_models(model, coor + (i,)):
+            for couple in enumerate_pipeline_models(model, (*coor, i)):
                 yield couple
     elif ColumnTransformer is not None and isinstance(pipe, ColumnTransformer):
         for i, (_, fitted_transformer, column) in enumerate(pipe.transformers):
             for couple in enumerate_pipeline_models(
-                fitted_transformer, coor + (i,), column
+                fitted_transformer, (*coor, i), column
             ):
                 yield couple
     elif isinstance(pipe, FeatureUnion):
         for i, (_, model) in enumerate(pipe.transformer_list):
-            for couple in enumerate_pipeline_models(model, coor + (i,)):
+            for couple in enumerate_pipeline_models(model, (*coor, i)):
                 yield couple
     elif TransformedTargetRegressor is not None and isinstance(
         pipe, TransformedTargetRegressor
@@ -103,10 +103,8 @@ class BaseEstimatorDebugInformation:
             self.methods["predict_proba"] = lambda model, X: model._debug_predict_proba(
                 X
             )
-        if hasattr(model, "decision_function") and callable(
-            model.decision_function
-        ):  # noqa
-            model._debug_decision_function = model.decision_function  # noqa
+        if hasattr(model, "decision_function") and callable(model.decision_function):
+            model._debug_decision_function = model.decision_function
             self.methods["decision_function"] = (
                 lambda model, X: model._debug_decision_function(X)
             )
@@ -209,7 +207,7 @@ def _alter_model_for_debugging(skl_model, recursive=False):
                 try:
                     setattr(model, k, MethodType(new_methods[k], model))
                 except AttributeError:
-                    warnings.warn(
+                    warnings.warning(
                         "Unable to overwrite method '{}' for class "
                         "{}.".format(k, type(model))
                     )
@@ -219,7 +217,7 @@ def _alter_model_for_debugging(skl_model, recursive=False):
             try:
                 setattr(skl_model, k, MethodType(new_methods[k], skl_model))
             except AttributeError:
-                warnings.warn(
+                warnings.warning(
                     "Unable to overwrite method '{}' for class "
                     "{}.".format(k, type(skl_model))
                 )
@@ -289,12 +287,11 @@ def compare_objects(o1, o2, decimal=4):
     """
 
     def convert(o):
-        if isinstance(o, list) and len(o) == 1:
-            if isinstance(o[0], numpy.ndarray):
-                if o[0].dtype in (numpy.str_, object, str):
-                    o = list(o[0])
-                else:
-                    o = o[0]
+        if isinstance(o, list) and len(o) == 1 and isinstance(o[0], numpy.ndarray):
+            if o[0].dtype in (numpy.str_, object, str):
+                o = list(o[0])
+            else:
+                o = o[0]
         # Following line avoid importing pandas and taking
         # dependency on pandas.
         if o.__class__.__name__ == "Series":

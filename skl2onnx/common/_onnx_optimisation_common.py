@@ -4,6 +4,7 @@
 Common functions to reduce the number of
 nodes of an :epkg:`ONNX` graphs.
 """
+
 from onnx.helper import make_graph, ValueInfoProto, make_model
 from onnx import AttributeProto, NodeProto
 from onnx.helper import make_attribute
@@ -24,7 +25,7 @@ def _apply_optimisation_on_graph(
     return: new onnx model
     """
     if hasattr(onnx_model, "graph"):
-        graph = fct(onnx_model.graph, debug_info=debug_info + ["GRAPH"], **kwargs)
+        graph = fct(onnx_model.graph, debug_info=[*debug_info, "GRAPH"], **kwargs)
         new_model = make_model(graph)
         new_model.ir_version = onnx_model.ir_version
         new_model.producer_name = onnx_model.producer_name
@@ -62,7 +63,7 @@ def _apply_remove_node_fct_node(fct, node, recursive, debug_info):
     for att in node.attribute:
         if att.name == "body":
             new_body = fct(
-                att.g, recursive=recursive, debug_info=debug_info + [att.name]
+                att.g, recursive=recursive, debug_info=[*debug_info, att.name]
             )
             new_atts.append(_make_att_graph(att.name, new_body))
             modified += 1

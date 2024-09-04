@@ -115,7 +115,7 @@ def convert_kernel_diag(
         )
 
     raise RuntimeError(
-        "Unable to convert diag method for " "class {}.".format(type(kernel))
+        "Unable to convert diag method for class {}.".format(type(kernel))
     )
 
 
@@ -447,7 +447,7 @@ def convert_kernel(
         else:
             if len(x_train.shape) != 2:
                 raise NotImplementedError(
-                    "Only DotProduct for two dimension train set is " "implemented."
+                    "Only DotProduct for two dimension train set is implemented."
                 )
             return _convert_dot_product(
                 X,
@@ -531,7 +531,7 @@ def convert_kernel(
         )
 
     raise RuntimeError(
-        "Unable to convert __call__ method for " "class {}.".format(type(kernel))
+        "Unable to convert __call__ method for class {}.".format(type(kernel))
     )
 
 

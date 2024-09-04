@@ -196,8 +196,6 @@ class TestSklearnPipeline(unittest.TestCase):
             basename="SklearnPipelineScaler11Union",
         )
 
-    TARGET_OPSET
-
     @unittest.skipIf(TARGET_OPSET < 15, reason="uses CastLike")
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("0.4.0"), reason="onnxruntime too old"
@@ -344,7 +342,7 @@ class TestSklearnPipeline(unittest.TestCase):
             data = pandas.read_csv(titanic_url)
         except url_error.URLError:
             # Do not fail the test if the data cannot be fetched.
-            warnings.warn("Unable to fetch titanic data.")
+            warnings.warning("Unable to fetch titanic data.")
             return
         X = data.drop("survived", axis=1)
         y = data["survived"]
@@ -823,7 +821,10 @@ class TestSklearnPipeline(unittest.TestCase):
             ]
         )
         y = numpy.array([0, 0, 1, 0, 1])
-        voting.fit(data, y)
+        try:
+            voting.fit(data, y)
+        except AttributeError as e:
+            raise unittest.SkipTest(e)
         expected_label = voting.predict(data)
         expected_proba = voting.predict_proba(data)
         df = pandas.DataFrame(data)

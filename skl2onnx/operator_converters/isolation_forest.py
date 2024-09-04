@@ -54,7 +54,7 @@ def convert_sklearn_isolation_forest(
     options = container.get_options(op, dict(score_samples=None))
     if opvml < 2:
         raise RuntimeError(
-            "This converter requires at least opset 2 for " "domain 'ai.onnx.ml'."
+            "This converter requires at least opset 2 for domain 'ai.onnx.ml'."
         )
 
     input_name = operator.inputs[0]

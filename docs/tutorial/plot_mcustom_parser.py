@@ -24,6 +24,7 @@ one output but both are needed.
 A new transformer
 +++++++++++++++++
 """
+
 import numpy
 from onnxruntime import InferenceSession
 from sklearn.base import TransformerMixin, BaseEstimator

@@ -52,7 +52,7 @@ def convert_sklearn_zipmap(
             operator.inputs[1].full_name,
             operator.outputs[1].full_name,
             op_domain="ai.onnx.ml",
-            **zipmap_attrs
+            **zipmap_attrs,
         )
         return
 
@@ -70,7 +70,7 @@ def convert_sklearn_zipmap(
         operator.inputs[0].full_name,
         operator.outputs[0].full_name,
         op_domain="ai.onnx.ml",
-        **zipmap_attrs
+        **zipmap_attrs,
     )
 
 

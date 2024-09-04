@@ -2,7 +2,7 @@
 
 import textwrap
 import onnx
-import onnx.defs  # noqa
+import onnx.defs
 
 
 def _get_doc_template():
@@ -182,7 +182,7 @@ def get_rst_doc_sklearn():
 
     classes = dynamic_class_creation_sklearn()
     tmpl = _template_operator_sklearn
-    values = [(k, v) for k, v in sorted(classes.items())]
+    values = list(sorted(classes.items()))
     values = [_[1] for _ in values]
     docs = tmpl.render(len=len, classes=values, format_doc=format_doc)
     return docs

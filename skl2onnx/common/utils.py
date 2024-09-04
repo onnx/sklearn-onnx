@@ -5,13 +5,17 @@ from collections import OrderedDict
 import hashlib
 import numpy as np
 from onnx.numpy_helper import from_array
-from onnxconverter_common.utils import sklearn_installed, skl2onnx_installed  # noqa
-from onnxconverter_common.utils import is_numeric_type, is_string_type  # noqa
-from onnxconverter_common.utils import cast_list, convert_to_python_value  # noqa
-from onnxconverter_common.utils import convert_to_python_default_value  # noqa
-from onnxconverter_common.utils import convert_to_list  # noqa
-from onnxconverter_common.utils import check_input_and_output_numbers  # noqa
-from onnxconverter_common.utils import check_input_and_output_types  # noqa
+from onnxconverter_common.utils import (  # noqa: F401
+    sklearn_installed,
+    skl2onnx_installed,
+    is_numeric_type,
+    is_string_type,
+    cast_list,
+    convert_to_python_value,
+    convert_to_python_default_value,
+    convert_to_list,
+    check_input_and_output_numbers,
+)
 from .data_types import TensorType
 
 _unique_index = {"subgraph": 0}

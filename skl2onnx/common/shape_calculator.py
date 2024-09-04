@@ -4,6 +4,7 @@
 Functions to calculate output shapes of linear classifiers
 and regressors.
 """
+
 import numbers
 import numpy as np
 from .data_types import (

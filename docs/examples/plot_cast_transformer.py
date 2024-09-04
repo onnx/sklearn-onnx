@@ -28,6 +28,7 @@ This is not a typical example, it is build to make it fails
 based on the assumption ``(x / y)`` is usually different from
 ``x * ( 1 / y)`` on a computer.
 """
+
 import onnxruntime
 import onnx
 import os
@@ -169,11 +170,11 @@ ax.axis("off")
 #################################
 # **Versions used for this example**
 
-import sklearn  # noqa
+import sklearn
 
 print("numpy:", np.__version__)
 print("scikit-learn:", sklearn.__version__)
-import skl2onnx  # noqa
+import skl2onnx
 
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)

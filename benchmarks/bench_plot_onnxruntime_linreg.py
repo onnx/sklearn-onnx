@@ -4,6 +4,7 @@
 """
 Benchmark of onnxruntime on LinearRegression.
 """
+
 import warnings
 from io import BytesIO
 from time import perf_counter as time
@@ -100,7 +101,7 @@ def bench(n_obs, n_features, fit_intercepts, methods, repeat=10, verbose=False):
 
                     # creates different inputs to avoid caching in any ways
                     Xs = []
-                    for r in range(loop_repeat):
+                    for _r in range(loop_repeat):
                         x = np.empty((n, nfeat))
                         x[:, :] = rand(n, nfeat)[:, :]
                         Xs.append(x.astype(np.float32))
@@ -120,7 +121,7 @@ def bench(n_obs, n_features, fit_intercepts, methods, repeat=10, verbose=False):
                     r2 = 0
                     for X in Xs:
                         p2 = fct2(X)
-                        r2 += 1
+                        r2 += 1  # noqa: SIM113
                     end = time()
                     obs["time_ort"] = (end - st) / repeated
                     res.append(obs)
@@ -128,13 +129,12 @@ def bench(n_obs, n_features, fit_intercepts, methods, repeat=10, verbose=False):
                         print("bench", len(res), ":", obs)
 
                     # checks that both produce the same outputs
-                    if n <= 10000:
-                        if len(p1.shape) == 1 and len(p2.shape) == 2:
+                    if n <= 10000 and len(p1.shape) == 1 and len(p2.shape) == 2:
                             p2 = p2.ravel()
                             try:
                                 assert_almost_equal(p1.ravel(), p2.ravel(), decimal=5)
                             except AssertionError as e:
-                                warnings.warn(str(e))
+                                warnings.warning(str(e))
     return res
 
 
