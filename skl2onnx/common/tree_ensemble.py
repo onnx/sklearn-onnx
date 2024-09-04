@@ -3,6 +3,7 @@
 """
 Common functions to convert any learner based on trees.
 """
+
 import numpy as np
 
 

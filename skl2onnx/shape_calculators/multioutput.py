@@ -23,7 +23,7 @@ def multioutput_classifier_shape_calculator(operator):
     check_input_and_output_numbers(operator, input_count_range=1, output_count_range=2)
     if not isinstance(operator.outputs[1].type, SequenceType):
         raise RuntimeError(
-            "Probabilites should be a sequence not %r." "" % operator.outputs[1].type
+            "Probabilites should be a sequence not %r." % operator.outputs[1].type
         )
     i = operator.inputs[0]
     outputs = operator.outputs

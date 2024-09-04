@@ -3,11 +3,11 @@
 """
 Helpers to test runtimes.
 """
+
 import io
 import contextlib
 import types
 import numpy as np
-from scipy.special import expit  # noqa
 import pandas
 import onnx
 from onnx import AttributeProto, numpy_helper
@@ -303,7 +303,6 @@ if onnx_opset_version() >= 18:
         )
 
     else:
-
         from onnx.reference.ops.op_scan import Scan as _Scan
 
         class Scan(_Scan):
@@ -483,7 +482,6 @@ if onnx_opset_version() >= 18:
             return "\n".join(classes)
 
 else:
-
     ReferenceEvaluatorEx = None
 
 
@@ -606,10 +604,7 @@ def compare_runtime(
 
     onx = test["onnx"]
     if options is None:
-        if isinstance(onx, str):
-            options = extract_options(onx)
-        else:
-            options = {}
+        options = extract_options(onx) if isinstance(onx, str) else {}
     elif not isinstance(options, dict):
         raise TypeError("options must be a dictionary.")
 
@@ -630,9 +625,7 @@ def compare_runtime(
             smodel = "\nJSON ONNX\n" + str(model)
         else:
             smodel = ""
-        if "NOT_IMPLEMENTED : Could not find an implementation " "for the node" in str(
-            e
-        ):
+        if "NOT_IMPLEMENTED : Could not find an implementation for the node" in str(e):
             # onnxruntime does not implement a specific node yet.
             raise OnnxRuntimeMissingNewOnnxOperatorException(
                 "ReferenceEvaluator does not implement a new operator "
@@ -646,7 +639,7 @@ def compare_runtime(
                 )
             )
         raise OnnxRuntimeAssertionError(
-            "Unable to load onnx '{0}'\nONNX\n{1}\n{2}" ".".format(onx, smodel, e)
+            "Unable to load onnx '{0}'\nONNX\n{1}\n{2}.".format(onx, smodel, e)
         )
 
     input = load["data"]
@@ -692,7 +685,7 @@ def compare_runtime(
                     if shape == array_input.shape[1]:
                         inputs = {}
                         c = 0
-                        for i, n in enumerate(inp):
+                        for _i, n in enumerate(inp):
                             d = c + n.shape[1]
                             inputs[n.name] = _create_column(
                                 [row[c:d] for row in input], n.type
@@ -721,7 +714,7 @@ def compare_runtime(
                     if shape == array_input.shape[1]:
                         inputs = {}
                         c = 0
-                        for i, n in enumerate(inp):
+                        for _i, n in enumerate(inp):
                             d = c + n.shape[1]
                             inputs[n.name] = _create_column(input.iloc[:, c:d], n.type)
                             c = d
@@ -764,7 +757,7 @@ def compare_runtime(
                 try:
                     one = sess.run(None, {name: input})
                     if lambda_onnx is None:
-                        lambda_onnx = lambda sess=sess, input=input: sess.run(  # noqa
+                        lambda_onnx = lambda sess=sess, input=input: sess.run(
                             None, {name: input}
                         )
                     if verbose:
@@ -808,9 +801,7 @@ def compare_runtime(
                 try:
                     one = sess.run(None, iii)
                     if lambda_onnx is None:
-                        lambda_onnx = lambda sess=sess, iii=iii: sess.run(  # noqa
-                            None, iii
-                        )
+                        lambda_onnx = lambda sess=sess, iii=iii: sess.run(None, iii)
                     if verbose:
                         import pprint
 
@@ -863,7 +854,7 @@ def compare_runtime(
             output = sess.run(None, inputs)
 
             def lambda_onnx():
-                return sess.run(None, inputs)  # noqa
+                return sess.run(None, inputs)
 
             if verbose:
                 import pprint
@@ -876,7 +867,7 @@ def compare_runtime(
                 _display_intermediate_steps(onx, inputs, disable_optimisation)
             if "-Fail" in onx:
                 raise ExpectedAssertionError(
-                    "onnxruntime cannot compute the " "prediction for '{0}'".format(onx)
+                    "onnxruntime cannot compute the prediction for '{0}'".format(onx)
                 )
             else:
                 if verbose:

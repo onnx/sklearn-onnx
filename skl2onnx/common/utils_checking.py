@@ -15,10 +15,13 @@ def check_signature(fct, reference, skip=None):
     def select_parameters(pars):
         new_pars = OrderedDict()
         for i, (name, p) in enumerate(pars.items()):
-            if i >= 3 and name in ("op_type", "op_domain", "op_version"):
-                if p.default is not None:
-                    # Parameters op_type and op_domain are skipped.
-                    continue
+            if (
+                i >= 3
+                and name in ("op_type", "op_domain", "op_version")
+                and p.default is not None
+            ):
+                # Parameters op_type and op_domain are skipped.
+                continue
             new_pars[name] = p
         return new_pars
 

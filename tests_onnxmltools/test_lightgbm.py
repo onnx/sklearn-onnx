@@ -16,14 +16,14 @@ from lightgbm import LGBMClassifier, LGBMRegressor, Dataset, train, Booster
 from skl2onnx import update_registered_converter
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.common.shape_calculator import (
-    calculate_linear_classifier_output_shapes,  # noqa
+    calculate_linear_classifier_output_shapes,
     calculate_linear_regressor_output_shapes,
 )
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
-    convert_lightgbm,  # noqa
+    convert_lightgbm,
 )
 import onnxmltools
-from onnxmltools.convert.lightgbm._parse import WrappedBooster  # noqa
+from onnxmltools.convert.lightgbm._parse import WrappedBooster
 from skl2onnx import to_onnx
 from skl2onnx._parse import _parse_sklearn_classifier, _parse_sklearn_simple_model
 
@@ -66,7 +66,7 @@ def calculate_lightgbm_output_shapes(operator):
 def lightgbm_parser(scope, model, inputs, custom_parsers=None):
     if hasattr(model, "fit"):
         raise TypeError(  # pragma: no cover
-            "This converter does not apply on type '{}'." "".format(type(model))
+            "This converter does not apply on type '{}'.".format(type(model))
         )
 
     if len(inputs) == 1:
@@ -116,7 +116,6 @@ class WrappedLightGbmBoosterClassifier(ClassifierMixin):
             "booster_",
             "n_features_",
             "objective_",
-            "boosting_type",
             "n_features_in_",
             "n_features_out_",
         }:

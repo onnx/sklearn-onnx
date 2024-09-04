@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's tfidf converter.
 """
+
 import unittest
 import copy
 import sys
@@ -181,7 +182,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
             corpus[2:],
             vect,
             model_onnx,
-            basename="SklearnTfidfVectorizer11EmptyStringSepCase1-" "OneOff-SklCol",
+            basename="SklearnTfidfVectorizer11EmptyStringSepCase1-OneOff-SklCol",
             backend=BACKEND,
         )
 

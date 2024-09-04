@@ -33,6 +33,7 @@ Data
 
 A simple example.
 """
+
 from onnx.defs import onnx_opset_version
 from skl2onnx import to_onnx
 import numpy

@@ -8,7 +8,7 @@ try:
 except ImportError:
 
     def _deprecate_positional_args(x):
-        return x  # noqa
+        return x
 
 
 class ReplaceTransformer(TransformerMixin, BaseEstimator):
@@ -21,7 +21,7 @@ class ReplaceTransformer(TransformerMixin, BaseEstimator):
     from_value : value to replace
     to_value : new value
     dtype: dtype of replaced values
-    """  # noqa
+    """
 
     @_deprecate_positional_args
     def __init__(self, *, from_value=0, to_value=np.nan, dtype=np.float32):
@@ -36,7 +36,7 @@ class ReplaceTransformer(TransformerMixin, BaseEstimator):
                 # implicit
                 return a
             raise RuntimeError(
-                "Unable to replace 0 by nan one value by another " "in sparse matrix."
+                "Unable to replace 0 by nan one value by another in sparse matrix."
             )
         return np.where(a == self.from_value, self.to_value, a)
 

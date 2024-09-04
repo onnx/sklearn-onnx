@@ -19,6 +19,7 @@ a *LGBMClassifier*. Let's see how to do it.
 Train a LightGBM classifier
 +++++++++++++++++++++++++++
 """
+
 import lightgbm
 import onnxmltools
 import skl2onnx
@@ -32,10 +33,10 @@ from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
-)  # noqa
+)
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm,
-)  # noqa
+)
 import onnxmltools.convert.common.data_types
 from skl2onnx.common.data_types import FloatTensorType
 import numpy

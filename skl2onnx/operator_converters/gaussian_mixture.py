@@ -222,14 +222,13 @@ def convert_sklearn_gaussian_mixture(
     if add_score and len(out) != 3:
         raise RuntimeError("3 outputs are expected.")
 
-    if X.type is not None:
-        if X.type.shape[1] != op.means_.shape[1]:
-            raise RuntimeError(
-                "Dimension mismath between expected number of features {} "
-                "and ONNX graphs expectations {}.".format(
-                    op.means_.shape[1], X.type.shape[1]
-                )
+    if X.type is not None and X.type.shape[1] != op.means_.shape[1]:
+        raise RuntimeError(
+            "Dimension mismath between expected number of features {} "
+            "and ONNX graphs expectations {}.".format(
+                op.means_.shape[1], X.type.shape[1]
             )
+        )
     n_features = op.means_.shape[1]
 
     # All comments come from scikit-learn code and tells

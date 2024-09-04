@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
 import onnxruntime as ort
-from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
+from skl2onnx.algebra.onnx_ops import OnnxPad
 
 
 class TestOnnxOperatorsOpset(unittest.TestCase):

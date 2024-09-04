@@ -126,7 +126,7 @@ def convert_sklearn_gradient_boosting_classifier(
         [operator.outputs[0].full_name, operator.outputs[1].full_name],
         op_domain=op_domain,
         op_version=op_version,
-        **attrs
+        **attrs,
     )
 
 
@@ -210,7 +210,7 @@ def convert_sklearn_gradient_boosting_regressor(
         operator.output_full_names,
         op_domain=op_domain,
         op_version=op_version,
-        **attrs
+        **attrs,
     )
 
 

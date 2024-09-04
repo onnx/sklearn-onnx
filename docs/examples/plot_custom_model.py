@@ -40,6 +40,7 @@ And to predict on a test set:
 * k nearest neightbours, :math:`f(X') \\rightarrow X'_3`
 * final normalization, simple scaling :math:`X'_3 \\rightarrow X'_4`
 """
+
 import inspect
 import os
 import numpy
@@ -69,7 +70,7 @@ class PredictableTSNE(BaseEstimator, TransformerMixin):
         estimator=None,
         normalize=True,
         keep_tsne_outputs=False,
-        **kwargs
+        **kwargs,
     ):
         """
         :param transformer: `TSNE` by default
@@ -280,7 +281,7 @@ plot_embedding(
     X_train_tsne2,
     y_train,
     imgs_train,
-    "Predictable t-SNE of the digits\n" "StandardScaler+KNeighborsRegressor",
+    "Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor",
 )
 
 ################################
@@ -292,7 +293,7 @@ plot_embedding(
     X_test_tsne2,
     y_test,
     imgs_test,
-    "Predictable t-SNE of the digits\n" "StandardScaler+KNeighborsRegressor",
+    "Predictable t-SNE of the digits\nStandardScaler+KNeighborsRegressor",
 )
 
 #######################################
@@ -369,7 +370,7 @@ def predictable_tsne_converter(scope, operator, container):
         [knn_output.onnx_name],
         [output.full_name],
         op_domain="ai.onnx.ml",
-        **attrs
+        **attrs,
     )
 
 

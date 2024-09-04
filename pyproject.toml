@@ -7,13 +7,47 @@ exclude = [
     "dist",
 ]
 
-# Same as Black.
-line-length = 88
+line-length = 93
 
-[tool.ruff.lint.mccabe]
-max-complexity = 10
+[tool.ruff.lint]
+select = [
+    "B", # flake8-bugbear
+    "C4", # flake8-comprehensions
+    #"D", # pydocstyle
+    "E", # pycodestyle
+    "F", # Pyflakes
+    "G", # flake8-logging-format
+    #"I", # isort
+    "ISC", # flake8-implicit-str-concat
+    "LOG", # flake8-logging
+    #"N", # pep8-naming
+    #"NPY", # modern numpy
+    #"PERF", # Perflint
+    "PIE", # flake8-pie
+    "PYI", # flake8-pyi
+    "RUF", # Ruff-specific rules
+    "SIM", # flake8-simplify
+    "SLOT", # flake8-slot
+    "T10", # flake8-debugger
+    #"TID", # Disallow relative imports
+    #"TRY", # flake8-try-except-raise
+    "UP", # pyupgrade
+    "W", # pycodestyle
+    "YTT", # flake8-2020
+]
 
 [tool.ruff.lint.per-file-ignores]
+"**" = ["C413", "C408", "C417", "E731", "PIE808", "RUF012", "RUF015", "SIM103", "SIM108", "SIM114", "SIM910", "UP008", "UP015", "UP028", "UP030", "UP031", "UP032"]
+"**/__init__.py" = ["F401"]
+"docs/**" = ["B018", "E402"]
 "skl2onnx/algebra/onnx_ops.py" = ["F821"]
-"skl2onnx/common/data_types.py" = ["E721"]
-"tests/**.py" = ["E721"]
+"skl2onnx/common/_apply_operation.py" = ["F403", "F405"]
+"tests/**" = [
+    "B007", "B019", "B028", "B904",
+    "C401", "C403", "C405", "C406", "C408", "C413", "C416", "C417",
+    "PIE808", "PIE810",
+    "RUF005", "RUF012", "RUF010", "RUF015",
+    "SIM102", "SIM105", "SIM113", "SIM114", "SIM118", "SIM300",
+    "UP015", "UP018", "UP028", "UP030", "UP031", "UP032"
+]
+"tests_onnxmltools/**" = ["B028", "B904", "C403", "C408", "C413", "C417", "PIE808", "PIE810", "RUF010", "RUF015", "SIM102", "SIM105", "SIM118", "UP015", "UP028", "UP030", "UP031", "UP032"]

@@ -102,7 +102,7 @@ class TestInvestigate(unittest.TestCase):
         model.transform(data)
         all_models = list(enumerate_pipeline_models(model))
 
-        for ind, step, last in all_models:
+        for ind, step, _last in all_models:
             if ind == (0,):
                 # whole pipeline
                 continue

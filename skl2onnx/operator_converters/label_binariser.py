@@ -22,7 +22,7 @@ def convert_sklearn_label_binariser(
         and binariser_op.y_type_ == "multilabel-indicator"
     ):
         if binariser_op.pos_label != 1:
-            raise RuntimeError("pos_label != 1 is not supported " "for LabelBinarizer.")
+            raise RuntimeError("pos_label != 1 is not supported for LabelBinarizer.")
         if list(classes) != list(range(len(classes))):
             raise RuntimeError(
                 "classes != [0, 1, ..., n_classes] is not "

@@ -4,6 +4,7 @@
 """
 Tests scikit-learn's TfidfTransformer converter.
 """
+
 import unittest
 import numpy
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer

@@ -3,6 +3,7 @@
 """
 Tests scikit-normalizer converter.
 """
+
 import unittest
 import numpy
 from sklearn.preprocessing import Normalizer

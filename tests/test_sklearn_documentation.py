@@ -3,6 +3,7 @@
 """
 Tests examples from scikit-learn documentation.
 """
+
 import sys
 import unittest
 import urllib.error

@@ -3,4 +3,4 @@
 
 # skl2onnx common code has been refactored into onnxconverter-common.
 
-from .exceptions import MissingShapeCalculator, MissingConverter  # noqa
+from .exceptions import MissingShapeCalculator, MissingConverter

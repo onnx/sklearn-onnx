@@ -20,10 +20,9 @@ class RegisteredConverter:
             len(args) == 3
             and hasattr(args[2], "_get_allowed_options")
             and hasattr(args[1], "raw_operator")
-        ):
+        ) and args[1].raw_operator is not None:
             # Checks that the user did not specify a wrong option.
-            if args[1].raw_operator is not None:
-                args[2]._get_allowed_options(args[1].raw_operator)
+            args[2]._get_allowed_options(args[1].raw_operator)
         return self._fct(*args)
 
     def get_allowed_options(self):
@@ -56,7 +55,7 @@ def register_converter(
     if conversion_function is None:
         raise ValueError("A converter cannot be None for %r." % operator_name)
     if not overwrite and operator_name in _converter_pool:
-        raise ValueError("We do not overwrite registered converter " "by default")
+        raise ValueError("We do not overwrite registered converter by default")
     if len(_converter_pool) > 0:
         key = next(iter(_converter_pool))
         check_signature(
@@ -89,9 +88,7 @@ def register_shape_calculator(operator_name, calculator_function, overwrite=Fals
     if calculator_function is None:
         raise ValueError("A shape calculator cannot be None for %r." % operator_name)
     if not overwrite and operator_name in _shape_calculator_pool:
-        raise ValueError(
-            "We do not overwrite registrated shape calculator " "by default"
-        )
+        raise ValueError("We do not overwrite registrated shape calculator by default")
     if calculator_function is not None and len(_shape_calculator_pool) > 0:
         key = next(iter(_shape_calculator_pool))
         check_signature(
@@ -102,6 +99,6 @@ def register_shape_calculator(operator_name, calculator_function, overwrite=Fals
 
 def get_shape_calculator(operator_name):
     if operator_name not in _shape_calculator_pool:
-        msg = "Unsupported shape calculator for operator " "'%s'." % operator_name
+        msg = "Unsupported shape calculator for operator '%s'." % operator_name
         raise ValueError(msg)
     return _shape_calculator_pool[operator_name]

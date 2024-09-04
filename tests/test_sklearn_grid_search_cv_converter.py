@@ -169,7 +169,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGridSearchGaussianRegressionFloat" "-OneOffArray-Dec4",
+            basename="SklearnGridSearchGaussianRegressionFloat-OneOffArray-Dec4",
         )
 
     @unittest.skipIf(
@@ -191,7 +191,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             X.astype(np.float64),
             model,
             model_onnx,
-            basename="SklearnGridSearchGaussianRegressionDouble" "-OneOffArray-Dec4",
+            basename="SklearnGridSearchGaussianRegressionDouble-OneOffArray-Dec4",
         )
 
     def test_grid_search_binary_float_nozipmap(self):

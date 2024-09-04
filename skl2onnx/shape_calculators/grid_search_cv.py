@@ -11,7 +11,7 @@ def convert_sklearn_grid_search_cv(operator):
     name = sklearn_operator_name_map.get(type(best_estimator), None)
     if name is None:
         logger = logging.getLogger("skl2onnx")
-        logger.warn(
+        logger.warning(
             "[convert_sklearn_grid_search_cv] failed to find alias "
             "to model type %r.",
             type(best_estimator),

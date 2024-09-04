@@ -21,6 +21,7 @@ Train a model
 A very basic example using *GaussianProcessRegressor*
 on the Boston dataset.
 """
+
 import pprint
 import numpy
 import sklearn

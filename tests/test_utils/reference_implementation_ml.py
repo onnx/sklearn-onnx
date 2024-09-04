@@ -51,7 +51,7 @@ if 19 >= onnx_opset_version() >= 18:
                 _meth = FusedMatMul._fmatmul11 if transB else FusedMatMul._fmatmul10
             else:
                 _meth = FusedMatMul._fmatmul01 if transB else FusedMatMul._fmatmul00
-            _meth = lambda a, b: _meth(a, b, alpha)  # noqa
+            _meth = lambda a, b: _meth(a, b, alpha)
             # more recent versions of the operator
             if transBatchA is None:
                 transBatchA = 0
@@ -220,7 +220,7 @@ if 19 >= onnx_opset_version() >= 18:
                 raise RuntimeError("No encoding was defined.")
 
             shape = x.shape
-            new_shape = shape + (len(classes_),)
+            new_shape = (*shape, len(classes_))
             res = np.zeros(new_shape, dtype=np.float32)
             if len(x.shape) == 1:
                 for i, v in enumerate(x):

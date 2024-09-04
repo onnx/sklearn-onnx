@@ -11,7 +11,7 @@ except ImportError:
         return NP_TYPE_TO_TENSOR_TYPE[dtype]
 
 
-from onnxconverter_common.onnx_ops import *  # noqa
+from onnxconverter_common.onnx_ops import *
 from ..proto import onnx_proto
 
 
@@ -64,7 +64,7 @@ def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
                     keepdims=1,
                     name=scope.get_unique_operator_name("ReduceSum"),
                 )
-            apply_div(  # noqa
+            apply_div(
                 scope,
                 [input, norm],
                 output,
@@ -98,7 +98,7 @@ def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
             container.add_node(
                 "Sqrt", [norm], norm2, name=scope.get_unique_operator_name("Sqrt")
             )
-            apply_div(  # noqa
+            apply_div(
                 scope,
                 [input, norm2],
                 output,

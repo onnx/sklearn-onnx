@@ -3,6 +3,7 @@
 """
 Extension for sphinx.
 """
+
 from importlib import import_module
 import sphinx
 from docutils import nodes
@@ -34,7 +35,7 @@ def skl2onnx_version_role(
         version = "v" + onnxruntime.__version__
     else:
         raise RuntimeError(
-            "skl2onnx_version_role cannot interpret content '{0}'." "".format(text)
+            "skl2onnx_version_role cannot interpret content '{0}'.".format(text)
         )
     node = nodes.literal(version)
     return [node], []

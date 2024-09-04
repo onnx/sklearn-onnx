@@ -76,11 +76,11 @@ def _fetch_input_slice(scope, inputs, column_indices):
         raise TypeError("Parameter inputs must be a list.")
     if len(inputs) == 0:
         raise RuntimeError(
-            "Operator ArrayFeatureExtractor requires at " "least one inputs."
+            "Operator ArrayFeatureExtractor requires at least one inputs."
         )
     if len(inputs) != 1:
         raise RuntimeError(
-            "Operator ArrayFeatureExtractor does not support " "multiple input tensors."
+            "Operator ArrayFeatureExtractor does not support multiple input tensors."
         )
     if (
         isinstance(inputs[0].type, TensorType)
@@ -117,11 +117,11 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None, alias
     # alias can be None
     if isinstance(model, str):
         raise RuntimeError(
-            "Parameter model must be an object not a " "string '{0}'.".format(model)
+            "Parameter model must be an object not a string '{0}'.".format(model)
         )
     if any(not isinstance(i, Variable) for i in inputs):
         raise TypeError(
-            "One input is not a Variable for model %r - %r." "" % (model, inputs)
+            "One input is not a Variable for model %r - %r." % (model, inputs)
         )
     if alias is None:
         alias = _get_sklearn_operator_name(type(model))
@@ -140,6 +140,7 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None, alias
                     "The parser signature should parser(scope=None, "
                     "inputs=None)." % (parser_names, e, type(model)),
                     DeprecationWarning,
+                    stacklevel=0,
                 )
                 names = parser_names()
             if names is not None:
@@ -565,6 +566,7 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs, custom_parsers=
             "Set option zipmap to False to "
             "remove this message." % type(model),
             UserWarning,
+            stacklevel=0,
         )
     alias = _get_sklearn_operator_name(type(model))
     this_operator = scope.declare_local_operator(alias, model)
@@ -574,10 +576,9 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs, custom_parsers=
         classes = model.classes_
     else:
         classes = [get_label_classes(scope, m) for m in model.estimators_]
-    if len(set(cl.dtype for cl in classes)) != 1:
+    if len({cl.dtype for cl in classes}) != 1:
         raise RuntimeError(
-            "Class labels may have only one type %r."
-            "" % set(cl.dtype for cl in classes)
+            "Class labels may have only one type %r." % {cl.dtype for cl in classes}
         )
     if classes[0].dtype in (np.int32, np.int64, np.bool_):
         ctype = Int64TensorType
@@ -600,7 +601,7 @@ def _parse_sklearn_multi_output_classifier(scope, model, inputs, custom_parsers=
             "class_labels", SequenceType(ctype())
         )
         clout.outputs.append(class_labels)
-        return list(this_operator.outputs) + [class_labels]
+        return [*this_operator.outputs, class_labels]
 
     return this_operator.outputs
 

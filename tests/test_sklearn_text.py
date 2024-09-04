@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import unittest
 import packaging.version as pv
 import numpy

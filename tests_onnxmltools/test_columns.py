@@ -12,14 +12,10 @@ from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import update_registered_converter, convert_sklearn
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
-)  # noqa
+)
 from skl2onnx._parse import _parse_sklearn_classifier
-from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
-    convert_lightgbm,
-)  # noqa
-from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
-    convert_xgboost,
-)  # noqa
+from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
+from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 
 try:
     from test_utils import fit_classification_model

@@ -276,7 +276,7 @@ except ImportError:
     # Second verification as these models still require
     # manual activation.
     try:
-        from sklearn.ensemble._hist_gradient_boosting.gradient_boosting import (  # noqa
+        from sklearn.ensemble._hist_gradient_boosting.gradient_boosting import (
             HistGradientBoostingClassifier,
             HistGradientBoostingRegressor,
         )
@@ -543,8 +543,12 @@ def update_registered_converter(
 
     ::
 
-        from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_shapes
-        from skl2onnx.operator_converters.RandomForest import convert_sklearn_random_forest_classifier
+        from skl2onnx.common.shape_calculator import (
+            calculate_linear_classifier_output_shapes,
+        )
+        from skl2onnx.operator_converters.RandomForest import (
+            convert_sklearn_random_forest_classifier,
+        )
         from skl2onnx import update_registered_converter
         update_registered_converter(
                 SGDClassifier, 'SklearnLinearClassifier',
@@ -558,7 +562,7 @@ def update_registered_converter(
     option `'zipmap'` is added to the list. Every classifier
     must declare this option to let the default parser
     automatically handle that option.
-    """  # noqa
+    """
     if (
         not overwrite
         and model in sklearn_operator_name_map
@@ -566,7 +570,8 @@ def update_registered_converter(
     ):
         warnings.warn(
             "Model '{0}' was already registered under alias "
-            "'{1}'.".format(model, sklearn_operator_name_map[model])
+            "'{1}'.".format(model, sklearn_operator_name_map[model]),
+            stacklevel=0,
         )
     sklearn_operator_name_map[model] = alias
     register_converter(alias, convert_fct, overwrite=overwrite, options=options)
@@ -592,7 +597,7 @@ def _get_sklearn_operator_name(model_type):
     :return: A string which stands for the type of the input model in
              our conversion framework
     """
-    if model_type not in sklearn_operator_name_map:
+    if model_type not in sklearn_operator_name_map:  # noqa: SIM401
         # No proper operator name found, it means a local operator.
         alias = None
     else:

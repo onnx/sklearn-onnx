@@ -159,7 +159,7 @@ class TestAlgebraTestHelper(unittest.TestCase):
             dtypes.append(
                 (np.complex128, Complex128TensorType, onnx_proto.TensorProto.COMPLEX128)
             )
-        for dtype, exp, pt in dtypes:
+        for _dtype, exp, _pt in dtypes:
             nt2 = guess_tensor_type(exp([None, 1]))
             self.assertEqual(nt2.__class__, exp)
 

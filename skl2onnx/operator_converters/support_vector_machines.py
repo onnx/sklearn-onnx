@@ -98,7 +98,7 @@ def convert_sklearn_svm_regressor(
             svm_out,
             op_domain=op_domain,
             op_version=op_version,
-            **svm_attrs
+            **svm_attrs,
         )
         apply_cast(
             scope, svm_out, operator.output_full_names, container, to=proto_dtype
@@ -126,7 +126,7 @@ def convert_sklearn_svm_regressor(
             svm_out0,
             op_domain=op_domain,
             op_version=op_version,
-            **svm_attrs
+            **svm_attrs,
         )
 
         svm_out = operator.output_full_names[1]
@@ -259,7 +259,7 @@ def convert_sklearn_svm_classifier(
             [label_name, svm_out],
             op_domain=op_domain,
             op_version=op_version,
-            **svm_attrs
+            **svm_attrs,
         )
         apply_cast(scope, svm_out, probability_tensor_name, container, to=proto_dtype)
         if len(op.classes_) == 2 and use_raw_scores:
@@ -291,7 +291,7 @@ def convert_sklearn_svm_classifier(
 
         if apply_less is None:
             raise RuntimeError(
-                "Function apply_less is missing. " "onnxconverter-common is too old."
+                "Function apply_less is missing. onnxconverter-common is too old."
             )
 
         cst0 = scope.get_unique_variable_name("cst0")
