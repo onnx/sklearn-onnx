@@ -130,11 +130,11 @@ def bench(n_obs, n_features, fit_intercepts, methods, repeat=10, verbose=False):
 
                     # checks that both produce the same outputs
                     if n <= 10000 and len(p1.shape) == 1 and len(p2.shape) == 2:
-                            p2 = p2.ravel()
-                            try:
-                                assert_almost_equal(p1.ravel(), p2.ravel(), decimal=5)
-                            except AssertionError as e:
-                                warnings.warning(str(e))
+                        p2 = p2.ravel()
+                        try:
+                            assert_almost_equal(p1.ravel(), p2.ravel(), decimal=5)
+                        except AssertionError as e:
+                            warnings.warning(str(e))
     return res
 
 
