@@ -188,15 +188,22 @@ print(predict_with_onnxruntime(onx, X))
 
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
-pydot_graph = GetPydotGraph(
-    onx.graph,
-    name=onx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_onnx_mixin.dot")
+try:
+    pydot_graph = GetPydotGraph(
+        onx.graph,
+        name=onx.graph.name,
+        rankdir="TB",
+        node_producer=GetOpNodeProducer(
+            "docstring", color="yellow", fillcolor="yellow", style="filled"
+        ),
+    )
+    pydot_graph.write_dot("pipeline_onnx_mixin.dot")
+except AssertionError:
+    print("GetPydotGraph failed to produce a valid DOT graph. Trying something else.")
+    from onnx_array_api.plotting.dot_plot import to_dot
+
+    with open("pipeline_onnx_mixin.dot", "w", encoding="utf-8") as f:
+        f.write(to_dot(onx))
 
 import os
 
