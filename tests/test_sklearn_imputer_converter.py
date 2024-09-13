@@ -51,6 +51,15 @@ class TestSklearnImputerConverter(unittest.TestCase):
         exp = model.transform(data)
         assert_almost_equal(res, exp)
 
+    def _check_outputs_floats(self, model, model_onnx, data):
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        idata = {"input": np.array(data).astype(np.float32)}
+        res = sess.run(None, idata)[0]
+        exp = model.transform(data)
+        assert_almost_equal(res, exp)
+
     def _check_outputs_strings(self, model, model_onnx, data, verbose=0):
         idata = {"input": np.array(data).astype(np.str_)}
         sess = InferenceSession(
@@ -203,6 +212,140 @@ class TestSklearnImputerConverter(unittest.TestCase):
         )
         self.assertIn("ai.onnx.ml", str(model_onnx))
         self.assertTrue(model_onnx.graph.node is not None)
+        self.assertEqual(len(model_onnx.graph.output), 1)
+        self._check_outputs_strings(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_float_constant_default_fill_value(self):
+        model = SimpleImputer(strategy="constant")
+        data = [[1, 2], [np.nan, 3], [7, 6]]
+        model.fit(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn simple imputer",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx.graph.node)
+
+        # should contain only node
+        self.assertEqual(len(model_onnx.graph.node), 1)
+
+        # last node should contain the Imputer
+        outputs = model_onnx.graph.output
+        self.assertEqual(len(outputs), 1)
+        self._check_outputs_floats(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_float_constant_provided_fill_value(self):
+        model = SimpleImputer(strategy="constant", fill_value=99.0)
+        data = [[1, 2], [np.nan, 3], [7, 6]]
+        model.fit(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn simple imputer",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx.graph.node)
+
+        # should contain only node
+        self.assertEqual(len(model_onnx.graph.node), 1)
+
+        # last node should contain the Imputer
+        outputs = model_onnx.graph.output
+        self.assertEqual(len(outputs), 1)
+        self._check_outputs_floats(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_int_constant_default_fill_value(self):
+        model = SimpleImputer(strategy="constant")
+        data = [[1, 2], [np.nan, 3], [7, 6], [8, np.nan]]
+        model.fit(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn simple imputer",
+            [("input", Int64TensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx.graph.node)
+
+        # should contain only node
+        self.assertEqual(len(model_onnx.graph.node), 1)
+
+        # last node should contain the Imputer
+        outputs = model_onnx.graph.output
+        self.assertEqual(len(outputs), 1)
+        self._check_outputs_ints(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_int_constant_provided_fill_value(self):
+        model = SimpleImputer(strategy="constant", fill_value=99)
+        data = [[1, 2], [np.nan, 3], [7, 6], [8, np.nan]]
+        model.fit(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn simple imputer",
+            [("input", Int64TensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx.graph.node)
+
+        # should contain only node
+        self.assertEqual(len(model_onnx.graph.node), 1)
+
+        # last node should contain the Imputer
+        outputs = model_onnx.graph.output
+        self.assertEqual(len(outputs), 1)
+        self._check_outputs_ints(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    @unittest.skipIf(
+        pv.Version(skl_ver) < pv.Version("0.24"),
+        reason="SimpleImputer does not support strings",
+    )
+    def test_simple_imputer_string_inputs_constant_provided_fill_value(self):
+        model = SimpleImputer(
+            strategy="constant", missing_values="", fill_value="missing"
+        )
+        data = pd.DataFrame(
+            [["s1", "s2"], ["s1", "s2"], ["", "s3"], ["s7", "s6"], ["s8", ""]]
+        )
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn simple imputer",
+            [("input", StringTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIn("ai.onnx.ml", str(model_onnx))
+        self.assertIsNotNone(model_onnx.graph.node)
+        self.assertEqual(len(model_onnx.graph.output), 1)
+        self._check_outputs_strings(model, model_onnx, data)
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    @unittest.skipIf(
+        pv.Version(skl_ver) < pv.Version("0.24"),
+        reason="SimpleImputer does not support strings",
+    )
+    def test_simple_imputer_string_inputs_constant_default_fill_value(self):
+        model = SimpleImputer(strategy="constant", missing_values="")
+        data = pd.DataFrame(
+            [["s1", "s2"], ["s1", "s2"], ["", "s3"], ["s7", "s6"], ["s8", ""]]
+        )
+        model.fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn simple imputer",
+            [("input", StringTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIn("ai.onnx.ml", str(model_onnx))
+        self.assertIsNotNone(model_onnx.graph.node)
         self.assertEqual(len(model_onnx.graph.output), 1)
         self._check_outputs_strings(model, model_onnx, data)
 
