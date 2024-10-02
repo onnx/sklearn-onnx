@@ -277,6 +277,8 @@ class TestInvestigate(unittest.TestCase):
         from numpy.testing import assert_almost_equal
         import pandas as pd
         from sklearn.linear_model import LogisticRegression
+        from sklearn.tree import DecisionTreeClassifier
+        from sklearn.ensemble import RandomForestClassifier
         import skl2onnx
         from onnxruntime import InferenceSession
 
@@ -286,7 +288,7 @@ class TestInvestigate(unittest.TestCase):
             "float_column": np.random.rand(10).astype(np.float64),
             "int_column": np.random.randint(0, 100, size=10).astype(np.int64),
         }
-        x = pd.DataFrame(data)
+        x_ = pd.DataFrame(data)
         y = np.random.binomial(1, 0.5, size=10)
 
         # Create a test dataset with 10 rows
@@ -294,22 +296,34 @@ class TestInvestigate(unittest.TestCase):
             "float_column": np.random.rand(10).astype(np.float64),
             "int_column": np.random.randint(0, 100, size=10).astype(np.int64),
         }
-        x_test = pd.DataFrame(test_data)
+        x_test_ = pd.DataFrame(test_data)
 
-        # Select and train a model
-        model = LogisticRegression()
-        model.fit(x, y)
-        # Take predictions and probabilities with sklearn
-        sklearn_preds = model.predict(x_test)
-        sklearn_probs = model.predict_proba(x_test)
+        for cls in [LogisticRegression, DecisionTreeClassifier, RandomForestClassifier]:
+            with self.subTest(cls=cls):
+                # Select and train a model
+                if cls == LogisticRegression:
+                    x = x_.astype(np.float64)
+                    x_test = x_test_.astype(np.float64)
+                    decimal = 10
+                else:
+                    x = x_.astype(np.float32)
+                    x_test = x_test_.astype(np.float32)
+                    decimal = 4
+                model = cls()
+                model.fit(x, y)
+                # Take predictions and probabilities with sklearn
+                sklearn_preds = model.predict(x_test)
+                sklearn_probs = model.predict_proba(x_test)
 
-        # Convert the model to ONNX
-        onnx_model = skl2onnx.to_onnx(model, x.values, options={"zipmap": False})
-        # Take predictions and probabilities with ONNX
-        sess = InferenceSession(onnx_model.SerializeToString())
-        onnx_prediction = sess.run(None, {"X": x_test.to_numpy()})
-        assert_almost_equal(sklearn_probs, onnx_prediction[1])
-        assert_almost_equal(sklearn_preds, onnx_prediction[0])
+                # Convert the model to ONNX
+                onnx_model = skl2onnx.to_onnx(
+                    model, x.values, options={"zipmap": False}
+                )
+                # Take predictions and probabilities with ONNX
+                sess = InferenceSession(onnx_model.SerializeToString())
+                onnx_prediction = sess.run(None, {"X": x_test.to_numpy()})
+                assert_almost_equal(sklearn_probs, onnx_prediction[1], decimal=decimal)
+                assert_almost_equal(sklearn_preds, onnx_prediction[0])
 
 
 if __name__ == "__main__":
