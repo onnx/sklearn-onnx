@@ -271,6 +271,46 @@ class TestInvestigate(unittest.TestCase):
                 )
                 assert modelengine is not None
 
+    def test_issue_1129_lr(self):
+
+        import numpy as np
+        from numpy.testing import assert_almost_equal
+        import pandas as pd
+        from sklearn.linear_model import LogisticRegression
+        import skl2onnx
+        from onnxruntime import InferenceSession
+
+        # Create a small dataframe with 10 rows and 2 columns
+        np.random.seed(0)
+        data = {
+            "float_column": np.random.rand(10).astype(np.float64),
+            "int_column": np.random.randint(0, 100, size=10).astype(np.int64),
+        }
+        x = pd.DataFrame(data)
+        y = np.random.binomial(1, 0.5, size=10)
+
+        # Create a test dataset with 10 rows
+        test_data = {
+            "float_column": np.random.rand(10).astype(np.float64),
+            "int_column": np.random.randint(0, 100, size=10).astype(np.int64),
+        }
+        x_test = pd.DataFrame(test_data)
+
+        # Select and train a model
+        model = LogisticRegression()
+        model.fit(x, y)
+        # Take predictions and probabilities with sklearn
+        sklearn_preds = model.predict(x_test)
+        sklearn_probs = model.predict_proba(x_test)
+
+        # Convert the model to ONNX
+        onnx_model = skl2onnx.to_onnx(model, x.values, options={"zipmap": False})
+        # Take predictions and probabilities with ONNX
+        sess = InferenceSession(onnx_model.SerializeToString())
+        onnx_prediction = sess.run(None, {"X": x_test.to_numpy()})
+        assert_almost_equal(sklearn_probs, onnx_prediction[1])
+        assert_almost_equal(sklearn_preds, onnx_prediction[0])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
