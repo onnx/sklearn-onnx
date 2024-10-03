@@ -320,7 +320,9 @@ class TestInvestigate(unittest.TestCase):
                     model, x.values, options={"zipmap": False}
                 )
                 # Take predictions and probabilities with ONNX
-                sess = InferenceSession(onnx_model.SerializeToString())
+                sess = InferenceSession(
+                    onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+                )
                 onnx_prediction = sess.run(None, {"X": x_test.to_numpy()})
                 assert_almost_equal(sklearn_probs, onnx_prediction[1], decimal=decimal)
                 assert_almost_equal(sklearn_preds, onnx_prediction[0])
