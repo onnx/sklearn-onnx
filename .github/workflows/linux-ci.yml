@@ -7,16 +7,16 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        sklearn_version: ['==1.5.0', '==1.4.2', '==1.3.2', '==1.2.2', '==1.1.3']
+        sklearn_version: ['==1.5.2', '==1.4.2', '==1.3.2', '==1.2.2', '==1.1.3']
         include:
-          - sklearn_version: '==1.5.0'
+          - sklearn_version: '==1.5.2'
             documentation: 1
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
-            onnx_version: 'onnx>=1.16.0'
-            onnxrt_version: 'onnxruntime>=1.19.0'
+            onnx_version: 'onnx>=1.17.0'
+            onnxrt_version: 'onnxruntime>=1.19.2'
             python_version: '3.11'
-          - sklearn_version: '==1.5.0'
+          - sklearn_version: '==1.5.2'
             documentation: 0
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
