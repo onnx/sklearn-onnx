@@ -468,7 +468,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                     "Sparse matrices require SparseTensorProto. Update onnx."
                 )
             values_tensor = make_tensor(
-                name + "_v",
+                name,
                 data_type=onnx_type,
                 dims=(len(content.data),),
                 vals=content.data,
@@ -543,14 +543,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
             cached_name = self.initializers_strings.get(content, None)
             if cached_name is None:
                 self.initializers_strings[content] = name
-                self.add_node(
-                    "Constant",
-                    [],
-                    [name],
-                    sparse_value=sparse_tensor,
-                    op_version=self.target_opset,
-                    name=name + "_op",
-                )
+                self.initializers.append(sparse_tensor)
                 return sparse_tensor
 
             self.add_node(
@@ -869,8 +862,10 @@ class ModelComponentContainer(_WhiteBlackContainer):
             name = inp.name
             order[name] = 0
         for inp in self.initializers:
-            name = inp.name
+            name = inp.name if hasattr(inp, "name") else inp.values.name
             order[name] = 0
+            print("#", type(inp), name)
+        print("---", order)
 
         n_iter = 0
         missing_ops = []
@@ -888,6 +883,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                     else:
                         maxi = None
                         missing_names.add(name)
+                        print("***", name, order, node.input)
                         break
                 if maxi is None:
                     missing_ops.append(node)
