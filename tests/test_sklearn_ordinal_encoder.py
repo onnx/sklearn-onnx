@@ -257,7 +257,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
-        
+
     @unittest.skipIf(
         not ordinal_encoder_support(),
         reason="OrdinalEncoder was not available before 0.20",
@@ -267,9 +267,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
 
         model = OrdinalEncoder(encoded_missing_value=42)
         data = np.array([["a"], ["b"], ["c"], ["d"]], dtype=np.object_)
-        
+
         expected = model.fit_transform(data)
-        
+
         model_onnx = convert_sklearn(
             model,
             "scikit-learn ordinal encoder",
@@ -278,7 +278,10 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
-            data, model, model_onnx, basename="SklearnOrdinalEncoderEncodedMissingValueNoNan"
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOrdinalEncoderEncodedMissingValueNoNan",
         )
 
         sess = InferenceSession(
