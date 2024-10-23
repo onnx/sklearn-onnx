@@ -5,9 +5,9 @@
 Convert a pipeline
 ==================
 
-*skl2onnx* converts any machine learning pipeline into
-*ONNX* pipelines. Every transformer or predictors is converted
-into one or multiple nodes into the *ONNX* graph.
+*skl2onnx* converts any machine learning pipeline into an
+*ONNX* pipeline. Every transformer or predictor is converted
+into one or multiple nodes in the *ONNX* graph.
 Any `ONNX backend <https://github.com/onnx/onnx/blob/main/docs/ImplementingAnOnnxBackend.md>`_
 can then use this graph to compute equivalent outputs for the same inputs.
 
@@ -17,8 +17,8 @@ Convert complex pipelines
 =========================
 
 *scikit-learn* introduced
-`ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_
-useful to build complex pipelines such as the following one:
+`ColumnTransformer <https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html>`_,
+useful for building complex pipelines such as the following one:
 
 ::
 
@@ -56,7 +56,7 @@ useful to build complex pipelines such as the following one:
         ('classifier', classifier)
     ])
 
-Which we can represents as:
+Which we can represent as:
 
 .. blockdiag::
 
@@ -112,15 +112,15 @@ Parser, shape calculator, converter
 
 .. index:: parser, shape calculator, converter
 
-Three kinds of functions are involved into the conversion
+Three kinds of functions are involved in the conversion
 of a *scikit-pipeline*. Each of them is called in the following
 order:
 
 * **parser(scope, model, inputs, custom_parser)**:
-  the parser builds the expected outputs of a model,
-  as the resulting graph must contain unique names,
-  *scope* contains all names already given,
-  *model* is the model to convert,
+  The parser builds the expected outputs of a model.
+  As the resulting graph must contain unique names,
+  *scope* contains all names already given.
+  *model* is the model to convert.
   *inputs* are the *inputs* the model receives
   in the *ONNX* graph. It is a list of
   :class:`Variable <skl2onnx.common._topology.Variable>`.
@@ -130,12 +130,12 @@ order:
   machine learned problems. The shape calculator
   changes the shapes and types for each of them
   depending on the model and is called after all
-  outputs were defined (topology). This steps defines
+  outputs are defined (topology). This step defines
   the number of outputs and their types for every node
   and sets them to a default shape ``[None, None]``
   which the output node has one row and no known
   columns yet.
-* **shape_calculator(model):**
+* **shape_calculator(model)**:
   The shape calculator changes the shape
   of the outputs created by the parser. Once this function
   returned its results, the graph structure is fully defined
@@ -143,19 +143,19 @@ order:
   not change types. Many runtimes are implemented in C++
   and do not support implicit casts. A change of type
   might make the runtime fail due to a type mismatch
-  between two consecutive nodes produces by two different
+  between two consecutive nodes produced by two different
   converters.
-* **converter(scope, operator, container):**
+* **converter(scope, operator, container)**:
   The converter converts the transformers or predictors into
-  *ONNX* nodes. Each node can an *ONNX*
+  *ONNX* nodes. Each node can be an *ONNX*
   `operator <https://github.com/onnx/onnx/blob/main/docs/Operators.md>`_ or
   `ML operator <https://github.com/onnx/onnx/blob/main/docs/Operators.md>`_ or
   custom *ONNX* operators.
 
 As *sklearn-onnx* may convert pipelines with model coming from other libraries,
 the library must handle parsers, shape calculators or converters coming
-from other packages. This can be done is two ways. The first one
-consists in calling function :func:`convert_sklearn <skl2onnx.convert_sklearn>`
+from other packages. This can be done in two ways. The first one
+consists of calling function :func:`convert_sklearn <skl2onnx.convert_sklearn>`
 by mapping the model type to a specific parser, a specific shape calculator
 or a specific converter. It is possible to avoid these specifications
 by registering the new parser or shape calculator or converter
@@ -169,13 +169,13 @@ One example follows.
 New converters in a pipeline
 ============================
 
-Many libraries implement *scikit-learn* API and their models can
+Many libraries implement the *scikit-learn* API and their models can
 be included in *scikit-learn* pipelines. However, *sklearn-onnx* cannot
-a pipeline which include a model such as *XGBoost* or *LightGbm*
+convert a pipeline which includes a model such as *XGBoost* or *LightGBM*
 if it does not know the corresponding converters: it needs to be registered.
-That's the purpose of function :func:`skl2onnx.update_registered_converter`.
+That's the purpose of the function :func:`skl2onnx.update_registered_converter`.
 The following example shows how to register a new converter or
-or update an existing one. Four elements are registered:
+update an existing one. Four elements are registered:
 
 * the model class
 * an alias, usually the class name prefixed by the library name
@@ -193,8 +193,7 @@ The following lines shows what these four elements are for a random forest:
                                 calculate_linear_classifier_output_shapes,
                                 convert_sklearn_random_forest_classifier)
 
-See example :ref:`example-lightgbm` to see a complete example
-with a *LightGbm* model.
+See :ref:`example-lightgbm` for a complete example with a *LightGBM* model.
 
 Titanic example
 ===============
@@ -202,14 +201,14 @@ Titanic example
 The first example was a simplified pipeline coming from *scikit-learn*'s documentation:
 `Column Transformer with Mixed Types <https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py>`_.
 The full story is available in a runnable example: :ref:`example-complex-pipeline`
-which also shows up some mistakes that a user could come accross
+which also shows some mistakes that a user could come across
 when trying to convert a pipeline.
 
 Parameterize the conversion
 ===========================
 
-Most of the converter do not require specific options
-to convert a *scikit-learn* model. It always produces the same
+Most of the converters do not require specific options
+to convert a *scikit-learn* model and produce the same
 results. However, in some cases, the conversion cannot produce
 a model which returns the exact same results. The user may want
 to optimize the conversion by giving the converter additional
@@ -220,16 +219,16 @@ pipeline. That why the option mechanism was implemented:
 Investigate discrepencies
 =========================
 
-A wrong converter may introduce introduce discrepencies
-in a converter pipeline but it is not alway easy to
+A wrong converter may introduce discrepancies
+in a converted pipeline but it is not always easy to
 isolate the source of the differences. The function
 :func:`collect_intermediate_steps
 <skl2onnx.helpers.collect_intermediate_steps>`
-may then be used to investigate each component independently.
-The following piece of code is extracted from unit test
+may be used to investigate each component independently.
+The following piece of code is taken from unit test
 `test_investigate.py <https://github.com/onnx/sklearn-onnx/
 blob/main/tests/test_investigate.py>`_ and converts
-a pipeline and each of its components independently.
+a pipeline and each of its components independently:
 
 ::
 
