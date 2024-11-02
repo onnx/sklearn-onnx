@@ -244,6 +244,7 @@ from sklearn.preprocessing import (
     LabelEncoder,
     Normalizer,
     OneHotEncoder,
+    TargetEncoder,
 )
 
 try:
@@ -464,6 +465,7 @@ def build_sklearn_operator_name_map():
             StackingRegressor,
             SVC,
             SVR,
+            TargetEncoder,
             TfidfVectorizer,
             TfidfTransformer,
             TruncatedSVD,
@@ -512,6 +514,7 @@ def build_sklearn_operator_name_map():
             SGDRegressor: "SklearnLinearRegressor",
             StandardScaler: "SklearnScaler",
             TheilSenRegressor: "SklearnLinearRegressor",
+            TargetEncoder: "SklearnTargetEncoder",
         }
     )
     if None in res:
@@ -569,8 +572,9 @@ def update_registered_converter(
         and alias != sklearn_operator_name_map[model]
     ):
         warnings.warn(
-            "Model '{0}' was already registered under alias "
-            "'{1}'.".format(model, sklearn_operator_name_map[model]),
+            "Model '{0}' was already registered under alias " "'{1}'.".format(
+                model, sklearn_operator_name_map[model]
+            ),
             stacklevel=0,
         )
     sklearn_operator_name_map[model] = alias
@@ -580,9 +584,7 @@ def update_registered_converter(
         from ._parse import update_registered_parser
 
         update_registered_parser(model, parser)
-    elif options is not None and (
-        "zipmap" in options or "output_class_labels" in options
-    ):
+    elif options is not None and ("zipmap" in options or "output_class_labels" in options):
         from ._parse import _parse_sklearn_classifier, update_registered_parser
 
         update_registered_parser(model, _parse_sklearn_classifier)
