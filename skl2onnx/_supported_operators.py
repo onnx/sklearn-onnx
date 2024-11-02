@@ -244,6 +244,7 @@ from sklearn.preprocessing import (
     LabelEncoder,
     Normalizer,
     OneHotEncoder,
+    TargetEncoder,
 )
 
 try:
@@ -511,6 +512,7 @@ def build_sklearn_operator_name_map():
             RidgeClassifierCV: "SklearnLinearClassifier",
             SGDRegressor: "SklearnLinearRegressor",
             StandardScaler: "SklearnScaler",
+            TargetEncoder: "SklearnTargetEncoder",
             TheilSenRegressor: "SklearnLinearRegressor",
         }
     )

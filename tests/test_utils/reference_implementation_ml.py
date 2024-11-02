@@ -419,3 +419,49 @@ if 19 >= onnx_opset_version() >= 18:
                 return (np.array(res),)
 
             raise TypeError(f"x must be iterable not {type(x)}.")  # pragma: no cover
+
+
+    class TargetEncoder(OpRun):
+        op_domain = "ai.onnx.ml"
+
+        def _run(
+            self,
+            x,
+            default_float=None,
+            default_int64=None,
+            default_string=None,
+            keys_floats=None,
+            keys_int64s=None,
+            keys_strings=None,
+            values_floats=None,
+            values_int64s=None,
+            values_strings=None,
+        ):
+            keys = keys_floats or keys_int64s or keys_strings
+            values = values_floats or values_int64s or values_strings
+            classes = {k: v for k, v in zip(keys, values)}
+            if id(keys) == id(keys_floats):
+                cast = float
+            elif id(keys) == id(keys_int64s):
+                cast = int
+            else:
+                cast = str
+            if id(values) == id(values_floats):
+                defval = default_float
+                dtype = np.float32
+            elif id(values) == id(values_int64s):
+                defval = default_int64
+                dtype = np.int64
+            else:
+                defval = default_string
+                if not isinstance(defval, str):
+                    defval = ""
+                dtype = np.str_
+            shape = x.shape
+            if len(x.shape) > 1:
+                x = x.flatten()
+            res = []
+            for i in range(0, x.shape[0]):
+                v = classes.get(cast(x[i]), defval)
+                res.append(v)
+            return (np.array(res, dtype=dtype).reshape(shape),)

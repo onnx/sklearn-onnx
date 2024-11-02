@@ -47,6 +47,7 @@ from . import sequence
 from . import sgd_oneclass_svm
 from . import svd
 from . import support_vector_machines
+from . import target_encoder
 from . import text_vectorizer
 from . import tuned_threshold_classifier
 from . import tfidf_transformer
@@ -99,6 +100,7 @@ __all__ = [
     sgd_oneclass_svm,
     svd,
     support_vector_machines,
+    target_encoder,
     text_vectorizer,
     tfidf_transformer,
     tuned_threshold_classifier,
