@@ -51,10 +51,7 @@ if 19 >= onnx_opset_version() >= 18:
                 _meth = FusedMatMul._fmatmul11 if transB else FusedMatMul._fmatmul10
             else:
                 _meth = FusedMatMul._fmatmul01 if transB else FusedMatMul._fmatmul00
-
-            def _meth(a, b):
-                return _meth(a, b, alpha)
-
+            _meth = lambda a, b: _meth(a, b, alpha)
             # more recent versions of the operator
             if transBatchA is None:
                 transBatchA = 0
@@ -237,7 +234,9 @@ if 19 >= onnx_opset_version() >= 18:
                         if j >= 0:
                             res[a, i, j] = 1.0
             else:
-                raise RuntimeError(f"This operator is not implemented for shape {x.shape}.")
+                raise RuntimeError(
+                    f"This operator is not implemented for shape {x.shape}."
+                )
 
             if not self.zeros:
                 red = res.sum(axis=len(res.shape) - 1)
@@ -288,8 +287,9 @@ if 19 >= onnx_opset_version() >= 18:
             if len(set(dimensions)) == 1:
                 res = np.concatenate(args, axis=inputdimensions[0])
                 return (res,)
-            raise RuntimeError(f"inputdimensions={
-                               inputdimensions} is not supported yet.")
+            raise RuntimeError(
+                f"inputdimensions={inputdimensions} is not supported yet."
+            )
 
     class Imputer(OpRun):
         op_domain = "ai.onnx.ml"
@@ -390,7 +390,8 @@ if 19 >= onnx_opset_version() >= 18:
                         dict_labels[v] = i
                 if len(dict_labels) == 0:
                     raise RuntimeError(
-                        "int64_vocabulary and string_vocabulary " "cannot be both empty."
+                        "int64_vocabulary and string_vocabulary "
+                        "cannot be both empty."
                     )
 
                 values = []
@@ -417,8 +418,8 @@ if 19 >= onnx_opset_version() >= 18:
                     res.append(x.get(k, 0))
                 return (np.array(res),)
 
-            raise TypeError(f"x must be iterable not {
-                            type(x)}.")  # pragma: no cover
+            raise TypeError(f"x must be iterable not {type(x)}.")  # pragma: no cover
+
 
     class TargetEncoder(OpRun):
         op_domain = "ai.onnx.ml"
