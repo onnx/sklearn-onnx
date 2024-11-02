@@ -58,7 +58,9 @@ class TestSklearnLabelEncoderConverter(unittest.TestCase):
         self.assertTrue(model_onnx.graph.node is not None)
         if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
             raise AssertionError("Incompatbilities")
-        dump_data_and_model(data, model, model_onnx, basename="SklearnLabelEncoderFloat")
+        dump_data_and_model(
+            data, model, model_onnx, basename="SklearnLabelEncoderFloat"
+        )
 
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.3.0"), reason="onnxruntime too old"
