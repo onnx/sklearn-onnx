@@ -205,7 +205,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             [("input", StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             data, model, model_onnx, basename="SklearnOrdinalEncoderUnknownValue"
         )
