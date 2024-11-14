@@ -1,6 +1,6 @@
 """
-Append onnx node to the converted model
-=======================================
+Append onnx nodes to the converted model
+========================================
 
 This example show how to append some onnx nodes to the converted
 model to produce the desired output. In this case, it removes the second
