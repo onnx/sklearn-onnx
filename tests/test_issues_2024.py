@@ -284,7 +284,7 @@ class TestInvestigate(unittest.TestCase):
             Int64TensorType,
             DoubleTensorType,
         )
-        from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
+        from skl2onnx import convert_sklearn, update_registered_converter
         from skl2onnx.common.shape_calculator import (
             calculate_linear_classifier_output_shapes,
         )
@@ -346,7 +346,7 @@ class TestInvestigate(unittest.TestCase):
         X_train["x1"] = X_train["x1"].astype(np.float32)
 
         categorical_features = get_categorical_features(X_train)
-        numeric_features = [f for f in X_train.columns if not f in categorical_features]
+        numeric_features = [f for f in X_train.columns if f not in categorical_features]
 
         preprocessor = ColumnTransformer(
             transformers=[
