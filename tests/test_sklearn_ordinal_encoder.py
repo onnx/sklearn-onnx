@@ -55,7 +55,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             [("input", Int64TensorType([None, 3]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             data, model, model_onnx, basename="SklearnOrdinalEncoderInt64-SkipDim1"
         )
@@ -241,7 +241,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             [("input", StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             data, model, model_onnx, basename="SklearnOrdinalEncoderEncodedMissingValue"
         )
@@ -276,7 +276,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             [("input", StringTensorType([None, 1]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             data,
             model,

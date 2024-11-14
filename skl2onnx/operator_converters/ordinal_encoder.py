@@ -106,8 +106,10 @@ def convert_sklearn_ordinal_encoder(
         if not np.isnan(ordinal_op.encoded_missing_value) and (
             isinstance(categories[-1], float) and np.isnan(categories[-1])
         ):
-            # sklearn always places np.nan as the last entry in its cathegories if it was in the training data
-            # => we simply add the 'ordinal_op.encoded_missing_value' as our last entry in 'values_int64s' if it was in the training data
+            # sklearn always places np.nan as the last entry
+            # in its cathegories if it was in the training data
+            # => we simply add the 'ordinal_op.encoded_missing_value'
+            # as our last entry in 'values_int64s' if it was in the training data
             encoded_missing_value = np.array(
                 [int(ordinal_op.encoded_missing_value)]
             ).astype(np.int64)
