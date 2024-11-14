@@ -379,8 +379,8 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
             target_opset=TARGET_OPSET,
             options={CountVectorizer: {"keep_empty_string": True}},
         )
-        with open("debug.onnx", "wb") as f:
-            f.write(onx.SerializeToString())
+        # with open("debug.onnx", "wb") as f:
+        #     f.write(onx.SerializeToString())
         sess = InferenceSession(
             onx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
