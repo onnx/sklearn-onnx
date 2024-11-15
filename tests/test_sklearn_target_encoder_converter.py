@@ -23,6 +23,7 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 try:
     from sklearn.preprocessing import TargetEncoder
 except ImportError:
+    # Not available for scikit-learn < 1.3
     pass
 
 

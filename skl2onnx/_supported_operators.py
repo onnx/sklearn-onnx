@@ -239,12 +239,17 @@ try:
 except ImportError:
     # not available in 0.19
     KBinsDiscretizer = None
+try:
+    from sklearn.preprocessing import TargetEncoder
+except ImportError:
+    # Not available in scikit-learn < 1.3
+    TargetEncoder = None
+
 from sklearn.preprocessing import (
     LabelBinarizer,
     LabelEncoder,
     Normalizer,
     OneHotEncoder,
-    TargetEncoder,
 )
 
 try:
