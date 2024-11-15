@@ -24,6 +24,12 @@ def convert_sklearn_ordinal_encoder(
     result = []
     input_idx = 0
     dimension_idx = 0
+
+    # handle the 'handle_unknown=use_encoded_value' case
+    default_value = (
+        None if ordinal_op.handle_unknown == "error" else int(ordinal_op.unknown_value)
+    )
+
     for categories in ordinal_op.categories_:
         if len(categories) == 0:
             continue
@@ -82,6 +88,7 @@ def convert_sklearn_ordinal_encoder(
             feature_column = casted_feature_column
 
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
+
         if isinstance(feature_column.type, FloatTensorType):
             attrs["keys_floats"] = np.array(
                 [float(s) for s in categories], dtype=np.float32
@@ -94,7 +101,26 @@ def convert_sklearn_ordinal_encoder(
             attrs["keys_strings"] = np.array(
                 [str(s).encode("utf-8") for s in categories]
             )
-        attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
+
+        # hanlde encoded_missing_value
+        if not np.isnan(ordinal_op.encoded_missing_value) and (
+            isinstance(categories[-1], float) and np.isnan(categories[-1])
+        ):
+            # sklearn always places np.nan as the last entry
+            # in its cathegories if it was in the training data
+            # => we simply add the 'ordinal_op.encoded_missing_value'
+            # as our last entry in 'values_int64s' if it was in the training data
+            encoded_missing_value = np.array(
+                [int(ordinal_op.encoded_missing_value)]
+            ).astype(np.int64)
+            attrs["values_int64s"] = np.concatenate(
+                (np.arange(len(categories) - 1).astype(np.int64), encoded_missing_value)
+            )
+        else:
+            attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
+
+        if default_value:
+            attrs["default_int64"] = default_value
 
         result.append(scope.get_unique_variable_name("ordinal_output"))
         label_encoder_output = scope.get_unique_variable_name("label_encoder")
