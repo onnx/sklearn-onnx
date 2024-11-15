@@ -65,8 +65,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         self.assertTrue(model_onnx.graph.node is not None)
         if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
             raise AssertionError("Incompatbilities")
-        dump_data_and_model(X, model, model_onnx,
-                            basename="SklearnTargetEncoder")
+        dump_data_and_model(X, model, model_onnx, basename="SklearnTargetEncoder")
 
     @unittest.skipIf(
         not target_encoder_support(),
@@ -89,8 +88,9 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         self.assertTrue(model_onnx.graph.node is not None)
         if model_onnx.ir_version >= 7 and TARGET_OPSET < 12:
             raise AssertionError("Incompatbilities")
-        dump_data_and_model(X_test, model, model_onnx,
-                            basename="SklearnTargetEncoderInt")
+        dump_data_and_model(
+            X_test, model, model_onnx, basename="SklearnTargetEncoderInt"
+        )
 
     @unittest.skipIf(
         not target_encoder_support(),
@@ -121,8 +121,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
     def test_target_encoder_pipeline_int64(self):
         from onnxruntime import InferenceSession
 
-        data = pd.DataFrame(
-            {"cat": ["cat2", "cat1"] * 10, "num": [0, 1, 1, 0] * 5})
+        data = pd.DataFrame({"cat": ["cat2", "cat1"] * 10, "num": [0, 1, 1, 0] * 5})
         data["num"] = data["num"].astype(np.float32)
         y = np.array([0, 1, 0, 1] * 5, dtype=np.float32)
         # target encoder uses cross-fitting and have cv=5 as default, which

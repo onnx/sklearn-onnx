@@ -420,7 +420,6 @@ if 19 >= onnx_opset_version() >= 18:
 
             raise TypeError(f"x must be iterable not {type(x)}.")  # pragma: no cover
 
-
     class TargetEncoder(OpRun):
         op_domain = "ai.onnx.ml"
 

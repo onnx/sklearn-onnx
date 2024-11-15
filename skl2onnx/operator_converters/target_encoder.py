@@ -59,11 +59,17 @@ def convert_sklearn_target_encoder(
 
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
         if isinstance(feature_column.type, FloatTensorType):
-            attrs["keys_floats"] = np.array([float(s) for s in categories], dtype=np.float32)
+            attrs["keys_floats"] = np.array(
+                [float(s) for s in categories], dtype=np.float32
+            )
         elif isinstance(feature_column.type, Int64TensorType):
-            attrs["keys_int64s"] = np.array([int(s) for s in categories], dtype=np.int64)
+            attrs["keys_int64s"] = np.array(
+                [int(s) for s in categories], dtype=np.int64
+            )
         else:
-            attrs["keys_strings"] = np.array([str(s).encode("utf-8") for s in categories])
+            attrs["keys_strings"] = np.array(
+                [str(s).encode("utf-8") for s in categories]
+            )
         attrs["values_floats"] = encodings
         attrs["default_float"] = op.target_mean_
 
