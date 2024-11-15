@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-import copy
 from ..common._registration import register_shape_calculator
 from ..common.data_types import FloatTensorType
 from ..common.data_types import Int64TensorType, StringTensorType

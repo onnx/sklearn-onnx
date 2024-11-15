@@ -75,7 +75,6 @@ def convert_sklearn_target_encoder(
             feature_column.onnx_name,
             label_encoder_output,
             op_domain="ai.onnx.ml",
-            op_version=2,
             **attrs,
         )
         apply_reshape(
