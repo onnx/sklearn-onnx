@@ -257,6 +257,7 @@ from sklearn.preprocessing import (
     MaxAbsScaler,
     MinMaxScaler,
     PolynomialFeatures,
+    QuantileTransformer,
     RobustScaler,
     StandardScaler,
 )
@@ -441,6 +442,7 @@ def build_sklearn_operator_name_map():
             PolynomialFeatures,
             PowerTransformer,
             QuadraticDiscriminantAnalysis,
+            QuantileTransformer,
             RadiusNeighborsClassifier,
             RadiusNeighborsRegressor,
             RandomForestClassifier,
