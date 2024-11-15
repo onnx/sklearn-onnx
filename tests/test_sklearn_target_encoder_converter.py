@@ -253,7 +253,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
 
         model.fit(X, y)
         with self.assertRaises(NotImplementedError):
-            model_onnx = convert_sklearn(
+            convert_sklearn(
                 model,
                 "scikit-learn label encoder",
                 [("input", Int64TensorType([None, X.shape[1]]))],
