@@ -1,5 +1,9 @@
 # Change Logs
 
+## 1.19.0
+
+In progress.
+
 ## 1.18.0
 
 * Converter for OneHotEncoder does not add a concat operator if not needed,
@@ -9,6 +13,17 @@
   [#1109](https://github.com/onnx/sklearn-onnx/pull/1109)  
 * Add converter for TunedThresholdClassifierCV,
   [#1107](https://github.com/onnx/sklearn-onnx/pull/1107)
+* Update and Fix documentation
+  [#1113](https://github.com/onnx/sklearn-onnx/pull/1113)
+* Support fill_value for SimpleImputer with string data
+  [#1123](https://github.com/onnx/sklearn-onnx/pull/1123)
+* Remove unnecessary options for Regressor
+  [#1124](https://github.com/onnx/sklearn-onnx/pull/1124)
+* OrdinalEncoder handle encoded_missing_value and unknown_value
+  [#1132](https://github.com/onnx/sklearn-onnx/pull/1132)
+* Create output_onnx_single_probability.py
+  [#1139](https://github.com/onnx/sklearn-onnx/pull/1139),
+  [#1141](https://github.com/onnx/sklearn-onnx/pull/1141)
 
 ## 1.17.0 (development)
 

@@ -290,9 +290,6 @@ def to_onnx(
     :class:`OnnxOperatorMixin`, it calls method *to_onnx*
     in that case otherwise it calls :func:`convert_sklearn`.
 
-    .. versionchanged:: 1.10.0
-        Parameter *naming* was added.
-
     .. versionchanged:: 1.18.0
         The main opset is now equal to target_opset and not a value equal or less
         than the given value.

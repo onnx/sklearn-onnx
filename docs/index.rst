@@ -126,8 +126,3 @@ Shouheng Yi, Shauheen Zahirazami, Yiwen Zhu, Du Li, Xuan Li, Wenbing Li.
 **License**
 
 It is licensed with `Apache License v2.0 <../LICENSE>`_.
-
-**Older versions**
-
-* `1.17.0 <versions/v1.17.0/>`_
-* `1.16.0 <versions/v1.16.0/>`_

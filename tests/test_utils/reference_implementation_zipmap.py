@@ -20,7 +20,7 @@ if onnx_opset_version() >= 18:
         :param mat: matrix if values is a row index, one or two dimensions
         """
 
-        __slots__ = ["_mat", "_rev_keys", "_values", ]
+        __slots__ = ["_mat", "_rev_keys", "_values"]
 
         @staticmethod
         def build_rev_keys(keys):
