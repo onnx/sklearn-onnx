@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_wext_pyod_forest.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -38,9 +38,10 @@ Trains a model
 All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-77
+.. GENERATED FROM PYTHON SOURCE LINES 24-78
 
 .. code-block:: Python
+
 
     import numpy as np
     import pandas as pd
@@ -108,11 +109,11 @@ and *lightgbm*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-79
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 We check that the conversion fails as expected.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-87
+.. GENERATED FROM PYTHON SOURCE LINES 80-88
 
 .. code-block:: Python
 
@@ -131,7 +132,7 @@ We check that the conversion fails as expected.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-94
+.. GENERATED FROM PYTHON SOURCE LINES 89-95
 
 Custom converter
 ++++++++++++++++
@@ -140,7 +141,7 @@ First the parser and the shape calculator.
 The parser defines the number of outputs and their type.
 The shape calculator defines their dimensions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-120
+.. GENERATED FROM PYTHON SOURCE LINES 95-121
 
 .. code-block:: Python
 
@@ -177,11 +178,11 @@ The shape calculator defines their dimensions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-122
+.. GENERATED FROM PYTHON SOURCE LINES 122-123
 
 Then the converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-178
+.. GENERATED FROM PYTHON SOURCE LINES 123-179
 
 .. code-block:: Python
 
@@ -248,11 +249,11 @@ Then the converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-180
+.. GENERATED FROM PYTHON SOURCE LINES 180-181
 
 Finally the registration.
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-191
+.. GENERATED FROM PYTHON SOURCE LINES 181-192
 
 .. code-block:: Python
 
@@ -274,11 +275,11 @@ Finally the registration.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-193
+.. GENERATED FROM PYTHON SOURCE LINES 193-194
 
 And the conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-199
+.. GENERATED FROM PYTHON SOURCE LINES 194-200
 
 .. code-block:: Python
 
@@ -295,12 +296,12 @@ And the conversion.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-202
+.. GENERATED FROM PYTHON SOURCE LINES 201-203
 
 Checking discrepencies
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-222
+.. GENERATED FROM PYTHON SOURCE LINES 203-223
 
 .. code-block:: Python
 
@@ -334,7 +335,7 @@ Checking discrepencies
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.008 seconds)
+   **Total running time of the script:** (0 minutes 0.019 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_wext_pyod_forest.py:
@@ -350,6 +351,10 @@ Checking discrepencies
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_wext_pyod_forest.py <plot_wext_pyod_forest.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_wext_pyod_forest.zip <plot_wext_pyod_forest.zip>`
 
 
 .. only:: html

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_weird_pandas_and_hash.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -27,9 +27,10 @@ A game of finding it goes wrong and there are multiple places.
 Initial example
 +++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-70
+.. GENERATED FROM PYTHON SOURCE LINES 13-71
 
 .. code-block:: Python
+
 
     import logging
     import numpy as np
@@ -96,9 +97,10 @@ Initial example
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-3 {
+    <style>#sk-container-id-1 {
       /* Definition of color scheme common for light and dark mode */
-      --sklearn-color-text: black;
+      --sklearn-color-text: #000;
+      --sklearn-color-text-muted: #666;
       --sklearn-color-line: gray;
       /* Definition of color scheme for unfitted estimators */
       --sklearn-color-unfitted-level-0: #fff5e6;
@@ -126,15 +128,15 @@ Initial example
       }
     }
 
-    #sk-container-id-3 {
+    #sk-container-id-1 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-3 pre {
+    #sk-container-id-1 pre {
       padding: 0;
     }
 
-    #sk-container-id-3 input.sk-hidden--visually {
+    #sk-container-id-1 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -146,7 +148,7 @@ Initial example
       width: 1px;
     }
 
-    #sk-container-id-3 div.sk-dashed-wrapped {
+    #sk-container-id-1 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -154,7 +156,7 @@ Initial example
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-3 div.sk-container {
+    #sk-container-id-1 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -164,7 +166,7 @@ Initial example
       position: relative;
     }
 
-    #sk-container-id-3 div.sk-text-repr-fallback {
+    #sk-container-id-1 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -180,14 +182,14 @@ Initial example
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-3 div.sk-parallel-item::after {
+    #sk-container-id-1 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-3 div.sk-parallel {
+    #sk-container-id-1 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -195,28 +197,28 @@ Initial example
       position: relative;
     }
 
-    #sk-container-id-3 div.sk-parallel-item {
+    #sk-container-id-1 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-3 div.sk-parallel-item:first-child::after {
+    #sk-container-id-1 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-3 div.sk-parallel-item:last-child::after {
+    #sk-container-id-1 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-3 div.sk-parallel-item:only-child::after {
+    #sk-container-id-1 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-3 div.sk-serial {
+    #sk-container-id-1 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -234,24 +236,33 @@ Initial example
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-3 div.sk-toggleable {
+    #sk-container-id-1 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-3 label.sk-toggleable__label {
+    #sk-container-id-1 label.sk-toggleable__label {
       cursor: pointer;
-      display: block;
+      display: flex;
       width: 100%;
       margin-bottom: 0;
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.5em;
     }
 
-    #sk-container-id-3 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-1 label.sk-toggleable__label .caption {
+      font-size: 0.6rem;
+      font-weight: lighter;
+      color: var(--sklearn-color-text-muted);
+    }
+
+    #sk-container-id-1 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -259,13 +270,13 @@ Initial example
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-3 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-3 div.sk-toggleable__content {
+    #sk-container-id-1 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -274,12 +285,12 @@ Initial example
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-3 div.sk-toggleable__content.fitted {
+    #sk-container-id-1 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-3 div.sk-toggleable__content pre {
+    #sk-container-id-1 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -287,79 +298,79 @@ Initial example
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-3 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-1 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-3 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-3 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-3 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-3 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-3 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-3 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-3 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-3 div.sk-label label {
+    #sk-container-id-1 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-1 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-3 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-3 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-3 div.sk-label label {
+    #sk-container-id-1 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-3 div.sk-label-container {
+    #sk-container-id-1 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-3 div.sk-estimator {
+    #sk-container-id-1 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -369,18 +380,18 @@ Initial example
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-3 div.sk-estimator.fitted {
+    #sk-container-id-1 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-3 div.sk-estimator:hover {
+    #sk-container-id-1 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-3 div.sk-estimator.fitted:hover {
+    #sk-container-id-1 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -401,7 +412,8 @@ Initial example
       height: 1em;
       width: 1em;
       text-decoration: none !important;
-      margin-left: 1ex;
+      margin-left: 0.5em;
+      text-align: center;
       /* unfitted */
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
       color: var(--sklearn-color-unfitted-level-1);
@@ -467,7 +479,7 @@ Initial example
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-3 a.estimator_doc_link {
+    #sk-container-id-1 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -482,25 +494,25 @@ Initial example
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-3 a.estimator_doc_link.fitted {
+    #sk-container-id-1 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-3 a.estimator_doc_link:hover {
+    #sk-container-id-1 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-3 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-1 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
+    </style><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
                      ColumnTransformer(sparse_threshold=0.0,
                                        transformers=[(&#x27;cat_preprocessor&#x27;,
                                                       FeatureHasher(alternate_sign=False,
@@ -509,7 +521,7 @@ Initial example
                                                                     n_features=8),
                                                       &#x27;cat_features&#x27;)])),
                     (&#x27;classifier&#x27;,
-                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-17" type="checkbox" ><label for="sk-estimator-id-17" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
+                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
                      ColumnTransformer(sparse_threshold=0.0,
                                        transformers=[(&#x27;cat_preprocessor&#x27;,
                                                       FeatureHasher(alternate_sign=False,
@@ -518,23 +530,23 @@ Initial example
                                                                     n_features=8),
                                                       &#x27;cat_features&#x27;)])),
                     (&#x27;classifier&#x27;,
-                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-18" type="checkbox" ><label for="sk-estimator-id-18" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;preprocessor: ColumnTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(sparse_threshold=0.0,
+                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>preprocessor: ColumnTransformer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></div></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(sparse_threshold=0.0,
                       transformers=[(&#x27;cat_preprocessor&#x27;,
                                      FeatureHasher(alternate_sign=False,
                                                    dtype=&lt;class &#x27;numpy.float32&#x27;&gt;,
                                                    input_type=&#x27;string&#x27;,
                                                    n_features=8),
-                                     &#x27;cat_features&#x27;)])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-19" type="checkbox" ><label for="sk-estimator-id-19" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">cat_preprocessor</label><div class="sk-toggleable__content fitted"><pre>cat_features</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-20" type="checkbox" ><label for="sk-estimator-id-20" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;FeatureHasher<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.feature_extraction.FeatureHasher.html">?<span>Documentation for FeatureHasher</span></a></label><div class="sk-toggleable__content fitted"><pre>FeatureHasher(alternate_sign=False, dtype=&lt;class &#x27;numpy.float32&#x27;&gt;,
-                  input_type=&#x27;string&#x27;, n_features=8)</pre></div> </div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-21" type="checkbox" ><label for="sk-estimator-id-21" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;GradientBoostingClassifier<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html">?<span>Documentation for GradientBoostingClassifier</span></a></label><div class="sk-toggleable__content fitted"><pre>GradientBoostingClassifier(max_depth=2, n_estimators=2)</pre></div> </div></div></div></div></div></div>
+                                     &#x27;cat_features&#x27;)])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>cat_preprocessor</div></div></label><div class="sk-toggleable__content fitted"><pre>cat_features</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>FeatureHasher</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.feature_extraction.FeatureHasher.html">?<span>Documentation for FeatureHasher</span></a></div></label><div class="sk-toggleable__content fitted"><pre>FeatureHasher(alternate_sign=False, dtype=&lt;class &#x27;numpy.float32&#x27;&gt;,
+                  input_type=&#x27;string&#x27;, n_features=8)</pre></div> </div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GradientBoostingClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html">?<span>Documentation for GradientBoostingClassifier</span></a></div></label><div class="sk-toggleable__content fitted"><pre>GradientBoostingClassifier(max_depth=2, n_estimators=2)</pre></div> </div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-72
+.. GENERATED FROM PYTHON SOURCE LINES 72-73
 
 Conversion to ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-79
+.. GENERATED FROM PYTHON SOURCE LINES 73-80
 
 .. code-block:: Python
 
@@ -552,11 +564,11 @@ Conversion to ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 81-82
 
 There are many discrepancies?
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-95
+.. GENERATED FROM PYTHON SOURCE LINES 82-96
 
 .. code-block:: Python
 
@@ -583,33 +595,33 @@ There are many discrepancies?
  .. code-block:: none
 
     expected probabilities
-    [[0.53360884 0.46639116]
-     [0.53637279 0.46362721]
-     [0.61595526 0.38404474]
-     [0.61595526 0.38404474]
+    [[0.53637279 0.46362721]
      [0.46226277 0.53773723]
+     [0.61595526 0.38404474]
+     [0.61595526 0.38404474]
+     [0.53360884 0.46639116]
      [0.61595526 0.38404474]
      [0.61595526 0.38404474]]
     onnx probabilities
     [[0.6159553  0.3840447 ]
-     [0.5363728  0.46362722]
-     [0.5363728  0.46362722]
+     [0.4622628  0.5377372 ]
+     [0.4622628  0.5377372 ]
      [0.6159553  0.3840447 ]
      [0.6159553  0.3840447 ]
      [0.6159553  0.3840447 ]
-     [0.53360885 0.46639115]]
+     [0.5363728  0.46362722]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-100
+.. GENERATED FROM PYTHON SOURCE LINES 97-101
 
 Let's check the feature hasher
 ++++++++++++++++++++++++++++++
 
 We just remove the classifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-144
+.. GENERATED FROM PYTHON SOURCE LINES 101-145
 
 .. code-block:: Python
 
@@ -685,7 +697,7 @@ We just remove the classifier.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-156
+.. GENERATED FROM PYTHON SOURCE LINES 146-157
 
 Nothing seems to be working.
 
@@ -699,7 +711,7 @@ The type list is expected by scikit-learn and it can process a variable
 number of elements per list. onnxruntime cannot do that.
 It must be changed into the following.
 
-.. GENERATED FROM PYTHON SOURCE LINES 156-224
+.. GENERATED FROM PYTHON SOURCE LINES 157-225
 
 .. code-block:: Python
 
@@ -799,7 +811,7 @@ It must be changed into the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-235
+.. GENERATED FROM PYTHON SOURCE LINES 226-236
 
 This is not the original pipeline. It has 16 columns instead of 8
 but it does produce the same results.
@@ -812,7 +824,7 @@ Second proposal
 We use the same initial pipeline but we tweak the input
 onnxruntime receives.
 
-.. GENERATED FROM PYTHON SOURCE LINES 235-285
+.. GENERATED FROM PYTHON SOURCE LINES 236-286
 
 .. code-block:: Python
 
@@ -894,7 +906,7 @@ onnxruntime receives.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 286-292
+.. GENERATED FROM PYTHON SOURCE LINES 287-293
 
 It works now.
 
@@ -903,7 +915,7 @@ Sparsity?
 
 Let's try with the classifier now and no `sparse_threshold=0.0`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 292-338
+.. GENERATED FROM PYTHON SOURCE LINES 293-339
 
 .. code-block:: Python
 
@@ -963,25 +975,25 @@ Let's try with the classifier now and no `sparse_threshold=0.0`.
 
     expected probabilies
     [[0.53637279 0.46362721]
-     [0.53360884 0.46639116]
-     [0.61595526 0.38404474]
-     [0.61595526 0.38404474]
      [0.46226277 0.53773723]
+     [0.61595526 0.38404474]
+     [0.61595526 0.38404474]
+     [0.53360884 0.46639116]
      [0.61595526 0.38404474]
      [0.61595526 0.38404474]]
     onnx probabilies
     [[0.5363728  0.46362722]
-     [0.53360885 0.46639115]
-     [0.6159553  0.3840447 ]
-     [0.6159553  0.3840447 ]
      [0.4622628  0.5377372 ]
+     [0.6159553  0.3840447 ]
+     [0.6159553  0.3840447 ]
+     [0.53360885 0.46639115]
      [0.6159553  0.3840447 ]
      [0.6159553  0.3840447 ]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 339-346
+.. GENERATED FROM PYTHON SOURCE LINES 340-347
 
 scikit-learn keeps the sparse outputs from
 the FeatureHasher. onnxruntime does not support
@@ -991,7 +1003,7 @@ missing sparse value and zero.
 That does not seem to be the case for this model but
 other models or libraries may behave differently.
 
-.. GENERATED FROM PYTHON SOURCE LINES 346-348
+.. GENERATED FROM PYTHON SOURCE LINES 347-349
 
 .. code-block:: Python
 
@@ -1005,6 +1017,9 @@ other models or libraries may behave differently.
 
  .. code-block:: none
 
+    <Compressed Sparse Row sparse matrix of dtype 'float32'
+            with 11 stored elements and shape (7, 8)>
+      Coords        Values
       (0, 2)        1.0
       (0, 6)        1.0
       (1, 5)        1.0
@@ -1023,7 +1038,7 @@ other models or libraries may behave differently.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.231 seconds)
+   **Total running time of the script:** (0 minutes 0.295 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_weird_pandas_and_hash.py:
@@ -1039,6 +1054,10 @@ other models or libraries may behave differently.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_weird_pandas_and_hash.py <plot_weird_pandas_and_hash.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_weird_pandas_and_hash.zip <plot_weird_pandas_and_hash.zip>`
 
 
 .. only:: html

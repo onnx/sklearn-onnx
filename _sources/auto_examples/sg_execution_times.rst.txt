@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**01:09.863** total execution time for 25 files **from auto_examples**:
+**00:00.161** total execution time for 26 files **from auto_examples**:
 
 .. container::
 
@@ -32,43 +32,25 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)
-     - 00:19.991
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)
+     - 00:00.161
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_backend.py` (``plot_backend.py``)
-     - 00:17.934
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)
-     - 00:10.217
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)
-     - 00:04.925
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)
-     - 00:04.738
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)
-     - 00:04.086
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)
-     - 00:03.752
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)
-     - 00:02.180
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)
-     - 00:00.882
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)
-     - 00:00.652
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)
-     - 00:00.506
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py` (``plot_benchmark_cdist.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_black_op.py` (``plot_black_op.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py` (``plot_convert_decision_function.py``)
@@ -83,6 +65,9 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py` (``plot_convert_zipmap.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_custom_parser.py` (``plot_custom_parser.py``)
      - 00:00.000
      - 0.0
@@ -95,6 +80,12 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_plot_gpr.py` (``plot_gpr.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_logging.py` (``plot_logging.py``)
      - 00:00.000
      - 0.0
@@ -102,6 +93,18 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_nmf.py` (``plot_nmf.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_output_onnx_single_probability.py` (``plot_output_onnx_single_probability.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py` (``plot_tfidfvectorizer.py``)

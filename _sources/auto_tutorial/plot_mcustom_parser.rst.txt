@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_mcustom_parser.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -41,9 +41,10 @@ one output but both are needed.
 A new transformer
 +++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-83
+.. GENERATED FROM PYTHON SOURCE LINES 27-84
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import numpy
     from onnxruntime import InferenceSession
@@ -118,16 +119,16 @@ A new transformer
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-88
+.. GENERATED FROM PYTHON SOURCE LINES 85-89
 
 Conversion into ONNX with two outputs
 +++++++++++++++++++++++++++++++++++++
 
 Let's try to convert it and see what happens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-146
+.. GENERATED FROM PYTHON SOURCE LINES 89-147
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -194,13 +195,13 @@ Let's try to convert it and see what happens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-148
+.. GENERATED FROM PYTHON SOURCE LINES 148-149
 
 The registration needs to declare the parser as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-159
+.. GENERATED FROM PYTHON SOURCE LINES 149-160
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -220,13 +221,13 @@ The registration needs to declare the parser as well.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-161
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 And conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-181
+.. GENERATED FROM PYTHON SOURCE LINES 162-182
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(dec, X.astype(numpy.float32), target_opset=14)
@@ -256,8 +257,8 @@ And conversion.
 
  .. code-block:: none
 
-    (6.04657619085458e-07, 0.0002951417065406967)
-    (2.01757041717876e-06, 0.0005483764980468156)
+    (np.float64(6.04657619085458e-07), np.float64(0.0002951417065406967))
+    (np.float64(2.01757041717876e-06), np.float64(0.0005483764980468156))
 
 
 
@@ -265,7 +266,7 @@ And conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.021 seconds)
+   **Total running time of the script:** (0 minutes 0.045 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_mcustom_parser.py:
@@ -274,16 +275,17 @@ And conversion.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_mcustom_parser.ipynb <plot_mcustom_parser.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_mcustom_parser.py <plot_mcustom_parser.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_mcustom_parser.ipynb <plot_mcustom_parser.ipynb>`
+      :download:`Download zipped: plot_mcustom_parser.zip <plot_mcustom_parser.zip>`
 
 
 .. only:: html

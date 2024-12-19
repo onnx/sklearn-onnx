@@ -10,6 +10,7 @@ A game of finding it goes wrong and there are multiple places.
 Initial example
 +++++++++++++++
 """
+
 import logging
 import numpy as np
 from pandas import DataFrame

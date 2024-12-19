@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_metadata.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -33,7 +33,7 @@ logistic regression model trained with
 
 .. GENERATED FROM PYTHON SOURCE LINES 18-39
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import skl2onnx
@@ -81,10 +81,10 @@ With *ONNX Runtime*:
 
 .. GENERATED FROM PYTHON SOURCE LINES 41-52
 
-.. code-block:: default
+.. code-block:: Python
 
 
-    sess = InferenceSession(example)
+    sess = InferenceSession(example, providers=["CPUExecutionProvider"])
     meta = sess.get_modelmeta()
 
     print("custom_metadata_map={}".format(meta.custom_metadata_map))
@@ -96,20 +96,18 @@ With *ONNX Runtime*:
 
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/home/xadupre/github/sklearn-onnx/docs/examples/plot_metadata.py", line 42, in <module>
-        sess = InferenceSession(example)
-      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/capi/onnxruntime_inference_collection.py", line 432, in __init__
-        raise e
-      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/capi/onnxruntime_inference_collection.py", line 419, in __init__
-        self._create_inference_session(providers, provider_options, disabled_optimizers)
-      File "/home/xadupre/github/onnxruntime/build/linux_cuda/Release/onnxruntime/capi/onnxruntime_inference_collection.py", line 451, in _create_inference_session
-        raise ValueError(
-    ValueError: This ORT build has ['CUDAExecutionProvider', 'CPUExecutionProvider'] enabled. Since ORT 1.9, you are required to explicitly set the providers parameter when instantiating InferenceSession. For example, onnxruntime.InferenceSession(..., providers=['CUDAExecutionProvider', 'CPUExecutionProvider'], ...)
+    custom_metadata_map={}
+    description=
+    domain=onnxml
+    graph_name=3c59201b940f410fa29dc71ea9d5767d
+    producer_name=OnnxMLTools
+    version=0
 
 
 
@@ -120,7 +118,7 @@ With *ONNX Runtime*:
 
 .. GENERATED FROM PYTHON SOURCE LINES 54-60
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -130,9 +128,25 @@ With *ONNX Runtime*:
     print("skl2onnx: ", skl2onnx.__version__)
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.008 seconds)
+   **Total running time of the script:** (0 minutes 0.102 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_metadata.py:
@@ -141,16 +155,17 @@ With *ONNX Runtime*:
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_metadata.ipynb <plot_metadata.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_metadata.py <plot_metadata.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_metadata.ipynb <plot_metadata.ipynb>`
+      :download:`Download zipped: plot_metadata.zip <plot_metadata.zip>`
 
 
 .. only:: html

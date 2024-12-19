@@ -31,6 +31,7 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 """
+
 import pickle
 from io import BytesIO
 import numpy

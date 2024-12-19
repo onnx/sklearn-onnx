@@ -32,9 +32,10 @@ to run predictions using this runtime.
 Let's use the API to compute the prediction
 of a simple logistic regression model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-32
+.. GENERATED FROM PYTHON SOURCE LINES 20-33
 
 .. code-block:: Python
+
 
     import skl2onnx
     import onnxruntime
@@ -55,11 +56,11 @@ of a simple logistic regression model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-34
+.. GENERATED FROM PYTHON SOURCE LINES 34-35
 
 Let's create an ONNX graph first.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-43
+.. GENERATED FROM PYTHON SOURCE LINES 35-44
 
 .. code-block:: Python
 
@@ -79,11 +80,11 @@ Let's create an ONNX graph first.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-45
+.. GENERATED FROM PYTHON SOURCE LINES 45-46
 
 Let's use ONNX backend API to test it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-56
+.. GENERATED FROM PYTHON SOURCE LINES 46-57
 
 .. code-block:: Python
 
@@ -112,12 +113,12 @@ Let's use ONNX backend API to test it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-59
+.. GENERATED FROM PYTHON SOURCE LINES 58-60
 
 The device depends on how the package was compiled,
 GPU or CPU.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 60-62
 
 .. code-block:: Python
 
@@ -136,12 +137,12 @@ GPU or CPU.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 63-65
 
 The backend can also directly load the model
 without using *onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-74
+.. GENERATED FROM PYTHON SOURCE LINES 65-75
 
 .. code-block:: Python
 
@@ -169,17 +170,17 @@ without using *onnx*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-78
+.. GENERATED FROM PYTHON SOURCE LINES 76-79
 
 The backend API is implemented by other frameworks
 and makes it easier to switch between multiple runtimes
 with the same API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 81-82
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-87
+.. GENERATED FROM PYTHON SOURCE LINES 82-88
 
 .. code-block:: Python
 
@@ -197,11 +198,11 @@ with the same API.
 
  .. code-block:: none
 
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -209,7 +210,7 @@ with the same API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 17.934 seconds)
+   **Total running time of the script:** (0 minutes 7.881 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:
@@ -225,6 +226,10 @@ with the same API.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_backend.py <plot_backend.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_backend.zip <plot_backend.zip>`
 
 
 .. only:: html

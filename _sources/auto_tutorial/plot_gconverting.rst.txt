@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_gconverting.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -27,9 +27,10 @@ renaming the inputs or outputs names.
 Basic example
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 14-40
+.. GENERATED FROM PYTHON SOURCE LINES 14-41
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import numpy
     from onnxruntime import InferenceSession
@@ -66,13 +67,13 @@ Basic example
  .. code-block:: none
 
     inputs=['X'], outputs=['label', 'probabilities']
-    [array([1, 1], dtype=int64), array([[0.05684776, 0.8244833 , 0.11866891],
-           [0.05001822, 0.73737246, 0.21260935]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[0.03960225, 0.79471505, 0.16568264],
+           [0.00120798, 0.34261844, 0.65617365]], dtype=float32)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-47
+.. GENERATED FROM PYTHON SOURCE LINES 42-48
 
 Changes the input names
 +++++++++++++++++++++++
@@ -81,9 +82,9 @@ It is possible to change the input name by using the
 parameter *initial_types*. However, the user must specify the input
 types as well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-63
+.. GENERATED FROM PYTHON SOURCE LINES 48-64
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(
@@ -110,13 +111,13 @@ types as well.
  .. code-block:: none
 
     inputs=['X56'], outputs=['label', 'probabilities']
-    [array([1, 1], dtype=int64), array([[0.05684776, 0.8244833 , 0.11866891],
-           [0.05001822, 0.73737246, 0.21260935]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[0.03960225, 0.79471505, 0.16568264],
+           [0.00120798, 0.34261844, 0.65617365]], dtype=float32)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-69
+.. GENERATED FROM PYTHON SOURCE LINES 65-70
 
 Changes the output names
 ++++++++++++++++++++++++
@@ -124,9 +125,9 @@ Changes the output names
 It is possible to change the input name by using the
 parameter *final_types*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-84
+.. GENERATED FROM PYTHON SOURCE LINES 70-85
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(
@@ -152,13 +153,13 @@ parameter *final_types*.
  .. code-block:: none
 
     inputs=['X'], outputs=['L', 'P']
-    [array([1, 1], dtype=int64), array([[0.05684776, 0.8244833 , 0.11866891],
-           [0.05001822, 0.73737246, 0.21260935]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[0.03960225, 0.79471505, 0.16568264],
+           [0.00120798, 0.34261844, 0.65617365]], dtype=float32)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-91
+.. GENERATED FROM PYTHON SOURCE LINES 86-92
 
 Renaming intermediate results
 +++++++++++++++++++++++++++++
@@ -167,9 +168,9 @@ It is possible to rename intermediate results by using a prefix
 or by using a function. The result will be post-processed in order
 to unique names. It does not impact the graph inputs or outputs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-108
+.. GENERATED FROM PYTHON SOURCE LINES 92-109
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -203,8 +204,8 @@ to unique names. It does not impact the graph inputs or outputs.
     changed 'probability_tensor' into '_PROBABILITY_TENSOR'.
     changed 'Normalizer' into '_NORMALIZER'.
     inputs=['X'], outputs=['label', 'probabilities']
-    [array([1, 1], dtype=int64), array([[0.05684776, 0.8244833 , 0.11866891],
-           [0.05001822, 0.73737246, 0.21260935]], dtype=float32)]
+    [array([1, 2], dtype=int64), array([[0.03960225, 0.79471505, 0.16568264],
+           [0.00120798, 0.34261844, 0.65617365]], dtype=float32)]
 
 
 
@@ -212,7 +213,7 @@ to unique names. It does not impact the graph inputs or outputs.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.065 seconds)
+   **Total running time of the script:** (0 minutes 0.131 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gconverting.py:
@@ -221,16 +222,17 @@ to unique names. It does not impact the graph inputs or outputs.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_gconverting.ipynb <plot_gconverting.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gconverting.py <plot_gconverting.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_gconverting.ipynb <plot_gconverting.ipynb>`
+      :download:`Download zipped: plot_gconverting.zip <plot_gconverting.zip>`
 
 
 .. only:: html

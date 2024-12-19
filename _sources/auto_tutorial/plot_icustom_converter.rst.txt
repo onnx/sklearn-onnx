@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_icustom_converter.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -48,9 +48,10 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-121
+.. GENERATED FROM PYTHON SOURCE LINES 34-122
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import pickle
     from io import BytesIO
@@ -156,13 +157,13 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-123
+.. GENERATED FROM PYTHON SOURCE LINES 123-124
 
 Trained coefficients.
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-127
+.. GENERATED FROM PYTHON SOURCE LINES 124-128
 
-.. code-block:: default
+.. code-block:: Python
 
     print(dec.mean_)
     print(dec.coef_)
@@ -185,16 +186,16 @@ Trained coefficients.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-132
+.. GENERATED FROM PYTHON SOURCE LINES 129-133
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 Let's try to convert it and see what happens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-139
+.. GENERATED FROM PYTHON SOURCE LINES 133-140
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -228,7 +229,7 @@ Let's try to convert it and see what happens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-148
+.. GENERATED FROM PYTHON SOURCE LINES 141-149
 
 This error means there is no converter associated
 to *DecorrelateTransformer*. Let's implement it.
@@ -239,9 +240,9 @@ First the shape calculator. We retrieve the input type
 add tells the output type has the same type,
 the same number of rows and a specific number of columns.
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-161
+.. GENERATED FROM PYTHON SOURCE LINES 149-162
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -263,16 +264,16 @@ the same number of rows and a specific number of columns.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-166
+.. GENERATED FROM PYTHON SOURCE LINES 163-167
 
 The converter. One thing we need to pay attention to
 is the target opset. This information is important
 to make sure that every node is defined following the
 specifications of that opset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-193
+.. GENERATED FROM PYTHON SOURCE LINES 167-194
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -308,13 +309,13 @@ specifications of that opset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-195
+.. GENERATED FROM PYTHON SOURCE LINES 195-196
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-222
+.. GENERATED FROM PYTHON SOURCE LINES 196-223
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -351,18 +352,18 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (6.04657619085458e-07, 0.0002951417065406967)
+    (np.float64(6.04657619085458e-07), np.float64(0.0002951417065406967))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-224
+.. GENERATED FROM PYTHON SOURCE LINES 224-225
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-233
+.. GENERATED FROM PYTHON SOURCE LINES 225-234
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(dec, X.astype(numpy.float64))
@@ -381,19 +382,19 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (0.0, 0.0)
+    (np.float64(0.0), np.float64(0.0))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-235
+.. GENERATED FROM PYTHON SOURCE LINES 235-236
 
 The differences are smaller with double as expected.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.038 seconds)
+   **Total running time of the script:** (0 minutes 0.036 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_icustom_converter.py:
@@ -402,16 +403,17 @@ The differences are smaller with double as expected.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_icustom_converter.ipynb <plot_icustom_converter.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_icustom_converter.py <plot_icustom_converter.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_icustom_converter.ipynb <plot_icustom_converter.ipynb>`
+      :download:`Download zipped: plot_icustom_converter.zip <plot_icustom_converter.zip>`
 
 
 .. only:: html

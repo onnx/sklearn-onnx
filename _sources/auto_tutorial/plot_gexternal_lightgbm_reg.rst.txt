@@ -51,9 +51,10 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|`.
 Train a LGBMRegressor
 +++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-66
+.. GENERATED FROM PYTHON SOURCE LINES 38-67
 
 .. code-block:: Python
+
 
     import packaging.version as pv
     import warnings
@@ -67,11 +68,11 @@ Train a LGBMRegressor
     from skl2onnx import to_onnx, update_registered_converter
     from skl2onnx.common.shape_calculator import (
         calculate_linear_regressor_output_shapes,
-    )  # noqa
+    )
     from onnxmltools import __version__ as oml_version
     from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
         convert_lightgbm,
-    )  # noqa
+    )
 
 
     N = 1000
@@ -91,19 +92,20 @@ Train a LGBMRegressor
 
  .. code-block:: none
 
-    [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000276 seconds.
+    [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000475 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 5100
     [LightGBM] [Info] Number of data points in the train set: 1000, number of used features: 20
-    [LightGBM] [Info] Start training from score 0.001127
+    [LightGBM] [Info] Start training from score 0.033823
 
 
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-7 {
+    <style>#sk-container-id-8 {
       /* Definition of color scheme common for light and dark mode */
-      --sklearn-color-text: black;
+      --sklearn-color-text: #000;
+      --sklearn-color-text-muted: #666;
       --sklearn-color-line: gray;
       /* Definition of color scheme for unfitted estimators */
       --sklearn-color-unfitted-level-0: #fff5e6;
@@ -131,15 +133,15 @@ Train a LGBMRegressor
       }
     }
 
-    #sk-container-id-7 {
+    #sk-container-id-8 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-7 pre {
+    #sk-container-id-8 pre {
       padding: 0;
     }
 
-    #sk-container-id-7 input.sk-hidden--visually {
+    #sk-container-id-8 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -151,7 +153,7 @@ Train a LGBMRegressor
       width: 1px;
     }
 
-    #sk-container-id-7 div.sk-dashed-wrapped {
+    #sk-container-id-8 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -159,7 +161,7 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-7 div.sk-container {
+    #sk-container-id-8 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -169,7 +171,7 @@ Train a LGBMRegressor
       position: relative;
     }
 
-    #sk-container-id-7 div.sk-text-repr-fallback {
+    #sk-container-id-8 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -185,14 +187,14 @@ Train a LGBMRegressor
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-7 div.sk-parallel-item::after {
+    #sk-container-id-8 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-7 div.sk-parallel {
+    #sk-container-id-8 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -200,28 +202,28 @@ Train a LGBMRegressor
       position: relative;
     }
 
-    #sk-container-id-7 div.sk-parallel-item {
+    #sk-container-id-8 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-7 div.sk-parallel-item:first-child::after {
+    #sk-container-id-8 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-7 div.sk-parallel-item:last-child::after {
+    #sk-container-id-8 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-7 div.sk-parallel-item:only-child::after {
+    #sk-container-id-8 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-7 div.sk-serial {
+    #sk-container-id-8 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -239,24 +241,33 @@ Train a LGBMRegressor
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-7 div.sk-toggleable {
+    #sk-container-id-8 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-7 label.sk-toggleable__label {
+    #sk-container-id-8 label.sk-toggleable__label {
       cursor: pointer;
-      display: block;
+      display: flex;
       width: 100%;
       margin-bottom: 0;
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.5em;
     }
 
-    #sk-container-id-7 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-8 label.sk-toggleable__label .caption {
+      font-size: 0.6rem;
+      font-weight: lighter;
+      color: var(--sklearn-color-text-muted);
+    }
+
+    #sk-container-id-8 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -264,13 +275,13 @@ Train a LGBMRegressor
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-7 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-8 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-7 div.sk-toggleable__content {
+    #sk-container-id-8 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -279,12 +290,12 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-7 div.sk-toggleable__content.fitted {
+    #sk-container-id-8 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-7 div.sk-toggleable__content pre {
+    #sk-container-id-8 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -292,79 +303,79 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-7 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-8 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-7 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-8 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-7 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-8 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-7 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-7 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-7 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-7 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-7 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-7 div.sk-label label {
+    #sk-container-id-8 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-8 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-7 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-8 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-7 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-8 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-7 div.sk-label label {
+    #sk-container-id-8 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-7 div.sk-label-container {
+    #sk-container-id-8 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-7 div.sk-estimator {
+    #sk-container-id-8 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -374,18 +385,18 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-7 div.sk-estimator.fitted {
+    #sk-container-id-8 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-7 div.sk-estimator:hover {
+    #sk-container-id-8 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-7 div.sk-estimator.fitted:hover {
+    #sk-container-id-8 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -406,7 +417,8 @@ Train a LGBMRegressor
       height: 1em;
       width: 1em;
       text-decoration: none !important;
-      margin-left: 1ex;
+      margin-left: 0.5em;
+      text-align: center;
       /* unfitted */
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
       color: var(--sklearn-color-unfitted-level-1);
@@ -472,7 +484,7 @@ Train a LGBMRegressor
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-7 a.estimator_doc_link {
+    #sk-container-id-8 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -487,30 +499,30 @@ Train a LGBMRegressor
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-7 a.estimator_doc_link.fitted {
+    #sk-container-id-8 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-7 a.estimator_doc_link:hover {
+    #sk-container-id-8 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-7 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-8 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-7" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-29" type="checkbox" checked><label for="sk-estimator-id-29" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;LGBMRegressor<span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>LGBMRegressor(n_estimators=1000)</pre></div> </div></div></div></div>
+    </style><div id="sk-container-id-8" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-30" type="checkbox" checked><label for="sk-estimator-id-30" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMRegressor</div></div><div><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>LGBMRegressor(n_estimators=1000)</pre></div> </div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-78
+.. GENERATED FROM PYTHON SOURCE LINES 68-79
 
 Register the converter for LGBMClassifier
 +++++++++++++++++++++++++++++++++++++++++
@@ -524,7 +536,7 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 lightgbm/shape_calculators/Regressor.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-102
+.. GENERATED FROM PYTHON SOURCE LINES 79-104
 
 .. code-block:: Python
 
@@ -536,7 +548,8 @@ lightgbm/shape_calculators/Regressor.py>`_.
             if pv.Version(oml_version) < pv.Version("1.9.2"):
                 warnings.warn(
                     "Option split was released in version 1.9.2 but %s is "
-                    "installed. It will be ignored." % oml_version
+                    "installed. It will be ignored." % oml_version,
+                    stacklevel=0,
                 )
             operator.split = options["split"]
         else:
@@ -559,7 +572,7 @@ lightgbm/shape_calculators/Regressor.py>`_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-109
+.. GENERATED FROM PYTHON SOURCE LINES 105-111
 
 Convert
 +++++++
@@ -568,7 +581,7 @@ We convert the same model following the two scenarios, one single
 TreeEnsembleRegressor node, or more. *split* parameter is the number of
 trees per node TreeEnsembleRegressor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-120
+.. GENERATED FROM PYTHON SOURCE LINES 111-122
 
 .. code-block:: Python
 
@@ -590,12 +603,12 @@ trees per node TreeEnsembleRegressor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-123
+.. GENERATED FROM PYTHON SOURCE LINES 123-125
 
 Discrepancies
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-142
+.. GENERATED FROM PYTHON SOURCE LINES 125-144
 
 .. code-block:: Python
 
@@ -626,18 +639,18 @@ Discrepancies
 
  .. code-block:: none
 
-    sum of discrepancies 1 node 0.00020644343950206685
-    sum of discrepancies split node 4.144931004458315e-05 ratio: 4.980624268052108
+    sum of discrepancies 1 node 0.00010992635655524084
+    sum of discrepancies split node 4.182445361007939e-05 ratio: 2.6282795605666776
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-145
+.. GENERATED FROM PYTHON SOURCE LINES 145-147
 
 The sum of the discrepancies were reduced 4, 5 times.
 The maximum is much better too.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-152
+.. GENERATED FROM PYTHON SOURCE LINES 147-154
 
 .. code-block:: Python
 
@@ -656,20 +669,20 @@ The maximum is much better too.
 
  .. code-block:: none
 
-    max discrepancies 1 node 1.985479140209634e-06
-    max discrepancies split node 2.6622454418756547e-07 ratio: 7.457911689805682
+    max discrepancies 1 node 9.335552881850617e-07
+    max discrepancies split node 2.9892391495423e-07 ratio: 3.1230531967574557
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-157
+.. GENERATED FROM PYTHON SOURCE LINES 155-159
 
 Processing time
 +++++++++++++++
 
 The processing time is slower but not much.
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-167
+.. GENERATED FROM PYTHON SOURCE LINES 159-169
 
 .. code-block:: Python
 
@@ -691,13 +704,13 @@ The processing time is slower but not much.
 
  .. code-block:: none
 
-    processing time no split 2.342391199999838
-    processing time split 2.7244762999998784
+    processing time no split 1.0977208300027996
+    processing time split 1.2429911670005822
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-173
+.. GENERATED FROM PYTHON SOURCE LINES 170-175
 
 Split influence
 +++++++++++++++
@@ -705,13 +718,13 @@ Split influence
 Let's see how the sum of the discrepancies moves against
 the parameter *split*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-193
+.. GENERATED FROM PYTHON SOURCE LINES 175-195
 
 .. code-block:: Python
 
 
     res = []
-    for i in tqdm(list(range(20, 170, 20)) + [200, 300, 400, 500]):
+    for i in tqdm([*range(20, 170, 20), 200, 300, 400, 500]):
         model_onnx_split = to_onnx(
             reg,
             X[:1].astype(numpy.float32),
@@ -737,36 +750,36 @@ the parameter *split*.
 
  .. code-block:: none
 
-      0%|          | 0/12 [00:00<?, ?it/s]      8%|▊         | 1/12 [00:01<00:17,  1.61s/it]     17%|█▋        | 2/12 [00:03<00:15,  1.51s/it]     25%|██▌       | 3/12 [00:04<00:13,  1.45s/it]     33%|███▎      | 4/12 [00:05<00:11,  1.43s/it]     42%|████▏     | 5/12 [00:07<00:09,  1.41s/it]     50%|█████     | 6/12 [00:08<00:08,  1.40s/it]     58%|█████▊    | 7/12 [00:10<00:07,  1.41s/it]     67%|██████▋   | 8/12 [00:11<00:05,  1.44s/it]     75%|███████▌  | 9/12 [00:12<00:04,  1.41s/it]     83%|████████▎ | 10/12 [00:15<00:03,  1.80s/it]     92%|█████████▏| 11/12 [00:17<00:01,  1.74s/it]    100%|██████████| 12/12 [00:18<00:00,  1.61s/it]    100%|██████████| 12/12 [00:18<00:00,  1.54s/it]
-                   disc  baseline
-    split                        
-    20     2.560464e-07  0.000002
-    40     1.937818e-07  0.000002
-    60     2.614565e-07  0.000002
-    80     2.560464e-07  0.000002
-    100    2.662245e-07  0.000002
-    120    4.614585e-07  0.000002
-    140    4.614585e-07  0.000002
-    160    4.614585e-07  0.000002
-    200    5.745647e-07  0.000002
-    300    8.129833e-07  0.000002
-    400    1.289820e-06  0.000002
-    500    1.031805e-06  0.000002
+      0%|          | 0/12 [00:00<?, ?it/s]      8%|▊         | 1/12 [00:01<00:12,  1.11s/it]     17%|█▋        | 2/12 [00:02<00:10,  1.09s/it]     25%|██▌       | 3/12 [00:03<00:10,  1.15s/it]     33%|███▎      | 4/12 [00:04<00:08,  1.11s/it]     42%|████▏     | 5/12 [00:05<00:07,  1.12s/it]     50%|█████     | 6/12 [00:06<00:06,  1.12s/it]     58%|█████▊    | 7/12 [00:08<00:06,  1.31s/it]     67%|██████▋   | 8/12 [00:09<00:05,  1.33s/it]     75%|███████▌  | 9/12 [00:11<00:04,  1.36s/it]     83%|████████▎ | 10/12 [00:12<00:02,  1.28s/it]     92%|█████████▏| 11/12 [00:13<00:01,  1.31s/it]    100%|██████████| 12/12 [00:14<00:00,  1.24s/it]    100%|██████████| 12/12 [00:14<00:00,  1.23s/it]
+                   disc      baseline
+    split                            
+    20     1.955193e-07  9.335553e-07
+    40     3.277593e-07  9.335553e-07
+    60     3.374452e-07  9.335553e-07
+    80     3.948104e-07  9.335553e-07
+    100    2.989239e-07  9.335553e-07
+    120    2.703531e-07  9.335553e-07
+    140    3.906515e-07  9.335553e-07
+    160    3.629678e-07  9.335553e-07
+    200    4.123835e-07  9.335553e-07
+    300    6.290701e-07  9.335553e-07
+    400    5.661779e-07  9.335553e-07
+    500    6.868547e-07  9.335553e-07
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-195
+.. GENERATED FROM PYTHON SOURCE LINES 196-197
 
 Graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-202
+.. GENERATED FROM PYTHON SOURCE LINES 197-204
 
 .. code-block:: Python
 
     _, ax = plt.subplots(1, 1)
     df.plot(
-        title="Sum of discrepancies against split\n" "split = number of tree per node",
+        title="Sum of discrepancies against split\nsplit = number of tree per node",
         ax=ax,
     )
 
@@ -786,7 +799,7 @@ Graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 27.317 seconds)
+   **Total running time of the script:** (0 minutes 19.930 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm_reg.py:
@@ -802,6 +815,10 @@ Graph.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gexternal_lightgbm_reg.py <plot_gexternal_lightgbm_reg.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_gexternal_lightgbm_reg.zip <plot_gexternal_lightgbm_reg.zip>`
 
 
 .. only:: html

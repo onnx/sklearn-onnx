@@ -24,6 +24,7 @@ Custom model
 It basically copies what is in example
 `:ref:`l-plot-custom-converter`.
 """
+
 from skl2onnx.common.data_types import guess_proto_type
 from onnxconverter_common.onnx_ops import apply_sub
 from onnxruntime import InferenceSession

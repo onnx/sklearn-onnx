@@ -35,18 +35,19 @@ a *LGBMClassifier*. Let's see how to do it.
 Train a LightGBM classifier
 +++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-51
+.. GENERATED FROM PYTHON SOURCE LINES 22-52
 
 .. code-block:: Python
+
 
     import onnxruntime as rt
     from skl2onnx import convert_sklearn, update_registered_converter
     from skl2onnx.common.shape_calculator import (
         calculate_linear_classifier_output_shapes,
-    )  # noqa
+    )
     from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
         convert_lightgbm,
-    )  # noqa
+    )
     from skl2onnx.common.data_types import FloatTensorType
     import numpy
     from sklearn.datasets import load_iris
@@ -76,7 +77,7 @@ Train a LightGBM classifier
 
  .. code-block:: none
 
-    [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000695 seconds.
+    [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.018751 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 47
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 2
@@ -97,9 +98,10 @@ Train a LightGBM classifier
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-6 {
+    <style>#sk-container-id-7 {
       /* Definition of color scheme common for light and dark mode */
-      --sklearn-color-text: black;
+      --sklearn-color-text: #000;
+      --sklearn-color-text-muted: #666;
       --sklearn-color-line: gray;
       /* Definition of color scheme for unfitted estimators */
       --sklearn-color-unfitted-level-0: #fff5e6;
@@ -127,15 +129,15 @@ Train a LightGBM classifier
       }
     }
 
-    #sk-container-id-6 {
+    #sk-container-id-7 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-6 pre {
+    #sk-container-id-7 pre {
       padding: 0;
     }
 
-    #sk-container-id-6 input.sk-hidden--visually {
+    #sk-container-id-7 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -147,7 +149,7 @@ Train a LightGBM classifier
       width: 1px;
     }
 
-    #sk-container-id-6 div.sk-dashed-wrapped {
+    #sk-container-id-7 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -155,7 +157,7 @@ Train a LightGBM classifier
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-6 div.sk-container {
+    #sk-container-id-7 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -165,7 +167,7 @@ Train a LightGBM classifier
       position: relative;
     }
 
-    #sk-container-id-6 div.sk-text-repr-fallback {
+    #sk-container-id-7 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -181,14 +183,14 @@ Train a LightGBM classifier
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-6 div.sk-parallel-item::after {
+    #sk-container-id-7 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-6 div.sk-parallel {
+    #sk-container-id-7 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -196,28 +198,28 @@ Train a LightGBM classifier
       position: relative;
     }
 
-    #sk-container-id-6 div.sk-parallel-item {
+    #sk-container-id-7 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-6 div.sk-parallel-item:first-child::after {
+    #sk-container-id-7 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-6 div.sk-parallel-item:last-child::after {
+    #sk-container-id-7 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-6 div.sk-parallel-item:only-child::after {
+    #sk-container-id-7 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-6 div.sk-serial {
+    #sk-container-id-7 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -235,24 +237,33 @@ Train a LightGBM classifier
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-6 div.sk-toggleable {
+    #sk-container-id-7 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-6 label.sk-toggleable__label {
+    #sk-container-id-7 label.sk-toggleable__label {
       cursor: pointer;
-      display: block;
+      display: flex;
       width: 100%;
       margin-bottom: 0;
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.5em;
     }
 
-    #sk-container-id-6 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-7 label.sk-toggleable__label .caption {
+      font-size: 0.6rem;
+      font-weight: lighter;
+      color: var(--sklearn-color-text-muted);
+    }
+
+    #sk-container-id-7 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -260,13 +271,13 @@ Train a LightGBM classifier
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-6 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-7 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-6 div.sk-toggleable__content {
+    #sk-container-id-7 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -275,12 +286,12 @@ Train a LightGBM classifier
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-6 div.sk-toggleable__content.fitted {
+    #sk-container-id-7 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-6 div.sk-toggleable__content pre {
+    #sk-container-id-7 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -288,79 +299,79 @@ Train a LightGBM classifier
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-6 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-7 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-6 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-7 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-6 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-7 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-6 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-7 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-6 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-7 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-6 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-7 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-6 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-7 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-6 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-6 div.sk-label label {
+    #sk-container-id-7 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-7 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-6 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-7 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-6 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-7 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-6 div.sk-label label {
+    #sk-container-id-7 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-6 div.sk-label-container {
+    #sk-container-id-7 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-6 div.sk-estimator {
+    #sk-container-id-7 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -370,18 +381,18 @@ Train a LightGBM classifier
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-6 div.sk-estimator.fitted {
+    #sk-container-id-7 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-6 div.sk-estimator:hover {
+    #sk-container-id-7 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-6 div.sk-estimator.fitted:hover {
+    #sk-container-id-7 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -402,7 +413,8 @@ Train a LightGBM classifier
       height: 1em;
       width: 1em;
       text-decoration: none !important;
-      margin-left: 1ex;
+      margin-left: 0.5em;
+      text-align: center;
       /* unfitted */
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
       color: var(--sklearn-color-unfitted-level-1);
@@ -468,7 +480,7 @@ Train a LightGBM classifier
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-6 a.estimator_doc_link {
+    #sk-container-id-7 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -483,32 +495,32 @@ Train a LightGBM classifier
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-6 a.estimator_doc_link.fitted {
+    #sk-container-id-7 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-6 a.estimator_doc_link:hover {
+    #sk-container-id-7 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-6 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-7 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-6" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;scaler&#x27;, StandardScaler()),
-                    (&#x27;lgbm&#x27;, LGBMClassifier(n_estimators=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-26" type="checkbox" ><label for="sk-estimator-id-26" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;scaler&#x27;, StandardScaler()),
-                    (&#x27;lgbm&#x27;, LGBMClassifier(n_estimators=3))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-27" type="checkbox" ><label for="sk-estimator-id-27" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;StandardScaler<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-28" type="checkbox" ><label for="sk-estimator-id-28" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">LGBMClassifier</label><div class="sk-toggleable__content fitted"><pre>LGBMClassifier(n_estimators=3)</pre></div> </div></div></div></div></div></div>
+    </style><div id="sk-container-id-7" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;scaler&#x27;, StandardScaler()),
+                    (&#x27;lgbm&#x27;, LGBMClassifier(n_estimators=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-27" type="checkbox" ><label for="sk-estimator-id-27" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;scaler&#x27;, StandardScaler()),
+                    (&#x27;lgbm&#x27;, LGBMClassifier(n_estimators=3))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-28" type="checkbox" ><label for="sk-estimator-id-28" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-29" type="checkbox" ><label for="sk-estimator-id-29" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMClassifier</div></div></label><div class="sk-toggleable__content fitted"><pre>LGBMClassifier(n_estimators=3)</pre></div> </div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-63
+.. GENERATED FROM PYTHON SOURCE LINES 53-64
 
 Register the converter for LGBMClassifier
 +++++++++++++++++++++++++++++++++++++++++
@@ -522,7 +534,7 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 lightgbm/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-72
+.. GENERATED FROM PYTHON SOURCE LINES 64-73
 
 .. code-block:: Python
 
@@ -542,12 +554,12 @@ lightgbm/shape_calculators/Classifier.py>`_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 74-76
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-87
+.. GENERATED FROM PYTHON SOURCE LINES 76-88
 
 .. code-block:: Python
 
@@ -570,14 +582,14 @@ Convert again
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-92
+.. GENERATED FROM PYTHON SOURCE LINES 89-93
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with LightGbm.
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-96
+.. GENERATED FROM PYTHON SOURCE LINES 93-97
 
 .. code-block:: Python
 
@@ -593,17 +605,17 @@ Predictions with LightGbm.
 
  .. code-block:: none
 
-    predict [1 2 1 0 1]
-    predict_proba [[0.25335584 0.45934348 0.28730068]]
+    predict [2 0 0 0 1]
+    predict_proba [[0.22814003 0.31657806 0.45528191]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-98
+.. GENERATED FROM PYTHON SOURCE LINES 98-99
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-104
+.. GENERATED FROM PYTHON SOURCE LINES 99-105
 
 .. code-block:: Python
 
@@ -621,8 +633,8 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 2 1 0 1]
-    predict_proba [{0: 0.25335583090782166, 1: 0.45934349298477173, 2: 0.287300705909729}]
+    predict [2 0 0 0 1]
+    predict_proba [{0: 0.22814001142978668, 1: 0.3165780305862427, 2: 0.45528194308280945}]
 
 
 
@@ -630,7 +642,7 @@ Predictions with onnxruntime.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.060 seconds)
+   **Total running time of the script:** (0 minutes 0.102 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm.py:
@@ -646,6 +658,10 @@ Predictions with onnxruntime.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gexternal_lightgbm.py <plot_gexternal_lightgbm.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_gexternal_lightgbm.zip <plot_gexternal_lightgbm.zip>`
 
 
 .. only:: html

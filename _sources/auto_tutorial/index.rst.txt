@@ -13,7 +13,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This issue is described at scikit-learn/issues/13733. If a CountVectorizer or a TfidfVectorizer...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This issue is described at scikit-learn/issues/13733. If a CountVectorizer or a TfidfVectorizer produces a token with a space, skl2onnx cannot know if it a bi-grams or a unigram with a space.">
 
 .. only:: html
 
@@ -30,7 +30,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This program starts from an example in scikit-learn documentation: Plot individual and voting r...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This program starts from an example in scikit-learn documentation: Plot individual and voting regression predictions, converts it into ONNX and finally computes the predictions a different runtime.">
 
 .. only:: html
 
@@ -47,7 +47,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a LightGBM model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a LGBMClassifier. Let&#x27;s see how to do it.">
 
 .. only:: html
 
@@ -64,7 +64,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Some runtimes do not implement a runtime for every available operator in ONNX. The converter do...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Some runtimes do not implement a runtime for every available operator in ONNX. The converter does not know that but it is possible to black some operators. Most of the converters do not change their behaviour, they fail if they use a black listed operator, a couple of them produces a different ONNX graph.">
 
 .. only:: html
 
@@ -81,7 +81,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Every library is versioned. scikit-learn may change the implementation of a specific model. Tha...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Every library is versioned. scikit-learn may change the implementation of a specific model. That happens for example with the SVC model where the parameter break_ties was added in 0.22. ONNX does also have a version called opset number. Operator ArgMin was added in opset 1 and changed in opset 11, 12, 13. Sometimes, it is updated to extend the list of types it supports, sometimes, it moves a parameter into the input list. The runtime used to deploy the model does not implement a new version, in that case, a model must be converted by usually using the most recent opset supported by the runtime, we call that opset the targeted opset. An ONNX graph only contains one unique opset, every node must be described following the specifications defined by the latest opset below the targeted opset.">
 
 .. only:: html
 
@@ -98,7 +98,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There are many reasons why a user wants more than using the converted model into ONNX. Intermed...">
+    <div class="sphx-glr-thumbcontainer" tooltip="There are many reasons why a user wants more than using the converted model into ONNX. Intermediate results may be needed, the output of every node in the graph. The ONNX may need to be altered to remove some nodes. Transfer learning is usually removing the last layers of a deep neural network. Another reaason is debugging. It often happens that the runtime fails to compute the predictions due to a shape mismatch. Then it is useful the get the shape of every intermediate result. This example looks into two ways of doing it.">
 
 .. only:: html
 
@@ -115,7 +115,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Once a model is converted it can be useful to store an array as a constant in the graph an retr...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Once a model is converted it can be useful to store an array as a constant in the graph an retrieve it through an output. This allows the user to store training parameters or other informations like a vocabulary. Last sections shows how to remove an output or to promote an intermediate result to an output.">
 
 .. only:: html
 
@@ -132,7 +132,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer is one transform for which the corresponding converted onnx model may produce d...">
+    <div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer is one transform for which the corresponding converted onnx model may produce different results. The larger the vocabulary is, the higher the probability to get different result is. This example proposes a equivalent model with no discrepancies.">
 
 .. only:: html
 
@@ -149,7 +149,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to change the default ONNX graph such as renaming the inputs or outputs ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to change the default ONNX graph such as renaming the inputs or outputs names.">
 
 .. only:: html
 
@@ -166,7 +166,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="WOE means Weights of Evidence. It consists in checking that a feature X belongs to a series of ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="WOE means Weights of Evidence. It consists in checking that a feature X belongs to a series of regions - intervals -. The results is the label of every intervals containing the feature.">
 
 .. only:: html
 
@@ -183,7 +183,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Example l-simple-deploy-1 converts a simple model. This example takes a similar example but on ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Example l-simple-deploy-1 converts a simple model. This example takes a similar example but on random data and compares the processing time required by each option to compute predictions.">
 
 .. only:: html
 
@@ -200,7 +200,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline usually ingests data as a matrix. It may be converted in a matrix if all the data sh...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline usually ingests data as a matrix. It may be converted in a matrix if all the data share the same type. But data held in a dataframe have usually multiple types, float, integer or string for categories. ONNX also supports that case.">
 
 .. only:: html
 
@@ -217,7 +217,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There is not one way to convert a model. A new operator might have been added in a newer versio...">
+    <div class="sphx-glr-thumbcontainer" tooltip="There is not one way to convert a model. A new operator might have been added in a newer version of ONNX and that speeds up the converted model. The rational choice would be to use this new operator but what means the associated runtime has an implementation for it. What if two different users needs two different conversion for the same model? Let&#x27;s see how this may be done.">
 
 .. only:: html
 
@@ -234,7 +234,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In many cases, a custom models leverages existing models which already have an associated conve...">
+    <div class="sphx-glr-thumbcontainer" tooltip="In many cases, a custom models leverages existing models which already have an associated converter. To convert this patchwork, existing converters must be called. This example shows how to do that. Example l-plot-custom-converter can be rewritten by using a PCA. We could then reuse the converter associated to this model.">
 
 .. only:: html
 
@@ -251,7 +251,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Most models in scikit-learn do computation with double, not float. Most models in deep learning...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Most models in scikit-learn do computation with double, not float. Most models in deep learning use float because that&#x27;s the most common situation with GPU. ONNX was initially created to facilitate the deployment of deep learning models and that explains why many converters assume the converted models should use float. That assumption does not usually harm the predictions, the conversion to float introduce small discrepencies compare to double predictions. That assumption is usually true if the prediction function is continuous, y = f(x), then dy = f&#x27;(x) dx. We can determine an upper bound to the discrepencies : \Delta(y) \leqslant \sup_x \left\Vert f&#x27;(x)\right\Vert dx. dx is the discrepency introduced by a float conversion, dx = x - numpy.float32(x).">
 
 .. only:: html
 
@@ -268,7 +268,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The discrepancies observed when using float and TreeEnsemble operator (see l-example-discrepenc...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The discrepancies observed when using float and TreeEnsemble operator (see l-example-discrepencies-float-double) explains why the converter for LGBMRegressor may introduce significant discrepancies even when it is used with float tensors.">
 
 .. only:: html
 
@@ -285,7 +285,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a...">
+    <div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a regressor has one output (prediction), a transform has one output (the transformed data). What if it is not the case? The following example creates a custom converter and a custom parser which defines the number of outputs expected by the converted model.">
 
 .. only:: html
 
@@ -302,7 +302,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A scikit-learn classifier usually returns a matrix of probabilities. By default, sklearn-onnx c...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A scikit-learn classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that matrix into a list of dictionaries where each probabily is mapped to its class id or name. That mechanism retains the class names but is slower. Let&#x27;s see what other options are available.">
 
 .. only:: html
 
@@ -319,7 +319,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it.">
 
 .. only:: html
 
@@ -336,7 +336,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Options are used to implement different conversion for a same model. The options can be used to...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Options are used to implement different conversion for a same model. The options can be used to replace an operator MatMul by the Gemm operator and compare the processing time for both graph. Let&#x27;s see how to retrieve the options within a converter.">
 
 .. only:: html
 
@@ -353,7 +353,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it.">
 
 .. only:: html
 
@@ -370,7 +370,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There are two ways to write a converter. The first one is less verbose and easier to understand...">
+    <div class="sphx-glr-thumbcontainer" tooltip="There are two ways to write a converter. The first one is less verbose and easier to understand (see k_means.py). The other is very verbose (see ada_boost.py for an example).">
 
 .. only:: html
 
@@ -387,7 +387,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a...">
+    <div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a regressor has one output (prediction), a transform has one output (the transformed data). This example assumes the model to convert is one of them. In that case, a new converter requires in fact two functions:">
 
 .. only:: html
 
@@ -404,7 +404,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example answers issues 685. It implements a custom converter for model pyod.models.iforest...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example answers issues 685. It implements a custom converter for model pyod.models.iforest.IForest. This example uses l-plot-custom-converter as a start.">
 
 .. only:: html
 
@@ -421,7 +421,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="WOEEncoder is a transformer implemented in categorical_encoder and as such, any converter would...">
+    <div class="sphx-glr-thumbcontainer" tooltip="WOEEncoder is a transformer implemented in categorical_encoder and as such, any converter would not be included in sklearn-onnx which only implements converters for scikit-learn models. Anyhow, this example demonstrates how to implement a custom converter for WOEEncoder. This code is not fully tested for all possible cases the original encoder can handle.">
 
 .. only:: html
 
@@ -438,7 +438,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline including a FunctionTransformer cannot be automatically converted into onnx because ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline including a FunctionTransformer cannot be automatically converted into onnx because there is no converter able to convert custom python code into ONNX. A custom converter needs to be written specifically for it.">
 
 .. only:: html
 
@@ -455,7 +455,7 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer usually creates sparse data. If the data is sparse enough, matrices usually sta...">
+    <div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer usually creates sparse data. If the data is sparse enough, matrices usually stays as sparse all along the pipeline until the predictor is trained. Sparse matrices do not consider null and missing values as they are not present in the datasets. Because some predictors do the difference, this ambiguity may introduces discrepencies when converter into ONNX. This example looks into several configurations.">
 
 .. only:: html
 

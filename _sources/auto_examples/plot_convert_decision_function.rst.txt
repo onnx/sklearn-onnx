@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_convert_decision_function.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -34,9 +34,10 @@ that on a simple example.
 Train a model and convert it
 ++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-43
+.. GENERATED FROM PYTHON SOURCE LINES 22-44
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import numpy
     import sklearn
@@ -72,7 +73,7 @@ Train a model and convert it
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-49
+.. GENERATED FROM PYTHON SOURCE LINES 45-50
 
 Output type
 +++++++++++
@@ -80,9 +81,9 @@ Output type
 Let's confirm the output type of the probabilities
 is a list of dictionaries with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-55
+.. GENERATED FROM PYTHON SOURCE LINES 50-56
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
@@ -98,21 +99,21 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    skl [[9.82794559e-01 1.72053489e-02 9.16403830e-08]]
-    onnx [{0: 0.9827945232391357, 1: 0.017205340787768364, 2: 9.164028114128087e-08}, {0: 0.00189912598580122, 1: 0.4566256105899811, 2: 0.541475236415863}]
+    skl [[2.18706981e-05 3.86603824e-02 9.61317747e-01]]
+    onnx [{0: 2.1870704586035572e-05, 1: 0.03866042196750641, 2: 0.9613177180290222}, {0: 1.1326104868203402e-05, 1: 0.06515791267156601, 2: 0.9348307847976685}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-59
+.. GENERATED FROM PYTHON SOURCE LINES 57-60
 
 Raw scores and decision_function
 ++++++++++++++++++++++++++++++++
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-73
+.. GENERATED FROM PYTHON SOURCE LINES 60-74
 
-.. code-block:: default
+.. code-block:: Python
 
 
     initial_type = [("float_input", FloatTensorType([None, 4]))]
@@ -136,19 +137,19 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    skl [[ 6.74440614  2.69922635 -9.44363249]]
-    onnx [{0: 6.744406700134277, 1: 2.6992263793945312, 2: -9.443633079528809}, {0: -3.7117910385131836, 1: 1.770678997039795, 2: 1.9411125183105469}]
+    skl [[-6.0561118   1.42131109  4.63480072]]
+    onnx [{0: -6.056112289428711, 1: 1.4213112592697144, 2: 4.634799957275391}, {0: -6.659489631652832, 1: 1.997969150543213, 2: 4.661520957946777}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-75
+.. GENERATED FROM PYTHON SOURCE LINES 75-76
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-81
+.. GENERATED FROM PYTHON SOURCE LINES 76-82
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -164,11 +165,11 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.15.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -176,7 +177,7 @@ Raw scores and decision_function
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.134 seconds)
+   **Total running time of the script:** (0 minutes 0.042 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_decision_function.py:
@@ -185,16 +186,17 @@ Raw scores and decision_function
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_convert_decision_function.ipynb <plot_convert_decision_function.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_convert_decision_function.py <plot_convert_decision_function.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_convert_decision_function.ipynb <plot_convert_decision_function.ipynb>`
+      :download:`Download zipped: plot_convert_decision_function.zip <plot_convert_decision_function.zip>`
 
 
 .. only:: html

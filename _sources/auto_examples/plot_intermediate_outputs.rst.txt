@@ -41,9 +41,10 @@ Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-102
+.. GENERATED FROM PYTHON SOURCE LINES 28-103
 
 .. code-block:: Python
+
 
     import skl2onnx
     import onnx
@@ -127,9 +128,10 @@ and must be removed. Look for comment starting with ``---`` below.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-5 {
+    <style>#sk-container-id-4 {
       /* Definition of color scheme common for light and dark mode */
-      --sklearn-color-text: black;
+      --sklearn-color-text: #000;
+      --sklearn-color-text-muted: #666;
       --sklearn-color-line: gray;
       /* Definition of color scheme for unfitted estimators */
       --sklearn-color-unfitted-level-0: #fff5e6;
@@ -157,15 +159,15 @@ and must be removed. Look for comment starting with ``---`` below.
       }
     }
 
-    #sk-container-id-5 {
+    #sk-container-id-4 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-5 pre {
+    #sk-container-id-4 pre {
       padding: 0;
     }
 
-    #sk-container-id-5 input.sk-hidden--visually {
+    #sk-container-id-4 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -177,7 +179,7 @@ and must be removed. Look for comment starting with ``---`` below.
       width: 1px;
     }
 
-    #sk-container-id-5 div.sk-dashed-wrapped {
+    #sk-container-id-4 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -185,7 +187,7 @@ and must be removed. Look for comment starting with ``---`` below.
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-5 div.sk-container {
+    #sk-container-id-4 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -195,7 +197,7 @@ and must be removed. Look for comment starting with ``---`` below.
       position: relative;
     }
 
-    #sk-container-id-5 div.sk-text-repr-fallback {
+    #sk-container-id-4 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -211,14 +213,14 @@ and must be removed. Look for comment starting with ``---`` below.
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-5 div.sk-parallel-item::after {
+    #sk-container-id-4 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-5 div.sk-parallel {
+    #sk-container-id-4 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -226,28 +228,28 @@ and must be removed. Look for comment starting with ``---`` below.
       position: relative;
     }
 
-    #sk-container-id-5 div.sk-parallel-item {
+    #sk-container-id-4 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-5 div.sk-parallel-item:first-child::after {
+    #sk-container-id-4 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-5 div.sk-parallel-item:last-child::after {
+    #sk-container-id-4 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-5 div.sk-parallel-item:only-child::after {
+    #sk-container-id-4 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-5 div.sk-serial {
+    #sk-container-id-4 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -265,24 +267,33 @@ and must be removed. Look for comment starting with ``---`` below.
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-5 div.sk-toggleable {
+    #sk-container-id-4 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-5 label.sk-toggleable__label {
+    #sk-container-id-4 label.sk-toggleable__label {
       cursor: pointer;
-      display: block;
+      display: flex;
       width: 100%;
       margin-bottom: 0;
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.5em;
     }
 
-    #sk-container-id-5 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-4 label.sk-toggleable__label .caption {
+      font-size: 0.6rem;
+      font-weight: lighter;
+      color: var(--sklearn-color-text-muted);
+    }
+
+    #sk-container-id-4 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -290,13 +301,13 @@ and must be removed. Look for comment starting with ``---`` below.
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-5 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-4 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-5 div.sk-toggleable__content {
+    #sk-container-id-4 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -305,12 +316,12 @@ and must be removed. Look for comment starting with ``---`` below.
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-5 div.sk-toggleable__content.fitted {
+    #sk-container-id-4 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-5 div.sk-toggleable__content pre {
+    #sk-container-id-4 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -318,79 +329,79 @@ and must be removed. Look for comment starting with ``---`` below.
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-5 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-4 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-5 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-4 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-5 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-4 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-5 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-4 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-5 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-4 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-5 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-4 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-5 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-4 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-5 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-5 div.sk-label label {
+    #sk-container-id-4 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-4 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-5 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-4 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-5 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-4 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-5 div.sk-label label {
+    #sk-container-id-4 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-5 div.sk-label-container {
+    #sk-container-id-4 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-5 div.sk-estimator {
+    #sk-container-id-4 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -400,18 +411,18 @@ and must be removed. Look for comment starting with ``---`` below.
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-5 div.sk-estimator.fitted {
+    #sk-container-id-4 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-5 div.sk-estimator:hover {
+    #sk-container-id-4 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-5 div.sk-estimator.fitted:hover {
+    #sk-container-id-4 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -432,7 +443,8 @@ and must be removed. Look for comment starting with ``---`` below.
       height: 1em;
       width: 1em;
       text-decoration: none !important;
-      margin-left: 1ex;
+      margin-left: 0.5em;
+      text-align: center;
       /* unfitted */
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
       color: var(--sklearn-color-unfitted-level-1);
@@ -498,7 +510,7 @@ and must be removed. Look for comment starting with ``---`` below.
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-5 a.estimator_doc_link {
+    #sk-container-id-4 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -513,25 +525,25 @@ and must be removed. Look for comment starting with ``---`` below.
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-5 a.estimator_doc_link.fitted {
+    #sk-container-id-4 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-5 a.estimator_doc_link:hover {
+    #sk-container-id-4 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-5 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-4 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-5" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
+    </style><div id="sk-container-id-4" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
                      ColumnTransformer(transformers=[(&#x27;num&#x27;,
                                                       Pipeline(steps=[(&#x27;imputer&#x27;,
                                                                        SimpleImputer(strategy=&#x27;median&#x27;)),
@@ -543,7 +555,7 @@ and must be removed. Look for comment starting with ``---`` below.
                                                                        OneHotEncoder(handle_unknown=&#x27;ignore&#x27;))]),
                                                       [&#x27;embarked&#x27;, &#x27;sex&#x27;,
                                                        &#x27;pclass&#x27;])])),
-                    (&#x27;classifier&#x27;, LogisticRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-18" type="checkbox" ><label for="sk-estimator-id-18" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
+                    (&#x27;classifier&#x27;, LogisticRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-13" type="checkbox" ><label for="sk-estimator-id-13" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
                      ColumnTransformer(transformers=[(&#x27;num&#x27;,
                                                       Pipeline(steps=[(&#x27;imputer&#x27;,
                                                                        SimpleImputer(strategy=&#x27;median&#x27;)),
@@ -555,7 +567,7 @@ and must be removed. Look for comment starting with ``---`` below.
                                                                        OneHotEncoder(handle_unknown=&#x27;ignore&#x27;))]),
                                                       [&#x27;embarked&#x27;, &#x27;sex&#x27;,
                                                        &#x27;pclass&#x27;])])),
-                    (&#x27;classifier&#x27;, LogisticRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-19" type="checkbox" ><label for="sk-estimator-id-19" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;preprocessor: ColumnTransformer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(transformers=[(&#x27;num&#x27;,
+                    (&#x27;classifier&#x27;, LogisticRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-14" type="checkbox" ><label for="sk-estimator-id-14" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>preprocessor: ColumnTransformer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></div></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(transformers=[(&#x27;num&#x27;,
                                      Pipeline(steps=[(&#x27;imputer&#x27;,
                                                       SimpleImputer(strategy=&#x27;median&#x27;)),
                                                      (&#x27;scaler&#x27;, StandardScaler())]),
@@ -563,12 +575,12 @@ and must be removed. Look for comment starting with ``---`` below.
                                     (&#x27;cat&#x27;,
                                      Pipeline(steps=[(&#x27;onehot&#x27;,
                                                       OneHotEncoder(handle_unknown=&#x27;ignore&#x27;))]),
-                                     [&#x27;embarked&#x27;, &#x27;sex&#x27;, &#x27;pclass&#x27;])])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-20" type="checkbox" ><label for="sk-estimator-id-20" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">num</label><div class="sk-toggleable__content fitted"><pre>[&#x27;age&#x27;, &#x27;fare&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-21" type="checkbox" ><label for="sk-estimator-id-21" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;SimpleImputer<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.impute.SimpleImputer.html">?<span>Documentation for SimpleImputer</span></a></label><div class="sk-toggleable__content fitted"><pre>SimpleImputer(strategy=&#x27;median&#x27;)</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-22" type="checkbox" ><label for="sk-estimator-id-22" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;StandardScaler<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-23" type="checkbox" ><label for="sk-estimator-id-23" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">cat</label><div class="sk-toggleable__content fitted"><pre>[&#x27;embarked&#x27;, &#x27;sex&#x27;, &#x27;pclass&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-24" type="checkbox" ><label for="sk-estimator-id-24" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;OneHotEncoder<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.preprocessing.OneHotEncoder.html">?<span>Documentation for OneHotEncoder</span></a></label><div class="sk-toggleable__content fitted"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;)</pre></div> </div></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-25" type="checkbox" ><label for="sk-estimator-id-25" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;LogisticRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.linear_model.LogisticRegression.html">?<span>Documentation for LogisticRegression</span></a></label><div class="sk-toggleable__content fitted"><pre>LogisticRegression()</pre></div> </div></div></div></div></div></div>
+                                     [&#x27;embarked&#x27;, &#x27;sex&#x27;, &#x27;pclass&#x27;])])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" ><label for="sk-estimator-id-15" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>num</div></div></label><div class="sk-toggleable__content fitted"><pre>[&#x27;age&#x27;, &#x27;fare&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox" ><label for="sk-estimator-id-16" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>SimpleImputer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.impute.SimpleImputer.html">?<span>Documentation for SimpleImputer</span></a></div></label><div class="sk-toggleable__content fitted"><pre>SimpleImputer(strategy=&#x27;median&#x27;)</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-17" type="checkbox" ><label for="sk-estimator-id-17" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div></div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-18" type="checkbox" ><label for="sk-estimator-id-18" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>cat</div></div></label><div class="sk-toggleable__content fitted"><pre>[&#x27;embarked&#x27;, &#x27;sex&#x27;, &#x27;pclass&#x27;]</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-19" type="checkbox" ><label for="sk-estimator-id-19" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>OneHotEncoder</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.OneHotEncoder.html">?<span>Documentation for OneHotEncoder</span></a></div></label><div class="sk-toggleable__content fitted"><pre>OneHotEncoder(handle_unknown=&#x27;ignore&#x27;)</pre></div> </div></div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-20" type="checkbox" ><label for="sk-estimator-id-20" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LogisticRegression</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.linear_model.LogisticRegression.html">?<span>Documentation for LogisticRegression</span></a></div></label><div class="sk-toggleable__content fitted"><pre>LogisticRegression()</pre></div> </div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-109
+.. GENERATED FROM PYTHON SOURCE LINES 104-110
 
 Define the inputs of the ONNX graph
 +++++++++++++++++++++++++++++++++++
@@ -577,7 +589,7 @@ Define the inputs of the ONNX graph
 but it needs to know which feature has which name.
 We simply reuse the dataframe column definition.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 110-112
 
 .. code-block:: Python
 
@@ -609,11 +621,11 @@ We simply reuse the dataframe column definition.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-113
+.. GENERATED FROM PYTHON SOURCE LINES 113-114
 
 After conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-134
+.. GENERATED FROM PYTHON SOURCE LINES 114-135
 
 .. code-block:: Python
 
@@ -663,18 +675,18 @@ After conversion.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-138
+.. GENERATED FROM PYTHON SOURCE LINES 136-139
 
 Merging single column into vectors is not
 the most efficient way to compute the prediction.
 It could be done before converting the pipeline into a graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-142
+.. GENERATED FROM PYTHON SOURCE LINES 141-143
 
 Convert the pipeline into ONNX
 ++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-148
+.. GENERATED FROM PYTHON SOURCE LINES 143-149
 
 .. code-block:: Python
 
@@ -691,13 +703,13 @@ Convert the pipeline into ONNX
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-152
+.. GENERATED FROM PYTHON SOURCE LINES 150-153
 
 *scikit-learn* does implicit conversions when it can.
 *sklearn-onnx* does not. The ONNX version of *OneHotEncoder*
 must be applied on columns of the same type.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-166
+.. GENERATED FROM PYTHON SOURCE LINES 153-167
 
 .. code-block:: Python
 
@@ -722,7 +734,7 @@ must be applied on columns of the same type.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-173
+.. GENERATED FROM PYTHON SOURCE LINES 168-174
 
 Compare the predictions
 +++++++++++++++++++++++
@@ -731,7 +743,7 @@ Final step, we need to ensure the converted model
 produces the same predictions, labels and probabilities.
 Let's start with *scikit-learn*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-177
+.. GENERATED FROM PYTHON SOURCE LINES 174-178
 
 .. code-block:: Python
 
@@ -747,13 +759,13 @@ Let's start with *scikit-learn*.
 
  .. code-block:: none
 
-    predict [0 0 1 0 0]
-    predict_proba [[0.60224126 0.39775874]]
+    predict [0 0 0 0 1]
+    predict_proba [[0.88600265 0.11399735]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-187
+.. GENERATED FROM PYTHON SOURCE LINES 179-188
 
 Predictions with onnxruntime.
 We need to remove the dropped columns and to change
@@ -765,7 +777,7 @@ Last detail, every column was described  not really as a vector
 but as a matrix of one column which explains the last line
 with the *reshape*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-195
+.. GENERATED FROM PYTHON SOURCE LINES 188-196
 
 .. code-block:: Python
 
@@ -784,11 +796,11 @@ with the *reshape*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-197
+.. GENERATED FROM PYTHON SOURCE LINES 197-198
 
 We are ready to run *onnxruntime*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-204
+.. GENERATED FROM PYTHON SOURCE LINES 198-205
 
 .. code-block:: Python
 
@@ -807,13 +819,13 @@ We are ready to run *onnxruntime*.
 
  .. code-block:: none
 
-    predict [0 0 1 0 0]
-    predict_proba [{0: 0.7899309396743774, 1: 0.21006903052330017}]
+    predict [0 0 0 0 1]
+    predict_proba [{0: 0.9543983340263367, 1: 0.04560166597366333}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-212
+.. GENERATED FROM PYTHON SOURCE LINES 206-213
 
 Compute intermediate outputs
 ++++++++++++++++++++++++++++
@@ -823,7 +835,7 @@ Unfortunately, there is actually no way to ask
 We need to modifies the *ONNX* before it is given to *onnxruntime*.
 Let's see first the list of intermediate output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-217
+.. GENERATED FROM PYTHON SOURCE LINES 213-218
 
 .. code-block:: Python
 
@@ -857,7 +869,7 @@ Let's see first the list of intermediate output.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-224
+.. GENERATED FROM PYTHON SOURCE LINES 219-225
 
 Not that easy to tell which one is what as the *ONNX*
 has more operators than the original *scikit-learn* pipelines.
@@ -866,7 +878,7 @@ helps up to find the outputs of both numerical
 and textual pipeline: *variable1*, *variable2*.
 Let's look into the numerical pipeline first.
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-228
+.. GENERATED FROM PYTHON SOURCE LINES 225-229
 
 .. code-block:: Python
 
@@ -883,15 +895,15 @@ Let's look into the numerical pipeline first.
  .. code-block:: none
 
 
-    b'\x08\x07\x12\x08skl2onnx\x1a\x061.17.0"\x07ai.onnx(\x002\x00:\xcd\x03\n:\n\x03age\n\x04fare\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe2A=\xcdLgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=\xe05\xedA=\'\xcb\nB\xa0\x01\x06*\x14\n\x05scale=\'l\x9f==\xdd,\x96<\xa0\x01\x06:\nai.onnx.ml\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\tB\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x0e\n\nai.onnx.ml\x10\x01B\x04\n\x00\x10\x0b'
+    b'\x08\x07\x12\x08skl2onnx\x1a\x061.18.0"\x07ai.onnx(\x002\x00:\xcd\x03\n:\n\x03age\n\x04fare\x12\x0emerged_columns\x1a\x06Concat"\x06Concat*\x0b\n\x04axis\x18\x01\xa0\x01\x02:\x00\n}\n\x0emerged_columns\x12\x08variable\x1a\x07Imputer"\x07Imputer*#\n\x14imputed_value_floats=\x00\x00\xe0A=2UgA\xa0\x01\x06*\x1e\n\x14replaced_value_float\x15\x00\x00\xc0\x7f\xa0\x01\x01:\nai.onnx.ml\n^\n\x08variable\x12\tvariable1\x1a\x06Scaler"\x06Scaler*\x15\n\x06offset=f\x13\xecA=\xc3\xad\x02B\xa0\x01\x06*\x14\n\x05scale=h7\x9f==\x1a\xbc\xa7<\xa0\x01\x06:\nai.onnx.ml\x12\x10pipeline_titanic*\x1f\x08\x02\x10\x07:\x0b\xff\xff\xff\xff\xff\xff\xff\xff\xff\x01\tB\x0cshape_tensorZ\x16\n\x06pclass\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03sex\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01Z\x13\n\x03age\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x14\n\x04fare\x12\x0c\n\n\x08\x01\x12\x06\n\x00\n\x02\x08\x01Z\x18\n\x08embarked\x12\x0c\n\n\x08\x08\x12\x06\n\x00\n\x02\x08\x01b\x0b\n\tvariable1B\x04\n\x00\x10\x0bB\x0e\n\nai.onnx.ml\x10\x01'
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-230
+.. GENERATED FROM PYTHON SOURCE LINES 230-231
 
 Let's compute the numerical features.
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-237
+.. GENERATED FROM PYTHON SOURCE LINES 231-238
 
 .. code-block:: Python
 
@@ -910,16 +922,16 @@ Let's compute the numerical features.
 
  .. code-block:: none
 
-    numerical features [[-0.7512866  -0.50364053]]
+    numerical features [[ 1.6707252  -0.52448833]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-239
+.. GENERATED FROM PYTHON SOURCE LINES 239-240
 
 We do the same for the textual features.
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-249
+.. GENERATED FROM PYTHON SOURCE LINES 240-250
 
 .. code-block:: Python
 
@@ -942,16 +954,8 @@ We do the same for the textual features.
  .. code-block:: none
 
     ir_version: 7
-    opset_import {
-      domain: "ai.onnx.ml"
-      version: 1
-    }
-    opset_import {
-      domain: ""
-      version: 11
-    }
     producer_name: "skl2onnx"
-    producer_version: "1.17.0"
+    producer_version: "1.18.0"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -962,69 +966,69 @@ We do the same for the textual features.
         output: "merged_columns"
         name: "Concat"
         op_type: "Concat"
-        domain: ""
         attribute {
           name: "axis"
-          type: INT
           i: 1
+          type: INT
         }
+        domain: ""
       }
       node {
         input: "embarked"
         output: "embarkedout"
         name: "OneHotEncoder"
         op_type: "OneHotEncoder"
-        domain: "ai.onnx.ml"
         attribute {
           name: "cats_strings"
-          type: STRINGS
           strings: "C"
           strings: "Q"
           strings: "S"
           strings: "missing"
+          type: STRINGS
         }
         attribute {
           name: "zeros"
-          type: INT
           i: 1
+          type: INT
         }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "sex"
         output: "sexout"
         name: "OneHotEncoder1"
         op_type: "OneHotEncoder"
-        domain: "ai.onnx.ml"
         attribute {
           name: "cats_strings"
-          type: STRINGS
           strings: "female"
           strings: "male"
+          type: STRINGS
         }
         attribute {
           name: "zeros"
-          type: INT
           i: 1
+          type: INT
         }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "pclass"
         output: "pclassout"
         name: "OneHotEncoder2"
         op_type: "OneHotEncoder"
-        domain: "ai.onnx.ml"
         attribute {
           name: "cats_strings"
-          type: STRINGS
           strings: "1"
           strings: "2"
           strings: "3"
+          type: STRINGS
         }
         attribute {
           name: "zeros"
-          type: INT
           i: 1
+          type: INT
         }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "embarkedout"
@@ -1033,30 +1037,30 @@ We do the same for the textual features.
         output: "concat_result"
         name: "Concat1"
         op_type: "Concat"
-        domain: ""
         attribute {
           name: "axis"
-          type: INT
           i: -1
+          type: INT
         }
+        domain: ""
       }
       node {
         input: "merged_columns"
         output: "variable"
         name: "Imputer"
         op_type: "Imputer"
-        domain: "ai.onnx.ml"
         attribute {
           name: "imputed_value_floats"
+          floats: 28
+          floats: 14.4583
           type: FLOATS
-          floats: 28.25
-          floats: 14.4562502
         }
         attribute {
           name: "replaced_value_float"
-          type: FLOAT
           f: nan
+          type: FLOAT
         }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "concat_result"
@@ -1071,19 +1075,19 @@ We do the same for the textual features.
         output: "variable1"
         name: "Scaler"
         op_type: "Scaler"
-        domain: "ai.onnx.ml"
         attribute {
           name: "offset"
+          floats: 29.5094719
+          floats: 32.6696892
           type: FLOATS
-          floats: 29.6513062
-          floats: 34.698391
         }
         attribute {
           name: "scale"
+          floats: 0.0777424
+          floats: 0.020475436
           type: FLOATS
-          floats: 0.077843
-          floats: 0.0183319394
         }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "variable1"
@@ -1091,12 +1095,12 @@ We do the same for the textual features.
         output: "transformed_column"
         name: "Concat2"
         op_type: "Concat"
-        domain: ""
         attribute {
           name: "axis"
-          type: INT
           i: 1
+          type: INT
         }
+        domain: ""
       }
       node {
         input: "transformed_column"
@@ -1104,80 +1108,80 @@ We do the same for the textual features.
         output: "probabilities"
         name: "LinearClassifier"
         op_type: "LinearClassifier"
-        domain: "ai.onnx.ml"
         attribute {
           name: "classlabels_ints"
-          type: INTS
           ints: 0
           ints: 1
+          type: INTS
         }
         attribute {
           name: "coefficients"
+          floats: 0.414287567
+          floats: 0.0486155599
+          floats: -0.254193634
+          floats: 0.0872347131
+          floats: 0.349803418
+          floats: -0.259518
+          floats: -1.27854633
+          floats: 1.20187283
+          floats: -1.06555367
+          floats: -0.00171175227
+          floats: 0.990591884
+          floats: -0.414287567
+          floats: -0.0486155599
+          floats: 0.254193634
+          floats: -0.0872347131
+          floats: -0.349803418
+          floats: 0.259518
+          floats: 1.27854633
+          floats: -1.20187283
+          floats: 1.06555367
+          floats: 0.00171175227
+          floats: -0.990591884
           type: FLOATS
-          floats: 0.411349356
-          floats: -0.0257858913
-          floats: -0.341414243
-          floats: 0.0805286616
-          floats: 0.334271878
-          floats: -0.121588431
-          floats: -1.24841082
-          floats: 1.20020878
-          floats: -0.920275748
-          floats: -0.037623141
-          floats: 0.909696758
-          floats: -0.411349356
-          floats: 0.0257858913
-          floats: 0.341414243
-          floats: -0.0805286616
-          floats: -0.334271878
-          floats: 0.121588431
-          floats: 1.24841082
-          floats: -1.20020878
-          floats: 0.920275748
-          floats: 0.037623141
-          floats: -0.909696758
         }
         attribute {
           name: "intercepts"
+          floats: -0.1677939
+          floats: 0.1677939
           type: FLOATS
-          floats: -0.147927582
-          floats: 0.147927582
         }
         attribute {
           name: "multi_class"
-          type: INT
           i: 0
+          type: INT
         }
         attribute {
           name: "post_transform"
-          type: STRING
           s: "LOGISTIC"
+          type: STRING
         }
+        domain: "ai.onnx.ml"
       }
       node {
         input: "label"
         output: "output_label"
         name: "Cast"
         op_type: "Cast"
-        domain: ""
         attribute {
           name: "to"
-          type: INT
           i: 7
+          type: INT
         }
+        domain: ""
       }
       node {
         input: "probabilities"
         output: "output_probability"
         name: "ZipMap"
         op_type: "ZipMap"
-        domain: "ai.onnx.ml"
         attribute {
           name: "classlabels_int64s"
-          type: INTS
           ints: 0
           ints: 1
+          type: INTS
         }
+        domain: "ai.onnx.ml"
       }
       name: "pipeline_titanic"
       initializer {
@@ -1292,20 +1296,28 @@ We do the same for the textual features.
         }
       }
     }
+    opset_import {
+      domain: ""
+      version: 11
+    }
+    opset_import {
+      domain: "ai.onnx.ml"
+      version: 1
+    }
 
-    textual features [[1. 0. 0. 0. 0. 1. 0. 0. 1.]]
+    textual features [[0. 0. 1. 0. 0. 1. 0. 0. 1.]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-254
+.. GENERATED FROM PYTHON SOURCE LINES 251-255
 
 Display the sub-ONNX graph
 ++++++++++++++++++++++++++
 
 Finally, let's see both subgraphs. First, numerical pipeline.
 
-.. GENERATED FROM PYTHON SOURCE LINES 254-272
+.. GENERATED FROM PYTHON SOURCE LINES 255-273
 
 .. code-block:: Python
 
@@ -1341,15 +1353,15 @@ Finally, let's see both subgraphs. First, numerical pipeline.
  .. code-block:: none
 
 
-    (-0.5, 1229.5, 2558.5, -0.5)
+    (np.float64(-0.5), np.float64(1229.5), np.float64(2558.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-274
+.. GENERATED FROM PYTHON SOURCE LINES 274-275
 
 Then textual pipeline.
 
-.. GENERATED FROM PYTHON SOURCE LINES 274-292
+.. GENERATED FROM PYTHON SOURCE LINES 275-293
 
 .. code-block:: Python
 
@@ -1385,15 +1397,15 @@ Then textual pipeline.
  .. code-block:: none
 
 
-    (-0.5, 5630.5, 2735.5, -0.5)
+    (np.float64(-0.5), np.float64(5630.5), np.float64(2735.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-294
+.. GENERATED FROM PYTHON SOURCE LINES 294-295
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-300
+.. GENERATED FROM PYTHON SOURCE LINES 295-301
 
 .. code-block:: Python
 
@@ -1411,11 +1423,11 @@ Then textual pipeline.
 
  .. code-block:: none
 
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -1423,7 +1435,7 @@ Then textual pipeline.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.738 seconds)
+   **Total running time of the script:** (0 minutes 2.980 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_intermediate_outputs.py:
@@ -1439,6 +1451,10 @@ Then textual pipeline.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_intermediate_outputs.py <plot_intermediate_outputs.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_intermediate_outputs.zip <plot_intermediate_outputs.zip>`
 
 
 .. only:: html

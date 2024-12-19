@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_catwoe_transformer.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -41,9 +41,10 @@ Let's take the `Iris dataset
 <https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html>`_.
 Every feature is converter into integer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-48
+.. GENERATED FROM PYTHON SOURCE LINES 27-49
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import numpy as np
     from onnxruntime import InferenceSession
@@ -56,7 +57,7 @@ Every feature is converter into integer.
     from skl2onnx.algebra.onnx_ops import OnnxCast
     from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
     from skl2onnx.sklapi import WOETransformer
-    import skl2onnx.sklapi.register  # noqa
+    import skl2onnx.sklapi.register  # noqa: F401
 
     data = load_iris()
     X, y = data.data, data.target
@@ -68,32 +69,43 @@ Every feature is converter into integer.
 
 
 
-
-
 .. rst-class:: sphx-glr-script-out
 
- .. code-block:: none
+.. code-block:: pytb
 
-              0  1
-    0 -1.405712  3
-    1 -1.724166  3
-    2 -1.724166  3
-    3 -1.724166  3
-    4 -1.405712  3
+    Traceback (most recent call last):
+      File "/home/xadupre/github/sklearn-onnx/docs/tutorial/plot_catwoe_transformer.py", line 46, in <module>
+        woe = WOEEncoder(cols=[0]).fit(X, y)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/category_encoders/utils.py", line 299, in fit
+        self._check_fit_inputs(X, y)
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/category_encoders/utils.py", line 336, in _check_fit_inputs
+        if self._get_tags().get('supervised_encoder'):
+           ^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 417, in _get_tags
+        return _to_old_tags(get_tags(self))
+                            ^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/_tags.py", line 405, in get_tags
+        sklearn_tags_provider[klass] = klass.__sklearn_tags__(estimator)  # type: ignore[attr-defined]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 859, in __sklearn_tags__
+        tags = super().__sklearn_tags__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    AttributeError: 'super' object has no attribute '__sklearn_tags__'
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-53
+.. GENERATED FROM PYTHON SOURCE LINES 50-54
 
 Let's look into the trained parameters of the model.
 It appears that WOEEncoder uses an OrdinalEncoder
 but not the one from scikit-learn. We need to add a
 converter for this model tool.
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-59
+.. GENERATED FROM PYTHON SOURCE LINES 54-60
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("encoder", type(woe.ordinal_encoder), woe.ordinal_encoder)
@@ -102,41 +114,7 @@ converter for this model tool.
     print("encoder.cols", woe.ordinal_encoder.cols)
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    encoder <class 'category_encoders.ordinal.OrdinalEncoder'> OrdinalEncoder(cols=[0],
-                   mapping=[{'col': 0, 'data_type': dtype('int64'),
-                             'mapping': 5.0    1
-    4.0    2
-    7.0    3
-    6.0    4
-    NaN   -2
-    dtype: int64}])
-    mapping {0: 0
-     1   -1.405712
-     2   -1.724166
-     3    2.545531
-     4    0.961411
-    -1    0.000000
-    -2    0.000000
-    dtype: float64}
-    encoder.mapping [{'col': 0, 'mapping': 5.0    1
-    4.0    2
-    7.0    3
-    6.0    4
-    NaN   -2
-    dtype: int64, 'data_type': dtype('int64')}]
-    encoder.cols [0]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 60-65
+.. GENERATED FROM PYTHON SOURCE LINES 61-66
 
 Custom converter for OrdinalEncoder
 +++++++++++++++++++++++++++++++++++
@@ -144,9 +122,9 @@ Custom converter for OrdinalEncoder
 We start from example :ref:`l-plot-custom-converter`
 and then write the conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-120
+.. GENERATED FROM PYTHON SOURCE LINES 66-121
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -204,19 +182,13 @@ and then write the conversion.
 
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 121-122
+.. GENERATED FROM PYTHON SOURCE LINES 122-123
 
 Let's compute the output one a short example.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-129
+.. GENERATED FROM PYTHON SOURCE LINES 123-130
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -226,30 +198,13 @@ Let's compute the output one a short example.
 
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-       0  1
-    0  1  1
-    1  2  1
-    2  2  1
-    3  2  1
-    4  1  1
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 130-131
+.. GENERATED FROM PYTHON SOURCE LINES 131-132
 
 Let's check the ONNX conversion produces the same results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-137
+.. GENERATED FROM PYTHON SOURCE LINES 132-138
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -258,23 +213,7 @@ Let's check the ONNX conversion produces the same results.
     print(sess.run(None, {"X": X[:5]})[0])
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    [[1 1]
-     [2 1]
-     [2 1]
-     [2 1]
-     [1 1]]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 138-145
+.. GENERATED FROM PYTHON SOURCE LINES 139-146
 
 That works.
 
@@ -284,9 +223,9 @@ Custom converter for WOEEncoder
 We start from example :ref:`l-plot-custom-converter`
 and then write the conversion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-223
+.. GENERATED FROM PYTHON SOURCE LINES 146-224
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -367,19 +306,13 @@ and then write the conversion.
 
 
 
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 224-225
+.. GENERATED FROM PYTHON SOURCE LINES 225-226
 
 Let's compute the output one a short example.
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-230
+.. GENERATED FROM PYTHON SOURCE LINES 226-231
 
-.. code-block:: default
+.. code-block:: Python
 
 
     woe = WOEEncoder(cols=[0, 1]).fit(X, y)
@@ -387,30 +320,13 @@ Let's compute the output one a short example.
 
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-              0         1
-    0 -1.405712 -0.035947
-    1 -1.724166 -0.035947
-    2 -1.724166 -0.035947
-    3 -1.724166 -0.035947
-    4 -1.405712 -0.035947
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 231-232
+.. GENERATED FROM PYTHON SOURCE LINES 232-233
 
 Let's check the ONNX conversion produces the same results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-237
+.. GENERATED FROM PYTHON SOURCE LINES 233-238
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -419,25 +335,9 @@ Let's check the ONNX conversion produces the same results.
     print(sess.run(None, {"X": X[:5]})[0])
 
 
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    [[-1.4057125  -0.03594739]
-     [-1.7241662  -0.03594739]
-     [-1.7241662  -0.03594739]
-     [-1.7241662  -0.03594739]
-     [-1.4057125  -0.03594739]]
-
-
-
-
-
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.820 seconds)
+   **Total running time of the script:** (0 minutes 0.127 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_catwoe_transformer.py:
@@ -446,16 +346,17 @@ Let's check the ONNX conversion produces the same results.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_catwoe_transformer.ipynb <plot_catwoe_transformer.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_catwoe_transformer.py <plot_catwoe_transformer.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_catwoe_transformer.ipynb <plot_catwoe_transformer.ipynb>`
+      :download:`Download zipped: plot_catwoe_transformer.zip <plot_catwoe_transformer.zip>`
 
 
 .. only:: html

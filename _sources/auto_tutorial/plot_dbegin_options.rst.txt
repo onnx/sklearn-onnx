@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_dbegin_options.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -86,7 +86,7 @@ and which is not. So it is possible to specify options by id.
 
 .. GENERATED FROM PYTHON SOURCE LINES 70-97
 
-.. code-block:: default
+.. code-block:: Python
 
 
     from pprint import pformat
@@ -123,14 +123,6 @@ and which is not. So it is possible to specify options by id.
 
  .. code-block:: none
 
-    /home/xadupre/github/scikit-learn/sklearn/linear_model/_logistic.py:472: ConvergenceWarning: lbfgs failed to converge (status=1):
-    STOP: TOTAL NO. of ITERATIONS REACHED LIMIT.
-
-    Increase the number of iterations (max_iter) or scale the data as shown in:
-        https://scikit-learn.org/stable/modules/preprocessing.html
-    Please also refer to the documentation for alternative solver options:
-        https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
-      n_iter_i = _check_optimize_result(
     ReferenceEvaluator(X) -> label, probabilities
 
 
@@ -143,7 +135,7 @@ It is just better to use strings.
 
 .. GENERATED FROM PYTHON SOURCE LINES 100-106
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_def = to_onnx(clr, X_train.astype(numpy.float32), options={"zipmap": False})
@@ -174,7 +166,7 @@ name convention.
 
 .. GENERATED FROM PYTHON SOURCE LINES 112-121
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -210,7 +202,7 @@ First, with probabilities:
 
 .. GENERATED FROM PYTHON SOURCE LINES 129-142
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -233,11 +225,11 @@ First, with probabilities:
 
  .. code-block:: none
 
-    [array([0, 0, 0, 0, 0]), array([[0.88268626, 0.10948393, 0.00782984],
-           [0.7944385 , 0.19728662, 0.00827491],
-           [0.85557765, 0.13792053, 0.00650185],
-           [0.8262804 , 0.16634221, 0.00737737],
-           [0.90050155, 0.092388  , 0.00711049]], dtype=float32)]
+    [array([0, 0, 0, 0, 0]), array([[0.8826898 , 0.10948468, 0.00782558],
+           [0.7944286 , 0.19729899, 0.00827242],
+           [0.8555814 , 0.13791925, 0.00649932],
+           [0.82628906, 0.16633531, 0.00737559],
+           [0.9005094 , 0.09238414, 0.00710642]], dtype=float32)]
 
 
 
@@ -248,7 +240,7 @@ Then with raw scores:
 
 .. GENERATED FROM PYTHON SOURCE LINES 144-154
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_def = to_onnx(
@@ -268,11 +260,11 @@ Then with raw scores:
 
  .. code-block:: none
 
-    [array([0, 0, 0, 0, 0]), array([[0.88268626, 0.10948393, 0.00782984],
-           [0.7944385 , 0.19728662, 0.00827491],
-           [0.85557765, 0.13792053, 0.00650185],
-           [0.8262804 , 0.16634221, 0.00737737],
-           [0.90050155, 0.092388  , 0.00711049]], dtype=float32)]
+    [array([0, 0, 0, 0, 0]), array([[0.8826898 , 0.10948468, 0.00782558],
+           [0.7944286 , 0.19729899, 0.00827242],
+           [0.8555814 , 0.13791925, 0.00649932],
+           [0.82628906, 0.16633531, 0.00737559],
+           [0.9005094 , 0.09238414, 0.00710642]], dtype=float32)]
 
 
 
@@ -285,7 +277,7 @@ and not the whole pipeline.
 
 .. GENERATED FROM PYTHON SOURCE LINES 158-168
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_def = to_onnx(
@@ -305,11 +297,11 @@ and not the whole pipeline.
 
  .. code-block:: none
 
-    [array([0, 0, 0, 0, 0]), array([[ 2.2707398 ,  0.18354762, -2.4542873 ],
-           [ 1.9857951 ,  0.5928172 , -2.5786123 ],
-           [ 2.2349296 ,  0.4098304 , -2.6447601 ],
-           [ 2.1071343 ,  0.5042473 , -2.6113818 ],
-           [ 2.3727787 ,  0.095824  , -2.4686027 ]], dtype=float32)]
+    [array([0, 0, 0, 0, 0]), array([[ 2.2709217 ,  0.18373239, -2.454654  ],
+           [ 1.9858665 ,  0.59296364, -2.57883   ],
+           [ 2.2350655 ,  0.40995252, -2.6450179 ],
+           [ 2.1072361 ,  0.5042972 , -2.6115332 ],
+           [ 2.3729892 ,  0.09598386, -2.468973  ]], dtype=float32)]
 
 
 
@@ -321,7 +313,7 @@ Strings are still easier to use.
 
 .. GENERATED FROM PYTHON SOURCE LINES 171-182
 
-.. code-block:: default
+.. code-block:: Python
 
 
     model_def = to_onnx(
@@ -342,11 +334,11 @@ Strings are still easier to use.
 
  .. code-block:: none
 
-    [array([0, 0, 0, 0, 0]), array([[ 2.2707398 ,  0.18354762, -2.4542873 ],
-           [ 1.9857951 ,  0.5928172 , -2.5786123 ],
-           [ 2.2349296 ,  0.4098304 , -2.6447601 ],
-           [ 2.1071343 ,  0.5042473 , -2.6113818 ],
-           [ 2.3727787 ,  0.095824  , -2.4686027 ]], dtype=float32)]
+    [array([0, 0, 0, 0, 0]), array([[ 2.2709217 ,  0.18373239, -2.454654  ],
+           [ 1.9858665 ,  0.59296364, -2.57883   ],
+           [ 2.2350655 ,  0.40995252, -2.6450179 ],
+           [ 2.1072361 ,  0.5042972 , -2.6115332 ],
+           [ 2.3729892 ,  0.09598386, -2.468973  ]], dtype=float32)]
 
 
 
@@ -365,7 +357,7 @@ decision path. It can be enabled by option *decision_path*.
 
 .. GENERATED FROM PYTHON SOURCE LINES 191-207
 
-.. code-block:: default
+.. code-block:: Python
 
 
     clrrf = RandomForestClassifier(n_estimators=2, max_depth=2)
@@ -391,8 +383,8 @@ decision path. It can be enabled by option *decision_path*.
 
  .. code-block:: none
 
-    [[1 0 0 0 1 0 1 1 1 0 1 0 0 0]
-     [1 0 0 0 1 0 1 1 1 0 1 0 0 0]]
+    [[1 0 0 0 1 0 1 1 0 1 0 1]
+     [1 0 0 0 1 0 1 1 0 1 0 1]]
 
 
 
@@ -403,7 +395,7 @@ The model produces 3 outputs.
 
 .. GENERATED FROM PYTHON SOURCE LINES 209-212
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print([o.name for o in sess.get_outputs()])
@@ -427,7 +419,7 @@ Let's display the last one.
 
 .. GENERATED FROM PYTHON SOURCE LINES 214-218
 
-.. code-block:: default
+.. code-block:: Python
 
 
     res = sess.run(None, {"X": X_test[:2].astype(numpy.float32)})
@@ -441,8 +433,8 @@ Let's display the last one.
 
  .. code-block:: none
 
-    [['1000101' '1101000']
-     ['1000101' '1101000']]
+    [['1000101' '10101']
+     ['1000101' '10101']]
 
 
 
@@ -457,7 +449,7 @@ supported options while running the conversion.
 
 .. GENERATED FROM PYTHON SOURCE LINES 224-237
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -480,6 +472,8 @@ supported options while running the conversion.
 
  .. code-block:: none
 
+    Skl2onnxTraceableCountVectorizer {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False], 'locale': None}
+    Skl2onnxTraceableTfidfVectorizer {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False], 'locale': None}
     AdaBoostClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     BaggingClassifier              {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     BayesianGaussianMixture        {'score_samples': [True, False]}
@@ -495,13 +489,14 @@ supported options while running the conversion.
     ExtraTreeRegressor             {'decision_path': [True, False], 'decision_leaf': [True, False]}
     ExtraTreesClassifier           {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'nocl': [True, False], 'output_class_labels': [False, True], 'decision_path': [True, False], 'decision_leaf': [True, False]}
     ExtraTreesRegressor            {'decision_path': [True, False], 'decision_leaf': [True, False]}
+    FeatureHasher                  {'separator': None}
     GaussianMixture                {'score_samples': [True, False]}
     GaussianNB                     {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     GaussianProcessClassifier      {'optim': [None, 'cdist'], 'nocl': [False, True], 'output_class_labels': [False, True], 'zipmap': [False, True]}
     GaussianProcessRegressor       {'return_cov': [False, True], 'return_std': [False, True], 'optim': [None, 'cdist']}
     GradientBoostingClassifier     {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'nocl': [True, False]}
     HistGradientBoostingClassifier {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'nocl': [True, False]}
-    HistGradientBoostingRegressor  {'zipmap': [True, False, 'columns'], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'nocl': [True, False]}
+    HistGradientBoostingRegressor  {'raw_scores': [True, False]}
     IsolationForest                {'score_samples': [True, False]}
     KMeans                         {'gemm': [True, False]}
     KNNImputer                     {'optim': [None, 'cdist']}
@@ -520,6 +515,7 @@ supported options while running the conversion.
     NearestNeighbors               {'optim': [None, 'cdist']}
     OneVsOneClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True]}
     OneVsRestClassifier            {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
+    Pipeline                       {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     QuadraticDiscriminantAnalysis  {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True]}
     RadiusNeighborsClassifier      {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'raw_scores': [True, False], 'output_class_labels': [False, True], 'optim': [None, 'cdist']}
     RadiusNeighborsRegressor       {'optim': [None, 'cdist']}
@@ -532,6 +528,7 @@ supported options while running the conversion.
     StackingClassifier             {'zipmap': [True, False, 'columns'], 'nocl': [True, False], 'output_class_labels': [False, True], 'raw_scores': [True, False]}
     TfidfTransformer               {'nan': [True, False]}
     TfidfVectorizer                {'tokenexp': None, 'separators': None, 'nan': [True, False], 'keep_empty_string': [True, False], 'locale': None}
+    TunedThresholdClassifierCV     {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     VotingClassifier               {'zipmap': [True, False, 'columns'], 'output_class_labels': [False, True], 'nocl': [True, False]}
     _ConstantPredictor             {'zipmap': [True, False, 'columns'], 'nocl': [True, False]}
     all options: ['decision_leaf',
@@ -548,6 +545,7 @@ supported options while running the conversion.
      'return_cov',
      'return_std',
      'score_samples',
+     'separator',
      'separators',
      'tokenexp',
      'zipmap']
@@ -558,7 +556,7 @@ supported options while running the conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.116 seconds)
+   **Total running time of the script:** (0 minutes 0.109 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options.py:
@@ -567,16 +565,17 @@ supported options while running the conversion.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_dbegin_options.ipynb <plot_dbegin_options.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_dbegin_options.py <plot_dbegin_options.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_dbegin_options.ipynb <plot_dbegin_options.ipynb>`
+      :download:`Download zipped: plot_dbegin_options.zip <plot_dbegin_options.zip>`
 
 
 .. only:: html

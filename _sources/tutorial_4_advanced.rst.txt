@@ -13,3 +13,4 @@ with issues and resolved issues.
     auto_tutorial/plot_ngrams
     auto_tutorial/plot_usparse_xgboost
     auto_tutorial/plot_woe_transformer
+    auto_tutorial/plot_output_onnx_single_probability

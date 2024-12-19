@@ -51,9 +51,10 @@ It relies on *protobuf* whose definition can be found
 on github `onnx.proto
 <https://github.com/onnx/onnx/blob/main/onnx/onnx.proto>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-80
+.. GENERATED FROM PYTHON SOURCE LINES 38-81
 
 .. code-block:: Python
+
 
     import onnxruntime
     import numpy
@@ -106,10 +107,7 @@ on github `onnx.proto
  .. code-block:: none
 
     The model is:
-    ir_version: 10
-    opset_import {
-      version: 10
-    }
+    ir_version: 11
     producer_name: "onnx-example"
     graph {
       node {
@@ -118,21 +116,21 @@ on github `onnx.proto
         op_type: "Pad"
         attribute {
           name: "mode"
-          type: STRING
           s: "constant"
+          type: STRING
         }
         attribute {
           name: "pads"
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 1
           type: INTS
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 1
         }
         attribute {
           name: "value"
-          type: FLOAT
           f: 1.5
+          type: FLOAT
         }
       }
       name: "test-model"
@@ -167,13 +165,16 @@ on github `onnx.proto
         }
       }
     }
+    opset_import {
+      version: 10
+    }
 
     The model is checked!
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-87
+.. GENERATED FROM PYTHON SOURCE LINES 82-88
 
 Same example with sklearn-onnx
 ++++++++++++++++++++++++++++++
@@ -182,12 +183,12 @@ Every operator has its own class in *sklearn-onnx*.
 The list is dynamically created based on the installed
 onnx package.
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-104
+.. GENERATED FROM PYTHON SOURCE LINES 88-105
 
 .. code-block:: Python
 
 
-    from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
+    from skl2onnx.algebra.onnx_ops import OnnxPad
 
     pad = OnnxPad(
         "X",
@@ -213,12 +214,8 @@ onnx package.
 
     The model is:
     ir_version: 5
-    opset_import {
-      domain: ""
-      version: 10
-    }
     producer_name: "skl2onnx"
-    producer_version: "1.17.0"
+    producer_version: "1.18.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -227,25 +224,25 @@ onnx package.
         output: "Y"
         name: "Pa_Pad"
         op_type: "Pad"
-        domain: ""
         attribute {
           name: "mode"
-          type: STRING
           s: "constant"
+          type: STRING
         }
         attribute {
           name: "pads"
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 1
           type: INTS
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 1
         }
         attribute {
           name: "value"
-          type: FLOAT
           f: 1.5
+          type: FLOAT
         }
+        domain: ""
       }
       name: "OnnxPad"
       input {
@@ -279,17 +276,21 @@ onnx package.
         }
       }
     }
+    opset_import {
+      domain: ""
+      version: 10
+    }
 
     The model is checked!
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-106
+.. GENERATED FROM PYTHON SOURCE LINES 106-107
 
 Inputs and outputs can also be skipped.
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-112
+.. GENERATED FROM PYTHON SOURCE LINES 107-113
 
 .. code-block:: Python
 
@@ -306,14 +307,14 @@ Inputs and outputs can also be skipped.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-117
+.. GENERATED FROM PYTHON SOURCE LINES 114-118
 
 Multiple operators
 ++++++++++++++++++
 
 Let's use the second example from the documentation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-135
+.. GENERATED FROM PYTHON SOURCE LINES 118-136
 
 .. code-block:: Python
 
@@ -342,16 +343,16 @@ Let's use the second example from the documentation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-137
+.. GENERATED FROM PYTHON SOURCE LINES 137-138
 
 Which we translate into:
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-149
+.. GENERATED FROM PYTHON SOURCE LINES 138-150
 
 .. code-block:: Python
 
 
-    from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
+    from skl2onnx.algebra.onnx_ops import OnnxTranspose
 
     node = OnnxTranspose(
         OnnxTranspose("X", perm=[1, 0, 2], op_version=12), perm=[1, 0, 2], op_version=12
@@ -369,11 +370,11 @@ Which we translate into:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
 
 Let's the output with onnxruntime
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-169
+.. GENERATED FROM PYTHON SOURCE LINES 152-170
 
 .. code-block:: Python
 
@@ -386,10 +387,10 @@ Let's the output with onnxruntime
             model_def.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         names = [i.name for i in sess.get_inputs()]
-        dinputs = {name: input for name, input in zip(names, inputs)}
+        dinputs = dict(zip(names, inputs))
         res = sess.run(None, dinputs)
         names = [o.name for o in sess.get_outputs()]
-        return {name: output for name, output in zip(names, res)}
+        return dict(zip(names, res))
 
 
     Y = predict_with_onnxruntime(model_def, X)
@@ -414,12 +415,12 @@ Let's the output with onnxruntime
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-172
+.. GENERATED FROM PYTHON SOURCE LINES 171-173
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-190
+.. GENERATED FROM PYTHON SOURCE LINES 173-191
 
 .. code-block:: Python
 
@@ -455,24 +456,24 @@ Display the ONNX graph
  .. code-block:: none
 
 
-    (-0.5, 1524.5, 1707.5, -0.5)
+    (np.float64(-0.5), np.float64(1524.5), np.float64(1707.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-192
+.. GENERATED FROM PYTHON SOURCE LINES 192-193
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-202
+.. GENERATED FROM PYTHON SOURCE LINES 193-203
 
 .. code-block:: Python
 
 
-    import sklearn  # noqa
+    import sklearn
 
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import skl2onnx  # noqa
+    import skl2onnx
 
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
@@ -485,11 +486,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -497,7 +498,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.882 seconds)
+   **Total running time of the script:** (0 minutes 0.526 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_onnx_operators.py:
@@ -513,6 +514,10 @@ Display the ONNX graph
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_onnx_operators.py <plot_onnx_operators.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_onnx_operators.zip <plot_onnx_operators.zip>`
 
 
 .. only:: html

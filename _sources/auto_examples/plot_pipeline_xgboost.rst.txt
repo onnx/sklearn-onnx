@@ -33,9 +33,10 @@ a *XGBClassifier*. Let's see how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-76
+.. GENERATED FROM PYTHON SOURCE LINES 20-77
 
 .. code-block:: Python
+
 
     import os
     import numpy
@@ -54,11 +55,11 @@ Train a XGBoost classifier
     from skl2onnx import convert_sklearn, update_registered_converter
     from skl2onnx.common.shape_calculator import (
         calculate_linear_classifier_output_shapes,
-    )  # noqa
+    )
     import onnxmltools
     from onnxmltools.convert.xgboost.operator_converters.XGBoost import (
         convert_xgboost,
-    )  # noqa
+    )
     import onnxmltools.convert.common.data_types
 
     data = load_iris()
@@ -101,24 +102,12 @@ Train a XGBoost classifier
 
  .. code-block:: none
 
-    Unable to find a shape calculator for type '<class 'xgboost.sklearn.XGBClassifier'>'.
-    It usually means the pipeline being converted contains a
-    transformer or a predictor with no corresponding converter
-    implemented in sklearn-onnx. If the converted is implemented
-    in another library, you need to register
-    the converted so that it can be used by sklearn-onnx (function
-    update_registered_converter). If the model is not yet covered
-    by sklearn-onnx, you may raise an issue to
-    https://github.com/onnx/sklearn-onnx/issues
-    to get the converter implemented or even contribute to the
-    project. If the model is a custom model, a new converter must
-    be implemented. Examples can be found in the gallery.
+    'super' object has no attribute '__sklearn_tags__'
 
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 77-88
+.. GENERATED FROM PYTHON SOURCE LINES 78-89
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -132,15 +121,15 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-91
+.. GENERATED FROM PYTHON SOURCE LINES 91-92
 
 Then we import the converter and shape calculator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-94
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Let's register the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-102
+.. GENERATED FROM PYTHON SOURCE LINES 95-103
 
 .. code-block:: Python
 
@@ -159,12 +148,12 @@ Let's register the new converter.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-105
+.. GENERATED FROM PYTHON SOURCE LINES 104-106
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-117
+.. GENERATED FROM PYTHON SOURCE LINES 106-118
 
 .. code-block:: Python
 
@@ -182,19 +171,51 @@ Convert again
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+.. code-block:: pytb
+
+    Traceback (most recent call last):
+      File "/home/xadupre/github/sklearn-onnx/docs/examples/plot_pipeline_xgboost.py", line 107, in <module>
+        model_onnx = convert_sklearn(
+                     ^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/convert.py", line 192, in convert_sklearn
+        topology = parse_sklearn_model(
+                   ^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 847, in parse_sklearn_model
+        outputs = parse_sklearn(
+                  ^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 757, in parse_sklearn
+        res = _parse_sklearn(scope, model, inputs, custom_parsers=custom_parsers)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 688, in _parse_sklearn
+        outputs = sklearn_parsers_map[tmodel](
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 295, in _parse_sklearn_pipeline
+        ) and is_classifier(step[1]):
+              ^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 1237, in is_classifier
+        return get_tags(estimator).estimator_type == "classifier"
+               ^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/_tags.py", line 405, in get_tags
+        sklearn_tags_provider[klass] = klass.__sklearn_tags__(estimator)  # type: ignore[attr-defined]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 540, in __sklearn_tags__
+        tags = super().__sklearn_tags__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    AttributeError: 'super' object has no attribute '__sklearn_tags__'
 
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 118-122
+.. GENERATED FROM PYTHON SOURCE LINES 119-123
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-126
+.. GENERATED FROM PYTHON SOURCE LINES 123-127
 
 .. code-block:: Python
 
@@ -203,24 +224,11 @@ Predictions with XGBoost.
     print("predict_proba", pipe.predict_proba(X[:1]))
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    predict [0 2 2 1 1]
-    predict_proba [[0.69600695 0.1526681  0.15132491]]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 127-128
+.. GENERATED FROM PYTHON SOURCE LINES 128-129
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-134
+.. GENERATED FROM PYTHON SOURCE LINES 129-135
 
 .. code-block:: Python
 
@@ -231,25 +239,12 @@ Predictions with onnxruntime.
     print("predict_proba", pred_onx[1][:1])
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    predict [0 2 2 1 1]
-    predict_proba [{0: 0.6960069537162781, 1: 0.15266810357570648, 2: 0.15132491290569305}]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 135-137
+.. GENERATED FROM PYTHON SOURCE LINES 136-138
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-155
+.. GENERATED FROM PYTHON SOURCE LINES 138-156
 
 .. code-block:: Python
 
@@ -272,28 +267,11 @@ Display the ONNX graph
     ax.axis("off")
 
 
-
-
-.. image-sg:: /auto_examples/images/sphx_glr_plot_pipeline_xgboost_001.png
-   :alt: plot pipeline xgboost
-   :srcset: /auto_examples/images/sphx_glr_plot_pipeline_xgboost_001.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-
-    (-0.5, 2485.5, 2558.5, -0.5)
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 156-157
+.. GENERATED FROM PYTHON SOURCE LINES 157-158
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-165
+.. GENERATED FROM PYTHON SOURCE LINES 158-166
 
 .. code-block:: Python
 
@@ -307,27 +285,9 @@ Display the ONNX graph
     print("xgboost: ", xgboost.__version__)
 
 
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
-    onnxmltools:  1.13.0
-    xgboost:  2.0.3
-
-
-
-
-
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.180 seconds)
+   **Total running time of the script:** (0 minutes 0.161 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline_xgboost.py:
@@ -343,6 +303,10 @@ Display the ONNX graph
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_pipeline_xgboost.py <plot_pipeline_xgboost.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_pipeline_xgboost.zip <plot_pipeline_xgboost.zip>`
 
 
 .. only:: html

@@ -5,17 +5,17 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Metadata" href="plot_metadata.html" /><link rel="prev" title="API Summary" href="../api_summary.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2024.05.06 -->
+    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Gallery of examples - sklearn-onnx 1.18.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=92fd9be5" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
-    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
-    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css?v=7f9a90b1" />
-    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=61a4c737" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
     
     
 
@@ -94,19 +94,6 @@
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
     </svg>
   </symbol>
-  <symbol id="svg-sun-half" viewBox="0 0 24 24">
-    <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
-      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M13 12h5" />
-      <path d="M13 15h4" />
-      <path d="M13 18h1" />
-      <path d="M13 9h4" />
-      <path d="M13 6h1" />
-    </svg>
-  </symbol>
   <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
     <title>Auto light/dark, in light mode</title>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -147,7 +134,7 @@
       <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
       <path d="M13.5 6.5l4 4" />
       <path d="M20 21l2 -2l-2 -2" />
-      <path d="M17 17l-2 2l2 2" /
+      <path d="M17 17l-2 2l2 2" />
     </svg>
   </symbol>
   <symbol id="svg-eye" viewBox="0 0 24 24">
@@ -273,10 +260,11 @@
 <li class="toctree-l2"><a class="reference internal" href="plot_logging.html">Logging, verbose</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_decision_function.html">Probabilities or raw scores</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_output_onnx_single_probability.html">Append onnx nodes to the converted model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_investigate_pipeline.html">Investigate a pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_benchmark_cdist.html">Compare CDist with scipy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_convert_zipmap.html">Probabilities as a vector or as a ZipMap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_convert_zipmap.html">Probabilities as a vector or as a ZipMap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_black_op.html">Convert a model with a reduced list of operators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_nmf.html">Custom Operator for NMF Decomposition</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_cast_transformer.html">Discrepencies with StandardScaler</a></li>
@@ -341,79 +329,82 @@
 <h1>Gallery of examples<a class="headerlink" href="#gallery-of-examples" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="ONNX format contains metadata related to how the model was produced. It is useful when the mode..."><img alt="" src="../_images/sphx_glr_plot_metadata_thumb.png" />
+<div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="ONNX format contains metadata related to how the model was produced. It is useful when the model is deployed to production to keep track of which instance was used at a specific time. Let&#x27;s see how to do that with a simple logistic regression model trained with scikit-learn."><img alt="" src="../_images/sphx_glr_plot_metadata_thumb.png" />
 <p><a class="reference internal" href="plot_metadata.html#sphx-glr-auto-examples-plot-metadata-py"><span class="std std-ref">Metadata</span></a></p>
   <div class="sphx-glr-thumbnail-title">Metadata</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="ONNX Runtime extends the onnx backend API to run predictions using this runtime. Let&#x27;s use the ..."><img alt="" src="../_images/sphx_glr_plot_backend_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="ONNX Runtime extends the onnx backend API to run predictions using this runtime. Let&#x27;s use the API to compute the prediction of a simple logistic regression model."><img alt="" src="../_images/sphx_glr_plot_backend_thumb.png" />
 <p><a class="reference internal" href="plot_backend.html#sphx-glr-auto-examples-plot-backend-py"><span class="std std-ref">ONNX Runtime Backend for ONNX</span></a></p>
   <div class="sphx-glr-thumbnail-title">ONNX Runtime Backend for ONNX</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="There is no other way to look into one model stored in ONNX format than looking into its node w..."><img alt="" src="../_images/sphx_glr_plot_pipeline_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="There is no other way to look into one model stored in ONNX format than looking into its node with onnx. This example demonstrates how to draw a model and to retrieve it in json format."><img alt="" src="../_images/sphx_glr_plot_pipeline_thumb.png" />
 <p><a class="reference internal" href="plot_pipeline.html#sphx-glr-auto-examples-plot-pipeline-py"><span class="std std-ref">Draw a pipeline</span></a></p>
   <div class="sphx-glr-thumbnail-title">Draw a pipeline</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The conversion of a pipeline fails if it contains an object without any associated converter. I..."><img alt="" src="../_images/sphx_glr_plot_logging_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The conversion of a pipeline fails if it contains an object without any associated converter. It may also fails if one of the object is mapped by a custom converter. If the error message is not explicit enough, it is possible to enable logging."><img alt="" src="../_images/sphx_glr_plot_logging_thumb.png" />
 <p><a class="reference internal" href="plot_logging.html#sphx-glr-auto-examples-plot-logging-py"><span class="std std-ref">Logging, verbose</span></a></p>
   <div class="sphx-glr-thumbnail-title">Logging, verbose</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx creates an ONN..."><img alt="" src="../_images/sphx_glr_plot_convert_decision_function_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx creates an ONNX graph which returns probabilities but it may skip that step and return raw scores if the model implements the method decision_function. Option &#x27;raw_scores&#x27; is used to change the default behaviour. Let&#x27;s see that on a simple example."><img alt="" src="../_images/sphx_glr_plot_convert_decision_function_thumb.png" />
 <p><a class="reference internal" href="plot_convert_decision_function.html#sphx-glr-auto-examples-plot-convert-decision-function-py"><span class="std std-ref">Probabilities or raw scores</span></a></p>
   <div class="sphx-glr-thumbnail-title">Probabilities or raw scores</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Train and deploy a model usually involves the three following steps:"><img alt="" src="../_images/sphx_glr_plot_convert_model_thumb.png" />
 <p><a class="reference internal" href="plot_convert_model.html#sphx-glr-auto-examples-plot-convert-model-py"><span class="std std-ref">Train, convert and predict a model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Train, convert and predict a model</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The following example shows how to look into a converted models and easily find errors at every..."><img alt="" src="../_images/sphx_glr_plot_investigate_pipeline_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example show how to append some onnx nodes to the converted model to produce the desired output. In this case, it removes the second column of the output probabilies."><img alt="" src="../_images/sphx_glr_plot_output_onnx_single_probability_thumb.png" />
+<p><a class="reference internal" href="plot_output_onnx_single_probability.html#sphx-glr-auto-examples-plot-output-onnx-single-probability-py"><span class="std std-ref">Append onnx nodes to the converted model</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Append onnx nodes to the converted model</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="The following example shows how to look into a converted models and easily find errors at every step of the pipeline."><img alt="" src="../_images/sphx_glr_plot_investigate_pipeline_thumb.png" />
 <p><a class="reference internal" href="plot_investigate_pipeline.html#sphx-glr-auto-examples-plot-investigate-pipeline-py"><span class="std std-ref">Investigate a pipeline</span></a></p>
   <div class="sphx-glr-thumbnail-title">Investigate a pipeline</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The following example focuses on one particular operator, CDist and compares its execution time..."><img alt="" src="../_images/sphx_glr_plot_benchmark_cdist_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The following example focuses on one particular operator, CDist and compares its execution time between onnxruntime and scipy."><img alt="" src="../_images/sphx_glr_plot_benchmark_cdist_thumb.png" />
 <p><a class="reference internal" href="plot_benchmark_cdist.html#sphx-glr-auto-examples-plot-benchmark-cdist-py"><span class="std std-ref">Compare CDist with scipy</span></a></p>
   <div class="sphx-glr-thumbnail-title">Compare CDist with scipy</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that ..."><img alt="" src="../_images/sphx_glr_plot_convert_zipmap_thumb.png" />
-<p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Probabilities as a vector or as a ZipMap</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le..."><img alt="" src="../_images/sphx_glr_plot_pipeline_lightgbm_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a LightGbm model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a LGBMClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_pipeline_lightgbm_thumb.png" />
 <p><a class="reference internal" href="plot_pipeline_lightgbm.html#sphx-glr-auto-examples-plot-pipeline-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGbm model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a pipeline with a LightGbm model</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Some runtime dedicated to onnx do not implement all the operators and a converted model may not..."><img alt="" src="../_images/sphx_glr_plot_black_op_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that matrix into a list of dictionaries where each probabily is mapped to its class id or name. That mechanism retains the class names. This conversion increases the prediction time and is not always needed. Let&#x27;s see how to deactivate this behaviour on the Iris example."><img alt="" src="../_images/sphx_glr_plot_convert_zipmap_thumb.png" />
+<p><a class="reference internal" href="plot_convert_zipmap.html#sphx-glr-auto-examples-plot-convert-zipmap-py"><span class="std std-ref">Probabilities as a vector or as a ZipMap</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Probabilities as a vector or as a ZipMap</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Some runtime dedicated to onnx do not implement all the operators and a converted model may not run if one of them is missing from the list of available operators. Some converters may convert a model in different ways if the users wants to blacklist some operators."><img alt="" src="../_images/sphx_glr_plot_black_op_thumb.png" />
 <p><a class="reference internal" href="plot_black_op.html#sphx-glr-auto-examples-plot-black-op-py"><span class="std std-ref">Convert a model with a reduced list of operators</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a model with a reduced list of operators</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="NMF factorizes an input matrix into two matrices W, H of rank k so that WH \sim M`. M=(m_{ij}) ..."><img alt="" src="../_images/sphx_glr_plot_nmf_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="NMF factorizes an input matrix into two matrices W, H of rank k so that WH \sim M`. M=(m_{ij}) may be a binary matrix where i is a user and j a product he bought. The prediction function depends on whether or not the user needs a recommandation for an existing user or a new user. This example addresses the first case."><img alt="" src="../_images/sphx_glr_plot_nmf_thumb.png" />
 <p><a class="reference internal" href="plot_nmf.html#sphx-glr-auto-examples-plot-nmf-py"><span class="std std-ref">Custom Operator for NMF Decomposition</span></a></p>
   <div class="sphx-glr-thumbnail-title">Custom Operator for NMF Decomposition</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="A StandardScaler does a very basic scaling. The conversion in ONNX assumes that (x / y) is equi..."><img alt="" src="../_images/sphx_glr_plot_cast_transformer_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="A StandardScaler does a very basic scaling. The conversion in ONNX assumes that (x / y) is equivalent to x * ( 1 / y) but that&#x27;s not true with float or double (see Will the compiler optimize division into multiplication). Even if the difference is small, it may introduce discrepencies if the next step is a decision tree. One small difference and the decision follows another path in the tree. Let&#x27;s see how to solve that issue."><img alt="" src="../_images/sphx_glr_plot_cast_transformer_thumb.png" />
 <p><a class="reference internal" href="plot_cast_transformer.html#sphx-glr-auto-examples-plot-cast-transformer-py"><span class="std std-ref">Discrepencies with StandardScaler</span></a></p>
   <div class="sphx-glr-thumbnail-title">Discrepencies with StandardScaler</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The following example checks up on every step in a pipeline, compares and benchmarks the predic..."><img alt="" src="../_images/sphx_glr_plot_benchmark_pipeline_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The following example checks up on every step in a pipeline, compares and benchmarks the predictions."><img alt="" src="../_images/sphx_glr_plot_benchmark_pipeline_thumb.png" />
 <p><a class="reference internal" href="plot_benchmark_pipeline.html#sphx-glr-auto-examples-plot-benchmark-pipeline-py"><span class="std std-ref">Benchmark a pipeline</span></a></p>
   <div class="sphx-glr-thumbnail-title">Benchmark a pipeline</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le..."><img alt="" src="../_images/sphx_glr_plot_pipeline_xgboost_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_pipeline_xgboost_thumb.png" />
 <p><a class="reference internal" href="plot_pipeline_xgboost.html#sphx-glr-auto-examples-plot-pipeline-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="The GaussianProcessRegressor involves many matrix operations which may requires double precisio..."><img alt="" src="../_images/sphx_glr_plot_gpr_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="The GaussianProcessRegressor involves many matrix operations which may requires double precisions. sklearn-onnx is using single floats by default but for this particular model, it is better to use double. Let&#x27;s see how to create an ONNX file using doubles."><img alt="" src="../_images/sphx_glr_plot_gpr_thumb.png" />
 <p><a class="reference internal" href="plot_gpr.html#sphx-glr-auto-examples-plot-gpr-py"><span class="std std-ref">Discrepencies with GaussianProcessorRegressor: use of double</span></a></p>
   <div class="sphx-glr-thumbnail-title">Discrepencies with GaussianProcessorRegressor: use of double</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with onnxruntime. This example looks into several common situations ..."><img alt="" src="../_images/sphx_glr_plot_errors_onnxruntime_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with onnxruntime. This example looks into several common situations in which onnxruntime does not return the model prediction but raises an exception instead. It starts by loading a model (see l-rf-iris-example). which produces a logistic regression trained on Iris datasets. The model takes a vector of dimension 2 and returns a class among three."><img alt="" src="../_images/sphx_glr_plot_errors_onnxruntime_thumb.png" />
 <p><a class="reference internal" href="plot_errors_onnxruntime.html#sphx-glr-auto-examples-plot-errors-onnxruntime-py"><span class="std std-ref">Errors with onnxruntime</span></a></p>
   <div class="sphx-glr-thumbnail-title">Errors with onnxruntime</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="ONNX aims at describing most of the machine learning models implemented in scikit-learn but it ..."><img alt="" src="../_images/sphx_glr_plot_onnx_operators_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="ONNX aims at describing most of the machine learning models implemented in scikit-learn but it does not necessarily describe the prediction function the same way scikit-learn does. If it is possible to define custom operators, it usually requires some time to add it to ONNX specifications and then to the backend used to compute the predictions. It is better to look first if the existing operators can be used. The list is available on github and gives the basic operators and others dedicated to machine learning. ONNX has a Python API which can be used to define an ONNX graph: PythonAPIOverview.md. But it is quite verbose and makes it difficult to describe big graphs. sklearn-onnx implements a nicer way to test ONNX operators."><img alt="" src="../_images/sphx_glr_plot_onnx_operators_thumb.png" />
 <p><a class="reference internal" href="plot_onnx_operators.html#sphx-glr-auto-examples-plot-onnx-operators-py"><span class="std std-ref">Play with ONNX operators</span></a></p>
   <div class="sphx-glr-thumbnail-title">Play with ONNX operators</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example leverages some code added to implement custom converters in an easy way."><img alt="" src="../_images/sphx_glr_plot_convert_syntax_thumb.png" />
 <p><a class="reference internal" href="plot_convert_syntax.html#sphx-glr-auto-examples-plot-convert-syntax-py"><span class="std std-ref">Different ways to convert a model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Different ways to convert a model</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="scikit-learn recently shipped ColumnTransformer which lets the user define complex pipeline whe..."><img alt="" src="../_images/sphx_glr_plot_complex_pipeline_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="scikit-learn recently shipped ColumnTransformer which lets the user define complex pipeline where each column may be preprocessed with a different transformer. sklearn-onnx still works in this case as shown in Section l-complex-pipeline."><img alt="" src="../_images/sphx_glr_plot_complex_pipeline_thumb.png" />
 <p><a class="reference internal" href="plot_complex_pipeline.html#sphx-glr-auto-examples-plot-complex-pipeline-py"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a pipeline with ColumnTransformer</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: Column Transformer with Heterogeneous Data..."><img alt="" src="../_images/sphx_glr_plot_tfidfvectorizer_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: Column Transformer with Heterogeneous Data Sources which builds a pipeline to classify text."><img alt="" src="../_images/sphx_glr_plot_tfidfvectorizer_thumb.png" />
 <p><a class="reference internal" href="plot_tfidfvectorizer.html#sphx-glr-auto-examples-plot-tfidfvectorizer-py"><span class="std std-ref">TfIdfVectorizer with ONNX</span></a></p>
   <div class="sphx-glr-thumbnail-title">TfIdfVectorizer with ONNX</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="We reuse the example example-complex-pipeline and walk through intermediates outputs. It is ver..."><img alt="" src="../_images/sphx_glr_plot_intermediate_outputs_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="We reuse the example example-complex-pipeline and walk through intermediates outputs. It is very likely a converted model gives different outputs or fails due to a custom converter which is not correctly implemented. One option is to look into the output of every node of the ONNX graph."><img alt="" src="../_images/sphx_glr_plot_intermediate_outputs_thumb.png" />
 <p><a class="reference internal" href="plot_intermediate_outputs.html#sphx-glr-auto-examples-plot-intermediate-outputs-py"><span class="std std-ref">Walk through intermediate outputs</span></a></p>
   <div class="sphx-glr-thumbnail-title">Walk through intermediate outputs</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces tw..."><img alt="" src="../_images/sphx_glr_plot_custom_parser_alternative_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces two outputs, predicted labels and probabilities. The goal here is to add a third result which tells if the probability is above a given threshold. That&#x27;s implemented in method validate."><img alt="" src="../_images/sphx_glr_plot_custom_parser_alternative_thumb.png" />
 <p><a class="reference internal" href="plot_custom_parser_alternative.html#sphx-glr-auto-examples-plot-custom-parser-alternative-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor (alternative)</span></a></p>
   <div class="sphx-glr-thumbnail-title">When a custom model is neither a classifier nor a regressor (alternative)</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces tw..."><img alt="" src="../_images/sphx_glr_plot_custom_parser_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces two outputs, predicted labels and probabilities. The goal here is to add a third result which tells if the probability is above a given threshold. That&#x27;s implemented in method validate."><img alt="" src="../_images/sphx_glr_plot_custom_parser_thumb.png" />
 <p><a class="reference internal" href="plot_custom_parser.html#sphx-glr-auto-examples-plot-custom-parser-py"><span class="std std-ref">When a custom model is neither a classifier nor a regressor</span></a></p>
   <div class="sphx-glr-thumbnail-title">When a custom model is neither a classifier nor a regressor</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converte..."><img alt="" src="../_images/sphx_glr_plot_custom_model_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converter for this new model. That does not mean the conversion of a pipeline which includes it would not work. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_custom_model_thumb.png" />
 <p><a class="reference internal" href="plot_custom_model.html#sphx-glr-auto-examples-plot-custom-model-py"><span class="std std-ref">Write your own converter for your own model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Write your own converter for your own model</div>
 </div></div><div class="toctree-wrapper compound">
@@ -458,7 +449,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2018-2023, Microsoft
+                Copyright &#169; 2018-2025, Microsoft
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -479,8 +470,8 @@
     </aside>
   </div>
 </div><script src="../_static/documentation_options.js?v=256cef93"></script>
-    <script src="../_static/doctools.js?v=888ff710"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=4e2eecee"></script>
+    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
     </body>
 </html>

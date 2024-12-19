@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -44,9 +44,10 @@ through every step of the pipeline. If the pipeline
 has *n* steps, it converts the pipeline with step 1,
 then the pipeline with steps 1, 2, then 1, 2, 3...
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-41
+.. GENERATED FROM PYTHON SOURCE LINES 30-42
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import numpy
     from onnx.reference import ReferenceEvaluator
@@ -66,13 +67,13 @@ then the pipeline with steps 1, 2, then 1, 2, 3...
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-43
+.. GENERATED FROM PYTHON SOURCE LINES 43-44
 
 The pipeline.
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-50
+.. GENERATED FROM PYTHON SOURCE LINES 44-51
 
-.. code-block:: default
+.. code-block:: Python
 
 
     data = load_iris()
@@ -89,22 +90,437 @@ The pipeline.
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-13 {color: black;}#sk-container-id-13 pre{padding: 0;}#sk-container-id-13 div.sk-toggleable {background-color: white;}#sk-container-id-13 label.sk-toggleable__label {cursor: pointer;display: block;width: 100%;margin-bottom: 0;padding: 0.3em;box-sizing: border-box;text-align: center;}#sk-container-id-13 label.sk-toggleable__label-arrow:before {content: "▸";float: left;margin-right: 0.25em;color: #696969;}#sk-container-id-13 label.sk-toggleable__label-arrow:hover:before {color: black;}#sk-container-id-13 div.sk-estimator:hover label.sk-toggleable__label-arrow:before {color: black;}#sk-container-id-13 div.sk-toggleable__content {max-height: 0;max-width: 0;overflow: hidden;text-align: left;background-color: #f0f8ff;}#sk-container-id-13 div.sk-toggleable__content pre {margin: 0.2em;color: black;border-radius: 0.25em;background-color: #f0f8ff;}#sk-container-id-13 input.sk-toggleable__control:checked~div.sk-toggleable__content {max-height: 200px;max-width: 100%;overflow: auto;}#sk-container-id-13 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {content: "▾";}#sk-container-id-13 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 input.sk-hidden--visually {border: 0;clip: rect(1px 1px 1px 1px);clip: rect(1px, 1px, 1px, 1px);height: 1px;margin: -1px;overflow: hidden;padding: 0;position: absolute;width: 1px;}#sk-container-id-13 div.sk-estimator {font-family: monospace;background-color: #f0f8ff;border: 1px dotted black;border-radius: 0.25em;box-sizing: border-box;margin-bottom: 0.5em;}#sk-container-id-13 div.sk-estimator:hover {background-color: #d4ebff;}#sk-container-id-13 div.sk-parallel-item::after {content: "";width: 100%;border-bottom: 1px solid gray;flex-grow: 1;}#sk-container-id-13 div.sk-label:hover label.sk-toggleable__label {background-color: #d4ebff;}#sk-container-id-13 div.sk-serial::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: 0;}#sk-container-id-13 div.sk-serial {display: flex;flex-direction: column;align-items: center;background-color: white;padding-right: 0.2em;padding-left: 0.2em;position: relative;}#sk-container-id-13 div.sk-item {position: relative;z-index: 1;}#sk-container-id-13 div.sk-parallel {display: flex;align-items: stretch;justify-content: center;background-color: white;position: relative;}#sk-container-id-13 div.sk-item::before, #sk-container-id-13 div.sk-parallel-item::before {content: "";position: absolute;border-left: 1px solid gray;box-sizing: border-box;top: 0;bottom: 0;left: 50%;z-index: -1;}#sk-container-id-13 div.sk-parallel-item {display: flex;flex-direction: column;z-index: 1;position: relative;background-color: white;}#sk-container-id-13 div.sk-parallel-item:first-child::after {align-self: flex-end;width: 50%;}#sk-container-id-13 div.sk-parallel-item:last-child::after {align-self: flex-start;width: 50%;}#sk-container-id-13 div.sk-parallel-item:only-child::after {width: 0;}#sk-container-id-13 div.sk-dashed-wrapped {border: 1px dashed gray;margin: 0 0.4em 0.5em 0.4em;box-sizing: border-box;padding-bottom: 0.4em;background-color: white;}#sk-container-id-13 div.sk-label label {font-family: monospace;font-weight: bold;display: inline-block;line-height: 1.2em;}#sk-container-id-13 div.sk-label-container {text-align: center;}#sk-container-id-13 div.sk-container {/* jupyter's `normalize.less` sets `[hidden] { display: none; }` but bootstrap.min.css set `[hidden] { display: none !important; }` so we also need the `!important` here to be able to override the default hidden behavior on the sphinx rendered scikit-learn.org. See: https://github.com/scikit-learn/scikit-learn/issues/21755 */display: inline-block !important;position: relative;}#sk-container-id-13 div.sk-text-repr-fallback {display: none;}</style><div id="sk-container-id-13" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
-                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-43" type="checkbox" ><label for="sk-estimator-id-43" class="sk-toggleable__label sk-toggleable__label-arrow">Pipeline</label><div class="sk-toggleable__content"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
-                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label sk-toggleable__label-arrow">StandardScaler</label><div class="sk-toggleable__content"><pre>StandardScaler()</pre></div></div></div><div class="sk-item"><div class="sk-estimator sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-45" type="checkbox" ><label for="sk-estimator-id-45" class="sk-toggleable__label sk-toggleable__label-arrow">KMeans</label><div class="sk-toggleable__content"><pre>KMeans(n_clusters=3, n_init=3)</pre></div></div></div></div></div></div></div>
+    <style>#sk-container-id-7 {
+      /* Definition of color scheme common for light and dark mode */
+      --sklearn-color-text: #000;
+      --sklearn-color-text-muted: #666;
+      --sklearn-color-line: gray;
+      /* Definition of color scheme for unfitted estimators */
+      --sklearn-color-unfitted-level-0: #fff5e6;
+      --sklearn-color-unfitted-level-1: #f6e4d2;
+      --sklearn-color-unfitted-level-2: #ffe0b3;
+      --sklearn-color-unfitted-level-3: chocolate;
+      /* Definition of color scheme for fitted estimators */
+      --sklearn-color-fitted-level-0: #f0f8ff;
+      --sklearn-color-fitted-level-1: #d4ebff;
+      --sklearn-color-fitted-level-2: #b3dbfd;
+      --sklearn-color-fitted-level-3: cornflowerblue;
+
+      /* Specific color for light theme */
+      --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+      --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
+      --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+      --sklearn-color-icon: #696969;
+
+      @media (prefers-color-scheme: dark) {
+        /* Redefinition of color scheme for dark theme */
+        --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+        --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
+        --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
+        --sklearn-color-icon: #878787;
+      }
+    }
+
+    #sk-container-id-7 {
+      color: var(--sklearn-color-text);
+    }
+
+    #sk-container-id-7 pre {
+      padding: 0;
+    }
+
+    #sk-container-id-7 input.sk-hidden--visually {
+      border: 0;
+      clip: rect(1px 1px 1px 1px);
+      clip: rect(1px, 1px, 1px, 1px);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+
+    #sk-container-id-7 div.sk-dashed-wrapped {
+      border: 1px dashed var(--sklearn-color-line);
+      margin: 0 0.4em 0.5em 0.4em;
+      box-sizing: border-box;
+      padding-bottom: 0.4em;
+      background-color: var(--sklearn-color-background);
+    }
+
+    #sk-container-id-7 div.sk-container {
+      /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
+         but bootstrap.min.css set `[hidden] { display: none !important; }`
+         so we also need the `!important` here to be able to override the
+         default hidden behavior on the sphinx rendered scikit-learn.org.
+         See: https://github.com/scikit-learn/scikit-learn/issues/21755 */
+      display: inline-block !important;
+      position: relative;
+    }
+
+    #sk-container-id-7 div.sk-text-repr-fallback {
+      display: none;
+    }
+
+    div.sk-parallel-item,
+    div.sk-serial,
+    div.sk-item {
+      /* draw centered vertical line to link estimators */
+      background-image: linear-gradient(var(--sklearn-color-text-on-default-background), var(--sklearn-color-text-on-default-background));
+      background-size: 2px 100%;
+      background-repeat: no-repeat;
+      background-position: center center;
+    }
+
+    /* Parallel-specific style estimator block */
+
+    #sk-container-id-7 div.sk-parallel-item::after {
+      content: "";
+      width: 100%;
+      border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
+      flex-grow: 1;
+    }
+
+    #sk-container-id-7 div.sk-parallel {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      background-color: var(--sklearn-color-background);
+      position: relative;
+    }
+
+    #sk-container-id-7 div.sk-parallel-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    #sk-container-id-7 div.sk-parallel-item:first-child::after {
+      align-self: flex-end;
+      width: 50%;
+    }
+
+    #sk-container-id-7 div.sk-parallel-item:last-child::after {
+      align-self: flex-start;
+      width: 50%;
+    }
+
+    #sk-container-id-7 div.sk-parallel-item:only-child::after {
+      width: 0;
+    }
+
+    /* Serial-specific style estimator block */
+
+    #sk-container-id-7 div.sk-serial {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--sklearn-color-background);
+      padding-right: 1em;
+      padding-left: 1em;
+    }
+
+
+    /* Toggleable style: style used for estimator/Pipeline/ColumnTransformer box that is
+    clickable and can be expanded/collapsed.
+    - Pipeline and ColumnTransformer use this feature and define the default style
+    - Estimators will overwrite some part of the style using the `sk-estimator` class
+    */
+
+    /* Pipeline and ColumnTransformer style (default) */
+
+    #sk-container-id-7 div.sk-toggleable {
+      /* Default theme specific background. It is overwritten whether we have a
+      specific estimator or a Pipeline/ColumnTransformer */
+      background-color: var(--sklearn-color-background);
+    }
+
+    /* Toggleable label */
+    #sk-container-id-7 label.sk-toggleable__label {
+      cursor: pointer;
+      display: flex;
+      width: 100%;
+      margin-bottom: 0;
+      padding: 0.5em;
+      box-sizing: border-box;
+      text-align: center;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.5em;
+    }
+
+    #sk-container-id-7 label.sk-toggleable__label .caption {
+      font-size: 0.6rem;
+      font-weight: lighter;
+      color: var(--sklearn-color-text-muted);
+    }
+
+    #sk-container-id-7 label.sk-toggleable__label-arrow:before {
+      /* Arrow on the left of the label */
+      content: "▸";
+      float: left;
+      margin-right: 0.25em;
+      color: var(--sklearn-color-icon);
+    }
+
+    #sk-container-id-7 label.sk-toggleable__label-arrow:hover:before {
+      color: var(--sklearn-color-text);
+    }
+
+    /* Toggleable content - dropdown */
+
+    #sk-container-id-7 div.sk-toggleable__content {
+      max-height: 0;
+      max-width: 0;
+      overflow: hidden;
+      text-align: left;
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-0);
+    }
+
+    #sk-container-id-7 div.sk-toggleable__content.fitted {
+      /* fitted */
+      background-color: var(--sklearn-color-fitted-level-0);
+    }
+
+    #sk-container-id-7 div.sk-toggleable__content pre {
+      margin: 0.2em;
+      border-radius: 0.25em;
+      color: var(--sklearn-color-text);
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-0);
+    }
+
+    #sk-container-id-7 div.sk-toggleable__content.fitted pre {
+      /* unfitted */
+      background-color: var(--sklearn-color-fitted-level-0);
+    }
+
+    #sk-container-id-7 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+      /* Expand drop-down */
+      max-height: 200px;
+      max-width: 100%;
+      overflow: auto;
+    }
+
+    #sk-container-id-7 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+      content: "▾";
+    }
+
+    /* Pipeline/ColumnTransformer-specific style */
+
+    #sk-container-id-7 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+      color: var(--sklearn-color-text);
+      background-color: var(--sklearn-color-unfitted-level-2);
+    }
+
+    #sk-container-id-7 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+      background-color: var(--sklearn-color-fitted-level-2);
+    }
+
+    /* Estimator-specific style */
+
+    /* Colorize estimator box */
+    #sk-container-id-7 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-2);
+    }
+
+    #sk-container-id-7 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+      /* fitted */
+      background-color: var(--sklearn-color-fitted-level-2);
+    }
+
+    #sk-container-id-7 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-7 div.sk-label label {
+      /* The background is the default theme color */
+      color: var(--sklearn-color-text-on-default-background);
+    }
+
+    /* On hover, darken the color of the background */
+    #sk-container-id-7 div.sk-label:hover label.sk-toggleable__label {
+      color: var(--sklearn-color-text);
+      background-color: var(--sklearn-color-unfitted-level-2);
+    }
+
+    /* Label box, darken color on hover, fitted */
+    #sk-container-id-7 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+      color: var(--sklearn-color-text);
+      background-color: var(--sklearn-color-fitted-level-2);
+    }
+
+    /* Estimator label */
+
+    #sk-container-id-7 div.sk-label label {
+      font-family: monospace;
+      font-weight: bold;
+      display: inline-block;
+      line-height: 1.2em;
+    }
+
+    #sk-container-id-7 div.sk-label-container {
+      text-align: center;
+    }
+
+    /* Estimator-specific */
+    #sk-container-id-7 div.sk-estimator {
+      font-family: monospace;
+      border: 1px dotted var(--sklearn-color-border-box);
+      border-radius: 0.25em;
+      box-sizing: border-box;
+      margin-bottom: 0.5em;
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-0);
+    }
+
+    #sk-container-id-7 div.sk-estimator.fitted {
+      /* fitted */
+      background-color: var(--sklearn-color-fitted-level-0);
+    }
+
+    /* on hover */
+    #sk-container-id-7 div.sk-estimator:hover {
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-2);
+    }
+
+    #sk-container-id-7 div.sk-estimator.fitted:hover {
+      /* fitted */
+      background-color: var(--sklearn-color-fitted-level-2);
+    }
+
+    /* Specification for estimator info (e.g. "i" and "?") */
+
+    /* Common style for "i" and "?" */
+
+    .sk-estimator-doc-link,
+    a:link.sk-estimator-doc-link,
+    a:visited.sk-estimator-doc-link {
+      float: right;
+      font-size: smaller;
+      line-height: 1em;
+      font-family: monospace;
+      background-color: var(--sklearn-color-background);
+      border-radius: 1em;
+      height: 1em;
+      width: 1em;
+      text-decoration: none !important;
+      margin-left: 0.5em;
+      text-align: center;
+      /* unfitted */
+      border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-1);
+    }
+
+    .sk-estimator-doc-link.fitted,
+    a:link.sk-estimator-doc-link.fitted,
+    a:visited.sk-estimator-doc-link.fitted {
+      /* fitted */
+      border: var(--sklearn-color-fitted-level-1) 1pt solid;
+      color: var(--sklearn-color-fitted-level-1);
+    }
+
+    /* On hover */
+    div.sk-estimator:hover .sk-estimator-doc-link:hover,
+    .sk-estimator-doc-link:hover,
+    div.sk-label-container:hover .sk-estimator-doc-link:hover,
+    .sk-estimator-doc-link:hover {
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-3);
+      color: var(--sklearn-color-background);
+      text-decoration: none;
+    }
+
+    div.sk-estimator.fitted:hover .sk-estimator-doc-link.fitted:hover,
+    .sk-estimator-doc-link.fitted:hover,
+    div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
+    .sk-estimator-doc-link.fitted:hover {
+      /* fitted */
+      background-color: var(--sklearn-color-fitted-level-3);
+      color: var(--sklearn-color-background);
+      text-decoration: none;
+    }
+
+    /* Span, style for the box shown on hovering the info icon */
+    .sk-estimator-doc-link span {
+      display: none;
+      z-index: 9999;
+      position: relative;
+      font-weight: normal;
+      right: .2ex;
+      padding: .5ex;
+      margin: .5ex;
+      width: min-content;
+      min-width: 20ex;
+      max-width: 50ex;
+      color: var(--sklearn-color-text);
+      box-shadow: 2pt 2pt 4pt #999;
+      /* unfitted */
+      background: var(--sklearn-color-unfitted-level-0);
+      border: .5pt solid var(--sklearn-color-unfitted-level-3);
+    }
+
+    .sk-estimator-doc-link.fitted span {
+      /* fitted */
+      background: var(--sklearn-color-fitted-level-0);
+      border: var(--sklearn-color-fitted-level-3);
+    }
+
+    .sk-estimator-doc-link:hover span {
+      display: block;
+    }
+
+    /* "?"-specific style due to the `<a>` HTML tag */
+
+    #sk-container-id-7 a.estimator_doc_link {
+      float: right;
+      font-size: 1rem;
+      line-height: 1em;
+      font-family: monospace;
+      background-color: var(--sklearn-color-background);
+      border-radius: 1rem;
+      height: 1rem;
+      width: 1rem;
+      text-decoration: none;
+      /* unfitted */
+      color: var(--sklearn-color-unfitted-level-1);
+      border: var(--sklearn-color-unfitted-level-1) 1pt solid;
+    }
+
+    #sk-container-id-7 a.estimator_doc_link.fitted {
+      /* fitted */
+      border: var(--sklearn-color-fitted-level-1) 1pt solid;
+      color: var(--sklearn-color-fitted-level-1);
+    }
+
+    /* On hover */
+    #sk-container-id-7 a.estimator_doc_link:hover {
+      /* unfitted */
+      background-color: var(--sklearn-color-unfitted-level-3);
+      color: var(--sklearn-color-background);
+      text-decoration: none;
+    }
+
+    #sk-container-id-7 a.estimator_doc_link.fitted:hover {
+      /* fitted */
+      background-color: var(--sklearn-color-fitted-level-3);
+    }
+    </style><div id="sk-container-id-7" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" ><label for="sk-estimator-id-15" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox" ><label for="sk-estimator-id-16" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-17" type="checkbox" ><label for="sk-estimator-id-17" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>KMeans</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.cluster.KMeans.html">?<span>Documentation for KMeans</span></a></div></label><div class="sk-toggleable__content fitted"><pre>KMeans(n_clusters=3, n_init=3)</pre></div> </div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-54
+.. GENERATED FROM PYTHON SOURCE LINES 52-55
 
 The function goes through every step,
 overloads the methods *transform* and
 returns an ONNX graph for every step.
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-58
+.. GENERATED FROM PYTHON SOURCE LINES 55-59
 
-.. code-block:: default
+.. code-block:: Python
 
     steps = collect_intermediate_steps(
         pipe, "pipeline", [("X", FloatTensorType([None, X.shape[1]]))], target_opset=17
@@ -117,14 +533,14 @@ returns an ONNX graph for every step.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 60-62
 
 We call method transform to population the
 cache the overloaded methods *transform* keeps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-63
+.. GENERATED FROM PYTHON SOURCE LINES 62-64
 
-.. code-block:: default
+.. code-block:: Python
 
     pipe.transform(X)
 
@@ -137,167 +553,167 @@ cache the overloaded methods *transform* keeps.
  .. code-block:: none
 
 
-    array([[3.12119834, 0.21295824, 3.98940603],
-           [2.6755083 , 0.99604549, 4.01793312],
-           [2.97416665, 0.65198444, 4.19343668],
-           [2.88014429, 0.9034561 , 4.19784749],
-           [3.30022609, 0.40215457, 4.11157152],
-           [3.50554424, 1.21154793, 3.89893116],
-           [3.14856384, 0.50244932, 4.21638048],
-           [2.99184826, 0.09132468, 3.97313411],
-           [2.92515933, 1.42174651, 4.40757189],
-           [2.79398956, 0.78993078, 4.05764261],
-           [3.32125333, 0.78999385, 3.92088109],
-           [3.0493632 , 0.27618123, 4.07853631],
-           [2.80635045, 1.03497888, 4.16440431],
-           [3.21220972, 1.33482453, 4.63069748],
-           [3.88834965, 1.63865558, 4.14619343],
-           [4.4998303 , 2.39898792, 4.49547518],
-           [3.60978017, 1.20748818, 4.02966144],
-           [3.05594182, 0.21618828, 3.91388548],
-           [3.34493953, 1.20986655, 3.72562039],
-           [3.50065397, 0.86706182, 4.10101938],
-           [2.80825681, 0.50401564, 3.66383713],
-           [3.27800809, 0.66826437, 3.94496718],
-           [3.58990876, 0.68658071, 4.51061335],
-           [2.55934697, 0.47945627, 3.57996434],
-           [2.96493153, 0.36345425, 3.98817445],
-           [2.55682739, 0.99023912, 3.88431906],
-           [2.8279719 , 0.22683089, 3.79088782],
-           [3.05970831, 0.2947186 , 3.89539875],
-           [2.95425291, 0.25361098, 3.88085622],
-           [2.87745051, 0.65019824, 4.09851673],
-           [2.73238773, 0.80138328, 4.01796142],
-           [2.73361981, 0.52309257, 3.57350896],
-           [4.11853014, 1.57658655, 4.5037664 ],
-           [4.22845606, 1.87652483, 4.4465301 ],
-           [2.71452112, 0.76858489, 3.97906378],
-           [2.86508665, 0.54896332, 4.01986385],
-           [3.0573692 , 0.63079314, 3.80064093],
-           [3.40284985, 0.45982568, 4.25136846],
-           [3.00742655, 1.2336976 , 4.42052558],
-           [2.95472117, 0.14580827, 3.90865188],
-           [3.12324651, 0.20261743, 4.01192633],
-           [2.90164193, 2.67055552, 4.64398605],
-           [3.15411688, 0.90927099, 4.42154566],
-           [2.8613548 , 0.50081008, 3.70483773],
-           [3.34606471, 0.92159916, 3.9078554 ],
-           [2.65231058, 1.01946042, 4.01421067],
-           [3.53206587, 0.86953764, 4.14238152],
-           [2.99813103, 0.72275914, 4.23577398],
-           [3.34116935, 0.72324305, 3.97409784],
-           [2.90222887, 0.30295342, 3.97223984],
-           [1.9003878 , 3.43619989, 0.95288059],
-           [1.41851492, 2.97232682, 0.99352148],
-           [1.68457079, 3.51850037, 0.72661726],
-           [0.96940962, 3.33264308, 2.69898424],
-           [0.9112523 , 3.35747592, 1.11074501],
-           [0.35721918, 2.77550662, 1.8143491 ],
-           [1.59351202, 3.01808184, 1.00650285],
-           [1.50213315, 2.77360088, 3.31296552],
-           [1.11632078, 3.21148368, 1.14114175],
-           [0.77921299, 2.66294828, 2.42994048],
-           [1.97194958, 3.62389817, 3.73666782],
-           [0.77530513, 2.70011145, 1.45918639],
-           [1.25941769, 3.53658932, 2.74268279],
-           [0.66155141, 2.98813829, 1.28976474],
-           [0.73833453, 2.32311723, 2.05251547],
-           [1.46572707, 3.14311522, 0.98780965],
-           [0.80185102, 2.68234835, 1.67700171],
-           [0.568386  , 2.63954211, 2.12682734],
-           [1.19987895, 3.97369206, 2.33743839],
-           [0.67881532, 2.87494798, 2.46667974],
-           [1.34222961, 3.03853641, 1.1880022 ],
-           [0.53061062, 2.8022861 , 1.63233668],
-           [0.79234309, 3.68305664, 1.65142259],
-           [0.57371215, 2.96833851, 1.54593744],
-           [0.90589785, 2.9760862 , 1.2933375 ],
-           [1.22490527, 3.13002382, 1.03085926],
-           [1.26783271, 3.56679427, 1.09304603],
-           [1.42114042, 3.5903606 , 0.52050254],
-           [0.58974672, 2.93839428, 1.34712856],
-           [0.76432091, 2.58203512, 2.44164622],
-           [0.89738242, 2.99796537, 2.69027665],
-           [0.98549851, 2.92597852, 2.76965187],
-           [0.3921368 , 2.68907313, 2.02829879],
-           [0.54223583, 3.42215998, 1.4211892 ],
-           [0.90567816, 2.62771445, 1.88799766],
-           [1.70872911, 2.75915071, 1.39853465],
-           [1.48190142, 3.30075052, 0.78009974],
-           [1.06129323, 3.73017167, 2.2083069 ],
-           [0.81863359, 2.37943811, 1.87666989],
-           [0.599882  , 2.98789866, 2.41035271],
-           [0.4914813 , 2.89079656, 2.26782134],
-           [0.84409423, 2.86642713, 1.25085451],
-           [0.38941349, 2.86642575, 2.11791607],
-           [1.53271026, 2.96966239, 3.35089399],
-           [0.30831638, 2.77003779, 2.05312152],
-           [0.81726253, 2.38255534, 1.83091351],
-           [0.56428027, 2.55559903, 1.80454586],
-           [0.72672271, 2.8455521 , 1.39825227],
-           [1.28805849, 2.56987887, 3.06324547],
-           [0.38163798, 2.64007308, 1.89861511],
-           [2.31271244, 4.24274589, 1.0584579 ],
-           [0.76585766, 3.57067982, 1.5185265 ],
-           [2.14762671, 4.44150237, 0.52472   ],
-           [1.17645413, 3.69480186, 0.77236486],
-           [1.73594932, 4.11613683, 0.53031563],
-           [2.78128346, 5.03326801, 1.2022172 ],
-           [1.22550604, 3.3503222 , 2.74462238],
-           [2.2426558 , 4.577021  , 0.92275933],
-           [1.50462864, 4.363498  , 1.40314162],
-           [3.22975724, 4.79334275, 1.48323372],
-           [1.71837714, 3.62749566, 0.4787491 ],
-           [1.10409694, 3.89360823, 1.0325986 ],
-           [1.80475907, 4.1132966 , 0.27818948],
-           [0.94858807, 3.82688169, 1.91870424],
-           [1.39433359, 3.91538879, 1.49910975],
-           [1.90677079, 3.89835633, 0.68622715],
-           [1.39713702, 3.70128288, 0.46463058],
-           [3.85224062, 5.18341242, 2.10127163],
-           [2.95786451, 5.58136629, 1.83092395],
-           [1.17790381, 4.02615768, 2.37017622],
-           [2.27442972, 4.31907679, 0.52540209],
-           [0.91211061, 3.4288432 , 1.62249456],
-           [2.77937737, 5.19031307, 1.47042293],
-           [0.84735471, 3.64273089, 1.15814207],
-           [2.15695444, 4.00723617, 0.520093  ],
-           [2.33581345, 4.2637671 , 0.66660166],
-           [0.79774043, 3.45930032, 1.08324891],
-           [1.022307  , 3.27575645, 0.94925151],
-           [1.3842265 , 4.05342943, 0.84098317],
-           [2.03854964, 4.1585729 , 0.75748198],
-           [2.28297732, 4.71100584, 1.07124861],
-           [3.88774921, 5.12224641, 2.17345728],
-           [1.47357101, 4.13401784, 0.87682321],
-           [0.7964005 , 3.39830644, 1.11534598],
-           [0.80521086, 3.63719075, 1.59782917],
-           [2.8607372 , 5.08776655, 1.25982873],
-           [2.3101089 , 4.00416552, 1.07214028],
-           [1.46990247, 3.58815834, 0.51434392],
-           [0.97017134, 3.19454679, 1.0762733 ],
-           [1.97333575, 4.09907253, 0.23050145],
-           [2.07939567, 4.28416057, 0.57373487],
-           [2.06609741, 4.17402084, 0.51130902],
-           [0.76585766, 3.57067982, 1.5185265 ],
-           [2.24723796, 4.32128686, 0.54141867],
-           [2.42521977, 4.3480018 , 0.85128501],
-           [1.82594618, 4.1240495 , 0.52475835],
-           [1.03093862, 3.97564407, 1.52100812],
-           [1.44892686, 3.7539635 , 0.44371189],
-           [2.17585453, 3.7969924 , 1.08437101],
-           [1.00508668, 3.25638099, 1.13739231]])
+    array([[4.00404832, 0.21295824, 3.15861505],
+           [4.05055769, 0.99604549, 2.72563625],
+           [4.22040251, 0.65198444, 3.02188403],
+           [4.22860026, 0.9034561 , 2.93043986],
+           [4.12353003, 0.40215457, 3.33653691],
+           [3.89643029, 1.21154793, 3.52936423],
+           [4.2374443 , 0.50244932, 3.19234391],
+           [3.99197553, 0.09132468, 3.03242342],
+           [4.4445734 , 1.42174651, 2.9795537 ],
+           [4.08705397, 0.78993078, 2.84221713],
+           [3.92610748, 0.78999385, 3.3507236 ],
+           [4.09865843, 0.27618123, 3.09168785],
+           [4.19718995, 1.03497888, 2.85719428],
+           [4.66454355, 1.33482453, 3.26547013],
+           [4.13826195, 1.63865558, 3.90871872],
+           [4.47633229, 2.39898792, 4.51414747],
+           [4.02762963, 1.20748818, 3.63475229],
+           [3.92839122, 0.21618828, 3.09288714],
+           [3.72388908, 1.20986655, 3.36736664],
+           [4.10521298, 0.86706182, 3.53103908],
+           [3.67990695, 0.50401564, 2.8436663 ],
+           [3.95222508, 0.66826437, 3.30977167],
+           [4.52523323, 0.68658071, 3.63034505],
+           [3.60185594, 0.47945627, 2.59973228],
+           [4.00845791, 0.36345425, 3.00678098],
+           [3.91688379, 0.99023912, 2.60615351],
+           [3.80966594, 0.22683089, 2.86756462],
+           [3.90931811, 0.2947186 , 3.0958103 ],
+           [3.89828815, 0.25361098, 2.99275191],
+           [4.12581898, 0.65019824, 2.92503544],
+           [4.04810077, 0.80138328, 2.78137328],
+           [3.58928575, 0.52309257, 2.76837135],
+           [4.49874494, 1.57658655, 4.14390673],
+           [4.43563509, 1.87652483, 4.2489329 ],
+           [4.008642  , 0.76858489, 2.76272437],
+           [4.04525625, 0.54896332, 2.9103173 ],
+           [3.81211172, 0.63079314, 3.09001251],
+           [4.26421417, 0.45982568, 3.44057865],
+           [4.45456872, 1.2336976 , 3.06034971],
+           [3.92683189, 0.14580827, 2.99422852],
+           [4.02712265, 0.20261743, 3.16142101],
+           [4.69480008, 2.67055552, 2.9575648 ],
+           [4.4496996 , 0.90927099, 3.20355969],
+           [3.71964918, 0.50081008, 2.89721622],
+           [3.91143692, 0.92159916, 3.37471011],
+           [4.04740147, 1.01946042, 2.70316642],
+           [4.14683513, 0.86953764, 3.56280964],
+           [4.26327469, 0.72275914, 3.04646993],
+           [3.98021229, 0.72324305, 3.37186092],
+           [3.99446269, 0.30295342, 2.94518173],
+           [0.9452659 , 3.43619989, 1.8639233 ],
+           [1.00829443, 2.97232682, 1.38933168],
+           [0.73653572, 3.51850037, 1.6428166 ],
+           [2.76204203, 3.33264308, 1.00264343],
+           [1.16604995, 3.35747592, 0.86560047],
+           [1.86711784, 2.77550662, 0.3750882 ],
+           [1.00955989, 3.01808184, 1.56489146],
+           [3.3697155 , 2.77360088, 1.55619573],
+           [1.18358725, 3.21148368, 1.08067281],
+           [2.48285941, 2.66294828, 0.82637993],
+           [3.79967007, 3.62389817, 2.01281316],
+           [1.50054672, 2.70011145, 0.76353654],
+           [2.80438695, 3.53658932, 1.27727048],
+           [1.34023352, 2.98813829, 0.62868121],
+           [2.09655735, 2.32311723, 0.77087912],
+           [1.00633966, 3.14311522, 1.43272989],
+           [1.71909321, 2.68234835, 0.80192   ],
+           [2.17926627, 2.63954211, 0.60569829],
+           [2.40214871, 3.97369206, 1.18764767],
+           [2.52511757, 2.87494798, 0.727372  ],
+           [1.21113562, 3.03853641, 1.31653995],
+           [1.68291281, 2.8022861 , 0.52313867],
+           [1.71597913, 3.68305664, 0.75211692],
+           [1.59856561, 2.96833851, 0.55292557],
+           [1.33753092, 2.9760862 , 0.87815407],
+           [1.06462905, 3.13002382, 1.19061026],
+           [1.13996294, 3.56679427, 1.22441299],
+           [0.5652633 , 3.5903606 , 1.37258261],
+           [1.39763754, 2.93839428, 0.56006248],
+           [2.49518379, 2.58203512, 0.81289907],
+           [2.75025306, 2.99796537, 0.94324481],
+           [2.82866407, 2.92597852, 1.03283946],
+           [2.08201734, 2.68907313, 0.4343386 ],
+           [1.48418961, 3.42215998, 0.48873673],
+           [1.92943813, 2.62771445, 0.91606802],
+           [1.40011111, 2.75915071, 1.69140864],
+           [0.79992473, 3.30075052, 1.44311693],
+           [2.2708714 , 3.73017167, 1.05036852],
+           [1.91690629, 2.37943811, 0.83618809],
+           [2.47017911, 2.98789866, 0.6470029 ],
+           [2.32571939, 2.89079656, 0.53979211],
+           [1.29304411, 2.86642713, 0.81855214],
+           [2.17526444, 2.86642575, 0.43194777],
+           [3.40973541, 2.96966239, 1.58383257],
+           [2.10849001, 2.77003779, 0.3618706 ],
+           [1.87076527, 2.38255534, 0.83187956],
+           [1.85116384, 2.55559903, 0.58147273],
+           [1.44451588, 2.8455521 , 0.70529895],
+           [3.11774537, 2.56987887, 1.34329146],
+           [1.94990512, 2.64007308, 0.41481694],
+           [1.04248866, 4.24274589, 2.26819164],
+           [1.57935402, 3.57067982, 0.72581017],
+           [0.52274684, 4.44150237, 2.09231844],
+           [0.83298461, 3.69480186, 1.12321156],
+           [0.5678145 , 4.11613683, 1.68255837],
+           [1.1830756 , 5.03326801, 2.72592116],
+           [2.8024351 , 3.3503222 , 1.25267619],
+           [0.93117407, 4.577021  , 2.18852343],
+           [1.46246781, 4.363498  , 1.45283591],
+           [1.4207266 , 4.79334275, 3.18264007],
+           [0.47962495, 3.62749566, 1.67405555],
+           [1.09881086, 3.89360823, 1.04698204],
+           [0.31830999, 4.1132966 , 1.75049044],
+           [1.98175664, 3.82688169, 0.92293569],
+           [1.54698303, 3.91538879, 1.35721732],
+           [0.68407345, 3.89835633, 1.86138575],
+           [0.52205472, 3.70128288, 1.34561415],
+           [2.03678461, 5.18341242, 3.80620352],
+           [1.84250874, 5.58136629, 2.90217633],
+           [2.43634558, 4.02615768, 1.16636059],
+           [0.48150581, 4.31907679, 2.22297775],
+           [1.67578773, 3.4288432 , 0.88685031],
+           [1.47096547, 5.19031307, 2.72431414],
+           [1.22329554, 3.64273089, 0.79101156],
+           [0.47109224, 4.00723617, 2.10999425],
+           [0.62558995, 4.2637671 , 2.28591141],
+           [1.14490402, 3.45930032, 0.74392898],
+           [0.99645552, 3.27575645, 0.98053107],
+           [0.90181942, 4.05342943, 1.3282425 ],
+           [0.76242411, 4.1585729 , 1.98849304],
+           [1.08628479, 4.71100584, 2.22822113],
+           [2.10967488, 5.12224641, 3.84302072],
+           [0.93357383, 4.13401784, 1.41836425],
+           [1.17526973, 3.39830644, 0.74517066],
+           [1.66051938, 3.63719075, 0.76558228],
+           [1.23742547, 5.08776655, 2.80545775],
+           [1.04697429, 4.00416552, 2.26945032],
+           [0.55013293, 3.58815834, 1.42313566],
+           [1.12188023, 3.19454679, 0.93290167],
+           [0.20983625, 4.09907253, 1.92136662],
+           [0.5691276 , 4.28416057, 2.02737038],
+           [0.49810802, 4.17402084, 2.01513279],
+           [1.57935402, 3.57067982, 0.72581017],
+           [0.50497262, 4.32128686, 2.19577242],
+           [0.81423561, 4.3480018 , 2.37699732],
+           [0.55018391, 4.1240495 , 1.77340222],
+           [1.58648502, 3.97564407, 0.98294137],
+           [0.49931367, 3.7539635 , 1.39731191],
+           [1.06536484, 3.7969924 , 2.13822884],
+           [1.18287527, 3.25638099, 0.96885287]])
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
+.. GENERATED FROM PYTHON SOURCE LINES 65-67
 
 We compute every step and compare
 ONNX and scikit-learn outputs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-88
+.. GENERATED FROM PYTHON SOURCE LINES 67-89
 
-.. code-block:: default
+.. code-block:: Python
 
 
     for step in steps:
@@ -339,7 +755,7 @@ ONNX and scikit-learn outputs.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-96
+.. GENERATED FROM PYTHON SOURCE LINES 90-97
 
 Python runtime to look into every node
 ++++++++++++++++++++++++++++++++++++++
@@ -349,9 +765,9 @@ into every node of the ONNX graph.
 This option can be used to check when the computation
 fails due to nan values or a dimension mismatch.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-103
+.. GENERATED FROM PYTHON SOURCE LINES 97-104
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -369,18 +785,18 @@ fails due to nan values or a dimension mismatch.
  .. code-block:: none
 
 
-    [array([1, 1]), array([[3.1211984 , 0.21295893, 3.9894059 ],
-           [2.675508  , 0.99604493, 4.017933  ]], dtype=float32)]
+    [array([1, 1]), array([[4.0040483 , 0.21295893, 3.158615  ],
+           [4.050557  , 0.99604493, 2.7256362 ]], dtype=float32)]
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-105
+.. GENERATED FROM PYTHON SOURCE LINES 105-106
 
 And to get a sense of the intermediate results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-111
+.. GENERATED FROM PYTHON SOURCE LINES 106-112
 
-.. code-block:: default
+.. code-block:: Python
 
 
     oinf = ReferenceEvaluator(onx, verbose=3)
@@ -396,8 +812,8 @@ And to get a sense of the intermediate results.
 
  .. code-block:: none
 
-     +C Ad_Addcst: float32:(3,) in [0.9830552339553833, 5.035177230834961]
-     +C Ge_Gemmcst: float32:(3, 4) in [-1.3049873113632202, 1.1359702348709106]
+     +C Ad_Addcst: float32:(3,) in [1.0065230131149292, 5.035177230834961]
+     +C Ge_Gemmcst: float32:(3, 4) in [-1.3049873113632202, 1.1674340963363647]
      +C Mu_Mulcst: float32:(1,) in [0.0, 0.0]
      +I X: float32:(2, 4) in [0.20000000298023224, 5.099999904632568]
     Scaler(X) -> variable
@@ -407,25 +823,25 @@ And to get a sense of the intermediate results.
     Mul(Re_reduced0, Mu_Mulcst) -> Mu_C0
      + Mu_C0: float32:(2, 1) in [0.0, 0.0]
     Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0
-     + Ge_Y0: float32:(2, 3) in [-10.366023063659668, 7.967348575592041]
+     + Ge_Y0: float32:(2, 3) in [-10.366023063659668, 8.10552978515625]
     Add(Re_reduced0, Ge_Y0) -> Ad_C01
-     + Ad_C01: float32:(2, 3) in [-4.98982572555542, 12.817853927612305]
+     + Ad_C01: float32:(2, 3) in [-4.98982572555542, 12.956035614013672]
     Add(Ad_Addcst, Ad_C01) -> Ad_C0
-     + Ad_C0: float32:(2, 3) in [0.045351505279541016, 16.143783569335938]
+     + Ad_C0: float32:(2, 3) in [0.045351505279541016, 16.407014846801758]
     ArgMin(Ad_C0) -> label
      + label: int64:(2,) in [1, 1]
     Sqrt(Ad_C0) -> scores
-     + scores: float32:(2, 3) in [0.2129589319229126, 4.017932891845703]
+     + scores: float32:(2, 3) in [0.2129589319229126, 4.0505571365356445]
 
-    [array([1, 1]), array([[3.1211984 , 0.21295893, 3.9894059 ],
-           [2.675508  , 0.99604493, 4.017933  ]], dtype=float32)]
+    [array([1, 1]), array([[4.0040483 , 0.21295893, 3.158615  ],
+           [4.050557  , 0.99604493, 2.7256362 ]], dtype=float32)]
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.291 seconds)
+   **Total running time of the script:** (0 minutes 0.115 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py:
@@ -434,16 +850,17 @@ And to get a sense of the intermediate results.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_fbegin_investigate.ipynb <plot_fbegin_investigate.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_fbegin_investigate.py <plot_fbegin_investigate.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_fbegin_investigate.ipynb <plot_fbegin_investigate.ipynb>`
+      :download:`Download zipped: plot_fbegin_investigate.zip <plot_fbegin_investigate.zip>`
 
 
 .. only:: html

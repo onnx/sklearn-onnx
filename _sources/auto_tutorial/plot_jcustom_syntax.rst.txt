@@ -41,9 +41,10 @@ Custom model
 It basically copies what is in example
 `:ref:`l-plot-custom-converter`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-83
+.. GENERATED FROM PYTHON SOURCE LINES 27-84
 
 .. code-block:: Python
+
 
     from skl2onnx.common.data_types import guess_proto_type
     from onnxconverter_common.onnx_ops import apply_sub
@@ -118,14 +119,14 @@ It basically copies what is in example
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-88
+.. GENERATED FROM PYTHON SOURCE LINES 85-89
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 The shape calculator does not change.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-101
+.. GENERATED FROM PYTHON SOURCE LINES 89-102
 
 .. code-block:: Python
 
@@ -149,11 +150,11 @@ The shape calculator does not change.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-103
+.. GENERATED FROM PYTHON SOURCE LINES 103-104
 
 The converter is different.
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-143
+.. GENERATED FROM PYTHON SOURCE LINES 104-144
 
 .. code-block:: Python
 
@@ -204,11 +205,11 @@ The converter is different.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-145
+.. GENERATED FROM PYTHON SOURCE LINES 145-146
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-171
+.. GENERATED FROM PYTHON SOURCE LINES 146-172
 
 .. code-block:: Python
 
@@ -246,16 +247,16 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (6.04657619085458e-07, 0.0002951417065406967)
+    (np.float64(6.04657619085458e-07), np.float64(0.0002951417065406967))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-173
+.. GENERATED FROM PYTHON SOURCE LINES 173-174
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-182
+.. GENERATED FROM PYTHON SOURCE LINES 174-183
 
 .. code-block:: Python
 
@@ -276,19 +277,19 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (0.0, 0.0)
+    (np.float64(0.0), np.float64(0.0))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-184
+.. GENERATED FROM PYTHON SOURCE LINES 184-185
 
 The differences are smaller with double as expected.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.043 seconds)
+   **Total running time of the script:** (0 minutes 0.060 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_jcustom_syntax.py:
@@ -304,6 +305,10 @@ The differences are smaller with double as expected.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_jcustom_syntax.py <plot_jcustom_syntax.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_jcustom_syntax.zip <plot_jcustom_syntax.zip>`
 
 
 .. only:: html
