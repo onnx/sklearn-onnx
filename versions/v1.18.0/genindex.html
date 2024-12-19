@@ -1,0 +1,2602 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.05.06 --><title>Index - sklearn-onnx 1.18.0 documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css?v=92fd9be5" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=387cc868" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=eafc0fe6" />
+    <link rel="stylesheet" type="text/css" href="_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=36a5483c" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" /
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo_main.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_cbegin_opset.html">What is the opset number?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_dbegin_options.html">One model, many possible conversions with options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_dbegin_options_zipmap.html">Choose appropriate output of a classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_dbegin_options_list.html">Black list operators when converting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_ebegin_float_double.html">Issues when switching to float</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_fbegin_investigate.html">Intermediate results and investigation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gbegin_cst.html">Store arrays in one onnx graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gbegin_dataframe.html">Dataframe as an input</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gconverting.html">Modify the ONNX graph</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_woe_transformer.html">Converter for WOE</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="auto_tutorial/plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_summary.html">API Summary</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_metadata.html">Metadata</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_logging.html">Logging, verbose</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_decision_function.html">Probabilities or raw scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_model.html">Train, convert and predict a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_investigate_pipeline.html">Investigate a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_benchmark_cdist.html">Compare CDist with scipy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_zipmap.html">Probabilities as a vector or as a ZipMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline_lightgbm.html">Convert a pipeline with a LightGbm model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_black_op.html">Convert a model with a reduced list of operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_nmf.html">Custom Operator for NMF Decomposition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_cast_transformer.html">Discrepencies with StandardScaler</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_benchmark_pipeline.html">Benchmark a pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_pipeline_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_gpr.html">Discrepencies with GaussianProcessorRegressor: use of double</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_errors_onnxruntime.html">Errors with onnxruntime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_onnx_operators.html">Play with ONNX operators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_convert_syntax.html">Different ways to convert a model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_complex_pipeline.html">Convert a pipeline with ColumnTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_tfidfvectorizer.html">TfIdfVectorizer with ONNX</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_intermediate_outputs.html">Walk through intermediate outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_custom_parser_alternative.html">When a custom model is neither a classifier nor a regressor (alternative)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_custom_parser.html">When a custom model is neither a classifier nor a regressor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auto_examples/plot_custom_model.html">Write your own converter for your own model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Convert a pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameterized.html">Converters with options</a></li>
+<li class="toctree-l1"><a class="reference internal" href="supported.html">Supported scikit-learn Models</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#X"><strong>X</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_initializer">add_initializer() (skl2onnx.common._container.ModelComponentContainer method)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_input">add_input() (skl2onnx.common._container.ModelComponentContainer method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_node">add_node() (skl2onnx.common._container.ModelComponentContainer method)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.helpers.add_onnx_graph">add_onnx_graph() (in module skl2onnx.helpers)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_output">add_output() (skl2onnx.common._container.ModelComponentContainer method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_examples/plot_backend.html#index-0">backend</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_bbegin_measure_time.html#index-0">benchmark</a>
+</li>
+        <li><a href="auto_tutorial/plot_dbegin_options_list.html#index-0">black list</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Topology.call_converter">call_converter() (skl2onnx.common._topology.Topology method)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Topology.call_shape_calculator">call_shape_calculator() (skl2onnx.common._topology.Topology method)</a>
+</li>
+        <li><a href="auto_tutorial/plot_gexternal_catboost.html#index-0">CatBoost</a>
+</li>
+        <li><a href="parameterized.html#index-0">cdist</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common.utils.check_input_and_output_numbers">check_input_and_output_numbers() (in module skl2onnx.common.utils)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common.utils.check_input_and_output_types">check_input_and_output_types() (in module skl2onnx.common.utils)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Topology.convert_operators">convert_operators() (skl2onnx.common._topology.Topology method)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.convert_sklearn">convert_sklearn() (in module skl2onnx)</a>
+</li>
+        <li><a href="parameterized.html#skl2onnx.operator_converters.text_vectoriser.convert_sklearn_text_vectorizer">convert_sklearn_text_vectorizer() (in module skl2onnx.operator_converters.text_vectoriser)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.convert_topology">convert_topology() (in module skl2onnx.common._topology)</a>
+</li>
+        <li><a href="pipeline.html#index-0">converter</a>
+</li>
+        <li><a href="auto_tutorial/plot_icustom_converter.html#index-0">custom converter</a>, <a href="auto_tutorial/plot_kcustom_converter_wrapper.html#index-0">[1]</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_gbegin_dataframe.html#index-0">dataframe</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Topology.declare_scope">declare_scope() (skl2onnx.common._topology.Topology method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_abegin_convert_pipeline.html#index-0">deployment</a>
+</li>
+        <li><a href="auto_tutorial/plot_ebegin_float_double.html#index-0">discrepencies</a>
+</li>
+        <li><a href="auto_tutorial/plot_ebegin_float_double.html#index-0">double</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_usparse_xgboost.html#index-0">ensemble</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.helpers.onnx_helper.enumerate_model_node_outputs">enumerate_model_node_outputs() (in module skl2onnx.helpers.onnx_helper)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_ebegin_float_double.html#index-0">float</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.get_latest_tested_opset_version">get_latest_tested_opset_version() (in module skl2onnx)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Scope.get_unique_operator_name">get_unique_operator_name() (skl2onnx.common._topology.Scope method)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Scope.get_unique_variable_name">get_unique_variable_name() (skl2onnx.common._topology.Scope method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_wext_pyod_forest.html#index-0">iforest</a>
+</li>
+        <li><a href="introduction.html#index-0">initial types</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._container.SklearnModelContainerNode.input_names">input_names (skl2onnx.common._container.SklearnModelContainerNode property)</a>
+</li>
+        <li><a href="auto_tutorial/plot_fbegin_investigate.html#index-0">intermediate results</a>
+</li>
+        <li><a href="auto_tutorial/plot_fbegin_investigate.html#index-0">investigate</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_gexternal_lightgbm.html#index-0">LightGBM</a>, <a href="auto_tutorial/plot_gexternal_lightgbm_reg.html#index-0">[1]</a>
+</li>
+        <li><a href="auto_examples/plot_pipeline_lightgbm.html#index-0">LightGbm</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_usparse_xgboost.html#index-0">lightgbm</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.helpers.onnx_helper.load_onnx_model">load_onnx_model() (in module skl2onnx.helpers.onnx_helper)</a>
+</li>
+        <li><a href="api_summary.html#index-0">logging</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_examples/plot_metadata.html#index-0">metadata</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._container.ModelComponentContainer">ModelComponentContainer (class in skl2onnx.common._container)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer.onnx_converter">onnx_converter() (skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer method)</a>
+
+        <ul>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion.onnx_converter">(skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion method)</a>
+</li>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline.onnx_converter">(skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline method)</a>
+</li>
+        </ul></li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer.onnx_parser">onnx_parser() (skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer method)</a>
+
+        <ul>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion.onnx_parser">(skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion method)</a>
+</li>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline.onnx_parser">(skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline method)</a>
+</li>
+        </ul></li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer.onnx_shape_calculator">onnx_shape_calculator() (skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer method)</a>
+
+        <ul>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion.onnx_shape_calculator">(skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion method)</a>
+</li>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline.onnx_shape_calculator">(skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline method)</a>
+</li>
+        </ul></li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAbs">OnnxAbs (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAbs_1">OnnxAbs_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAbs_13">OnnxAbs_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAbs_6">OnnxAbs_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAcos">OnnxAcos (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAcos_22">OnnxAcos_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAcos_7">OnnxAcos_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAcosh">OnnxAcosh (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAcosh_22">OnnxAcosh_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAcosh_9">OnnxAcosh_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdagrad">OnnxAdagrad (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdagrad_1">OnnxAdagrad_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdam">OnnxAdam (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdam_1">OnnxAdam_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd">OnnxAdd (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd_1">OnnxAdd_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd_13">OnnxAdd_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd_14">OnnxAdd_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd_6">OnnxAdd_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAdd_7">OnnxAdd_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAffineGrid">OnnxAffineGrid (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAffineGrid_20">OnnxAffineGrid_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAnd">OnnxAnd (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAnd_1">OnnxAnd_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAnd_7">OnnxAnd_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMax">OnnxArgMax (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMax_1">OnnxArgMax_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMax_11">OnnxArgMax_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMax_12">OnnxArgMax_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMax_13">OnnxArgMax_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMin">OnnxArgMin (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMin_1">OnnxArgMin_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMin_11">OnnxArgMin_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMin_12">OnnxArgMin_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArgMin_13">OnnxArgMin_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArrayFeatureExtractor">OnnxArrayFeatureExtractor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxArrayFeatureExtractor_1">OnnxArrayFeatureExtractor_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAsin">OnnxAsin (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAsin_22">OnnxAsin_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAsin_7">OnnxAsin_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAsinh">OnnxAsinh (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAsinh_22">OnnxAsinh_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAsinh_9">OnnxAsinh_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAtan">OnnxAtan (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAtan_22">OnnxAtan_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAtan_7">OnnxAtan_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAtanh">OnnxAtanh (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAtanh_22">OnnxAtanh_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAtanh_9">OnnxAtanh_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool">OnnxAveragePool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool_1">OnnxAveragePool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool_10">OnnxAveragePool_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool_11">OnnxAveragePool_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool_19">OnnxAveragePool_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool_22">OnnxAveragePool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxAveragePool_7">OnnxAveragePool_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization">OnnxBatchNormalization (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization_1">OnnxBatchNormalization_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization_14">OnnxBatchNormalization_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization_15">OnnxBatchNormalization_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization_6">OnnxBatchNormalization_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization_7">OnnxBatchNormalization_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBatchNormalization_9">OnnxBatchNormalization_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBernoulli">OnnxBernoulli (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBernoulli_15">OnnxBernoulli_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBernoulli_22">OnnxBernoulli_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBinarizer">OnnxBinarizer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBinarizer_1">OnnxBinarizer_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitShift">OnnxBitShift (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitShift_11">OnnxBitShift_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseAnd">OnnxBitwiseAnd (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseAnd_18">OnnxBitwiseAnd_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseNot">OnnxBitwiseNot (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseNot_18">OnnxBitwiseNot_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseOr">OnnxBitwiseOr (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseOr_18">OnnxBitwiseOr_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseXor">OnnxBitwiseXor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBitwiseXor_18">OnnxBitwiseXor_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBlackmanWindow">OnnxBlackmanWindow (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxBlackmanWindow_17">OnnxBlackmanWindow_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast">OnnxCast (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast_1">OnnxCast_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast_13">OnnxCast_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast_19">OnnxCast_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast_21">OnnxCast_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast_6">OnnxCast_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCast_9">OnnxCast_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCastLike">OnnxCastLike (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCastLike_15">OnnxCastLike_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCastLike_19">OnnxCastLike_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCastLike_21">OnnxCastLike_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCastMap">OnnxCastMap (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCastMap_1">OnnxCastMap_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxCastRegressor">OnnxCastRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxCastTransformer">OnnxCastTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCategoryMapper">OnnxCategoryMapper (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCategoryMapper_1">OnnxCategoryMapper_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCeil">OnnxCeil (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCeil_1">OnnxCeil_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCeil_13">OnnxCeil_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCeil_6">OnnxCeil_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCelu">OnnxCelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCelu_12">OnnxCelu_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCenterCropPad">OnnxCenterCropPad (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCenterCropPad_18">OnnxCenterCropPad_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxClip">OnnxClip (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxClip_1">OnnxClip_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxClip_11">OnnxClip_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxClip_12">OnnxClip_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxClip_13">OnnxClip_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxClip_6">OnnxClip_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCol2Im">OnnxCol2Im (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCol2Im_18">OnnxCol2Im_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCompress">OnnxCompress (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCompress_11">OnnxCompress_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCompress_9">OnnxCompress_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcat">OnnxConcat (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcat_1">OnnxConcat_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcat_11">OnnxConcat_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcat_13">OnnxConcat_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcat_4">OnnxConcat_4 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcatFromSequence">OnnxConcatFromSequence (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConcatFromSequence_11">OnnxConcatFromSequence_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant">OnnxConstant (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_1">OnnxConstant_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_11">OnnxConstant_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_12">OnnxConstant_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_13">OnnxConstant_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_19">OnnxConstant_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_21">OnnxConstant_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstant_9">OnnxConstant_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstantOfShape">OnnxConstantOfShape (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstantOfShape_20">OnnxConstantOfShape_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstantOfShape_21">OnnxConstantOfShape_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConstantOfShape_9">OnnxConstantOfShape_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConv">OnnxConv (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConv_1">OnnxConv_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConv_11">OnnxConv_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConv_22">OnnxConv_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConvInteger">OnnxConvInteger (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConvInteger_10">OnnxConvInteger_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConvTranspose">OnnxConvTranspose (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConvTranspose_1">OnnxConvTranspose_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConvTranspose_11">OnnxConvTranspose_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxConvTranspose_22">OnnxConvTranspose_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCos">OnnxCos (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCos_22">OnnxCos_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCos_7">OnnxCos_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCosh">OnnxCosh (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCosh_22">OnnxCosh_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCosh_9">OnnxCosh_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCumSum">OnnxCumSum (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCumSum_11">OnnxCumSum_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxCumSum_14">OnnxCumSum_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDeformConv">OnnxDeformConv (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDeformConv_19">OnnxDeformConv_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDeformConv_22">OnnxDeformConv_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDepthToSpace">OnnxDepthToSpace (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDepthToSpace_1">OnnxDepthToSpace_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDepthToSpace_11">OnnxDepthToSpace_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDepthToSpace_13">OnnxDepthToSpace_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDequantizeLinear">OnnxDequantizeLinear (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDequantizeLinear_10">OnnxDequantizeLinear_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDequantizeLinear_13">OnnxDequantizeLinear_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDequantizeLinear_19">OnnxDequantizeLinear_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDequantizeLinear_21">OnnxDequantizeLinear_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDet">OnnxDet (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDet_11">OnnxDet_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDet_22">OnnxDet_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDFT">OnnxDFT (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDFT_17">OnnxDFT_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDFT_20">OnnxDFT_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDictVectorizer">OnnxDictVectorizer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDictVectorizer_1">OnnxDictVectorizer_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv">OnnxDiv (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv_1">OnnxDiv_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv_13">OnnxDiv_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv_14">OnnxDiv_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv_6">OnnxDiv_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDiv_7">OnnxDiv_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout">OnnxDropout (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_1">OnnxDropout_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_10">OnnxDropout_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_12">OnnxDropout_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_13">OnnxDropout_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_22">OnnxDropout_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_6">OnnxDropout_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDropout_7">OnnxDropout_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDynamicQuantizeLinear">OnnxDynamicQuantizeLinear (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxDynamicQuantizeLinear_11">OnnxDynamicQuantizeLinear_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEinsum">OnnxEinsum (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEinsum_12">OnnxEinsum_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxElu">OnnxElu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxElu_1">OnnxElu_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxElu_22">OnnxElu_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxElu_6">OnnxElu_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEqual">OnnxEqual (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEqual_1">OnnxEqual_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEqual_11">OnnxEqual_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEqual_13">OnnxEqual_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEqual_19">OnnxEqual_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEqual_7">OnnxEqual_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxErf">OnnxErf (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxErf_13">OnnxErf_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxErf_9">OnnxErf_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExp">OnnxExp (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExp_1">OnnxExp_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExp_13">OnnxExp_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExp_6">OnnxExp_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExpand">OnnxExpand (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExpand_13">OnnxExpand_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxExpand_8">OnnxExpand_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEyeLike">OnnxEyeLike (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEyeLike_22">OnnxEyeLike_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxEyeLike_9">OnnxEyeLike_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFeatureVectorizer">OnnxFeatureVectorizer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFeatureVectorizer_1">OnnxFeatureVectorizer_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFlatten">OnnxFlatten (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFlatten_1">OnnxFlatten_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFlatten_11">OnnxFlatten_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFlatten_13">OnnxFlatten_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFlatten_21">OnnxFlatten_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFlatten_9">OnnxFlatten_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFloor">OnnxFloor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFloor_1">OnnxFloor_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFloor_13">OnnxFloor_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxFloor_6">OnnxFloor_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGather">OnnxGather (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGather_1">OnnxGather_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGather_11">OnnxGather_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGather_13">OnnxGather_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherElements">OnnxGatherElements (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherElements_11">OnnxGatherElements_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherElements_13">OnnxGatherElements_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherND">OnnxGatherND (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherND_11">OnnxGatherND_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherND_12">OnnxGatherND_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGatherND_13">OnnxGatherND_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGelu">OnnxGelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGelu_20">OnnxGelu_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm">OnnxGemm (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm_1">OnnxGemm_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm_11">OnnxGemm_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm_13">OnnxGemm_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm_6">OnnxGemm_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm_7">OnnxGemm_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGemm_9">OnnxGemm_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalAveragePool">OnnxGlobalAveragePool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalAveragePool_1">OnnxGlobalAveragePool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalAveragePool_22">OnnxGlobalAveragePool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalLpPool">OnnxGlobalLpPool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalLpPool_1">OnnxGlobalLpPool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalLpPool_2">OnnxGlobalLpPool_2 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalLpPool_22">OnnxGlobalLpPool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalMaxPool">OnnxGlobalMaxPool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalMaxPool_1">OnnxGlobalMaxPool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGlobalMaxPool_22">OnnxGlobalMaxPool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGradient">OnnxGradient (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGradient_1">OnnxGradient_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreater">OnnxGreater (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreater_1">OnnxGreater_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreater_13">OnnxGreater_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreater_7">OnnxGreater_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreater_9">OnnxGreater_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreaterOrEqual">OnnxGreaterOrEqual (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreaterOrEqual_12">OnnxGreaterOrEqual_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGreaterOrEqual_16">OnnxGreaterOrEqual_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGridSample">OnnxGridSample (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGridSample_16">OnnxGridSample_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGridSample_20">OnnxGridSample_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGridSample_22">OnnxGridSample_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGroupNormalization">OnnxGroupNormalization (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGroupNormalization_18">OnnxGroupNormalization_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGroupNormalization_21">OnnxGroupNormalization_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGRU">OnnxGRU (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGRU_1">OnnxGRU_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGRU_14">OnnxGRU_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGRU_22">OnnxGRU_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGRU_3">OnnxGRU_3 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxGRU_7">OnnxGRU_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHammingWindow">OnnxHammingWindow (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHammingWindow_17">OnnxHammingWindow_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHannWindow">OnnxHannWindow (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHannWindow_17">OnnxHannWindow_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardmax">OnnxHardmax (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardmax_1">OnnxHardmax_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardmax_11">OnnxHardmax_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardmax_13">OnnxHardmax_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSigmoid">OnnxHardSigmoid (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSigmoid_1">OnnxHardSigmoid_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSigmoid_22">OnnxHardSigmoid_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSigmoid_6">OnnxHardSigmoid_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSwish">OnnxHardSwish (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSwish_14">OnnxHardSwish_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxHardSwish_22">OnnxHardSwish_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity">OnnxIdentity (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity_1">OnnxIdentity_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity_13">OnnxIdentity_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity_14">OnnxIdentity_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity_16">OnnxIdentity_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity_19">OnnxIdentity_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIdentity_21">OnnxIdentity_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf">OnnxIf (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf_1">OnnxIf_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf_11">OnnxIf_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf_13">OnnxIf_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf_16">OnnxIf_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf_19">OnnxIf_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIf_21">OnnxIf_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxImageDecoder">OnnxImageDecoder (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxImageDecoder_20">OnnxImageDecoder_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxImputer">OnnxImputer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxImputer_1">OnnxImputer_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxInstanceNormalization">OnnxInstanceNormalization (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxInstanceNormalization_1">OnnxInstanceNormalization_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxInstanceNormalization_22">OnnxInstanceNormalization_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxInstanceNormalization_6">OnnxInstanceNormalization_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsInf">OnnxIsInf (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsInf_10">OnnxIsInf_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsInf_20">OnnxIsInf_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsNaN">OnnxIsNaN (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsNaN_13">OnnxIsNaN_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsNaN_20">OnnxIsNaN_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxIsNaN_9">OnnxIsNaN_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLabelEncoder">OnnxLabelEncoder (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLabelEncoder_1">OnnxLabelEncoder_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLabelEncoder_2">OnnxLabelEncoder_2 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLabelEncoder_4">OnnxLabelEncoder_4 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLayerNormalization">OnnxLayerNormalization (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLayerNormalization_17">OnnxLayerNormalization_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLeakyRelu">OnnxLeakyRelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLeakyRelu_1">OnnxLeakyRelu_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLeakyRelu_16">OnnxLeakyRelu_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLeakyRelu_6">OnnxLeakyRelu_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLess">OnnxLess (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLess_1">OnnxLess_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLess_13">OnnxLess_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLess_7">OnnxLess_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLess_9">OnnxLess_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLessOrEqual">OnnxLessOrEqual (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLessOrEqual_12">OnnxLessOrEqual_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLessOrEqual_16">OnnxLessOrEqual_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLinearClassifier">OnnxLinearClassifier (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLinearClassifier_1">OnnxLinearClassifier_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLinearRegressor">OnnxLinearRegressor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLinearRegressor_1">OnnxLinearRegressor_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLog">OnnxLog (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLog_1">OnnxLog_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLog_13">OnnxLog_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLog_6">OnnxLog_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLogSoftmax">OnnxLogSoftmax (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLogSoftmax_1">OnnxLogSoftmax_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLogSoftmax_11">OnnxLogSoftmax_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLogSoftmax_13">OnnxLogSoftmax_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop">OnnxLoop (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop_1">OnnxLoop_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop_11">OnnxLoop_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop_13">OnnxLoop_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop_16">OnnxLoop_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop_19">OnnxLoop_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLoop_21">OnnxLoop_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpNormalization">OnnxLpNormalization (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpNormalization_1">OnnxLpNormalization_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpNormalization_22">OnnxLpNormalization_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpPool">OnnxLpPool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpPool_1">OnnxLpPool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpPool_11">OnnxLpPool_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpPool_18">OnnxLpPool_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpPool_2">OnnxLpPool_2 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLpPool_22">OnnxLpPool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLRN">OnnxLRN (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLRN_1">OnnxLRN_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLRN_13">OnnxLRN_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLSTM">OnnxLSTM (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLSTM_1">OnnxLSTM_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLSTM_14">OnnxLSTM_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLSTM_22">OnnxLSTM_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxLSTM_7">OnnxLSTM_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul">OnnxMatMul (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul_1">OnnxMatMul_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul_13">OnnxMatMul_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMul_9">OnnxMatMul_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMulInteger">OnnxMatMulInteger (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMatMulInteger_10">OnnxMatMulInteger_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMax">OnnxMax (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMax_1">OnnxMax_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMax_12">OnnxMax_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMax_13">OnnxMax_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMax_6">OnnxMax_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMax_8">OnnxMax_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool">OnnxMaxPool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool_1">OnnxMaxPool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool_10">OnnxMaxPool_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool_11">OnnxMaxPool_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool_12">OnnxMaxPool_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool_22">OnnxMaxPool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxPool_8">OnnxMaxPool_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxRoiPool">OnnxMaxRoiPool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxRoiPool_1">OnnxMaxRoiPool_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxRoiPool_22">OnnxMaxRoiPool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxUnpool">OnnxMaxUnpool (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxUnpool_11">OnnxMaxUnpool_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxUnpool_22">OnnxMaxUnpool_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMaxUnpool_9">OnnxMaxUnpool_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMean">OnnxMean (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMean_1">OnnxMean_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMean_13">OnnxMean_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMean_6">OnnxMean_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMean_8">OnnxMean_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMeanVarianceNormalization">OnnxMeanVarianceNormalization (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMeanVarianceNormalization_13">OnnxMeanVarianceNormalization_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMeanVarianceNormalization_9">OnnxMeanVarianceNormalization_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMelWeightMatrix">OnnxMelWeightMatrix (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMelWeightMatrix_17">OnnxMelWeightMatrix_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMin">OnnxMin (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMin_1">OnnxMin_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMin_12">OnnxMin_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMin_13">OnnxMin_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMin_6">OnnxMin_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMin_8">OnnxMin_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMish">OnnxMish (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMish_18">OnnxMish_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMish_22">OnnxMish_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMod">OnnxMod (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMod_10">OnnxMod_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMod_13">OnnxMod_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMomentum">OnnxMomentum (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMomentum_1">OnnxMomentum_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMul">OnnxMul (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMul_1">OnnxMul_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMul_13">OnnxMul_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMul_14">OnnxMul_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMul_6">OnnxMul_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMul_7">OnnxMul_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMultinomial">OnnxMultinomial (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMultinomial_22">OnnxMultinomial_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxMultinomial_7">OnnxMultinomial_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNeg">OnnxNeg (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNeg_1">OnnxNeg_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNeg_13">OnnxNeg_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNeg_6">OnnxNeg_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNegativeLogLikelihoodLoss">OnnxNegativeLogLikelihoodLoss (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNegativeLogLikelihoodLoss_12">OnnxNegativeLogLikelihoodLoss_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNegativeLogLikelihoodLoss_13">OnnxNegativeLogLikelihoodLoss_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNegativeLogLikelihoodLoss_22">OnnxNegativeLogLikelihoodLoss_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNonMaxSuppression">OnnxNonMaxSuppression (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNonMaxSuppression_10">OnnxNonMaxSuppression_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNonMaxSuppression_11">OnnxNonMaxSuppression_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNonZero">OnnxNonZero (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNonZero_13">OnnxNonZero_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNonZero_9">OnnxNonZero_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNormalizer">OnnxNormalizer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNormalizer_1">OnnxNormalizer_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNot">OnnxNot (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxNot_1">OnnxNot_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOneHot">OnnxOneHot (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOneHot_11">OnnxOneHot_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOneHot_9">OnnxOneHot_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOneHotEncoder">OnnxOneHotEncoder (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOneHotEncoder_1">OnnxOneHotEncoder_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptional">OnnxOptional (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptional_15">OnnxOptional_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptionalGetElement">OnnxOptionalGetElement (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptionalGetElement_15">OnnxOptionalGetElement_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptionalGetElement_18">OnnxOptionalGetElement_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptionalHasElement">OnnxOptionalHasElement (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptionalHasElement_15">OnnxOptionalHasElement_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOptionalHasElement_18">OnnxOptionalHasElement_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOr">OnnxOr (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOr_1">OnnxOr_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxOr_7">OnnxOr_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad">OnnxPad (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_1">OnnxPad_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_11">OnnxPad_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_13">OnnxPad_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_18">OnnxPad_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_19">OnnxPad_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_2">OnnxPad_2 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPad_21">OnnxPad_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPow">OnnxPow (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPow_1">OnnxPow_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPow_12">OnnxPow_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPow_13">OnnxPow_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPow_15">OnnxPow_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPow_7">OnnxPow_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPRelu">OnnxPRelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPRelu_1">OnnxPRelu_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPRelu_16">OnnxPRelu_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPRelu_6">OnnxPRelu_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPRelu_7">OnnxPRelu_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxPRelu_9">OnnxPRelu_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQLinearConv">OnnxQLinearConv (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQLinearConv_10">OnnxQLinearConv_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQLinearMatMul">OnnxQLinearMatMul (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQLinearMatMul_10">OnnxQLinearMatMul_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQLinearMatMul_21">OnnxQLinearMatMul_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQuantizeLinear">OnnxQuantizeLinear (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQuantizeLinear_10">OnnxQuantizeLinear_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQuantizeLinear_13">OnnxQuantizeLinear_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQuantizeLinear_19">OnnxQuantizeLinear_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxQuantizeLinear_21">OnnxQuantizeLinear_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomNormal">OnnxRandomNormal (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomNormal_1">OnnxRandomNormal_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomNormal_22">OnnxRandomNormal_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomNormalLike">OnnxRandomNormalLike (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomNormalLike_1">OnnxRandomNormalLike_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomNormalLike_22">OnnxRandomNormalLike_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomUniform">OnnxRandomUniform (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomUniform_1">OnnxRandomUniform_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomUniform_22">OnnxRandomUniform_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomUniformLike">OnnxRandomUniformLike (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomUniformLike_1">OnnxRandomUniformLike_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRandomUniformLike_22">OnnxRandomUniformLike_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRange">OnnxRange (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRange_11">OnnxRange_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReciprocal">OnnxReciprocal (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReciprocal_1">OnnxReciprocal_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReciprocal_13">OnnxReciprocal_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReciprocal_6">OnnxReciprocal_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL1">OnnxReduceL1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL1_1">OnnxReduceL1_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL1_11">OnnxReduceL1_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL1_13">OnnxReduceL1_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL1_18">OnnxReduceL1_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL2">OnnxReduceL2 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL2_1">OnnxReduceL2_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL2_11">OnnxReduceL2_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL2_13">OnnxReduceL2_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceL2_18">OnnxReduceL2_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSum">OnnxReduceLogSum (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSum_1">OnnxReduceLogSum_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSum_11">OnnxReduceLogSum_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSum_13">OnnxReduceLogSum_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSum_18">OnnxReduceLogSum_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSumExp">OnnxReduceLogSumExp (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSumExp_1">OnnxReduceLogSumExp_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSumExp_11">OnnxReduceLogSumExp_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSumExp_13">OnnxReduceLogSumExp_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceLogSumExp_18">OnnxReduceLogSumExp_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax">OnnxReduceMax (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax_1">OnnxReduceMax_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax_11">OnnxReduceMax_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax_12">OnnxReduceMax_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax_13">OnnxReduceMax_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax_18">OnnxReduceMax_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMax_20">OnnxReduceMax_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean">OnnxReduceMean (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean_1">OnnxReduceMean_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean_11">OnnxReduceMean_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean_13">OnnxReduceMean_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMean_18">OnnxReduceMean_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin">OnnxReduceMin (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin_1">OnnxReduceMin_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin_11">OnnxReduceMin_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin_12">OnnxReduceMin_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin_13">OnnxReduceMin_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin_18">OnnxReduceMin_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceMin_20">OnnxReduceMin_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceProd">OnnxReduceProd (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceProd_1">OnnxReduceProd_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceProd_11">OnnxReduceProd_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceProd_13">OnnxReduceProd_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceProd_18">OnnxReduceProd_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSum">OnnxReduceSum (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSum_1">OnnxReduceSum_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSum_11">OnnxReduceSum_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSum_13">OnnxReduceSum_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSumSquare">OnnxReduceSumSquare (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSumSquare_1">OnnxReduceSumSquare_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSumSquare_11">OnnxReduceSumSquare_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSumSquare_13">OnnxReduceSumSquare_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReduceSumSquare_18">OnnxReduceSumSquare_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRegexFullMatch">OnnxRegexFullMatch (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRegexFullMatch_20">OnnxRegexFullMatch_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRelu">OnnxRelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRelu_1">OnnxRelu_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRelu_13">OnnxRelu_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRelu_14">OnnxRelu_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRelu_6">OnnxRelu_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxReplaceTransformer">OnnxReplaceTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape">OnnxReshape (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape_1">OnnxReshape_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape_13">OnnxReshape_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape_14">OnnxReshape_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape_19">OnnxReshape_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape_21">OnnxReshape_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReshape_5">OnnxReshape_5 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxResize">OnnxResize (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxResize_10">OnnxResize_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxResize_11">OnnxResize_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxResize_13">OnnxResize_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxResize_18">OnnxResize_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxResize_19">OnnxResize_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReverseSequence">OnnxReverseSequence (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxReverseSequence_10">OnnxReverseSequence_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRNN">OnnxRNN (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRNN_1">OnnxRNN_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRNN_14">OnnxRNN_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRNN_22">OnnxRNN_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRNN_7">OnnxRNN_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRoiAlign">OnnxRoiAlign (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRoiAlign_10">OnnxRoiAlign_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRoiAlign_16">OnnxRoiAlign_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRoiAlign_22">OnnxRoiAlign_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRound">OnnxRound (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRound_11">OnnxRound_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxRound_22">OnnxRound_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScaler">OnnxScaler (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScaler_1">OnnxScaler_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan">OnnxScan (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan_11">OnnxScan_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan_16">OnnxScan_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan_19">OnnxScan_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan_21">OnnxScan_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan_8">OnnxScan_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScan_9">OnnxScan_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatter">OnnxScatter (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatter_11">OnnxScatter_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatter_9">OnnxScatter_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterElements">OnnxScatterElements (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterElements_11">OnnxScatterElements_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterElements_13">OnnxScatterElements_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterElements_16">OnnxScatterElements_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterElements_18">OnnxScatterElements_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterND">OnnxScatterND (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterND_11">OnnxScatterND_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterND_13">OnnxScatterND_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterND_16">OnnxScatterND_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxScatterND_18">OnnxScatterND_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSelu">OnnxSelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSelu_1">OnnxSelu_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSelu_22">OnnxSelu_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSelu_6">OnnxSelu_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceAt">OnnxSequenceAt (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceAt_11">OnnxSequenceAt_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceConstruct">OnnxSequenceConstruct (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceConstruct_11">OnnxSequenceConstruct_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceEmpty">OnnxSequenceEmpty (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceEmpty_11">OnnxSequenceEmpty_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceErase">OnnxSequenceErase (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceErase_11">OnnxSequenceErase_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceInsert">OnnxSequenceInsert (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceInsert_11">OnnxSequenceInsert_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceLength">OnnxSequenceLength (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceLength_11">OnnxSequenceLength_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceMap">OnnxSequenceMap (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSequenceMap_17">OnnxSequenceMap_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShape">OnnxShape (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShape_1">OnnxShape_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShape_13">OnnxShape_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShape_15">OnnxShape_15 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShape_19">OnnxShape_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShape_21">OnnxShape_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShrink">OnnxShrink (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxShrink_9">OnnxShrink_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSigmoid">OnnxSigmoid (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSigmoid_1">OnnxSigmoid_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSigmoid_13">OnnxSigmoid_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSigmoid_6">OnnxSigmoid_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSign">OnnxSign (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSign_13">OnnxSign_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSign_9">OnnxSign_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSin">OnnxSin (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSin_22">OnnxSin_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSin_7">OnnxSin_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSinh">OnnxSinh (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSinh_22">OnnxSinh_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSinh_9">OnnxSinh_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSize">OnnxSize (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSize_1">OnnxSize_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSize_13">OnnxSize_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSize_19">OnnxSize_19 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSize_21">OnnxSize_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearn_ConstantPredictor">OnnxSklearn_ConstantPredictor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnAdaBoostClassifier">OnnxSklearnAdaBoostClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnAdaBoostRegressor">OnnxSklearnAdaBoostRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnARDRegression">OnnxSklearnARDRegression (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnBaggingClassifier">OnnxSklearnBaggingClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnBaggingRegressor">OnnxSklearnBaggingRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnBayesianGaussianMixture">OnnxSklearnBayesianGaussianMixture (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnBayesianRidge">OnnxSklearnBayesianRidge (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnBernoulliNB">OnnxSklearnBernoulliNB (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnBinarizer">OnnxSklearnBinarizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnCalibratedClassifierCV">OnnxSklearnCalibratedClassifierCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnCategoricalNB">OnnxSklearnCategoricalNB (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer">OnnxSklearnColumnTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnComplementNB">OnnxSklearnComplementNB (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnCountVectorizer">OnnxSklearnCountVectorizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnDecisionTreeClassifier">OnnxSklearnDecisionTreeClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnDecisionTreeRegressor">OnnxSklearnDecisionTreeRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnDictVectorizer">OnnxSklearnDictVectorizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnElasticNet">OnnxSklearnElasticNet (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnElasticNetCV">OnnxSklearnElasticNetCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnExtraTreeClassifier">OnnxSklearnExtraTreeClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnExtraTreeRegressor">OnnxSklearnExtraTreeRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnExtraTreesClassifier">OnnxSklearnExtraTreesClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnExtraTreesRegressor">OnnxSklearnExtraTreesRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureHasher">OnnxSklearnFeatureHasher (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion">OnnxSklearnFeatureUnion (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFunctionTransformer">OnnxSklearnFunctionTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGammaRegressor">OnnxSklearnGammaRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGaussianMixture">OnnxSklearnGaussianMixture (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGaussianNB">OnnxSklearnGaussianNB (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGaussianProcessClassifier">OnnxSklearnGaussianProcessClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGaussianProcessRegressor">OnnxSklearnGaussianProcessRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGaussianRandomProjection">OnnxSklearnGaussianRandomProjection (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGenericUnivariateSelect">OnnxSklearnGenericUnivariateSelect (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGradientBoostingClassifier">OnnxSklearnGradientBoostingClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGradientBoostingRegressor">OnnxSklearnGradientBoostingRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnGridSearchCV">OnnxSklearnGridSearchCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnHistGradientBoostingClassifier">OnnxSklearnHistGradientBoostingClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnHistGradientBoostingRegressor">OnnxSklearnHistGradientBoostingRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnHuberRegressor">OnnxSklearnHuberRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnIncrementalPCA">OnnxSklearnIncrementalPCA (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnIsolationForest">OnnxSklearnIsolationForest (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKBinsDiscretizer">OnnxSklearnKBinsDiscretizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKernelCenterer">OnnxSklearnKernelCenterer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKernelPCA">OnnxSklearnKernelPCA (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKMeans">OnnxSklearnKMeans (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKNeighborsClassifier">OnnxSklearnKNeighborsClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKNeighborsRegressor">OnnxSklearnKNeighborsRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKNeighborsTransformer">OnnxSklearnKNeighborsTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnKNNImputer">OnnxSklearnKNNImputer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLabelBinarizer">OnnxSklearnLabelBinarizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLabelEncoder">OnnxSklearnLabelEncoder (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLars">OnnxSklearnLars (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLarsCV">OnnxSklearnLarsCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLasso">OnnxSklearnLasso (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLassoCV">OnnxSklearnLassoCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLassoLars">OnnxSklearnLassoLars (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLassoLarsCV">OnnxSklearnLassoLarsCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLassoLarsIC">OnnxSklearnLassoLarsIC (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLinearDiscriminantAnalysis">OnnxSklearnLinearDiscriminantAnalysis (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLinearRegression">OnnxSklearnLinearRegression (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLinearSVC">OnnxSklearnLinearSVC (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLinearSVR">OnnxSklearnLinearSVR (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLocalOutlierFactor">OnnxSklearnLocalOutlierFactor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLogisticRegression">OnnxSklearnLogisticRegression (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnLogisticRegressionCV">OnnxSklearnLogisticRegressionCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMaxAbsScaler">OnnxSklearnMaxAbsScaler (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMiniBatchKMeans">OnnxSklearnMiniBatchKMeans (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMinMaxScaler">OnnxSklearnMinMaxScaler (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMLPClassifier">OnnxSklearnMLPClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMLPRegressor">OnnxSklearnMLPRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultinomialNB">OnnxSklearnMultinomialNB (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultiOutputClassifier">OnnxSklearnMultiOutputClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultiOutputRegressor">OnnxSklearnMultiOutputRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultiTaskElasticNet">OnnxSklearnMultiTaskElasticNet (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultiTaskElasticNetCV">OnnxSklearnMultiTaskElasticNetCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultiTaskLasso">OnnxSklearnMultiTaskLasso (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnMultiTaskLassoCV">OnnxSklearnMultiTaskLassoCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnNearestNeighbors">OnnxSklearnNearestNeighbors (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnNeighborhoodComponentsAnalysis">OnnxSklearnNeighborhoodComponentsAnalysis (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnNormalizer">OnnxSklearnNormalizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnNuSVC">OnnxSklearnNuSVC (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnNuSVR">OnnxSklearnNuSVR (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOneClassSVM">OnnxSklearnOneClassSVM (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOneHotEncoder">OnnxSklearnOneHotEncoder (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOneVsOneClassifier">OnnxSklearnOneVsOneClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOneVsRestClassifier">OnnxSklearnOneVsRestClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOrdinalEncoder">OnnxSklearnOrdinalEncoder (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOrthogonalMatchingPursuit">OnnxSklearnOrthogonalMatchingPursuit (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnOrthogonalMatchingPursuitCV">OnnxSklearnOrthogonalMatchingPursuitCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPassiveAggressiveClassifier">OnnxSklearnPassiveAggressiveClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPassiveAggressiveRegressor">OnnxSklearnPassiveAggressiveRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPCA">OnnxSklearnPCA (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPerceptron">OnnxSklearnPerceptron (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline">OnnxSklearnPipeline (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPLSRegression">OnnxSklearnPLSRegression (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPoissonRegressor">OnnxSklearnPoissonRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPolynomialFeatures">OnnxSklearnPolynomialFeatures (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPowerTransformer">OnnxSklearnPowerTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnQuadraticDiscriminantAnalysis">OnnxSklearnQuadraticDiscriminantAnalysis (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnQuantileRegressor">OnnxSklearnQuantileRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRadiusNeighborsClassifier">OnnxSklearnRadiusNeighborsClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRadiusNeighborsRegressor">OnnxSklearnRadiusNeighborsRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomForestClassifier">OnnxSklearnRandomForestClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomForestRegressor">OnnxSklearnRandomForestRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRandomTreesEmbedding">OnnxSklearnRandomTreesEmbedding (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRANSACRegressor">OnnxSklearnRANSACRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRFE">OnnxSklearnRFE (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRFECV">OnnxSklearnRFECV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRidge">OnnxSklearnRidge (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRidgeClassifier">OnnxSklearnRidgeClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRidgeClassifierCV">OnnxSklearnRidgeClassifierCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRidgeCV">OnnxSklearnRidgeCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnRobustScaler">OnnxSklearnRobustScaler (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSelectFdr">OnnxSklearnSelectFdr (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSelectFpr">OnnxSklearnSelectFpr (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSelectFromModel">OnnxSklearnSelectFromModel (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSelectFwe">OnnxSklearnSelectFwe (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSelectKBest">OnnxSklearnSelectKBest (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSelectPercentile">OnnxSklearnSelectPercentile (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSGDClassifier">OnnxSklearnSGDClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSGDOneClassSVM">OnnxSklearnSGDOneClassSVM (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSGDRegressor">OnnxSklearnSGDRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSimpleImputer">OnnxSklearnSimpleImputer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnStackingClassifier">OnnxSklearnStackingClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnStackingRegressor">OnnxSklearnStackingRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnStandardScaler">OnnxSklearnStandardScaler (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSVC">OnnxSklearnSVC (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnSVR">OnnxSklearnSVR (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnTfidfTransformer">OnnxSklearnTfidfTransformer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnTfidfVectorizer">OnnxSklearnTfidfVectorizer (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnTheilSenRegressor">OnnxSklearnTheilSenRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnTruncatedSVD">OnnxSklearnTruncatedSVD (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnTunedThresholdClassifierCV">OnnxSklearnTunedThresholdClassifierCV (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnTweedieRegressor">OnnxSklearnTweedieRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnVarianceThreshold">OnnxSklearnVarianceThreshold (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnVotingClassifier">OnnxSklearnVotingClassifier (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnVotingRegressor">OnnxSklearnVotingRegressor (class in skl2onnx.algebra.sklearn_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSlice">OnnxSlice (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSlice_1">OnnxSlice_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSlice_10">OnnxSlice_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSlice_11">OnnxSlice_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSlice_13">OnnxSlice_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmax">OnnxSoftmax (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmax_1">OnnxSoftmax_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmax_11">OnnxSoftmax_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmax_13">OnnxSoftmax_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmaxCrossEntropyLoss">OnnxSoftmaxCrossEntropyLoss (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmaxCrossEntropyLoss_12">OnnxSoftmaxCrossEntropyLoss_12 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftmaxCrossEntropyLoss_13">OnnxSoftmaxCrossEntropyLoss_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftplus">OnnxSoftplus (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftplus_1">OnnxSoftplus_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftplus_22">OnnxSoftplus_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftsign">OnnxSoftsign (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftsign_1">OnnxSoftsign_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSoftsign_22">OnnxSoftsign_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSpaceToDepth">OnnxSpaceToDepth (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSpaceToDepth_1">OnnxSpaceToDepth_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSpaceToDepth_13">OnnxSpaceToDepth_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplit">OnnxSplit (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplit_1">OnnxSplit_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplit_11">OnnxSplit_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplit_13">OnnxSplit_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplit_18">OnnxSplit_18 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplit_2">OnnxSplit_2 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplitToSequence">OnnxSplitToSequence (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSplitToSequence_11">OnnxSplitToSequence_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqrt">OnnxSqrt (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqrt_1">OnnxSqrt_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqrt_13">OnnxSqrt_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqrt_6">OnnxSqrt_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqueeze">OnnxSqueeze (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqueeze_1">OnnxSqueeze_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqueeze_11">OnnxSqueeze_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqueeze_13">OnnxSqueeze_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSqueeze_21">OnnxSqueeze_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSTFT">OnnxSTFT (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSTFT_17">OnnxSTFT_17 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxStringConcat">OnnxStringConcat (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxStringConcat_20">OnnxStringConcat_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxStringNormalizer">OnnxStringNormalizer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxStringNormalizer_10">OnnxStringNormalizer_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxStringSplit">OnnxStringSplit (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxStringSplit_20">OnnxStringSplit_20 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSub">OnnxSub (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSub_1">OnnxSub_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSub_13">OnnxSub_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSub_14">OnnxSub_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSub_6">OnnxSub_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSub_7">OnnxSub_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSum">OnnxSum (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSum_1">OnnxSum_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSum_13">OnnxSum_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSum_6">OnnxSum_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSum_8">OnnxSum_8 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSVMClassifier">OnnxSVMClassifier (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSVMClassifier_1">OnnxSVMClassifier_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSVMRegressor">OnnxSVMRegressor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxSVMRegressor_1">OnnxSVMRegressor_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTan">OnnxTan (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTan_22">OnnxTan_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTan_7">OnnxTan_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTanh">OnnxTanh (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTanh_1">OnnxTanh_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTanh_13">OnnxTanh_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTanh_6">OnnxTanh_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTfIdfVectorizer">OnnxTfIdfVectorizer (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTfIdfVectorizer_9">OnnxTfIdfVectorizer_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxThresholdedRelu">OnnxThresholdedRelu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxThresholdedRelu_10">OnnxThresholdedRelu_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxThresholdedRelu_22">OnnxThresholdedRelu_22 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTile">OnnxTile (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTile_1">OnnxTile_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTile_13">OnnxTile_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTile_6">OnnxTile_6 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTopK">OnnxTopK (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTopK_1">OnnxTopK_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTopK_10">OnnxTopK_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTopK_11">OnnxTopK_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose">OnnxTranspose (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose_1">OnnxTranspose_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose_13">OnnxTranspose_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTranspose_21">OnnxTranspose_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsemble">OnnxTreeEnsemble (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsemble_5">OnnxTreeEnsemble_5 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleClassifier">OnnxTreeEnsembleClassifier (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleClassifier_1">OnnxTreeEnsembleClassifier_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleClassifier_3">OnnxTreeEnsembleClassifier_3 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleClassifier_5">OnnxTreeEnsembleClassifier_5 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleRegressor">OnnxTreeEnsembleRegressor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleRegressor_1">OnnxTreeEnsembleRegressor_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleRegressor_3">OnnxTreeEnsembleRegressor_3 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTreeEnsembleRegressor_5">OnnxTreeEnsembleRegressor_5 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTrilu">OnnxTrilu (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxTrilu_14">OnnxTrilu_14 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnique">OnnxUnique (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnique_11">OnnxUnique_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnsqueeze">OnnxUnsqueeze (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnsqueeze_1">OnnxUnsqueeze_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnsqueeze_11">OnnxUnsqueeze_11 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnsqueeze_13">OnnxUnsqueeze_13 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUnsqueeze_21">OnnxUnsqueeze_21 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUpsample">OnnxUpsample (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUpsample_10">OnnxUpsample_10 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUpsample_7">OnnxUpsample_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxUpsample_9">OnnxUpsample_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxWhere">OnnxWhere (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxWhere_16">OnnxWhere_16 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxWhere_9">OnnxWhere_9 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxXor">OnnxXor (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxXor_1">OnnxXor_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxXor_7">OnnxXor_7 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxZipMap">OnnxZipMap (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="supported.html#skl2onnx.algebra.onnx_ops.OnnxZipMap_1">OnnxZipMap_1 (class in skl2onnx.algebra.onnx_ops)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Operator">Operator (class in skl2onnx.common._topology)</a>
+</li>
+        <li><a href="auto_tutorial/plot_cbegin_opset.html#index-0">opset</a>
+</li>
+        <li><a href="index.html#index-0">opset version</a>
+</li>
+        <li><a href="auto_tutorial/plot_dbegin_options.html#index-0">options</a>, <a href="auto_tutorial/plot_lcustom_options.html#index-0">[1]</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._container.SklearnModelContainerNode.output_names">output_names (skl2onnx.common._container.SklearnModelContainerNode property)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="parameterized.html#index-0">pairwise distances</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx._parse.parse_sklearn">parse_sklearn() (in module skl2onnx._parse)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx._parse.parse_sklearn_model">parse_sklearn_model() (in module skl2onnx._parse)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_mcustom_parser.html#index-0">parser</a>, <a href="pipeline.html#index-0">[1]</a>
+</li>
+        <li><a href="auto_tutorial/plot_abegin_convert_pipeline.html#index-0">pipeline</a>
+</li>
+        <li><a href="auto_tutorial/plot_wext_pyod_forest.html#index-0">pyod</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.helpers.onnx_helper.save_onnx_model">save_onnx_model() (in module skl2onnx.helpers.onnx_helper)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Scope">Scope (class in skl2onnx.common._topology)</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.helpers.onnx_helper.select_model_inputs_outputs">select_model_inputs_outputs() (in module skl2onnx.helpers.onnx_helper)</a>
+</li>
+        <li><a href="pipeline.html#index-0">shape calculator</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._container.SklearnModelContainerNode">SklearnModelContainerNode (class in skl2onnx.common._container)</a>
+</li>
+        <li><a href="auto_tutorial/plot_usparse_xgboost.html#index-0">sparse</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.supported_converters">supported_converters() (in module skl2onnx)</a>
+</li>
+        <li><a href="auto_tutorial/plot_jcustom_syntax.html#index-0">syntax</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_cbegin_opset.html#index-0">target opset</a>
+</li>
+        <li><a href="index.html#index-0">target_opset</a>
+</li>
+        <li><a href="auto_tutorial/plot_transformer_discrepancy.html#index-0">td-idf</a>
+</li>
+        <li><a href="api_summary.html#skl2onnx.to_onnx">to_onnx() (in module skl2onnx)</a>
+
+        <ul>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer.to_onnx">(skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer method)</a>
+</li>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion.to_onnx">(skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion method)</a>
+</li>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline.to_onnx">(skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer.to_onnx_operator">to_onnx_operator() (skl2onnx.algebra.sklearn_ops.OnnxSklearnColumnTransformer method)</a>
+
+        <ul>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion.to_onnx_operator">(skl2onnx.algebra.sklearn_ops.OnnxSklearnFeatureUnion method)</a>
+</li>
+          <li><a href="supported.html#skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline.to_onnx_operator">(skl2onnx.algebra.sklearn_ops.OnnxSklearnPipeline method)</a>
+</li>
+        </ul></li>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Topology">Topology (class in skl2onnx.common._topology)</a>
+</li>
+        <li><a href="index_tutorial.html#index-0">tutorial</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.update_registered_converter">update_registered_converter() (in module skl2onnx)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.update_registered_parser">update_registered_parser() (in module skl2onnx)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="api_summary.html#skl2onnx.common._topology.Variable">Variable (class in skl2onnx.common._topology)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_cbegin_opset.html#index-0">version</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_dbegin_options_list.html#index-0">white list</a>
+</li>
+        <li><a href="auto_tutorial/plot_catwoe_transformer.html#index-0">WOE</a>, <a href="auto_tutorial/plot_woe_transformer.html#index-0">[1]</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_catwoe_transformer.html#index-0">WOEEncoder</a>
+</li>
+        <li><a href="auto_tutorial/plot_woe_transformer.html#index-0">WOETransformer</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="X" class="genindex-section">
+  <h2>X</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_examples/plot_pipeline_xgboost.html#index-0">XGBoost</a>, <a href="auto_tutorial/plot_gexternal_xgboost.html#index-0">[1]</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="auto_tutorial/plot_usparse_xgboost.html#index-0">xgboost</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2018-2023, Microsoft
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=256cef93"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=4e2eecee"></script>
+    </body>
+</html>

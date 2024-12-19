@@ -1,0 +1,109 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+
+Computation times
+=================
+**01:09.863** total execution time for 25 files **from auto_examples**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)
+     - 00:19.991
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_backend.py` (``plot_backend.py``)
+     - 00:17.934
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)
+     - 00:10.217
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)
+     - 00:04.925
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)
+     - 00:04.738
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)
+     - 00:04.086
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)
+     - 00:03.752
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)
+     - 00:02.180
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)
+     - 00:00.882
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)
+     - 00:00.652
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)
+     - 00:00.506
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py` (``plot_benchmark_cdist.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_black_op.py` (``plot_black_op.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py` (``plot_convert_decision_function.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_model.py` (``plot_convert_model.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_syntax.py` (``plot_convert_syntax.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py` (``plot_convert_zipmap.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_parser.py` (``plot_custom_parser.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_parser_alternative.py` (``plot_custom_parser_alternative.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py` (``plot_errors_onnxruntime.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_gpr.py` (``plot_gpr.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_logging.py` (``plot_logging.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_metadata.py` (``plot_metadata.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_nmf.py` (``plot_nmf.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py` (``plot_tfidfvectorizer.py``)
+     - 00:00.000
+     - 0.0
