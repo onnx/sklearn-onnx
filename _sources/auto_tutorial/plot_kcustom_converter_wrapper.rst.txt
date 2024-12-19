@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_kcustom_converter_wrapper.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -42,9 +42,10 @@ which decorrelates correlated random variables.
 If *X* is a matrix of features, :math:`V=\frac{1}{n}X'X`
 is the covariance matrix. We compute :math:`X V^{1/2}`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-97
+.. GENERATED FROM PYTHON SOURCE LINES 28-98
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import pickle
     from io import BytesIO
@@ -123,25 +124,25 @@ is the covariance matrix. We compute :math:`X V^{1/2}`.
 
  .. code-block:: none
 
-    [[-2.68412563e+00  3.19397247e-01 -2.79148276e-02 -2.26243707e-03]
-     [-2.71414169e+00 -1.77001225e-01 -2.10464272e-01 -9.90265503e-02]
-     [-2.88899057e+00 -1.44949426e-01  1.79002563e-02 -1.99683897e-02]
-     [-2.74534286e+00 -3.18298979e-01  3.15593736e-02  7.55758166e-02]
-     [-2.72871654e+00  3.26754513e-01  9.00792406e-02  6.12585926e-02]]
+    [[-2.68412563e+00  3.19397247e-01 -2.79148276e-02  2.26243707e-03]
+     [-2.71414169e+00 -1.77001225e-01 -2.10464272e-01  9.90265503e-02]
+     [-2.88899057e+00 -1.44949426e-01  1.79002563e-02  1.99683897e-02]
+     [-2.74534286e+00 -3.18298979e-01  3.15593736e-02 -7.55758166e-02]
+     [-2.72871654e+00  3.26754513e-01  9.00792406e-02 -6.12585926e-02]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-102
+.. GENERATED FROM PYTHON SOURCE LINES 99-103
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 Let's try to convert it and see what happens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-109
+.. GENERATED FROM PYTHON SOURCE LINES 103-110
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -175,7 +176,7 @@ Let's try to convert it and see what happens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-118
+.. GENERATED FROM PYTHON SOURCE LINES 111-119
 
 This error means there is no converter associated
 to *DecorrelateTransformer*. Let's do it.
@@ -186,9 +187,9 @@ First the shape calculator. We retrieve the input type
 add tells the output type has the same type,
 the same number of rows and a specific number of columns.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-128
+.. GENERATED FROM PYTHON SOURCE LINES 119-129
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -207,16 +208,16 @@ the same number of rows and a specific number of columns.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-133
+.. GENERATED FROM PYTHON SOURCE LINES 130-134
 
 The converter. One thing we need to pay attention to
 is the target opset. This information is important
 to make sure that every node is defined following the
 specifications of that opset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-149
+.. GENERATED FROM PYTHON SOURCE LINES 134-150
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -241,13 +242,13 @@ specifications of that opset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-178
+.. GENERATED FROM PYTHON SOURCE LINES 152-179
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -284,18 +285,18 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (3.560125949597648e-07, 0.0003158352661960492)
+    (np.float64(3.5601259806838925e-07), np.float64(0.00031583501773748286))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-180
+.. GENERATED FROM PYTHON SOURCE LINES 180-181
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-189
+.. GENERATED FROM PYTHON SOURCE LINES 181-190
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx = to_onnx(dec, X.astype(numpy.float64))
@@ -314,19 +315,19 @@ Let's check it works as well with double.
 
  .. code-block:: none
 
-    (0.0, 0.0)
+    (np.float64(1.942890293094024e-15), np.float64(2.5733660162141577e-13))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-191
+.. GENERATED FROM PYTHON SOURCE LINES 191-192
 
 The differences are smaller with double as expected.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.056 seconds)
+   **Total running time of the script:** (0 minutes 0.049 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_kcustom_converter_wrapper.py:
@@ -335,16 +336,17 @@ The differences are smaller with double as expected.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_kcustom_converter_wrapper.ipynb <plot_kcustom_converter_wrapper.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_kcustom_converter_wrapper.py <plot_kcustom_converter_wrapper.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_kcustom_converter_wrapper.ipynb <plot_kcustom_converter_wrapper.ipynb>`
+      :download:`Download zipped: plot_kcustom_converter_wrapper.zip <plot_kcustom_converter_wrapper.zip>`
 
 
 .. only:: html

@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_convert_syntax.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -32,9 +32,10 @@ Predict with onnxruntime
 Simple function to check the converted model
 works fine.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-40
+.. GENERATED FROM PYTHON SOURCE LINES 19-41
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import onnxruntime
     import onnx
@@ -64,16 +65,16 @@ works fine.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-45
+.. GENERATED FROM PYTHON SOURCE LINES 42-46
 
 Simple KMeans
 +++++++++++++
 
 The first way: :func:`convert_sklearn`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-56
+.. GENERATED FROM PYTHON SOURCE LINES 46-57
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -99,14 +100,14 @@ The first way: :func:`convert_sklearn`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-59
+.. GENERATED FROM PYTHON SOURCE LINES 58-60
 
 The second way: :func:`to_onnx`: no need to play with
 :class:`FloatTensorType` anymore.
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-68
+.. GENERATED FROM PYTHON SOURCE LINES 60-69
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X = np.arange(20).reshape(10, 2)
@@ -125,20 +126,20 @@ The second way: :func:`to_onnx`: no need to play with
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 0 0 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-72
+.. GENERATED FROM PYTHON SOURCE LINES 70-73
 
 The third way: :func:`wrap_as_onnx_mixin`: wraps
 the machine learned model into a new class
 inheriting from :class:`OnnxOperatorMixin`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-82
+.. GENERATED FROM PYTHON SOURCE LINES 73-83
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X = np.arange(20).reshape(10, 2)
@@ -158,19 +159,19 @@ inheriting from :class:`OnnxOperatorMixin`.
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 0 0 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 84-86
 
 The fourth way: :func:`wrap_as_onnx_mixin`: can be called
 before fitting the model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-93
+.. GENERATED FROM PYTHON SOURCE LINES 86-94
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X = np.arange(20).reshape(10, 2)
@@ -188,21 +189,21 @@ before fitting the model.
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [1 1 1 1 0 0 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-98
+.. GENERATED FROM PYTHON SOURCE LINES 95-99
 
 Pipeline and a custom object
 ++++++++++++++++++++++++++++
 
 This is a simple scaler.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-134
+.. GENERATED FROM PYTHON SOURCE LINES 99-135
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -230,7 +231,7 @@ This is a simple scaler.
             self, inputs=None, outputs=("Y",), target_opset=None, **kwargs
         ):
             if inputs is None:
-                raise RuntimeError("Parameter inputs should contain at least " "one name.")
+                raise RuntimeError("Parameter inputs should contain at least one name.")
             opv = target_opset or self.op_version
             i0 = self.get_inputs(inputs, 0)
             W = self.W_.astype(np.float32)
@@ -247,13 +248,13 @@ This is a simple scaler.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-136
+.. GENERATED FROM PYTHON SOURCE LINES 136-137
 
 Way 1
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-147
+.. GENERATED FROM PYTHON SOURCE LINES 137-148
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -274,18 +275,18 @@ Way 1
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 1 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-149
+.. GENERATED FROM PYTHON SOURCE LINES 149-150
 
 Way 2
 
-.. GENERATED FROM PYTHON SOURCE LINES 149-157
+.. GENERATED FROM PYTHON SOURCE LINES 150-158
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X = np.arange(20).reshape(10, 2)
@@ -303,18 +304,18 @@ Way 2
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 0 1 1 1 1]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-159
+.. GENERATED FROM PYTHON SOURCE LINES 159-160
 
 Way 3
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-169
+.. GENERATED FROM PYTHON SOURCE LINES 160-170
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X = np.arange(20).reshape(10, 2)
@@ -334,18 +335,18 @@ Way 3
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [0 0 0 0 0 0 1 1 1 1]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-171
+.. GENERATED FROM PYTHON SOURCE LINES 171-172
 
 Way 4
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-182
+.. GENERATED FROM PYTHON SOURCE LINES 172-183
 
-.. code-block:: default
+.. code-block:: Python
 
 
     X = np.arange(20).reshape(10, 2)
@@ -366,40 +367,47 @@ Way 4
 
  .. code-block:: none
 
-    [0 0 0 0 0 1 1 1 1 1]
+    [1 1 1 1 1 0 0 0 0 0]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-187
+.. GENERATED FROM PYTHON SOURCE LINES 184-188
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
 Finally, let's see the graph converted with *sklearn-onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-211
+.. GENERATED FROM PYTHON SOURCE LINES 188-219
 
-.. code-block:: default
+.. code-block:: Python
 
 
-    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer  # noqa
+    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
-    pydot_graph = GetPydotGraph(
-        onx.graph,
-        name=onx.graph.name,
-        rankdir="TB",
-        node_producer=GetOpNodeProducer(
-            "docstring", color="yellow", fillcolor="yellow", style="filled"
-        ),
-    )
-    pydot_graph.write_dot("pipeline_onnx_mixin.dot")
+    try:
+        pydot_graph = GetPydotGraph(
+            onx.graph,
+            name=onx.graph.name,
+            rankdir="TB",
+            node_producer=GetOpNodeProducer(
+                "docstring", color="yellow", fillcolor="yellow", style="filled"
+            ),
+        )
+        pydot_graph.write_dot("pipeline_onnx_mixin.dot")
+    except AssertionError:
+        print("GetPydotGraph failed to produce a valid DOT graph. Trying something else.")
+        from onnx_array_api.plotting.dot_plot import to_dot
 
-    import os  # noqa
+        with open("pipeline_onnx_mixin.dot", "w", encoding="utf-8") as f:
+            f.write(to_dot(onx))
+
+    import os
 
     os.system("dot -O -Gdpi=300 -Tpng pipeline_onnx_mixin.dot")
 
-    import matplotlib.pyplot as plt  # noqa
+    import matplotlib.pyplot as plt
 
     image = plt.imread("pipeline_onnx_mixin.dot.png")
     fig, ax = plt.subplots(figsize=(40, 20))
@@ -420,24 +428,24 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 3103.5, 6900.5, -0.5)
+    (np.float64(-0.5), np.float64(3103.5), np.float64(6900.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-213
+.. GENERATED FROM PYTHON SOURCE LINES 220-221
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-223
+.. GENERATED FROM PYTHON SOURCE LINES 221-231
 
-.. code-block:: default
+.. code-block:: Python
 
 
-    import sklearn  # noqa
+    import sklearn
 
     print("numpy:", numpy.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import skl2onnx  # noqa
+    import skl2onnx
 
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
@@ -450,11 +458,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.16.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -462,7 +470,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.140 seconds)
+   **Total running time of the script:** (0 minutes 3.267 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_syntax.py:
@@ -471,16 +479,17 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_convert_syntax.ipynb <plot_convert_syntax.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_convert_syntax.py <plot_convert_syntax.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_convert_syntax.ipynb <plot_convert_syntax.ipynb>`
+      :download:`Download zipped: plot_convert_syntax.zip <plot_convert_syntax.zip>`
 
 
 .. only:: html

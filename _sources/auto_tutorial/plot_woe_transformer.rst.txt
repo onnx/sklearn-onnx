@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_woe_transformer.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -39,9 +39,10 @@ checks that every of them belongs to two intervals,
 (left-right-closed). The first interval is associated
 to weight 55 and and the second one to 107.
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-48
+.. GENERATED FROM PYTHON SOURCE LINES 25-49
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import os
     import numpy as np
@@ -53,7 +54,7 @@ to weight 55 and and the second one to 107.
     from skl2onnx.sklapi import WOETransformer
 
     # automatically registers the converter for WOETransformer
-    import skl2onnx.sklapi.register  # noqa
+    import skl2onnx.sklapi.register  # noqa: F401
 
     X = np.arange(10).astype(np.float32).reshape((-1, 1))
 
@@ -154,7 +155,7 @@ to weight 55 and and the second one to 107.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-54
+.. GENERATED FROM PYTHON SOURCE LINES 50-55
 
 One Hot
 +++++++
@@ -162,9 +163,9 @@ One Hot
 The transformer outputs one column with the weights.
 But it could return one column per interval.
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-63
+.. GENERATED FROM PYTHON SOURCE LINES 55-64
 
-.. code-block:: default
+.. code-block:: Python
 
 
     woe2 = WOETransformer(intervals, onehot=True, weights=weights)
@@ -274,14 +275,14 @@ But it could return one column per interval.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-66
+.. GENERATED FROM PYTHON SOURCE LINES 65-67
 
 In that case, weights can be omitted.
 The output is binary.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-75
+.. GENERATED FROM PYTHON SOURCE LINES 67-76
 
-.. code-block:: default
+.. code-block:: Python
 
 
     woe = WOETransformer(intervals, onehot=True)
@@ -391,7 +392,7 @@ The output is binary.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-82
+.. GENERATED FROM PYTHON SOURCE LINES 77-83
 
 Conversion to ONNX
 ++++++++++++++++++
@@ -400,9 +401,9 @@ Conversion to ONNX
 
 onehot=False
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-86
+.. GENERATED FROM PYTHON SOURCE LINES 83-87
 
-.. code-block:: default
+.. code-block:: Python
 
     onx1 = to_onnx(woe1, X)
     sess = InferenceSession(onx1.SerializeToString(), providers=["CPUExecutionProvider"])
@@ -430,13 +431,13 @@ onehot=False
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-88
+.. GENERATED FROM PYTHON SOURCE LINES 88-89
 
 onehot=True
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-93
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx2 = to_onnx(woe2, X)
@@ -465,16 +466,16 @@ onehot=True
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-98
+.. GENERATED FROM PYTHON SOURCE LINES 95-99
 
 ONNX Graphs
 +++++++++++
 
 onehot=False
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-116
+.. GENERATED FROM PYTHON SOURCE LINES 99-117
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -508,17 +509,17 @@ onehot=False
  .. code-block:: none
 
 
-    (-0.5, 2674.5, 3321.5, -0.5)
+    (np.float64(-0.5), np.float64(2674.5), np.float64(3321.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-118
+.. GENERATED FROM PYTHON SOURCE LINES 118-119
 
 onehot=True
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-136
+.. GENERATED FROM PYTHON SOURCE LINES 119-137
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -552,11 +553,11 @@ onehot=True
  .. code-block:: none
 
 
-    (-0.5, 2743.5, 5696.5, -0.5)
+    (np.float64(-0.5), np.float64(2743.5), np.float64(5696.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-142
+.. GENERATED FROM PYTHON SOURCE LINES 138-143
 
 Half-line
 +++++++++
@@ -564,9 +565,9 @@ Half-line
 An interval may have only one extremity defined and the other
 can be infinite.
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-152
+.. GENERATED FROM PYTHON SOURCE LINES 143-153
 
-.. code-block:: default
+.. code-block:: Python
 
 
     intervals = [[(-np.inf, 3.0, True, True), (5.0, np.inf, True, True)]]
@@ -666,13 +667,13 @@ can be infinite.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-154
+.. GENERATED FROM PYTHON SOURCE LINES 154-155
 
 And the conversion to ONNX using the same instruction.
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-158
+.. GENERATED FROM PYTHON SOURCE LINES 155-159
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onxinf = to_onnx(woe1, X)
@@ -703,7 +704,7 @@ And the conversion to ONNX using the same instruction.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.955 seconds)
+   **Total running time of the script:** (0 minutes 2.590 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_woe_transformer.py:
@@ -712,16 +713,17 @@ And the conversion to ONNX using the same instruction.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_woe_transformer.ipynb <plot_woe_transformer.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_woe_transformer.py <plot_woe_transformer.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_woe_transformer.ipynb <plot_woe_transformer.ipynb>`
+      :download:`Download zipped: plot_woe_transformer.zip <plot_woe_transformer.zip>`
 
 
 .. only:: html

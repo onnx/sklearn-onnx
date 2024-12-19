@@ -34,9 +34,10 @@ how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-70
+.. GENERATED FROM PYTHON SOURCE LINES 21-71
 
 .. code-block:: Python
+
 
     import numpy
     import onnxruntime as rt
@@ -91,10 +92,16 @@ Train a XGBoost classifier
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    'super' object has no attribute '__sklearn_tags__'
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-82
+
+.. GENERATED FROM PYTHON SOURCE LINES 72-83
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -108,7 +115,7 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-91
+.. GENERATED FROM PYTHON SOURCE LINES 83-92
 
 .. code-block:: Python
 
@@ -128,12 +135,12 @@ xgboost/shape_calculators/Classifier.py>`_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-94
+.. GENERATED FROM PYTHON SOURCE LINES 93-95
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-106
+.. GENERATED FROM PYTHON SOURCE LINES 95-107
 
 .. code-block:: Python
 
@@ -151,19 +158,51 @@ Convert again
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+.. code-block:: pytb
+
+    Traceback (most recent call last):
+      File "/home/xadupre/github/sklearn-onnx/docs/tutorial/plot_gexternal_xgboost.py", line 96, in <module>
+        model_onnx = convert_sklearn(
+                     ^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/convert.py", line 192, in convert_sklearn
+        topology = parse_sklearn_model(
+                   ^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 847, in parse_sklearn_model
+        outputs = parse_sklearn(
+                  ^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 757, in parse_sklearn
+        res = _parse_sklearn(scope, model, inputs, custom_parsers=custom_parsers)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 688, in _parse_sklearn
+        outputs = sklearn_parsers_map[tmodel](
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 295, in _parse_sklearn_pipeline
+        ) and is_classifier(step[1]):
+              ^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 1237, in is_classifier
+        return get_tags(estimator).estimator_type == "classifier"
+               ^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/_tags.py", line 405, in get_tags
+        sklearn_tags_provider[klass] = klass.__sklearn_tags__(estimator)  # type: ignore[attr-defined]
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 540, in __sklearn_tags__
+        tags = super().__sklearn_tags__()
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+    AttributeError: 'super' object has no attribute '__sklearn_tags__'
 
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 107-111
+.. GENERATED FROM PYTHON SOURCE LINES 108-112
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-115
+.. GENERATED FROM PYTHON SOURCE LINES 112-116
 
 .. code-block:: Python
 
@@ -172,24 +211,11 @@ Predictions with XGBoost.
     print("predict_proba", pipe.predict_proba(X[:1]))
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    predict [0 2 1 1 2]
-    predict_proba [[0.69600695 0.1526681  0.15132491]]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 116-117
+.. GENERATED FROM PYTHON SOURCE LINES 117-118
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-123
+.. GENERATED FROM PYTHON SOURCE LINES 118-124
 
 .. code-block:: Python
 
@@ -200,25 +226,12 @@ Predictions with onnxruntime.
     print("predict_proba", pred_onx[1][:1])
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    predict [0 2 1 1 2]
-    predict_proba [{0: 0.6960069537162781, 1: 0.15266810357570648, 2: 0.15132491290569305}]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 124-126
+.. GENERATED FROM PYTHON SOURCE LINES 125-127
 
 Same example with XGBRegressor
 ++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-145
+.. GENERATED FROM PYTHON SOURCE LINES 127-146
 
 .. code-block:: Python
 
@@ -242,23 +255,11 @@ Same example with XGBRegressor
     print("predict", pipe.predict(X_test[:5]))
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    predict [167.95638 209.4882  112.31891 127.7238  126.65028]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 146-147
+.. GENERATED FROM PYTHON SOURCE LINES 147-148
 
 ONNX
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-156
+.. GENERATED FROM PYTHON SOURCE LINES 148-157
 
 .. code-block:: Python
 
@@ -272,24 +273,12 @@ ONNX
     print("predict", pred_onx[0].ravel())
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    predict [167.95638 209.4882  112.31891 127.7238  126.65028]
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 157-159
+.. GENERATED FROM PYTHON SOURCE LINES 158-160
 
 Some discrepencies may appear. In that case,
 you should read :ref:`l-example-discrepencies-float-double`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-167
+.. GENERATED FROM PYTHON SOURCE LINES 162-168
 
 Same with a Booster
 +++++++++++++++++++
@@ -298,7 +287,7 @@ A booster cannot be inserted in a pipeline. It requires
 a different conversion function because it does not
 follow :epkg:`scikit-learn` API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-195
+.. GENERATED FROM PYTHON SOURCE LINES 168-196
 
 .. code-block:: Python
 
@@ -332,22 +321,9 @@ follow :epkg:`scikit-learn` API.
         print(pred_onx)
 
 
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 1 1 1 1
-     0 1 1 1 0 0 1 1 0 0 0 1 0]
-
-
-
-
-
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.126 seconds)
+   **Total running time of the script:** (0 minutes 0.032 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py:
@@ -363,6 +339,10 @@ follow :epkg:`scikit-learn` API.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gexternal_xgboost.py <plot_gexternal_xgboost.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_gexternal_xgboost.zip <plot_gexternal_xgboost.zip>`
 
 
 .. only:: html

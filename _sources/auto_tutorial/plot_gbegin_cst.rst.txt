@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_gbegin_cst.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -34,9 +34,10 @@ Train and convert a model
 We download one model from the :epkg:`ONNX Zoo` but the model
 could be trained and produced by another converter library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-42
+.. GENERATED FROM PYTHON SOURCE LINES 20-43
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import pprint
     import numpy
@@ -68,21 +69,21 @@ could be trained and produced by another converter library.
 
  .. code-block:: none
 
-    /home/xadupre/github/scikit-learn/sklearn/linear_model/_sag.py:350: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/linear_model/_sag.py:348: ConvergenceWarning: The max_iter was reached which means the coef_ did not converge
       warnings.warn(
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-46
+.. GENERATED FROM PYTHON SOURCE LINES 44-47
 
 Add training parameter
 ++++++++++++++++++++++
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-51
+.. GENERATED FROM PYTHON SOURCE LINES 47-52
 
-.. code-block:: default
+.. code-block:: Python
 
 
     new_onx = add_output_initializer(
@@ -96,14 +97,14 @@ Add training parameter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 53-55
 
 Inference
 +++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-62
+.. GENERATED FROM PYTHON SOURCE LINES 55-63
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = InferenceSession(new_onx.SerializeToString(), providers=["CPUExecutionProvider"])
@@ -123,16 +124,16 @@ Inference
 
     output names: ['label', 'probabilities', 'C', 'l1_ratio']
     outputs
-    [array([1, 0], dtype=int64),
-     array([[2.4983161e-03, 8.6063814e-01, 1.3686356e-01],
-           [9.7875208e-01, 2.1247936e-02, 2.7418587e-08]], dtype=float32),
+    [array([0, 2], dtype=int64),
+     array([[9.9722755e-01, 2.7724325e-03, 3.5656236e-10],
+           [1.3919589e-04, 7.1695939e-02, 9.2816484e-01]], dtype=float32),
      array([2.]),
      array([0.5])]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-73
+.. GENERATED FROM PYTHON SOURCE LINES 64-74
 
 The major draw back of this solution is increase the prediction
 time as onnxruntime copies the constants for every prediction.
@@ -145,9 +146,9 @@ Select outputs
 Next function removes unneeded outputs from a model,
 not only the constants. Next model only keeps the probabilities.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-87
+.. GENERATED FROM PYTHON SOURCE LINES 74-88
 
-.. code-block:: default
+.. code-block:: Python
 
 
     simple_onx = select_model_inputs_outputs(new_onx, ["probabilities"])
@@ -173,13 +174,13 @@ not only the constants. Next model only keeps the probabilities.
 
     output names: ['probabilities']
     outputs
-    [array([[2.4983161e-03, 8.6063814e-01, 1.3686356e-01],
-           [9.7875208e-01, 2.1247936e-02, 2.7418587e-08]], dtype=float32)]
+    [array([[9.9722755e-01, 2.7724325e-03, 3.5656236e-10],
+           [1.3919589e-04, 7.1695939e-02, 9.2816484e-01]], dtype=float32)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-93
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
 This example only uses ONNX graph in memory and never saves or loads a
 model. This can be done by using the following snippets of code.
@@ -187,9 +188,9 @@ model. This can be done by using the following snippets of code.
 Save a model
 ++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-97
+.. GENERATED FROM PYTHON SOURCE LINES 94-98
 
-.. code-block:: default
+.. code-block:: Python
 
 
     with open("simplified_model.onnx", "wb") as f:
@@ -202,14 +203,14 @@ Save a model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-100
+.. GENERATED FROM PYTHON SOURCE LINES 99-101
 
 Load a model
 ++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-109
+.. GENERATED FROM PYTHON SOURCE LINES 101-110
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -230,8 +231,8 @@ Load a model
 
     output names: ['probabilities']
     outputs
-    [array([[2.4983161e-03, 8.6063814e-01, 1.3686356e-01],
-           [9.7875208e-01, 2.1247936e-02, 2.7418587e-08]], dtype=float32)]
+    [array([[9.9722755e-01, 2.7724325e-03, 3.5656236e-10],
+           [1.3919589e-04, 7.1695939e-02, 9.2816484e-01]], dtype=float32)]
 
 
 
@@ -239,7 +240,7 @@ Load a model
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.034 seconds)
+   **Total running time of the script:** (0 minutes 0.058 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_cst.py:
@@ -248,16 +249,17 @@ Load a model
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_gbegin_cst.ipynb <plot_gbegin_cst.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gbegin_cst.py <plot_gbegin_cst.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_gbegin_cst.ipynb <plot_gbegin_cst.ipynb>`
+      :download:`Download zipped: plot_gbegin_cst.zip <plot_gbegin_cst.zip>`
 
 
 .. only:: html

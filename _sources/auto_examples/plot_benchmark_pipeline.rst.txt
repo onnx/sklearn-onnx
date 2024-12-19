@@ -36,9 +36,10 @@ docs/Operators-ml.md#ai.onnx.ml.Imputer>`_
 does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-51
+.. GENERATED FROM PYTHON SOURCE LINES 23-52
 
 .. code-block:: Python
+
 
     import skl2onnx
     import onnx
@@ -78,7 +79,8 @@ and must be removed. Look for comment starting with ``---`` below.
     <div class="output_subarea output_html rendered_html output_result">
     <style>#sk-container-id-3 {
       /* Definition of color scheme common for light and dark mode */
-      --sklearn-color-text: black;
+      --sklearn-color-text: #000;
+      --sklearn-color-text-muted: #666;
       --sklearn-color-line: gray;
       /* Definition of color scheme for unfitted estimators */
       --sklearn-color-unfitted-level-0: #fff5e6;
@@ -223,12 +225,21 @@ and must be removed. Look for comment starting with ``---`` below.
     /* Toggleable label */
     #sk-container-id-3 label.sk-toggleable__label {
       cursor: pointer;
-      display: block;
+      display: flex;
       width: 100%;
       margin-bottom: 0;
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
+      align-items: start;
+      justify-content: space-between;
+      gap: 0.5em;
+    }
+
+    #sk-container-id-3 label.sk-toggleable__label .caption {
+      font-size: 0.6rem;
+      font-weight: lighter;
+      color: var(--sklearn-color-text-muted);
     }
 
     #sk-container-id-3 label.sk-toggleable__label-arrow:before {
@@ -381,7 +392,8 @@ and must be removed. Look for comment starting with ``---`` below.
       height: 1em;
       width: 1em;
       text-decoration: none !important;
-      margin-left: 1ex;
+      margin-left: 0.5em;
+      text-align: center;
       /* unfitted */
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
       color: var(--sklearn-color-unfitted-level-1);
@@ -480,17 +492,17 @@ and must be removed. Look for comment starting with ``---`` below.
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox" ><label for="sk-estimator-id-7" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;&nbsp;Pipeline<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-8" type="checkbox" ><label for="sk-estimator-id-8" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;PCA<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.decomposition.PCA.html">?<span>Documentation for PCA</span></a></label><div class="sk-toggleable__content fitted"><pre>PCA()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-9" type="checkbox" ><label for="sk-estimator-id-9" class="sk-toggleable__label fitted sk-toggleable__label-arrow fitted">&nbsp;LogisticRegression<a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/dev/modules/generated/sklearn.linear_model.LogisticRegression.html">?<span>Documentation for LogisticRegression</span></a></label><div class="sk-toggleable__content fitted"><pre>LogisticRegression()</pre></div> </div></div></div></div></div></div>
+    </style><div id="sk-container-id-3" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;pca&#x27;, PCA()), (&#x27;logistic&#x27;, LogisticRegression())])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-6" type="checkbox" ><label for="sk-estimator-id-6" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>PCA</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.decomposition.PCA.html">?<span>Documentation for PCA</span></a></div></label><div class="sk-toggleable__content fitted"><pre>PCA()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-7" type="checkbox" ><label for="sk-estimator-id-7" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LogisticRegression</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.linear_model.LogisticRegression.html">?<span>Documentation for LogisticRegression</span></a></div></label><div class="sk-toggleable__content fitted"><pre>LogisticRegression()</pre></div> </div></div></div></div></div></div>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 53-55
 
 Conversion to ONNX
 ++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-69
+.. GENERATED FROM PYTHON SOURCE LINES 55-70
 
 .. code-block:: Python
 
@@ -518,12 +530,12 @@ Conversion to ONNX
  .. code-block:: none
 
     skl predict_proba
-    [[9.99998530e-01 7.81608916e-19 4.87445989e-10 1.79842282e-08
-      3.58700554e-10 1.18138025e-06 4.14411051e-08 1.48275027e-07
-      2.50162860e-08 5.51240034e-08]
-     [1.37889361e-14 9.99999324e-01 9.17867392e-11 8.30390364e-13
-      2.57277805e-07 8.84035071e-12 5.11781429e-11 2.83346408e-11
-      4.18965301e-07 1.32796353e-13]]
+    [[9.99998530e-01 7.81608915e-19 4.87445983e-10 1.79842282e-08
+      3.58700553e-10 1.18138026e-06 4.14411050e-08 1.48275026e-07
+      2.50162856e-08 5.51240033e-08]
+     [1.37889361e-14 9.99999324e-01 9.17867405e-11 8.30390363e-13
+      2.57277806e-07 8.84035067e-12 5.11781433e-11 2.83346409e-11
+      4.18965301e-07 1.32796354e-13]]
     onnx predict_proba
     [[9.99998569e-01 7.81611026e-19 4.87444585e-10 1.79842026e-08
       3.58700042e-10 1.18137689e-06 4.14409520e-08 1.48274751e-07
@@ -535,12 +547,12 @@ Conversion to ONNX
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-72
+.. GENERATED FROM PYTHON SOURCE LINES 71-73
 
 Comparing outputs
 +++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-76
+.. GENERATED FROM PYTHON SOURCE LINES 73-77
 
 .. code-block:: Python
 
@@ -555,12 +567,12 @@ Comparing outputs
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-79
+.. GENERATED FROM PYTHON SOURCE LINES 78-80
 
 Benchmarks
 ++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-91
+.. GENERATED FROM PYTHON SOURCE LINES 80-92
 
 .. code-block:: Python
 
@@ -585,14 +597,14 @@ Benchmarks
  .. code-block:: none
 
     scikit-learn
-    2.0426334000003408
+    2.1023744829981297
     onnxruntime
-    0.2637577000004967
+    0.12994074699963676
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-100
+.. GENERATED FROM PYTHON SOURCE LINES 93-101
 
 Intermediate steps
 ++++++++++++++++++
@@ -603,7 +615,7 @@ is failing. The following method modifies the scikit-learn
 pipeline to steal the intermediate outputs and produces
 an smaller ONNX graph for every operator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-144
+.. GENERATED FROM PYTHON SOURCE LINES 101-145
 
 .. code-block:: Python
 
@@ -615,7 +627,7 @@ an smaller ONNX graph for every operator.
 
     pipe.predict_proba(X_digits[:2])
 
-    for i, step in enumerate(steps):
+    for _i, step in enumerate(steps):
         onnx_step = step["onnx_step"]
         sess = rt.InferenceSession(
             onnx_step.SerializeToString(), providers=["CPUExecutionProvider"]
@@ -661,23 +673,23 @@ an smaller ONNX graph for every operator.
 
     benchmark <class 'sklearn.decomposition._pca.PCA'>
     scikit-learn
-    0.8991796999998769
+    0.6131834360021458
     onnxruntime
-    0.25503109999954177
+    0.07247600700065959
     benchmark <class 'sklearn.linear_model._logistic.LogisticRegression'>
     scikit-learn
-    1.1041783999990002
+    0.8395350790015073
     onnxruntime
-    0.1891211000001931
+    0.10347538899804931
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-146
+.. GENERATED FROM PYTHON SOURCE LINES 146-147
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-152
+.. GENERATED FROM PYTHON SOURCE LINES 147-153
 
 .. code-block:: Python
 
@@ -695,11 +707,11 @@ an smaller ONNX graph for every operator.
 
  .. code-block:: none
 
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -707,7 +719,7 @@ an smaller ONNX graph for every operator.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.925 seconds)
+   **Total running time of the script:** (0 minutes 4.029 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_pipeline.py:
@@ -723,6 +735,10 @@ an smaller ONNX graph for every operator.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_benchmark_pipeline.py <plot_benchmark_pipeline.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_benchmark_pipeline.zip <plot_benchmark_pipeline.zip>`
 
 
 .. only:: html

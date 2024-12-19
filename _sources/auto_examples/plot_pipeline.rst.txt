@@ -73,12 +73,8 @@ That's the most simple way.
  .. code-block:: none
 
     ir_version: 7
-    opset_import {
-      domain: ""
-      version: 12
-    }
     producer_name: "skl2onnx"
-    producer_version: "1.17.0"
+    producer_version: "1.18.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -146,6 +142,10 @@ That's the most simple way.
           }
         }
       }
+    }
+    opset_import {
+      domain: ""
+      version: 12
     }
 
 
@@ -252,7 +252,7 @@ Which we display...
  .. code-block:: none
 
 
-    (-0.5, 431.5, 602.5, -0.5)
+    (np.float64(-0.5), np.float64(431.5), np.float64(602.5), np.float64(-0.5))
 
 
 
@@ -278,11 +278,11 @@ Which we display...
 
  .. code-block:: none
 
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -290,7 +290,7 @@ Which we display...
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.652 seconds)
+   **Total running time of the script:** (0 minutes 0.472 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_pipeline.py:
@@ -306,6 +306,10 @@ Which we display...
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_pipeline.py <plot_pipeline.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_pipeline.zip <plot_pipeline.zip>`
 
 
 .. only:: html

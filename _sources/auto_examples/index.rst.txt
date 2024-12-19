@@ -16,7 +16,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="ONNX format contains metadata related to how the model was produced. It is useful when the mode...">
+    <div class="sphx-glr-thumbcontainer" tooltip="ONNX format contains metadata related to how the model was produced. It is useful when the model is deployed to production to keep track of which instance was used at a specific time. Let&#x27;s see how to do that with a simple logistic regression model trained with scikit-learn.">
 
 .. only:: html
 
@@ -33,7 +33,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="ONNX Runtime extends the onnx backend API to run predictions using this runtime. Let&#x27;s use the ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="ONNX Runtime extends the onnx backend API to run predictions using this runtime. Let&#x27;s use the API to compute the prediction of a simple logistic regression model.">
 
 .. only:: html
 
@@ -50,7 +50,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="There is no other way to look into one model stored in ONNX format than looking into its node w...">
+    <div class="sphx-glr-thumbcontainer" tooltip="There is no other way to look into one model stored in ONNX format than looking into its node with onnx. This example demonstrates how to draw a model and to retrieve it in json format.">
 
 .. only:: html
 
@@ -67,7 +67,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The conversion of a pipeline fails if it contains an object without any associated converter. I...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The conversion of a pipeline fails if it contains an object without any associated converter. It may also fails if one of the object is mapped by a custom converter. If the error message is not explicit enough, it is possible to enable logging.">
 
 .. only:: html
 
@@ -84,7 +84,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx creates an ONN...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx creates an ONNX graph which returns probabilities but it may skip that step and return raw scores if the model implements the method decision_function. Option &#x27;raw_scores&#x27; is used to change the default behaviour. Let&#x27;s see that on a simple example.">
 
 .. only:: html
 
@@ -118,7 +118,24 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The following example shows how to look into a converted models and easily find errors at every...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example show how to append some onnx nodes to the converted model to produce the desired output. In this case, it removes the second column of the output probabilies.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_output_onnx_single_probability_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_output_onnx_single_probability.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Append onnx nodes to the converted model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The following example shows how to look into a converted models and easily find errors at every step of the pipeline.">
 
 .. only:: html
 
@@ -135,7 +152,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The following example focuses on one particular operator, CDist and compares its execution time...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The following example focuses on one particular operator, CDist and compares its execution time between onnxruntime and scipy.">
 
 .. only:: html
 
@@ -152,24 +169,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that ...">
-
-.. only:: html
-
-  .. image:: /auto_examples/images/thumb/sphx_glr_plot_convert_zipmap_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Probabilities as a vector or as a ZipMap</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a LightGbm model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a LGBMClassifier. Let&#x27;s see how to do it.">
 
 .. only:: html
 
@@ -186,7 +186,24 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Some runtime dedicated to onnx do not implement all the operators and a converted model may not...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that matrix into a list of dictionaries where each probabily is mapped to its class id or name. That mechanism retains the class names. This conversion increases the prediction time and is not always needed. Let&#x27;s see how to deactivate this behaviour on the Iris example.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_convert_zipmap_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Probabilities as a vector or as a ZipMap</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Some runtime dedicated to onnx do not implement all the operators and a converted model may not run if one of them is missing from the list of available operators. Some converters may convert a model in different ways if the users wants to blacklist some operators.">
 
 .. only:: html
 
@@ -203,7 +220,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="NMF factorizes an input matrix into two matrices W, H of rank k so that WH \sim M`. M=(m_{ij}) ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="NMF factorizes an input matrix into two matrices W, H of rank k so that WH \sim M`. M=(m_{ij}) may be a binary matrix where i is a user and j a product he bought. The prediction function depends on whether or not the user needs a recommandation for an existing user or a new user. This example addresses the first case.">
 
 .. only:: html
 
@@ -220,7 +237,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="A StandardScaler does a very basic scaling. The conversion in ONNX assumes that (x / y) is equi...">
+    <div class="sphx-glr-thumbcontainer" tooltip="A StandardScaler does a very basic scaling. The conversion in ONNX assumes that (x / y) is equivalent to x * ( 1 / y) but that&#x27;s not true with float or double (see Will the compiler optimize division into multiplication). Even if the difference is small, it may introduce discrepencies if the next step is a decision tree. One small difference and the decision follows another path in the tree. Let&#x27;s see how to solve that issue.">
 
 .. only:: html
 
@@ -237,7 +254,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The following example checks up on every step in a pipeline, compares and benchmarks the predic...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The following example checks up on every step in a pipeline, compares and benchmarks the predictions.">
 
 .. only:: html
 
@@ -254,7 +271,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it.">
 
 .. only:: html
 
@@ -271,7 +288,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="The GaussianProcessRegressor involves many matrix operations which may requires double precisio...">
+    <div class="sphx-glr-thumbcontainer" tooltip="The GaussianProcessRegressor involves many matrix operations which may requires double precisions. sklearn-onnx is using single floats by default but for this particular model, it is better to use double. Let&#x27;s see how to create an ONNX file using doubles.">
 
 .. only:: html
 
@@ -288,7 +305,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with onnxruntime. This example looks into several common situations ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with onnxruntime. This example looks into several common situations in which onnxruntime does not return the model prediction but raises an exception instead. It starts by loading a model (see l-rf-iris-example). which produces a logistic regression trained on Iris datasets. The model takes a vector of dimension 2 and returns a class among three.">
 
 .. only:: html
 
@@ -305,7 +322,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="ONNX aims at describing most of the machine learning models implemented in scikit-learn but it ...">
+    <div class="sphx-glr-thumbcontainer" tooltip="ONNX aims at describing most of the machine learning models implemented in scikit-learn but it does not necessarily describe the prediction function the same way scikit-learn does. If it is possible to define custom operators, it usually requires some time to add it to ONNX specifications and then to the backend used to compute the predictions. It is better to look first if the existing operators can be used. The list is available on github and gives the basic operators and others dedicated to machine learning. ONNX has a Python API which can be used to define an ONNX graph: PythonAPIOverview.md. But it is quite verbose and makes it difficult to describe big graphs. sklearn-onnx implements a nicer way to test ONNX operators.">
 
 .. only:: html
 
@@ -339,7 +356,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn recently shipped ColumnTransformer which lets the user define complex pipeline whe...">
+    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn recently shipped ColumnTransformer which lets the user define complex pipeline where each column may be preprocessed with a different transformer. sklearn-onnx still works in this case as shown in Section l-complex-pipeline.">
 
 .. only:: html
 
@@ -356,7 +373,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: Column Transformer with Heterogeneous Data...">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: Column Transformer with Heterogeneous Data Sources which builds a pipeline to classify text.">
 
 .. only:: html
 
@@ -373,7 +390,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="We reuse the example example-complex-pipeline and walk through intermediates outputs. It is ver...">
+    <div class="sphx-glr-thumbcontainer" tooltip="We reuse the example example-complex-pipeline and walk through intermediates outputs. It is very likely a converted model gives different outputs or fails due to a custom converter which is not correctly implemented. One option is to look into the output of every node of the ONNX graph.">
 
 .. only:: html
 
@@ -390,7 +407,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces tw...">
+    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces two outputs, predicted labels and probabilities. The goal here is to add a third result which tells if the probability is above a given threshold. That&#x27;s implemented in method validate.">
 
 .. only:: html
 
@@ -407,7 +424,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces tw...">
+    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces two outputs, predicted labels and probabilities. The goal here is to add a third result which tells if the probability is above a given threshold. That&#x27;s implemented in method validate.">
 
 .. only:: html
 
@@ -424,7 +441,7 @@ Gallery of examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converte...">
+    <div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converter for this new model. That does not mean the conversion of a pipeline which includes it would not work. Let&#x27;s see how to do it.">
 
 .. only:: html
 
@@ -455,10 +472,11 @@ Gallery of examples
    /auto_examples/plot_logging
    /auto_examples/plot_convert_decision_function
    /auto_examples/plot_convert_model
+   /auto_examples/plot_output_onnx_single_probability
    /auto_examples/plot_investigate_pipeline
    /auto_examples/plot_benchmark_cdist
-   /auto_examples/plot_convert_zipmap
    /auto_examples/plot_pipeline_lightgbm
+   /auto_examples/plot_convert_zipmap
    /auto_examples/plot_black_op
    /auto_examples/plot_nmf
    /auto_examples/plot_cast_transformer

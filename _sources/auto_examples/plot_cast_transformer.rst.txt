@@ -44,9 +44,10 @@ This is not a typical example, it is build to make it fails
 based on the assumption ``(x / y)`` is usually different from
 ``x * ( 1 / y)`` on a computer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-48
+.. GENERATED FROM PYTHON SOURCE LINES 31-49
 
 .. code-block:: Python
+
 
     import onnxruntime
     import onnx
@@ -72,11 +73,11 @@ based on the assumption ``(x / y)`` is usually different from
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-50
+.. GENERATED FROM PYTHON SOURCE LINES 50-51
 
 The weird data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-61
+.. GENERATED FROM PYTHON SOURCE LINES 51-62
 
 .. code-block:: Python
 
@@ -98,11 +99,11 @@ The weird data.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 63-64
 
 A simple model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-70
+.. GENERATED FROM PYTHON SOURCE LINES 64-71
 
 .. code-block:: Python
 
@@ -120,11 +121,11 @@ A simple model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-72
+.. GENERATED FROM PYTHON SOURCE LINES 72-73
 
 Conversion into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-75
+.. GENERATED FROM PYTHON SOURCE LINES 73-76
 
 .. code-block:: Python
 
@@ -138,11 +139,11 @@ Conversion into ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-77
+.. GENERATED FROM PYTHON SOURCE LINES 77-78
 
 And the maximum difference.
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-88
+.. GENERATED FROM PYTHON SOURCE LINES 78-89
 
 .. code-block:: Python
 
@@ -170,11 +171,11 @@ And the maximum difference.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-90
+.. GENERATED FROM PYTHON SOURCE LINES 90-91
 
 The graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-108
+.. GENERATED FROM PYTHON SOURCE LINES 91-109
 
 .. code-block:: Python
 
@@ -210,11 +211,11 @@ The graph.
  .. code-block:: none
 
 
-    (-0.5, 2536.5, 1707.5, -0.5)
+    (np.float64(-0.5), np.float64(2536.5), np.float64(1707.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-123
+.. GENERATED FROM PYTHON SOURCE LINES 110-124
 
 New pipeline
 ++++++++++++
@@ -231,7 +232,7 @@ change the conversion (remove node Scaler by using option
 `'div'`) and to use double by inserting an explicit
 Cast.
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-149
+.. GENERATED FROM PYTHON SOURCE LINES 124-150
 
 .. code-block:: Python
 
@@ -274,11 +275,11 @@ Cast.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
 
 The graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-169
+.. GENERATED FROM PYTHON SOURCE LINES 152-170
 
 .. code-block:: Python
 
@@ -314,24 +315,24 @@ The graph.
  .. code-block:: none
 
 
-    (-0.5, 2536.5, 4171.5, -0.5)
+    (np.float64(-0.5), np.float64(2536.5), np.float64(4171.5), np.float64(-0.5))
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-171
+.. GENERATED FROM PYTHON SOURCE LINES 171-172
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-181
+.. GENERATED FROM PYTHON SOURCE LINES 172-182
 
 .. code-block:: Python
 
 
-    import sklearn  # noqa
+    import sklearn
 
     print("numpy:", np.__version__)
     print("scikit-learn:", sklearn.__version__)
-    import skl2onnx  # noqa
+    import skl2onnx
 
     print("onnx: ", onnx.__version__)
     print("onnxruntime: ", onnxruntime.__version__)
@@ -344,11 +345,11 @@ The graph.
 
  .. code-block:: none
 
-    numpy: 1.26.4
-    scikit-learn: 1.6.dev0
-    onnx:  1.17.0
-    onnxruntime:  1.18.0+cu118
-    skl2onnx:  1.17.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -356,7 +357,7 @@ The graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.086 seconds)
+   **Total running time of the script:** (0 minutes 2.268 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_cast_transformer.py:
@@ -372,6 +373,10 @@ The graph.
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_cast_transformer.py <plot_cast_transformer.py>`
+
+    .. container:: sphx-glr-download sphx-glr-download-zip
+
+      :download:`Download zipped: plot_cast_transformer.zip <plot_cast_transformer.zip>`
 
 
 .. only:: html

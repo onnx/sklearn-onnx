@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_tfidfvectorizer.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -38,7 +38,7 @@ a custom converter. Let's get the data.
 
 .. GENERATED FROM PYTHON SOURCE LINES 23-67
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import matplotlib.pyplot as plt
@@ -99,7 +99,7 @@ the data is defined by two text columns.
 
 .. GENERATED FROM PYTHON SOURCE LINES 71-106
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -150,7 +150,7 @@ we remove the custom features.
 
 .. GENERATED FROM PYTHON SOURCE LINES 109-150
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pipeline = Pipeline(
@@ -228,7 +228,7 @@ in variable *seps*.
 
 .. GENERATED FROM PYTHON SOURCE LINES 160-192
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -275,7 +275,7 @@ And save.
 
 .. GENERATED FROM PYTHON SOURCE LINES 194-197
 
-.. code-block:: default
+.. code-block:: Python
 
     with open("pipeline_tfidf.onnx", "wb") as f:
         f.write(model_onnx.SerializeToString())
@@ -293,7 +293,7 @@ Predictions with onnxruntime.
 
 .. GENERATED FROM PYTHON SOURCE LINES 199-207
 
-.. code-block:: default
+.. code-block:: Python
 
 
     sess = rt.InferenceSession("pipeline_tfidf.onnx", providers=["CPUExecutionProvider"])
@@ -314,7 +314,7 @@ Predictions with onnxruntime.
     --- [" Re: Jews can't hide from keith@cco."
      'Deletions...\n\nSo, you consider the german poster\'s remark anti-semitic?  Perhaps you\nimply that anyone in Germany who doesn\'t agree with israely policy in a\nnazi?  Pray tell, how does it even qualify as "casual anti-semitism"? \nIf the term doesn\'t apply, why then bring it up?\n\nYour own bigotry is shining through.  \n-- ']
     predict [1]
-    predict_proba [{0: 0.4396112561225891, 1: 0.5603887438774109}]
+    predict_proba [{0: 0.43947482109069824, 1: 0.5605251789093018}]
 
 
 
@@ -325,7 +325,7 @@ With *scikit-learn*:
 
 .. GENERATED FROM PYTHON SOURCE LINES 209-212
 
-.. code-block:: default
+.. code-block:: Python
 
     print(pipeline.predict(train_data[:1]))
     print(pipeline.predict_proba(train_data[:1]))
@@ -339,7 +339,7 @@ With *scikit-learn*:
  .. code-block:: none
 
     [0]
-    [[0.72374074 0.27625926]]
+    [[0.71870405 0.28129595]]
 
 
 
@@ -359,7 +359,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. GENERATED FROM PYTHON SOURCE LINES 222-239
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pydot_graph = GetPydotGraph(
@@ -392,14 +392,14 @@ Finally, let's see the graph converted with *sklearn-onnx*.
  .. code-block:: none
 
 
-    (-0.5, 4939.5, 11475.5, -0.5)
+    (np.float64(-0.5), np.float64(4939.5), np.float64(10712.5), np.float64(-0.5))
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 14.922 seconds)
+   **Total running time of the script:** (0 minutes 16.743 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tfidfvectorizer.py:
@@ -408,16 +408,17 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_tfidfvectorizer.ipynb <plot_tfidfvectorizer.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_tfidfvectorizer.py <plot_tfidfvectorizer.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_tfidfvectorizer.ipynb <plot_tfidfvectorizer.ipynb>`
+      :download:`Download zipped: plot_tfidfvectorizer.zip <plot_tfidfvectorizer.zip>`
 
 
 .. only:: html

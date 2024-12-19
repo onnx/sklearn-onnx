@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_tutorial_plot_lcustom_options.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -38,9 +38,10 @@ replace *MatMul* by *Gemm*.
 Custom model
 ++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-83
+.. GENERATED FROM PYTHON SOURCE LINES 25-84
 
-.. code-block:: default
+.. code-block:: Python
+
 
     from pandas import DataFrame
     from skl2onnx.tutorial import measure_time
@@ -117,16 +118,16 @@ Custom model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-88
+.. GENERATED FROM PYTHON SOURCE LINES 85-89
 
 Conversion into ONNX
 ++++++++++++++++++++
 
 Let's try to convert it and see what happens.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-130
+.. GENERATED FROM PYTHON SOURCE LINES 89-131
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -177,14 +178,14 @@ Let's try to convert it and see what happens.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-133
+.. GENERATED FROM PYTHON SOURCE LINES 132-134
 
 The registration needs to declare the options
 supported by the converted.
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-161
+.. GENERATED FROM PYTHON SOURCE LINES 134-162
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -223,18 +224,18 @@ supported by the converted.
  .. code-block:: none
 
     conversion: use_gemm= False
-    (6.04657619085458e-07, 0.0002951417065406967)
+    (np.float64(6.04657619085458e-07), np.float64(0.0002951417065406967))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-163
+.. GENERATED FROM PYTHON SOURCE LINES 163-164
 
 We try the non default option, `use_gemm: True`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 163-174
+.. GENERATED FROM PYTHON SOURCE LINES 164-175
 
-.. code-block:: default
+.. code-block:: Python
 
 
     onx2 = to_onnx(dec, X.astype(numpy.float32), options={"use_gemm": True})
@@ -256,21 +257,21 @@ We try the non default option, `use_gemm: True`.
  .. code-block:: none
 
     conversion: use_gemm= True
-    (2.01757041717876e-06, 0.0005483764980468156)
+    (np.float64(2.01757041717876e-06), np.float64(0.0005483764980468156))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-179
+.. GENERATED FROM PYTHON SOURCE LINES 176-180
 
 Time comparison
 +++++++++++++++
 
 Let's compare the two computation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-199
+.. GENERATED FROM PYTHON SOURCE LINES 180-200
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -325,23 +326,23 @@ Let's compare the two computation.
       <tbody>
         <tr>
           <th>average</th>
-          <td>0.000029</td>
-          <td>0.000032</td>
+          <td>0.00001</td>
+          <td>0.000006</td>
         </tr>
         <tr>
           <th>deviation</th>
-          <td>0.00001</td>
-          <td>0.000015</td>
+          <td>0.000003</td>
+          <td>0.000006</td>
         </tr>
         <tr>
           <th>min_exec</th>
-          <td>0.000017</td>
-          <td>0.000016</td>
+          <td>0.000008</td>
+          <td>0.000005</td>
         </tr>
         <tr>
           <th>max_exec</th>
-          <td>0.000086</td>
-          <td>0.000111</td>
+          <td>0.000039</td>
+          <td>0.000059</td>
         </tr>
         <tr>
           <th>repeat</th>
@@ -368,7 +369,7 @@ Let's compare the two computation.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 2.996 seconds)
+   **Total running time of the script:** (0 minutes 1.068 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_lcustom_options.py:
@@ -377,16 +378,17 @@ Let's compare the two computation.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_lcustom_options.ipynb <plot_lcustom_options.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_lcustom_options.py <plot_lcustom_options.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_lcustom_options.ipynb <plot_lcustom_options.ipynb>`
+      :download:`Download zipped: plot_lcustom_options.zip <plot_lcustom_options.zip>`
 
 
 .. only:: html

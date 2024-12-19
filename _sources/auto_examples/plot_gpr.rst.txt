@@ -11,7 +11,7 @@
         :class: sphx-glr-download-link-note
 
         :ref:`Go to the end <sphx_glr_download_auto_examples_plot_gpr.py>`
-        to download the full example code
+        to download the full example code.
 
 .. rst-class:: sphx-glr-example-title
 
@@ -37,9 +37,10 @@ Train a model
 A very basic example using *GaussianProcessRegressor*
 on the Boston dataset.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-44
+.. GENERATED FROM PYTHON SOURCE LINES 24-45
 
-.. code-block:: default
+.. code-block:: Python
+
 
     import pprint
     import numpy
@@ -69,7 +70,13 @@ on the Boston dataset.
 
  .. code-block:: none
 
-    /home/xadupre/github/scikit-learn/sklearn/gaussian_process/kernels.py:419: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/_gpr.py:660: ConvergenceWarning: lbfgs failed to converge (status=2):
+    ABNORMAL_TERMINATION_IN_LNSRCH.
+
+    Increase the number of iterations (max_iter) or scale the data as shown in:
+        https://scikit-learn.org/stable/modules/preprocessing.html
+      _check_optimize_result("lbfgs", opt_res)
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:442: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
       warnings.warn(
     GaussianProcessRegressor(alpha=1.0,
                              kernel=DotProduct(sigma_0=1) + RBF(length_scale=1))
@@ -77,7 +84,7 @@ on the Boston dataset.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-50
+.. GENERATED FROM PYTHON SOURCE LINES 46-51
 
 First attempt to convert a model into ONNX
 ++++++++++++++++++++++++++++++++++++++++++
@@ -85,9 +92,9 @@ First attempt to convert a model into ONNX
 The documentation suggests the following way to
 convert a model into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-60
+.. GENERATED FROM PYTHON SOURCE LINES 51-61
 
-.. code-block:: default
+.. code-block:: Python
 
 
     initial_type = [("X", FloatTensorType([None, X_train.shape[1]]))]
@@ -106,7 +113,7 @@ convert a model into ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-73
+.. GENERATED FROM PYTHON SOURCE LINES 62-74
 
 Second attempt: variable dimensions
 +++++++++++++++++++++++++++++++++++
@@ -121,9 +128,9 @@ We need to disable these checkings by replacing
 the fixed dimensions by an empty value.
 (see next line).
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-84
+.. GENERATED FROM PYTHON SOURCE LINES 74-85
 
-.. code-block:: default
+.. code-block:: Python
 
 
     initial_type = [("X", FloatTensorType([None, None]))]
@@ -144,22 +151,22 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [157.67407448 142.03651212 160.8484086  135.0034477  100.48107033
-     171.43261057 134.12309522 167.4292642  155.90885873 201.31475888]
-    [155.5]
+    [199.16400146 144.28936768 109.57861328 183.99377441 169.99847412
+     112.01519775 179.21099854 130.21044922 189.19836426 136.98278809]
+    [557056.]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-88
+.. GENERATED FROM PYTHON SOURCE LINES 86-89
 
 The differences seems quite important.
 Let's confirm that by looking at the biggest
 differences.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-93
+.. GENERATED FROM PYTHON SOURCE LINES 89-94
 
-.. code-block:: default
+.. code-block:: Python
 
 
     diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) - numpy.squeeze(pred_onx)))[-5:]
@@ -174,13 +181,14 @@ differences.
 
  .. code-block:: none
 
-    [2.24528426 2.36538915 2.37925239 2.38045369 2.63459276]
-    min(Y)-max(Y): 25.0 336.0
+    [556952.34741211 556953.92102051 556957.08154297 556958.05334473
+     556961.00817871]
+    min(Y)-max(Y): 39.0 341.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-110
+.. GENERATED FROM PYTHON SOURCE LINES 95-111
 
 Third attempt: use of double
 ++++++++++++++++++++++++++++
@@ -199,9 +207,9 @@ tells the conversion function that every real
 constant matrix such as the trained coefficients
 will be dumped as doubles and not as floats anymore.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-121
+.. GENERATED FROM PYTHON SOURCE LINES 111-122
 
-.. code-block:: default
+.. code-block:: Python
 
 
     initial_type = [("X", DoubleTensorType([None, None]))]
@@ -222,18 +230,18 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [157.67407447]
+    [199.16298882]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-123
+.. GENERATED FROM PYTHON SOURCE LINES 123-124
 
 The new differences look much better.
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-128
+.. GENERATED FROM PYTHON SOURCE LINES 124-129
 
-.. code-block:: default
+.. code-block:: Python
 
 
     diff = numpy.sort(numpy.abs(numpy.squeeze(pred_skl) - numpy.squeeze(pred_onx64)))[-5:]
@@ -248,14 +256,13 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [7.92597632e-09 8.98936037e-09 9.23387233e-09 9.66474545e-09
-     1.00339719e-08]
-    min(Y)-max(Y): 25.0 336.0
+    [0.00544517 0.0063448  0.00640814 0.00701725 0.00797183]
+    min(Y)-max(Y): 39.0 341.0
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-135
+.. GENERATED FROM PYTHON SOURCE LINES 130-136
 
 Size increase
 +++++++++++++
@@ -264,9 +271,9 @@ As a result, the ONNX model is almost twice bigger
 because every coefficient is stored as double and
 and not as floats anymore.
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-141
+.. GENERATED FROM PYTHON SOURCE LINES 136-142
 
-.. code-block:: default
+.. code-block:: Python
 
 
     size32 = len(onx.SerializeToString())
@@ -282,13 +289,13 @@ and not as floats anymore.
 
  .. code-block:: none
 
-    ONNX with floats: 29814
-    ONNX with doubles: 57694
+    ONNX with floats: 29226
+    ONNX with doubles: 57050
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-153
+.. GENERATED FROM PYTHON SOURCE LINES 143-154
 
 return_std=True
 +++++++++++++++
@@ -302,9 +309,9 @@ The converter needs to know that an extended graph is required.
 That's done through the option mechanism
 (see :ref:`l-conv-options`).
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-163
+.. GENERATED FROM PYTHON SOURCE LINES 154-164
 
-.. code-block:: default
+.. code-block:: Python
 
 
     initial_type = [("X", DoubleTensorType([None, None]))]
@@ -323,16 +330,16 @@ That's done through the option mechanism
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-168
+.. GENERATED FROM PYTHON SOURCE LINES 165-169
 
 This error highlights the fact that the *scikit-learn*
 computes internal variables on first call to method predict.
 The converter needs them to be initialized by calling method
 predict at least once and then converting again.
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-181
+.. GENERATED FROM PYTHON SOURCE LINES 169-182
 
-.. code-block:: default
+.. code-block:: Python
 
 
     gpr.predict(X_test[:1], return_std=True)
@@ -355,23 +362,24 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[157.67407447],
-           [142.03651212],
-           [160.8484086 ],
-           [135.0034477 ],
-           [100.48107033]]),
-     array([1.00845167, 1.0054851 , 1.0139891 , 1.00514903, 1.01019988])]
+    [array([[199.16298882],
+           [144.28235043],
+           [109.58064467],
+           [183.99437845],
+           [169.99982479]]),
+     array([668.01881677, 785.8806495 , 561.56004495, 541.05432348,
+             0.        ])]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-183
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 Let's compare with *scikit-learn* prediction.
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-186
+.. GENERATED FROM PYTHON SOURCE LINES 184-187
 
-.. code-block:: default
+.. code-block:: Python
 
 
     pprint.pprint(gpr.predict(X_test[:5], return_std=True))
@@ -384,20 +392,20 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([157.67407448, 142.03651212, 160.8484086 , 135.0034477 ,
-           100.48107033]),
-     array([1.00845384, 1.00548596, 1.01398906, 1.00515132, 1.01019995]))
+    (array([199.16400146, 144.28936768, 109.57861328, 183.99377441,
+           169.99798584]),
+     array([1.01514412, 1.00504366, 1.01094833, 1.01163485, 1.0076308 ]))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-188
+.. GENERATED FROM PYTHON SOURCE LINES 188-189
 
 It looks good. Let's do a better checks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-199
+.. GENERATED FROM PYTHON SOURCE LINES 189-200
 
-.. code-block:: default
+.. code-block:: Python
 
 
 
@@ -418,21 +426,20 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [2.54371954e-06 2.56724555e-06 2.58754006e-06 2.63925354e-06
-     3.30249346e-06]
+    [ 952.49009449  969.80341373  995.20442978 1069.49191637 1079.44581069]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-203
+.. GENERATED FROM PYTHON SOURCE LINES 201-204
 
 There are some discrepencies but it seems reasonable.
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-209
+.. GENERATED FROM PYTHON SOURCE LINES 204-210
 
-.. code-block:: default
+.. code-block:: Python
 
 
     print("numpy:", numpy.__version__)
@@ -448,11 +455,11 @@ There are some discrepencies but it seems reasonable.
 
  .. code-block:: none
 
-    numpy: 1.23.5
-    scikit-learn: 1.4.dev0
-    onnx:  1.15.0
-    onnxruntime:  1.16.0+cu118
-    skl2onnx:  1.16.0
+    numpy: 2.2.0
+    scikit-learn: 1.6.0
+    onnx:  1.18.0
+    onnxruntime:  1.21.0+cu126
+    skl2onnx:  1.18.0
 
 
 
@@ -460,7 +467,7 @@ There are some discrepencies but it seems reasonable.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.428 seconds)
+   **Total running time of the script:** (0 minutes 5.965 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:
@@ -469,16 +476,17 @@ There are some discrepencies but it seems reasonable.
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: plot_gpr.ipynb <plot_gpr.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: plot_gpr.py <plot_gpr.py>`
 
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
+    .. container:: sphx-glr-download sphx-glr-download-zip
 
-      :download:`Download Jupyter notebook: plot_gpr.ipynb <plot_gpr.ipynb>`
+      :download:`Download zipped: plot_gpr.zip <plot_gpr.zip>`
 
 
 .. only:: html
