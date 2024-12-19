@@ -1,0 +1,493 @@
+:orphan:
+
+Gallery of examples
+===================
+
+.. toctree::
+    :maxdepth: 1
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="ONNX format contains metadata related to how the model was produced. It is useful when the mode...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_metadata_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_metadata.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Metadata</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="ONNX Runtime extends the onnx backend API to run predictions using this runtime. Let&#x27;s use the ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_backend_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_backend.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">ONNX Runtime Backend for ONNX</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="There is no other way to look into one model stored in ONNX format than looking into its node w...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_pipeline.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Draw a pipeline</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The conversion of a pipeline fails if it contains an object without any associated converter. I...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_logging_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_logging.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Logging, verbose</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx creates an ONN...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_convert_decision_function_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Probabilities or raw scores</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Train and deploy a model usually involves the three following steps:">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_convert_model_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_convert_model.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Train, convert and predict a model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The following example shows how to look into a converted models and easily find errors at every...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_investigate_pipeline_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Investigate a pipeline</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The following example focuses on one particular operator, CDist and compares its execution time...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_benchmark_cdist_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Compare CDist with scipy</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_convert_zipmap_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Probabilities as a vector or as a ZipMap</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_lightgbm_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a LightGbm model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Some runtime dedicated to onnx do not implement all the operators and a converted model may not...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_black_op_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_black_op.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a model with a reduced list of operators</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="NMF factorizes an input matrix into two matrices W, H of rank k so that WH \sim M`. M=(m_{ij}) ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_nmf_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_nmf.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Custom Operator for NMF Decomposition</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A StandardScaler does a very basic scaling. The conversion in ONNX assumes that (x / y) is equi...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_cast_transformer_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_cast_transformer.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Discrepencies with StandardScaler</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The following example checks up on every step in a pipeline, compares and benchmarks the predic...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_benchmark_pipeline_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Benchmark a pipeline</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-le...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_pipeline_xgboost_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The GaussianProcessRegressor involves many matrix operations which may requires double precisio...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_gpr_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_gpr.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Discrepencies with GaussianProcessorRegressor: use of double</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Many mistakes might happen with onnxruntime. This example looks into several common situations ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_errors_onnxruntime_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Errors with onnxruntime</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="ONNX aims at describing most of the machine learning models implemented in scikit-learn but it ...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_onnx_operators_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_onnx_operators.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Play with ONNX operators</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example leverages some code added to implement custom converters in an easy way.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_convert_syntax_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_convert_syntax.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Different ways to convert a model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn recently shipped ColumnTransformer which lets the user define complex pipeline whe...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_complex_pipeline_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a pipeline with ColumnTransformer</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example is inspired from the following example: Column Transformer with Heterogeneous Data...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_tfidfvectorizer_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">TfIdfVectorizer with ONNX</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="We reuse the example example-complex-pipeline and walk through intermediates outputs. It is ver...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_intermediate_outputs_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Walk through intermediate outputs</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces tw...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_custom_parser_alternative_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_custom_parser_alternative.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">When a custom model is neither a classifier nor a regressor (alternative)</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="scikit-learn&#x27;s API specifies that a regressor produces one outputs and a classifier produces tw...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_custom_parser_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_custom_parser.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">When a custom model is neither a classifier nor a regressor</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="It might happen that you implemented your own model and there is obviously no existing converte...">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_plot_custom_model_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_plot_custom_model.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Write your own converter for your own model</div>
+    </div>
+
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/plot_metadata
+   /auto_examples/plot_backend
+   /auto_examples/plot_pipeline
+   /auto_examples/plot_logging
+   /auto_examples/plot_convert_decision_function
+   /auto_examples/plot_convert_model
+   /auto_examples/plot_investigate_pipeline
+   /auto_examples/plot_benchmark_cdist
+   /auto_examples/plot_convert_zipmap
+   /auto_examples/plot_pipeline_lightgbm
+   /auto_examples/plot_black_op
+   /auto_examples/plot_nmf
+   /auto_examples/plot_cast_transformer
+   /auto_examples/plot_benchmark_pipeline
+   /auto_examples/plot_pipeline_xgboost
+   /auto_examples/plot_gpr
+   /auto_examples/plot_errors_onnxruntime
+   /auto_examples/plot_onnx_operators
+   /auto_examples/plot_convert_syntax
+   /auto_examples/plot_complex_pipeline
+   /auto_examples/plot_tfidfvectorizer
+   /auto_examples/plot_intermediate_outputs
+   /auto_examples/plot_custom_parser_alternative
+   /auto_examples/plot_custom_parser
+   /auto_examples/plot_custom_model
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
