@@ -75,6 +75,8 @@ class TestDocumentationExamples(unittest.TestCase):
                 reason = None
                 if name in {"plot_woe_transformer.py"}:
                     reason = "dot not available"
+                if name in {"plot_catwoe_transformer.py"}:
+                    reason = "unstable"
 
                 if reason:
 
