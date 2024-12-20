@@ -78,7 +78,7 @@ def convert_powertransformer(
         y_gr0 = OnnxImputer(
             y_gr0,
             imputed_value_floats=[0.0],
-            replaced_value_float=np.NAN,
+            replaced_value_float=getattr(np, "nan", getattr(np, "NAN")),
             op_version=opv,
         )
         y_gr0 = OnnxMul(y_gr0, greater_mask, op_version=opv)
@@ -104,7 +104,7 @@ def convert_powertransformer(
         y_le0 = OnnxImputer(
             y_le0,
             imputed_value_floats=[0.0],
-            replaced_value_float=np.NAN,
+            replaced_value_float=getattr(np, "nan", getattr(np, "NAN")),
             op_version=opv,
         )
         y_le0 = OnnxMul(y_le0, less_mask, op_version=opv)
@@ -130,7 +130,7 @@ def convert_powertransformer(
         y_gr0_l_eq0 = OnnxImputer(
             y_gr0_l_eq0,
             imputed_value_floats=[0.0],
-            replaced_value_float=np.NAN,
+            replaced_value_float=getattr(np, "nan", getattr(np, "NAN")),
             op_version=opv,
         )
         y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask, op_version=opv)
