@@ -15,7 +15,7 @@ jobs:
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx>=1.17.0'
             onnxrt_version: 'onnxruntime>=1.20.1'
-            python_version: '3.11'
+            python_version: '3.12'
           - sklearn_version: '==1.5.2'
             documentation: 0
             numpy_version: '>=1.21.1,<2.0'

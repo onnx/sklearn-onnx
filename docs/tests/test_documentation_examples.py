@@ -78,6 +78,7 @@ class TestDocumentationExamples(unittest.TestCase):
                 if name in {
                     "plot_catwoe_transformer.py",
                     "plot_gexternal_xgboost.py",
+                    "plot_pipeline_xgboost.py",
                 }:
                     reason = "unstable, xgboost not ready"
 
