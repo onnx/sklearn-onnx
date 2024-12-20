@@ -29,6 +29,7 @@ skl_version = ".".join(sklearn_version.split(".")[:2])
 
 class TestSklearnAdaBoostModels(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
+    @unittest.skipIf(pv.Version(skl_version) < pv.Version("1.6"), "deprecated")
     def test_ada_boost_classifier_samme_r(self):
         if pv.Version(skl_version) < pv.Version("1.2"):
             model, X_test = fit_classification_model(
@@ -62,6 +63,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         )
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
+    @unittest.skipIf(pv.Version(skl_version) < pv.Version("1.6"), "deprecated")
     def test_ada_boost_classifier_samme_r_decision_function(self):
         if pv.Version(skl_version) < pv.Version("1.2"):
             model, X_test = fit_classification_model(
@@ -101,6 +103,7 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
         )
 
     @unittest.skipIf(TARGET_OPSET < 11, reason="not available")
+    @unittest.skipIf(pv.Version(skl_version) < pv.Version("1.6"), "deprecated")
     def test_ada_boost_classifier_samme_r_logreg(self):
         if pv.Version(skl_version) < pv.Version("1.2"):
             model, X_test = fit_classification_model(
