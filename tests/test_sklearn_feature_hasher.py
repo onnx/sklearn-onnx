@@ -7,7 +7,6 @@ import unittest
 from typing import Optional
 import packaging.version as pv
 import numpy as np
-from sklearn.utils._testing import assert_almost_equal
 from pandas import DataFrame
 from onnx import TensorProto, __version__ as onnx_version
 from onnx.helper import (
@@ -113,7 +112,10 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             mat[i, indices[i]] = final[i]
 
         skl = FeatureHasher(n_features, input_type="string", dtype=np.uint32)
-        expected = skl.transform(feeds["X"].reshape((-1, 1)))
+        try:
+            expected = skl.transform(feeds["X"].reshape((-1, 1)))
+        except OverflowError as e:
+            raise unittest.SkipTest(f"Unexpected sklearn error: {e}")
         dense = expected.todense()
         for i, (a, b) in enumerate(zip(dense.tolist(), mat.tolist())):
             if a != b:
@@ -327,10 +329,10 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         got2 = sess.run(None, dict(cat_features=X_train_ort2))
-        assert_almost_equal(expected2, got2[0])
+        np.testing.assert_almost_equal(expected2, got2[0])
         got1 = sess.run(None, dict(cat_features=X_train_ort1))
         with self.assertRaises(AssertionError):
-            assert_almost_equal(expected2, got1[0])
+            np.testing.assert_almost_equal(expected2, got1[0])
 
         # check hash
         X_train_ort = X_train.values
@@ -350,9 +352,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         got = sess.run(None, dict(cat_features=X_train_ort))
         with self.assertRaises(AssertionError):
-            assert_almost_equal(expected, got[0])
+            np.testing.assert_almost_equal(expected, got[0])
         got = sess.run(None, dict(cat_features=X_train_ort2))
-        assert_almost_equal(expected, got[0])
+        np.testing.assert_almost_equal(expected, got[0])
 
         # transform
         X_train_ort = X_train.values
@@ -367,9 +369,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         )
         got = sess.run(None, dict(cat_features=X_train_ort))
         with self.assertRaises(AssertionError):
-            assert_almost_equal(expected, got[0].astype(np.float64))
+            np.testing.assert_almost_equal(expected, got[0].astype(np.float64))
         got = sess.run(None, dict(cat_features=X_train_ort2))
-        assert_almost_equal(expected, got[0].astype(np.float64))
+        np.testing.assert_almost_equal(expected, got[0].astype(np.float64))
 
         # classifier
         expected = complete_pipeline.predict_proba(X_train)
@@ -387,9 +389,9 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         X_train_ort = X_train.values
         got = sess.run(None, dict(cat_features=X_train_ort))
         with self.assertRaises(AssertionError):
-            assert_almost_equal(expected, got[1].astype(np.float64))
+            np.testing.assert_almost_equal(expected, got[1].astype(np.float64))
         got = sess.run(None, dict(cat_features=X_train_ort2))
-        assert_almost_equal(labels, got[0])
+        np.testing.assert_almost_equal(labels, got[0])
 
     @unittest.skipIf(
         pv.Version(onnx_version) < pv.Version("1.11"), reason="onnx is too old"
@@ -565,12 +567,12 @@ class TestSklearnFeatureHasher(unittest.TestCase):
             onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
         )
         got = sess.run(None, feeds)
-        assert_almost_equal(expected, got[0])
+        np.testing.assert_almost_equal(expected, got[0])
 
         if ReferenceEvaluator is not None:
             # The pure python implementation does not correctly implement murmurhash3.
             # There are issue with type int.
-            assert_almost_equal(expected.shape, got_py[0].shape)
+            np.testing.assert_almost_equal(expected.shape, got_py[0].shape)
 
 
 if __name__ == "__main__":

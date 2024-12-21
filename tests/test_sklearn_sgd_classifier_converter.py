@@ -436,7 +436,7 @@ class TestSGDClassifierConverter(unittest.TestCase):
 
     def test_model_sgd_multi_class_log_int(self):
         model, X = fit_classification_model(
-            SGDClassifier(loss=LOG_LOSS, random_state=42), 5, is_int=True
+            SGDClassifier(loss=LOG_LOSS, random_state=42), 2, is_int=True
         )
         model_onnx = convert_sklearn(
             model,

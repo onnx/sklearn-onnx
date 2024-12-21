@@ -37,7 +37,14 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-"**" = ["C413", "C408", "C417", "E731", "PIE808", "RUF012", "RUF015", "SIM103", "SIM108", "SIM114", "SIM910", "UP008", "UP015", "UP028", "UP030", "UP031", "UP032"]
+"**" = [
+    "C413", "C408", "C417",
+    "E731",
+    "PIE808",
+    "RUF012", "RUF015",
+    "SIM103", "SIM108", "SIM114", "SIM910",
+    "UP006", "UP008", "UP015", "UP028", "UP030", "UP031", "UP035", "UP032"
+]
 "**/__init__.py" = ["F401"]
 "docs/**" = ["B018", "E402"]
 "skl2onnx/algebra/onnx_ops.py" = ["F821"]

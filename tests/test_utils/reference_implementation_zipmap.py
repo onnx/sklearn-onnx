@@ -14,9 +14,13 @@ if onnx_opset_version() >= 18:
         """
         Custom dictionary class much faster for this runtime,
         it implements a subset of the same methods.
+
+        :param rev_keys: returns by ``build_rev_keys``, *{keys: column index}*
+        :param values: values
+        :param mat: matrix if values is a row index, one or two dimensions
         """
 
-        __slots__ = ["_rev_keys", "_values", "_mat"]
+        __slots__ = ["_mat", "_rev_keys", "_values"]
 
         @staticmethod
         def build_rev_keys(keys):
@@ -26,13 +30,6 @@ if onnx_opset_version() >= 18:
             return res
 
         def __init__(self, rev_keys, values, mat=None):
-            """
-            @param      rev_keys        returns by @see me build_rev_keys,
-                                        *{keys: column index}*
-            @param      values          values
-            @param      mat             matrix if values is a row index,
-                                        one or two dimensions
-            """
             if mat is not None:
                 if not isinstance(mat, numpy.ndarray):
                     raise TypeError(f"matrix is expected, got {type(mat)}.")
