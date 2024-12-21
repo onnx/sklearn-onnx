@@ -79,6 +79,7 @@ class TestDocumentationExamples(unittest.TestCase):
                     "plot_catwoe_transformer.py",
                     "plot_gexternal_xgboost.py",
                     "plot_pipeline_xgboost.py",
+                    "plot_usparse_xgboost.py",
                 }:
                     reason = "unstable, xgboost not ready"
 
