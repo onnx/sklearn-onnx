@@ -257,8 +257,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
     single_reg = (
         not hasattr(op, "_y")
         or len(op._y.shape) == 1
-        or len(op._y.shape) == 2
-        and op._y.shape[1] == 1
+        or (len(op._y.shape) == 2 and op._y.shape[1] == 1)
     )
     ndim = 1 if single_reg else op._y.shape[1]
 
