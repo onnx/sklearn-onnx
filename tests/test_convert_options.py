@@ -227,7 +227,7 @@ class TestConvertOptions(unittest.TestCase):
                 assert_almost_equal(row.ravel(), pr.ravel(), decimal=decimal)
 
         elif zipmap:
-            for expected, proba in zip(expected_proba, probas):
+            for _expected, proba in zip(expected_proba, probas):
                 assert_almost_equal(
                     expected_proba,
                     TestConvertOptions.dict_to_array(proba),

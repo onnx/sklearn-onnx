@@ -7,7 +7,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 
 try:
-    import onnx.reference  # noqa
+    import onnx.reference  # noqa: F401
     from test_utils import ReferenceEvaluatorEx
 except ImportError:
     ReferenceEvaluatorEx = None

@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -16,8 +17,8 @@ from skl2onnx.common.utils import check_input_and_output_numbers
 from skl2onnx.algebra.onnx_ops import OnnxCast, OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.sklapi import WOETransformer
-import skl2onnx.sklapi.register  # noqa
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
+import skl2onnx.sklapi.register  # noqa: F401
 
 
 class OrdinalWOETransformer(BaseEstimator, TransformerMixin):

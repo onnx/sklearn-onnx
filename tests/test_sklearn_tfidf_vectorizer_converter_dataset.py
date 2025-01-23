@@ -3,7 +3,9 @@
 """
 Tests scikit-learn's tfidf converter using downloaded data.
 """
+
 import unittest
+import urllib.error
 import packaging.version as pv
 import numpy as np
 import onnx
@@ -25,7 +27,10 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_tfidf_20newsgroups(self):
-        data = fetch_20newsgroups()
+        try:
+            data = fetch_20newsgroups()
+        except urllib.error.HTTPError as e:
+            raise unittest.SkipTest(f"HTTP fails due to {e}")
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.5, random_state=42
@@ -49,7 +54,10 @@ class TestSklearnTfidfVectorizerDataSet(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @unittest.skipIf(TARGET_OPSET < 18, reason="too long")
     def test_tfidf_20newsgroups_nolowercase(self):
-        data = fetch_20newsgroups()
+        try:
+            data = fetch_20newsgroups()
+        except urllib.error.HTTPError as e:
+            raise unittest.SkipTest(f"HTTP fails due to {e}")
         X, y = np.array(data.data)[:100], np.array(data.target)[:100]
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=0.5, random_state=42

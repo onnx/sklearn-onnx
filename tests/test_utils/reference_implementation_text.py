@@ -2,6 +2,7 @@
 """
 Helpers to test runtimes.
 """
+
 from typing import List
 import re
 import numpy as np
@@ -322,10 +323,7 @@ if onnx_opset_version() >= 18:
             pool_strings=None,
             weights=None,
         ) -> None:
-            if len(X.shape) > 1:
-                X_flat = X[row_num]
-            else:
-                X_flat = X
+            X_flat = X[row_num] if len(X.shape) > 1 else X
             row_begin = 0
             row_end = row_begin + row_size
 

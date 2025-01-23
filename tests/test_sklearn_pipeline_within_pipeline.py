@@ -3,6 +3,7 @@
 """
 Tests pipeline within pipelines.
 """
+
 from textwrap import dedent
 import unittest
 from io import StringIO

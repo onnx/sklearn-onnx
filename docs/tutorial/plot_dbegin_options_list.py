@@ -19,6 +19,7 @@ GaussianMixture
 The first converter to change its behaviour depending on a black list
 of operators is for model *GaussianMixture*.
 """
+
 from timeit import timeit
 import numpy
 from onnxruntime import InferenceSession

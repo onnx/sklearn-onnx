@@ -18,6 +18,7 @@ a *CatBoostClassifier*. Let's see how to do it.
 Train a CatBoostClassifier
 ++++++++++++++++++++++++++
 """
+
 import numpy
 from onnx.helper import get_attribute_value
 from sklearn.datasets import load_iris
@@ -27,7 +28,7 @@ import onnxruntime as rt
 from skl2onnx import convert_sklearn, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
-)  # noqa
+)
 from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,

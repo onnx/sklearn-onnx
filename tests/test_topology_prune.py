@@ -3,6 +3,7 @@
 """
 Tests topology.
 """
+
 import unittest
 import numpy
 from onnxruntime import InferenceSession

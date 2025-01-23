@@ -218,6 +218,7 @@ class OnnxOperatorMixin:
                     "This will be the case in version 1.11, class=%r."
                     "" % type(self),
                     DeprecationWarning,
+                    stacklevel=0,
                 )
                 try:
                     if inputs:

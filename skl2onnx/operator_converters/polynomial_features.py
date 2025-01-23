@@ -107,7 +107,7 @@ def convert_sklearn_polynomial_features(
 
         apply_concat(
             scope,
-            [t for t in transformed_columns],
+            list(transformed_columns),
             concat_result_name,
             container,
             axis=1,
@@ -122,7 +122,7 @@ def convert_sklearn_polynomial_features(
     else:
         apply_concat(
             scope,
-            [t for t in transformed_columns],
+            list(transformed_columns),
             operator.outputs[0].full_name,
             container,
             axis=1,

@@ -34,7 +34,7 @@ def convert_sklearn_feature_hasher(
         )
         empty_string = scope.get_unique_variable_name("empty_string")
         container.add_initializer(
-            empty_string, TensorProto.STRING, [], ["".encode("utf-8")]
+            empty_string, TensorProto.STRING, [], ["".encode("utf-8")]  # noqa: UP012
         )
         skip_empty = scope.get_unique_variable_name("delimiter")
         container.add_initializer(skip_empty, TensorProto.BOOL, [], [False])
@@ -64,7 +64,8 @@ def convert_sklearn_feature_hasher(
                 )
             else:
                 raise RuntimeError(
-                    f"Only one character separators are supported but delimiter is {separator!r}."
+                    f"Only one character separators are supported but delimiter "
+                    f"is {separator!r}."
                 )
             shape = scope.get_unique_variable_name(f"shape{i}")
             container.add_node("Shape", [col_to_split.full_name], [shape])

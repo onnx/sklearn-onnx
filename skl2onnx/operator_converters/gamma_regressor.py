@@ -83,7 +83,7 @@ def convert_sklearn_gamma_regressor(
             Y = OnnxSigmoid(eta, op_version=opv)
         else:
             raise RuntimeError(
-                f"Unexpected type of link for {loss!r} loss " "in operator type {op!r}."
+                f"Unexpected type of link for {loss!r} loss in operator type {op!r}."
             )
 
     last_dim = 1 if len(op.coef_.shape) == 1 else op.coef_.shape[-1]

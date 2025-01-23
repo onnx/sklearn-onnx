@@ -3,10 +3,10 @@
 """
 Helpers to test runtimes.
 """
+
 import os
 import glob
 import pickle
-import packaging.version as pv  # noqa
 import numpy
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 import onnx
@@ -18,8 +18,6 @@ class ExpectedAssertionError(Exception):
     """
     Expected failure.
     """
-
-    pass
 
 
 class OnnxRuntimeAssertionError(AssertionError):
@@ -42,8 +40,6 @@ class OnnxRuntimeMissingNewOnnxOperatorException(OnnxRuntimeAssertionError):
     defined in the latest onnx.
     """
 
-    pass
-
 
 def evaluate_condition(backend, condition):
     """
@@ -51,7 +47,7 @@ def evaluate_condition(backend, condition):
     ``pv.Version(onnxruntime.__version__) <= pv.Version('0.1.3')``
     """
     if backend == "onnxruntime":
-        import onnxruntime  # noqa
+        import onnxruntime  # noqa: F401
 
         return eval(condition)
     raise NotImplementedError(
@@ -68,7 +64,7 @@ def is_backend_enabled(backend):
     """
     if backend == "onnxruntime":
         try:
-            import onnxruntime  # noqa
+            import onnxruntime  # noqa: F401
 
             return True
         except ImportError:
@@ -169,7 +165,7 @@ def search_converted_models(root=None):
         expected = basename + ".expected.pkl"
         res = dict(onnx=onnx, data=data, expected=expected)
         ok = True
-        for k, v in res.items():
+        for _k, v in res.items():
             if not os.path.exists(v):
                 ok = False
         if ok:

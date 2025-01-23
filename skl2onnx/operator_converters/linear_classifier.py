@@ -66,7 +66,8 @@ def convert_sklearn_linear_classifier(
             multi_class = 1
         elif number_of_classes > 2:
             # See https://scikit-learn.org/dev/modules/generated/
-            # sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression
+            # sklearn.linear_model.LogisticRegression.html#
+            #    sklearn.linear_model.LogisticRegression
             # multi_class attribute is deprecated.
             # OVR is not supported anymore.
             multi_class = 2
@@ -76,7 +77,8 @@ def convert_sklearn_linear_classifier(
         )
     else:
         # See https://scikit-learn.org/dev/modules/generated/
-        # sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression
+        # sklearn.linear_model.LogisticRegression.html
+        #      #sklearn.linear_model.LogisticRegression
         # multi_class attribute is deprecated.
         # OVR is not supported anymore.
         if number_of_classes > 2:
@@ -127,7 +129,7 @@ def convert_sklearn_linear_classifier(
         class_labels = [int(i) for i in classes]
         classifier_attrs["classlabels_ints"] = class_labels
     else:
-        raise RuntimeError("Label vector must be a string or a integer " "tensor.")
+        raise RuntimeError("Label vector must be a string or a integer tensor.")
 
     if not use_linear_op or type(operator.inputs[0].type) in (DoubleTensorType,):
         # Double -> double parameters not supported in ONNX LinearClassifier
@@ -222,7 +224,7 @@ def convert_sklearn_linear_classifier(
             input_name,
             [label_name, operator.outputs[1].full_name],
             op_domain="ai.onnx.ml",
-            **classifier_attrs
+            **classifier_attrs,
         )
     elif (
         isinstance(op, (LinearSVC, RidgeClassifier, RidgeClassifierCV))
@@ -249,7 +251,7 @@ def convert_sklearn_linear_classifier(
                 input_name,
                 [y_pred_name, raw_scores_tensor_name],
                 op_domain="ai.onnx.ml",
-                **classifier_attrs
+                **classifier_attrs,
             )
             container.add_node(
                 "Binarizer",
@@ -270,7 +272,7 @@ def convert_sklearn_linear_classifier(
                 input_name,
                 [label_name, raw_scores_tensor_name],
                 op_domain="ai.onnx.ml",
-                **classifier_attrs
+                **classifier_attrs,
             )
         container.add_node(
             "ArrayFeatureExtractor",
@@ -292,7 +294,7 @@ def convert_sklearn_linear_classifier(
                 input_name,
                 [label_name, probability_tensor_name],
                 op_domain="ai.onnx.ml",
-                **classifier_attrs
+                **classifier_attrs,
             )
             use_float = type(operator.inputs[0].type) not in (DoubleTensorType,)
             apply_normalizer(
@@ -315,7 +317,7 @@ def convert_sklearn_linear_classifier(
                 input_name,
                 [y_pred_name, operator.outputs[1].full_name],
                 op_domain="ai.onnx.ml",
-                **classifier_attrs
+                **classifier_attrs,
             )
             container.add_node(
                 "Binarizer",
@@ -336,7 +338,7 @@ def convert_sklearn_linear_classifier(
                 input_name,
                 [label_name, operator.outputs[1].full_name],
                 op_domain="ai.onnx.ml",
-                **classifier_attrs
+                **classifier_attrs,
             )
 
 

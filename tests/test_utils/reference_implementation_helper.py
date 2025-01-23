@@ -69,7 +69,7 @@ def multiclass_probability(k, R):
             Q[t, t] += R[j, t] * R[j, t]
             Q[t, j] = -R[j, t] * R[t, j]
 
-    for it in range(max_iter):
+    for _it in range(max_iter):
         # stopping condition, recalculate QP,pQP for numerical accuracy
         pQp = 0
         for t in range(0, k):

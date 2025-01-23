@@ -186,7 +186,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                     assert_almost_equal(
                         self.remove_dim1(e), self.remove_dim1(g), decimal=decimal
                     )
-                except AssertionError as e:  # noqa
+                except AssertionError as e:
                     raise AssertionError(
                         "Mismatch for output {} and attributes {}"
                         ".".format(i, predict_attributes)
@@ -1043,7 +1043,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         except (AttributeError, TypeError) as e:
             # unstable issue fixed with scikit-learn>=0.24
             warnings.warn(
-                "Training did not converge but fails at raising " "a warning: %r." % e
+                "Training did not converge but fails at raising a warning: %r." % e
             )
             return
 

@@ -500,11 +500,11 @@ def convert_sklearn_decision_tree_classifier(
 
         if options["decision_path"]:
             raise RuntimeError(
-                "Option decision_path for multi-outputs " "is not implemented yet."
+                "Option decision_path for multi-outputs is not implemented yet."
             )
         if options["decision_leaf"]:
             raise RuntimeError(
-                "Option decision_leaf for multi-outputs " "is not implemented yet."
+                "Option decision_leaf for multi-outputs is not implemented yet."
             )
 
 
@@ -629,7 +629,7 @@ def _build_labels_leaf(tree):
     paths = {}
     current = {}
 
-    for leave_index, path in _recursive_build_labels(tree, 0, current):
+    for leave_index, _path in _recursive_build_labels(tree, 0, current):
         paths[leave_index] = leave_index
     return paths
 

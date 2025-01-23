@@ -44,7 +44,7 @@ class GraphState:
         operator=None,
         run_converters=False,
         input_types=None,
-        **attrs
+        **attrs,
     ):
         logger.debug(
             "[State] +%s n_inputs=%r n_outputs=%r",
@@ -100,9 +100,7 @@ class GraphState:
             if v is None:
                 continue
             if not isinstance(v, list):
-                raise TypeError(
-                    "Attribute %r must be a list not %r." "" % (att, type(v))
-                )
+                raise TypeError("Attribute %r must be a list not %r." % (att, type(v)))
             for i, vi in enumerate(v):
                 if hasattr(vi, "state") or hasattr(vi, "onx_op"):
                     continue
@@ -216,7 +214,7 @@ class GraphState:
             except ValueError:
                 pass
             raise RuntimeError(
-                "Unexpected type for parameter 'var': {0}." "".format(type(var))
+                "Unexpected type for parameter 'var': {0}.".format(type(var))
             )
 
         try:
@@ -266,7 +264,7 @@ class GraphState:
                 ty = guess_proto_type(_guess_numpy_type(cst.dtype, cst.shape))
             except NotImplementedError as e:
                 st = str(astype).lower()
-                if st.startswith("u") or st.startswith("<u"):
+                if st.startswith(("u", "<u")):
                     ty = onnx_proto.TensorProto.STRING
                     astype = None
                     cst = np.array([s.encode("utf-8") for s in cst])
@@ -359,7 +357,7 @@ class GraphState:
                 new_inputs.extend(etype)
                 continue
             raise TypeError(
-                "Unable to infer shape of inputs %r (type is %r)" "." % (inp, type(inp))
+                "Unable to infer shape of inputs %r (type is %r)." % (inp, type(inp))
             )
 
         for i in range(0, len(new_inputs)):
@@ -398,7 +396,7 @@ class GraphState:
         # Second pass.
         if expected_inputs is not None:
             memo = {}
-            for i, (name, ct) in enumerate(expected_inputs):
+            for i, (_name, ct) in enumerate(expected_inputs):
                 if ct in memo:
                     memo[ct].append(i)
                 else:
@@ -447,7 +445,7 @@ class GraphState:
                     memo[key].append(vt)
 
         for k, v in memo.items():
-            if len(set(_.__class__ for _ in v)) != 1:
+            if len({_.__class__ for _ in v}) != 1:
                 raise RuntimeError(
                     "Conflicted constraint %r, got types %r operator=%s"
                     "." % (k, v, debug)
@@ -538,18 +536,20 @@ class GraphState:
                             " v=%r." % (type(v), v)
                         )
                     scope = v.scope
-                    if hasattr(scope, "variables"):
-                        if v.onnx_name not in scope.variables:
-                            raise RuntimeError(
-                                "Variable %r missing from scope "
-                                "(operator=%r, model=%r), list=%r."
-                                % (
-                                    v,
-                                    self.operator,
-                                    type(self.operator_instance),
-                                    list(sorted(self.scope.variables)),
-                                )
+                    if (
+                        hasattr(scope, "variables")
+                        and v.onnx_name not in scope.variables
+                    ):
+                        raise RuntimeError(
+                            "Variable %r missing from scope "
+                            "(operator=%r, model=%r), list=%r."
+                            % (
+                                v,
+                                self.operator,
+                                type(self.operator_instance),
+                                list(sorted(self.scope.variables)),
                             )
+                        )
 
                 # output are not defined, we need to call a parser.
                 from .._parse import _parse_sklearn
@@ -572,7 +572,7 @@ class GraphState:
                             self.input_types,
                         )
                     ) from e
-                set_input_names = set(v.onnx_name for v in sub_op_inputs)
+                set_input_names = {v.onnx_name for v in sub_op_inputs}
                 sub_op = None
                 for op in self.scope.operators.values():
                     for inp in op.inputs:
@@ -657,16 +657,19 @@ class GraphState:
                         for v1, v2 in zip(sub_op.outputs, expected_outputs):
                             if isinstance(v2, tuple):
                                 v2 = v2[0]
-                            if hasattr(v1, "onnx_name") and hasattr(v2, "onnx_name"):
-                                if v1.onnx_name != v2.onnx_name:
-                                    # One identity is missing
-                                    n = self.scope.get_unique_operator_name("idgstate")
-                                    self.container.add_node(
-                                        "Identity",
-                                        [v1.onnx_name],
-                                        [v2.onnx_name],
-                                        name=n,
-                                    )
+                            if (
+                                hasattr(v1, "onnx_name")
+                                and hasattr(v2, "onnx_name")
+                                and v1.onnx_name != v2.onnx_name
+                            ):
+                                # One identity is missing
+                                n = self.scope.get_unique_operator_name("idgstate")
+                                self.container.add_node(
+                                    "Identity",
+                                    [v1.onnx_name],
+                                    [v2.onnx_name],
+                                    name=n,
+                                )
             else:
 
                 def _name_(obj):
@@ -693,7 +696,7 @@ class GraphState:
                     input_names,
                     output_names,
                     name=name,
-                    **self.attrs
+                    **self.attrs,
                 )
 
                 computed_outputs = [

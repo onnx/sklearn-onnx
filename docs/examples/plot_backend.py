@@ -17,6 +17,7 @@ to run predictions using this runtime.
 Let's use the API to compute the prediction
 of a simple logistic regression model.
 """
+
 import skl2onnx
 import onnxruntime
 import onnx

@@ -2,8 +2,10 @@
 """
 Tests examples from scikit-learn's documentation.
 """
+
 import packaging.version as pv
 import unittest
+import urllib.error
 import sys
 import onnx
 from sklearn.datasets import fetch_20newsgroups
@@ -40,9 +42,12 @@ class TestSklearnTfidfVectorizerSparse(unittest.TestCase):
             "comp.graphics",
             "sci.med",
         ]
-        twenty_train = fetch_20newsgroups(
-            subset="train", categories=categories, shuffle=True, random_state=0
-        )
+        try:
+            twenty_train = fetch_20newsgroups(
+                subset="train", categories=categories, shuffle=True, random_state=0
+            )
+        except urllib.error.HTTPError as e:
+            raise unittest.SkipTest(f"HTTP fails due to {e}")
         text_clf = Pipeline(
             [("vect", CountVectorizer()), ("tfidf", TfidfTransformer())]
         )

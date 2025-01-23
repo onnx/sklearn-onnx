@@ -4,7 +4,6 @@
 Common errors.
 """
 
-
 _missing_converter = """
 It usually means the pipeline being converted contains a
 transformer or a predictor with no corresponding converter

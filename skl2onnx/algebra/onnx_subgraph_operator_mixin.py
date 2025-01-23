@@ -7,5 +7,3 @@ class OnnxSubGraphOperatorMixin(OnnxOperatorMixin):
     """
     :class:`OnnxOperatorMixin` for converters.
     """
-
-    pass

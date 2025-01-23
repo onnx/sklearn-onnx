@@ -73,10 +73,7 @@ class TestSklearnDoubleTensorTypeClassifier(unittest.TestCase):
         verbose=False,
     ):
         for model_cls in model_cls_set:
-            if name_root is None:
-                name = model_cls.__name__
-            else:
-                name = name_root
+            name = model_cls.__name__ if name_root is None else name_root
             for n_cl in [2, 3]:
                 model, X = fit_classification_model(
                     model_cls(),

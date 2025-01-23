@@ -17,6 +17,7 @@ which produces a logistic regression
 trained on *Iris* datasets. The model takes
 a vector of dimension 2 and returns a class among three.
 """
+
 import skl2onnx
 import onnx
 import sklearn

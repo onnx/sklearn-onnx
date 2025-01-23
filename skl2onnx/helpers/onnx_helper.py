@@ -3,7 +3,7 @@
 from logging import getLogger
 from io import BytesIO
 import numpy as np
-import onnx  # noqa
+import onnx
 from onnx import shape_inference, TensorProto, ValueInfoProto
 from onnx.numpy_helper import from_array, to_array
 from onnx.helper import (
@@ -65,7 +65,7 @@ def enumerate_model_node_outputs(model, add_node=False):
     """
     if not hasattr(model, "graph"):
         raise TypeError(
-            "Parameter model is not an ONNX model but " "{}".format(type(model))
+            "Parameter model is not an ONNX model but {}".format(type(model))
         )
     for node in model.graph.node:
         for out in node.output:
@@ -234,7 +234,7 @@ def infer_outputs(
             onnx_inputs.append(inp)
         elif isinstance(input, onnx.TensorProto):
             v = make_tensor_value_info(
-                input.name, input.data_type.real, list(d for d in input.dims)
+                input.name, input.data_type.real, list(input.dims)
             )
             onnx_inputs.append(v)
         elif isinstance(input, onnx.AttributeProto):
@@ -252,7 +252,7 @@ def infer_outputs(
     domains = {}
     for n in node:
         domains[n.domain] = max(domains.get(n.domain, 1), getattr(n, "op_version", 1))
-    for i, (k, v) in enumerate(domains.items()):
+    for i, (k, _v) in enumerate(domains.items()):
         if i == 0 and len(original_model.opset_import) == 1:
             op_set = original_model.opset_import[0]
         else:
@@ -385,19 +385,19 @@ def add_output_initializer(model_onnx, name, value, suffix="_init"):
     for name, value in zip(name_list, value_list):
         name_output = name
         name_init = name + suffix
-        names = set(i.name for i in model_onnx.graph.initializer)
+        names = {i.name for i in model_onnx.graph.initializer}
         if name_output in names or name_init in names:
             raise ValueError(
                 "Names %r or %r is already taken by an initializer: %r."
                 % (name_output, name_init, ", ".join(sorted(names)))
             )
-        names = set(i.name for i in model_onnx.graph.output)
+        names = {i.name for i in model_onnx.graph.output}
         if name_output in names or name_init in names:
             raise ValueError(
                 "Names %r or %r is already taken by an output: %r."
                 % (name_output, name_init, ", ".join(sorted(names)))
             )
-        names = set(i.name for i in model_onnx.graph.input)
+        names = {i.name for i in model_onnx.graph.input}
         if name_output in names or name_init in names:
             raise ValueError(
                 "Names %r or %r is already taken by an output: %r."
@@ -408,7 +408,7 @@ def add_output_initializer(model_onnx, name, value, suffix="_init"):
             cst = from_array(value, name=name_init)
         except RuntimeError as e:
             st = str(value.dtype).lower()
-            if st.startswith("u") or st.startswith("<u"):
+            if st.startswith(("u", "<u")):
                 cst_value = np.array([s.encode("utf-8") for s in value])
                 cst = make_tensor(
                     name_init,

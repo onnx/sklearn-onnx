@@ -9,21 +9,15 @@ from collections import OrderedDict
 import numpy as np
 from onnx import onnx_pb as onnx_proto
 from onnx.helper import make_graph, make_model, make_tensor_value_info
-from onnxconverter_common.data_types import (  # noqa
+from onnxconverter_common.data_types import (
     DataType,
     TensorType,
-    FloatType,
-    Int64Type,
-    StringType,
-    DictionaryType,
-    FloatTensorType,  # noqa
+    FloatTensorType,
     Int64TensorType,
-    SequenceType,  # noqa
     StringTensorType,
     DoubleTensorType,
     Int32TensorType,
     BooleanTensorType,
-    DoubleTensorType,
 )
 
 try:
@@ -172,7 +166,7 @@ class Variable:
                 try:
                     shape = list(shape)
                 except TypeError:
-                    raise TypeError(
+                    raise TypeError(  # noqa: B904
                         "shape must be a tuple or a list not "
                         "{}.".format(type_fct(shape))
                     )
@@ -198,7 +192,7 @@ class Variable:
                     continue
                 if not isinstance(k, (int, np.integer)):
                     raise ValueError(
-                        "Unexpected type %r for shape %r." "" % (type(k), self)
+                        "Unexpected type %r for shape %r." % (type(k), self)
                     )
 
     @property
@@ -365,7 +359,7 @@ class Variable:
                 )
         else:
             raise NotImplementedError(
-                "Unsupported type '{}' as " "a string ({}).".format(type(obj), obj)
+                "Unsupported type '{}' as a string ({}).".format(type(obj), obj)
             )
 
         return Variable(name, name, None, ty)
@@ -396,7 +390,7 @@ class Variable:
         if self.type is None:
             if other_type is None:
                 return
-        elif other_type is not None:
+        elif other_type is not None:  # noqa: SIM102
             if isinstance(self.type, type(other_type)):
                 if self.type.shape == other_type.shape:
                     return
@@ -423,7 +417,7 @@ class VariableStr(Variable):
     def onnx_name(self):
         if self._onnx_name.startswith("u("):
             raise RuntimeError(
-                "Variable should be renamed as onnx_name=%r." "" % self._onnx_name
+                "Variable should be renamed as onnx_name=%r." % self._onnx_name
             )
         return self._onnx_name
 
@@ -445,7 +439,7 @@ class Operator:
         def append(self, v):
             if not isinstance(v, Variable):
                 raise TypeError(
-                    "Input and output must be of type Variable not %r." "" % type(v)
+                    "Input and output must be of type Variable not %r." % type(v)
                 )
             if self.kind == "Out":
                 v.set_parent(self.parent)
@@ -636,7 +630,7 @@ class Operator:
         try:
             shape_calc = _registration.get_shape_calculator(self.type)
         except ValueError:
-            raise MissingShapeCalculator(
+            raise MissingShapeCalculator(  # noqa: B904
                 "Unable to find a shape calculator for alias '{}' "
                 "and type '{}'.".format(self.type, type(self.raw_operator))
             )
@@ -760,7 +754,7 @@ class Scope:
         """
         if not isinstance(seed, str):
             raise TypeError(
-                "Parameter seed must be a string not {}." "".format(type(seed))
+                "Parameter seed must be a string not {}.".format(type(seed))
             )
         if rename:
             name = self._naming(seed, self.onnx_variable_names)
@@ -1115,7 +1109,7 @@ class Topology:
             try:
                 conv = _registration.get_converter(operator.type)
             except ValueError:
-                raise MissingConverter(
+                raise MissingConverter(  # noqa: B904
                     "Unable to find converter for alias '{}' type "
                     "'{}'. You may raise an issue at "
                     "https://github.com/onnx/sklearn-onnx/issues."
@@ -1171,7 +1165,7 @@ class Topology:
         """
         if len(self.scopes) != 1:
             raise RuntimeError("Only one scope is allowed not %d." % len(self.scopes))
-        input_names = set(v.onnx_name for v in self.scopes[0].input_variables)
+        input_names = {v.onnx_name for v in self.scopes[0].input_variables}
         if len(input_names) == 0:
             raise RuntimeError("No detected inputs.")
         for variable in self.unordered_variable_iterator():
@@ -1198,7 +1192,7 @@ class Topology:
         if verbose > 1:
             print(
                 "[_propagate_status] newly fed=%r"
-                % list(v.onnx_name for v in operator.outputs if v.is_fed)
+                % [v.onnx_name for v in operator.outputs if v.is_fed]
             )
         stack = list(fed_variables)
         scope = self.scopes[0]
@@ -1255,7 +1249,7 @@ class Topology:
 
         def _check_variable_in_(variable, operator):
             idop = id(operator)
-            ids = set(id(op) for op in variable.operators_inputs_)
+            ids = {id(op) for op in variable.operators_inputs_}
             if idop not in ids:
                 raise RuntimeError(
                     "Operator %r not registered in the list of operators "
@@ -1516,7 +1510,8 @@ def convert_topology(
         warnings.warn(
             "Parameter target_opset {} > {} is higher than the "
             "the latest tested version"
-            ".".format(onnx_target_opset, get_latest_tested_opset_version())
+            ".".format(onnx_target_opset, get_latest_tested_opset_version()),
+            stacklevel=0,
         )
 
     container = ModelComponentContainer(

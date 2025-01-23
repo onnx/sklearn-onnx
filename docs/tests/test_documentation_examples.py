@@ -50,7 +50,7 @@ class TestDocumentationExamples(unittest.TestCase):
                     if verbose:
                         print(f"failed: {name!r} due to missing dot.")
                     return 0
-                raise AssertionError(
+                raise AssertionError(  # noqa: B904
                     "Example '{}' (cmd: {} - exec_prefix='{}') "
                     "failed due to\n{}"
                     "".format(name, cmds, sys.exec_prefix, st)
@@ -75,17 +75,24 @@ class TestDocumentationExamples(unittest.TestCase):
                 reason = None
                 if name in {"plot_woe_transformer.py"}:
                     reason = "dot not available"
+                if name in {
+                    "plot_catwoe_transformer.py",
+                    "plot_gexternal_xgboost.py",
+                    "plot_pipeline_xgboost.py",
+                    "plot_usparse_xgboost.py",
+                }:
+                    reason = "unstable, xgboost not ready"
 
                 if reason:
 
                     @unittest.skip(reason)
-                    def _test_(self, name=name):
+                    def _test_(self, name=name, fold=fold):
                         res = self.run_test(fold, name, verbose=VERBOSE)
                         self.assertTrue(res)
 
                 else:
 
-                    def _test_(self, name=name):
+                    def _test_(self, name=name, fold=fold):
                         res = self.run_test(fold, name, verbose=VERBOSE)
                         self.assertTrue(res)
 

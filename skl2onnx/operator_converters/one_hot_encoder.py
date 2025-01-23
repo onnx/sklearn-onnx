@@ -153,7 +153,7 @@ def convert_sklearn_one_hot_encoder(
                 try:
                     ci = int(c)
                 except TypeError:
-                    raise RuntimeError(
+                    raise RuntimeError(  # noqa: B904
                         "Category '{}' cannot be casted into int.".format(c)
                     )
                 if ci != c:
@@ -238,8 +238,11 @@ def convert_sklearn_one_hot_encoder(
         result.append(ohe_output)
         categories_len += len(categories)
 
-    concat_result_name = scope.get_unique_variable_name("concat_result")
-    apply_concat(scope, result, concat_result_name, container, axis=-1)
+    if len(result) == 1:
+        concat_result_name = result[0]
+    else:
+        concat_result_name = scope.get_unique_variable_name("concat_result")
+        apply_concat(scope, result, concat_result_name, container, axis=-1)
 
     reshape_input = concat_result_name
     if np.issubdtype(ohe_op.dtype, np.signedinteger):

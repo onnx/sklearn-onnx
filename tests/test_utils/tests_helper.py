@@ -332,8 +332,8 @@ def dump_data_and_model(
         for method in methods:
             if callable(method):
 
-                def call(X, model=model):
-                    return method(model, X)  # noqa
+                def call(X, model=model, method=method):
+                    return method(model, X)
 
             else:
                 try:
@@ -350,8 +350,8 @@ def dump_data_and_model(
                 prediction.append(call(data))
                 # we only take the last one for benchmark
 
-                def lambda_original():
-                    return call(dataone)  # noqa
+                def lambda_original(call=call, dataone=dataone):
+                    return call(dataone)
 
             else:
                 raise RuntimeError("Method '{0}' is not callable.".format(method))
@@ -362,7 +362,7 @@ def dump_data_and_model(
                 prediction = [model.predict(data), model.predict_proba(data)]
 
                 def lambda_original():
-                    return model.predict_proba(dataone)  # noqa
+                    return model.predict_proba(dataone)
 
             elif _has_decision_function(model):
                 # Classifier without probabilities
@@ -372,7 +372,7 @@ def dump_data_and_model(
                 ]
 
                 def lambda_original():
-                    return model.decision_function(dataone)  # noqa
+                    return model.decision_function(dataone)
 
             elif _has_transform_model(model):
                 # clustering
@@ -380,7 +380,7 @@ def dump_data_and_model(
                     prediction = [model.predict(data), model.transform(data)]
 
                     def lambda_original():
-                        return model.transform(dataone)  # noqa
+                        return model.transform(dataone)
 
                 except ValueError as e:
                     if "Buffer dtype mismatch" in str(e):
@@ -393,7 +393,7 @@ def dump_data_and_model(
                         dataone64 = dataone.astype(numpy.float64)
 
                         def lambda_original():
-                            return model.transform(dataone64)  # noqa
+                            return model.transform(dataone64)
 
                     else:
                         raise e
@@ -402,7 +402,7 @@ def dump_data_and_model(
                 prediction = [model.predict(data)]
 
                 def lambda_original():
-                    return model.predict(dataone)  # noqa
+                    return model.predict(dataone)
 
         elif hasattr(model, "transform"):
             options = extract_options(basename)
@@ -411,13 +411,13 @@ def dump_data_and_model(
                 prediction = model.transform(data.ravel())
 
                 def lambda_original():
-                    return model.transform(dataone.ravel())  # noqa
+                    return model.transform(dataone.ravel())
 
             else:
                 prediction = model.transform(data)
 
                 def lambda_original():
-                    return model.transform(dataone)  # noqa
+                    return model.transform(dataone)
 
         else:
             raise TypeError(
@@ -937,9 +937,9 @@ def timeit_repeat(fct, number, repeat):
     is a function.
     """
     res = []
-    for r in range(0, repeat):
+    for _r in range(0, repeat):
         t1 = time.perf_counter()
-        for i in range(0, number):
+        for _i in range(0, number):
             fct()
         t2 = time.perf_counter()
         res.append(t2 - t1)
@@ -1095,7 +1095,7 @@ def make_report_backend(folder, as_df=False, verbose=0):
             df = pandas.read_csv(fullname, sep=",")
             if model not in res:
                 res[model] = {}
-            for index, row in df.iterrows():
+            for _index, row in df.iterrows():
                 name = row["name"]
                 ave = row["average"]
                 std = row["deviation"]

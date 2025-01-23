@@ -15,10 +15,10 @@ def calculate_sklearn_gaussian_process_regressor_shape(operator):
     )
     if len(operator.inputs) != 1:
         raise RuntimeError(
-            "Only one input vector is allowed for " "GaussianProcessRegressor."
+            "Only one input vector is allowed for GaussianProcessRegressor."
         )
     if len(operator.outputs) not in (1, 2):
-        raise RuntimeError("One output is expected for " "GaussianProcessRegressor.")
+        raise RuntimeError("One output is expected for GaussianProcessRegressor.")
 
     variable = operator.inputs[0]
 

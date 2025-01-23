@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's binarizer converter.
 """
+
 import unittest
 import numpy
 from sklearn.base import BaseEstimator, ClassifierMixin

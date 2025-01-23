@@ -86,9 +86,8 @@ class NGramsMixin(VectorizerMixin):
             if not isinstance(w, tuple):
                 raise TypeError(f"Tuple is expected for a token not {type(w)}.")
             s = " ".join(w)
-            if s in expected:
-                if expected[s] != wid:
-                    update[w] = wid
+            if s in expected and expected[s] != wid:
+                update[w] = wid
         if update:
             new_voc.update(update)
         duplicates = {}

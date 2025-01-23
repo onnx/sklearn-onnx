@@ -43,7 +43,7 @@ ort_version = ort_version.split("+")[0]
 class TestSklearnDecisionTreeModels(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("0.3.0"),
-        reason="No suitable kernel definition found " "for op Cast(9) (node Cast)",
+        reason="No suitable kernel definition found for op Cast(9) (node Cast)",
     )
     def test_decisiontree_classifier1(self):
         model = DecisionTreeClassifier(max_depth=2)

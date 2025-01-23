@@ -23,6 +23,12 @@ from ..algebra.onnx_ops import (
 )
 
 
+def get_nan():
+    if hasattr(np, "nan"):
+        return np.nan
+    return np.NAN
+
+
 def convert_powertransformer(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
@@ -42,14 +48,10 @@ def convert_powertransformer(
 
     # logical masks for input
     less_than_zero = OnnxLess(op_in, zeros_, op_version=opv)
-    less_mask = OnnxCast(
-        less_than_zero, to=getattr(TensorProto, "FLOAT"), op_version=opv
-    )
+    less_mask = OnnxCast(less_than_zero, to=TensorProto.FLOAT, op_version=opv)
 
     greater_than_zero = OnnxNot(less_than_zero, op_version=opv)
-    greater_mask = OnnxCast(
-        greater_than_zero, to=getattr(TensorProto, "FLOAT"), op_version=opv
-    )
+    greater_mask = OnnxCast(greater_than_zero, to=TensorProto.FLOAT, op_version=opv)
 
     # logical masks for lambdas
     lambda_zero_mask = np.float32(lambdas == 0)
@@ -82,7 +84,7 @@ def convert_powertransformer(
         y_gr0 = OnnxImputer(
             y_gr0,
             imputed_value_floats=[0.0],
-            replaced_value_float=np.NAN,
+            replaced_value_float=get_nan(),
             op_version=opv,
         )
         y_gr0 = OnnxMul(y_gr0, greater_mask, op_version=opv)
@@ -108,7 +110,7 @@ def convert_powertransformer(
         y_le0 = OnnxImputer(
             y_le0,
             imputed_value_floats=[0.0],
-            replaced_value_float=np.NAN,
+            replaced_value_float=get_nan(),
             op_version=opv,
         )
         y_le0 = OnnxMul(y_le0, less_mask, op_version=opv)
@@ -134,7 +136,7 @@ def convert_powertransformer(
         y_gr0_l_eq0 = OnnxImputer(
             y_gr0_l_eq0,
             imputed_value_floats=[0.0],
-            replaced_value_float=np.NAN,
+            replaced_value_float=get_nan(),
             op_version=opv,
         )
         y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask, op_version=opv)

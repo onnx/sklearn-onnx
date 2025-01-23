@@ -35,6 +35,7 @@ It relies on *protobuf* whose definition can be found
 on github `onnx.proto
 <https://github.com/onnx/onnx/blob/main/onnx/onnx.proto>`_.
 """
+
 import onnxruntime
 import numpy
 import os
@@ -85,7 +86,7 @@ print("The model is checked!")
 # The list is dynamically created based on the installed
 # onnx package.
 
-from skl2onnx.algebra.onnx_ops import OnnxPad  # noqa
+from skl2onnx.algebra.onnx_ops import OnnxPad
 
 pad = OnnxPad(
     "X",
@@ -135,7 +136,7 @@ onnx.checker.check_model(original_model)
 #####################################
 # Which we translate into:
 
-from skl2onnx.algebra.onnx_ops import OnnxTranspose  # noqa
+from skl2onnx.algebra.onnx_ops import OnnxTranspose
 
 node = OnnxTranspose(
     OnnxTranspose("X", perm=[1, 0, 2], op_version=12), perm=[1, 0, 2], op_version=12
@@ -157,10 +158,10 @@ def predict_with_onnxruntime(model_def, *inputs):
         model_def.SerializeToString(), providers=["CPUExecutionProvider"]
     )
     names = [i.name for i in sess.get_inputs()]
-    dinputs = {name: input for name, input in zip(names, inputs)}
+    dinputs = dict(zip(names, inputs))
     res = sess.run(None, dinputs)
     names = [o.name for o in sess.get_outputs()]
-    return {name: output for name, output in zip(names, res)}
+    return dict(zip(names, res))
 
 
 Y = predict_with_onnxruntime(model_def, X)
@@ -190,11 +191,11 @@ ax.axis("off")
 #################################
 # **Versions used for this example**
 
-import sklearn  # noqa
+import sklearn
 
 print("numpy:", numpy.__version__)
 print("scikit-learn:", sklearn.__version__)
-import skl2onnx  # noqa
+import skl2onnx
 
 print("onnx: ", onnx.__version__)
 print("onnxruntime: ", onnxruntime.__version__)

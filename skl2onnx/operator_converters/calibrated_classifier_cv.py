@@ -556,7 +556,7 @@ def convert_sklearn_calibrated_classifier_cv(
 
     container.add_node(
         "Sum",
-        [s for s in prob_scores_name],
+        list(prob_scores_name),
         add_result_name,
         op_version=7,
         name=scope.get_unique_operator_name("Sum"),

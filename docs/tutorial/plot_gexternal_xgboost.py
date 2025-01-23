@@ -18,6 +18,7 @@ how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
+
 import numpy
 import onnxruntime as rt
 from sklearn.datasets import load_iris, load_diabetes, make_classification
@@ -31,6 +32,7 @@ from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
     calculate_linear_regressor_output_shapes,
 )
+from skl2onnx.convert import may_switch_bases_classes_order
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from onnxmltools.convert import convert_xgboost as convert_xgboost_booster
 
@@ -92,12 +94,15 @@ update_registered_converter(
 # Convert again
 # +++++++++++++
 
-model_onnx = convert_sklearn(
-    pipe,
-    "pipeline_xgboost",
-    [("input", FloatTensorType([None, 2]))],
-    target_opset={"": 12, "ai.onnx.ml": 2},
-)
+with may_switch_bases_classes_order(XGBClassifier):
+    # This context should not be needed anymore once this issue
+    # is fixed in XGBoost.
+    model_onnx = convert_sklearn(
+        pipe,
+        "pipeline_xgboost",
+        [("input", FloatTensorType([None, 2]))],
+        target_opset={"": 12, "ai.onnx.ml": 2},
+    )
 
 # And save.
 with open("pipeline_xgboost.onnx", "wb") as f:
@@ -109,8 +114,9 @@ with open("pipeline_xgboost.onnx", "wb") as f:
 #
 # Predictions with XGBoost.
 
-print("predict", pipe.predict(X[:5]))
-print("predict_proba", pipe.predict_proba(X[:1]))
+with may_switch_bases_classes_order(XGBClassifier):
+    print("predict", pipe.predict(X[:5]))
+    print("predict_proba", pipe.predict_proba(X[:1]))
 
 ##########################
 # Predictions with onnxruntime.
@@ -140,14 +146,16 @@ X_train, X_test, y_train, _ = train_test_split(x, y, test_size=0.5)
 pipe = Pipeline([("scaler", StandardScaler()), ("xgb", XGBRegressor(n_estimators=3))])
 pipe.fit(X_train, y_train)
 
-print("predict", pipe.predict(X_test[:5]))
+with may_switch_bases_classes_order(XGBRegressor):
+    print("predict", pipe.predict(X_test[:5]))
 
 #############################
 # ONNX
 
-onx = to_onnx(
-    pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
-)
+with may_switch_bases_classes_order(XGBRegressor):
+    onx = to_onnx(
+        pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
+    )
 
 sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, {"X": X_test[:5].astype(numpy.float32)})

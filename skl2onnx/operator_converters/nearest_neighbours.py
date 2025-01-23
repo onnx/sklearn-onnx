@@ -74,7 +74,7 @@ def onnx_nearest_neighbors_indices_k(
     op_version=None,
     keep_distances=False,
     optim=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Retrieves the nearest neigbours *ONNX*.
@@ -107,7 +107,7 @@ def onnx_nearest_neighbors_indices_k(
             op_version=op_version,
             dim_in=dim_in,
             dim_out=dim_out,
-            **kwargs_dist
+            **kwargs_dist,
         )
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
@@ -126,7 +126,7 @@ def onnx_nearest_neighbors_indices_k(
             largest=0,
             sorted=1,
             op_version=11,
-            **kwargs_topk
+            **kwargs_topk,
         )
         if keep_distances:
             return (
@@ -148,7 +148,7 @@ def onnx_nearest_neighbors_indices_radius(
     keep_distances=False,
     optim=None,
     proto_dtype=None,
-    **kwargs
+    **kwargs,
 ):
     """
     Retrieves the nearest neigbours *ONNX*.
@@ -182,7 +182,7 @@ def onnx_nearest_neighbors_indices_radius(
             op_version=op_version,
             dim_in=dim_in,
             dim_out=dim_out,
-            **kwargs
+            **kwargs,
         )
     else:
         raise ValueError("Unknown optimisation '{}'.".format(optim))
@@ -257,8 +257,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
     single_reg = (
         not hasattr(op, "_y")
         or len(op._y.shape) == 1
-        or len(op._y.shape) == 2
-        and op._y.shape[1] == 1
+        or (len(op._y.shape) == 2 and op._y.shape[1] == 1)
     )
     ndim = 1 if single_reg else op._y.shape[1]
 
@@ -305,7 +304,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
             dtype=dtype,
             op_version=opv,
             optim=options.get("optim", None),
-            **distance_kwargs
+            **distance_kwargs,
         )
         top_distances = None
     elif radius is not None:
@@ -319,7 +318,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
             keep_distances=True,
             proto_dtype=proto_type,
             optim=options.get("optim", None),
-            **distance_kwargs
+            **distance_kwargs,
         )
         top_indices, top_distances, binary = three
     elif weights == "distance":
@@ -332,7 +331,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
             op_version=opv,
             keep_distances=True,
             optim=options.get("optim", None),
-            **distance_kwargs
+            **distance_kwargs,
         )
     else:
         raise RuntimeError(
@@ -775,7 +774,7 @@ def _nearest_neighbours(
             neg_dist,
             np.array([model.n_neighbors], dtype=np.int64),
             op_version=10,
-            **kwargs
+            **kwargs,
         )
     else:
         node = OnnxTopK_11(
@@ -784,7 +783,7 @@ def _nearest_neighbours(
             largest=0,
             sorted=1,
             op_version=11,
-            **kwargs
+            **kwargs,
         )
     return node[1], missing_input_name
 

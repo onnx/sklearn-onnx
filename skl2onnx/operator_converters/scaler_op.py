@@ -43,7 +43,7 @@ def convert_sklearn_scaler(
             # Identity
             container.add_node("Identity", feature_name, operator.outputs[0].full_name)
             return
-        if C is not None and C != model_C:
+        if C is not None and C != model_C:  # noqa: SIM300
             raise RuntimeError(
                 "Unable Mismatch between expected shape %r and model (., %r)"
                 " in operator %r." % (operator.outputs[0].type.shape, model_C, operator)
@@ -66,7 +66,7 @@ def convert_sklearn_scaler(
             # Identity
             container.add_node("Identity", feature_name, operator.outputs[0].full_name)
             return
-        if C is not None and C != model_C:
+        if C is not None and C != model_C:  # noqa: SIM300
             raise RuntimeError(
                 "Unable Mismatch between expected shape %r and model (., %r)"
                 " in operator %r." % (operator.outputs[0].type.shape, model_C, operator)
@@ -91,7 +91,7 @@ def convert_sklearn_scaler(
             # Identity
             container.add_node("Identity", feature_name, operator.outputs[0].full_name)
             return
-        if C is not None and C != model_C:
+        if C is not None and C != model_C:  # noqa: SIM300
             raise RuntimeError(
                 "Unable Mismatch between expected shape %r and model (., %r)"
                 " in operator %r." % (operator.outputs[0].type.shape, model_C, operator)

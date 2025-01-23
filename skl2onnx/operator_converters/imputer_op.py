@@ -17,18 +17,8 @@ def convert_sklearn_imputer(
     op_type = "Imputer"
     attrs = {"name": scope.get_unique_operator_name(op_type)}
     op = operator.raw_operator
-    if (
-        hasattr(op, "fill_value")
-        and isinstance(op.fill_value, str)
-        and op.fill_value.lower() != "nan"
-    ):
-        raise RuntimeError(
-            "Imputer cannot fill missing values with a " "string '%s'." % op.fill_value
-        )
     if not hasattr(op, "statistics_"):
-        raise RuntimeError(
-            "Member statistics_ is not present, was the " "model fitted?"
-        )
+        raise RuntimeError("Member statistics_ is not present, was the model fitted?")
 
     if isinstance(operator.inputs[0].type, StringTensorType):
         if not isinstance(op.missing_values, (str, np.str_)):
@@ -88,6 +78,14 @@ def convert_sklearn_imputer(
 
         apply_concat(scope, names, operator.outputs[0].full_name, container, axis=1)
     else:
+        if (
+            hasattr(op, "fill_value")
+            and isinstance(op.fill_value, str)
+            and op.fill_value.lower() != "nan"
+        ):
+            raise RuntimeError(
+                "Imputer cannot fill missing values with a string '%s'." % op.fill_value
+            )
         if isinstance(operator.inputs[0].type, Int64TensorType):
             attrs["imputed_value_int64s"] = op.statistics_.astype(np.int64)
             use_int = True
@@ -124,7 +122,7 @@ def convert_sklearn_imputer(
             concatenated_feature,
             operator.outputs[0].full_name,
             op_domain="ai.onnx.ml",
-            **attrs
+            **attrs,
         )
 
 

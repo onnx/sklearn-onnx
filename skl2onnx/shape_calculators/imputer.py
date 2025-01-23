@@ -35,7 +35,7 @@ def calculate_sklearn_imputer_output_shapes(operator):
     )
     output = operator.outputs[0]
     for variable in operator.inputs:
-        if not isinstance(variable.type, type(output.type)):  # noqa
+        if not isinstance(variable.type, type(output.type)):
             raise RuntimeError(
                 "Inputs and outputs should have the same type "
                 "%r != %r." % (type(variable.type), type(output.type))
