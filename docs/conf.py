@@ -14,7 +14,7 @@ from github_link import make_linkcode_resolve
 # -- Project information -----------------------------------------------------
 
 project = "sklearn-onnx"
-copyright = "2018-2023, Microsoft"
+copyright = "2018-2025, Microsoft"
 author = "Microsoft"
 version = skl2onnx.__version__
 release = version
@@ -82,8 +82,6 @@ intersphinx_mapping = {
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "seaborn": ("https://seaborn.pydata.org/", None),
     "scikit-learn": ("https://scikit-learn.org/stable/", None),
-    "sklearn": ("https://scikit-learn.org/stable/", None),
-    "skl2onnx": ("https://onnx.ai/sklearn-onnx/", None),
     "sklearn-onnx": ("https://onnx.ai/sklearn-onnx/", None),
 }
 
@@ -105,6 +103,7 @@ sphinx_gallery_conf = {
 epkg_dictionary = {
     "C": "https://en.wikipedia.org/wiki/C_(programming_language)",
     "C++": "https://en.wikipedia.org/wiki/C%2B%2B",
+    "CatBoost": "https://catboost.ai/",
     "cython": "https://cython.org/",
     "DOT": "https://www.graphviz.org/doc/info/lang.html",
     "ImageNet": "http://www.image-net.org/",
@@ -118,6 +117,7 @@ epkg_dictionary = {
     "ONNX operators": "https://onnx.ai/onnx/operators/",
     "ONNX ML operators": "https://onnx.ai/onnx/operators/",
     "ONNX ML Operators": "https://onnx.ai/onnx/operators/",
+    "ONNX Zoo": "https://github.com/onnx/models/",
     "onnxmltools": "https://github.com/onnx/onnxmltools",
     "onnxruntime": "https://microsoft.github.io/onnxruntime/",
     "openmp": "https://en.wikipedia.org/wiki/OpenMP",

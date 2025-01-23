@@ -55,7 +55,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             [("input", Int64TensorType([None, 3]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             data, model, model_onnx, basename="SklearnOrdinalEncoderInt64-SkipDim1"
         )
@@ -181,6 +181,120 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         dump_data_and_model(
             data, model, model_onnx, basename="SklearnOrdinalEncoderCatList"
         )
+
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
+    def test_model_ordinal_encoder_unknown_value(self):
+        from onnxruntime import InferenceSession
+
+        model = OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=42)
+        data = np.array([["a"], ["b"], ["c"], ["d"]], dtype=np.object_)
+        data_with_missing_value = np.array(
+            [["a"], ["b"], ["c"], ["d"], [np.nan], ["e"], [None]], dtype=np.object_
+        )
+
+        model.fit(data)
+        # 'np.nan','e' and 'None' become 42.
+        expected = model.transform(data_with_missing_value)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ordinal encoder",
+            [("input", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            data, model, model_onnx, basename="SklearnOrdinalEncoderUnknownValue"
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(
+            None,
+            {
+                "input": data_with_missing_value,
+            },
+        )
+
+        assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
+
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
+    def test_model_ordinal_encoder_encoded_missing_value(self):
+        from onnxruntime import InferenceSession
+
+        model = OrdinalEncoder(encoded_missing_value=42)
+        data = np.array([["a"], ["b"], [np.nan], ["c"], ["d"]], dtype=np.object_)
+
+        # 'np.nan' becomes 42
+        expected = model.fit_transform(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ordinal encoder",
+            [("input", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            data, model, model_onnx, basename="SklearnOrdinalEncoderEncodedMissingValue"
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(
+            None,
+            {
+                "input": data,
+            },
+        )
+
+        assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
+
+    @unittest.skipIf(
+        not ordinal_encoder_support(),
+        reason="OrdinalEncoder was not available before 0.20",
+    )
+    def test_model_ordinal_encoder_encoded_missing_value_no_nan(self):
+        from onnxruntime import InferenceSession
+
+        model = OrdinalEncoder(encoded_missing_value=42)
+        data = np.array([["a"], ["b"], ["c"], ["d"]], dtype=np.object_)
+
+        expected = model.fit_transform(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ordinal encoder",
+            [("input", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOrdinalEncoderEncodedMissingValueNoNan",
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(
+            None,
+            {
+                "input": data,
+            },
+        )
+
+        assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
     @unittest.skipIf(
         not set_output_support(),
