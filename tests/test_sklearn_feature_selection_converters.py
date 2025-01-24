@@ -51,6 +51,26 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
             X, model, model_onnx, basename="SklearnGenericUnivariateSelect"
         )
 
+    def test_generic_univariate_select_kbest_int(self):
+        model = GenericUnivariateSelect(mode="k_best", param=2)
+
+        X = np.array(
+            [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.int64
+        )
+        y = np.array([0, 1, 0, 1])
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "generic univariate select",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnGenericUnivariateSelect"
+        )
+
     def test_rfe_int(self):
         model = RFE(estimator=SVR(kernel="linear"))
         X = np.array(

@@ -9,7 +9,7 @@ def calculate_sklearn_select(operator):
     check_input_and_output_numbers(operator, output_count_range=1)
     i = operator.inputs[0]
     N = i.get_first_dimension()
-    C = operator.raw_operator._get_support_mask().sum()
+    C = operator.raw_operator.get_support().sum()
     operator.outputs[0].type = i.type.__class__([N, C])
 
 
