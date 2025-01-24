@@ -33,11 +33,13 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 class TestSklearnFeatureSelectionConverters(unittest.TestCase):
     def test_generic_univariate_select_int(self):
         model = GenericUnivariateSelect()
+
         X = np.array(
             [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.int64
         )
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
+
         model_onnx = convert_sklearn(
             model,
             "generic univariate select",
