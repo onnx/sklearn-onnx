@@ -1339,10 +1339,8 @@ class TestSklearnPipeline(unittest.TestCase):
     @unittest.skipIf(not check_scikit_version(), reason="Scikit 0.21 too old")
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_empty_make_column_selector(self):
-        X = pandas.DataFrame(
-            {"city": ["London", "London", "Paris", "Sallisaw"]}
-        )
- 
+        X = pandas.DataFrame({"city": ["London", "London", "Paris", "Sallisaw"]})
+
         ct = make_column_transformer(
             (StandardScaler(), make_column_selector(dtype_include=numpy.number)),
             (OneHotEncoder(), make_column_selector(dtype_include=object)),
