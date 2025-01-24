@@ -362,6 +362,11 @@ def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None)
         elif isinstance(column_indices, (int, str)):
             column_indices = [column_indices]
         names = get_column_indices(column_indices, inputs, multiple=True)
+
+        # Skip transforms which apply to no columns at all
+        if len(names) == 0:
+            continue
+
         transform_inputs = []
         for onnx_var, onnx_is in names.items():
             tr_inputs = _fetch_input_slice(scope, [inputs[onnx_var]], onnx_is)
