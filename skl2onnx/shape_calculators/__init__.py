@@ -10,6 +10,7 @@ from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
 from . import ensemble_shapes
+from . import feature_selection
 from . import feature_hasher
 from . import flatten
 from . import function_transformer
@@ -63,6 +64,7 @@ __all__ = [
     dict_vectorizer,
     ensemble_shapes,
     feature_hasher,
+    feature_selection,
     flatten,
     function_transformer,
     gaussian_process,
