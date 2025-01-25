@@ -40,6 +40,7 @@ from . import pipelines
 from . import polynomial_features
 from . import power_transformer
 from . import quadratic_discriminant_analysis
+from . import quantile_transformer
 from . import random_projection
 from . import random_trees_embedding
 from . import replace_op
@@ -93,6 +94,7 @@ __all__ = [
     polynomial_features,
     power_transformer,
     quadratic_discriminant_analysis,
+    quantile_transformer,
     random_projection,
     random_trees_embedding,
     replace_op,
