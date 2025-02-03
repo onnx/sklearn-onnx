@@ -39,6 +39,11 @@ def convert_quantile_transformer(scope: Scope,
     op_out = operator.outputs[0].full_name
     opv = container.target_opset
 
+    if op.output_distribution != 'uniform':
+         raise RuntimeError(
+             "Conversion of QuantileTransformer with output_distribution=%r "
+             "is not supported." % op.output_distribution)
+
     dtype = guess_numpy_type(op_in.type)
     if dtype != np.float64:
         dtype = np.float32
