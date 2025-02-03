@@ -1621,6 +1621,28 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             model.predict(vx1.astype(np.float64)).ravel(), pred[0].ravel()
         )
 
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
+    def test_white_kernel_return_std(self):
+        X = np.array([[1], [3], [5], [6], [7], [8], [10], [12], [14], [15]])
+        y = np.array([3, 2, 7, 8, 7, 6, 9, 11, 10, 12])
+        kernel = WhiteKernel()
+        gpr = GaussianProcessRegressor(
+            kernel=kernel, n_restarts_optimizer=10, alpha=1e-2
+        )
+        gpr.fit(X, y)
+        initial_type = [("X", FloatTensorType([None, 1]))]
+        onnx_model = to_onnx(
+            gpr,
+            initial_types=initial_type,
+            options={GaussianProcessRegressor: {"return_std": True}},
+        )
+        self.check_outputs(
+            gpr,
+            onnx_model,
+            X.astype(np.float32),
+            predict_attributes={"return_std": True},
+        )
+
 
 if __name__ == "__main__":
     # import logging
