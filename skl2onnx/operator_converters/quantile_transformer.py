@@ -17,7 +17,6 @@ def _next_power_of_two(n):
 
 def _pad_quantiles(quantiles, target_size, n_quantiles, mode='min'):
     pad_before = target_size - n_quantiles + 1
-    pad_after = 0
     if mode == 'min':
         pad_values = np.repeat(quantiles[0:1, :], pad_before, axis=0)
     else:
@@ -26,7 +25,6 @@ def _pad_quantiles(quantiles, target_size, n_quantiles, mode='min'):
 
 def _pad_references(references, target_size, n_quantiles, mode='min'):
     pad_before = target_size - n_quantiles + 1
-    pad_after = 0
     if mode == 'min':
         pad_values = np.repeat([references[0]], pad_before)
     else:
@@ -174,14 +172,14 @@ def convert_quantile_transformer(scope: Scope,
     # Reshape to original shape
     output_shape = OnnxShape(X_clean, op_version=opv)
     final = OnnxReshape(final_interp, output_shape, op_version=opv, output_names=[op_out])
-    min_quantiles = quantiles[0, :]  # Минимальные значения квантилей
-    max_quantiles = quantiles[-1, :]  # Максимальные значения квантилей
+    min_quantiles = quantiles[0, :]  # Minimum values of quantiles
+    max_quantiles = quantiles[-1, :]  # Maximum values of quantiles
 
-    # Сравнение с минимальными и максимальными значениями
+    # Comparison with minimum and maximum values
     min_mask = OnnxFlatten(OnnxEqual(X_clean, min_quantiles, op_version=opv), axis=0, op_version=opv)
     max_mask = OnnxFlatten(OnnxEqual(X_clean, max_quantiles, op_version=opv), axis=0, op_version=opv)
 
-    # Установка 0 для минимальных значений и 1 для максимальных
+    # Set 0 for minimum values and 1 for maximum values
     final = OnnxWhere(
         max_mask,
         np.array(1.0, dtype=dtype),
