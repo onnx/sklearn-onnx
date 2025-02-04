@@ -1123,6 +1123,22 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNeighborsClassifierMReg3-Out0",
         )
 
+    @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @ignore_warnings(category=DeprecationWarning)
+    def test_sklearn_knn_imputer_issue_2025(self):
+        data = numpy.random.randn(7, 2)
+        for i in range(5):
+            data[i, i % 2] = numpy.nan
+        imputer = KNNImputer(n_neighbors=1, metric="nan_euclidean")
+        imputer.fit(data)
+        initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
+        onnx_model = convert_sklearn(imputer, initial_types=initial_type)
+        input_data = data.astype(numpy.float32)
+        dump_data_and_model(
+            input_data, imputer, onnx_model, basename="SklearnKNNImputer2025"
+        )
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
