@@ -2,10 +2,14 @@
 
 ## 1.19.0
 
-In progress.
-
-## 1.18.1
-
+* Fixes missing WhiteKernel with return_std=True #1163
+  [#1163](https://github.com/onnx/sklearn-onnx/issues/1163)
+* Fix empty column selector
+  [#1159](https://github.com/onnx/sklearn-onnx/issues/1159)
+* Fix conversion for XGBClassifier and XGBRegressor
+  [#1157](https://github.com/onnx/sklearn-onnx/issues/1157)
+* Test SelectKBest + StandardScaler pipeline
+  [#1156](https://github.com/onnx/sklearn-onnx/issues/1156)
 * Fix np.NAN into np.nan,
   [#1148](https://github.com/onnx/sklearn-onnx/issues/1148)
 
