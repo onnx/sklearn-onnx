@@ -78,6 +78,7 @@ if onnx_opset_version() >= 18:
             Normalizer,
             OneHotEncoder,
             Scaler,
+            TargetEncoder,
         )
         from .reference_implementation_afe import ArrayFeatureExtractor
         from .reference_implementation_svm import SVMClassifier, SVMRegressor
@@ -292,6 +293,7 @@ if onnx_opset_version() >= 18:
                 LinearRegressor,
                 Normalizer,
                 OneHotEncoder,
+                TargetEncoder,
                 TfIdfVectorizer,
                 Scaler,
                 Scan,
