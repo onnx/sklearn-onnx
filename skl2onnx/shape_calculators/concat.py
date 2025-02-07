@@ -93,13 +93,3 @@ def calculate_sklearn_concat(operator):
 
 
 register_shape_calculator("SklearnConcat", calculate_sklearn_concat)
-register_shape_calculator("SklearnGenericUnivariateSelect", calculate_sklearn_concat)
-register_shape_calculator("SklearnRFE", calculate_sklearn_concat)
-register_shape_calculator("SklearnRFECV", calculate_sklearn_concat)
-register_shape_calculator("SklearnSelectFdr", calculate_sklearn_concat)
-register_shape_calculator("SklearnSelectFpr", calculate_sklearn_concat)
-register_shape_calculator("SklearnSelectFromModel", calculate_sklearn_concat)
-register_shape_calculator("SklearnSelectFwe", calculate_sklearn_concat)
-register_shape_calculator("SklearnSelectKBest", calculate_sklearn_concat)
-register_shape_calculator("SklearnSelectPercentile", calculate_sklearn_concat)
-register_shape_calculator("SklearnVarianceThreshold", calculate_sklearn_concat)

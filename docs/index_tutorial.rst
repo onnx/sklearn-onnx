@@ -25,7 +25,11 @@ The tutorial was tested with following version:
 .. runpython::
     :showcode:
 
-    import catboost
+    try:
+        import catboost
+    except Exception as e:
+        print("Unable to import catboost due to", e)
+        catboost = None
     import numpy
     import scipy
     import sklearn
@@ -39,7 +43,7 @@ The tutorial was tested with following version:
     mods = [numpy, scipy, sklearn, lightgbm, xgboost, catboost,
             onnx, onnxmltools, onnxruntime,
             skl2onnx]
-    mods = [(m.__name__, m.__version__) for m in mods]
+    mods = [(m.__name__, m.__version__) for m in mods if m is not None]
     mx = max(len(_[0]) for _ in mods) + 1
     for name, vers in sorted(mods):
         print("%s%s%s" % (name, " " * (mx - len(name)), vers))
