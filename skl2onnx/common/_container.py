@@ -11,7 +11,13 @@ import numpy as np
 from scipy.sparse import coo_matrix
 from onnx import SparseTensorProto, ValueInfoProto
 from onnx.defs import onnx_opset_version, get_all_schemas_with_history
-from onnx.helper import make_node, make_tensor, make_attribute, make_sparse_tensor
+from onnx.helper import (
+    make_node,
+    make_tensor,
+    make_attribute,
+    make_sparse_tensor,
+    make_tensor_value_info,
+)
 import onnx.onnx_cpp2py_export.defs as C
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
@@ -223,6 +229,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
         white_op=None,
         black_op=None,
         verbose=0,
+        as_function=False,
     ):
         """
         :param target_opset: number, for example, 7 for *ONNX 1.2*, and
@@ -234,6 +241,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
         :param black_op: black list of ONNX nodes allowed
             while converting a pipeline, if empty, none are blacklisted
         :param verbose: display information while converting
+        :param as_function: to export as a local function
         """
         _WhiteBlackContainer.__init__(
             self, white_op=white_op, black_op=black_op, verbose=verbose
@@ -252,6 +260,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
         # ONNX nodes (type: NodeProto) used to define computation
         # structure
         self.nodes = []
+        self.as_function = as_function
         # ONNX operators' domain-version pair set. They will be added
         # into opset_import field in the final ONNX model.
         self.node_domain_version_pair_sets = set()
@@ -267,10 +276,14 @@ class ModelComponentContainer(_WhiteBlackContainer):
         self.options = options
         # All registered models.
         self.registered_models = registered_models
+        self.local_functions = {}
 
     @property
     def main_opset(self):
         return self.target_opset
+
+    def make_local_function(self, domain: str, name: str, container, optimize=False):
+        self.local_functions[domain, name] = container
 
     def swap_names(self, old_name, new_name):
         """
@@ -393,6 +406,12 @@ class ModelComponentContainer(_WhiteBlackContainer):
         :param variable: The Variable object to be added
         """
         self.inputs.append(self._make_value_info(variable))
+
+    def make_tensor_input(self, name):
+        self.inputs.append(make_tensor_value_info(name, 0, None))
+
+    def make_tensor_output(self, name):
+        self.outputs.append(make_tensor_value_info(name, 0, None))
 
     def add_output(self, variable):
         """
@@ -626,6 +645,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
                       attributes' names and attributes' values,
                       respectively.
         """
+        assert op_type != "knn_imputer_column" or op_domain
         if "axes" in attrs and (
             attrs["axes"] is None or not isinstance(attrs["axes"], (list, np.ndarray))
         ):
@@ -768,7 +788,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
         key = domain, op_type
         vers = self._op_versions.get(key, None)
         if vers is None:
-            if domain == "com.microsoft":
+            if domain in ("com.microsoft", "local_domain"):
                 # avoid a not necessarily necessary warning
                 vers = 1
             else:

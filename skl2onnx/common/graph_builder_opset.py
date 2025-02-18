@@ -191,7 +191,7 @@ class Opset:
             op_type,
             new_inputs,
             outputs,
-            domain=domain,
+            op_domain=domain,
             name=name or f"{self.__class__.__name__}",
             **kwargs,
         )
