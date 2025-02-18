@@ -323,7 +323,7 @@ if onnx_opset_version() >= 18:
         def __init__(self, *args, new_ops=None, **kwargs):
             # filter out new_ops
             onx = args[0]
-            if isinstance(onx, onnx.ModelProto):
+            if isinstance(onx, (onnx.ModelProto, onnx.FunctionProto)):
                 model = onx
             elif isinstance(onx, bytes):
                 model = onnx.load(io.BytesIO(onx))

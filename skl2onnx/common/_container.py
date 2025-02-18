@@ -409,9 +409,11 @@ class ModelComponentContainer(_WhiteBlackContainer):
 
     def make_tensor_input(self, name):
         self.inputs.append(make_tensor_value_info(name, 0, None))
+        return name
 
     def make_tensor_output(self, name):
         self.outputs.append(make_tensor_value_info(name, 0, None))
+        return name
 
     def add_output(self, variable):
         """

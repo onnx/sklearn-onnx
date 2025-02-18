@@ -1477,6 +1477,7 @@ def make_model_from_container(
     onnx_target_opset=None,
     model_name="",
     as_function=False,
+    domain_name="",
 ):
     container.ensure_topological_order()
 
@@ -1533,16 +1534,18 @@ def make_model_from_container(
         # extra_inputs.
         if as_function:
             graph = make_function(
+                domain_name,
+                model_name,
+                [i.name for i in container.inputs],
+                [i.name for i in container.outputs],
                 [
                     *[
                         make_node("Constant", [], [init.name], value=init)
-                        for init in container.initializer
+                        for init in container.initializers
                     ],
-                    container.nodes,
+                    *container.nodes,
                 ],
-                container.name,
-                [i.name for i in container.inputs],
-                [i.name for i in container.outputs],
+                [],  # opsets
             )
         else:
             graph = make_graph(
@@ -1595,9 +1598,15 @@ def make_model_from_container(
     for key, cont in container.local_functions.items():
         domain, name = key
         proto = make_model_from_container(
-            cont, remove_identity=remove_identity, verbose=verbose, as_function=True
+            cont,
+            remove_identity=remove_identity,
+            verbose=verbose,
+            as_function=True,
+            model_name=name,
+            domain_name=domain,
+            onnx_target_opset=container.target_opset_onnx,
         )
-        onnx_model.function.append(proto)
+        onnx_model.functions.append(proto)
 
     return onnx_model
 

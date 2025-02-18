@@ -943,8 +943,18 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 target_opset=opset,
             )
             self.assertIsNotNone(model_onnx)
+            # from onnx.reference import ExtendedReferenceEvaluator
+
+            # ExtendedReferenceEvaluator(model_onnx, verbose=10).run(
+            #     None, {"input": x_test}
+            # )
+            print(model.transform(x_test))
             dump_data_and_model(
-                x_test, model, model_onnx, basename="SklearnKNNImputer%d" % opset
+                x_test,
+                model,
+                model_onnx,
+                basename="SklearnKNNImputer%d" % opset,
+                backend="onnxruntime",
             )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
