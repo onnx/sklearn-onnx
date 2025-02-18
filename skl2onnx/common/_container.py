@@ -16,6 +16,7 @@ import onnx.onnx_cpp2py_export.defs as C
 from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
 from .utils import get_domain
+from .graph_builder_opset import Opset
 
 
 logger = getLogger("skl2onnx")
@@ -266,6 +267,10 @@ class ModelComponentContainer(_WhiteBlackContainer):
         self.options = options
         # All registered models.
         self.registered_models = registered_models
+
+    @property
+    def main_opset(self):
+        return self.target_opset
 
     def swap_names(self, old_name, new_name):
         """
@@ -732,7 +737,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
     def target_opset_any_domain(self, domain):
         target_opset = self.target_opset_all
         if isinstance(target_opset, dict):
-            if domain in target_opset:  # noqa: SIM401
+            if domain in target_opset:
                 to = target_opset[domain]
             else:
                 to = None
@@ -1030,3 +1035,6 @@ class ModelComponentContainer(_WhiteBlackContainer):
         )
         map_nodes = {str(id(node)): node for node in self.nodes}
         self.nodes = [map_nodes[_[-1]] for _ in topo]
+
+    def get_op_builder(self, scope):
+        return Opset(self, scope)

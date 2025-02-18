@@ -597,7 +597,7 @@ def _get_sklearn_operator_name(model_type):
     :return: A string which stands for the type of the input model in
              our conversion framework
     """
-    if model_type not in sklearn_operator_name_map:  # noqa: SIM401
+    if model_type not in sklearn_operator_name_map:
         # No proper operator name found, it means a local operator.
         alias = None
     else:

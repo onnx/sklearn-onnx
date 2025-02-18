@@ -1127,10 +1127,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_issue_2025(self):
-        data = numpy.random.randn(7, 2)
+        data = numpy.arange(14).reshape((-1, 2)).astype(float)
         for i in range(5):
             data[i, i % 2] = numpy.nan
-        imputer = KNNImputer(n_neighbors=1, metric="nan_euclidean")
+        imputer = KNNImputer(n_neighbors=3, metric="nan_euclidean")
         imputer.fit(data)
         initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
         onnx_model = convert_sklearn(imputer, initial_types=initial_type)
