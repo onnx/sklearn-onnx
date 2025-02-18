@@ -792,7 +792,7 @@ def make_dict_idx_map_default(g: ModelComponentContainer, scope: Scope):
     gr = ModelComponentContainer({"": g.main_opset}, as_function=True)
     x = gr.make_tensor_input("x")
     row_missing_idx = gr.make_tensor_input("row_missing_idx")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     init7_s_0 = op.Constant(value=from_array(np.array(0, dtype=np.int64), name="value"))
     init7_s_4 = op.Constant(value=from_array(np.array(4, dtype=np.int64), name="value"))
     init7_s_1 = op.Constant(value=from_array(np.array(1, dtype=np.int64), name="value"))
@@ -804,8 +804,8 @@ def make_dict_idx_map_default(g: ModelComponentContainer, scope: Scope):
         _shape_x0, value=from_array(np.array([0], dtype=np.int64), name="value")
     )
     arange = op.Range(init7_s_0, init7_s_4, init7_s_1)
-    _onx_unsqueeze_row_missing_idx0 = op.UnsqueezeAnyOpset(row_missing_idx, init7_s1__1)
-    output_0 = op.ScatterND(zeros, _onx_unsqueeze_row_missing_idx0, arange)
+    unsqueeze_row_missing_idx0 = op.UnsqueezeAnyOpset(row_missing_idx, init7_s1__1)
+    output_0 = op.ScatterND(zeros, unsqueeze_row_missing_idx0, arange)
     gr.make_tensor_output(output_0)
     g.make_local_function(
         container=gr, optimize=False, name="dict_idx_map_default", domain="local_domain"
@@ -817,7 +817,7 @@ def make_local_domain_dist_nan_euclidean(g: ModelComponentContainer, scope: Scop
     gr = ModelComponentContainer({"": g.main_opset}, as_function=True)
     x = gr.make_tensor_input("x")
     y = gr.make_tensor_input("y")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     c_lifted_tensor_0 = op.Constant(
         value=from_array(np.array(0.0, dtype=np.float32), name="value")
     )
@@ -861,8 +861,8 @@ def make_local_domain_dist_nan_euclidean(g: ModelComponentContainer, scope: Scop
     mul_11 = op.Mul(index_put_1, index_put_1)
     matmul_2 = op.Gemm(_to_copy_2, mul_11, transA=0, transB=1)
     _reshape_init1_s_0 = op.Reshape(init1_s_, init7_s1_1)
-    _onx_mul_index_put0 = op.Mul(index_put, _reshape_init1_s_0)
-    matmul = op.Gemm(_onx_mul_index_put0, index_put_1, transA=0, transB=1)
+    mul_index_put0 = op.Mul(index_put, _reshape_init1_s_0)
+    matmul = op.Gemm(mul_index_put0, index_put_1, transA=0, transB=1)
     sum_1 = op.ReduceSumAnyOpset(mul_10, init7_s1_1, keepdims=1)
     add_26 = op.Add(matmul, sum_1)
     sum_2 = op.ReduceSumAnyOpset(mul_11, init7_s1_1, keepdims=1)
@@ -884,8 +884,8 @@ def make_local_domain_dist_nan_euclidean(g: ModelComponentContainer, scope: Scop
     maximum = op.Max(c_lifted_tensor_3, matmul_3)
     div = op.Div(index_put_2, maximum)
     _reshape_init1_s_40 = op.Reshape(init1_s_4, init7_s1_1)
-    _onx_mul_div0 = op.Mul(div, _reshape_init1_s_40)
-    output_0 = op.Sqrt(_onx_mul_div0)
+    mul_div0 = op.Mul(div, _reshape_init1_s_40)
+    output_0 = op.Sqrt(mul_div0)
     gr.make_tensor_output(output_0)
     g.make_local_function(
         container=gr, optimize=False, name="dist_nan_euclidean", domain="local_domain"
@@ -897,7 +897,7 @@ def make_calc_impute__donors_idx_default(g: ModelComponentContainer, scope: Scop
     gr = ModelComponentContainer({"": g.main_opset}, as_function=True)
     dist_pot_donors = gr.make_tensor_input("dist_pot_donors")
     n_neighbors = gr.make_tensor_input("n_neighbors")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     init7_s_0 = op.Constant(value=from_array(np.array(0, dtype=np.int64), name="value"))
     init7_s1_1 = op.Constant(
         value=from_array(np.array([1], dtype=np.int64), name="value")
@@ -910,10 +910,8 @@ def make_calc_impute__donors_idx_default(g: ModelComponentContainer, scope: Scop
     )
     arange = op.Range(init7_s_0, sym_size_int_4, init7_s_1)
     unsqueeze = op.UnsqueezeAnyOpset(arange, init7_s1_1)
-    _onx_gathernd_dist_pot_donors0 = op.GatherND(
-        dist_pot_donors, unsqueeze, batch_dims=0
-    )
-    output_1 = op.GatherElements(_onx_gathernd_dist_pot_donors0, output_0, axis=1)
+    gathernd_dist_pot_donors0 = op.GatherND(dist_pot_donors, unsqueeze, batch_dims=0)
+    output_1 = op.GatherElements(gathernd_dist_pot_donors0, output_0, axis=1)
     gr.make_tensor_output(output_0)
     gr.make_tensor_output(output_1)
     g.make_local_function(
@@ -928,7 +926,7 @@ def make_calc_impute__donors_idx_default(g: ModelComponentContainer, scope: Scop
 def make_calc_impute__weights_default(g: ModelComponentContainer, scope: Scope):
     gr = ModelComponentContainer({"": g.main_opset}, as_function=True)
     donors_dist = gr.make_tensor_input("donors_dist")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     c_lifted_tensor_0 = op.Constant(
         value=from_array(np.array(0.0, dtype=np.float32), name="value")
     )
@@ -953,7 +951,7 @@ def make_calc_impute__make_new_neights_default(
     donors_mask = gr.make_tensor_input("donors_mask")
     _donors = gr.make_tensor_input("donors")
     weight_matrix = gr.make_tensor_input("weight_matrix")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     _to_copy = op.Cast(donors_mask, to=11)
     _to_copy_1 = op.Cast(weight_matrix, to=11)
     output_0 = op.Mul(_to_copy, _to_copy_1)
@@ -975,7 +973,7 @@ def make_calc_impute_default(g: ModelComponentContainer, scope: Scope):
     n_neighbors = gr.make_tensor_input("n_neighbors")
     fit_x_col = gr.make_tensor_input("fit_x_col")
     mask_fit_x_col = gr.make_tensor_input("mask_fit_x_col")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     c_lifted_tensor_0 = op.Constant(
         value=from_array(np.array([1], dtype=np.int64), name="value")
     )
@@ -1027,8 +1025,8 @@ def make_calc_impute_default(g: ModelComponentContainer, scope: Scope):
     mul_17 = op.Mul(take, c_torch_knnimputer_columns_0___calc_impute__make_new_neights)
     sum_2 = op.ReduceSumAnyOpset(mul_17, c_lifted_tensor_0, keepdims=1)
     div = op.Div(sum_2, where)
-    _onx_squeeze_div0 = op.SqueezeAnyOpset(div, c_lifted_tensor_0)
-    output_0 = op.Cast(_onx_squeeze_div0, to=1)
+    squeeze_div0 = op.SqueezeAnyOpset(div, c_lifted_tensor_0)
+    output_0 = op.Cast(squeeze_div0, to=1)
     gr.make_tensor_output(output_0)
     g.make_local_function(
         container=gr, optimize=False, name="calc_impute", domain="local_domain"
@@ -1049,7 +1047,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope):
     mask = gr.make_tensor_input("mask")
     row_missing_idx = gr.make_tensor_input("row_missing_idx")
     _fit_x = gr.make_tensor_input("_fit_x")
-    op = g.get_op_builder(scope)
+    op = gr.get_op_builder(scope)
     c_lifted_tensor_0 = op.Constant(
         value=from_array(np.array([1.0], dtype=np.float32), name="value")
     )
@@ -1076,23 +1074,23 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope):
     select = op.Gather(mask, index_column, axis=1)
     index = op.Gather(select, row_missing_idx, axis=0)
     select_1 = op.Gather(non_missing_fix_x, index_column, axis=1)
-    _onx_nonzero_select_10 = op.NonZero(select_1)
-    nonzero_numpy__0 = op.Reshape(_onx_nonzero_select_10, init7_s1__1)
+    nonzero_select_10 = op.NonZero(select_1)
+    nonzero_numpy__0 = op.Reshape(nonzero_select_10, init7_s1__1)
     _shape_getitem_20 = op.Shape(nonzero_numpy__0, end=1, start=0)
     sym_size_int_20 = op.SqueezeAnyOpset(_shape_getitem_20)
     view = op.Reshape(index, init7_s1__1)
-    _onx_nonzero_view0 = op.NonZero(view)
-    nonzero_numpy_1__0 = op.Reshape(_onx_nonzero_view0, init7_s1__1)
+    nonzero_view0 = op.NonZero(view)
+    nonzero_numpy_1__0 = op.Reshape(nonzero_view0, init7_s1__1)
     index_1 = op.Gather(row_missing_idx, nonzero_numpy_1__0, axis=0)
     index_2 = op.Gather(dist_idx_map, index_1, axis=0)
     index_3 = op.Gather(dist_chunk, index_2, axis=0)
-    _onx_gather_index_30 = op.Gather(index_3, nonzero_numpy__0, axis=1)
-    isnan = op.IsNaN(_onx_gather_index_30)
-    _onx_cast_isnan0 = op.Cast(isnan, to=6)
-    _onx_reducemin_cast_isnan00 = op.ReduceMinAnyOpset(
-        _onx_cast_isnan0, c_lifted_tensor_2, keepdims=0
+    gather_index_30 = op.Gather(index_3, nonzero_numpy__0, axis=1)
+    isnan = op.IsNaN(gather_index_30)
+    cast_isnan0 = op.Cast(isnan, to=6)
+    reducemin_cast_isnan00 = op.ReduceMinAnyOpset(
+        cast_isnan0, c_lifted_tensor_2, keepdims=0
     )
-    all_1 = op.Cast(_onx_reducemin_cast_isnan00, to=9)
+    all_1 = op.Cast(reducemin_cast_isnan00, to=9)
     index_5 = op.Compress(index_1, all_1, axis=0)
     select_2 = op.Gather(mask_fit_x, index_column, axis=1)
     bitwise_not = op.Not(select_2)
@@ -1111,19 +1109,19 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope):
     div = op.Div(_reshape__to_copy_20, where)
     select_4 = op.Gather(x, index_column, axis=1)
     view_1 = op.SqueezeAnyOpset(div, init7_s1_0)
-    _onx_unsqueeze_index_50 = op.UnsqueezeAnyOpset(index_5, init7_s1__1)
+    unsqueeze_index_50 = op.UnsqueezeAnyOpset(index_5, init7_s1__1)
     _shape_index_502 = op.Shape(index_5)
-    _onx_expand_view_10 = op.Expand(view_1, _shape_index_502)
-    index_put = op.ScatterND(select_4, _onx_unsqueeze_index_50, _onx_expand_view_10)
-    _onx_unsqueeze_index_put0 = op.UnsqueezeAnyOpset(index_put, init7_s_1)
-    _shape_unsqueeze_index_put00 = op.Shape(_onx_unsqueeze_index_put0)
-    _onx_expand_c_lifted_tensor_20 = op.Expand(
+    expand_view_10 = op.Expand(view_1, _shape_index_502)
+    index_put = op.ScatterND(select_4, unsqueeze_index_50, expand_view_10)
+    unsqueeze_index_put0 = op.UnsqueezeAnyOpset(index_put, init7_s_1)
+    _shape_unsqueeze_index_put00 = op.Shape(unsqueeze_index_put0)
+    expand_c_lifted_tensor_20 = op.Expand(
         c_lifted_tensor_2, _shape_unsqueeze_index_put00
     )
     select_scatter = op.ScatterElements(
         x,
-        _onx_expand_c_lifted_tensor_20,
-        _onx_unsqueeze_index_put0,
+        expand_c_lifted_tensor_20,
+        unsqueeze_index_put0,
         axis=1,
         reduction="none",
     )
@@ -1131,7 +1129,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope):
     index_7 = op.Compress(index_1, bitwise_not_1, axis=0)
     index_8 = op.Gather(dist_idx_map, index_7, axis=0)
     index_9 = op.Gather(dist_chunk, index_8, axis=0)
-    _onx_gather_index_90 = op.Gather(index_9, nonzero_numpy__0, axis=1)
+    gather_index_90 = op.Gather(index_9, nonzero_numpy__0, axis=1)
     lt = op.Less(c_lifted_tensor_1, sym_size_int_20)
     where_1 = op.Where(lt, c_lifted_tensor_1, sym_size_int_20)
     le_3 = op.LessOrEqual(where_1, init7_s_0)
@@ -1140,23 +1138,21 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope):
     index_11 = op.Gather(select_6, nonzero_numpy__0, axis=0)
     select_7 = op.Gather(mask_fit_x, index_column, axis=1)
     index_12 = op.Gather(select_7, nonzero_numpy__0, axis=0)
-    c_torch_knnimputer_columns_1___calc_impute = op.calc_impute_default(
-        _onx_gather_index_90, where_2, index_11, index_12, domain="local_domain"
+    calc_impute = op.calc_impute_default(
+        gather_index_90, where_2, index_11, index_12, domain="local_domain"
     )
     select_9 = op.Gather(select_scatter, index_column, axis=1)
-    _onx_unsqueeze_index_70 = op.UnsqueezeAnyOpset(index_7, init7_s1__1)
-    index_put_1 = op.ScatterND(
-        select_9, _onx_unsqueeze_index_70, c_torch_knnimputer_columns_1___calc_impute
-    )
-    _onx_unsqueeze_index_put_10 = op.UnsqueezeAnyOpset(index_put_1, init7_s_1)
-    _shape_unsqueeze_index_put_100 = op.Shape(_onx_unsqueeze_index_put_10)
-    _onx_expand_c_lifted_tensor_202 = op.Expand(
+    unsqueeze_index_70 = op.UnsqueezeAnyOpset(index_7, init7_s1__1)
+    index_put_1 = op.ScatterND(select_9, unsqueeze_index_70, calc_impute)
+    unsqueeze_index_put_10 = op.UnsqueezeAnyOpset(index_put_1, init7_s_1)
+    _shape_unsqueeze_index_put_100 = op.Shape(unsqueeze_index_put_10)
+    expand_c_lifted_tensor_202 = op.Expand(
         c_lifted_tensor_2, _shape_unsqueeze_index_put_100
     )
     output_0 = op.ScatterElements(
         select_scatter,
-        _onx_expand_c_lifted_tensor_202,
-        _onx_unsqueeze_index_put_10,
+        expand_c_lifted_tensor_202,
+        unsqueeze_index_put_10,
         axis=1,
         reduction="none",
     )
@@ -1178,15 +1174,13 @@ def _knn_imputer_builder(
     init7_s1_1 = np.array([1], dtype=np.int64)
     init7_s1__1 = np.array([-1], dtype=np.int64)
     isnan = op.IsNaN(x)
-    _onx_compress_isnan0 = op.Compress(isnan, _valid_mask, axis=1)
-    _onx_cast_index0 = op.Cast(_onx_compress_isnan0, to=6)
-    _onx_reducemax_cast_index00 = op.ReduceMaxAnyOpset(
-        _onx_cast_index0, init7_s1_1, keepdims=0
-    )
-    any_1 = op.Cast(_onx_reducemax_cast_index00, to=9)
+    compress_isnan0 = op.Compress(isnan, _valid_mask, axis=1)
+    cast_index0 = op.Cast(compress_isnan0, to=6)
+    reducemax_cast_index00 = op.ReduceMaxAnyOpset(cast_index0, init7_s1_1, keepdims=0)
+    any_1 = op.Cast(reducemax_cast_index00, to=9)
     view = op.Reshape(any_1, init7_s1__1)
-    _onx_nonzero_view0 = op.NonZero(view)
-    nonzero_numpy__0 = op.Reshape(_onx_nonzero_view0, init7_s1__1)
+    nonzero_view0 = op.NonZero(view)
+    nonzero_numpy__0 = op.Reshape(nonzero_view0, init7_s1__1)
     logical_not = op.Not(_mask_fit_x)
     c_torch_knnimputer__make_dict_idx_map = op.dict_idx_map_default(
         x, nonzero_numpy__0, domain="local_domain"
@@ -1248,13 +1242,13 @@ def convert_knn_imputer(
         training_data,
         operator.inputs[0].full_name,
     )
-    make_dict_idx_map_default(container, scope)
-    make_local_domain_dist_nan_euclidean(container, scope)
-    make_calc_impute__donors_idx_default(container, scope)
-    make_calc_impute__weights_default(container, scope)
-    make_calc_impute__make_new_neights_default(container, scope)
-    make_calc_impute_default(container, scope)
-    make_knn_imputer_column(container, scope)
+    make_dict_idx_map_default(container, Scope("LF1"))
+    make_local_domain_dist_nan_euclidean(container, Scope("LF2"))
+    make_calc_impute__donors_idx_default(container, Scope("LF3"))
+    make_calc_impute__weights_default(container, Scope("LF4"))
+    make_calc_impute__make_new_neights_default(container, Scope("LF5"))
+    make_calc_impute_default(container, Scope("LF6"))
+    make_knn_imputer_column(container, Scope("LF7"))
     container.add_node("Identity", [result], [operator.outputs[0].full_name])
 
 

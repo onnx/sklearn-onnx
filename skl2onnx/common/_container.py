@@ -675,6 +675,12 @@ class ModelComponentContainer(_WhiteBlackContainer):
             ",".join(outputs),
             name,
         )
+        if not hasattr(self, "_added_names_"):
+            self._added_names_ = set()
+        assert all(
+            n not in self._added_names_ for n in outputs
+        ), f"One output node in {outputs} was already added, added={self._added_names_}"
+        self._added_names_ |= set(outputs)
         try:
             common = set(inputs) & set(outputs)
         except TypeError as e:
@@ -900,6 +906,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
         n_iter = 0
         missing_ops = []
         cont = True
+        parent = {}
         while cont and n_iter < len(self.nodes) * 2:
             n_iter += 1
             missing_names = set()
@@ -925,11 +932,16 @@ class ModelComponentContainer(_WhiteBlackContainer):
                 order[key] = maxi
                 maxi += 1
                 for name in node.output:
+                    if name not in parent:
+                        parent[name] = []
+                    parent[name].append(node)
                     if name in order:
                         raise RuntimeError(
-                            "Unable to sort a node (cycle). An output was "
-                            "already ordered with name %r (iteration=%r)."
-                            "" % (name, n_iter)
+                            f"Unable to sort a node (cycle). An output was "
+                            f"already ordered with name {name!r} (iteration={n_iter})\n"
+                            f"--\n{[f'{id(n)}-{n.op_type}' for n in parent[name]]}\n"
+                            f"--\n{[n.op_type for n in self.nodes]}\n"
+                            f"--\n{pprint.pformat(order)}"
                         )
                     order[name] = maxi
             if len(missing_names) == 0:

@@ -134,14 +134,19 @@ class Opset:
         if outputs is None:
             num_outputs = self._implemented[op_type]
             outputs = [
-                self.scope.get_unique_variable_name(f"_onx_{op_type.lower()}")
+                self.scope.get_unique_variable_name(f"_un_{op_type.lower()}")
                 for _ in range(num_outputs)
             ]
         elif isinstance(outputs, int):
             outputs = [
-                self.scope.get_unique_variable_name(f"_onx_{op_type.lower()}")
+                self.scope.get_unique_variable_name(f"_un_{op_type.lower()}")
                 for _ in range(outputs)
             ]
+        else:
+            assert all(
+                not self.scope.has_variable_name(n) for n in outputs
+            ), f"Duplicated names {outputs!r}"
+
         if inputs is None:
             inputs = []
         assert (
@@ -184,7 +189,6 @@ class Opset:
                     f"inputs={inputs!r}, op_type={op_type!r}"
                 )
 
-        assert None not in new_inputs
         if self.allow_unknown and not self.container.get_opset(domain):
             self.container.add_domain(domain)
         self.container.add_node(
