@@ -292,7 +292,6 @@ if onnx_opset_version() >= 18:
                 LinearRegressor,
                 Normalizer,
                 OneHotEncoder,
-                TargetEncoder,
                 TfIdfVectorizer,
                 Scaler,
                 Scan,
