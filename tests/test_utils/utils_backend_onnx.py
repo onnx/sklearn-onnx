@@ -244,7 +244,8 @@ if onnx_opset_version() >= 18:
                     and not (x.dtype.type is np.str_ and y.dtype.type is np.str_)
                 ):
                     raise RuntimeError(
-                        f"x and y should share the same dtype {x.dtype} != {y.dtype}"
+                        f"x and y should share the same dtype "
+                        f"{x.dtype} != {y.dtype}"
                     )
                 return (np.where(condition, x, y).astype(x.dtype),)
 
@@ -677,9 +678,8 @@ def compare_runtime(
                     array_input = np.array(input)
                 except Exception:
                     raise OnnxRuntimeAssertionError(
-                        "Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(
-                            len(inp), len(input), onx
-                        )
+                        "Wrong number of inputs onnx {0} != "
+                        "original {1}, onnx='{2}'".format(len(inp), len(input), onx)
                     )
                 if hasattr(inp[0], "shape"):
                     shape = sum(i.shape[1] for i in inp)
@@ -707,9 +707,8 @@ def compare_runtime(
                     array_input = np.array(input)
                 except Exception:
                     raise OnnxRuntimeAssertionError(
-                        "Wrong number of inputs onnx {0} != original {1}, onnx='{2}'".format(
-                            len(inp), len(input), onx
-                        )
+                        "Wrong number of inputs onnx {0} != "
+                        "original {1}, onnx='{2}'".format(len(inp), len(input), onx)
                     )
                 if hasattr(inp[0], "shape"):
                     shape = sum(i.shape[1] for i in inp)
@@ -749,9 +748,8 @@ def compare_runtime(
     if OneOff or OneOffArray:
         if verbose:
             print(
-                "[compare_runtime] OneOff: type(inputs)={} len={} OneOffArray={}".format(
-                    type(input), len(inputs), OneOffArray
-                )
+                "[compare_runtime] OneOff: type(inputs)={} "
+                "len={} OneOffArray={}".format(type(input), len(inputs), OneOffArray)
             )
         if len(inputs) == 1 and not OneOffArray:
             name, values = list(inputs.items())[0]
@@ -947,9 +945,8 @@ def compare_runtime(
         else:
             smodel = ""
         raise OnnxRuntimeAssertionError(
-            "Model '{0}' has discrepencies with backend='onnx'.\n{1}: {2}{3}".format(
-                onx, type(e), e, smodel
-            )
+            "Model '{0}' has discrepencies with backend="
+            "'onnx'.\n{1}: {2}{3}".format(onx, type(e), e, smodel)
         )
 
     return output0, lambda_onnx
@@ -975,9 +972,8 @@ def _post_process_output(res):
         mi = min(ls)
         if mi != max(ls):
             raise NotImplementedError(
-                "Unable to postprocess various number of outputs in [{0}, {1}]".format(
-                    min(ls), max(ls)
-                )
+                "Unable to postprocess various number of "
+                "outputs in [{0}, {1}]".format(min(ls), max(ls))
             )
         if mi > 1:
             output = []
@@ -1042,9 +1038,8 @@ def _compare_expected(
                 )
             if len(expected) != len(output):
                 raise OnnxRuntimeAssertionError(
-                    "Unexpected number of outputs '{0}', expected={1}, got={2}".format(
-                        onnx, len(expected), len(output)
-                    )
+                    "Unexpected number of outputs '{0}', "
+                    "expected={1}, got={2}".format(onnx, len(expected), len(output))
                 )
             for exp, out in zip(expected, output):
                 _compare_expected(
@@ -1098,9 +1093,8 @@ def _compare_expected(
                 if len(ex) > 170:
                     ex = ex[:170] + "..."
                 raise OnnxRuntimeAssertionError(
-                    "More than one output when 1 is expected for onnx '{0}'\n{1}".format(
-                        onnx, ex
-                    )
+                    "More than one output when 1 is expected "
+                    "for onnx '{0}'\n{1}".format(onnx, ex)
                 )
             output = output[-1]
         if not isinstance(output, np.ndarray):
@@ -1164,9 +1158,8 @@ def _compare_expected(
             tested += 1
         else:
             raise OnnxRuntimeAssertionError(
-                "Unexpected type for expected output ({1}) and onnx '{0}'".format(
-                    onnx, type(expected)
-                )
+                "Unexpected type for expected output ({1}) "
+                "and onnx '{0}'".format(onnx, type(expected))
             )
     if tested == 0:
         raise OnnxRuntimeAssertionError("No test for onnx '{0}'".format(onnx))
