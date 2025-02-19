@@ -258,7 +258,6 @@ class Opset:
     def SqueezeAnyOpset(self, *args, name: str = "SqueezeAnyOpset", **kwargs):
         if len(args) == 1 and len(kwargs) == 0:
             return self.Squeeze(*args, name=name)
-        assert len(args) == 2, f"SqueezeAnyOpset expects 2 arguments not {len(args)}"
         if self.container.main_opset >= 13:
             return self.Squeeze(*args, name=name, **kwargs)
         return self.Squeeze(

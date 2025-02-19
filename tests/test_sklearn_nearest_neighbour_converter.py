@@ -918,7 +918,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
-    def test_sklearn_knn_imputer(self):
+    def test_sklearn_knn_imputer_main(self):
         x_train = numpy.array(
             [
                 [1, 2, numpy.nan, 12],
@@ -942,13 +942,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 [("input", FloatTensorType((None, x_test.shape[1])))],
                 target_opset=opset,
             )
-            self.assertIsNotNone(model_onnx)
-            # from onnx.reference import ExtendedReferenceEvaluator
-
-            # ExtendedReferenceEvaluator(model_onnx, verbose=10).run(
-            #     None, {"input": x_test}
-            # )
-            print(model.transform(x_test))
             dump_data_and_model(
                 x_test,
                 model,
