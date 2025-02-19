@@ -33,11 +33,11 @@ ort_version = ".".join(ort_version.split(".")[:2])
 def target_encoder_support():
     # pv.Version does not work with development versions
     vers = ".".join(sklearn_version.split(".")[:2])
-    if pv.Version(vers) < pv.Version("1.5.0"):
+    if pv.Version(vers) < pv.Version("1.3.0"):
         return False
     if pv.Version(onnxruntime.__version__) < pv.Version("0.3.0"):
         return False
-    return pv.Version(vers) >= pv.Version("1.5.0")
+    return pv.Version(vers) >= pv.Version("1.3.0")
 
 
 def set_output_support():
@@ -48,7 +48,7 @@ def set_output_support():
 class TestSklearnTargetEncoderConverter(unittest.TestCase):
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
     def test_model_target_encoder(self):
         model = TargetEncoder()
@@ -69,7 +69,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
 
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
     def test_model_target_encoder_int(self):
         model = TargetEncoder()
@@ -94,7 +94,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
 
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
     def test_target_encoder_twocats(self):
         data = [["cat2"], ["cat1"]]
@@ -103,7 +103,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         model.fit(data, label)
         inputs = [("input1", StringTensorType([None, 1]))]
         model_onnx = convert_sklearn(
-            model, "ordinal encoder two string cats", inputs, target_opset=TARGET_OPSET
+            model, "Target encoder two string cats", inputs, target_opset=TARGET_OPSET
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -116,9 +116,9 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
     )
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
-    def test_target_encoder_pipeline_int64(self):
+    def test_target_encoder_pipeline_f32(self):
         from onnxruntime import InferenceSession
 
         data = pd.DataFrame({"cat": ["cat2", "cat1"] * 10, "num": [0, 1, 1, 0] * 5})
@@ -158,7 +158,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
     )
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
     def test_target_encoder_pipeline_string_int64(self):
         from onnxruntime import InferenceSession
@@ -172,7 +172,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         )
         data["num"] = data["num"].astype(np.float32)
         data["C2"] = data["C2"].astype(np.int64)
-        y = np.array([0, 1, 0, 1, 0, 1] * 5, dtype=np.float32)
+        y = np.array([0, 1, 0, 1, 0, 1] * 5, dtype=np.int64)
         preprocessor = ColumnTransformer(
             transformers=[
                 ("cat", TargetEncoder(cv=2), ["C1", "C2"]),
@@ -202,7 +202,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
 
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_target_encoder_mixed_string_int_pandas(self):
@@ -243,7 +243,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
 
     @unittest.skipIf(
         not target_encoder_support(),
-        reason="TargetEncoder was not available before 1.5",
+        reason="TargetEncoder was not available before 1.3",
     )
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     def test_target_encoder_multiclass_assertion(self):
@@ -255,7 +255,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             convert_sklearn(
                 model,
-                "scikit-learn label encoder",
+                "scikit-learn target encoder",
                 [("input", Int64TensorType([None, X.shape[1]]))],
                 target_opset=TARGET_OPSET,
             )

@@ -20,7 +20,6 @@ def convert_sklearn_target_encoder(
     input_idx = 0
     dimension_idx = 0
 
-    # NotImplementedError(   # TODO: assert that we have binary output
     if (op.target_type_ == "multiclass") or (
         isinstance(op.classes_.dtype, np.int64) and (len(op.classes_) > 2)
     ):
@@ -81,6 +80,7 @@ def convert_sklearn_target_encoder(
             feature_column.onnx_name,
             label_encoder_output,
             op_domain="ai.onnx.ml",
+            op_version=2,
             **attrs,
         )
         apply_reshape(
