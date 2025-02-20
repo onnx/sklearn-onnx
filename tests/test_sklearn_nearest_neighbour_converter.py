@@ -942,6 +942,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 [("input", FloatTensorType((None, x_test.shape[1])))],
                 target_opset=opset,
             )
+            with open("debug.onnx", "wb") as f:
+                f.write(model_onnx.SerializeToString())
 
             from experimental_experiment.reference import ExtendedReferenceEvaluator
 

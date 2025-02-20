@@ -1084,28 +1084,28 @@ def make_calc_impute(g: ModelComponentContainer, scope: Scope, itype: int):
         outputs=["init1_s_"],
     )
     (
-        c_torch_knnimputer_columns_2___calc_impute__donors_idx__0,
-        c_torch_knnimputer_columns_2___calc_impute__donors_idx__1,
+        calc_impute_in__donors_idx__0,
+        calc_impute_in__donors_idx__1,
     ) = op.calc_impute_donors(
         dist_pot_donors,
         n_neighbors,
         domain="local_domain",
         outputs=[
-            "c_torch_knnimputer_columns_2___calc_impute__donors_idx__0",
-            "c_torch_knnimputer_columns_2___calc_impute__donors_idx__1",
+            "calc_impute_in__donors_idx__0",
+            "calc_impute_in__donors_idx__1",
         ],
     )
-    c_torch_knnimputer_columns_2___calc_impute__weights = op.calc_impute_weights(
-        c_torch_knnimputer_columns_2___calc_impute__donors_idx__1,
+    calc_impute_in__weights = op.calc_impute_weights(
+        calc_impute_in__donors_idx__1,
         domain="local_domain",
-        outputs=["c_torch_knnimputer_columns_2___calc_impute__weights"],
+        outputs=["calc_impute_in__weights"],
     )
     _reshape_fit_x_col0 = op.Reshape(
         fit_x_col, init7_s1__1, outputs=["_reshape_fit_x_col0"]
     )
     take = op.Gather(
         _reshape_fit_x_col0,
-        c_torch_knnimputer_columns_2___calc_impute__donors_idx__0,
+        calc_impute_in__donors_idx__0,
         outputs=["take"],
     )
     _reshape_mask_fit_x_col0 = op.Reshape(
@@ -1113,22 +1113,20 @@ def make_calc_impute(g: ModelComponentContainer, scope: Scope, itype: int):
     )
     take_1 = op.Gather(
         _reshape_mask_fit_x_col0,
-        c_torch_knnimputer_columns_2___calc_impute__donors_idx__0,
+        calc_impute_in__donors_idx__0,
         outputs=["take_1"],
     )
     _to_copy = op.Cast(take_1, to=TensorProto.INT64, outputs=["_to_copy"])
     sub_12 = op.Sub(c_lifted_tensor_0, _to_copy, outputs=["sub_12"])
-    c_torch_knnimputer_columns_2___calc_impute__make_new_neights = (
-        op.calc_impute_make_new_neights(
-            sub_12,
-            take,
-            c_torch_knnimputer_columns_2___calc_impute__weights,
-            domain="local_domain",
-            outputs=["c_torch_knnimputer_columns_2___calc_impute__make_new_neights"],
-        )
+    calc_impute_in__make_new_neights = op.calc_impute_make_new_neights(
+        sub_12,
+        take,
+        calc_impute_in__weights,
+        domain="local_domain",
+        outputs=["calc_impute_in__make_new_neights"],
     )
     sum_1 = op.ReduceSumAnyOpset(
-        c_torch_knnimputer_columns_2___calc_impute__make_new_neights,
+        calc_impute_in__make_new_neights,
         c_lifted_tensor_0,
         keepdims=1,
         outputs=["sum_1"],
@@ -1140,7 +1138,7 @@ def make_calc_impute(g: ModelComponentContainer, scope: Scope, itype: int):
     where = op.Where(eq_17, c_lifted_tensor_1, sum_1, outputs=["where"])
     mul_17 = op.Mul(
         take,
-        c_torch_knnimputer_columns_2___calc_impute__make_new_neights,
+        calc_impute_in__make_new_neights,
         outputs=["mul_17"],
     )
     sum_2 = op.ReduceSumAnyOpset(
@@ -1414,13 +1412,13 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     index_11 = op.Gather(select_6, nonzero_numpy__0, axis=0, outputs=["index_11"])
     select_7 = op.Gather(mask_fit_x, init7_s_2, axis=1, outputs=["select_7"])
     index_12 = op.Gather(select_7, nonzero_numpy__0, axis=0, outputs=["index_12"])
-    c_torch_knnimputer_columns_2___calc_impute = op.calc_impute(
+    calc_impute_output = op.calc_impute(
         _onx_gather_index_90,
         where_2,
         index_11,
         index_12,
         domain="local_domain",
-        outputs=["c_torch_knnimputer_columns_2___calc_impute"],
+        outputs=["calc_impute_output"],
     )
     select_9 = op.Gather(select_scatter, init7_s_2, axis=1, outputs=["select_9"])
     _onx_unsqueeze_index_70 = op.UnsqueezeAnyOpset(
@@ -1429,7 +1427,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     index_put_1 = op.ScatterND(
         select_9,
         _onx_unsqueeze_index_70,
-        c_torch_knnimputer_columns_2___calc_impute,
+        calc_impute_output,
         outputs=["index_put_1"],
     )
     _onx_unsqueeze_index_put_10 = op.UnsqueezeAnyOpset(
