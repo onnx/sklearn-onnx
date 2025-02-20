@@ -732,7 +732,7 @@ class ModelComponentContainer(_WhiteBlackContainer):
     def target_opset_any_domain(self, domain):
         target_opset = self.target_opset_all
         if isinstance(target_opset, dict):
-            if domain in target_opset:  # noqa: SIM401
+            if domain in target_opset:
                 to = target_opset[domain]
             else:
                 to = None

@@ -2,6 +2,8 @@
 
 ## 1.19.0
 
+* Add support to sklearn TargetEncoder
+  [#1137](https://github.com/onnx/sklearn-onnx/issues/1137)
 * Fixes missing WhiteKernel with return_std=True #1163
   [#1163](https://github.com/onnx/sklearn-onnx/issues/1163)
 * Fix empty column selector
