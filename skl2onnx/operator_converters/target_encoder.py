@@ -20,10 +20,12 @@ def convert_sklearn_target_encoder(
     input_idx = 0
     dimension_idx = 0
 
-    if (op.target_type_ == "multiclass") or (
-        isinstance(op.classes_.dtype, np.int64) and (len(op.classes_) > 2)
-    ):
-        raise NotImplementedError("multiclass TargetEncoder is not supported")
+    if op.target_type_ not in ("binary", "continuous"):
+        raise NotImplementedError(
+            "Current implementation of the converter only support TargetEncoder for"
+            " binary classification or 1d regression (sklearn target types binary"
+            " or continuous). See scikit-learn type_of_target documentation for details."
+        )
     for categories, encodings in zip(op.categories_, op.encodings_):
         if len(categories) == 0:
             continue
