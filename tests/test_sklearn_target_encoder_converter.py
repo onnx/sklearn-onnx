@@ -40,6 +40,11 @@ def target_encoder_support():
     return pv.Version(vers) >= pv.Version("1.3.0")
 
 
+def is_scikit_13():
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) < pv.Version("1.4.0")
+
+
 def set_output_support():
     vers = ".".join(sklearn_version.split(".")[:2])
     return pv.Version(vers) >= pv.Version("1.2")
@@ -246,22 +251,25 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         reason="TargetEncoder was not available before 1.3",
     )
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @unittest.skipIf(
+        is_scikit_13(),
+        reason="scikit-learn 1.3 does not allow multiclass TargetEncoder",
+    )
     def test_target_encoder_multiclass_assertion(self):
         model = TargetEncoder()
         X = np.array([0, 0, 1, 0, 0, 1, 1], dtype=np.int64).reshape(-1, 1)
         y = np.array([0, 1, 2, 0, 1, 2, 0], dtype=np.int64)
 
-        with self.assertRaises(ValueError):
-            # scikit-learn won't allow multiclass on 1.3.2
-            model.fit(X, y)
-            with self.assertRaises(NotImplementedError):
-                # after that, we must ensure that the output is binary or continuous
-                convert_sklearn(
-                    model,
-                    "scikit-learn target encoder",
-                    [("input", Int64TensorType([None, X.shape[1]]))],
-                    target_opset=TARGET_OPSET,
-                )
+        model.fit(X, y)
+        with self.assertRaises(NotImplementedError):
+            # sklearn 1.3 does not allow for multiclass TargetEncoder.
+            # for >= 1.4 we must ensure that the output is binary or continuous
+            convert_sklearn(
+                model,
+                "scikit-learn target encoder",
+                [("input", Int64TensorType([None, X.shape[1]]))],
+                target_opset=TARGET_OPSET,
+            )
 
 
 if __name__ == "__main__":
