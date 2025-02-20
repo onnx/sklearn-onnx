@@ -251,14 +251,17 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         X = np.array([0, 0, 1, 0, 0, 1, 1], dtype=np.int64).reshape(-1, 1)
         y = np.array([0, 1, 2, 0, 1, 2, 0], dtype=np.int64)
 
-        model.fit(X, y)
-        with self.assertRaises(NotImplementedError):
-            convert_sklearn(
-                model,
-                "scikit-learn target encoder",
-                [("input", Int64TensorType([None, X.shape[1]]))],
-                target_opset=TARGET_OPSET,
-            )
+        with self.assertRaises(ValueError):
+            # scikit-learn won't allow multiclass on 1.3.2
+            model.fit(X, y)
+            with self.assertRaises(NotImplementedError):
+                # after that, we must ensure that the output is binary or continuous
+                convert_sklearn(
+                    model,
+                    "scikit-learn target encoder",
+                    [("input", Int64TensorType([None, X.shape[1]]))],
+                    target_opset=TARGET_OPSET,
+                )
 
 
 if __name__ == "__main__":
