@@ -942,6 +942,29 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 [("input", FloatTensorType((None, x_test.shape[1])))],
                 target_opset=opset,
             )
+
+            from experimental_experiment.reference import ExtendedReferenceEvaluator
+
+            ExtendedReferenceEvaluator(model_onnx, verbose=10).run(
+                None, {"input": x_test}
+            )
+
+            import onnxruntime
+
+            opts = onnxruntime.SessionOptions()
+            opts.log_severity_level = 0
+            opts.log_verbosity_level = 0
+            opts.graph_optimization_level = (
+                onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+            )
+            sess = onnxruntime.InferenceSession(
+                model_onnx.SerializeToString(), opts, providers=["CPUExecutionProvider"]
+            )
+            runopts = onnxruntime.RunOptions()
+            runopts.log_severity_level = 0
+            runopts.log_verbosity_level = 0
+            sess.run(None, {"input": x_test}, runopts)
+
             dump_data_and_model(
                 x_test,
                 model,

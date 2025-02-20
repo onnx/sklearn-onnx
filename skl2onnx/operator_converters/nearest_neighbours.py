@@ -3,7 +3,13 @@
 
 import numpy as np
 from onnx import TensorProto
-from onnx.helper import make_tensor, tensor_dtype_to_np_dtype
+from onnx.helper import (
+    make_tensor,
+    tensor_dtype_to_np_dtype,
+    make_tensor_value_info,
+    make_graph,
+    make_node,
+)
 from onnx.numpy_helper import from_array
 from ..algebra.onnx_ops import (
     OnnxAdd,
@@ -977,7 +983,7 @@ def make_calc_impute_donors(g: ModelComponentContainer, scope: Scope, itype: int
     )
     unused_topk_values, output_0 = op.TopK(
         dist_pot_donors,
-        n_neighbors,
+        op.Reshape(n_neighbors, np.array([1], dtype=np.int64)),
         largest=0,
         sorted=1,
         outputs=["unused_topk_values", "output_0"],
@@ -1149,45 +1155,28 @@ def make_calc_impute(g: ModelComponentContainer, scope: Scope, itype: int):
     return gr
 
 
-def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int):
+def make_knn_imputer_column_all_nan(
+    g: ModelComponentContainer, scope: Scope, itype: int
+):
     gr = ModelComponentContainer(
         {"": g.main_opset, "local_domain": 1}, as_function=True
     )
     i_col = gr.make_tensor_input("i_col")
     x = gr.make_tensor_input("x")
-    dist_chunk = gr.make_tensor_input("dist_chunk")
-    non_missing_fix_x = gr.make_tensor_input("non_missing_fix_x")
     mask_fit_x = gr.make_tensor_input("mask_fit_x")
+    dist_chunk = gr.make_tensor_input("dist_chunk")
     dist_idx_map = gr.make_tensor_input("dist_idx_map")
-    mask = gr.make_tensor_input("mask")
-    row_missing_idx = gr.make_tensor_input("row_missing_idx")
+    nonzero_numpy__0 = gr.make_tensor_input("nonzero_numpy__0")
+    c_lifted_tensor_0 = gr.make_tensor_input("c_lifted_tensor_0")
+    c_lifted_tensor_2 = gr.make_tensor_input("c_lifted_tensor_2")
     _fit_x = gr.make_tensor_input("_fit_x")
+    index_1 = gr.make_tensor_input("index_1")
+    index_5 = gr.make_tensor_input("index_5")
+    all_1 = gr.make_tensor_input("all_1")
+
     op = gr.get_op_builder(scope)
-    c_lifted_tensor_0 = op.Constant(
-        value=from_array(
-            np.array([1.0], dtype=tensor_dtype_to_np_dtype(itype)), name="value"
-        ),
-        outputs=["c_lifted_tensor_0"],
-    )
-    c_lifted_tensor_1 = op.Constant(
-        value=from_array(np.array(3, dtype=np.int64), name="value"),
-        outputs=["c_lifted_tensor_1"],
-    )
-    c_lifted_tensor_2 = op.Constant(
-        value=from_array(np.array([1], dtype=np.int64), name="value"),
-        outputs=["c_lifted_tensor_2"],
-    )
     init7_s_2 = i_col
-    # init7_s_2 = op.Constant(value=from_array(np.array(2, dtype=np.int64), name='value'),
-    # outputs=['init7_s_2'])
-    init7_s1__1 = op.Constant(
-        value=from_array(np.array([-1], dtype=np.int64), name="value"),
-        outputs=["init7_s1__1"],
-    )
-    init7_s_0 = op.Constant(
-        value=from_array(np.array(0, dtype=np.int64), name="value"),
-        outputs=["init7_s_0"],
-    )
+
     init1_s_ = op.Constant(
         value=from_array(
             np.array(1.0, dtype=tensor_dtype_to_np_dtype(itype)), name="value"
@@ -1204,47 +1193,16 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
         value=from_array(np.array([0], dtype=np.int64), name="value"),
         outputs=["init7_s1_0"],
     )
+    init7_s1__1 = op.Constant(
+        value=from_array(np.array([-1], dtype=np.int64), name="value"),
+        outputs=["init7_s1__1"],
+    )
     init7_s_1 = op.Constant(
         value=from_array(np.array(1, dtype=np.int64), name="value"),
         outputs=["init7_s_1"],
     )
-    # init7_s1_2 = op.Constant(value=from_array(np.array([2], dtype=np.int64), name='value'),
-    # outputs=['init7_s1_2'])
     init7_s1_2 = op.UnsqueezeAnyOpset(init7_s_2, np.array([0], dtype=np.int64))
-    select = op.Gather(mask, init7_s_2, axis=1, outputs=["select"])
-    index = op.Gather(select, row_missing_idx, axis=0, outputs=["index"])
-    select_1 = op.Gather(non_missing_fix_x, init7_s_2, axis=1, outputs=["select_1"])
-    _onx_nonzero_select_10 = op.NonZero(select_1, outputs=["_onx_nonzero_select_10"])
-    nonzero_numpy__0 = op.Reshape(
-        _onx_nonzero_select_10, init7_s1__1, outputs=["nonzero_numpy__0"]
-    )
-    _shape_getitem_20 = op.Shape(
-        nonzero_numpy__0, end=1, start=0, outputs=["_shape_getitem_20"]
-    )
-    sym_size_int_23 = op.SqueezeAnyOpset(_shape_getitem_20, outputs=["sym_size_int_23"])
-    view = op.Reshape(index, init7_s1__1, outputs=["view"])
-    _onx_nonzero_view0 = op.NonZero(view, outputs=["_onx_nonzero_view0"])
-    nonzero_numpy_1__0 = op.Reshape(
-        _onx_nonzero_view0, init7_s1__1, outputs=["nonzero_numpy_1__0"]
-    )
-    index_1 = op.Gather(
-        row_missing_idx, nonzero_numpy_1__0, axis=0, outputs=["index_1"]
-    )
-    index_2 = op.Gather(dist_idx_map, index_1, axis=0, outputs=["index_2"])
-    index_3 = op.Gather(dist_chunk, index_2, axis=0, outputs=["index_3"])
-    _onx_gather_index_30 = op.Gather(
-        index_3, nonzero_numpy__0, axis=1, outputs=["_onx_gather_index_30"]
-    )
-    isnan = op.IsNaN(_onx_gather_index_30, outputs=["isnan"])
-    _onx_cast_isnan0 = op.Cast(isnan, to=6, outputs=["_onx_cast_isnan0"])
-    _onx_reducemin_cast_isnan00 = op.ReduceMinAnyOpset(
-        _onx_cast_isnan0,
-        c_lifted_tensor_2,
-        keepdims=0,
-        outputs=["_onx_reducemin_cast_isnan00"],
-    )
-    all_1 = op.Cast(_onx_reducemin_cast_isnan00, to=TensorProto.BOOL, outputs=["all_1"])
-    index_5 = op.Compress(index_1, all_1, axis=0, outputs=["index_5"])
+
     select_2 = op.Gather(mask_fit_x, init7_s_2, axis=1, outputs=["select_2"])
     bitwise_not = op.Not(select_2, outputs=["bitwise_not"])
     _to_copy = op.Cast(bitwise_not, to=itype, outputs=["_to_copy"])
@@ -1298,10 +1256,160 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     _onx_gather_index_90 = op.Gather(
         index_9, nonzero_numpy__0, axis=1, outputs=["_onx_gather_index_90"]
     )
+
+    # returns
+    gr.make_tensor_output(select_scatter)
+    gr.make_tensor_output(_onx_gather_index_90)
+    gr.make_tensor_output(index_7)
+    g.make_local_function(
+        container=gr,
+        optimize=False,
+        name="knn_imputer_column_all_nan",
+        domain="local_domain",
+    )
+    return gr
+
+
+def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int):
+    gr = ModelComponentContainer(
+        {"": g.main_opset, "local_domain": 1}, as_function=True
+    )
+    i_col = gr.make_tensor_input("i_col")
+    x = gr.make_tensor_input("x")
+    dist_chunk = gr.make_tensor_input("dist_chunk")
+    non_missing_fix_x = gr.make_tensor_input("non_missing_fix_x")
+    mask_fit_x = gr.make_tensor_input("mask_fit_x")
+    dist_idx_map = gr.make_tensor_input("dist_idx_map")
+    mask = gr.make_tensor_input("mask")
+    row_missing_idx = gr.make_tensor_input("row_missing_idx")
+    _fit_x = gr.make_tensor_input("_fit_x")
+    op = gr.get_op_builder(scope)
+    c_lifted_tensor_0 = op.Constant(
+        value=from_array(
+            np.array([1.0], dtype=tensor_dtype_to_np_dtype(itype)), name="value"
+        ),
+        outputs=["c_lifted_tensor_0"],
+    )
+    c_lifted_tensor_1 = op.Constant(
+        value=from_array(np.array(3, dtype=np.int64), name="value"),
+        outputs=["c_lifted_tensor_1"],
+    )
+    c_lifted_tensor_2 = op.Constant(
+        value=from_array(np.array([1], dtype=np.int64), name="value"),
+        outputs=["c_lifted_tensor_2"],
+    )
+    init7_s_2 = i_col
+    # init7_s_2 = op.Constant(value=from_array(np.array(2, dtype=np.int64), name='value'),
+    # outputs=['init7_s_2'])
+    init7_s1__1 = op.Constant(
+        value=from_array(np.array([-1], dtype=np.int64), name="value"),
+        outputs=["init7_s1__1"],
+    )
+    init7_s_0 = op.Constant(
+        value=from_array(np.array(0, dtype=np.int64), name="value"),
+        outputs=["init7_s_0"],
+    )
+    init7_s_1 = op.Constant(
+        value=from_array(np.array(1, dtype=np.int64), name="value"),
+        outputs=["init7_s_1"],
+    )
+    # init7_s1_2 = op.Constant(value=from_array(np.array([2], dtype=np.int64), name='value'),
+    # outputs=['init7_s1_2'])
+    init7_s1_2 = op.UnsqueezeAnyOpset(init7_s_2, np.array([0], dtype=np.int64))
+    select = op.Gather(mask, init7_s_2, axis=1, outputs=["select"])
+    index = op.Gather(select, row_missing_idx, axis=0, outputs=["index"])
+    select_1 = op.Gather(non_missing_fix_x, init7_s_2, axis=1, outputs=["select_1"])
+    _onx_nonzero_select_10 = op.NonZero(select_1, outputs=["_onx_nonzero_select_10"])
+    nonzero_numpy__0 = op.Reshape(
+        _onx_nonzero_select_10, init7_s1__1, outputs=["nonzero_numpy__0"]
+    )
+    _shape_getitem_20 = op.Shape(
+        nonzero_numpy__0, end=1, start=0, outputs=["_shape_getitem_20"]
+    )
+    sym_size_int_23 = op.SqueezeAnyOpset(_shape_getitem_20, outputs=["sym_size_int_23"])
+    view = op.Reshape(index, init7_s1__1, outputs=["view"])
+    _onx_nonzero_view0 = op.NonZero(view, outputs=["_onx_nonzero_view0"])
+    nonzero_numpy_1__0 = op.Reshape(
+        _onx_nonzero_view0, init7_s1__1, outputs=["nonzero_numpy_1__0"]
+    )
+    index_1 = op.Gather(
+        row_missing_idx, nonzero_numpy_1__0, axis=0, outputs=["index_1"]
+    )
+    index_2 = op.Gather(dist_idx_map, index_1, axis=0, outputs=["index_2"])
+    index_3 = op.Gather(dist_chunk, index_2, axis=0, outputs=["index_3"])
+    _onx_gather_index_30 = op.Gather(
+        index_3, nonzero_numpy__0, axis=1, outputs=["_onx_gather_index_30"]
+    )
+    isnan = op.IsNaN(_onx_gather_index_30, outputs=["isnan"])
+    _onx_cast_isnan0 = op.Cast(isnan, to=6, outputs=["_onx_cast_isnan0"])
+    _onx_reducemin_cast_isnan00 = op.ReduceMinAnyOpset(
+        _onx_cast_isnan0,
+        c_lifted_tensor_2,
+        keepdims=0,
+        outputs=["_onx_reducemin_cast_isnan00"],
+    )
+    all_1 = op.Cast(_onx_reducemin_cast_isnan00, to=TensorProto.BOOL, outputs=["all_1"])
+    index_5 = op.Compress(index_1, all_1, axis=0, outputs=["index_5"])
+
+    # This is part which shoudl be executed only if index_5 is not empty
+    size_index_5 = op.Size(index_5)
+    zero_i = op.Constant(value=from_array(np.array(0, dtype=np.int64), name="zero"))
+    size_index_5_greater = op.Greater(size_index_5, zero_i)
+    select_scatter, _onx_gather_index_90, index_7 = op.If(
+        size_index_5_greater,
+        then_branch=make_graph(
+            [
+                make_node(
+                    "knn_imputer_column_all_nan",
+                    [
+                        i_col,
+                        x,
+                        mask_fit_x,
+                        dist_chunk,
+                        dist_idx_map,
+                        nonzero_numpy__0,
+                        c_lifted_tensor_0,
+                        c_lifted_tensor_2,
+                        _fit_x,
+                        index_1,
+                        index_5,
+                        all_1,
+                    ],
+                    ["A", "B", "C"],
+                    domain="local_domain",
+                )
+            ],
+            "then_branch",
+            [],
+            [
+                make_tensor_value_info("A", itype, None),
+                make_tensor_value_info("B", TensorProto.INT64, None),
+                make_tensor_value_info("C", TensorProto.INT64, None),
+            ],
+        ),
+        else_branch=make_graph(
+            [
+                make_node("Identity", [x], ["A"]),
+                make_node("Identity", [dist_chunk], ["B"]),
+                make_node("Identity", [index_1], ["C"]),
+            ],
+            "identity",
+            [],
+            [
+                make_tensor_value_info("A", itype, None),
+                make_tensor_value_info("B", itype, None),
+                make_tensor_value_info("C", TensorProto.INT64, None),
+            ],
+        ),
+        outputs=["select_scatter", "_onx_gather_index_90", "index_7"],
+    )
+
     lt = op.Less(c_lifted_tensor_1, sym_size_int_23, outputs=["lt"])
     where_1 = op.Where(lt, c_lifted_tensor_1, sym_size_int_23, outputs=["where_1"])
     le = op.LessOrEqual(where_1, init7_s_0, outputs=["le"])
-    where_2 = op.Where(le, c_lifted_tensor_2, where_1, outputs=["where_2"])
+    # c_lifted_tensor_2 -> init7_s_1 to have a zero time, onnxruntime crashes wher shapes are
+    # (), (1,), ()
+    where_2 = op.Where(le, init7_s_1, where_1, outputs=["where_2"])
     select_6 = op.Gather(_fit_x, init7_s_2, axis=1, outputs=["select_6"])
     index_11 = op.Gather(select_6, nonzero_numpy__0, axis=0, outputs=["index_11"])
     select_7 = op.Gather(mask_fit_x, init7_s_2, axis=1, outputs=["select_7"])
@@ -1443,7 +1551,8 @@ def convert_knn_imputer(
     make_calc_impute_weights(container, Scope("LF4"), itype=proto_type)
     make_calc_impute_make_new_neights(container, Scope("LF5"), itype=proto_type)
     make_calc_impute(container, Scope("LF6"), itype=proto_type)
-    make_knn_imputer_column(container, Scope("LF7"), itype=proto_type)
+    make_knn_imputer_column_all_nan(container, Scope("LF7"), itype=proto_type)
+    make_knn_imputer_column(container, Scope("LF8"), itype=proto_type)
     container.add_node("Identity", [result], [operator.outputs[0].full_name])
 
 
