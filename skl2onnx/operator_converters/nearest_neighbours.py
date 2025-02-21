@@ -1248,17 +1248,17 @@ def make_knn_imputer_column_all_nan(
         outputs=["select_scatter"],
     )
     bitwise_not_1 = op.Not(all_1, outputs=["bitwise_not_1"])
-    index_7 = op.Compress(index_1, bitwise_not_1, axis=0, outputs=["index_7"])
-    index_8 = op.Gather(dist_idx_map, index_7, axis=0, outputs=["index_8"])
-    index_9 = op.Gather(dist_chunk, index_8, axis=0, outputs=["index_9"])
-    _onx_gather_index_90 = op.Gather(
-        index_9, nonzero_numpy__0, axis=1, outputs=["_onx_gather_index_90"]
+    receivers_idx = op.Compress(
+        index_1, bitwise_not_1, axis=0, outputs=["receivers_idx"]
     )
+    index_8 = op.Gather(dist_idx_map, receivers_idx, axis=0, outputs=["index_8"])
+    index_9 = op.Gather(dist_chunk, index_8, axis=0, outputs=["index_9"])
+    dist_subset = op.Gather(index_9, nonzero_numpy__0, axis=1, outputs=["dist_subset"])
 
     # returns
     gr.make_tensor_output(select_scatter)
-    gr.make_tensor_output(_onx_gather_index_90)
-    gr.make_tensor_output(index_7)
+    gr.make_tensor_output(dist_subset)
+    gr.make_tensor_output(receivers_idx)
     g.make_local_function(
         container=gr,
         optimize=False,
@@ -1353,7 +1353,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     size_index_5 = op.Size(index_5)
     zero_i = op.Constant(value=from_array(np.array(0, dtype=np.int64), name="zero"))
     size_index_5_greater = op.Greater(size_index_5, zero_i)
-    select_scatter, _onx_gather_index_90, index_7 = op.If(
+    select_scatter, dist_subset, receivers_idx = op.If(
         size_index_5_greater,
         then_branch=make_graph(
             [
@@ -1399,7 +1399,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
                 make_tensor_value_info("C", TensorProto.INT64, None),
             ],
         ),
-        outputs=["select_scatter", "_onx_gather_index_90", "index_7"],
+        outputs=["select_scatter", "dist_subset", "receivers_idx"],
     )
 
     lt = op.Less(c_lifted_tensor_1, sym_size_int_23, outputs=["lt"])
@@ -1413,7 +1413,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     select_7 = op.Gather(mask_fit_x, init7_s_2, axis=1, outputs=["select_7"])
     index_12 = op.Gather(select_7, nonzero_numpy__0, axis=0, outputs=["index_12"])
     calc_impute_output = op.calc_impute(
-        _onx_gather_index_90,
+        dist_subset,
         where_2,
         index_11,
         index_12,
@@ -1422,7 +1422,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     )
     select_9 = op.Gather(select_scatter, init7_s_2, axis=1, outputs=["select_9"])
     _onx_unsqueeze_index_70 = op.UnsqueezeAnyOpset(
-        index_7, init7_s1__1, outputs=["_onx_unsqueeze_index_70"]
+        receivers_idx, init7_s1__1, outputs=["_onx_unsqueeze_index_70"]
     )
     index_put_1 = op.ScatterND(
         select_9,
