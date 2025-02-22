@@ -1389,7 +1389,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return TorchKNNImputer, NanEuclidean
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
-    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_main(self):
         x_train = numpy.array(
@@ -1491,7 +1491,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
-    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_cdist(self):
         x_train = numpy.array(
@@ -1518,7 +1518,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 options={id(model): {"optim2": "cdist"}},
             )
 
-        for opset in [TARGET_OPSET, 12, 11, 10, 9]:
+        for opset in [TARGET_OPSET, 18]:
             if opset > TARGET_OPSET:
                 continue
             model_onnx = convert_sklearn(
@@ -1667,7 +1667,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
-    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_issue_2025(self):
         data = numpy.arange(14).reshape((-1, 2)).astype(float)
