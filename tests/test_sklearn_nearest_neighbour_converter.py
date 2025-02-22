@@ -980,9 +980,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 XX = X * X
                 YY = Y * Y
 
-                distances = (
-                    -2 * X @ Y.T + XX.sum(1, keepdim=True) + YY.sum(1, keepdim=True).T
-                )
+                distances = -2 * X @ Y.T
+                distances += XX.sum(1, keepdim=True) + YY.sum(1, keepdim=True).T
 
                 distances -= XX @ missing_Y.to(X.dtype).T
                 distances -= missing_X.to(X.dtype) @ YY.T
@@ -1203,7 +1202,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 )[0]
 
                 # receivers_idx are indices in X
-                receivers_idx = row_missing_chunk[flatnonzero(col_mask)]
+                flat_index = flatnonzero(col_mask)
+                receivers_idx = row_missing_chunk[flat_index]
 
                 # distances for samples that needed imputation for column
                 dist_subset = dist_chunk[dist_idx_map[receivers_idx]][
@@ -1384,7 +1384,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             def forward(self, _mask_fit_X, _valid_mask, _fit_X, X):
                 return self.transform(_mask_fit_X, _valid_mask, _fit_X, X)
 
-        return TorchKNNImputer
+        return TorchKNNImputer, NanEuclidean
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
@@ -1413,8 +1413,6 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 [("input", FloatTensorType((None, x_test.shape[1])))],
                 target_opset=opset,
             )
-            with open("debug.onnx", "wb") as f:
-                f.write(model_onnx.SerializeToString())
 
             try:
                 import torch
@@ -1424,7 +1422,23 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 has_torch = False
 
             if has_torch:
-                tmodel = self._get_torch_knn_imputer()(model)
+                # DEBUG
+                with open("debug.onnx", "wb") as f:
+                    f.write(model_onnx.SerializeToString())
+
+                from sklearn.metrics.pairwise import nan_euclidean_distances
+
+                tmodel_cls, dist_cls = self._get_torch_knn_imputer()
+                tmodel = tmodel_cls(model)
+                mm = dist_cls()
+                td = mm(
+                    torch.from_numpy(x_test),
+                    torch.from_numpy(model._fit_X.astype(numpy.float32)),
+                )
+                skl = nan_euclidean_distances(
+                    x_test, model._fit_X.astype(numpy.float32)
+                )
+                assert_almost_equal(td.numpy(), skl, decimal=3)
 
                 ty = tmodel.transform(
                     torch.from_numpy(model._mask_fit_X),
@@ -1432,16 +1446,21 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     torch.from_numpy(model._fit_X.astype(numpy.float32)),
                     torch.from_numpy(x_test),
                 )
-                print("---------")
-                print(model.transform(x_test))
-                print(ty)
-                print("----------")
+                skl = model.transform(x_test)
+                assert_almost_equal(ty.numpy(), skl, decimal=3)
 
                 from experimental_experiment.reference import ExtendedReferenceEvaluator
 
                 ExtendedReferenceEvaluator(model_onnx, verbose=10).run(
                     None, {"input": x_test}
                 )
+
+                # let's inline first
+                import onnx.inliner
+
+                inlined = onnx.inliner.inline_local_functions(model_onnx)
+                with open("debug_inlined.onnx", "wb") as f:
+                    f.write(inlined.SerializeToString())
 
                 import onnxruntime
 
@@ -1452,7 +1471,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                     onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
                 )
                 sess = onnxruntime.InferenceSession(
-                    model_onnx.SerializeToString(),
+                    inlined.SerializeToString(),
                     opts,
                     providers=["CPUExecutionProvider"],
                 )
