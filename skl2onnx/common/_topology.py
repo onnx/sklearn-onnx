@@ -1696,10 +1696,12 @@ def _update_domain_version(container, onnx_model, verbose=0):
             )
 
     # Fill operator sets
+    done = set()
     i = 0
     for op_domain, op_version in purified_operator_set.items():
         if op_version is None:
             continue
+        done.add(op_domain)
         if i == 0 and len(onnx_model.opset_import) == 1:
             # Overwrite the default operator set created by
             # make_model(...)
@@ -1731,6 +1733,14 @@ def _update_domain_version(container, onnx_model, verbose=0):
                 "this model, which requires at least opset "
                 "%d." % (container.target_opset_any_domain(op_domain), op_version)
             )
+    for k, v in container.target_opset_all.items():
+        if k in done:
+            continue
+        # Some opsets may be forgotten if they appear in subgraphs.
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = k
+        op_set.version = v
+
     return "" in purified_operator_set
 
 

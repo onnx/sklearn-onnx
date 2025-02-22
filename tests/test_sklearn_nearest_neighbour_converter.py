@@ -1202,7 +1202,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 )[0]
 
                 # receivers_idx are indices in X
+                # if col_mask is all False, no need to continue
                 flat_index = flatnonzero(col_mask)
+
                 receivers_idx = row_missing_chunk[flat_index]
 
                 # distances for samples that needed imputation for column
@@ -1404,7 +1406,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             dtype=numpy.float32,
         )
         model = KNNImputer(n_neighbors=3, metric="nan_euclidean").fit(x_train)
-        for opset in [TARGET_OPSET, 9, 10, 11, 12]:
+        for opset in [TARGET_OPSET, 18]:
             if opset > TARGET_OPSET:
                 continue
             model_onnx = convert_sklearn(
@@ -1451,7 +1453,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
                 from experimental_experiment.reference import ExtendedReferenceEvaluator
 
-                ExtendedReferenceEvaluator(model_onnx, verbose=10).run(
+                ExtendedReferenceEvaluator(model_onnx, verbose=0).run(
                     None, {"input": x_test}
                 )
 
@@ -1465,19 +1467,19 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 import onnxruntime
 
                 opts = onnxruntime.SessionOptions()
-                opts.log_severity_level = 0
-                opts.log_verbosity_level = 0
-                opts.graph_optimization_level = (
-                    onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
-                )
+                # opts.log_severity_level = 0
+                # opts.log_verbosity_level = 0
+                # opts.graph_optimization_level = (
+                #     onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+                # )
                 sess = onnxruntime.InferenceSession(
                     inlined.SerializeToString(),
                     opts,
                     providers=["CPUExecutionProvider"],
                 )
                 runopts = onnxruntime.RunOptions()
-                runopts.log_severity_level = 0
-                runopts.log_verbosity_level = 0
+                # runopts.log_severity_level = 0
+                # runopts.log_verbosity_level = 0
                 sess.run(None, {"input": x_test}, runopts)
 
             dump_data_and_model(

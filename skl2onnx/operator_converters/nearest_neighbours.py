@@ -1210,7 +1210,7 @@ def make_knn_imputer_column_all_nan(
     )
     # init7_s1_2 = op.Constant(value=from_array(np.array([2], dtype=np.int64),
     # name='value'), outputs=['init7_s1_2'])
-    init7_s1_2 = op.Unsqueeze(i_col, init7_s1_0, outputs=["init7_s1_2"])
+    init7_s1_2 = op.UnsqueezeAnyOpset(i_col, init7_s1_0, outputs=["init7_s1_2"])
     select = op.Gather(mask_fit_x, init7_s_2, axis=1, outputs=["select"])
     bitwise_not = op.Not(select, outputs=["bitwise_not"])
     _to_copy = op.Cast(bitwise_not, to=1, outputs=["_to_copy"])
@@ -1282,31 +1282,25 @@ def make_knn_imputer_column_all_nan(
     return gr
 
 
-def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int):
+def make_knn_imputer_column_nan_found(
+    g: ModelComponentContainer, scope: Scope, itype: int
+):
     gr = ModelComponentContainer(
         {"": g.main_opset, "local_domain": 1}, as_function=True
     )
     i_col = gr.make_tensor_input("i_col")
     x = gr.make_tensor_input("x")
-    dist_chunk = gr.make_tensor_input("dist_chunk")
-    non_missing_fix_x = gr.make_tensor_input("non_missing_fix_x")
-    mask_fit_x = gr.make_tensor_input("mask_fit_x")
+    col_mask = gr.make_tensor_input("col_mask")
     dist_idx_map = gr.make_tensor_input("dist_idx_map")
-    mask = gr.make_tensor_input("mask")
-    row_missing_idx = gr.make_tensor_input("row_missing_idx")
+    mask_fit_x = gr.make_tensor_input("mask_fit_x")
+    non_missing_fix_x = gr.make_tensor_input("non_missing_fix_x")
+    dist_chunk = gr.make_tensor_input("dist_chunk")
     _fit_x = gr.make_tensor_input("_fit_x")
+    row_missing_idx = gr.make_tensor_input("row_missing_idx")
+
     op = gr.get_op_builder(scope)
-    c_lifted_tensor_1 = op.Constant(
-        value=from_array(np.array(3, dtype=np.int64), name="value"),
-        outputs=["c_lifted_tensor_1"],
-    )
-    c_lifted_tensor_2 = op.Constant(
-        value=from_array(np.array([1], dtype=np.int64), name="value"),
-        outputs=["c_lifted_tensor_2"],
-    )
+
     init7_s_2 = i_col
-    # init7_s_2 = op.Constant(value=from_array(np.array(2, dtype=np.int64), name='value'),
-    # outputs=['init7_s_2'])
     init7_s1__1 = op.Constant(
         value=from_array(np.array([-1], dtype=np.int64), name="value"),
         outputs=["init7_s1__1"],
@@ -1319,13 +1313,20 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
         value=from_array(np.array(1, dtype=np.int64), name="value"),
         outputs=["init7_s_1"],
     )
-    # init7_s1_2 = op.Constant(value=from_array(np.array([2], dtype=np.int64), name='value'),
-    # outputs=['init7_s1_2'])
+    c_lifted_tensor_1 = op.Constant(
+        value=from_array(np.array(3, dtype=np.int64), name="value"),
+        outputs=["c_lifted_tensor_1"],
+    )
+    c_lifted_tensor_2 = op.Constant(
+        value=from_array(np.array([1], dtype=np.int64), name="value"),
+        outputs=["c_lifted_tensor_2"],
+    )
+
     init7_s1_2 = op.UnsqueezeAnyOpset(init7_s_2, np.array([0], dtype=np.int64))
-    select = op.Gather(mask, init7_s_2, axis=1, outputs=["select"])
-    index = op.Gather(select, row_missing_idx, axis=0, outputs=["index"])
+
     select_1 = op.Gather(non_missing_fix_x, init7_s_2, axis=1, outputs=["select_1"])
     potential_donors_idx = op.NonZero(select_1, outputs=["potential_donors_idx"])
+
     nonzero_numpy__0 = op.Reshape(
         potential_donors_idx, init7_s1__1, outputs=["nonzero_numpy__0"]
     )
@@ -1333,9 +1334,8 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
         nonzero_numpy__0, end=1, start=0, outputs=["_shape_getitem_20"]
     )
     sym_size_int_23 = op.SqueezeAnyOpset(_shape_getitem_20, outputs=["sym_size_int_23"])
-    view = op.Reshape(index, init7_s1__1, outputs=["view"])
-    view_int = op.Cast(view, to=TensorProto.INT32)
-    flat_index = op.NonZero(view_int, outputs=["flat_index"])
+
+    flat_index = op.NonZero(col_mask, outputs=["flat_index"])
     nonzero_numpy_1__0 = op.Reshape(
         flat_index, init7_s1__1, outputs=["nonzero_numpy_1__0"]
     )
@@ -1458,6 +1458,87 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     )
     gr.make_tensor_output(output_0)
     g.make_local_function(
+        container=gr,
+        optimize=False,
+        name="knn_imputer_column_nan_found",
+        domain="local_domain",
+    )
+    return gr
+
+
+def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int):
+    gr = ModelComponentContainer(
+        {"": g.main_opset, "local_domain": 1}, as_function=True
+    )
+    i_col = gr.make_tensor_input("i_col")
+    x = gr.make_tensor_input("x")
+    dist_chunk = gr.make_tensor_input("dist_chunk")
+    non_missing_fix_x = gr.make_tensor_input("non_missing_fix_x")
+    mask_fit_x = gr.make_tensor_input("mask_fit_x")
+    dist_idx_map = gr.make_tensor_input("dist_idx_map")
+    mask = gr.make_tensor_input("mask")
+    row_missing_idx = gr.make_tensor_input("row_missing_idx")
+    _fit_x = gr.make_tensor_input("_fit_x")
+
+    op = gr.get_op_builder(scope)
+    zero32 = op.Constant(
+        value=from_array(np.array(0, dtype=np.int32), name="value"),
+        outputs=["zero"],
+    )
+    init7_s_2 = i_col
+    # init7_s_2 = op.Constant(value=from_array(np.array(2, dtype=np.int64), name='value'),
+    # outputs=['init7_s_2'])
+    init7_s1__1 = op.Constant(
+        value=from_array(np.array([-1], dtype=np.int64), name="value"),
+        outputs=["init7_s1__1"],
+    )
+    # init7_s1_2 = op.Constant(value=from_array(np.array([2], dtype=np.int64), name='value'),
+    # outputs=['init7_s1_2'])
+    select = op.Gather(mask, init7_s_2, axis=1, outputs=["select"])
+    index = op.Gather(select, row_missing_idx, axis=0, outputs=["index"])
+    view = op.Reshape(index, init7_s1__1, outputs=["view"])
+    col_mask = op.Cast(view, to=TensorProto.INT32)
+
+    # If max(col_mask) == 0, no need to continue
+    # That avoids dealing with empty sizes.
+    col_mask_max = op.ReduceMax(col_mask, outputs=["col_mask_max"])
+    col_mask_max_null = op.Equal(col_mask_max, zero32, outputs=["col_mask_max_null"])
+
+    output_0 = op.If(
+        col_mask_max_null,
+        then_branch=make_graph(
+            [make_node("Identity", [x], ["X"])],
+            "identity",
+            [],
+            [make_tensor_value_info("X", itype, None)],
+        ),
+        else_branch=make_graph(
+            [
+                make_node(
+                    "knn_imputer_column_nan_found",
+                    [
+                        i_col,
+                        x,
+                        col_mask,
+                        dist_idx_map,
+                        mask_fit_x,
+                        non_missing_fix_x,
+                        dist_chunk,
+                        _fit_x,
+                        row_missing_idx,
+                    ],
+                    ["X"],
+                    domain="local_domain",
+                )
+            ],
+            "then_branch",
+            [],
+            [make_tensor_value_info("X", itype, None)],
+        ),
+        outputs=["output_0"],
+    )
+    gr.make_tensor_output(output_0)
+    g.make_local_function(
         container=gr, optimize=False, name="knn_imputer_column", domain="local_domain"
     )
     return gr
@@ -1521,6 +1602,9 @@ def convert_knn_imputer(
     """
     Converts *KNNImputer* into *ONNX*.
     """
+    assert (
+        container.target_opset >= 18
+    ), f"This converter no longer works for opset {container.target_opset} < 18."
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
@@ -1559,7 +1643,8 @@ def convert_knn_imputer(
     make_calc_impute_make_new_neights(container, Scope("LF5"), itype=proto_type)
     make_calc_impute(container, Scope("LF6"), itype=proto_type)
     make_knn_imputer_column_all_nan(container, Scope("LF7"), itype=proto_type)
-    make_knn_imputer_column(container, Scope("LF8"), itype=proto_type)
+    make_knn_imputer_column_nan_found(container, Scope("LF8"), itype=proto_type)
+    make_knn_imputer_column(container, Scope("LF9"), itype=proto_type)
     container.add_node("Identity", [result], [operator.outputs[0].full_name])
 
 

@@ -258,7 +258,7 @@ class Opset:
     def SqueezeAnyOpset(self, *args, name: str = "SqueezeAnyOpset", **kwargs):
         if len(args) == 1 and len(kwargs) == 0:
             return self.Squeeze(*args, name=name)
-        if self.container.main_opset >= 13:
+        if self.container.main_opset >= 13 or len(args) == 1:
             return self.Squeeze(*args, name=name, **kwargs)
         return self.Squeeze(
             args[0], axes=self._iaxes("Squeeze", args[1]), name=name, **kwargs
