@@ -13,6 +13,7 @@ import functools
 import packaging.version as pv
 import numpy
 from numpy.testing import assert_almost_equal
+from onnx.reference import ReferenceEvaluator
 from onnxruntime import __version__ as ort_version
 from pandas import DataFrame
 
@@ -1674,7 +1675,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_issue_2025(self):
-        data = numpy.arange(14).reshape((-1, 2)).astype(float)
+        from onnxruntime import InferenceSession
+
+        data = (numpy.arange(14) + 100).reshape((-1, 2)).astype(float)
+        data[:, 0] += 1000
         for i in range(5):
             data[i, i % 2] = numpy.nan
         imputer = KNNImputer(n_neighbors=3, metric="nan_euclidean")
@@ -1682,6 +1686,15 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
         onnx_model = convert_sklearn(imputer, initial_types=initial_type)
         input_data = data.astype(numpy.float32)
+        expected = imputer.transform(input_data)
+        got = ReferenceEvaluator(onnx_model, verbose=10).run(
+            None, {"float_input": input_data}
+        )[0]
+        assert_almost_equal(expected, got)
+        got = InferenceSession(
+            onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+        ).run(None, {"float_input": input_data})[0]
+        assert_almost_equal(expected, got)
         dump_data_and_model(
             input_data,
             imputer,
