@@ -323,7 +323,7 @@ if onnx_opset_version() >= 18:
         def __init__(self, *args, new_ops=None, **kwargs):
             # filter out new_ops
             onx = args[0]
-            if isinstance(onx, (onnx.ModelProto, onnx.FunctionProto)):
+            if isinstance(onx, (onnx.ModelProto, onnx.FunctionProto, onnx.GraphProto)):
                 model = onx
             elif isinstance(onx, bytes):
                 model = onnx.load(io.BytesIO(onx))
@@ -333,9 +333,10 @@ if onnx_opset_version() >= 18:
             else:
                 raise TypeError(f"Not implemented for {type(args[0])}.")
             main_domain = None
-            for dom in model.opset_import:
-                if dom.domain == "":
-                    main_domain = dom.version
+            if hasattr(model, "opset_import"):
+                for dom in model.opset_import:
+                    if dom.domain == "":
+                        main_domain = dom.version
             if main_domain is None:
                 main_domain = 1
 
@@ -365,7 +366,8 @@ if onnx_opset_version() >= 18:
 
             self._main_domain = main_domain
             self._new_ops = new_new_ops
-            self._opset_import = model.opset_import
+            if hasattr(model, "opset_import"):
+                self._opset_import = model.opset_import
 
             # calls the constructor
             super().__init__(*args, new_ops=new_new_ops, **kwargs)
@@ -383,6 +385,7 @@ if onnx_opset_version() >= 18:
                 "opsets": self.opsets,
                 "verbose": self.verbose,
                 "new_ops": self.new_ops_,
+                "evaluator_cls": self.__class__,
             }
             if self.input_types_:
                 all_types = {i.name: i.type for i in self.onnx_graph_.input}

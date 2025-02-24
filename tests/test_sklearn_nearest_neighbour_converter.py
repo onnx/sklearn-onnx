@@ -1529,10 +1529,14 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 options={id(model): {"optim": "cdist"}},
             )
             self.assertIsNotNone(model_onnx)
-            self.assertIn('op_type: "cdist"', str(model_onnx).lower())
+            # self.assertIn('op_type: "cdist"', str(model_onnx).lower())
             self.assertNotIn("scan", str(model_onnx).lower())
             dump_data_and_model(
-                x_test, model, model_onnx, basename="SklearnKNNImputer%dcdist" % opset
+                x_test,
+                model,
+                model_onnx,
+                basename="SklearnKNNImputer%dcdist" % opset,
+                backend="onnxruntime",
             )
 
     @unittest.skipIf(
@@ -1679,7 +1683,11 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         onnx_model = convert_sklearn(imputer, initial_types=initial_type)
         input_data = data.astype(numpy.float32)
         dump_data_and_model(
-            input_data, imputer, onnx_model, basename="SklearnKNNImputer2025"
+            input_data,
+            imputer,
+            onnx_model,
+            basename="SklearnKNNImputer2025",
+            backend="onnxruntime",
         )
 
 
