@@ -1489,6 +1489,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 model_onnx,
                 basename="SklearnKNNImputer%d" % opset,
                 backend="onnxruntime",
+                verbose=10,
             )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
