@@ -1390,7 +1390,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         return TorchKNNImputer, NanEuclidean
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
-    @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.16.0"),
+        reason="onnxruntime not recent enough",
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_main(self):
         x_train = numpy.array(
@@ -1493,7 +1496,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
-    @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.16.0"),
+        reason="onnxruntime not recent enough",
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_cdist(self):
         x_train = numpy.array(
@@ -1673,7 +1679,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
-    @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.16.0"),
+        reason="onnxruntime not recent enough",
+    )
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_issue_2025(self):
         # This test is about having nan or the fact TopK
