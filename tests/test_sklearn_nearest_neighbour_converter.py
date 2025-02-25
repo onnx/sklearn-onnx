@@ -1489,7 +1489,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 model_onnx,
                 basename="SklearnKNNImputer%d" % opset,
                 backend="onnxruntime",
-                verbose=10,
+                verbose=0,
             )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
@@ -1690,7 +1690,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         onnx_model = convert_sklearn(imputer, initial_types=initial_type)
         input_data = data.astype(numpy.float32)
         expected = imputer.transform(input_data)
-        got = ReferenceEvaluator(onnx_model, verbose=10).run(
+        got = ReferenceEvaluator(onnx_model, verbose=0).run(
             None, {"float_input": input_data}
         )[0]
         assert_almost_equal(expected, got)
