@@ -1675,6 +1675,8 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     @unittest.skipIf(TARGET_OPSET < 18, reason="not available")
     @ignore_warnings(category=DeprecationWarning)
     def test_sklearn_knn_imputer_issue_2025(self):
+        # This test is about having nan or the fact TopK
+        # does not handle largest=1 in opset < 11.
         from onnxruntime import InferenceSession
 
         data = (numpy.arange(14) + 100).reshape((-1, 2)).astype(float)
@@ -1691,6 +1693,13 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             None, {"float_input": input_data}
         )[0]
         assert_almost_equal(expected, got)
+
+        # in case onnruntime fails
+        # from experimental_experiment.reference import OrtEval
+
+        # got = OrtEval(onnx_model, verbose=10).run(None, {"float_input": input_data})[0]
+        # assert_almost_equal(expected, got)
+
         got = InferenceSession(
             onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
         ).run(None, {"float_input": input_data})[0]
