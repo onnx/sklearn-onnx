@@ -1685,7 +1685,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
     )
     @ignore_warnings(category=DeprecationWarning)
     @unittest.skipIf(
-        pv.Version(ort_version) <= pv.Version("1.18.0"),
+        pv.Version(ort_version) < pv.Version("1.20.0"),
         reason="onnxruntime not recent enough",
     )
     def test_sklearn_knn_imputer_issue_2025(self):
