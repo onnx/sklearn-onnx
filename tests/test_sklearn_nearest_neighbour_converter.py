@@ -1684,6 +1684,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="onnxruntime not recent enough",
     )
     @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.18.0"),
+        reason="onnxruntime not recent enough",
+    )
     def test_sklearn_knn_imputer_issue_2025(self):
         # This test is about having nan or the fact TopK
         # does not handle largest=1 in opset < 11.
