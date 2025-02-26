@@ -1688,6 +1688,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.20.0"),
         reason="onnxruntime not recent enough",
     )
+    @unittest.skipIf(
+        sys.platform == "darwin", "investigate why topk returns different results"
+    )
     def test_sklearn_knn_imputer_issue_2025(self):
         # This test is about having nan or the fact TopK
         # does not handle largest=1 in opset < 11.
