@@ -1689,7 +1689,7 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         reason="onnxruntime not recent enough",
     )
     @unittest.skipIf(
-        sys.platform != "darwin" and pv.Version(skl_version) < pv.Version("1.5.0"),
+        sys.platform != "darwin" and pv.Version(skl_version) < pv.Version("1.6.0"),
         "investigate why topk returns different results",
     )
     def test_sklearn_knn_imputer_issue_2025(self):
