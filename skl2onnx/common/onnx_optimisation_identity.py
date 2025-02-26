@@ -7,7 +7,7 @@ opset < 9.
 """
 
 from logging import getLogger
-from onnx.helper import make_graph
+from onnx.helper import make_graph, make_function
 from ._onnx_optimisation_common import (
     _rename_node_input,
     _rename_node_output,
@@ -48,8 +48,8 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
 
     graph = onnx_model
 
-    inputs = {i.name for i in graph.input}
-    outputs = {o.name for o in graph.output}
+    inputs = {(i if isinstance(i, str) else i.name) for i in graph.input}
+    outputs = {(o if isinstance(o, str) else o.name) for o in graph.output}
 
     def retrieve_idnodes(graph, existing_nodes):
         idnodes = []
@@ -160,13 +160,22 @@ def onnx_remove_node_identity(onnx_model, recursive=True, debug_info=None):
 
     # Finally create the new graph.
     nodes = list(filter(lambda n: n is not None, nodes))
-    graph = make_graph(
-        nodes,
-        onnx_model.name,
-        onnx_model.input,
-        onnx_model.output,
-        onnx_model.initializer,
-    )
-
-    graph.value_info.extend(onnx_model.value_info)
+    if hasattr(onnx_model, "initializer"):
+        graph = make_graph(
+            nodes,
+            onnx_model.name,
+            onnx_model.input,
+            onnx_model.output,
+            onnx_model.initializer,
+        )
+        graph.value_info.extend(onnx_model.value_info)
+    else:
+        graph = make_function(
+            onnx_model.domain,
+            onnx_model.name,
+            onnx_model.input,
+            onnx_model.output,
+            nodes,
+            onnx_model.opset_import,
+        )
     return graph

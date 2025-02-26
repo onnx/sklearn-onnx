@@ -8,7 +8,13 @@ from logging import getLogger
 from collections import OrderedDict
 import numpy as np
 from onnx import onnx_pb as onnx_proto
-from onnx.helper import make_graph, make_model, make_tensor_value_info
+from onnx.helper import (
+    make_graph,
+    make_model,
+    make_tensor_value_info,
+    make_node,
+    make_function,
+)
 from onnxconverter_common.data_types import (
     DataType,
     TensorType,
@@ -1463,6 +1469,148 @@ class Topology:
             container.add_output(o)
 
 
+def make_model_from_container(
+    container: ModelComponentContainer,
+    remove_identity=True,
+    doc_string="",
+    verbose: int = 0,
+    onnx_target_opset=None,
+    model_name="",
+    as_function=False,
+    domain_name="",
+):
+    container.ensure_topological_order()
+
+    if len(container.inputs) == 0:
+        raise RuntimeError("No detected inputs after conversion.")
+    if len(container.outputs) == 0:
+        raise RuntimeError("No detected outputs after conversion.")
+    if verbose >= 2:
+        print("---NODES---")
+        for node in container.nodes:
+            print(
+                "  %s - %s: %r -> %r"
+                % (node.op_type, node.name, node.input, node.output)
+            )
+
+    # Create a graph from its main components
+    if container.target_opset_onnx < 9:
+        assert not as_function, "Functions not supported for opset < 9."
+        # When calling ModelComponentContainer's add_initializer(...),
+        # nothing is added into the input list. However, for ONNX target
+        # opset < 9, initializers should also be a part of model's
+        # (GraphProto) inputs. Thus, we create ValueInfoProto objects
+        # from initializers (type: TensorProto) directly and then add
+        # them into model's input list.
+        extra_inputs = []  # ValueInfoProto list of the initializers
+        for tensor in container.initializers:
+            # Sometimes (especially when creating optional input values
+            # such as RNN's initial hidden state), an initializer is also
+            # one of the original model's input, so it has been added into
+            # the container's input list. If this is the case, we need to
+            # skip one iteration to avoid duplicated inputs.
+            if tensor.name in [value_info.name for value_info in container.inputs]:
+                continue
+
+            # Initializers are always tensors so we can just call
+            # make_tensor_value_info(...).
+            value_info = make_tensor_value_info(
+                tensor.name, tensor.data_type, tensor.dims
+            )
+            extra_inputs.append(value_info)
+
+        # Before ONNX opset 9, initializers were needed to be passed in
+        # with inputs.
+        graph = make_graph(
+            container.nodes,
+            model_name,
+            container.inputs + extra_inputs,
+            container.outputs,
+            container.initializers,
+        )
+    else:
+        # In ONNX opset 9 and above, initializers are included as
+        # operator inputs and therefore do not need to be passed as
+        # extra_inputs.
+        if as_function:
+            graph = make_function(
+                domain_name,
+                model_name,
+                [i.name for i in container.inputs],
+                [i.name for i in container.outputs],
+                [
+                    *[
+                        make_node("Constant", [], [init.name], value=init)
+                        for init in container.initializers
+                    ],
+                    *container.nodes,
+                ],
+                [],  # opsets
+            )
+        else:
+            graph = make_graph(
+                container.nodes,
+                model_name,
+                container.inputs,
+                container.outputs,
+                container.initializers,
+            )
+
+    # Create model
+    if as_function:
+        onnx_model = graph
+    else:
+        # Add extra information related to the graph
+        graph.value_info.extend(container.value_info)
+        onnx_model = make_model(graph)
+
+    # Update domain version
+    opv = min(
+        onnx_target_opset, _get_main_opset_version(onnx_model) or onnx_target_opset
+    )
+    if not _update_domain_version(container, onnx_model, verbose=verbose):
+        # Main opset was not added. Doing it here.
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = ""
+        op_set.version = opv
+        if verbose > 0:
+            print("[convert_topology] +opset: name=%r, version=%s" % ("", opv))
+
+    # Add extra information
+    if not as_function:
+        irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
+        onnx_model.ir_version = irv
+        onnx_model.producer_name = utils.get_producer()
+        onnx_model.producer_version = utils.get_producer_version()
+        onnx_model.domain = utils.get_domain()
+        onnx_model.model_version = utils.get_model_version()
+    onnx_model.doc_string = doc_string
+
+    # Removes many identity nodes,
+    # the converter may introduct identity nodes
+    # after a zipmap operator and onnx <= 1.7 does not
+    # support that. It does not use onnxconverter-common
+    # as the optimizer only support opset >= 9.
+    if remove_identity:
+        onnx_model = onnx_remove_node_identity(onnx_model)
+
+    # process functions
+    for key, cont in container.local_functions.items():
+        domain, name = key
+        proto = make_model_from_container(
+            cont,
+            remove_identity=remove_identity,
+            verbose=verbose,
+            as_function=True,
+            model_name=name,
+            domain_name=domain,
+            onnx_target_opset=container.target_opset_onnx,
+        )
+        onnx_model.functions.append(proto)
+
+    return onnx_model
+
+
 def convert_topology(
     topology,
     model_name,
@@ -1522,106 +1670,17 @@ def convert_topology(
         black_op=topology.raw_model._black_op,
         verbose=verbose,
     )
-
     # Traverse the graph from roots to leaves
     # This loop could eventually be parallelized.
     topology.convert_operators(container=container, verbose=verbose)
-    container.ensure_topological_order()
-
-    if len(container.inputs) == 0:
-        raise RuntimeError("No detected inputs after conversion.")
-    if len(container.outputs) == 0:
-        raise RuntimeError("No detected outputs after conversion.")
-    if verbose >= 2:
-        print("---NODES---")
-        for node in container.nodes:
-            print(
-                "  %s - %s: %r -> %r"
-                % (node.op_type, node.name, node.input, node.output)
-            )
-
-    # Create a graph from its main components
-    if container.target_opset_onnx < 9:
-        # When calling ModelComponentContainer's add_initializer(...),
-        # nothing is added into the input list. However, for ONNX target
-        # opset < 9, initializers should also be a part of model's
-        # (GraphProto) inputs. Thus, we create ValueInfoProto objects
-        # from initializers (type: TensorProto) directly and then add
-        # them into model's input list.
-        extra_inputs = []  # ValueInfoProto list of the initializers
-        for tensor in container.initializers:
-            # Sometimes (especially when creating optional input values
-            # such as RNN's initial hidden state), an initializer is also
-            # one of the original model's input, so it has been added into
-            # the container's input list. If this is the case, we need to
-            # skip one iteration to avoid duplicated inputs.
-            if tensor.name in [value_info.name for value_info in container.inputs]:
-                continue
-
-            # Initializers are always tensors so we can just call
-            # make_tensor_value_info(...).
-            value_info = make_tensor_value_info(
-                tensor.name, tensor.data_type, tensor.dims
-            )
-            extra_inputs.append(value_info)
-
-        # Before ONNX opset 9, initializers were needed to be passed in
-        # with inputs.
-        graph = make_graph(
-            container.nodes,
-            model_name,
-            container.inputs + extra_inputs,
-            container.outputs,
-            container.initializers,
-        )
-    else:
-        # In ONNX opset 9 and above, initializers are included as
-        # operator inputs and therefore do not need to be passed as
-        # extra_inputs.
-        graph = make_graph(
-            container.nodes,
-            model_name,
-            container.inputs,
-            container.outputs,
-            container.initializers,
-        )
-
-    # Add extra information related to the graph
-    graph.value_info.extend(container.value_info)
-
-    # Create model
-    onnx_model = make_model(graph)
-
-    # Update domain version
-    opv = min(
-        onnx_target_opset, _get_main_opset_version(onnx_model) or onnx_target_opset
+    return make_model_from_container(
+        container,
+        remove_identity=remove_identity,
+        doc_string=doc_string,
+        verbose=verbose,
+        onnx_target_opset=onnx_target_opset,
+        model_name=model_name,
     )
-    if not _update_domain_version(container, onnx_model, verbose=verbose):
-        # Main opset was not added. Doing it here.
-        op_set = onnx_model.opset_import.add()
-        op_set.domain = ""
-        op_set.version = opv
-        if verbose > 0:
-            print("[convert_topology] +opset: name=%r, version=%s" % ("", opv))
-
-    # Add extra information
-    irv = OPSET_TO_IR_VERSION.get(opv, onnx_proto.IR_VERSION)
-    onnx_model.ir_version = irv
-    onnx_model.producer_name = utils.get_producer()
-    onnx_model.producer_version = utils.get_producer_version()
-    onnx_model.domain = utils.get_domain()
-    onnx_model.model_version = utils.get_model_version()
-    onnx_model.doc_string = doc_string
-
-    # Removes many identity nodes,
-    # the converter may introduct identity nodes
-    # after a zipmap operator and onnx <= 1.7 does not
-    # support that. It does not use onnxconverter-common
-    # as the optimizer only support opset >= 9.
-    if remove_identity:
-        onnx_model = onnx_remove_node_identity(onnx_model)
-
-    return onnx_model
 
 
 def _update_domain_version(container, onnx_model, verbose=0):
@@ -1637,10 +1696,12 @@ def _update_domain_version(container, onnx_model, verbose=0):
             )
 
     # Fill operator sets
+    done = set()
     i = 0
     for op_domain, op_version in purified_operator_set.items():
         if op_version is None:
             continue
+        done.add(op_domain)
         if i == 0 and len(onnx_model.opset_import) == 1:
             # Overwrite the default operator set created by
             # make_model(...)
@@ -1672,6 +1733,14 @@ def _update_domain_version(container, onnx_model, verbose=0):
                 "this model, which requires at least opset "
                 "%d." % (container.target_opset_any_domain(op_domain), op_version)
             )
+    for k, v in container.target_opset_all.items():
+        if k in done:
+            continue
+        # Some opsets may be forgotten if they appear in subgraphs.
+        op_set = onnx_model.opset_import.add()
+        op_set.domain = k
+        op_set.version = v
+
     return "" in purified_operator_set
 
 

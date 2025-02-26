@@ -19,7 +19,10 @@ except ImportError:
     # onnx is too old.
     pass
 
-from onnx.helper import split_complex_to_pairs
+try:
+    from onnx.helper import _split_complex_to_pairs as split_complex_to_pairs
+except ImportError:
+    from onnx.helper import split_complex_to_pairs
 
 
 def make_tensor_fixed(name, data_type, dims, vals, raw=False):

@@ -47,7 +47,7 @@ class TestConvert(unittest.TestCase):
                     model, X[:1].astype(numpy.float32), target_opset=tops
                 )
                 dom = get_domain_opset(model_onnx)
-                self.assertEqual(len(dom), 1)
+                self.assertEqual(len(dom), 2)
                 assert dom[""] <= i
 
     @unittest.skipIf(KBinsDiscretizer is None, "skl too old")
@@ -82,7 +82,7 @@ class TestConvert(unittest.TestCase):
                     model, X[:1].astype(numpy.float32), target_opset=tops
                 )
                 dom = get_domain_opset(model_onnx)
-                self.assertEqual(len(dom), 1)
+                self.assertEqual(len(dom), 2)
                 self.assertIn(dom[""], (i, i - 1))
 
     def test_onehot(self):
