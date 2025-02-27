@@ -2,6 +2,12 @@
 
 ## 1.19.0
 
+* Refactors KNNImputer converter with local function to match
+  scikit-learn's implementation, the code was partially
+  automatically generated from an equivalent implementation
+  in pytorch and exported into ONNX
+  [#1167](https://github.com/onnx/sklearn-onnx/issues/1167),
+  [#1165](https://github.com/onnx/sklearn-onnx/issues/1165)
 * Add support to sklearn TargetEncoder
   [#1137](https://github.com/onnx/sklearn-onnx/issues/1137)
 * Fixes missing WhiteKernel with return_std=True #1163

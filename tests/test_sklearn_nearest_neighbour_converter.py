@@ -919,7 +919,10 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
 
     def _get_torch_knn_imputer(self):
-        import torch
+        try:
+            import torch
+        except ImportError:
+            return None, None
 
         def _get_weights(dist, weights):
             """Get the weights from an array of distances and a parameter ``weights``.
@@ -1729,6 +1732,56 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             basename="SklearnKNNImputer2025",
             backend="onnxruntime",
         )
+
+    @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.16.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.20.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        sys.platform != "linux" and pv.Version(skl_version) < pv.Version("1.6.0"),
+        "investigate why topk returns different results",
+    )
+    def test_knn_imputer_one_nan(self):
+        import numpy as np
+        import onnxruntime as rt
+
+        np.random.seed(42)
+        data = np.random.randn(8, 2).astype(np.float32)
+        data[0, -1] = np.nan
+        imputer = KNNImputer(n_neighbors=5)
+        imputer.fit(data)
+        dataft = imputer.transform(data)
+
+        tmodel_cls, _ = self._get_torch_knn_imputer()
+        if tmodel_cls is not None:
+            import torch
+
+            tmodel = tmodel_cls(imputer)
+            ty = tmodel.transform(
+                torch.from_numpy(imputer._mask_fit_X),
+                torch.from_numpy(imputer._valid_mask),
+                torch.from_numpy(imputer._fit_X.astype(numpy.float32)),
+                torch.from_numpy(data),
+            )
+            assert_almost_equal(dataft[:2], ty[:2].numpy())
+
+        input_data = data.astype(np.float32)
+        initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
+        onnx_model = convert_sklearn(imputer, initial_types=initial_type)
+        # with open("test_knn_imputer_one_nan.onnx", "wb") as f:
+        #     f.write(onnx_model.SerializeToString())
+
+        sess = rt.InferenceSession(onnx_model.SerializeToString())
+        input_name = sess.get_inputs()[0].name
+        output_name = sess.get_outputs()[0].name
+        res = sess.run([output_name], {input_name: input_data})
+        assert_almost_equal(dataft[:2], res[0][:2])
 
 
 if __name__ == "__main__":
