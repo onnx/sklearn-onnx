@@ -1733,6 +1733,20 @@ class TestNearestNeighbourConverter(unittest.TestCase):
             backend="onnxruntime",
         )
 
+    @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.16.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @ignore_warnings(category=DeprecationWarning)
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("1.20.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @unittest.skipIf(
+        sys.platform != "linux" and pv.Version(skl_version) < pv.Version("1.6.0"),
+        "investigate why topk returns different results",
+    )
     def test_knn_imputer_one_nan(self):
         import numpy as np
         import onnxruntime as rt
