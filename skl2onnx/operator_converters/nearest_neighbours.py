@@ -1320,6 +1320,7 @@ def make_knn_imputer_column_nan_found(
     dist_chunk = gr.make_tensor_input("dist_chunk")
     _fit_x = gr.make_tensor_input("_fit_x")
     row_missing_idx = gr.make_tensor_input("row_missing_idx")
+    n_neighours = gr.make_tensor_input("n_neighbors")
 
     op = gr.get_op_builder(scope)
 
@@ -1335,10 +1336,6 @@ def make_knn_imputer_column_nan_found(
     init7_s_1 = op.Constant(
         value=from_array(np.array(1, dtype=np.int64), name="value"),
         outputs=["init7_s_1"],
-    )
-    c_lifted_tensor_1 = op.Constant(
-        value=from_array(np.array(3, dtype=np.int64), name="value"),
-        outputs=["c_lifted_tensor_1"],
     )
     c_lifted_tensor_2 = op.Constant(
         value=from_array(np.array([1], dtype=np.int64), name="value"),
@@ -1434,8 +1431,8 @@ def make_knn_imputer_column_nan_found(
         outputs=["select_scatter", "dist_subset_updated", "receivers_idx_updated"],
     )
 
-    lt = op.Less(c_lifted_tensor_1, sym_size_int_23, outputs=["lt"])
-    where_1 = op.Where(lt, c_lifted_tensor_1, sym_size_int_23, outputs=["where_1"])
+    lt = op.Less(n_neighours, sym_size_int_23, outputs=["lt"])
+    where_1 = op.Where(lt, n_neighours, sym_size_int_23, outputs=["where_1"])
     le = op.LessOrEqual(where_1, init7_s_0, outputs=["le"])
     # c_lifted_tensor_2 -> init7_s_1 to have a zero time, onnxruntime crashes wher shapes are
     # (), (1,), ()
@@ -1502,6 +1499,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
     mask = gr.make_tensor_input("mask")
     row_missing_idx = gr.make_tensor_input("row_missing_idx")
     _fit_x = gr.make_tensor_input("_fit_x")
+    n_neighbors = gr.make_tensor_input("n_neighbors")
 
     op = gr.get_op_builder(scope)
     zero32 = op.Constant(
@@ -1549,6 +1547,7 @@ def make_knn_imputer_column(g: ModelComponentContainer, scope: Scope, itype: int
                         dist_chunk,
                         _fit_x,
                         row_missing_idx,
+                        n_neighbors,
                     ],
                     ["X"],
                     domain="local_domain",
@@ -1572,6 +1571,7 @@ def _knn_imputer_builder(
     _mask_fit_x: "BOOL[s0, 2]",  # noqa: F821
     _valid_mask: "BOOL[2]",  # noqa: F821
     _fit_x: "DOUBLE[s1, 2]",  # noqa: F821
+    n_neighbors: "INT",  # noqa: F821
     x: "FLOAT[s2, 2]",  # noqa: F821
     itype: int,
 ):
@@ -1614,6 +1614,7 @@ def _knn_imputer_builder(
             isnan,
             nonzero_numpy__0,
             _fit_x,
+            n_neighbors,
             domain="local_domain",
         )
     return op.Compress(x, _valid_mask, axis=1, outputs=["output_0"])
@@ -1656,6 +1657,7 @@ def convert_knn_imputer(
         knn_op._mask_fit_X,
         knn_op._valid_mask,
         training_data,
+        np.array(knn_op.n_neighbors, dtype=np.int64),
         operator.inputs[0].full_name,
         itype=proto_type,
     )
