@@ -31,6 +31,12 @@ def convert_quadratic_discriminant_analysis_classifier(
     model = operator.raw_operator
 
     n_classes = len(model.classes_)
+    if all(isinstance(i, str) for i in model.classes_):
+        class_type = onnx_proto.TensorProto.STRING
+        class_labels = [s.encode("utf-8") for s in model.classes_]
+    else:
+        class_type = onnx_proto.TensorProto.INT64
+        class_labels = [int(i) for i in model.classes_]
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
     if proto_dtype != onnx_proto.TensorProto.DOUBLE:
@@ -149,9 +155,8 @@ def convert_quadratic_discriminant_analysis_classifier(
 
     classes = scope.get_unique_variable_name("classes")
     container.add_initializer(
-        classes, onnx_proto.TensorProto.INT64, [n_classes], model.classes_
+        classes, class_type, [n_classes], class_labels
     )
-
     container.add_node(
         "ArrayFeatureExtractor",
         [classes, argmax_out],
