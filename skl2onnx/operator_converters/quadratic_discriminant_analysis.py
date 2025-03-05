@@ -154,9 +154,7 @@ def convert_quadratic_discriminant_analysis_classifier(
     apply_argmax(scope, [decision_fun], [argmax_out], container, axis=1)
 
     classes = scope.get_unique_variable_name("classes")
-    container.add_initializer(
-        classes, class_type, [n_classes], class_labels
-    )
+    container.add_initializer(classes, class_type, [n_classes], class_labels)
     container.add_node(
         "ArrayFeatureExtractor",
         [classes, argmax_out],
