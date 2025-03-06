@@ -62,6 +62,7 @@ from . import sgd_classifier
 from . import sgd_oneclass_svm
 from . import stacking
 from . import support_vector_machines
+from . import target_encoder
 from . import text_vectoriser
 from . import tfidf_transformer
 from . import tfidf_vectoriser
@@ -130,6 +131,7 @@ __all__ = [
     sgd_oneclass_svm,
     stacking,
     support_vector_machines,
+    target_encoder,
     text_vectoriser,
     tfidf_transformer,
     tfidf_vectoriser,

@@ -2,10 +2,22 @@
 
 ## 1.19.0
 
-In progress.
-
-## 1.18.1
-
+* Refactors KNNImputer converter with local function to match
+  scikit-learn's implementation, the code was partially
+  automatically generated from an equivalent implementation
+  in pytorch and exported into ONNX
+  [#1167](https://github.com/onnx/sklearn-onnx/issues/1167),
+  [#1165](https://github.com/onnx/sklearn-onnx/issues/1165)
+* Add support to sklearn TargetEncoder
+  [#1137](https://github.com/onnx/sklearn-onnx/issues/1137)
+* Fixes missing WhiteKernel with return_std=True #1163
+  [#1163](https://github.com/onnx/sklearn-onnx/issues/1163)
+* Fix empty column selector
+  [#1159](https://github.com/onnx/sklearn-onnx/issues/1159)
+* Fix conversion for XGBClassifier and XGBRegressor
+  [#1157](https://github.com/onnx/sklearn-onnx/issues/1157)
+* Test SelectKBest + StandardScaler pipeline
+  [#1156](https://github.com/onnx/sklearn-onnx/issues/1156)
 * Fix np.NAN into np.nan,
   [#1148](https://github.com/onnx/sklearn-onnx/issues/1148)
 
