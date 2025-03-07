@@ -324,6 +324,8 @@ def compare_outputs(expected, output, verbose=False, **kwargs):
                 else:
                     return OnnxRuntimeAssertionError(str(e))
         else:
+            if "Out0" in kwargs:
+                del kwargs["Out0"]
             try:
                 assert_array_almost_equal(expected, output, verbose=verbose, **kwargs)
             except Exception as e:

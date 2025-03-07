@@ -21,6 +21,9 @@ from sklearn.feature_selection import (
     SelectPercentile,
     VarianceThreshold,
 )
+from sklearn.pipeline import make_pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import Int64TensorType, FloatTensorType
@@ -30,11 +33,33 @@ from test_utils import dump_data_and_model, TARGET_OPSET
 class TestSklearnFeatureSelectionConverters(unittest.TestCase):
     def test_generic_univariate_select_int(self):
         model = GenericUnivariateSelect()
+
         X = np.array(
             [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.int64
         )
         y = np.array([0, 1, 0, 1])
         model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "generic univariate select",
+            [("input", Int64TensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnGenericUnivariateSelect"
+        )
+
+    def test_generic_univariate_select_kbest_int(self):
+        model = GenericUnivariateSelect(mode="k_best", param=2)
+
+        X = np.array(
+            [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.int64
+        )
+        y = np.array([0, 1, 0, 1])
+        model.fit(X, y)
+
         model_onnx = convert_sklearn(
             model,
             "generic univariate select",
@@ -326,6 +351,23 @@ class TestSklearnFeatureSelectionConverters(unittest.TestCase):
 
     def test_select_k_best_float(self):
         model = SelectKBest(k="all")
+        X = np.array(
+            [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.float32
+        )
+        y = np.array([0, 1, 0, 1])
+        model.fit(X, y)
+        model_onnx = convert_sklearn(
+            model,
+            "select k best",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertTrue(model_onnx is not None)
+        dump_data_and_model(X, model, model_onnx, basename="SklearnSelectKBest")
+
+    def test_select_k_best_scaler_logistic_regression_pipeline_float(self):
+        model = make_pipeline(SelectKBest(k=3), StandardScaler(), LogisticRegression())
+
         X = np.array(
             [[1, 2, 3, 1], [0, 3, 1, 4], [3, 5, 6, 1], [1, 2, 1, 5]], dtype=np.float32
         )

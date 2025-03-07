@@ -239,6 +239,12 @@ try:
 except ImportError:
     # not available in 0.19
     KBinsDiscretizer = None
+try:
+    from sklearn.preprocessing import TargetEncoder
+except ImportError:
+    # Not available in scikit-learn < 1.3
+    TargetEncoder = None
+
 from sklearn.preprocessing import (
     LabelBinarizer,
     LabelEncoder,
@@ -266,6 +272,12 @@ try:
 except ImportError:
     # Not available in scikit-learn < 0.20.0
     PowerTransformer = None
+
+try:
+    from sklearn.preprocessing import QuantileTransformer
+except ImportError:
+    # Not available in scikit-learn < 0.19.0
+    QuantileTransformer = None
 
 try:
     from sklearn.ensemble import (
@@ -441,6 +453,7 @@ def build_sklearn_operator_name_map():
             PolynomialFeatures,
             PowerTransformer,
             QuadraticDiscriminantAnalysis,
+            QuantileTransformer,
             RadiusNeighborsClassifier,
             RadiusNeighborsRegressor,
             RandomForestClassifier,
@@ -511,6 +524,7 @@ def build_sklearn_operator_name_map():
             RidgeClassifierCV: "SklearnLinearClassifier",
             SGDRegressor: "SklearnLinearRegressor",
             StandardScaler: "SklearnScaler",
+            TargetEncoder: "SklearnTargetEncoder",
             TheilSenRegressor: "SklearnLinearRegressor",
         }
     )
@@ -597,7 +611,7 @@ def _get_sklearn_operator_name(model_type):
     :return: A string which stands for the type of the input model in
              our conversion framework
     """
-    if model_type not in sklearn_operator_name_map:  # noqa: SIM401
+    if model_type not in sklearn_operator_name_map:
         # No proper operator name found, it means a local operator.
         alias = None
     else:

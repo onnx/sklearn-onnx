@@ -83,6 +83,17 @@ def convert_kernel_diag(
             op_version=op_version,
         )
 
+    if type(kernel) is WhiteKernel:
+        onnx_zeros = _zero_vector_of_size(
+            X, keepdims=0, dtype=dtype, op_version=op_version
+        )
+        return OnnxAdd(
+            onnx_zeros,
+            np.array([kernel.noise_level], dtype=dtype),
+            output_names=output_names,
+            op_version=op_version,
+        )
+
     if type(kernel) in {RBF, ExpSineSquared, RationalQuadratic, Matern}:
         onnx_zeros = _zero_vector_of_size(
             X, keepdims=0, dtype=dtype, op_version=op_version
@@ -114,9 +125,7 @@ def convert_kernel_diag(
             op_version=op_version,
         )
 
-    raise RuntimeError(
-        "Unable to convert diag method for class {}.".format(type(kernel))
-    )
+    raise RuntimeError(f"Unable to convert diag method for class {type(kernel)}")
 
 
 def py_make_float_array(cst, dtype, as_tensor=False):

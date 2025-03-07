@@ -2,6 +2,7 @@
 
 import warnings
 from uuid import uuid4
+from contextlib import contextmanager
 from typing import Callable, Dict, List, Optional, Sequence, Set, Tuple, Union
 import numpy as np
 import sklearn.base
@@ -290,9 +291,6 @@ def to_onnx(
     :class:`OnnxOperatorMixin`, it calls method *to_onnx*
     in that case otherwise it calls :func:`convert_sklearn`.
 
-    .. versionchanged:: 1.10.0
-        Parameter *naming* was added.
-
     .. versionchanged:: 1.18.0
         The main opset is now equal to target_opset and not a value equal or less
         than the given value.
@@ -360,3 +358,27 @@ def wrap_as_onnx_mixin(model, target_opset=None):
     obj.__setstate__(state)
     obj.op_version = target_opset
     return obj
+
+
+@contextmanager
+def may_switch_bases_classes_order(cls):
+    """
+    XGBClassifier and XGBRegressor do not inherit from those classes
+    in the right order. We change it when it is registered to avoid
+    ``AttributeError: 'super' object has no attribute '__sklearn_tags__'``
+    to be raised.
+    """
+    bases = cls.__bases__
+    if len(bases) == 2 and bases[1] in (
+        sklearn.base.ClassifierMixin,
+        sklearn.base.RegressorMixin,
+    ):
+        cls.__bases__ = bases[1], bases[0]
+        revert = True
+    else:
+        revert = False
+    try:
+        yield
+    finally:
+        if revert:
+            cls.__bases__ = bases

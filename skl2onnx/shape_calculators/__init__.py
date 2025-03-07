@@ -10,6 +10,7 @@ from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
 from . import ensemble_shapes
+from . import feature_selection
 from . import feature_hasher
 from . import flatten
 from . import function_transformer
@@ -39,6 +40,7 @@ from . import pipelines
 from . import polynomial_features
 from . import power_transformer
 from . import quadratic_discriminant_analysis
+from . import quantile_transformer
 from . import random_projection
 from . import random_trees_embedding
 from . import replace_op
@@ -47,6 +49,7 @@ from . import sequence
 from . import sgd_oneclass_svm
 from . import svd
 from . import support_vector_machines
+from . import target_encoder
 from . import text_vectorizer
 from . import tuned_threshold_classifier
 from . import tfidf_transformer
@@ -63,6 +66,7 @@ __all__ = [
     dict_vectorizer,
     ensemble_shapes,
     feature_hasher,
+    feature_selection,
     flatten,
     function_transformer,
     gaussian_process,
@@ -91,6 +95,7 @@ __all__ = [
     polynomial_features,
     power_transformer,
     quadratic_discriminant_analysis,
+    quantile_transformer,
     random_projection,
     random_trees_embedding,
     replace_op,
@@ -99,6 +104,7 @@ __all__ = [
     sgd_oneclass_svm,
     svd,
     support_vector_machines,
+    target_encoder,
     text_vectorizer,
     tfidf_transformer,
     tuned_threshold_classifier,

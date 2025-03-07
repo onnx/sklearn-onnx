@@ -1,36 +1,32 @@
 # SPDX-License-Identifier: Apache-2.0
-import copy
-
 import numpy as np
 
 from ..common._apply_operation import apply_cast, apply_concat, apply_reshape
 from ..common._container import ModelComponentContainer
 from ..common.data_types import (
-    DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
-    Int32TensorType,
-    Int16TensorType,
 )
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..proto import onnx_proto
 
 
-def convert_sklearn_ordinal_encoder(
+def convert_sklearn_target_encoder(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
-    ordinal_op = operator.raw_operator
+    op = operator.raw_operator
     result = []
     input_idx = 0
     dimension_idx = 0
 
-    # handle the 'handle_unknown=use_encoded_value' case
-    default_value = (
-        None if ordinal_op.handle_unknown == "error" else int(ordinal_op.unknown_value)
-    )
-
-    for categories in ordinal_op.categories_:
+    if op.target_type_ not in ("binary", "continuous"):
+        raise NotImplementedError(
+            "Current implementation of the converter only support TargetEncoder for"
+            " binary classification or 1d regression (sklearn target types binary"
+            " or continuous). See scikit-learn type_of_target documentation for details."
+        )
+    for categories, encodings in zip(op.categories_, op.encodings_):
         if len(categories) == 0:
             continue
 
@@ -62,33 +58,7 @@ def convert_sklearn_ordinal_encoder(
                 dimension_idx = 0
                 input_idx += 1
 
-        to = None
-        if isinstance(current_input.type, DoubleTensorType):
-            to = onnx_proto.TensorProto.FLOAT
-        if isinstance(current_input.type, (Int16TensorType, Int32TensorType)):
-            to = onnx_proto.TensorProto.INT64
-        if to is not None:
-            dtype = (
-                Int64TensorType
-                if to == onnx_proto.TensorProto.INT64
-                else FloatTensorType
-            )
-            casted_feature_column = scope.declare_local_variable(
-                "casted_feature_column", dtype(copy.copy(feature_column.type.shape))
-            )
-
-            apply_cast(
-                scope,
-                feature_column.onnx_name,
-                casted_feature_column.onnx_name,
-                container,
-                to=to,
-            )
-
-            feature_column = casted_feature_column
-
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
-
         if isinstance(feature_column.type, FloatTensorType):
             attrs["keys_floats"] = np.array(
                 [float(s) for s in categories], dtype=np.float32
@@ -101,26 +71,8 @@ def convert_sklearn_ordinal_encoder(
             attrs["keys_strings"] = np.array(
                 [str(s).encode("utf-8") for s in categories]
             )
-
-        # hanlde encoded_missing_value
-        if not np.isnan(ordinal_op.encoded_missing_value) and (
-            isinstance(categories[-1], float) and np.isnan(categories[-1])
-        ):
-            # sklearn always places np.nan as the last entry
-            # in its cathegories if it was in the training data
-            # => we simply add the 'ordinal_op.encoded_missing_value'
-            # as our last entry in 'values_int64s' if it was in the training data
-            encoded_missing_value = np.array(
-                [int(ordinal_op.encoded_missing_value)]
-            ).astype(np.int64)
-            attrs["values_int64s"] = np.concatenate(
-                (np.arange(len(categories) - 1).astype(np.int64), encoded_missing_value)
-            )
-        else:
-            attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
-
-        if default_value:
-            attrs["default_int64"] = default_value
+        attrs["values_floats"] = encodings
+        attrs["default_float"] = op.target_mean_
 
         result.append(scope.get_unique_variable_name("ordinal_output"))
         label_encoder_output = scope.get_unique_variable_name("label_encoder")
@@ -143,14 +95,13 @@ def convert_sklearn_ordinal_encoder(
 
     concat_result_name = scope.get_unique_variable_name("concat_result")
     apply_concat(scope, result, concat_result_name, container, axis=1)
-    cast_type = (
-        onnx_proto.TensorProto.FLOAT
-        if np.issubdtype(ordinal_op.dtype, np.floating)
-        else onnx_proto.TensorProto.INT64
-    )
     apply_cast(
-        scope, concat_result_name, operator.output_full_names, container, to=cast_type
+        scope,
+        concat_result_name,
+        operator.output_full_names,
+        container,
+        to=onnx_proto.TensorProto.FLOAT,
     )
 
 
-register_converter("SklearnOrdinalEncoder", convert_sklearn_ordinal_encoder)
+register_converter("SklearnTargetEncoder", convert_sklearn_target_encoder)

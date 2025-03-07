@@ -50,6 +50,7 @@ from . import pipelines
 from . import polynomial_features
 from . import power_transformer
 from . import quadratic_discriminant_analysis
+from . import quantile_transformer
 from . import random_forest
 from . import random_projection
 from . import random_trees_embedding
@@ -61,6 +62,7 @@ from . import sgd_classifier
 from . import sgd_oneclass_svm
 from . import stacking
 from . import support_vector_machines
+from . import target_encoder
 from . import text_vectoriser
 from . import tfidf_transformer
 from . import tfidf_vectoriser
@@ -117,6 +119,7 @@ __all__ = [
     polynomial_features,
     power_transformer,
     quadratic_discriminant_analysis,
+    quantile_transformer,
     random_forest,
     random_projection,
     random_trees_embedding,
@@ -128,6 +131,7 @@ __all__ = [
     sgd_oneclass_svm,
     stacking,
     support_vector_machines,
+    target_encoder,
     text_vectoriser,
     tfidf_transformer,
     tfidf_vectoriser,
