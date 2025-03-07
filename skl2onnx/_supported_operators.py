@@ -274,6 +274,12 @@ except ImportError:
     PowerTransformer = None
 
 try:
+    from sklearn.preprocessing import QuantileTransformer
+except ImportError:
+    # Not available in scikit-learn < 0.19.0
+    QuantileTransformer = None
+
+try:
     from sklearn.ensemble import (
         HistGradientBoostingClassifier,
         HistGradientBoostingRegressor,
@@ -447,6 +453,7 @@ def build_sklearn_operator_name_map():
             PolynomialFeatures,
             PowerTransformer,
             QuadraticDiscriminantAnalysis,
+            QuantileTransformer,
             RadiusNeighborsClassifier,
             RadiusNeighborsRegressor,
             RandomForestClassifier,
