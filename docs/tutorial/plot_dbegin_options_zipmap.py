@@ -61,7 +61,6 @@ print("type for the first observations:", type(res[1][0]))
 #
 # Probabilities are now a matrix.
 
-initial_type = [("float_input", FloatTensorType([None, 4]))]
 options = {id(clr): {"zipmap": False}}
 onx2 = to_onnx(clr, X_train, options=options, target_opset=12)
 
@@ -125,7 +124,6 @@ print(sum(repeat(lambda: sess3.run(None, {"X": X_test}), number=100, repeat=10))
 # `output_class_labels` can be used to expose the labels
 # as a third output.
 
-initial_type = [("float_input", FloatTensorType([None, 4]))]
 options = {id(clr): {"zipmap": False, "output_class_labels": True}}
 onx4 = to_onnx(clr, X_train, options=options, target_opset=12)
 
