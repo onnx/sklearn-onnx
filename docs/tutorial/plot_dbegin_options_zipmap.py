@@ -26,7 +26,6 @@ from sklearn.model_selection import train_test_split
 import onnxruntime as rt
 import onnx
 import skl2onnx
-from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import to_onnx
 from sklearn.linear_model import LogisticRegression
 from sklearn.multioutput import MultiOutputClassifier
