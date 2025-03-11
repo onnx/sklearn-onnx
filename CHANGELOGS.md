@@ -2,6 +2,8 @@
 
 ## 1.19.0
 
+* Implements converter for QuantileTransformer
+  [#1164](https://github.com/onnx/sklearn-onnx/issues/1164),
 * Refactors KNNImputer converter with local function to match
   scikit-learn's implementation, the code was partially
   automatically generated from an equivalent implementation
