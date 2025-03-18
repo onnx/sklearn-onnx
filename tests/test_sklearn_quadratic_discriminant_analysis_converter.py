@@ -55,6 +55,36 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(onnx_version) < pv.Version("1.11"), reason="fails with onnx 1.10"
     )
+    def test_model_qda_2c2f_float_string_labels(self):
+        # 2 classes, 2 features, string_labels
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+        y = np.array(["apple", "apple", "apple", "banana", "banana", "banana"])
+        X_test = np.array([[-0.8, -1], [0.8, 1]])
+
+        skl_model = QuadraticDiscriminantAnalysis()
+        skl_model.fit(X, y)
+
+        onnx_model = convert_sklearn(
+            skl_model,
+            "scikit-learn QDA",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+
+        self.assertIsNotNone(onnx_model)
+        dump_data_and_model(
+            X_test.astype(np.float32),
+            skl_model,
+            onnx_model,
+            basename="SklearnQDA_2c2f_Float_String_labels",
+        )
+
+    @unittest.skipIf(
+        pv.Version(sklearn.__version__) < pv.Version("1.0"), reason="scikit-learn<1.0"
+    )
+    @unittest.skipIf(
+        pv.Version(onnx_version) < pv.Version("1.11"), reason="fails with onnx 1.10"
+    )
     def test_model_qda_2c3f_float(self):
         # 2 classes, 3 features
         X = np.array(
