@@ -26,7 +26,7 @@ It basically copies what is in example
 """
 
 from skl2onnx.common.data_types import guess_proto_type
-from onnxconverter_common.onnx_ops import apply_sub
+from skl2onnx.common._apply_operation import apply_sub
 from onnxruntime import InferenceSession
 from skl2onnx import update_registered_converter
 from skl2onnx import to_onnx
@@ -128,7 +128,6 @@ def decorrelate_transformer_converter(scope, operator, container):
 
     op_name = scope.get_unique_operator_name("sub")
     sub_name = scope.get_unique_variable_name("sub")
-    # This function is defined in package onnxconverter_common.
     # Most common operators can be added to the graph with
     # these functions. It handles the case when specifications
     # changed accross opsets (a parameter becomes an input

@@ -31,11 +31,6 @@ try:
 except ImportError:
     # scikit-learn < 0.22
     from sklearn.utils.testing import ignore_warnings
-try:
-    from skl2onnx.common._apply_operation import apply_less
-except ImportError:
-    # onnxconverter-common is too old
-    apply_less = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     FloatTensorType,
@@ -318,7 +313,6 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
-    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
     @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_svc(self):
@@ -341,7 +335,6 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
-    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
     @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_linearsvc(self):
@@ -366,7 +359,6 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
-    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
     @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_linearsvc2(self):
@@ -393,7 +385,6 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
-    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
     @unittest.skipIf(not skl12(), reason="base_estimator")
     def test_model_calibrated_classifier_cv_svc2_binary(self):
