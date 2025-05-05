@@ -26,7 +26,7 @@ It basically copies what is in example
 """
 
 from skl2onnx.common.data_types import guess_proto_type
-from skl2onnx.onnx_ops import apply_sub
+from skl2onnx.common._apply_operation import apply_sub
 from onnxruntime import InferenceSession
 from skl2onnx import update_registered_converter
 from skl2onnx import to_onnx

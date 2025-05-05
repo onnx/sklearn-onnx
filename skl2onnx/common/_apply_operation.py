@@ -814,3 +814,17 @@ def apply_less(scope, input_names, output_name, container, operator_name=None):
     container.add_node(
         "Less", input_names, output_name, name=name, op_version=op_version
     )
+
+
+def apply_greater(scope, input_names, output_name, container, operator_name=None):
+    name = _create_name_or_use_existing_one(scope, "Greater", operator_name)
+    if container.target_opset < 7:
+        op_version = 1
+    elif container.target_opset < 9:
+        op_version = 7
+    else:
+        op_version = 9
+
+    container.add_node(
+        "Greater", input_names, output_name, name=name, op_version=op_version
+    )
