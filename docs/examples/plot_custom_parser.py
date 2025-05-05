@@ -34,7 +34,7 @@ from skl2onnx import update_registered_converter
 import os
 from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
-from onnxconverter_common.onnx_ops import apply_identity, apply_cast, apply_greater
+from skl2onnx.common._apply_operation import apply_identity, apply_cast, apply_greater
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common._registration import get_shape_calculator

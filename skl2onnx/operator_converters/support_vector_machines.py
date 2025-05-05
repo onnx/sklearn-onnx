@@ -4,18 +4,12 @@ import numbers
 import numpy as np
 from scipy.sparse import isspmatrix
 from sklearn.svm import SVC, NuSVC, SVR, NuSVR, OneClassSVM
-from ..common._apply_operation import apply_cast
+from ..common._apply_operation import apply_cast, apply_less
 from ..common.data_types import BooleanTensorType, Int64TensorType, guess_proto_type
 from ..common._registration import register_converter
 from ..proto import onnx_proto
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-
-try:
-    from ..common._apply_operation import apply_less
-except ImportError:
-    # onnxconverter-common is too old
-    apply_less = None
 
 
 def convert_sklearn_svm_regressor(
@@ -288,12 +282,6 @@ def convert_sklearn_svm_classifier(
         # main/sklearn/utils/multiclass.py#L407:
         # ::
         #     _ovr_decision_function(dec < 0, -dec, len(self.classes_))
-
-        if apply_less is None:
-            raise RuntimeError(
-                "Function apply_less is missing. onnxconverter-common is too old."
-            )
-
         cst0 = scope.get_unique_variable_name("cst0")
         negative = scope.get_unique_variable_name("negative")
         container.add_initializer(cst0, proto_dtype, [], [0])

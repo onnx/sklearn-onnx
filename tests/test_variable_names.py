@@ -21,7 +21,7 @@ except ImportError:
 from skl2onnx import get_model_alias, update_registered_converter
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
 from skl2onnx import convert_sklearn, to_onnx
-from onnxconverter_common.data_types import (
+from skl2onnx.common.data_types import (
     FloatTensorType,
     Int64TensorType,
     StringTensorType,

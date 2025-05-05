@@ -11,11 +11,6 @@ from numpy.testing import assert_almost_equal
 from sklearn.datasets import load_iris
 from sklearn.svm import SVC, SVR, NuSVC, NuSVR, OneClassSVM, LinearSVC
 
-try:
-    from skl2onnx.common._apply_operation import apply_less
-except ImportError:
-    # onnxconverter-common is too old
-    apply_less = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -187,7 +182,6 @@ class TestSklearnSVM(unittest.TestCase):
 
         dump_data_and_model(X, model, model_onnx, basename="SklearnMclSVCLinearPF-Dec4")
 
-    @unittest.skipIf(apply_less is None, reason="onnxconverter-common old")
     def test_convert_svc_multi_linear_pfalse_ovr(self):
         model, X = self._fit_multi_classification(
             SVC(kernel="linear", probability=False, decision_function_shape="ovr")

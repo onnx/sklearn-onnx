@@ -19,12 +19,12 @@ from onnx.helper import (
     make_tensor_value_info,
 )
 import onnx.onnx_cpp2py_export.defs as C
-from onnxconverter_common.onnx_ops import __dict__ as dict_apply_operation
 from ..proto import TensorProto
 from .utils import get_domain
 from .graph_builder_opset import Opset
 
 
+dict_apply_operation = {}
 logger = getLogger("skl2onnx")
 
 
