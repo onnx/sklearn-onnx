@@ -7,12 +7,6 @@ from ..common._apply_operation import (
     apply_mul,
     apply_div,
 )
-
-try:
-    from ..common._apply_operation import apply_less
-except ImportError:
-    # onnxconverter-common is too old
-    apply_less = None
 from ..common.data_types import guess_proto_type
 from ..common._registration import register_converter
 from ..proto import onnx_proto

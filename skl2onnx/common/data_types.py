@@ -1,172 +1,283 @@
 # SPDX-License-Identifier: Apache-2.0
 
+import numbers
 import numpy as np
-from onnxconverter_common.data_types import (  # noqa: F401
-    DataType,
-    Int64Type,
-    FloatType,
-    StringType,
-    TensorType,
-    Int64TensorType,
-    Int32TensorType,
-    BooleanTensorType,
-    FloatTensorType,
-    StringTensorType,
-    DoubleTensorType,
-    DictionaryType,
-    SequenceType,
-)
-
-try:
-    from onnxconverter_common.data_types import (
-        Complex64TensorType,
-        Complex128TensorType,
-    )
-except ImportError:
-    Complex64TensorType = None
-    Complex128TensorType = None
-from ..proto import TensorProto, onnx_proto
+import onnx
 
 
-try:
-    from onnxconverter_common.data_types import DoubleType
-except ImportError:
+class DataType:
+    def __init__(self, shape=None, doc_string=""):
+        self.shape = shape
+        self.doc_string = doc_string
 
-    class DoubleType(DataType):
-        def __init__(self, doc_string=""):
-            super(DoubleType, self).__init__([1, 1], doc_string)
+    def to_onnx_type(self):
+        raise NotImplementedError()
 
-        def to_onnx_type(self):
-            onnx_type = onnx_proto.TypeProto()
-            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.DOUBLE
+    def __repr__(self):
+        return "{}(shape={})".format(self.__class__.__name__, self.shape)
+
+
+class FloatType(DataType):
+    def __init__(self, doc_string=""):
+        super(FloatType, self).__init__([1, 1], doc_string)
+
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = onnx.TensorProto.FLOAT
+        s = onnx_type.tensor_type.shape.dim.add()
+        s.dim_value = 1
+        return onnx_type
+
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
+
+
+class Int64Type(DataType):
+    def __init__(self, doc_string=""):
+        super(Int64Type, self).__init__([1, 1], doc_string)
+
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = onnx.TensorProto.INT64
+        s = onnx_type.tensor_type.shape.dim.add()
+        s.dim_value = 1
+        return onnx_type
+
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
+
+
+class StringType(DataType):
+    def __init__(self, doc_string=""):
+        super(StringType, self).__init__([1, 1], doc_string)
+
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = onnx.TensorProto.STRING
+        s = onnx_type.tensor_type.shape.dim.add()
+        s.dim_value = 1
+        return onnx_type
+
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
+
+
+class TensorType(DataType):
+    def __init__(
+        self, shape=None, doc_string="", denotation=None, channel_denotations=None
+    ):
+        super(TensorType, self).__init__(shape if shape else [], doc_string)
+        self.denotation = denotation
+        self.channel_denotations = channel_denotations
+
+    def _get_element_onnx_type(self):
+        raise NotImplementedError()
+
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = self._get_element_onnx_type()
+        for d in self.shape:
             s = onnx_type.tensor_type.shape.dim.add()
-            s.dim_value = 1
-            return onnx_type
-
-        def __repr__(self):
-            return "{}()".format(self.__class__.__name__)
-
-
-try:
-    from onnxconverter_common.data_types import Float16TensorType
-except ImportError:
-
-    class Float16TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(Float16TensorType, self).__init__(shape, doc_string)
-
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.FLOAT16
-
-
-try:
-    from onnxconverter_common.data_types import Int8TensorType
-except ImportError:
-
-    class Int8TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(Int8TensorType, self).__init__(shape, doc_string)
-
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.INT8
+            if d is None:
+                pass
+            elif isinstance(d, numbers.Integral):
+                s.dim_value = d
+            elif isinstance(d, str):
+                s.dim_param = d
+            else:
+                raise ValueError(
+                    "Unsupported dimension type: %s, see %s"
+                    % (
+                        type(d),
+                        "https://github.com/onnx/onnx/blob/master/docs/IR.md#"
+                        + "input--output-data-types",
+                    )
+                )
+        if getattr(onnx_type, "denotation", None) is not None:
+            if self.denotation:
+                onnx_type.denotation = self.denotation
+            if self.channel_denotations:
+                for d, denotation in zip(
+                    onnx_type.tensor_type.shape.dim, self.channel_denotations
+                ):
+                    if denotation:
+                        d.denotation = denotation
+        return onnx_type
 
 
-try:
-    from onnxconverter_common.data_types import Int16TensorType
-except ImportError:
+class DoubleType(DataType):
+    def __init__(self, doc_string=""):
+        super().__init__([1, 1], doc_string)
 
-    class Int16TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(Int16TensorType, self).__init__(shape, doc_string)
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = onnx.TensorProto.DOUBLE
+        s = onnx_type.tensor_type.shape.dim.add()
+        s.dim_value = 1
+        return onnx_type
 
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.INT16
-
-
-try:
-    from onnxconverter_common.data_types import UInt16TensorType
-except ImportError:
-
-    class UInt16TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(UInt16TensorType, self).__init__(shape, doc_string)
-
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.UINT16
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
 
 
-try:
-    from onnxconverter_common.data_types import UInt32TensorType
-except ImportError:
+class SequenceType(DataType):
+    def __init__(self, element_type, shape=None, doc_string=""):
+        super(SequenceType, self).__init__(shape, doc_string)
+        self.element_type = element_type
+        self.doc_string = doc_string
 
-    class UInt32TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(UInt32TensorType, self).__init__(shape, doc_string)
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        try:
+            onnx_type.sequence_type.elem_type.CopyFrom(self.element_type.to_onnx_type())
+        except AttributeError as ee:
+            msg = "ONNX was not compiled with flag ONNX-ML.\n{0}\n{1}"
+            msg = msg.format(str(self), str(self.element_type.to_onnx_type()))
+            info = [onnx.__version__, str(onnx_type)]
+            msg += "\n".join(info)
+            raise RuntimeError(msg) from ee
+        except TypeError as e:
+            raise RuntimeError(
+                "Unable to create SequenceType with "
+                "element_type=%r" % self.element_type
+            ) from e
+        return onnx_type
 
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.UINT32
-
-
-try:
-    from onnxconverter_common.data_types import UInt64TensorType
-except ImportError:
-
-    class UInt64TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(UInt64TensorType, self).__init__(shape, doc_string)
-
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.UINT64
-
-
-try:
-    from onnxconverter_common.data_types import UInt8TensorType
-except ImportError:
-
-    class UInt8TensorType(TensorType):
-        def __init__(self, shape=None, doc_string=""):
-            super(UInt8TensorType, self).__init__(shape, doc_string)
-
-        def _get_element_onnx_type(self):
-            return onnx_proto.TensorProto.UINT8
+    def __repr__(self):
+        return "SequenceType(element_type={0})".format(self.element_type)
 
 
-try:
-    from onnxconverter_common.data_types import UInt8Type
-except ImportError:
+class DictionaryType(DataType):
+    def __init__(self, key_type, value_type, shape=None, doc_string=""):
+        super(DictionaryType, self).__init__(shape, doc_string)
+        self.key_type = key_type
+        self.value_type = value_type
 
-    class UInt8Type(DataType):
-        def __init__(self, doc_string=""):
-            super(UInt8Type, self).__init__([1, 1], doc_string)
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        try:
+            if type(self.key_type) in [Int64Type, Int64TensorType]:
+                onnx_type.map_type.key_type = onnx.TensorProto.INT64
+            elif type(self.key_type) in [StringType, StringTensorType]:
+                onnx_type.map_type.key_type = onnx.TensorProto.STRING
+            onnx_type.map_type.value_type.CopyFrom(self.value_type.to_onnx_type())
+        except AttributeError as e:
+            msg = "ONNX was not compiled with flag ONNX-ML.\n{0}\n{1}"
+            msg = msg.format(str(self), str(self.value_type.to_onnx_type()))
+            info = [onnx.__version__, str(onnx_type)]
+            msg += "\n".join(info)
+            raise RuntimeError(msg) from e
+        return onnx_type
 
-        def to_onnx_type(self):
-            onnx_type = onnx_proto.TypeProto()
-            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.UINT8
-            s = onnx_type.tensor_type.shape.dim.add()
-            s.dim_value = 1
-            return onnx_type
-
-        def __repr__(self):
-            return "{}()".format(self.__class__.__name__)
+    def __repr__(self):
+        return "DictionaryType(key_type={0}, value_type={1})".format(
+            self.key_type, self.value_type
+        )
 
 
-try:
-    from onnxconverter_common.data_types import Int8Type
-except ImportError:
+class BooleanTensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.BOOLEAN
 
-    class Int8Type(DataType):
-        def __init__(self, doc_string=""):
-            super(Int8Type, self).__init__([1, 1], doc_string)
 
-        def to_onnx_type(self):
-            onnx_type = onnx_proto.TypeProto()
-            onnx_type.tensor_type.elem_type = onnx_proto.TensorProto.INT8
-            s = onnx_type.tensor_type.shape.dim.add()
-            s.dim_value = 1
-            return onnx_type
+class Complex64TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.COMPLEX64
 
-        def __repr__(self):
-            return "{}()".format(self.__class__.__name__)
+
+class Complex128TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.COMPLEX128
+
+
+class FloatTensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.FLOAT
+
+
+class StringTensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.STRING
+
+
+class DoubleTensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.DOUBLE
+
+
+class Float16TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.FLOAT16
+
+
+class Int8TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.INT8
+
+
+class Int16TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.INT16
+
+
+class Int32TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.INT32
+
+
+class Int64TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.INT64
+
+
+class UInt16TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.UINT16
+
+
+class UInt32TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.UINT32
+
+
+class UInt64TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.UINT64
+
+
+class UInt8TensorType(TensorType):
+    def _get_element_onnx_type(self):
+        return onnx.TensorProto.UINT8
+
+
+class UInt8Type(DataType):
+    def __init__(self, doc_string=""):
+        super(UInt8Type, self).__init__([1, 1], doc_string)
+
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = onnx.TensorProto.UINT8
+        s = onnx_type.tensor_type.shape.dim.add()
+        s.dim_value = 1
+        return onnx_type
+
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
+
+
+class Int8Type(DataType):
+    def __init__(self, doc_string=""):
+        super(Int8Type, self).__init__([1, 1], doc_string)
+
+    def to_onnx_type(self):
+        onnx_type = onnx.TypeProto()
+        onnx_type.tensor_type.elem_type = onnx.TensorProto.INT8
+        s = onnx_type.tensor_type.shape.dim.add()
+        s.dim_value = 1
+        return onnx_type
+
+    def __repr__(self):
+        return "{}()".format(self.__class__.__name__)
 
 
 def copy_type(vtype, empty=True):
@@ -178,30 +289,29 @@ def copy_type(vtype, empty=True):
 
 
 def _guess_type_proto(data_type, dims):
-    # This could be moved to onnxconverter_common.
     for d in dims:
         if d == 0:
             raise RuntimeError("Dimension should not be null: {}.".format(list(dims)))
-    if data_type == onnx_proto.TensorProto.FLOAT:
+    if data_type == onnx.TensorProto.FLOAT:
         return FloatTensorType(dims)
-    if data_type == onnx_proto.TensorProto.DOUBLE:
+    if data_type == onnx.TensorProto.DOUBLE:
         return DoubleTensorType(dims)
-    if data_type == onnx_proto.TensorProto.STRING:
+    if data_type == onnx.TensorProto.STRING:
         return StringTensorType(dims)
-    if data_type == onnx_proto.TensorProto.INT64:
+    if data_type == onnx.TensorProto.INT64:
         return Int64TensorType(dims)
-    if data_type == onnx_proto.TensorProto.INT32:
+    if data_type == onnx.TensorProto.INT32:
         return Int32TensorType(dims)
-    if data_type == onnx_proto.TensorProto.BOOL:
+    if data_type == onnx.TensorProto.BOOL:
         return BooleanTensorType(dims)
-    if data_type == onnx_proto.TensorProto.INT8:
+    if data_type == onnx.TensorProto.INT8:
         return Int8TensorType(dims)
-    if data_type == onnx_proto.TensorProto.UINT8:
+    if data_type == onnx.TensorProto.UINT8:
         return UInt8TensorType(dims)
     if Complex64TensorType is not None:
-        if data_type == onnx_proto.TensorProto.COMPLEX64:
+        if data_type == onnx.TensorProto.COMPLEX64:
             return Complex64TensorType(dims)
-        if data_type == onnx_proto.TensorProto.COMPLEX128:
+        if data_type == onnx.TensorProto.COMPLEX128:
             return Complex128TensorType(dims)
     raise NotImplementedError(
         "Unsupported data_type '{}'. You may raise an issue "
@@ -211,7 +321,6 @@ def _guess_type_proto(data_type, dims):
 
 
 def _guess_type_proto_str(data_type, dims):
-    # This could be moved to onnxconverter_common.
     if data_type == "tensor(float)":
         return FloatTensorType(dims)
     if data_type == "tensor(double)":
@@ -241,7 +350,6 @@ def _guess_type_proto_str(data_type, dims):
 
 
 def _guess_type_proto_str_inv(data_type):
-    # This could be moved to onnxconverter_common.
     if isinstance(data_type, FloatTensorType):
         return "tensor(float)"
     if isinstance(data_type, DoubleTensorType):
@@ -262,7 +370,6 @@ def _guess_type_proto_str_inv(data_type):
 
 
 def _guess_numpy_type(data_type, dims):
-    # This could be moved to onnxconverter_common.
     if data_type == np.float32:
         return FloatTensorType(dims)
     if data_type == np.float64:
@@ -311,7 +418,7 @@ def guess_data_type(type_, shape=None):
     """
     Guess the datatype given the type type_
     """
-    if isinstance(type_, TensorProto):
+    if isinstance(type_, onnx.TensorProto):
         return _guess_type_proto(type, shape)
     if isinstance(type_, str):
         return _guess_type_proto_str(type_, shape)
@@ -381,26 +488,26 @@ def guess_proto_type(data_type):
     Guess the corresponding proto type based on data_type.
     """
     if isinstance(data_type, FloatTensorType):
-        return onnx_proto.TensorProto.FLOAT
+        return onnx.TensorProto.FLOAT
     if isinstance(data_type, DoubleTensorType):
-        return onnx_proto.TensorProto.DOUBLE
+        return onnx.TensorProto.DOUBLE
     if isinstance(data_type, Int32TensorType):
-        return onnx_proto.TensorProto.INT32
+        return onnx.TensorProto.INT32
     if isinstance(data_type, Int64TensorType):
-        return onnx_proto.TensorProto.INT64
+        return onnx.TensorProto.INT64
     if isinstance(data_type, StringTensorType):
-        return onnx_proto.TensorProto.STRING
+        return onnx.TensorProto.STRING
     if isinstance(data_type, BooleanTensorType):
-        return onnx_proto.TensorProto.BOOL
+        return onnx.TensorProto.BOOL
     if isinstance(data_type, Int8TensorType):
-        return onnx_proto.TensorProto.INT8
+        return onnx.TensorProto.INT8
     if isinstance(data_type, UInt8TensorType):
-        return onnx_proto.TensorProto.UINT8
+        return onnx.TensorProto.UINT8
     if Complex64TensorType is not None:
         if isinstance(data_type, Complex64TensorType):
-            return onnx_proto.TensorProto.COMPLEX64
+            return onnx.TensorProto.COMPLEX64
         if isinstance(data_type, Complex128TensorType):
-            return onnx_proto.TensorProto.COMPLEX128
+            return onnx.TensorProto.COMPLEX128
     raise NotImplementedError("Unsupported data_type '{}'.".format(data_type))
 
 
