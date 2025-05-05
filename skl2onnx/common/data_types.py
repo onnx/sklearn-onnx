@@ -177,7 +177,7 @@ class DictionaryType(DataType):
 
 class BooleanTensorType(TensorType):
     def _get_element_onnx_type(self):
-        return onnx.TensorProto.BOOLEAN
+        return onnx.TensorProto.BOOL
 
 
 class Complex64TensorType(TensorType):
