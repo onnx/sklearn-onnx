@@ -559,7 +559,10 @@ class TestSklearnFeatureHasher(unittest.TestCase):
         else:
             got_py = None
 
-        from onnxruntime_extensions import get_library_path
+        try:
+            from onnxruntime_extensions import get_library_path
+        except ImportError:
+            raise unittest.SkipTest("cannot import onnxruntime_extensions")
 
         so = SessionOptions()
         so.register_custom_ops_library(get_library_path())

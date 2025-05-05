@@ -15,7 +15,7 @@ from onnx.helper import (
     make_node,
     make_function,
 )
-from onnxconverter_common.data_types import (
+from skl2onnx.common.data_types import (
     DataType,
     TensorType,
     FloatTensorType,
@@ -24,13 +24,10 @@ from onnxconverter_common.data_types import (
     DoubleTensorType,
     Int32TensorType,
     BooleanTensorType,
+    Int8TensorType,
+    UInt8TensorType,
 )
 
-try:
-    from onnxconverter_common.data_types import Int8TensorType, UInt8TensorType
-except ImportError:
-    Int8TensorType = None
-    UInt8TensorType = None
 from ..proto import get_opset_number_from_onnx, get_latest_tested_opset_version
 from . import _registration
 from . import utils
@@ -68,7 +65,7 @@ def _default_OPSET_TO_IR_VERSION():
 
 
 try:
-    from onnxconverter_common.topology import OPSET_TO_IR_VERSION
+    from skl2onnx.topology import OPSET_TO_IR_VERSION
 
     assert OPSET_TO_IR_VERSION[18] is not None
 except (ImportError, KeyError):
@@ -1589,8 +1586,7 @@ def make_model_from_container(
     # Removes many identity nodes,
     # the converter may introduct identity nodes
     # after a zipmap operator and onnx <= 1.7 does not
-    # support that. It does not use onnxconverter-common
-    # as the optimizer only support opset >= 9.
+    # support that.
     if remove_identity:
         onnx_model = onnx_remove_node_identity(onnx_model)
 

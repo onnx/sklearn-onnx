@@ -529,7 +529,7 @@ def build_sklearn_operator_name_map():
         }
     )
     if None in res:
-        del res[None]
+        del res[None]  # noqa: RUF051
     return res
 
 

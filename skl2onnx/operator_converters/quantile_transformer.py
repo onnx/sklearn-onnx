@@ -2,10 +2,11 @@
 
 import numpy as np
 import math
+from onnx import TensorProto
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_numpy_type, guess_proto_type, TensorProto
+from ..common.data_types import guess_numpy_type, guess_proto_type
 from ..algebra.onnx_ops import (
     OnnxWhere,
     OnnxIsNaN,

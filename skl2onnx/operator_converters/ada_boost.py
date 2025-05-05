@@ -790,7 +790,6 @@ def convert_sklearn_ada_boost_regressor(
             k=len(op.estimators_),
         )
     except TypeError:
-        # onnxconverter-common < 1.7.0
         apply_topk(
             scope,
             [negated_labels_name],

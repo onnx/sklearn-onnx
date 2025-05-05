@@ -83,6 +83,12 @@ class TestDocumentationExamples(unittest.TestCase):
                 }:
                     reason = "unstable, xgboost not ready"
 
+                if not reason and name in {"plot_weird_pandas_and_hash.py"}:
+                    try:
+                        import onnxruntime_extensions  # noqa: F401
+                    except ImportError:
+                        reason = "onnxruntime_extensions not available"
+
                 if reason:
 
                     @unittest.skip(reason)

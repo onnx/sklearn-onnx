@@ -2,6 +2,8 @@
 
 ## 1.19.0
 
+* Removes dependency on onnxconverter-common
+  [#1179](https://github.com/onnx/sklearn-onnx/issues/1179)
 * Implements converter for QuantileTransformer
   [#1164](https://github.com/onnx/sklearn-onnx/issues/1164),
 * Refactors KNNImputer converter with local function to match

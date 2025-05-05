@@ -13,7 +13,7 @@ jobs:
             documentation: 1
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
-            onnx_version: 'onnx>=1.17.0'
+            onnx_version: 'onnx-weekly'
             onnxrt_version: 'onnxruntime>=1.20.1'
             python_version: '3.12'
           - sklearn_version: '==1.5.2'
@@ -88,6 +88,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
+
+      - name: Uninstall onnx
+        run: pip uninstall -y onnx
 
       - name: Install specific versions
         run: pip install "${{ matrix.onnx_version }}" "${{ matrix.onnxrt_version }}" "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}"
