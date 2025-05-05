@@ -575,7 +575,7 @@ class TestSklearnTfidfVectorizer(unittest.TestCase):
 
         clf = SVC()
         clf.fit(embeddings, labels)
-        embeddings = embeddings.astype(numpy.float32).todense()
+        embeddings = numpy.asarray(embeddings.astype(numpy.float32).todense())
         exp = clf.predict(embeddings)
 
         initial_type = [("input", FloatTensorType([None, dim]))]
