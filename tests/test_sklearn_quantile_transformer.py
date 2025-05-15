@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.preprocessing import QuantileTransformer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnQuantileTransformer(unittest.TestCase):
@@ -18,28 +18,32 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
         X[:, 1] = np.arange(X.shape[0]) * 2
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+            model,
+            "test",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnQuantileTransformer",
+            basename="SklearnQuantileTransformerSimple",
         )
 
     def test_quantile_transformer_int(self):
         X = np.random.randint(0, 5, (100, 20))
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+            model,
+            "test",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnQuantileTransformer",
+            basename="SklearnQuantileTransformerInt",
         )
 
     def test_quantile_transformer_nan(self):
@@ -49,14 +53,16 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
         X[1][1] = np.nan
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+            model,
+            "test",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnQuantileTransformer",
+            basename="SklearnQuantileTransformerNan",
         )
 
 

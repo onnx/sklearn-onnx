@@ -18,11 +18,6 @@ except ImportError:
     # onnx is too old.
     pass
 
-try:
-    from onnx.helper import _split_complex_to_pairs as split_complex_to_pairs
-except ImportError:
-    from onnx.helper import split_complex_to_pairs
-
 
 def get_opset_number_from_onnx():
     """

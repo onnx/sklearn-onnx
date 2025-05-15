@@ -89,6 +89,16 @@ class TestDocumentationExamples(unittest.TestCase):
                     except ImportError:
                         reason = "onnxruntime_extensions not available"
 
+                if not reason and name in {
+                    "plot_gexternal_lightgbm_reg.py",
+                    "plot_gexternal_lightgbm.py",
+                    "plot_pipeline_lightgbm.py",
+                }:
+                    try:
+                        import onnxmltools  # noqa: F401
+                    except ImportError as e:
+                        reason = str(e)
+
                 if reason:
 
                     @unittest.skip(reason)
