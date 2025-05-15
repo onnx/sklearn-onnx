@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.preprocessing import QuantileTransformer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
-from test_utils import dump_data_and_model
+from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnQuantileTransformer(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
             model,
             "test",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=20,
+            target_opset=TARGET_OPSET,
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -38,7 +38,7 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
             model,
             "test",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=20,
+            target_opset=TARGET_OPSET,
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -58,7 +58,7 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
             model,
             "test",
             [("input", FloatTensorType([None, X.shape[1]]))],
-            target_opset=20,
+            target_opset=TARGET_OPSET,
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
