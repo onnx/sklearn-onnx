@@ -18,7 +18,10 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
         X[:, 1] = np.arange(X.shape[0]) * 2
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+            model,
+            "test",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=20,
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -32,7 +35,10 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
         X = np.random.randint(0, 5, (100, 20))
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+            model,
+            "test",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=20,
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
@@ -49,7 +55,10 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
         X[1][1] = np.nan
         model = QuantileTransformer(n_quantiles=6).fit(X)
         model_onnx = convert_sklearn(
-            model, "test", [("input", FloatTensorType([None, X.shape[1]]))]
+            model,
+            "test",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=20,
         )
         self.assertTrue(model_onnx is not None)
         dump_data_and_model(
