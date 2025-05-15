@@ -23,12 +23,11 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnQuantileTransformer",
+            basename="SklearnQuantileTransformerSimple",
         )
 
     def test_quantile_transformer_int(self):
@@ -40,12 +39,11 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnQuantileTransformer",
+            basename="SklearnQuantileTransformerInt",
         )
 
     def test_quantile_transformer_nan(self):
@@ -60,12 +58,11 @@ class TestSklearnQuantileTransformer(unittest.TestCase):
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
         )
-        self.assertTrue(model_onnx is not None)
         dump_data_and_model(
             X.astype(np.float32),
             model,
             model_onnx,
-            basename="SklearnQuantileTransformer",
+            basename="SklearnQuantileTransformerNan",
         )
 
 

@@ -143,7 +143,8 @@ def convert_quantile_transformer(
                 OnnxMul(current_index, np.array(0, dtype=np.int64), op_version=opv),
                 np.array([target_size // 2], dtype=np.int64),
                 op_version=opv,
-            )
+            ),
+            op_version=opv,
         )
         step.add_to(scope, container)
 
