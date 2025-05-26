@@ -1,0 +1,20 @@
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: '3.11'
+  displayName: 'Set Up Python'
+- script: python -m pip install --upgrade pip build wheel
+  displayName: 'Install Python build dependencies'
+- script: python -m build
+  displayName: 'Build skl2onnx wheel'
+- task: CopyFiles@2
+  displayName: 'Copy Python Wheel to: $(Build.ArtifactStagingDirectory)'
+  inputs:
+    SourceFolder: 'dist'
+    Contents: '*.*'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: 1ES.PublishPipelineArtifact@1
+  displayName: 'Publish Python Wheel'
+  inputs:
+    ArtifactName: 'skl2onnx'
+    targetPath: '$(Build.ArtifactStagingDirectory)'

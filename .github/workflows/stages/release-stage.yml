@@ -1,0 +1,11 @@
+stages:
+- stage: Stage
+  jobs:
+  - job: Job
+    steps:
+    - template: jobs/steps/release-steps.yml
+    # Test the wheels. This needs to happen after PublishBuildArtifacts
+    # to avoid interference with the artifacts
+    - script: python -m pip install dist/*.whl --no-deps
+      displayName: 'Install wheel'
+      condition: eq(variables['SKL2ONNX_RELEASE'], 1)
