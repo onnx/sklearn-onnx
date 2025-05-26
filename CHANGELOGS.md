@@ -2,6 +2,10 @@
 
 ## 1.19.0
 
+* Fix QDA converter crashing on string labels and incorrect shape calculation
+  [#1169](https://github.com/onnx/sklearn-onnx/issues/1169)
+* Remove import of split_complex_to_pairs
+  [#1182](https://github.com/onnx/sklearn-onnx/issues/1182)
 * Removes dependency on onnxconverter-common
   [#1179](https://github.com/onnx/sklearn-onnx/issues/1179)
 * Implements converter for QuantileTransformer
