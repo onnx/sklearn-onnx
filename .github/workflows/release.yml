@@ -1,31 +1,41 @@
-# Build the release version of the package and publish to artifacts
+# This workflow will upload a Python Package using Twine when a release is created
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
 
-trigger: none
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
 
-variables:
-  CI: 'true'
-  # Set the release environment variable to build a release version of the wheel
-  SKL2ONNX_RELEASE: 1
+name: Upload Python Package
 
-resources:
-  repositories:
-  - repository: 1esPipelines
-    type: git
-    name: 1ESPipelineTemplates/1ESPipelineTemplates
-    ref: refs/tags/release
+on:
+  release:
+    types: [published]
 
-extends:
-  # The pipeline extends the 1ES PT which will inject different SDL and compliance tasks.
-  # For non-production pipelines, use "Unofficial" as defined below.
-  # For productions pipelines, use "Official".
-  template: v1/1ES.Official.PipelineTemplate.yml@1esPipelines
-  parameters:
-    sdl:
-      sourceAnalysisPool:
-        name: onnxruntime-Win-CPU-2022
-        os: windows
-    pool:
-      name: 'onnxruntime-Ubuntu2204-AMD-CPU'
-      os: 'linux'
-    stages:
-    - template: stages/release-stage.yml
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+
+    - name: Build package
+      run: python -m build
+
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@v1
+      with:
+        attestations: true
