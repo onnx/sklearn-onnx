@@ -1,3 +1,44 @@
+[build-system]
+requires = ["setuptools>=70"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skl2onnx"
+dynamic = ["version", "dependencies"]
+description = "Convert scikit-learn models to ONNX"
+readme = "README.md"
+license = {text = "Apache License v2.0"}
+authors = [
+    { name = "ONNX Contributors", email = "onnx-technical-discuss@lists.lfaidata.foundation" }
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "License :: OSI Approved :: Apache Software License",
+]
+
+[project.urls]
+Homepage = "https://github.com/onnx/sklearn-onnx"
+
+[tool.setuptools]
+packages = ["skl2onnx"]
+
+[tool.setuptools.dynamic]
+version = { attr = "skl2onnx.__version__" }
+dependencies = { file = "requirements.txt" }
+
+
 [tool.ruff]
 
 exclude = [
