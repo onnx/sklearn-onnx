@@ -48,7 +48,7 @@ def convert_sklearn_binarizer(
         feature_name,
         operator.output_full_names,
         op_domain="ai.onnx.ml",
-        **attrs
+        **attrs,
     )
 
 

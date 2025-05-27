@@ -185,7 +185,7 @@ def convert_sklearn_scaler(
         feature_name,
         operator.outputs[0].full_name,
         op_domain="ai.onnx.ml",
-        **attrs
+        **attrs,
     )
 
 
