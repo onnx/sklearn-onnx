@@ -136,7 +136,7 @@ class TestConvertOptions(unittest.TestCase):
                             expected_proba,
                             cls.classes_,
                             *got,
-                            zipmap=zipmap
+                            zipmap=zipmap,
                         )
                     else:
                         TestConvertOptions.almost_equal(
@@ -164,7 +164,7 @@ class TestConvertOptions(unittest.TestCase):
                             expected_proba,
                             cls.classes_,
                             *got,
-                            zipmap=zipmap
+                            zipmap=zipmap,
                         )
                     else:
                         TestConvertOptions.almost_equal(
@@ -189,7 +189,7 @@ class TestConvertOptions(unittest.TestCase):
                             expected_proba,
                             cls.classes_,
                             *got,
-                            zipmap=zipmap
+                            zipmap=zipmap,
                         )
                     else:
                         TestConvertOptions.almost_equal(

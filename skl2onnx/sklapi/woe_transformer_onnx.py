@@ -599,7 +599,7 @@ def woe_transformer_to_onnx(op, opset=None):
                     ["X"],
                     ["rf%d" % i],
                     domain="ai.onnx.ml",
-                    **atts
+                    **atts,
                 )
             )
             cats = list(sorted({int(n.onnx_value) for n in tree.nodes if n.is_leaf}))
@@ -635,7 +635,7 @@ def woe_transformer_to_onnx(op, opset=None):
                     ["X"],
                     ["rf%d" % i],
                     domain="ai.onnx.ml",
-                    **atts
+                    **atts,
                 )
             )
             nodes.append(make_node("Reshape", ["rf%d" % i, "new_shape"], ["lab%d" % i]))

@@ -66,5 +66,5 @@ class OnnxSolve(OnnxOperator):
             lower=lower,
             transposed=transposed,
             op_version=op_version,
-            **kwargs
+            **kwargs,
         )
