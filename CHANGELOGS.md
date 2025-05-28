@@ -1,6 +1,6 @@
 # Change Logs
 
-## 1.19.0
+## 1.19.1
 
 * Fix QDA converter crashing on string labels and incorrect shape calculation
   [#1169](https://github.com/onnx/sklearn-onnx/issues/1169)
