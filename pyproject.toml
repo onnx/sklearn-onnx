@@ -31,8 +31,8 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/onnx/sklearn-onnx"
 
-[tool.setuptools]
-packages = ["skl2onnx"]
+[tool.setuptools.packages.find]
+include = ["skl2onnx*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "skl2onnx.__version__" }
