@@ -2,10 +2,9 @@
 
 <p align="center"><img width="50%" src="docs/logo_main.png" /></p>
 
+[![PyPI - Version](https://img.shields.io/pypi/v/skl2onnx.svg)](https://pypi.org/project/skl2onnx)
 [![Linux](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml)
-
 [![Windows/Macos](https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/windows-macos-ci.yml)
-
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## Introduction
