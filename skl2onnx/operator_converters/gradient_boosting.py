@@ -15,18 +15,18 @@ from ..proto import onnx_proto
 
 
 def convert_sklearn_gradient_boosting_classifier(
-    scope,
-    operator,
-    container,
-    op_type="TreeEnsembleClassifier",
-    op_domain="ai.onnx.ml",
-    op_version=1,
+        scope,
+        operator,
+        container,
+        op_type="TreeEnsembleClassifier",
+        op_domain="ai.onnx.ml",
+        op_version=1,
 ):
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
-    if op.loss not in ("deviance", "log_loss"):
+    if op.loss not in ("deviance", "log_loss", "exponential"):
         raise NotImplementedError(
             "Loss '{0}' is not supported yet. You "
             "may raise an issue at "
@@ -37,6 +37,8 @@ def convert_sklearn_gradient_boosting_classifier(
     attrs["name"] = scope.get_unique_operator_name(op_type)
 
     transform = "LOGISTIC" if op.n_classes_ == 2 else "SOFTMAX"
+    options = container.get_options(op, dict(raw_scores=False))
+
     if op.init == "zero":
         loss = op._loss if hasattr(op, "_loss") else op.loss_
         if hasattr(loss, "K"):
@@ -65,10 +67,15 @@ def convert_sklearn_gradient_boosting_classifier(
             "issue at https://github.com/onnx/sklearn-onnx/issues."
         )
 
+    if op.loss == "exponential":
+        attrs["post_transform"] = "NONE"
+        apply_exponential_sigmoid_patch = True
+    else:
+        apply_exponential_sigmoid_patch = False
+        if not options["raw_scores"]:
+            attrs["post_transform"] = transform
+
     attrs["base_values"] = [float(v) for v in base_values]
-    options = container.get_options(op, dict(raw_scores=False))
-    if not options["raw_scores"]:
-        attrs["post_transform"] = transform
 
     classes = op.classes_
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
@@ -100,11 +107,11 @@ def convert_sklearn_gradient_boosting_classifier(
     if dtype is not None:
         for k in attrs:
             if k in (
-                "nodes_values",
-                "class_weights",
-                "target_weights",
-                "nodes_hitrates",
-                "base_values",
+                    "nodes_values",
+                    "class_weights",
+                    "target_weights",
+                    "nodes_hitrates",
+                    "base_values",
             ):
                 attrs[k] = np.array(attrs[k], dtype=dtype)
 
@@ -120,23 +127,49 @@ def convert_sklearn_gradient_boosting_classifier(
             to=onnx_proto.TensorProto.FLOAT,
         )
         input_name = cast_input_name
+
+    if apply_exponential_sigmoid_patch:
+        raw_proba_output = scope.get_unique_variable_name("raw_logits")
+    else:
+        raw_proba_output = operator.outputs[1].full_name
+
     container.add_node(
         op_type,
         input_name,
-        [operator.outputs[0].full_name, operator.outputs[1].full_name],
+        [operator.outputs[0].full_name, raw_proba_output],
         op_domain=op_domain,
         op_version=op_version,
         **attrs,
     )
 
+    if apply_exponential_sigmoid_patch:
+        from ..algebra.onnx_ops import OnnxMul, OnnxSigmoid
+
+        scale_name = scope.get_unique_variable_name("scale2")
+        scaled_logits = scope.get_unique_variable_name("scaled_logits")
+
+        container.add_initializer(scale_name, onnx_proto.TensorProto.FLOAT, [], [2.0])
+        container.add_node(
+            "Mul",
+            [raw_proba_output, scale_name],
+            scaled_logits,
+            name=scope.get_unique_operator_name("Mul_Exp2"),
+        )
+        container.add_node(
+            "Sigmoid",
+            [scaled_logits],
+            operator.outputs[1].full_name,
+            name=scope.get_unique_operator_name("Sigmoid_Exp2"),
+        )
+
 
 def convert_sklearn_gradient_boosting_regressor(
-    scope,
-    operator,
-    container,
-    op_type="TreeEnsembleRegressor",
-    op_domain="ai.onnx.ml",
-    op_version=1,
+        scope,
+        operator,
+        container,
+        op_type="TreeEnsembleRegressor",
+        op_domain="ai.onnx.ml",
+        op_version=1,
 ):
     op = operator.raw_operator
     attrs = get_default_tree_regressor_attribute_pairs()
@@ -183,11 +216,11 @@ def convert_sklearn_gradient_boosting_regressor(
     if dtype is not None:
         for k in attrs:
             if k in (
-                "nodes_values",
-                "class_weights",
-                "target_weights",
-                "nodes_hitrates",
-                "base_values",
+                    "nodes_values",
+                    "class_weights",
+                    "target_weights",
+                    "nodes_hitrates",
+                    "base_values",
             ):
                 attrs[k] = np.array(attrs[k], dtype=dtype)
 
