@@ -37,7 +37,6 @@ def convert_sklearn_gradient_boosting_classifier(
     attrs["name"] = scope.get_unique_operator_name(op_type)
 
     transform = "LOGISTIC" if op.n_classes_ == 2 else "SOFTMAX"
-    options = container.get_options(op, dict(raw_scores=False))
 
     if op.init == "zero":
         loss = op._loss if hasattr(op, "_loss") else op.loss_
@@ -67,10 +66,10 @@ def convert_sklearn_gradient_boosting_classifier(
             "issue at https://github.com/onnx/sklearn-onnx/issues."
         )
 
+    attrs["base_values"] = [float(v) for v in base_values]
+    options = container.get_options(op, dict(raw_scores=False))
     if not options.get("raw_scores") and op.loss != "exponential":
         attrs["post_transform"] = transform
-
-    attrs["base_values"] = [float(v) for v in base_values]
 
     classes = op.classes_
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
