@@ -15,12 +15,12 @@ from ..proto import onnx_proto
 
 
 def convert_sklearn_gradient_boosting_classifier(
-        scope,
-        operator,
-        container,
-        op_type="TreeEnsembleClassifier",
-        op_domain="ai.onnx.ml",
-        op_version=1,
+    scope,
+    operator,
+    container,
+    op_type="TreeEnsembleClassifier",
+    op_domain="ai.onnx.ml",
+    op_version=1,
 ):
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
@@ -37,7 +37,6 @@ def convert_sklearn_gradient_boosting_classifier(
     attrs["name"] = scope.get_unique_operator_name(op_type)
 
     transform = "LOGISTIC" if op.n_classes_ == 2 else "SOFTMAX"
-
     if op.init == "zero":
         loss = op._loss if hasattr(op, "_loss") else op.loss_
         if hasattr(loss, "K"):
@@ -99,11 +98,11 @@ def convert_sklearn_gradient_boosting_classifier(
     if dtype is not None:
         for k in attrs:
             if k in (
-                    "nodes_values",
-                    "class_weights",
-                    "target_weights",
-                    "nodes_hitrates",
-                    "base_values",
+                "nodes_values",
+                "class_weights",
+                "target_weights",
+                "nodes_hitrates",
+                "base_values",
             ):
                 attrs[k] = np.array(attrs[k], dtype=dtype)
 
@@ -155,12 +154,12 @@ def convert_sklearn_gradient_boosting_classifier(
 
 
 def convert_sklearn_gradient_boosting_regressor(
-        scope,
-        operator,
-        container,
-        op_type="TreeEnsembleRegressor",
-        op_domain="ai.onnx.ml",
-        op_version=1,
+    scope,
+    operator,
+    container,
+    op_type="TreeEnsembleRegressor",
+    op_domain="ai.onnx.ml",
+    op_version=1,
 ):
     op = operator.raw_operator
     attrs = get_default_tree_regressor_attribute_pairs()
@@ -207,11 +206,11 @@ def convert_sklearn_gradient_boosting_regressor(
     if dtype is not None:
         for k in attrs:
             if k in (
-                    "nodes_values",
-                    "class_weights",
-                    "target_weights",
-                    "nodes_hitrates",
-                    "base_values",
+                "nodes_values",
+                "class_weights",
+                "target_weights",
+                "nodes_hitrates",
+                "base_values",
             ):
                 attrs[k] = np.array(attrs[k], dtype=dtype)
 
