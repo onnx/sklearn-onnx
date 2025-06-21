@@ -67,23 +67,16 @@ def convert_sklearn_gradient_boosting_classifier(
             "issue at https://github.com/onnx/sklearn-onnx/issues."
         )
 
-    if op.loss == "exponential":
-        attrs["post_transform"] = "NONE"
-        apply_exponential_sigmoid_patch = True
-    else:
-        apply_exponential_sigmoid_patch = False
-        if not options["raw_scores"]:
-            attrs["post_transform"] = transform
+    if not options.get("raw_scores") and op.loss != "exponential":
+        attrs["post_transform"] = transform
 
     attrs["base_values"] = [float(v) for v in base_values]
 
     classes = op.classes_
     if all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in classes):
-        class_labels = [int(i) for i in classes]
-        attrs["classlabels_int64s"] = class_labels
+        attrs["classlabels_int64s"] = [int(i) for i in classes]
     elif all(isinstance(i, str) for i in classes):
-        class_labels = [str(i) for i in classes]
-        attrs["classlabels_strings"] = class_labels
+        attrs["classlabels_strings"] = [str(i) for i in classes]
     else:
         raise ValueError("Labels must be all integer or all strings.")
 
@@ -128,39 +121,38 @@ def convert_sklearn_gradient_boosting_classifier(
         )
         input_name = cast_input_name
 
-    if apply_exponential_sigmoid_patch:
-        raw_proba_output = scope.get_unique_variable_name("raw_logits")
-    else:
-        raw_proba_output = operator.outputs[1].full_name
+    proba_output = scope.get_unique_variable_name("proba_output")
 
     container.add_node(
         op_type,
         input_name,
-        [operator.outputs[0].full_name, raw_proba_output],
+        [operator.outputs[0].full_name, proba_output],
         op_domain=op_domain,
         op_version=op_version,
         **attrs,
     )
 
-    if apply_exponential_sigmoid_patch:
-        from ..algebra.onnx_ops import OnnxMul, OnnxSigmoid
-
+    if op.loss == "exponential":
         scale_name = scope.get_unique_variable_name("scale2")
         scaled_logits = scope.get_unique_variable_name("scaled_logits")
 
         container.add_initializer(scale_name, onnx_proto.TensorProto.FLOAT, [], [2.0])
         container.add_node(
             "Mul",
-            [raw_proba_output, scale_name],
+            [proba_output, scale_name],
             scaled_logits,
             name=scope.get_unique_operator_name("Mul_Exp2"),
         )
+
+        proba_output = scope.get_unique_variable_name("routput")
         container.add_node(
             "Sigmoid",
             [scaled_logits],
-            operator.outputs[1].full_name,
+            proba_output,
             name=scope.get_unique_operator_name("Sigmoid_Exp2"),
         )
+
+    container.add_node("Identity", proba_output, operator.outputs[1].full_name)
 
 
 def convert_sklearn_gradient_boosting_regressor(
