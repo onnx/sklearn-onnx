@@ -370,6 +370,24 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X, model, model_onnx, basename="SklearnGradientBoostingRegressorBool-Dec4"
         )
 
+    def test_gradient_boosting_classifier_exponential(self):
+        model, X = fit_classification_model(
+            GradientBoostingClassifier(n_estimators=4, loss="exponential", random_state=42), 2
+        )
+        model_onnx = convert_sklearn(
+            model,
+            "gradient boosting classifier with exponential loss",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X,
+            model,
+            model_onnx,
+            basename="SklearnGradientBoostingClassifierExponentialLoss"
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
