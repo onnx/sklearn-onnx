@@ -76,9 +76,7 @@ def convert_sklearn_ordinal_encoder(
             to = onnx_proto.TensorProto.INT64
         if to is not None:
             dtype = (
-                Int64TensorType
-                if to == onnx_proto.TensorProto.INT64
-                else FloatTensorType
+                Int64TensorType if to == onnx_proto.TensorProto.INT64 else FloatTensorType
             )
             casted_feature_column = scope.declare_local_variable(
                 "casted_feature_column", dtype(copy.copy(feature_column.type.shape))
@@ -97,17 +95,11 @@ def convert_sklearn_ordinal_encoder(
         attrs = {"name": scope.get_unique_operator_name("LabelEncoder")}
 
         if isinstance(feature_column.type, FloatTensorType):
-            attrs["keys_floats"] = np.array(
-                [float(s) for s in categories], dtype=np.float32
-            )
+            attrs["keys_floats"] = np.array([float(s) for s in categories], dtype=np.float32)
         elif isinstance(feature_column.type, Int64TensorType):
-            attrs["keys_int64s"] = np.array(
-                [int(s) for s in categories], dtype=np.int64
-            )
+            attrs["keys_int64s"] = np.array([int(s) for s in categories], dtype=np.int64)
         else:
-            attrs["keys_strings"] = np.array(
-                [str(s).encode("utf-8") for s in categories]
-            )
+            attrs["keys_strings"] = np.array([str(s).encode("utf-8") for s in categories])
 
         # hanlde encoded_missing_value
         if not np.isnan(ordinal_op.encoded_missing_value) and (
@@ -117,14 +109,17 @@ def convert_sklearn_ordinal_encoder(
             # in its cathegories if it was in the training data
             # => we simply add the 'ordinal_op.encoded_missing_value'
             # as our last entry in 'values_int64s' if it was in the training data
-            encoded_missing_value = np.array(
-                [int(ordinal_op.encoded_missing_value)]
-            ).astype(np.int64)
+            encoded_missing_value = np.array([int(ordinal_op.encoded_missing_value)]).astype(
+                np.int64
+            )
 
             # handle max_categories or min_frequency
             if default_to_infrequent_mappings is not None:
                 attrs["values_int64s"] = np.concatenate(
-                    (np.array(default_to_infrequent_mappings, dtype=np.int64), encoded_missing_value)
+                    (
+                        np.array(default_to_infrequent_mappings, dtype=np.int64),
+                        encoded_missing_value,
+                    )
                 )
             else:
                 attrs["values_int64s"] = np.concatenate(
@@ -133,7 +128,9 @@ def convert_sklearn_ordinal_encoder(
         else:
             # handle max_categories or min_frequency
             if default_to_infrequent_mappings is not None:
-                attrs["values_int64s"] = np.array(default_to_infrequent_mappings, dtype=np.int64)
+                attrs["values_int64s"] = np.array(
+                    default_to_infrequent_mappings, dtype=np.int64
+                )
             else:
                 attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
 
