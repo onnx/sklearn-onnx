@@ -34,6 +34,13 @@ def convert_sklearn_ordinal_encoder(
         if len(categories) == 0:
             continue
 
+        if ordinal_op._infrequent_enabled:
+            current_infrequent_categories_ = ordinal_op.infrequent_categories_[
+                input_idx
+            ]
+        else:
+            current_infrequent_categories_ = None
+
         current_input = operator.inputs[input_idx]
         if current_input.get_second_dimension() == 1:
             feature_column = current_input
@@ -118,6 +125,15 @@ def convert_sklearn_ordinal_encoder(
             )
         else:
             attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
+
+        # handle max_categories or min_frequency
+        if current_infrequent_categories_ is not None:
+            infrequent_categories_value = len(categories) - len(
+                current_infrequent_categories_
+            )
+            for ix, category in enumerate(categories):
+                if category in current_infrequent_categories_:
+                    attrs["values_int64s"][ix] = infrequent_categories_value
 
         if default_value:
             attrs["default_int64"] = default_value
