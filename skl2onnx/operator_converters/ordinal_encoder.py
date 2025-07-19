@@ -34,7 +34,7 @@ def convert_sklearn_ordinal_encoder(
         if len(categories) == 0:
             continue
 
-        if ordinal_op._infrequent_enabled:
+        if hasattr(ordinal_op, "_infrequent_enabled") and ordinal_op._infrequent_enabled:
             default_to_infrequent_mappings = ordinal_op._default_to_infrequent_mappings[
                 input_idx
             ]
