@@ -67,5 +67,14 @@ pred_onx = sess.run([label_name], {input_name: X_test.astype(np.float32)})[0]
 ## Contribute
 We welcome contributions in the form of feedback, ideas, or code.
 
+## PR
+Before you submit any PR, you should apply the following command lines
+to fix the style issues.
+
+```bash
+black .
+ruff check .
+```
+
 ## License
 [Apache License v2.0](LICENSE)
