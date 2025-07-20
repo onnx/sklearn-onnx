@@ -8,7 +8,7 @@ joblib
 lightgbm; sys_platform != 'darwin'
 loky
 matplotlib
-mlinsights>=0.3.631
+mlinsights>=0.5.2
 nbsphinx
 onnx
 onnx-array-api
