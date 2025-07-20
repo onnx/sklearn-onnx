@@ -183,7 +183,9 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             target_opset=TARGET_OPSET,
         )
         self.assertTrue(model_onnx is not None)
-        dump_data_and_model(data, model, model_onnx, basename="SklearnOrdinalEncoderCatList")
+        dump_data_and_model(
+            data, model, model_onnx, basename="SklearnOrdinalEncoderCatList"
+        )
 
     @unittest.skipIf(
         not ordinal_encoder_support(),
