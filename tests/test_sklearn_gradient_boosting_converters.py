@@ -372,7 +372,10 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
 
     def test_gradient_boosting_classifier_exponential(self):
         model, X = fit_classification_model(
-            GradientBoostingClassifier(n_estimators=4, loss="exponential", random_state=42), 2
+            GradientBoostingClassifier(
+                n_estimators=4, loss="exponential", random_state=42
+            ),
+            2,
         )
         model_onnx = convert_sklearn(
             model,
@@ -385,7 +388,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGradientBoostingClassifierExponentialLoss"
+            basename="SklearnGradientBoostingClassifierExponentialLoss",
         )
 
 
