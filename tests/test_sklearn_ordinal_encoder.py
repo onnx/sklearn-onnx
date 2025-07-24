@@ -40,6 +40,11 @@ def set_output_support():
     return pv.Version(vers) >= pv.Version("1.2")
 
 
+def max_categories_support():
+    vers = ".".join(sklearn_version.split(".")[:2])
+    return pv.Version(vers) >= pv.Version("1.3")
+
+
 class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
     @unittest.skipIf(
         not ordinal_encoder_support(),
@@ -378,6 +383,86 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             },
         )
         assert_almost_equal(expected, got[0].ravel())
+
+    @unittest.skipIf(
+        not max_categories_support(),
+        reason="OrdinalEncoder supports max_categories and min_frequencey since 1.3",
+    )
+    def test_model_ordinal_encoder_max_categories(self):
+        from onnxruntime import InferenceSession
+
+        model = OrdinalEncoder(max_categories=4)
+        data = np.array(
+            [["a"], ["b"], ["c"], ["d"], ["a"], ["b"], ["c"], ["e"]], dtype=np.object_
+        )
+
+        expected = model.fit_transform(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ordinal encoder",
+            [("input", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOrdinalEncoderMaxCategories",
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(
+            None,
+            {
+                "input": data,
+            },
+        )
+
+        assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
+
+    @unittest.skipIf(
+        not max_categories_support(),
+        reason="OrdinalEncoder supports max_categories and min_frequencey since 1.3",
+    )
+    def test_model_ordinal_encoder_min_frequency(self):
+        from onnxruntime import InferenceSession
+
+        model = OrdinalEncoder(min_frequency=2)
+        data = np.array(
+            [["a"], ["b"], ["c"], ["d"], ["a"], ["b"], ["c"], ["e"]], dtype=np.object_
+        )
+
+        expected = model.fit_transform(data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ordinal encoder",
+            [("input", StringTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOrdinalEncoderMinFrequency",
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(
+            None,
+            {
+                "input": data,
+            },
+        )
+
+        assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
     @unittest.skipIf(
         not ordinal_encoder_support(),

@@ -4,6 +4,8 @@
 
 * Fixes unknown_value=np.nan in OrdinalEncoder
   [#1198](https://github.com/onnx/sklearn-onnx/issues/1198)
+* Enhance OrdinalEncoder conversion to handle infrequent categories
+  [#1195](https://github.com/onnx/sklearn-onnx/issues/1195)
 
 ## 1.19.1
 

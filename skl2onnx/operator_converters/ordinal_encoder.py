@@ -46,6 +46,16 @@ def convert_sklearn_ordinal_encoder(
         if len(categories) == 0:
             continue
 
+        if (
+            hasattr(ordinal_op, "_infrequent_enabled")
+            and ordinal_op._infrequent_enabled
+        ):
+            default_to_infrequent_mappings = ordinal_op._default_to_infrequent_mappings[
+                input_idx
+            ]
+        else:
+            default_to_infrequent_mappings = None
+
         current_input = operator.inputs[input_idx]
         if current_input.get_second_dimension() == 1:
             feature_column = current_input
@@ -127,11 +137,28 @@ def convert_sklearn_ordinal_encoder(
             encoded_missing_value = np.array(
                 [int(ordinal_op.encoded_missing_value)]
             ).astype(dtype)
-            attrs[key] = np.concatenate(
-                (np.arange(len(categories) - 1).astype(dtype), encoded_missing_value)
-            )
+
+            # handle max_categories or min_frequency
+            if default_to_infrequent_mappings is not None:
+                attrs[key] = np.concatenate(
+                    (
+                        np.array(default_to_infrequent_mappings, dtype=dtype),
+                        encoded_missing_value,
+                    )
+                )
+            else:
+                attrs[key] = np.concatenate(
+                    (
+                        np.arange(len(categories) - 1).astype(dtype),
+                        encoded_missing_value,
+                    )
+                )
         else:
-            attrs[key] = np.arange(len(categories)).astype(dtype)
+            # handle max_categories or min_frequency
+            if default_to_infrequent_mappings is not None:
+                attrs[key] = np.array(default_to_infrequent_mappings, dtype=dtype)
+            else:
+                attrs[key] = np.arange(len(categories)).astype(dtype)
 
         if default_value or (
             isinstance(default_value, float) and np.isnan(default_value)
