@@ -52,6 +52,7 @@ from .common._topology import Topology, Variable
 from .common.data_types import (
     DictionaryType,
     Int64TensorType,
+    DoubleTensorType,
     SequenceType,
     StringTensorType,
     TensorType,
@@ -62,6 +63,7 @@ from .common.utils import get_column_indices
 from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
 from .common.utils_sklearn import _process_options
+from .sklapi import CastTransformer
 
 
 do_not_merge_columns = tuple(
@@ -249,6 +251,18 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None, alias
         else:
             otype = guess_tensor_type(inputs[0].type)
         variable = scope.declare_local_variable("variable", otype)
+        this_operator.outputs.append(variable)
+    elif type(model) in {CastTransformer}:
+        dtype = model.dtype
+        if dtype == np.float32:
+            cls = FloatTensorType
+        elif dtype == np.float64:
+            cls = DoubleTensorType
+        elif dtype == np.int64:
+            cls = Int64TensorType
+        else:
+            raise NotImplementedError(f"Unexpected dtype={dtype} for model={model}")
+        variable = scope.declare_local_variable("cast", cls())
         this_operator.outputs.append(variable)
     else:
         if hasattr(model, "get_feature_names_out"):

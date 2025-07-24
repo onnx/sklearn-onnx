@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
 import sklearn
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.pipeline import Pipeline
 
 try:
     from sklearn.preprocessing import Imputer
@@ -24,8 +26,10 @@ except ImportError:
 
 from onnxruntime import __version__ as ort_version
 
+from skl2onnx.sklapi import CastTransformer
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
+    DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
     StringTensorType,
@@ -123,6 +127,33 @@ class TestSklearnImputerConverter(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnSimpleImputerMeanFloat32",
+        )
+
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_double_inputs(self):
+        model = Pipeline(
+            [
+                ("cast32", CastTransformer(dtype=np.float32)),
+                ("imputer", SimpleImputer()),
+                ("dt", DecisionTreeRegressor(max_depth=2)),
+            ]
+        )
+        data = np.array([[1, 2], [np.nan, 3], [7, 6]], dtype=np.float64)
+        y = [0, 1, 0]
+        model.fit(data, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "double",
+            [("input", DoubleTensorType([None, 2]))],
+            final_types=[("y", FloatTensorType([None, 1]))],
+            target_opset=TARGET_OPSET,
+        )
+        dump_data_and_model(
+            np.array(data, dtype=np.float64),
+            model,
+            model_onnx,
+            basename="SklearnSimpleImputerDoubleInputs",
         )
 
     @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
