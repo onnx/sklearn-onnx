@@ -34,6 +34,16 @@ def convert_sklearn_ordinal_encoder(
         if len(categories) == 0:
             continue
 
+        if (
+            hasattr(ordinal_op, "_infrequent_enabled")
+            and ordinal_op._infrequent_enabled
+        ):
+            default_to_infrequent_mappings = ordinal_op._default_to_infrequent_mappings[
+                input_idx
+            ]
+        else:
+            default_to_infrequent_mappings = None
+
         current_input = operator.inputs[input_idx]
         if current_input.get_second_dimension() == 1:
             feature_column = current_input
@@ -113,11 +123,30 @@ def convert_sklearn_ordinal_encoder(
             encoded_missing_value = np.array(
                 [int(ordinal_op.encoded_missing_value)]
             ).astype(np.int64)
-            attrs["values_int64s"] = np.concatenate(
-                (np.arange(len(categories) - 1).astype(np.int64), encoded_missing_value)
-            )
+
+            # handle max_categories or min_frequency
+            if default_to_infrequent_mappings is not None:
+                attrs["values_int64s"] = np.concatenate(
+                    (
+                        np.array(default_to_infrequent_mappings, dtype=np.int64),
+                        encoded_missing_value,
+                    )
+                )
+            else:
+                attrs["values_int64s"] = np.concatenate(
+                    (
+                        np.arange(len(categories) - 1).astype(np.int64),
+                        encoded_missing_value,
+                    )
+                )
         else:
-            attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
+            # handle max_categories or min_frequency
+            if default_to_infrequent_mappings is not None:
+                attrs["values_int64s"] = np.array(
+                    default_to_infrequent_mappings, dtype=np.int64
+                )
+            else:
+                attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
 
         if default_value:
             attrs["default_int64"] = default_value
