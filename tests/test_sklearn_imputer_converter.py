@@ -130,6 +130,10 @@ class TestSklearnImputerConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    @unittest.skipIf(
+        pv.Version(skl_ver) <= pv.Version("1.4.0"),
+        reason="unexpected pipeline + transform",
+    )
     def test_simple_imputer_double_inputs(self):
         model = Pipeline(
             [
