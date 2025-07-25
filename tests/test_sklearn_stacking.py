@@ -564,6 +564,104 @@ class TestStackingConverter(unittest.TestCase):
         got = sess.run(None, {"X": x})[0]
         self.assertEqual(got.shape[0], x.shape[0])
 
+    def test_model_stacking_classifier_column_transformer_issue_1199(self):
+        # see https://github.com/onnx/sklearn-onnx/issues/1199
+        import random
+
+        import numpy as np
+        from skl2onnx import to_onnx
+        from sklearn.compose import ColumnTransformer
+        from sklearn.datasets import make_classification
+        from sklearn.ensemble import StackingClassifier, RandomForestClassifier
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.model_selection import train_test_split
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import StandardScaler
+
+        np.random.seed(42)
+        random.seed(42)
+
+        X, y = make_classification(n_samples=1000, n_features=5, random_state=42)
+
+        pipeline = Pipeline(
+            steps=[
+                (
+                    "stacking_classifier",
+                    StackingClassifier(
+                        estimators=[
+                            (
+                                "tree",
+                                Pipeline(
+                                    [
+                                        (
+                                            "tree_column_selector",
+                                            ColumnTransformer(
+                                                [
+                                                    (
+                                                        "tree_cols",
+                                                        "passthrough",
+                                                        [0, 1, 2],
+                                                    )
+                                                ],
+                                                remainder="drop",
+                                            ),
+                                        ),
+                                        ("tree_classifier", RandomForestClassifier()),
+                                    ]
+                                ),
+                            )
+                        ],
+                        final_estimator=Pipeline(
+                            [
+                                (
+                                    "feature_combiner",
+                                    ColumnTransformer(
+                                        [
+                                            (
+                                                "standardize_proba",
+                                                Pipeline(
+                                                    [
+                                                        (
+                                                            "logit_transform",
+                                                            StandardScaler(),
+                                                        )
+                                                    ]
+                                                ),
+                                                [0],
+                                            ),
+                                            ("other_features", "passthrough", [4, 5]),
+                                        ],
+                                        remainder="drop",
+                                    ),
+                                ),
+                                ("final_logistic", LogisticRegression()),
+                            ]
+                        ),
+                        cv=2,
+                        stack_method="auto",
+                        passthrough=True,
+                    ),
+                )
+            ]
+        )
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=4
+        )
+        pipeline.fit(X_train, y_train)
+        expected = pipeline.predict_proba(X_train)
+        model_onnx = to_onnx(
+            pipeline,
+            X_train[:1].astype(np.float32),
+            verbose=1,
+            options={"zipmap": False},
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"X": X_train.astype(np.float32)})
+        assert_almost_equal(expected, got[1], decimal=5)
+
 
 if __name__ == "__main__":
     # import logging
