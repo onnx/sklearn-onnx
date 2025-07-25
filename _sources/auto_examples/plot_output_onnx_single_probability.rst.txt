@@ -540,14 +540,12 @@ numbers, which are numbers with decimals.
 .. GENERATED FROM PYTHON SOURCE LINES 51-62
 
 Convert the model to ONNX format.
-
 - target_opset=18 specifies the version of ONNX operators to use.
 - options={...} sets parameters for the conversion:
   - "zipmap": False ensures that the output is a raw array
   - of probabilities instead of a dictionary.
   - "output_class_labels": False ensures that the output
     contains only probabilities, not class labels.
-
 ONNX (Open Neural Network Exchange) is an open format for
 representing machine learning models.
 It allows interoperability between different machine learning frameworks,
@@ -824,17 +822,17 @@ The model can be printed as follows.
 
     <
        ir_version: 8,
-       opset_import: ["ai.onnx.ml" : 1, "" : 18],
+       opset_import: ["ai.onnx.ml" : 1, "" : 18, "" : 18],
        producer_name: "skl2onnx",
-       producer_version: "1.18.0",
+       producer_version: "1.19.1",
        domain: "ai.onnx",
        model_version: 0,
        doc_string: ""
     >
-    "2a0b430c8e794cac873666482db85939" (float[?,4] float_input) => (float[?,1] positive_class_prob) 
+    "05f01d3ce40e4d9d969b78b0be9e706d" (float[?,4] float_input) => (float[?,1] positive_class_prob) 
        <int64[1] indices =  {1}>
     {
-       [LinearClassifier] label, probability_tensor = ai.onnx.ml.LinearClassifier <classlabels_ints: ints = [0, 1, 2], coefficients: floats = [-0.442649, 0.828556, -2.36352, -0.972382, 0.269401, -0.245, -0.185949, -0.761031, 0.173248, -0.583556, 2.54947, 1.73341], intercepts: floats = [9.78245, 3.05803, -12.8405], multi_class: int = 1, post_transform: string = "SOFTMAX"> (float_input)
+       [LinearClassifier] label, probability_tensor = ai.onnx.ml.LinearClassifier <classlabels_ints: ints = [0, 1, 2], coefficients: floats = [-0.426998, 0.909799, -2.30715, -1.00512, 0.559776, -0.434449, -0.268645, -0.704307, -0.132778, -0.47535, 2.5758, 1.70943], intercepts: floats = [9.22076, 2.16403, -11.3848], multi_class: int = 1, post_transform: string = "SOFTMAX"> (float_input)
        [Normalizer] probabilities = ai.onnx.ml.Normalizer <norm: string = "L1"> (probability_tensor)
        positive_class_prob = Gather <axis: int = 1> (probabilities, indices)
     }
@@ -845,7 +843,7 @@ The model can be printed as follows.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.020 seconds)
+   **Total running time of the script:** (0 minutes 0.059 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_output_onnx_single_probability.py:

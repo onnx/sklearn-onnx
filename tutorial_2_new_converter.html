@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Implement a new converter" href="auto_tutorial/plot_icustom_converter.html" /><link rel="prev" title="Convert a pipeline with a CatBoost classifier" href="auto_tutorial/plot_gexternal_catboost.html" />
+        <link rel="prefetch" href="_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>A custom converter for a custom model - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>A custom converter for a custom model - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -351,7 +351,7 @@ it displays an error message telling it misses a converter.</p>
 </pre></div>
 </div>
 <p>&gt;&gt;&gt;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">shape</span> <span class="n">calculator</span> <span class="k">for</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">sphinx_runpython</span><span class="o">.</span><span class="n">runpython</span><span class="o">.</span><span class="n">sphinx_runpython_extension</span><span class="o">.</span><span class="n">run_python_script_140503414016832</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">MyLogisticRegression</span><span class="s1">&#39;&gt;&#39;</span><span class="o">.</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="n">find</span> <span class="n">a</span> <span class="n">shape</span> <span class="n">calculator</span> <span class="k">for</span> <span class="nb">type</span> <span class="s1">&#39;&lt;class &#39;</span><span class="n">sphinx_runpython</span><span class="o">.</span><span class="n">runpython</span><span class="o">.</span><span class="n">sphinx_runpython_extension</span><span class="o">.</span><span class="n">run_python_script_131728071632320</span><span class="o">.&lt;</span><span class="nb">locals</span><span class="o">&gt;.</span><span class="n">MyLogisticRegression</span><span class="s1">&#39;&gt;&#39;</span><span class="o">.</span>
     <span class="n">It</span> <span class="n">usually</span> <span class="n">means</span> <span class="n">the</span> <span class="n">pipeline</span> <span class="n">being</span> <span class="n">converted</span> <span class="n">contains</span> <span class="n">a</span>
     <span class="n">transformer</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">predictor</span> <span class="k">with</span> <span class="n">no</span> <span class="n">corresponding</span> <span class="n">converter</span>
     <span class="n">implemented</span> <span class="ow">in</span> <span class="n">sklearn</span><span class="o">-</span><span class="n">onnx</span><span class="o">.</span> <span class="n">If</span> <span class="n">the</span> <span class="n">converted</span> <span class="ow">is</span> <span class="n">implemented</span>
@@ -433,9 +433,9 @@ an example.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=256cef93"></script>
+</div><script src="_static/documentation_options.js?v=f0c121d3"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

@@ -81,7 +81,7 @@ Training a pipeline
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-8 {
+    <style>#sk-container-id-15 {
       /* Definition of color scheme common for light and dark mode */
       --sklearn-color-text: #000;
       --sklearn-color-text-muted: #666;
@@ -112,15 +112,15 @@ Training a pipeline
       }
     }
 
-    #sk-container-id-8 {
+    #sk-container-id-15 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-8 pre {
+    #sk-container-id-15 pre {
       padding: 0;
     }
 
-    #sk-container-id-8 input.sk-hidden--visually {
+    #sk-container-id-15 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -132,7 +132,7 @@ Training a pipeline
       width: 1px;
     }
 
-    #sk-container-id-8 div.sk-dashed-wrapped {
+    #sk-container-id-15 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -140,7 +140,7 @@ Training a pipeline
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-8 div.sk-container {
+    #sk-container-id-15 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -150,7 +150,7 @@ Training a pipeline
       position: relative;
     }
 
-    #sk-container-id-8 div.sk-text-repr-fallback {
+    #sk-container-id-15 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -166,14 +166,14 @@ Training a pipeline
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-8 div.sk-parallel-item::after {
+    #sk-container-id-15 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-8 div.sk-parallel {
+    #sk-container-id-15 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -181,28 +181,28 @@ Training a pipeline
       position: relative;
     }
 
-    #sk-container-id-8 div.sk-parallel-item {
+    #sk-container-id-15 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-8 div.sk-parallel-item:first-child::after {
+    #sk-container-id-15 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-8 div.sk-parallel-item:last-child::after {
+    #sk-container-id-15 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-8 div.sk-parallel-item:only-child::after {
+    #sk-container-id-15 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-8 div.sk-serial {
+    #sk-container-id-15 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -220,14 +220,14 @@ Training a pipeline
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-8 div.sk-toggleable {
+    #sk-container-id-15 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-8 label.sk-toggleable__label {
+    #sk-container-id-15 label.sk-toggleable__label {
       cursor: pointer;
       display: flex;
       width: 100%;
@@ -240,13 +240,13 @@ Training a pipeline
       gap: 0.5em;
     }
 
-    #sk-container-id-8 label.sk-toggleable__label .caption {
+    #sk-container-id-15 label.sk-toggleable__label .caption {
       font-size: 0.6rem;
       font-weight: lighter;
       color: var(--sklearn-color-text-muted);
     }
 
-    #sk-container-id-8 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-15 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -254,13 +254,13 @@ Training a pipeline
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-8 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-15 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-8 div.sk-toggleable__content {
+    #sk-container-id-15 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -269,12 +269,12 @@ Training a pipeline
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-toggleable__content.fitted {
+    #sk-container-id-15 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-toggleable__content pre {
+    #sk-container-id-15 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -282,79 +282,79 @@ Training a pipeline
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-15 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-8 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-15 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-8 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-15 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-8 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-15 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-15 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-8 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-15 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-15 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-8 div.sk-label label {
+    #sk-container-id-15 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-15 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-8 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-15 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-8 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-15 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-8 div.sk-label label {
+    #sk-container-id-15 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-8 div.sk-label-container {
+    #sk-container-id-15 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-8 div.sk-estimator {
+    #sk-container-id-15 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -364,18 +364,18 @@ Training a pipeline
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-estimator.fitted {
+    #sk-container-id-15 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-8 div.sk-estimator:hover {
+    #sk-container-id-15 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-estimator.fitted:hover {
+    #sk-container-id-15 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -463,7 +463,7 @@ Training a pipeline
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-8 a.estimator_doc_link {
+    #sk-container-id-15 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -478,29 +478,29 @@ Training a pipeline
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-8 a.estimator_doc_link.fitted {
+    #sk-container-id-15 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-8 a.estimator_doc_link:hover {
+    #sk-container-id-15 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-8 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-15 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-8" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
+    </style><div id="sk-container-id-15" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
                                 (&#x27;rf&#x27;, RandomForestRegressor(random_state=1)),
-                                (&#x27;lr&#x27;, LinearRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-18" type="checkbox" ><label for="sk-estimator-id-18" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>VotingRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.VotingRegressor.html">?<span>Documentation for VotingRegressor</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
+                                (&#x27;lr&#x27;, LinearRegression())])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-47" type="checkbox" ><label for="sk-estimator-id-47" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>VotingRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.VotingRegressor.html">?<span>Documentation for VotingRegressor</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>VotingRegressor(estimators=[(&#x27;gb&#x27;, GradientBoostingRegressor(random_state=1)),
                                 (&#x27;rf&#x27;, RandomForestRegressor(random_state=1)),
-                                (&#x27;lr&#x27;, LinearRegression())])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><label>gb</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-19" type="checkbox" ><label for="sk-estimator-id-19" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GradientBoostingRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html">?<span>Documentation for GradientBoostingRegressor</span></a></div></label><div class="sk-toggleable__content fitted"><pre>GradientBoostingRegressor(random_state=1)</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><label>rf</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-20" type="checkbox" ><label for="sk-estimator-id-20" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>RandomForestRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.RandomForestRegressor.html">?<span>Documentation for RandomForestRegressor</span></a></div></label><div class="sk-toggleable__content fitted"><pre>RandomForestRegressor(random_state=1)</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><label>lr</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-21" type="checkbox" ><label for="sk-estimator-id-21" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LinearRegression</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.linear_model.LinearRegression.html">?<span>Documentation for LinearRegression</span></a></div></label><div class="sk-toggleable__content fitted"><pre>LinearRegression()</pre></div> </div></div></div></div></div></div></div></div></div>
+                                (&#x27;lr&#x27;, LinearRegression())])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><label>gb</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-48" type="checkbox" ><label for="sk-estimator-id-48" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GradientBoostingRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.GradientBoostingRegressor.html">?<span>Documentation for GradientBoostingRegressor</span></a></div></label><div class="sk-toggleable__content fitted"><pre>GradientBoostingRegressor(random_state=1)</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><label>rf</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-49" type="checkbox" ><label for="sk-estimator-id-49" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>RandomForestRegressor</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.RandomForestRegressor.html">?<span>Documentation for RandomForestRegressor</span></a></div></label><div class="sk-toggleable__content fitted"><pre>RandomForestRegressor(random_state=1)</pre></div> </div></div></div></div></div><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><label>lr</label></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-50" type="checkbox" ><label for="sk-estimator-id-50" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LinearRegression</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.linear_model.LinearRegression.html">?<span>Documentation for LinearRegression</span></a></div></label><div class="sk-toggleable__content fitted"><pre>LinearRegression()</pre></div> </div></div></div></div></div></div></div></div></div>
     </div>
     <br />
     <br />
@@ -546,7 +546,7 @@ or not an observation belongs to a batch or is a single one.
 
  .. code-block:: none
 
-      0%|          | 0/3 [00:00<?, ?it/s]     33%|███▎      | 1/3 [00:02<00:04,  2.47s/it]     67%|██████▋   | 2/3 [00:05<00:02,  2.53s/it]    100%|██████████| 3/3 [00:05<00:00,  1.65s/it]    100%|██████████| 3/3 [00:05<00:00,  1.88s/it]
+      0%|          | 0/3 [00:00<?, ?it/s]     33%|███▎      | 1/3 [00:03<00:06,  3.43s/it]     67%|██████▋   | 2/3 [00:06<00:03,  3.36s/it]    100%|██████████| 3/3 [00:07<00:00,  2.19s/it]    100%|██████████| 3/3 [00:07<00:00,  2.51s/it]
 
 
 .. raw:: html
@@ -583,36 +583,36 @@ or not an observation belongs to a batch or is a single one.
       <tbody>
         <tr>
           <th>0</th>
-          <td>0.004927</td>
-          <td>0.000599</td>
-          <td>0.004307</td>
-          <td>0.006856</td>
+          <td>0.006848</td>
+          <td>0.000742</td>
+          <td>0.005936</td>
+          <td>0.009565</td>
           <td>50</td>
           <td>10</td>
           <td>1</td>
-          <td>0.004927</td>
+          <td>0.006848</td>
         </tr>
         <tr>
           <th>1</th>
-          <td>0.005127</td>
-          <td>0.000824</td>
-          <td>0.004372</td>
-          <td>0.008680</td>
+          <td>0.006621</td>
+          <td>0.000406</td>
+          <td>0.006046</td>
+          <td>0.007963</td>
           <td>50</td>
           <td>10</td>
           <td>10</td>
-          <td>0.000513</td>
+          <td>0.000662</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>0.006102</td>
-          <td>0.000432</td>
-          <td>0.005597</td>
-          <td>0.006985</td>
+          <td>0.007936</td>
+          <td>0.000504</td>
+          <td>0.007349</td>
+          <td>0.008897</td>
           <td>10</td>
           <td>10</td>
           <td>100</td>
-          <td>0.000061</td>
+          <td>0.000079</td>
         </tr>
       </tbody>
     </table>
@@ -708,7 +708,7 @@ available.
 
  .. code-block:: none
 
-      0%|          | 0/3 [00:00<?, ?it/s]     33%|███▎      | 1/3 [00:06<00:12,  6.37s/it]     67%|██████▋   | 2/3 [00:18<00:09,  9.56s/it]    100%|██████████| 3/3 [00:29<00:00, 10.46s/it]    100%|██████████| 3/3 [00:29<00:00,  9.90s/it]
+      0%|          | 0/3 [00:00<?, ?it/s]     33%|███▎      | 1/3 [00:08<00:16,  8.39s/it]     67%|██████▋   | 2/3 [00:23<00:12, 12.20s/it]    100%|██████████| 3/3 [00:39<00:00, 13.94s/it]    100%|██████████| 3/3 [00:39<00:00, 13.09s/it]
 
 
 .. raw:: html
@@ -747,42 +747,42 @@ available.
       <tbody>
         <tr>
           <th>0</th>
-          <td>0.005081</td>
-          <td>0.000962</td>
-          <td>0.004419</td>
-          <td>0.010415</td>
+          <td>0.006954</td>
+          <td>0.000836</td>
+          <td>0.006153</td>
+          <td>0.011056</td>
           <td>50</td>
           <td>10</td>
           <td>1</td>
-          <td>0.005081</td>
-          <td>0.000036</td>
-          <td>0.007617</td>
+          <td>0.006954</td>
+          <td>0.000032</td>
+          <td>0.009783</td>
         </tr>
         <tr>
           <th>1</th>
-          <td>0.004960</td>
-          <td>0.000507</td>
-          <td>0.004386</td>
-          <td>0.007150</td>
+          <td>0.007160</td>
+          <td>0.000781</td>
+          <td>0.006229</td>
+          <td>0.010164</td>
           <td>50</td>
           <td>10</td>
           <td>10</td>
-          <td>0.000496</td>
+          <td>0.000716</td>
           <td>0.000008</td>
-          <td>0.001852</td>
+          <td>0.002248</td>
         </tr>
         <tr>
           <th>2</th>
-          <td>0.006076</td>
-          <td>0.000710</td>
-          <td>0.005279</td>
-          <td>0.007308</td>
+          <td>0.008211</td>
+          <td>0.000546</td>
+          <td>0.007476</td>
+          <td>0.009356</td>
           <td>10</td>
           <td>10</td>
           <td>100</td>
-          <td>0.000061</td>
-          <td>0.000004</td>
-          <td>0.001088</td>
+          <td>0.000082</td>
+          <td>0.000007</td>
+          <td>0.001513</td>
         </tr>
       </tbody>
     </table>
@@ -828,7 +828,7 @@ parallelization and languages (:epkg:`C++`, :epkg:`openmp`).
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 36.073 seconds)
+   **Total running time of the script:** (0 minutes 47.729 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_bbegin_measure_time.py:

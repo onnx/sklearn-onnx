@@ -319,23 +319,6 @@ Examples
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it.">
-
-.. only:: html
-
-  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_xgboost_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
-    </div>
-
-
-.. raw:: html
-
     <div class="sphx-glr-thumbcontainer" tooltip="Options are used to implement different conversion for a same model. The options can be used to replace an operator MatMul by the Gemm operator and compare the processing time for both graph. Let&#x27;s see how to retrieve the options within a converter.">
 
 .. only:: html
@@ -348,23 +331,6 @@ Examples
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">A new converter with options</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it.">
-
-.. only:: html
-
-  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_catboost_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_tutorial_plot_gexternal_catboost.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
     </div>
 
 
@@ -387,6 +353,23 @@ Examples
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it.">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_catboost_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_tutorial_plot_gexternal_catboost.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a regressor has one output (prediction), a transform has one output (the transformed data). This example assumes the model to convert is one of them. In that case, a new converter requires in fact two functions:">
 
 .. only:: html
@@ -399,6 +382,23 @@ Examples
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Implement a new converter</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it.">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_xgboost_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
     </div>
 
 
@@ -515,11 +515,11 @@ Examples
    /auto_tutorial/plot_gexternal_lightgbm_reg
    /auto_tutorial/plot_mcustom_parser
    /auto_tutorial/plot_dbegin_options_zipmap
-   /auto_tutorial/plot_gexternal_xgboost
    /auto_tutorial/plot_lcustom_options
-   /auto_tutorial/plot_gexternal_catboost
    /auto_tutorial/plot_jcustom_syntax
+   /auto_tutorial/plot_gexternal_catboost
    /auto_tutorial/plot_icustom_converter
+   /auto_tutorial/plot_gexternal_xgboost
    /auto_tutorial/plot_wext_pyod_forest
    /auto_tutorial/plot_catwoe_transformer
    /auto_tutorial/plot_jfunction_transformer

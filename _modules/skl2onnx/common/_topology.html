@@ -3,18 +3,19 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
+        <link rel="prefetch" href="../../../_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>skl2onnx.common._topology - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>skl2onnx.common._topology - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -27,14 +28,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -171,7 +172,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -193,12 +194,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -329,8 +329,14 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">onnx_pb</span> <span class="k">as</span> <span class="n">onnx_proto</span>
-<span class="kn">from</span> <span class="nn">onnx.helper</span> <span class="kn">import</span> <span class="n">make_graph</span><span class="p">,</span> <span class="n">make_model</span><span class="p">,</span> <span class="n">make_tensor_value_info</span>
-<span class="kn">from</span> <span class="nn">onnxconverter_common.data_types</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span> <span class="nn">onnx.helper</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">make_graph</span><span class="p">,</span>
+    <span class="n">make_model</span><span class="p">,</span>
+    <span class="n">make_tensor_value_info</span><span class="p">,</span>
+    <span class="n">make_node</span><span class="p">,</span>
+    <span class="n">make_function</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DataType</span><span class="p">,</span>
     <span class="n">TensorType</span><span class="p">,</span>
     <span class="n">FloatTensorType</span><span class="p">,</span>
@@ -339,13 +345,10 @@
     <span class="n">DoubleTensorType</span><span class="p">,</span>
     <span class="n">Int32TensorType</span><span class="p">,</span>
     <span class="n">BooleanTensorType</span><span class="p">,</span>
+    <span class="n">Int8TensorType</span><span class="p">,</span>
+    <span class="n">UInt8TensorType</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">onnxconverter_common.data_types</span> <span class="kn">import</span> <span class="n">Int8TensorType</span><span class="p">,</span> <span class="n">UInt8TensorType</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">Int8TensorType</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">UInt8TensorType</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="kn">from</span> <span class="nn">..proto</span> <span class="kn">import</span> <span class="n">get_opset_number_from_onnx</span><span class="p">,</span> <span class="n">get_latest_tested_opset_version</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_registration</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
@@ -383,7 +386,7 @@
 
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">onnxconverter_common.topology</span> <span class="kn">import</span> <span class="n">OPSET_TO_IR_VERSION</span>
+    <span class="kn">from</span> <span class="nn">skl2onnx.topology</span> <span class="kn">import</span> <span class="n">OPSET_TO_IR_VERSION</span>
 
     <span class="k">assert</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="p">[</span><span class="mi">18</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
@@ -1814,6 +1817,147 @@
 
 
 
+<span class="k">def</span> <span class="nf">make_model_from_container</span><span class="p">(</span>
+    <span class="n">container</span><span class="p">:</span> <span class="n">ModelComponentContainer</span><span class="p">,</span>
+    <span class="n">remove_identity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">doc_string</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">onnx_target_opset</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">as_function</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">domain_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">container</span><span class="o">.</span><span class="n">ensure_topological_order</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No detected inputs after conversion.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No detected outputs after conversion.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---NODES---&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;  </span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">: </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%r</span><span class="s2">&quot;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Create a graph from its main components</span>
+    <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset_onnx</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">as_function</span><span class="p">,</span> <span class="s2">&quot;Functions not supported for opset &lt; 9.&quot;</span>
+        <span class="c1"># When calling ModelComponentContainer&#39;s add_initializer(...),</span>
+        <span class="c1"># nothing is added into the input list. However, for ONNX target</span>
+        <span class="c1"># opset &lt; 9, initializers should also be a part of model&#39;s</span>
+        <span class="c1"># (GraphProto) inputs. Thus, we create ValueInfoProto objects</span>
+        <span class="c1"># from initializers (type: TensorProto) directly and then add</span>
+        <span class="c1"># them into model&#39;s input list.</span>
+        <span class="n">extra_inputs</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># ValueInfoProto list of the initializers</span>
+        <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">initializers</span><span class="p">:</span>
+            <span class="c1"># Sometimes (especially when creating optional input values</span>
+            <span class="c1"># such as RNN&#39;s initial hidden state), an initializer is also</span>
+            <span class="c1"># one of the original model&#39;s input, so it has been added into</span>
+            <span class="c1"># the container&#39;s input list. If this is the case, we need to</span>
+            <span class="c1"># skip one iteration to avoid duplicated inputs.</span>
+            <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="n">value_info</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">value_info</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">]:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Initializers are always tensors so we can just call</span>
+            <span class="c1"># make_tensor_value_info(...).</span>
+            <span class="n">value_info</span> <span class="o">=</span> <span class="n">make_tensor_value_info</span><span class="p">(</span>
+                <span class="n">tensor</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dims</span>
+            <span class="p">)</span>
+            <span class="n">extra_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_info</span><span class="p">)</span>
+
+        <span class="c1"># Before ONNX opset 9, initializers were needed to be passed in</span>
+        <span class="c1"># with inputs.</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="p">,</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">inputs</span> <span class="o">+</span> <span class="n">extra_inputs</span><span class="p">,</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">initializers</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># In ONNX opset 9 and above, initializers are included as</span>
+        <span class="c1"># operator inputs and therefore do not need to be passed as</span>
+        <span class="c1"># extra_inputs.</span>
+        <span class="k">if</span> <span class="n">as_function</span><span class="p">:</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">make_function</span><span class="p">(</span>
+                <span class="n">domain_name</span><span class="p">,</span>
+                <span class="n">model_name</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">],</span>
+                <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">],</span>
+                <span class="p">[</span>
+                    <span class="o">*</span><span class="p">[</span>
+                        <span class="n">make_node</span><span class="p">(</span><span class="s2">&quot;Constant&quot;</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[</span><span class="n">init</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">init</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">init</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">initializers</span>
+                    <span class="p">],</span>
+                    <span class="o">*</span><span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="p">[],</span>  <span class="c1"># opsets</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span>
+                <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
+                <span class="n">model_name</span><span class="p">,</span>
+                <span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
+                <span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
+                <span class="n">container</span><span class="o">.</span><span class="n">initializers</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Create model</span>
+    <span class="k">if</span> <span class="n">as_function</span><span class="p">:</span>
+        <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">graph</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Add extra information related to the graph</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">value_info</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">value_info</span><span class="p">)</span>
+        <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+    <span class="c1"># Update domain version</span>
+    <span class="n">opv</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+        <span class="n">onnx_target_opset</span><span class="p">,</span> <span class="n">_get_main_opset_version</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span> <span class="ow">or</span> <span class="n">onnx_target_opset</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">):</span>
+        <span class="c1"># Main opset was not added. Doing it here.</span>
+        <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">opv</span>
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[convert_topology] +opset: name=</span><span class="si">%r</span><span class="s2">, version=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">opv</span><span class="p">))</span>
+
+    <span class="c1"># Add extra information</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">as_function</span><span class="p">:</span>
+        <span class="n">irv</span> <span class="o">=</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">IR_VERSION</span><span class="p">)</span>
+        <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">irv</span>
+        <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer</span><span class="p">()</span>
+        <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer_version</span><span class="p">()</span>
+        <span class="n">onnx_model</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_domain</span><span class="p">()</span>
+        <span class="n">onnx_model</span><span class="o">.</span><span class="n">model_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_model_version</span><span class="p">()</span>
+    <span class="n">onnx_model</span><span class="o">.</span><span class="n">doc_string</span> <span class="o">=</span> <span class="n">doc_string</span>
+
+    <span class="c1"># Removes many identity nodes,</span>
+    <span class="c1"># the converter may introduct identity nodes</span>
+    <span class="c1"># after a zipmap operator and onnx &lt;= 1.7 does not</span>
+    <span class="c1"># support that.</span>
+    <span class="k">if</span> <span class="n">remove_identity</span><span class="p">:</span>
+        <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">onnx_remove_node_identity</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span>
+
+    <span class="c1"># process functions</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">cont</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">local_functions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">domain</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="n">proto</span> <span class="o">=</span> <span class="n">make_model_from_container</span><span class="p">(</span>
+            <span class="n">cont</span><span class="p">,</span>
+            <span class="n">remove_identity</span><span class="o">=</span><span class="n">remove_identity</span><span class="p">,</span>
+            <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="n">as_function</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">model_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">domain_name</span><span class="o">=</span><span class="n">domain</span><span class="p">,</span>
+            <span class="n">onnx_target_opset</span><span class="o">=</span><span class="n">container</span><span class="o">.</span><span class="n">target_opset_onnx</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">onnx_model</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proto</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">onnx_model</span>
+
+
 <div class="viewcode-block" id="convert_topology">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._topology.convert_topology">[docs]</a>
 <span class="k">def</span> <span class="nf">convert_topology</span><span class="p">(</span>
@@ -1875,106 +2019,17 @@
         <span class="n">black_op</span><span class="o">=</span><span class="n">topology</span><span class="o">.</span><span class="n">raw_model</span><span class="o">.</span><span class="n">_black_op</span><span class="p">,</span>
         <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
     <span class="p">)</span>
-
     <span class="c1"># Traverse the graph from roots to leaves</span>
     <span class="c1"># This loop could eventually be parallelized.</span>
     <span class="n">topology</span><span class="o">.</span><span class="n">convert_operators</span><span class="p">(</span><span class="n">container</span><span class="o">=</span><span class="n">container</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-    <span class="n">container</span><span class="o">.</span><span class="n">ensure_topological_order</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No detected inputs after conversion.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No detected outputs after conversion.&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---NODES---&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;  </span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">: </span><span class="si">%r</span><span class="s2"> -&gt; </span><span class="si">%r</span><span class="s2">&quot;</span>
-                <span class="o">%</span> <span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">op_type</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">input</span><span class="p">,</span> <span class="n">node</span><span class="o">.</span><span class="n">output</span><span class="p">)</span>
-            <span class="p">)</span>
-
-    <span class="c1"># Create a graph from its main components</span>
-    <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset_onnx</span> <span class="o">&lt;</span> <span class="mi">9</span><span class="p">:</span>
-        <span class="c1"># When calling ModelComponentContainer&#39;s add_initializer(...),</span>
-        <span class="c1"># nothing is added into the input list. However, for ONNX target</span>
-        <span class="c1"># opset &lt; 9, initializers should also be a part of model&#39;s</span>
-        <span class="c1"># (GraphProto) inputs. Thus, we create ValueInfoProto objects</span>
-        <span class="c1"># from initializers (type: TensorProto) directly and then add</span>
-        <span class="c1"># them into model&#39;s input list.</span>
-        <span class="n">extra_inputs</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># ValueInfoProto list of the initializers</span>
-        <span class="k">for</span> <span class="n">tensor</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">initializers</span><span class="p">:</span>
-            <span class="c1"># Sometimes (especially when creating optional input values</span>
-            <span class="c1"># such as RNN&#39;s initial hidden state), an initializer is also</span>
-            <span class="c1"># one of the original model&#39;s input, so it has been added into</span>
-            <span class="c1"># the container&#39;s input list. If this is the case, we need to</span>
-            <span class="c1"># skip one iteration to avoid duplicated inputs.</span>
-            <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span><span class="n">value_info</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">value_info</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">]:</span>
-                <span class="k">continue</span>
-
-            <span class="c1"># Initializers are always tensors so we can just call</span>
-            <span class="c1"># make_tensor_value_info(...).</span>
-            <span class="n">value_info</span> <span class="o">=</span> <span class="n">make_tensor_value_info</span><span class="p">(</span>
-                <span class="n">tensor</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span> <span class="n">tensor</span><span class="o">.</span><span class="n">dims</span>
-            <span class="p">)</span>
-            <span class="n">extra_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_info</span><span class="p">)</span>
-
-        <span class="c1"># Before ONNX opset 9, initializers were needed to be passed in</span>
-        <span class="c1"># with inputs.</span>
-        <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
-            <span class="n">model_name</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">inputs</span> <span class="o">+</span> <span class="n">extra_inputs</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">initializers</span><span class="p">,</span>
-        <span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># In ONNX opset 9 and above, initializers are included as</span>
-        <span class="c1"># operator inputs and therefore do not need to be passed as</span>
-        <span class="c1"># extra_inputs.</span>
-        <span class="n">graph</span> <span class="o">=</span> <span class="n">make_graph</span><span class="p">(</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span>
-            <span class="n">model_name</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">inputs</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">outputs</span><span class="p">,</span>
-            <span class="n">container</span><span class="o">.</span><span class="n">initializers</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="c1"># Add extra information related to the graph</span>
-    <span class="n">graph</span><span class="o">.</span><span class="n">value_info</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">value_info</span><span class="p">)</span>
-
-    <span class="c1"># Create model</span>
-    <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">make_model</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
-
-    <span class="c1"># Update domain version</span>
-    <span class="n">opv</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-        <span class="n">onnx_target_opset</span><span class="p">,</span> <span class="n">_get_main_opset_version</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span> <span class="ow">or</span> <span class="n">onnx_target_opset</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_update_domain_version</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">onnx_model</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">):</span>
-        <span class="c1"># Main opset was not added. Doing it here.</span>
-        <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
-        <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">opv</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[convert_topology] +opset: name=</span><span class="si">%r</span><span class="s2">, version=</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">opv</span><span class="p">))</span>
-
-    <span class="c1"># Add extra information</span>
-    <span class="n">irv</span> <span class="o">=</span> <span class="n">OPSET_TO_IR_VERSION</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">opv</span><span class="p">,</span> <span class="n">onnx_proto</span><span class="o">.</span><span class="n">IR_VERSION</span><span class="p">)</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">ir_version</span> <span class="o">=</span> <span class="n">irv</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_name</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">producer_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_producer_version</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_domain</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">model_version</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_model_version</span><span class="p">()</span>
-    <span class="n">onnx_model</span><span class="o">.</span><span class="n">doc_string</span> <span class="o">=</span> <span class="n">doc_string</span>
-
-    <span class="c1"># Removes many identity nodes,</span>
-    <span class="c1"># the converter may introduct identity nodes</span>
-    <span class="c1"># after a zipmap operator and onnx &lt;= 1.7 does not</span>
-    <span class="c1"># support that. It does not use onnxconverter-common</span>
-    <span class="c1"># as the optimizer only support opset &gt;= 9.</span>
-    <span class="k">if</span> <span class="n">remove_identity</span><span class="p">:</span>
-        <span class="n">onnx_model</span> <span class="o">=</span> <span class="n">onnx_remove_node_identity</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">onnx_model</span></div>
+    <span class="k">return</span> <span class="n">make_model_from_container</span><span class="p">(</span>
+        <span class="n">container</span><span class="p">,</span>
+        <span class="n">remove_identity</span><span class="o">=</span><span class="n">remove_identity</span><span class="p">,</span>
+        <span class="n">doc_string</span><span class="o">=</span><span class="n">doc_string</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+        <span class="n">onnx_target_opset</span><span class="o">=</span><span class="n">onnx_target_opset</span><span class="p">,</span>
+        <span class="n">model_name</span><span class="o">=</span><span class="n">model_name</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -1991,10 +2046,12 @@
             <span class="p">)</span>
 
     <span class="c1"># Fill operator sets</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">op_domain</span><span class="p">,</span> <span class="n">op_version</span> <span class="ow">in</span> <span class="n">purified_operator_set</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">op_version</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
+        <span class="n">done</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">op_domain</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># Overwrite the default operator set created by</span>
             <span class="c1"># make_model(...)</span>
@@ -2026,6 +2083,14 @@
                 <span class="s2">&quot;this model, which requires at least opset &quot;</span>
                 <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="n">op_domain</span><span class="p">),</span> <span class="n">op_version</span><span class="p">)</span>
             <span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset_all</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">done</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="c1"># Some opsets may be forgotten if they appear in subgraphs.</span>
+        <span class="n">op_set</span> <span class="o">=</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">opset_import</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">k</span>
+        <span class="n">op_set</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="n">v</span>
+
     <span class="k">return</span> <span class="s2">&quot;&quot;</span> <span class="ow">in</span> <span class="n">purified_operator_set</span>
 
 
@@ -2074,9 +2139,9 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../../../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

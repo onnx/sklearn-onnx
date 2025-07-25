@@ -99,8 +99,8 @@ Convert a model into ONNX
 
  .. code-block:: none
 
-    [0 2 1 2 1 2 1 0 0 0 1 1 1 2 2 1 2 2 0 2 1 2 2 0 2 1 1 1 1 1 1 1 1 2 1 1 0
-     1]
+    [0 1 1 1 2 1 2 1 0 0 0 2 2 0 2 1 0 0 0 0 2 1 2 1 2 2 2 0 1 1 0 2 0 2 1 2 2
+     0]
 
 
 
@@ -146,7 +146,7 @@ is reserved for information within converters.
 
     ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.18.0"
+    producer_version: "1.19.1"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -177,6 +177,18 @@ is reserved for information within converters.
           ints: 0
           ints: 1
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
           type: INTS
         }
         attribute {
@@ -184,25 +196,49 @@ is reserved for information within converters.
           ints: 1
           ints: 1
           ints: 1
-          ints: 4
-          ints: 4
-          ints: 4
-          ints: 5
-          ints: 5
-          ints: 5
-          ints: 8
-          ints: 8
-          ints: 8
+          ints: 6
+          ints: 6
+          ints: 6
+          ints: 7
+          ints: 7
+          ints: 7
           ints: 9
           ints: 9
           ints: 9
-          ints: 10
-          ints: 10
-          ints: 10
+          ints: 11
+          ints: 11
+          ints: 11
+          ints: 12
+          ints: 12
+          ints: 12
+          ints: 13
+          ints: 13
+          ints: 13
+          ints: 16
+          ints: 16
+          ints: 16
+          ints: 17
+          ints: 17
+          ints: 17
+          ints: 18
+          ints: 18
+          ints: 18
           type: INTS
         }
         attribute {
           name: "class_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -235,6 +271,18 @@ is reserved for information within converters.
           floats: 0
           floats: 1
           floats: 0
+          floats: 1
+          floats: 0
+          floats: 0
+          floats: 0
+          floats: 1
+          floats: 0
+          floats: 1
+          floats: 0
+          floats: 0
+          floats: 0
+          floats: 1
+          floats: 0
           floats: 0
           floats: 1
           floats: 0
@@ -256,12 +304,20 @@ is reserved for information within converters.
           name: "nodes_falsenodeids"
           ints: 2
           ints: 0
-          ints: 6
-          ints: 5
+          ints: 14
+          ints: 13
+          ints: 8
+          ints: 7
           ints: 0
           ints: 0
           ints: 10
-          ints: 9
+          ints: 0
+          ints: 12
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 18
+          ints: 17
           ints: 0
           ints: 0
           ints: 0
@@ -269,10 +325,18 @@ is reserved for information within converters.
         }
         attribute {
           name: "nodes_featureids"
-          ints: 2
+          ints: 3
           ints: 0
           ints: 3
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 2
+          ints: 0
+          ints: 3
+          ints: 0
           ints: 0
           ints: 0
           ints: 2
@@ -284,6 +348,14 @@ is reserved for information within converters.
         }
         attribute {
           name: "nodes_hitrates"
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
           floats: 1
           floats: 1
           floats: 1
@@ -310,6 +382,14 @@ is reserved for information within converters.
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
@@ -318,6 +398,14 @@ is reserved for information within converters.
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
@@ -340,10 +428,26 @@ is reserved for information within converters.
           ints: 8
           ints: 9
           ints: 10
+          ints: 11
+          ints: 12
+          ints: 13
+          ints: 14
+          ints: 15
+          ints: 16
+          ints: 17
+          ints: 18
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -363,10 +467,18 @@ is reserved for information within converters.
           ints: 0
           ints: 3
           ints: 4
+          ints: 5
+          ints: 6
           ints: 0
           ints: 0
-          ints: 7
-          ints: 8
+          ints: 9
+          ints: 0
+          ints: 11
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 15
+          ints: 16
           ints: 0
           ints: 0
           ints: 0
@@ -374,10 +486,18 @@ is reserved for information within converters.
         }
         attribute {
           name: "nodes_values"
-          floats: 2.69999981
+          floats: 0.75
           floats: 0
           floats: 1.75
-          floats: 5.29999971
+          floats: 5.35
+          floats: 4.95
+          floats: 2.45
+          floats: 0
+          floats: 0
+          floats: 4.95
+          floats: 0
+          floats: 1.55
+          floats: 0
           floats: 0
           floats: 0
           floats: 4.85
@@ -420,7 +540,7 @@ is reserved for information within converters.
         }
         domain: "ai.onnx.ml"
       }
-      name: "4da61a0794d947c88ca182179ef062ca"
+      name: "21b6707aac84485f97acc71b370309e7"
       input {
         name: "float_input"
         type {
@@ -509,7 +629,7 @@ implemented.
 
     ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.18.0"
+    producer_version: "1.19.1"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -540,6 +660,18 @@ implemented.
           ints: 0
           ints: 1
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
+          ints: 0
+          ints: 1
+          ints: 2
           type: INTS
         }
         attribute {
@@ -547,25 +679,49 @@ implemented.
           ints: 1
           ints: 1
           ints: 1
-          ints: 4
-          ints: 4
-          ints: 4
-          ints: 5
-          ints: 5
-          ints: 5
-          ints: 8
-          ints: 8
-          ints: 8
+          ints: 6
+          ints: 6
+          ints: 6
+          ints: 7
+          ints: 7
+          ints: 7
           ints: 9
           ints: 9
           ints: 9
-          ints: 10
-          ints: 10
-          ints: 10
+          ints: 11
+          ints: 11
+          ints: 11
+          ints: 12
+          ints: 12
+          ints: 12
+          ints: 13
+          ints: 13
+          ints: 13
+          ints: 16
+          ints: 16
+          ints: 16
+          ints: 17
+          ints: 17
+          ints: 17
+          ints: 18
+          ints: 18
+          ints: 18
           type: INTS
         }
         attribute {
           name: "class_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -598,6 +754,18 @@ implemented.
           floats: 0
           floats: 1
           floats: 0
+          floats: 1
+          floats: 0
+          floats: 0
+          floats: 0
+          floats: 1
+          floats: 0
+          floats: 1
+          floats: 0
+          floats: 0
+          floats: 0
+          floats: 1
+          floats: 0
           floats: 0
           floats: 1
           floats: 0
@@ -619,12 +787,20 @@ implemented.
           name: "nodes_falsenodeids"
           ints: 2
           ints: 0
-          ints: 6
-          ints: 5
+          ints: 14
+          ints: 13
+          ints: 8
+          ints: 7
           ints: 0
           ints: 0
           ints: 10
-          ints: 9
+          ints: 0
+          ints: 12
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 18
+          ints: 17
           ints: 0
           ints: 0
           ints: 0
@@ -632,10 +808,18 @@ implemented.
         }
         attribute {
           name: "nodes_featureids"
-          ints: 2
+          ints: 3
           ints: 0
           ints: 3
           ints: 2
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 2
+          ints: 0
+          ints: 3
+          ints: 0
           ints: 0
           ints: 0
           ints: 2
@@ -647,6 +831,14 @@ implemented.
         }
         attribute {
           name: "nodes_hitrates"
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
           floats: 1
           floats: 1
           floats: 1
@@ -673,6 +865,14 @@ implemented.
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
@@ -681,6 +881,14 @@ implemented.
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
@@ -703,10 +911,26 @@ implemented.
           ints: 8
           ints: 9
           ints: 10
+          ints: 11
+          ints: 12
+          ints: 13
+          ints: 14
+          ints: 15
+          ints: 16
+          ints: 17
+          ints: 18
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -726,10 +950,18 @@ implemented.
           ints: 0
           ints: 3
           ints: 4
+          ints: 5
+          ints: 6
           ints: 0
           ints: 0
-          ints: 7
-          ints: 8
+          ints: 9
+          ints: 0
+          ints: 11
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 15
+          ints: 16
           ints: 0
           ints: 0
           ints: 0
@@ -737,10 +969,18 @@ implemented.
         }
         attribute {
           name: "nodes_values"
-          floats: 2.69999981
+          floats: 0.75
           floats: 0
           floats: 1.75
-          floats: 5.29999971
+          floats: 5.35
+          floats: 4.95
+          floats: 2.45
+          floats: 0
+          floats: 0
+          floats: 4.95
+          floats: 0
+          floats: 1.55
+          floats: 0
           floats: 0
           floats: 0
           floats: 4.85
@@ -783,7 +1023,7 @@ implemented.
         }
         domain: "ai.onnx.ml"
       }
-      name: "be257cd5d5d64ede939450f40904c278"
+      name: "7cb1fe8a42be413090ed7a77b076fb68"
       input {
         name: "float_input"
         type {
@@ -885,11 +1125,11 @@ And to disable it.
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -897,7 +1137,7 @@ And to disable it.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.088 seconds)
+   **Total running time of the script:** (0 minutes 0.155 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_logging.py:

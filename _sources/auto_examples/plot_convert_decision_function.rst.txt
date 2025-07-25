@@ -99,8 +99,8 @@ is a list of dictionaries with onnxruntime.
 
  .. code-block:: none
 
-    skl [[2.18706981e-05 3.86603824e-02 9.61317747e-01]]
-    onnx [{0: 2.1870704586035572e-05, 1: 0.03866042196750641, 2: 0.9613177180290222}, {0: 1.1326104868203402e-05, 1: 0.06515791267156601, 2: 0.9348307847976685}]
+    skl [[9.58822528e-01 4.11771279e-02 3.43780611e-07]]
+    onnx [{0: 0.9588225483894348, 1: 0.041177116334438324, 2: 3.437804991790472e-07}, {0: 1.1261729923717212e-05, 1: 0.0612429603934288, 2: 0.9387457966804504}]
 
 
 
@@ -137,8 +137,8 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    skl [[-6.0561118   1.42131109  4.63480072]]
-    onnx [{0: -6.056112289428711, 1: 1.4213112592697144, 2: 4.634799957275391}, {0: -6.659489631652832, 1: 1.997969150543213, 2: 4.661520957946777}]
+    skl [[ 5.9963453   2.84852226 -8.84486756]]
+    onnx [{0: 5.996345520019531, 1: 2.848522186279297, 2: -8.844867706298828}, {0: -6.6440277099609375, 1: 1.957166075706482, 2: 4.686861991882324}]
 
 
 
@@ -165,11 +165,11 @@ Raw scores and decision_function
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -177,7 +177,7 @@ Raw scores and decision_function
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.042 seconds)
+   **Total running time of the script:** (0 minutes 0.119 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_decision_function.py:

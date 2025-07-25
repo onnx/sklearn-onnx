@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>skl2onnx.proto - sklearn-onnx 1.18.0 documentation</title>
+        <title>skl2onnx.proto - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
@@ -171,7 +171,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -198,7 +198,7 @@
     <img class="sidebar-logo" src="../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -331,7 +331,6 @@
 
 <span class="c1"># Overwrite the make_tensor defined in onnx.helper because of a bug</span>
 <span class="c1"># (string tensor get assigned twice)</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">mapping</span>
 <span class="kn">from</span> <span class="nn">onnx.onnx_pb</span> <span class="kn">import</span> <span class="n">TensorProto</span><span class="p">,</span> <span class="n">ValueInfoProto</span>
 
 <span class="k">try</span><span class="p">:</span>  <span class="c1"># noqa: SIM105</span>
@@ -339,34 +338,6 @@
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># onnx is too old.</span>
     <span class="k">pass</span>
-
-<span class="kn">from</span> <span class="nn">onnx.helper</span> <span class="kn">import</span> <span class="n">split_complex_to_pairs</span>
-
-
-<span class="k">def</span> <span class="nf">make_tensor_fixed</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">vals</span><span class="p">,</span> <span class="n">raw</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Make a TensorProto with specified arguments.  If raw is False, this</span>
-<span class="sd">    function will choose the corresponding proto field to store the</span>
-<span class="sd">    values based on data_type. If raw is True, use &quot;raw_data&quot; proto</span>
-<span class="sd">    field to store the values, and values should be of type bytes in</span>
-<span class="sd">    this case.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tensor</span> <span class="o">=</span> <span class="n">TensorProto</span><span class="p">()</span>
-    <span class="n">tensor</span><span class="o">.</span><span class="n">data_type</span> <span class="o">=</span> <span class="n">data_type</span>
-    <span class="n">tensor</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-
-    <span class="k">if</span> <span class="n">data_type</span> <span class="o">==</span> <span class="n">TensorProto</span><span class="o">.</span><span class="n">COMPLEX64</span> <span class="ow">or</span> <span class="n">data_type</span> <span class="o">==</span> <span class="n">TensorProto</span><span class="o">.</span><span class="n">COMPLEX128</span><span class="p">:</span>
-        <span class="n">vals</span> <span class="o">=</span> <span class="n">split_complex_to_pairs</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">raw</span><span class="p">:</span>
-        <span class="n">tensor</span><span class="o">.</span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">vals</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">field</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">STORAGE_TENSOR_TYPE_TO_FIELD</span><span class="p">[</span>
-            <span class="n">mapping</span><span class="o">.</span><span class="n">TENSOR_TYPE_TO_STORAGE_TENSOR_TYPE</span><span class="p">[</span><span class="n">data_type</span><span class="p">]</span>
-        <span class="p">]</span>
-        <span class="nb">getattr</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">field</span><span class="p">)</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span>
-
-    <span class="n">tensor</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">tensor</span>
 
 
 <span class="k">def</span> <span class="nf">get_opset_number_from_onnx</span><span class="p">():</span>
@@ -423,7 +394,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>

@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Converters with options" href="parameterized.html" /><link rel="prev" title="Write your own converter for your own model" href="auto_examples/plot_custom_model.html" />
+        <link rel="prefetch" href="_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Convert a pipeline - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Convert a pipeline - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -327,16 +327,16 @@
         <article role="main" id="furo-main-content">
           <section id="convert-a-pipeline">
 <h1>Convert a pipeline<a class="headerlink" href="#convert-a-pipeline" title="Link to this heading">¶</a></h1>
-<p><em>skl2onnx</em> converts any machine learning pipeline into
-<em>ONNX</em> pipelines. Every transformer or predictors is converted
-into one or multiple nodes into the <em>ONNX</em> graph.
+<p><em>skl2onnx</em> converts any machine learning pipeline into an
+<em>ONNX</em> pipeline. Every transformer or predictor is converted
+into one or multiple nodes in the <em>ONNX</em> graph.
 Any <a class="reference external" href="https://github.com/onnx/onnx/blob/main/docs/ImplementingAnOnnxBackend.md">ONNX backend</a>
 can then use this graph to compute equivalent outputs for the same inputs.</p>
 <section id="convert-complex-pipelines">
 <span id="l-complex-pipeline"></span><h2>Convert complex pipelines<a class="headerlink" href="#convert-complex-pipelines" title="Link to this heading">¶</a></h2>
 <p><em>scikit-learn</em> introduced
-<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html">ColumnTransformer</a>
-useful to build complex pipelines such as the following one:</p>
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html">ColumnTransformer</a>,
+useful for building complex pipelines such as the following one:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span><span class="p">,</span> <span class="n">OneHotEncoder</span>
@@ -372,7 +372,7 @@ useful to build complex pipelines such as the following one:</p>
 <span class="p">])</span>
 </pre></div>
 </div>
-<p>Which we can represents as:</p>
+<p>Which we can represent as:</p>
 <p>Once fitted, the model is converted into <em>ONNX</em>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span><span class="p">,</span> <span class="n">StringTensorType</span>
@@ -404,15 +404,15 @@ created by method <cite>fit</cite>.</p>
 </section>
 <section id="parser-shape-calculator-converter">
 <h2>Parser, shape calculator, converter<a class="headerlink" href="#parser-shape-calculator-converter" title="Link to this heading">¶</a></h2>
-<p id="index-0">Three kinds of functions are involved into the conversion
+<p id="index-0">Three kinds of functions are involved in the conversion
 of a <em>scikit-pipeline</em>. Each of them is called in the following
 order:</p>
 <ul class="simple">
 <li><p><strong>parser(scope, model, inputs, custom_parser)</strong>:
-the parser builds the expected outputs of a model,
-as the resulting graph must contain unique names,
-<em>scope</em> contains all names already given,
-<em>model</em> is the model to convert,
+The parser builds the expected outputs of a model.
+As the resulting graph must contain unique names,
+<em>scope</em> contains all names already given.
+<em>model</em> is the model to convert.
 <em>inputs</em> are the <em>inputs</em> the model receives
 in the <em>ONNX</em> graph. It is a list of
 <a class="reference internal" href="api_summary.html#skl2onnx.common._topology.Variable" title="skl2onnx.common._topology.Variable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Variable</span></code></a>.
@@ -422,12 +422,12 @@ The parser defines default outputs for standard
 machine learned problems. The shape calculator
 changes the shapes and types for each of them
 depending on the model and is called after all
-outputs were defined (topology). This steps defines
+outputs are defined (topology). This step defines
 the number of outputs and their types for every node
 and sets them to a default shape <code class="docutils literal notranslate"><span class="pre">[None,</span> <span class="pre">None]</span></code>
 which the output node has one row and no known
 columns yet.</p></li>
-<li><p><strong>shape_calculator(model):</strong>
+<li><p><strong>shape_calculator(model)</strong>:
 The shape calculator changes the shape
 of the outputs created by the parser. Once this function
 returned its results, the graph structure is fully defined
@@ -435,19 +435,19 @@ and cannot be changed. The shape calculator should
 not change types. Many runtimes are implemented in C++
 and do not support implicit casts. A change of type
 might make the runtime fail due to a type mismatch
-between two consecutive nodes produces by two different
+between two consecutive nodes produced by two different
 converters.</p></li>
-<li><p><strong>converter(scope, operator, container):</strong>
+<li><p><strong>converter(scope, operator, container)</strong>:
 The converter converts the transformers or predictors into
-<em>ONNX</em> nodes. Each node can an <em>ONNX</em>
+<em>ONNX</em> nodes. Each node can be an <em>ONNX</em>
 <a class="reference external" href="https://github.com/onnx/onnx/blob/main/docs/Operators.md">operator</a> or
 <a class="reference external" href="https://github.com/onnx/onnx/blob/main/docs/Operators.md">ML operator</a> or
 custom <em>ONNX</em> operators.</p></li>
 </ul>
 <p>As <em>sklearn-onnx</em> may convert pipelines with model coming from other libraries,
 the library must handle parsers, shape calculators or converters coming
-from other packages. This can be done is two ways. The first one
-consists in calling function <a class="reference internal" href="api_summary.html#skl2onnx.convert_sklearn" title="skl2onnx.convert_sklearn"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_sklearn</span></code></a>
+from other packages. This can be done in two ways. The first one
+consists of calling function <a class="reference internal" href="api_summary.html#skl2onnx.convert_sklearn" title="skl2onnx.convert_sklearn"><code class="xref py py-func docutils literal notranslate"><span class="pre">convert_sklearn</span></code></a>
 by mapping the model type to a specific parser, a specific shape calculator
 or a specific converter. It is possible to avoid these specifications
 by registering the new parser or shape calculator or converter
@@ -458,13 +458,13 @@ One example follows.</p>
 </section>
 <section id="new-converters-in-a-pipeline">
 <span id="l-register-converter"></span><h2>New converters in a pipeline<a class="headerlink" href="#new-converters-in-a-pipeline" title="Link to this heading">¶</a></h2>
-<p>Many libraries implement <em>scikit-learn</em> API and their models can
+<p>Many libraries implement the <em>scikit-learn</em> API and their models can
 be included in <em>scikit-learn</em> pipelines. However, <em>sklearn-onnx</em> cannot
-a pipeline which include a model such as <em>XGBoost</em> or <em>LightGbm</em>
+convert a pipeline which includes a model such as <em>XGBoost</em> or <em>LightGBM</em>
 if it does not know the corresponding converters: it needs to be registered.
-That’s the purpose of function <a class="reference internal" href="api_summary.html#skl2onnx.update_registered_converter" title="skl2onnx.update_registered_converter"><code class="xref py py-func docutils literal notranslate"><span class="pre">skl2onnx.update_registered_converter()</span></code></a>.
+That’s the purpose of the function <a class="reference internal" href="api_summary.html#skl2onnx.update_registered_converter" title="skl2onnx.update_registered_converter"><code class="xref py py-func docutils literal notranslate"><span class="pre">skl2onnx.update_registered_converter()</span></code></a>.
 The following example shows how to register a new converter or
-or update an existing one. Four elements are registered:</p>
+update an existing one. Four elements are registered:</p>
 <ul class="simple">
 <li><p>the model class</p></li>
 <li><p>an alias, usually the class name prefixed by the library name</p></li>
@@ -480,21 +480,20 @@ or update an existing one. Four elements are registered:</p>
                             <span class="n">convert_sklearn_random_forest_classifier</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>See example <a class="reference internal" href="auto_tutorial/plot_gexternal_lightgbm.html#example-lightgbm"><span class="std std-ref">Convert a pipeline with a LightGBM classifier</span></a> to see a complete example
-with a <em>LightGbm</em> model.</p>
+<p>See <a class="reference internal" href="auto_tutorial/plot_gexternal_lightgbm.html#example-lightgbm"><span class="std std-ref">Convert a pipeline with a LightGBM classifier</span></a> for a complete example with a <em>LightGBM</em> model.</p>
 </section>
 <section id="titanic-example">
 <h2>Titanic example<a class="headerlink" href="#titanic-example" title="Link to this heading">¶</a></h2>
 <p>The first example was a simplified pipeline coming from <em>scikit-learn</em>’s documentation:
 <a class="reference external" href="https://scikit-learn.org/stable/auto_examples/compose/plot_column_transformer_mixed_types.html#sphx-glr-auto-examples-compose-plot-column-transformer-mixed-types-py">Column Transformer with Mixed Types</a>.
 The full story is available in a runnable example: <a class="reference internal" href="auto_examples/plot_complex_pipeline.html#example-complex-pipeline"><span class="std std-ref">Convert a pipeline with ColumnTransformer</span></a>
-which also shows up some mistakes that a user could come accross
+which also shows some mistakes that a user could come across
 when trying to convert a pipeline.</p>
 </section>
 <section id="parameterize-the-conversion">
 <h2>Parameterize the conversion<a class="headerlink" href="#parameterize-the-conversion" title="Link to this heading">¶</a></h2>
-<p>Most of the converter do not require specific options
-to convert a <em>scikit-learn</em> model. It always produces the same
+<p>Most of the converters do not require specific options
+to convert a <em>scikit-learn</em> model and produce the same
 results. However, in some cases, the conversion cannot produce
 a model which returns the exact same results. The user may want
 to optimize the conversion by giving the converter additional
@@ -504,14 +503,14 @@ pipeline. That why the option mechanism was implemented:
 </section>
 <section id="investigate-discrepencies">
 <h2>Investigate discrepencies<a class="headerlink" href="#investigate-discrepencies" title="Link to this heading">¶</a></h2>
-<p>A wrong converter may introduce introduce discrepencies
-in a converter pipeline but it is not alway easy to
+<p>A wrong converter may introduce discrepancies
+in a converted pipeline but it is not always easy to
 isolate the source of the differences. The function
 <code class="xref py py-func docutils literal notranslate"><span class="pre">collect_intermediate_steps</span></code>
-may then be used to investigate each component independently.
-The following piece of code is extracted from unit test
+may be used to investigate each component independently.
+The following piece of code is taken from unit test
 <a class="reference external" href="https://github.com/onnx/sklearn-onnx/blob/main/tests/test_investigate.py">test_investigate.py</a> and converts
-a pipeline and each of its components independently.</p>
+a pipeline and each of its components independently:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">numpy.testing</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
 <span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
@@ -714,9 +713,9 @@ them.</p>
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=256cef93"></script>
+</div><script src="_static/documentation_options.js?v=f0c121d3"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

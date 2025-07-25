@@ -70,12 +70,8 @@ on the Boston dataset.
 
  .. code-block:: none
 
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/_gpr.py:660: ConvergenceWarning: lbfgs failed to converge (status=2):
-    ABNORMAL_TERMINATION_IN_LNSRCH.
-
-    Increase the number of iterations (max_iter) or scale the data as shown in:
-        https://scikit-learn.org/stable/modules/preprocessing.html
-      _check_optimize_result("lbfgs", opt_res)
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:452: ConvergenceWarning: The optimal value found for dimension 0 of parameter k1__sigma_0 is close to the specified upper bound 100000.0. Increasing the bound and calling fit again may find a better value.
+      warnings.warn(
     /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:442: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
       warnings.warn(
     GaussianProcessRegressor(alpha=1.0,
@@ -151,9 +147,9 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [199.16400146 144.28936768 109.57861328 183.99377441 169.99847412
-     112.01519775 179.21099854 130.21044922 189.19836426 136.98278809]
-    [557056.]
+    [100.315979   158.71972656 134.34814453 149.08435059 113.38873291
+     124.66339111 163.16369629 143.5949707  145.91064453 190.05358887]
+    [-53248.]
 
 
 
@@ -181,9 +177,9 @@ differences.
 
  .. code-block:: none
 
-    [556952.34741211 556953.92102051 556957.08154297 556958.05334473
-     556961.00817871]
-    min(Y)-max(Y): 39.0 341.0
+    [53450.00366211 53452.51953125 53452.95153809 53455.44708252
+     53460.27514648]
+    min(Y)-max(Y): 39.0 332.0
 
 
 
@@ -230,7 +226,7 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [199.16298882]
+    [100.31582765]
 
 
 
@@ -256,8 +252,8 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [0.00544517 0.0063448  0.00640814 0.00701725 0.00797183]
-    min(Y)-max(Y): 39.0 341.0
+    [0.00612018 0.00635238 0.00669051 0.00719862 0.00763542]
+    min(Y)-max(Y): 39.0 332.0
 
 
 
@@ -362,13 +358,12 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[199.16298882],
-           [144.28235043],
-           [109.58064467],
-           [183.99437845],
-           [169.99982479]]),
-     array([668.01881677, 785.8806495 , 561.56004495, 541.05432348,
-             0.        ])]
+    [array([[100.31582765],
+           [158.71855798],
+           [134.34822088],
+           [149.0801781 ],
+           [113.38941371]]),
+     array([0., 0., 0., 0., 0.])]
 
 
 
@@ -392,9 +387,9 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([199.16400146, 144.28936768, 109.57861328, 183.99377441,
-           169.99798584]),
-     array([1.01514412, 1.00504366, 1.01094833, 1.01163485, 1.0076308 ]))
+    (array([100.315979  , 158.71972656, 134.34814453, 149.08435059,
+           113.38726807]),
+     array([1.01359849, 1.01227192, 1.00741782, 1.00668201, 1.0090939 ]))
 
 
 
@@ -426,7 +421,7 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [ 952.49009449  969.80341373  995.20442978 1069.49191637 1079.44581069]
+    [  1.02410261 168.13500527 298.00327908 317.31394382 357.80585252]
 
 
 
@@ -455,11 +450,11 @@ There are some discrepencies but it seems reasonable.
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -467,7 +462,7 @@ There are some discrepencies but it seems reasonable.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 5.965 seconds)
+   **Total running time of the script:** (0 minutes 0.764 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:

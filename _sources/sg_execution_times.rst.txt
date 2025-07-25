@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.603** total execution time for 54 files **from all galleries**:
+**00:04.385** total execution time for 54 files **from all galleries**:
 
 .. container::
 
@@ -32,20 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py` (``tutorial/plot_usparse_xgboost.py``)
-     - 00:00.258
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``examples/plot_pipeline_xgboost.py``)
-     - 00:00.161
-     - 0.0
-   * - :ref:`sphx_glr_auto_tutorial_plot_catwoe_transformer.py` (``tutorial/plot_catwoe_transformer.py``)
-     - 00:00.127
-     - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py` (``tutorial/plot_gexternal_xgboost.py``)
-     - 00:00.032
-     - 0.0
-   * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_catboost.py` (``tutorial/plot_gexternal_catboost.py``)
-     - 00:00.025
+     - 00:04.385
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_backend.py` (``examples/plot_backend.py``)
      - 00:00.000
@@ -119,6 +107,9 @@ Computation times
    * - :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``examples/plot_pipeline_lightgbm.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``examples/plot_pipeline_xgboost.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py` (``examples/plot_tfidfvectorizer.py``)
      - 00:00.000
      - 0.0
@@ -126,6 +117,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_bbegin_measure_time.py` (``tutorial/plot_bbegin_measure_time.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_tutorial_plot_catwoe_transformer.py` (``tutorial/plot_catwoe_transformer.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_cbegin_opset.py` (``tutorial/plot_cbegin_opset.py``)
@@ -153,6 +147,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_gconverting.py` (``tutorial/plot_gconverting.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_catboost.py` (``tutorial/plot_gexternal_catboost.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm.py` (``tutorial/plot_gexternal_lightgbm.py``)
@@ -183,6 +180,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_transformer_discrepancy.py` (``tutorial/plot_transformer_discrepancy.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py` (``tutorial/plot_usparse_xgboost.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_weird_pandas_and_hash.py` (``tutorial/plot_weird_pandas_and_hash.py``)

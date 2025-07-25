@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Store arrays in one onnx graph" href="plot_gbegin_cst.html" /><link rel="prev" title="Issues when switching to float" href="plot_ebegin_float_double.html" />
+        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Intermediate results and investigation - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Intermediate results and investigation - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -352,26 +352,26 @@ has <em>n</em> steps, it converts the pipeline with step 1,
 then the pipeline with steps 1, 2, then 1, 2, 3…</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">onnx.reference</span> <span class="kn">import</span> <span class="n">ReferenceEvaluator</span>
-<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span>
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
+<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler" title="sklearn.preprocessing.StandardScaler" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">StandardScaler</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="sklearn.cluster.KMeans" class="sphx-glr-backref-module-sklearn-cluster sphx-glr-backref-type-py-class"><span class="n">KMeans</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.helpers</span> <span class="kn">import</span> <span class="n">collect_intermediate_steps</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 </pre></div>
 </div>
 <p>The pipeline.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a>
 
-<span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">steps</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span> <span class="p">(</span><span class="s2">&quot;km&quot;</span><span class="p">,</span> <span class="n">KMeans</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">3</span><span class="p">))])</span>
-<span class="n">pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class"><span class="n">Pipeline</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">steps</span></a><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;std&quot;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html#sklearn.preprocessing.StandardScaler" title="sklearn.preprocessing.StandardScaler" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">StandardScaler</span></a><span class="p">()),</span> <span class="p">(</span><span class="s2">&quot;km&quot;</span><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html#sklearn.cluster.KMeans" title="sklearn.cluster.KMeans" class="sphx-glr-backref-module-sklearn-cluster sphx-glr-backref-type-py-class"><span class="n">KMeans</span></a><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">n_init</span><span class="o">=</span><span class="mi">3</span><span class="p">))])</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.fit" title="sklearn.pipeline.Pipeline.fit" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-method"><span class="n">pipe</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
-<style>#sk-container-id-7 {
+<style>#sk-container-id-14 {
   /* Definition of color scheme common for light and dark mode */
   --sklearn-color-text: #000;
   --sklearn-color-text-muted: #666;
@@ -402,15 +402,15 @@ then the pipeline with steps 1, 2, then 1, 2, 3…</p>
   }
 }
 
-#sk-container-id-7 {
+#sk-container-id-14 {
   color: var(--sklearn-color-text);
 }
 
-#sk-container-id-7 pre {
+#sk-container-id-14 pre {
   padding: 0;
 }
 
-#sk-container-id-7 input.sk-hidden--visually {
+#sk-container-id-14 input.sk-hidden--visually {
   border: 0;
   clip: rect(1px 1px 1px 1px);
   clip: rect(1px, 1px, 1px, 1px);
@@ -422,7 +422,7 @@ then the pipeline with steps 1, 2, then 1, 2, 3…</p>
   width: 1px;
 }
 
-#sk-container-id-7 div.sk-dashed-wrapped {
+#sk-container-id-14 div.sk-dashed-wrapped {
   border: 1px dashed var(--sklearn-color-line);
   margin: 0 0.4em 0.5em 0.4em;
   box-sizing: border-box;
@@ -430,7 +430,7 @@ then the pipeline with steps 1, 2, then 1, 2, 3…</p>
   background-color: var(--sklearn-color-background);
 }
 
-#sk-container-id-7 div.sk-container {
+#sk-container-id-14 div.sk-container {
   /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
      but bootstrap.min.css set `[hidden] { display: none !important; }`
      so we also need the `!important` here to be able to override the
@@ -440,7 +440,7 @@ then the pipeline with steps 1, 2, then 1, 2, 3…</p>
   position: relative;
 }
 
-#sk-container-id-7 div.sk-text-repr-fallback {
+#sk-container-id-14 div.sk-text-repr-fallback {
   display: none;
 }
 
@@ -456,14 +456,14 @@ div.sk-item {
 
 /* Parallel-specific style estimator block */
 
-#sk-container-id-7 div.sk-parallel-item::after {
+#sk-container-id-14 div.sk-parallel-item::after {
   content: "";
   width: 100%;
   border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
   flex-grow: 1;
 }
 
-#sk-container-id-7 div.sk-parallel {
+#sk-container-id-14 div.sk-parallel {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -471,28 +471,28 @@ div.sk-item {
   position: relative;
 }
 
-#sk-container-id-7 div.sk-parallel-item {
+#sk-container-id-14 div.sk-parallel-item {
   display: flex;
   flex-direction: column;
 }
 
-#sk-container-id-7 div.sk-parallel-item:first-child::after {
+#sk-container-id-14 div.sk-parallel-item:first-child::after {
   align-self: flex-end;
   width: 50%;
 }
 
-#sk-container-id-7 div.sk-parallel-item:last-child::after {
+#sk-container-id-14 div.sk-parallel-item:last-child::after {
   align-self: flex-start;
   width: 50%;
 }
 
-#sk-container-id-7 div.sk-parallel-item:only-child::after {
+#sk-container-id-14 div.sk-parallel-item:only-child::after {
   width: 0;
 }
 
 /* Serial-specific style estimator block */
 
-#sk-container-id-7 div.sk-serial {
+#sk-container-id-14 div.sk-serial {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -510,14 +510,14 @@ clickable and can be expanded/collapsed.
 
 /* Pipeline and ColumnTransformer style (default) */
 
-#sk-container-id-7 div.sk-toggleable {
+#sk-container-id-14 div.sk-toggleable {
   /* Default theme specific background. It is overwritten whether we have a
   specific estimator or a Pipeline/ColumnTransformer */
   background-color: var(--sklearn-color-background);
 }
 
 /* Toggleable label */
-#sk-container-id-7 label.sk-toggleable__label {
+#sk-container-id-14 label.sk-toggleable__label {
   cursor: pointer;
   display: flex;
   width: 100%;
@@ -530,13 +530,13 @@ clickable and can be expanded/collapsed.
   gap: 0.5em;
 }
 
-#sk-container-id-7 label.sk-toggleable__label .caption {
+#sk-container-id-14 label.sk-toggleable__label .caption {
   font-size: 0.6rem;
   font-weight: lighter;
   color: var(--sklearn-color-text-muted);
 }
 
-#sk-container-id-7 label.sk-toggleable__label-arrow:before {
+#sk-container-id-14 label.sk-toggleable__label-arrow:before {
   /* Arrow on the left of the label */
   content: "▸";
   float: left;
@@ -544,13 +544,13 @@ clickable and can be expanded/collapsed.
   color: var(--sklearn-color-icon);
 }
 
-#sk-container-id-7 label.sk-toggleable__label-arrow:hover:before {
+#sk-container-id-14 label.sk-toggleable__label-arrow:hover:before {
   color: var(--sklearn-color-text);
 }
 
 /* Toggleable content - dropdown */
 
-#sk-container-id-7 div.sk-toggleable__content {
+#sk-container-id-14 div.sk-toggleable__content {
   max-height: 0;
   max-width: 0;
   overflow: hidden;
@@ -559,12 +559,12 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-7 div.sk-toggleable__content.fitted {
+#sk-container-id-14 div.sk-toggleable__content.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-7 div.sk-toggleable__content pre {
+#sk-container-id-14 div.sk-toggleable__content pre {
   margin: 0.2em;
   border-radius: 0.25em;
   color: var(--sklearn-color-text);
@@ -572,79 +572,79 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-7 div.sk-toggleable__content.fitted pre {
+#sk-container-id-14 div.sk-toggleable__content.fitted pre {
   /* unfitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
-#sk-container-id-7 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+#sk-container-id-14 input.sk-toggleable__control:checked~div.sk-toggleable__content {
   /* Expand drop-down */
   max-height: 200px;
   max-width: 100%;
   overflow: auto;
 }
 
-#sk-container-id-7 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+#sk-container-id-14 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
   content: "▾";
 }
 
 /* Pipeline/ColumnTransformer-specific style */
 
-#sk-container-id-7 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-14 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-7 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-14 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator-specific style */
 
 /* Colorize estimator box */
-#sk-container-id-7 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-14 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-7 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+#sk-container-id-14 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
-#sk-container-id-7 div.sk-label label.sk-toggleable__label,
-#sk-container-id-7 div.sk-label label {
+#sk-container-id-14 div.sk-label label.sk-toggleable__label,
+#sk-container-id-14 div.sk-label label {
   /* The background is the default theme color */
   color: var(--sklearn-color-text-on-default-background);
 }
 
 /* On hover, darken the color of the background */
-#sk-container-id-7 div.sk-label:hover label.sk-toggleable__label {
+#sk-container-id-14 div.sk-label:hover label.sk-toggleable__label {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
 /* Label box, darken color on hover, fitted */
-#sk-container-id-7 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+#sk-container-id-14 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
   color: var(--sklearn-color-text);
   background-color: var(--sklearn-color-fitted-level-2);
 }
 
 /* Estimator label */
 
-#sk-container-id-7 div.sk-label label {
+#sk-container-id-14 div.sk-label label {
   font-family: monospace;
   font-weight: bold;
   display: inline-block;
   line-height: 1.2em;
 }
 
-#sk-container-id-7 div.sk-label-container {
+#sk-container-id-14 div.sk-label-container {
   text-align: center;
 }
 
 /* Estimator-specific */
-#sk-container-id-7 div.sk-estimator {
+#sk-container-id-14 div.sk-estimator {
   font-family: monospace;
   border: 1px dotted var(--sklearn-color-border-box);
   border-radius: 0.25em;
@@ -654,18 +654,18 @@ clickable and can be expanded/collapsed.
   background-color: var(--sklearn-color-unfitted-level-0);
 }
 
-#sk-container-id-7 div.sk-estimator.fitted {
+#sk-container-id-14 div.sk-estimator.fitted {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-0);
 }
 
 /* on hover */
-#sk-container-id-7 div.sk-estimator:hover {
+#sk-container-id-14 div.sk-estimator:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-2);
 }
 
-#sk-container-id-7 div.sk-estimator.fitted:hover {
+#sk-container-id-14 div.sk-estimator.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-2);
 }
@@ -753,7 +753,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 
 /* "?"-specific style due to the `<a>` HTML tag */
 
-#sk-container-id-7 a.estimator_doc_link {
+#sk-container-id-14 a.estimator_doc_link {
   float: right;
   font-size: 1rem;
   line-height: 1em;
@@ -768,210 +768,210 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   border: var(--sklearn-color-unfitted-level-1) 1pt solid;
 }
 
-#sk-container-id-7 a.estimator_doc_link.fitted {
+#sk-container-id-14 a.estimator_doc_link.fitted {
   /* fitted */
   border: var(--sklearn-color-fitted-level-1) 1pt solid;
   color: var(--sklearn-color-fitted-level-1);
 }
 
 /* On hover */
-#sk-container-id-7 a.estimator_doc_link:hover {
+#sk-container-id-14 a.estimator_doc_link:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-3);
   color: var(--sklearn-color-background);
   text-decoration: none;
 }
 
-#sk-container-id-7 a.estimator_doc_link.fitted:hover {
+#sk-container-id-14 a.estimator_doc_link.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-7" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
-                (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-15" type="checkbox" ><label for="sk-estimator-id-15" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
-                (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-16" type="checkbox" ><label for="sk-estimator-id-16" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-17" type="checkbox" ><label for="sk-estimator-id-17" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>KMeans</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.cluster.KMeans.html">?<span>Documentation for KMeans</span></a></div></label><div class="sk-toggleable__content fitted"><pre>KMeans(n_clusters=3, n_init=3)</pre></div> </div></div></div></div></div></div>
+</style><div id="sk-container-id-14" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-45" type="checkbox" ><label for="sk-estimator-id-45" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-46" type="checkbox" ><label for="sk-estimator-id-46" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>KMeans</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.cluster.KMeans.html">?<span>Documentation for KMeans</span></a></div></label><div class="sk-toggleable__content fitted"><pre>KMeans(n_clusters=3, n_init=3)</pre></div> </div></div></div></div></div></div>
 </div>
 <br />
 <br /><p>The function goes through every step,
 overloads the methods <em>transform</em> and
 returns an ONNX graph for every step.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">steps</span> <span class="o">=</span> <span class="n">collect_intermediate_steps</span><span class="p">(</span>
-    <span class="n">pipe</span><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))],</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">17</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">steps</span></a> <span class="o">=</span> <span class="n">collect_intermediate_steps</span><span class="p">(</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <span class="s2">&quot;pipeline&quot;</span><span class="p">,</span> <span class="p">[(</span><span class="s2">&quot;X&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]]))],</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">17</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <p>We call method transform to population the
 cache the overloaded methods <em>transform</em> keeps.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pipe</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline.transform" title="sklearn.pipeline.Pipeline.transform" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-method"><span class="n">pipe</span><span class="o">.</span><span class="n">transform</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array([[4.00404832, 0.21295824, 3.15861505],
-       [4.05055769, 0.99604549, 2.72563625],
-       [4.22040251, 0.65198444, 3.02188403],
-       [4.22860026, 0.9034561 , 2.93043986],
-       [4.12353003, 0.40215457, 3.33653691],
-       [3.89643029, 1.21154793, 3.52936423],
-       [4.2374443 , 0.50244932, 3.19234391],
-       [3.99197553, 0.09132468, 3.03242342],
-       [4.4445734 , 1.42174651, 2.9795537 ],
-       [4.08705397, 0.78993078, 2.84221713],
-       [3.92610748, 0.78999385, 3.3507236 ],
-       [4.09865843, 0.27618123, 3.09168785],
-       [4.19718995, 1.03497888, 2.85719428],
-       [4.66454355, 1.33482453, 3.26547013],
-       [4.13826195, 1.63865558, 3.90871872],
-       [4.47633229, 2.39898792, 4.51414747],
-       [4.02762963, 1.20748818, 3.63475229],
-       [3.92839122, 0.21618828, 3.09288714],
-       [3.72388908, 1.20986655, 3.36736664],
-       [4.10521298, 0.86706182, 3.53103908],
-       [3.67990695, 0.50401564, 2.8436663 ],
-       [3.95222508, 0.66826437, 3.30977167],
-       [4.52523323, 0.68658071, 3.63034505],
-       [3.60185594, 0.47945627, 2.59973228],
-       [4.00845791, 0.36345425, 3.00678098],
-       [3.91688379, 0.99023912, 2.60615351],
-       [3.80966594, 0.22683089, 2.86756462],
-       [3.90931811, 0.2947186 , 3.0958103 ],
-       [3.89828815, 0.25361098, 2.99275191],
-       [4.12581898, 0.65019824, 2.92503544],
-       [4.04810077, 0.80138328, 2.78137328],
-       [3.58928575, 0.52309257, 2.76837135],
-       [4.49874494, 1.57658655, 4.14390673],
-       [4.43563509, 1.87652483, 4.2489329 ],
-       [4.008642  , 0.76858489, 2.76272437],
-       [4.04525625, 0.54896332, 2.9103173 ],
-       [3.81211172, 0.63079314, 3.09001251],
-       [4.26421417, 0.45982568, 3.44057865],
-       [4.45456872, 1.2336976 , 3.06034971],
-       [3.92683189, 0.14580827, 2.99422852],
-       [4.02712265, 0.20261743, 3.16142101],
-       [4.69480008, 2.67055552, 2.9575648 ],
-       [4.4496996 , 0.90927099, 3.20355969],
-       [3.71964918, 0.50081008, 2.89721622],
-       [3.91143692, 0.92159916, 3.37471011],
-       [4.04740147, 1.01946042, 2.70316642],
-       [4.14683513, 0.86953764, 3.56280964],
-       [4.26327469, 0.72275914, 3.04646993],
-       [3.98021229, 0.72324305, 3.37186092],
-       [3.99446269, 0.30295342, 2.94518173],
-       [0.9452659 , 3.43619989, 1.8639233 ],
-       [1.00829443, 2.97232682, 1.38933168],
-       [0.73653572, 3.51850037, 1.6428166 ],
-       [2.76204203, 3.33264308, 1.00264343],
-       [1.16604995, 3.35747592, 0.86560047],
-       [1.86711784, 2.77550662, 0.3750882 ],
-       [1.00955989, 3.01808184, 1.56489146],
-       [3.3697155 , 2.77360088, 1.55619573],
-       [1.18358725, 3.21148368, 1.08067281],
-       [2.48285941, 2.66294828, 0.82637993],
-       [3.79967007, 3.62389817, 2.01281316],
-       [1.50054672, 2.70011145, 0.76353654],
-       [2.80438695, 3.53658932, 1.27727048],
-       [1.34023352, 2.98813829, 0.62868121],
-       [2.09655735, 2.32311723, 0.77087912],
-       [1.00633966, 3.14311522, 1.43272989],
-       [1.71909321, 2.68234835, 0.80192   ],
-       [2.17926627, 2.63954211, 0.60569829],
-       [2.40214871, 3.97369206, 1.18764767],
-       [2.52511757, 2.87494798, 0.727372  ],
-       [1.21113562, 3.03853641, 1.31653995],
-       [1.68291281, 2.8022861 , 0.52313867],
-       [1.71597913, 3.68305664, 0.75211692],
-       [1.59856561, 2.96833851, 0.55292557],
-       [1.33753092, 2.9760862 , 0.87815407],
-       [1.06462905, 3.13002382, 1.19061026],
-       [1.13996294, 3.56679427, 1.22441299],
-       [0.5652633 , 3.5903606 , 1.37258261],
-       [1.39763754, 2.93839428, 0.56006248],
-       [2.49518379, 2.58203512, 0.81289907],
-       [2.75025306, 2.99796537, 0.94324481],
-       [2.82866407, 2.92597852, 1.03283946],
-       [2.08201734, 2.68907313, 0.4343386 ],
-       [1.48418961, 3.42215998, 0.48873673],
-       [1.92943813, 2.62771445, 0.91606802],
-       [1.40011111, 2.75915071, 1.69140864],
-       [0.79992473, 3.30075052, 1.44311693],
-       [2.2708714 , 3.73017167, 1.05036852],
-       [1.91690629, 2.37943811, 0.83618809],
-       [2.47017911, 2.98789866, 0.6470029 ],
-       [2.32571939, 2.89079656, 0.53979211],
-       [1.29304411, 2.86642713, 0.81855214],
-       [2.17526444, 2.86642575, 0.43194777],
-       [3.40973541, 2.96966239, 1.58383257],
-       [2.10849001, 2.77003779, 0.3618706 ],
-       [1.87076527, 2.38255534, 0.83187956],
-       [1.85116384, 2.55559903, 0.58147273],
-       [1.44451588, 2.8455521 , 0.70529895],
-       [3.11774537, 2.56987887, 1.34329146],
-       [1.94990512, 2.64007308, 0.41481694],
-       [1.04248866, 4.24274589, 2.26819164],
-       [1.57935402, 3.57067982, 0.72581017],
-       [0.52274684, 4.44150237, 2.09231844],
-       [0.83298461, 3.69480186, 1.12321156],
-       [0.5678145 , 4.11613683, 1.68255837],
-       [1.1830756 , 5.03326801, 2.72592116],
-       [2.8024351 , 3.3503222 , 1.25267619],
-       [0.93117407, 4.577021  , 2.18852343],
-       [1.46246781, 4.363498  , 1.45283591],
-       [1.4207266 , 4.79334275, 3.18264007],
-       [0.47962495, 3.62749566, 1.67405555],
-       [1.09881086, 3.89360823, 1.04698204],
-       [0.31830999, 4.1132966 , 1.75049044],
-       [1.98175664, 3.82688169, 0.92293569],
-       [1.54698303, 3.91538879, 1.35721732],
-       [0.68407345, 3.89835633, 1.86138575],
-       [0.52205472, 3.70128288, 1.34561415],
-       [2.03678461, 5.18341242, 3.80620352],
-       [1.84250874, 5.58136629, 2.90217633],
-       [2.43634558, 4.02615768, 1.16636059],
-       [0.48150581, 4.31907679, 2.22297775],
-       [1.67578773, 3.4288432 , 0.88685031],
-       [1.47096547, 5.19031307, 2.72431414],
-       [1.22329554, 3.64273089, 0.79101156],
-       [0.47109224, 4.00723617, 2.10999425],
-       [0.62558995, 4.2637671 , 2.28591141],
-       [1.14490402, 3.45930032, 0.74392898],
-       [0.99645552, 3.27575645, 0.98053107],
-       [0.90181942, 4.05342943, 1.3282425 ],
-       [0.76242411, 4.1585729 , 1.98849304],
-       [1.08628479, 4.71100584, 2.22822113],
-       [2.10967488, 5.12224641, 3.84302072],
-       [0.93357383, 4.13401784, 1.41836425],
-       [1.17526973, 3.39830644, 0.74517066],
-       [1.66051938, 3.63719075, 0.76558228],
-       [1.23742547, 5.08776655, 2.80545775],
-       [1.04697429, 4.00416552, 2.26945032],
-       [0.55013293, 3.58815834, 1.42313566],
-       [1.12188023, 3.19454679, 0.93290167],
-       [0.20983625, 4.09907253, 1.92136662],
-       [0.5691276 , 4.28416057, 2.02737038],
-       [0.49810802, 4.17402084, 2.01513279],
-       [1.57935402, 3.57067982, 0.72581017],
-       [0.50497262, 4.32128686, 2.19577242],
-       [0.81423561, 4.3480018 , 2.37699732],
-       [0.55018391, 4.1240495 , 1.77340222],
-       [1.58648502, 3.97564407, 0.98294137],
-       [0.49931367, 3.7539635 , 1.39731191],
-       [1.06536484, 3.7969924 , 2.13822884],
-       [1.18287527, 3.25638099, 0.96885287]])
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>array([[3.04731565, 0.16691922, 3.90105048],
+       [2.53765667, 1.05008012, 3.89969118],
+       [2.8534191 , 0.70223132, 4.08275531],
+       [2.74622964, 0.95461003, 4.08107334],
+       [3.23237193, 0.35053394, 4.02752145],
+       [3.48845737, 1.15922234, 3.84344238],
+       [3.04980527, 0.52431514, 4.11468249],
+       [2.90441631, 0.13441315, 3.87710094],
+       [2.76651178, 1.4735953 , 4.28118798],
+       [2.6666299 , 0.84235354, 3.94465298],
+       [3.27919712, 0.74060536, 3.85127337],
+       [2.95563885, 0.30307356, 3.97956436],
+       [2.66465535, 1.08829832, 4.04591428],
+       [3.06103061, 1.38230617, 4.50871998],
+       [3.87938657, 1.58899913, 4.10425124],
+       [4.51669438, 2.34530067, 4.47566454],
+       [3.58762514, 1.1553485 , 3.97299158],
+       [2.98512391, 0.17213393, 3.82533283],
+       [3.32956199, 1.16389168, 3.67087693],
+       [3.45834067, 0.81319337, 4.03145794],
+       [2.73958458, 0.50120097, 3.57505244],
+       [3.23074088, 0.61712537, 3.86923945],
+       [3.50566186, 0.66747441, 4.42022781],
+       [2.4750801 , 0.51155505, 3.47802339],
+       [2.8736682 , 0.38345232, 3.8892069 ],
+       [2.42225934, 1.04291694, 3.76676185],
+       [2.74731742, 0.24845351, 3.69412992],
+       [2.99076871, 0.25714597, 3.80890374],
+       [2.87391396, 0.2611406 , 3.78824565],
+       [2.75790131, 0.70011574, 3.98744779],
+       [2.60379694, 0.85497633, 3.90292713],
+       [2.66975272, 0.52152421, 3.48410551],
+       [4.09438407, 1.52253885, 4.45342411],
+       [4.22214621, 1.82234641, 4.40895404],
+       [2.58864695, 0.82260166, 3.86530846],
+       [2.75335951, 0.60043553, 3.91302139],
+       [2.999389  , 0.60703836, 3.7203448 ],
+       [3.32859606, 0.41861164, 4.16574085],
+       [2.85880737, 1.28372352, 4.29823638],
+       [2.87114889, 0.16719611, 3.81424762],
+       [3.04765881, 0.16490106, 3.92166326],
+       [2.70488461, 2.72505665, 4.50242861],
+       [3.02636161, 0.9507447 , 4.30808784],
+       [2.79904696, 0.48729268, 3.61429734],
+       [3.31203486, 0.87083853, 3.83944771],
+       [2.51304561, 1.07390656, 3.89419068],
+       [3.48756201, 0.81546763, 4.07280665],
+       [2.87514706, 0.77022366, 4.12394547],
+       [3.29502383, 0.67120692, 3.90226132],
+       [2.80290905, 0.35513147, 3.87052324],
+       [2.05944499, 3.43556314, 0.9527343 ],
+       [1.57420922, 2.9747863 , 0.91533955],
+       [1.85627645, 3.52176851, 0.6991334 ],
+       [0.81977325, 3.37169191, 2.55294274],
+       [1.08188141, 3.37366488, 0.98171662],
+       [0.41559238, 2.7993061 , 1.67145475],
+       [1.75089133, 3.01695781, 0.94903551],
+       [1.3054677 , 2.81936231, 3.16550893],
+       [1.26497468, 3.2240354 , 1.03500423],
+       [0.66027189, 2.69540221, 2.28485901],
+       [1.79458962, 3.67188095, 3.59062915],
+       [0.90090717, 2.71474217, 1.32750103],
+       [1.15615482, 3.57454207, 2.60882281],
+       [0.82846537, 3.00417652, 1.15164743],
+       [0.7161265 , 2.34736206, 1.91677593],
+       [1.61900765, 3.14784569, 0.91938068],
+       [0.89305298, 2.69864257, 1.54559525],
+       [0.48160791, 2.66850781, 1.98816804],
+       [1.19881076, 4.00685571, 2.2104156 ],
+       [0.48795536, 2.9111416 , 2.32130025],
+       [1.49602283, 3.04351709, 1.09155949],
+       [0.62552403, 2.82390229, 1.49525468],
+       [0.90399583, 3.70843522, 1.52048216],
+       [0.69344472, 2.98843992, 1.4110861 ],
+       [1.04278165, 2.99074759, 1.17226863],
+       [1.37965904, 3.13914603, 0.93245527],
+       [1.42318454, 3.58065437, 0.99964865],
+       [1.61092178, 3.59787573, 0.41699742],
+       [0.7588276 , 2.95535251, 1.20525347],
+       [0.60280715, 2.61712971, 2.30054805],
+       [0.70912153, 3.03724529, 2.5441796 ],
+       [0.79425838, 2.96618351, 2.62458034],
+       [0.31391047, 2.71773006, 1.88550818],
+       [0.72639669, 3.44369296, 1.2765473 ],
+       [0.9578884 , 2.64549177, 1.75825155],
+       [1.83883648, 2.75522333, 1.33978733],
+       [1.65128962, 3.30521622, 0.71260555],
+       [1.06192984, 3.76176356, 2.08134113],
+       [0.85377093, 2.39781055, 1.74666846],
+       [0.41758567, 3.02333265, 2.26242483],
+       [0.33048259, 2.92302464, 2.12172553],
+       [0.99615987, 2.87894547, 1.12220529],
+       [0.25549279, 2.89750284, 1.97352593],
+       [1.33587433, 3.01599101, 3.2031426 ],
+       [0.20110153, 2.79890287, 1.90698574],
+       [0.85870837, 2.40014831, 1.70298258],
+       [0.61211268, 2.57682121, 1.6668071 ],
+       [0.85882898, 2.86194221, 1.26766899],
+       [1.09695347, 2.61357618, 2.91712098],
+       [0.38833729, 2.66524256, 1.75577427],
+       [2.5012404 , 4.2420242 , 1.0918546 ],
+       [0.92015293, 3.5923261 , 1.37898965],
+       [2.3460413 , 4.4461714 , 0.61533733],
+       [1.37537194, 3.7069135 , 0.64037065],
+       [1.93680867, 4.1234534 , 0.49148505],
+       [2.97325888, 5.03573504, 1.30938606],
+       [1.14289326, 3.38471765, 2.6019388 ],
+       [2.42763947, 4.58333402, 0.97719501],
+       [1.65576504, 4.38346835, 1.31984222],
+       [3.4249117 , 4.78218736, 1.61700085],
+       [1.90971055, 3.62917997, 0.4469887 ],
+       [1.29266937, 3.91108898, 0.9070538 ],
+       [2.00571419, 4.1195457 , 0.28701748],
+       [1.03296583, 3.8538939 , 1.7839299 ],
+       [1.54437256, 3.93228102, 1.3928708 ],
+       [2.09882765, 3.9004045 , 0.68129057],
+       [1.59624925, 3.70929828, 0.33306798],
+       [4.04228067, 5.16667811, 2.24280811],
+       [3.13108094, 5.59206313, 1.88051097],
+       [1.17369301, 4.0595081 , 2.24060385],
+       [2.47497267, 4.31907189, 0.64593529],
+       [1.04109807, 3.44883957, 1.48873586],
+       [2.95941231, 5.19705273, 1.54093757],
+       [1.03607405, 3.66188818, 1.01844967],
+       [2.35220999, 4.0048474 , 0.61341103],
+       [2.52679968, 4.26239611, 0.786576  ],
+       [0.99715764, 3.4764269 , 0.93620274],
+       [1.21104872, 3.28685101, 0.8130537 ],
+       [1.57955582, 4.06724081, 0.73703291],
+       [2.21952527, 4.16299138, 0.79795731],
+       [2.46401818, 4.71948935, 1.11257122],
+       [4.0726311 , 5.10470559, 2.31231128],
+       [1.66681009, 4.14760691, 0.78525226],
+       [0.98336185, 3.41503341, 0.97686289],
+       [0.92929783, 3.66012734, 1.46832263],
+       [3.05337662, 5.09008925, 1.3692878 ],
+       [2.49347287, 4.00041166, 1.10609628],
+       [1.66406596, 3.59345432, 0.41554383],
+       [1.15070886, 3.20642858, 0.94210414],
+       [2.17245566, 4.10202725, 0.33887736],
+       [2.27944809, 4.28777875, 0.62347517],
+       [2.26277812, 4.17709068, 0.57349609],
+       [0.92015293, 3.5923261 , 1.37898965],
+       [2.44823886, 4.32158336, 0.64919807],
+       [2.62180347, 4.3459761 , 0.93691617],
+       [2.02412194, 4.13081941, 0.51118153],
+       [1.17215474, 3.99933061, 1.396946  ],
+       [1.649638  , 3.76205335, 0.31254892],
+       [2.35342278, 3.79343916, 1.09600723],
+       [1.18085642, 3.26840383, 1.00795325]])
 </pre></div>
 </div>
 <p>We compute every step and compare
 ONNX and scikit-learn outputs.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">steps</span><span class="p">:</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">steps</span></a><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;----------------------------&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">step</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">])</span>
-    <span class="n">onnx_step</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s2">&quot;onnx_step&quot;</span><span class="p">]</span>
-    <span class="n">sess</span> <span class="o">=</span> <span class="n">InferenceSession</span><span class="p">(</span>
+    <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">])</span>
+    <span class="n">onnx_step</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a><span class="p">[</span><span class="s2">&quot;onnx_step&quot;</span><span class="p">]</span>
+    <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span>
         <span class="n">onnx_step</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">]</span>
     <span class="p">)</span>
-    <span class="n">onnx_outputs</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)})</span>
-    <span class="n">onnx_output</span> <span class="o">=</span> <span class="n">onnx_outputs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">skl_outputs</span> <span class="o">=</span> <span class="n">step</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_debug</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_outputs</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.run" title="onnxruntime.InferenceSession.run" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_output</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_outputs</span></a><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl_outputs</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">step</span></a><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">_debug</span><span class="o">.</span><span class="n">outputs</span><span class="p">[</span><span class="s2">&quot;transform&quot;</span><span class="p">]</span>
 
     <span class="c1"># comparison</span>
-    <span class="n">diff</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">skl_outputs</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">-</span> <span class="n">onnx_output</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;difference&quot;</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">diff</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl_outputs</span></a><span class="o">.</span><span class="n">ravel</span><span class="p">()</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx_output</span></a><span class="o">.</span><span class="n">ravel</span><span class="p">())</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;difference&quot;</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">diff</span></a><span class="p">)</span>
 
 <span class="c1"># That was the first way: dynamically overwrite</span>
 <span class="c1"># every method transform or predict in a scikit-learn</span>
@@ -986,7 +986,7 @@ StandardScaler()
 difference 4.799262827148709e-07
 ----------------------------
 KMeans(n_clusters=3, n_init=3)
-difference 1.095537650763756e-06
+difference 1.6719496572781267e-06
 </pre></div>
 </div>
 </section>
@@ -996,26 +996,26 @@ difference 1.095537650763756e-06
 into every node of the ONNX graph.
 This option can be used to check when the computation
 fails due to nan values or a dimension mismatch.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">pipe</span><span class="p">,</span> <span class="n">X</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">17</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline" title="sklearn.pipeline.Pipeline" class="sphx-glr-backref-module-sklearn-pipeline sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pipe</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">),</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">17</span><span class="p">)</span>
 
 <span class="n">oinf</span> <span class="o">=</span> <span class="n">ReferenceEvaluator</span><span class="p">(</span><span class="n">onx</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)})</span>
+<span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[array([1, 1]), array([[4.0040483 , 0.21295893, 3.158615  ],
-       [4.050557  , 0.99604493, 2.7256362 ]], dtype=float32)]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[array([1, 1]), array([[3.0473158 , 0.16691935, 3.9010506 ],
+       [2.5376565 , 1.05008   , 3.8996909 ]], dtype=float32)]
 </pre></div>
 </div>
 <p>And to get a sense of the intermediate results.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">oinf</span> <span class="o">=</span> <span class="n">ReferenceEvaluator</span><span class="p">(</span><span class="n">onx</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
-<span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)})</span>
+<span class="n">oinf</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})</span>
 
 <span class="c1"># This way is usually better if you need to investigate</span>
 <span class="c1"># issues within the code of the runtime for an operator.</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span> +C Ad_Addcst: float32:(3,) in [1.0065230131149292, 5.035177230834961]
- +C Ge_Gemmcst: float32:(3, 4) in [-1.3049873113632202, 1.1674340963363647]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span> +C Ad_Addcst: float32:(3,) in [1.0728117227554321, 5.101926803588867]
+ +C Ge_Gemmcst: float32:(3, 4) in [-1.3031082153320312, 1.0335986614227295]
  +C Mu_Mulcst: float32:(1,) in [0.0, 0.0]
  +I X: float32:(2, 4) in [0.20000000298023224, 5.099999904632568]
 Scaler(X) -&gt; variable
@@ -1025,21 +1025,21 @@ ReduceSumSquare(variable) -&gt; Re_reduced0
 Mul(Re_reduced0, Mu_Mulcst) -&gt; Mu_C0
  + Mu_C0: float32:(2, 1) in [0.0, 0.0]
 Gemm(variable, Ge_Gemmcst, Mu_C0) -&gt; Ge_Y0
- + Ge_Y0: float32:(2, 3) in [-10.366023063659668, 8.10552978515625]
+ + Ge_Y0: float32:(2, 3) in [-10.450262069702148, 7.452452182769775]
 Add(Re_reduced0, Ge_Y0) -&gt; Ad_C01
- + Ad_C01: float32:(2, 3) in [-4.98982572555542, 12.956035614013672]
+ + Ad_C01: float32:(2, 3) in [-5.0740647315979, 12.313563346862793]
 Add(Ad_Addcst, Ad_C01) -&gt; Ad_C0
- + Ad_C0: float32:(2, 3) in [0.045351505279541016, 16.407014846801758]
+ + Ad_C0: float32:(2, 3) in [0.027862071990966797, 15.218194961547852]
 ArgMin(Ad_C0) -&gt; label
  + label: int64:(2,) in [1, 1]
 Sqrt(Ad_C0) -&gt; scores
- + scores: float32:(2, 3) in [0.2129589319229126, 4.0505571365356445]
+ + scores: float32:(2, 3) in [0.16691935062408447, 3.901050567626953]
 
-[array([1, 1]), array([[4.0040483 , 0.21295893, 3.158615  ],
-       [4.050557  , 0.99604493, 2.7256362 ]], dtype=float32)]
+[array([1, 1]), array([[3.0473158 , 0.16691935, 3.9010506 ],
+       [2.5376565 , 1.05008   , 3.8996909 ]], dtype=float32)]
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.115 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.139 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-fbegin-investigate-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/c60e190dd1235e389247f0b47c599940/plot_fbegin_investigate.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_fbegin_investigate.ipynb</span></code></a></p>
@@ -1124,9 +1124,9 @@ Sqrt(Ad_C0) -&gt; scores
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

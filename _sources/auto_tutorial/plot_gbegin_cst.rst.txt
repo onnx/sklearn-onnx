@@ -124,9 +124,9 @@ Inference
 
     output names: ['label', 'probabilities', 'C', 'l1_ratio']
     outputs
-    [array([0, 2], dtype=int64),
-     array([[9.9722755e-01, 2.7724325e-03, 3.5656236e-10],
-           [1.3919589e-04, 7.1695939e-02, 9.2816484e-01]], dtype=float32),
+    [array([2, 1], dtype=int64),
+     array([[3.9809980e-05, 1.0255881e-01, 8.9740139e-01],
+           [1.2807048e-02, 9.5152801e-01, 3.5664950e-02]], dtype=float32),
      array([2.]),
      array([0.5])]
 
@@ -174,8 +174,8 @@ not only the constants. Next model only keeps the probabilities.
 
     output names: ['probabilities']
     outputs
-    [array([[9.9722755e-01, 2.7724325e-03, 3.5656236e-10],
-           [1.3919589e-04, 7.1695939e-02, 9.2816484e-01]], dtype=float32)]
+    [array([[3.9809980e-05, 1.0255881e-01, 8.9740139e-01],
+           [1.2807048e-02, 9.5152801e-01, 3.5664950e-02]], dtype=float32)]
 
 
 
@@ -231,8 +231,8 @@ Load a model
 
     output names: ['probabilities']
     outputs
-    [array([[9.9722755e-01, 2.7724325e-03, 3.5656236e-10],
-           [1.3919589e-04, 7.1695939e-02, 9.2816484e-01]], dtype=float32)]
+    [array([[3.9809980e-05, 1.0255881e-01, 8.9740139e-01],
+           [1.2807048e-02, 9.5152801e-01, 3.5664950e-02]], dtype=float32)]
 
 
 
@@ -240,7 +240,7 @@ Load a model
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.058 seconds)
+   **Total running time of the script:** (0 minutes 0.066 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_cst.py:

@@ -29,7 +29,7 @@ from skl2onnx.helpers import collect_intermediate_steps
 from timeit import timeit
 from skl2onnx.helpers import compare_objects
 import onnxruntime as rt
-from onnxconverter_common.data_types import FloatTensorType
+from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx import convert_sklearn
 import numpy as np
 import pandas as pd

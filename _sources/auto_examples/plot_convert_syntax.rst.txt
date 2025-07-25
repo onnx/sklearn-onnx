@@ -95,7 +95,7 @@ The first way: :func:`convert_sklearn`.
 
  .. code-block:: none
 
-    [1 1 1 1 1 0 0 0 0 0]
+    [1 1 1 1 0 0 0 0 0 0]
 
 
 
@@ -126,7 +126,7 @@ The second way: :func:`to_onnx`: no need to play with
 
  .. code-block:: none
 
-    [1 1 1 1 0 0 0 0 0 0]
+    [0 0 0 0 0 0 1 1 1 1]
 
 
 
@@ -159,7 +159,7 @@ inheriting from :class:`OnnxOperatorMixin`.
 
  .. code-block:: none
 
-    [1 1 1 1 0 0 0 0 0 0]
+    [0 0 0 0 0 0 1 1 1 1]
 
 
 
@@ -189,7 +189,7 @@ before fitting the model.
 
  .. code-block:: none
 
-    [1 1 1 1 0 0 0 0 0 0]
+    [0 0 0 0 0 0 1 1 1 1]
 
 
 
@@ -458,11 +458,11 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -470,7 +470,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.267 seconds)
+   **Total running time of the script:** (0 minutes 3.958 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_syntax.py:
