@@ -1,5 +1,14 @@
 # Change Logs
 
+## 1.20.0
+
+* Fixes CastTransformer output type
+  [#1200](https://github.com/onnx/sklearn-onnx/issues/1200)
+* Fixes unknown_value=np.nan in OrdinalEncoder
+  [#1198](https://github.com/onnx/sklearn-onnx/issues/1198)
+* Enhance OrdinalEncoder conversion to handle infrequent categories
+  [#1195](https://github.com/onnx/sklearn-onnx/issues/1195)
+
 ## 1.19.1
 
 * Fix QDA converter crashing on string labels and incorrect shape calculation
