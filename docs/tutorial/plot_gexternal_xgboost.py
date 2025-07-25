@@ -27,6 +27,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier, XGBRegressor, DMatrix, train as train_xgb
 from skl2onnx.common.data_types import FloatTensorType
+from onnxmltools.convert.common.data_types import FloatTensorType as ml_tools_FloatTensorType
 from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
@@ -89,7 +90,7 @@ update_registered_converter(
     convert_xgboost,
     options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
 )
-
+ 
 ##################################
 # Convert again
 # +++++++++++++
@@ -183,7 +184,7 @@ dtrain = DMatrix(X_train, label=y_train)
 param = {"objective": "multi:softmax", "num_class": 3}
 bst = train_xgb(param, dtrain, 10)
 
-initial_type = [("float_input", FloatTensorType([None, X_train.shape[1]]))]
+initial_type = [("float_input", ml_tools_FloatTensorType([None, X_train.shape[1]]))]
 
 try:
     onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)
