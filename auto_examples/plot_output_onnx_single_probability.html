@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Investigate a pipeline" href="plot_investigate_pipeline.html" /><link rel="prev" title="Train, convert and predict a model" href="plot_convert_model.html" />
+        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Append onnx nodes to the converted model - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Append onnx nodes to the converted model - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -337,18 +337,18 @@ model to produce the desired output. In this case, it removes the second
 column of the output probabilies.</p>
 <p>To be completly accurate, most of the code was generated using a LLM
 and modified to accomodate with the latest changes.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class"><span class="n">LogisticRegression</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="sklearn.model_selection.train_test_split" class="sphx-glr-backref-module-sklearn-model_selection sphx-glr-backref-type-py-function"><span class="n">train_test_split</span></a>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 <span class="kn">import</span> <span class="nn">onnx</span>
 
-<span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">clr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
-<span class="n">clr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span><span class="o">.</span><span class="n">data</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span><span class="o">.</span><span class="n">target</span></a>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_test</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="sklearn.model_selection.train_test_split" class="sphx-glr-backref-module-sklearn-model_selection sphx-glr-backref-type-py-function"><span class="n">train_test_split</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class"><span class="n">LogisticRegression</span></a><span class="p">(</span><span class="n">max_iter</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression.fit" title="sklearn.linear_model.LogisticRegression.fit" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-method"><span class="n">clr</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -771,12 +771,12 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 </div>
 <br />
 <br /><p>model_to_convert refers to the scikit-learn classifier to convert.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">model_to_convert</span> <span class="o">=</span> <span class="n">clr</span>  <span class="c1"># model to convert</span>
-<span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># data used to test or train, one row is enough</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model_to_convert</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a>  <span class="c1"># model to convert</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># data used to test or train, one row is enough</span>
 </pre></div>
 </div>
 <p>Set the output filename for the modified ONNX model</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">output_filename</span> <span class="o">=</span> <span class="s2">&quot;output_file.onnx&quot;</span>  <span class="c1"># Replace with your desired output filename</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">output_filename</span></a> <span class="o">=</span> <span class="s2">&quot;output_file.onnx&quot;</span>  <span class="c1"># Replace with your desired output filename</span>
 </pre></div>
 </div>
 <p>Step 1: Convert the model to ONNX format,
@@ -790,31 +790,30 @@ A “tensor” is essentially a multi-dimensional array,
 commonly used in machine learning to represent data.
 A “float tensor” specifically contains floating-point
 numbers, which are numbers with decimals.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;float_input&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="n">X_test</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]]))]</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;float_input&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span><span class="o">.</span><span class="n">shape</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]]))]</span>
 </pre></div>
 </div>
-<p>Convert the model to ONNX format.</p>
-<ul>
-<li><p>target_opset=18 specifies the version of ONNX operators to use.</p></li>
-<li><p>options={…} sets parameters for the conversion:
-- “zipmap”: False ensures that the output is a raw array
-- of probabilities instead of a dictionary.
-- “output_class_labels”: False ensures that the output</p>
+<p>Convert the model to ONNX format.
+- target_opset=18 specifies the version of ONNX operators to use.
+- options={…} sets parameters for the conversion:</p>
 <blockquote>
-<div><p>contains only probabilities, not class labels.</p>
-</div></blockquote>
-</li>
+<div><ul class="simple">
+<li><p>“zipmap”: False ensures that the output is a raw array</p></li>
+<li><p>of probabilities instead of a dictionary.</p></li>
+<li><p>“output_class_labels”: False ensures that the output
+contains only probabilities, not class labels.</p></li>
 </ul>
+</div></blockquote>
 <p>ONNX (Open Neural Network Exchange) is an open format for
 representing machine learning models.
 It allows interoperability between different machine learning frameworks,
 enabling the use of models across various platforms.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span>
-    <span class="n">model_to_convert</span><span class="p">,</span>
-    <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">,</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model_to_convert</span></a><span class="p">,</span>
+    <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a><span class="p">,</span>
     <span class="n">target_opset</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="mi">18</span><span class="p">,</span> <span class="s2">&quot;ai.onnx.ml&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
     <span class="n">options</span><span class="o">=</span><span class="p">{</span>
-        <span class="nb">id</span><span class="p">(</span><span class="n">model_to_convert</span><span class="p">):</span> <span class="p">{</span><span class="s2">&quot;zipmap&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;output_class_labels&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+        <span class="nb">id</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html#sklearn.linear_model.LogisticRegression" title="sklearn.linear_model.LogisticRegression" class="sphx-glr-backref-module-sklearn-linear_model sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">model_to_convert</span></a><span class="p">):</span> <span class="p">{</span><span class="s2">&quot;zipmap&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;output_class_labels&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
     <span class="p">},</span>  <span class="c1"># Ensures the output is only probabilities, not labels</span>
 <span class="p">)</span>
 </pre></div>
@@ -829,7 +828,7 @@ model that can be shared and used across different systems.</p>
 <p>Assuming the first output in this model should be the probability tensor
 Extract the name of the output tensor representing the probabilities.
 If there are multiple outputs, select the second one, otherwise, select the first.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">prob_output_name</span> <span class="o">=</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prob_output_name</span></a> <span class="o">=</span> <span class="p">(</span>
     <span class="n">onnx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">onnx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">output</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
     <span class="k">else</span> <span class="n">onnx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
@@ -841,7 +840,7 @@ of the positive class (index 1)
 Create a tensor to specify the index to gather
 (index 1), which represents the positive class.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">indices</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">helper</span><span class="o">.</span><span class="n">make_tensor</span><span class="p">(</span>
-    <span class="s2">&quot;indices&quot;</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">INT64</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="s2">&quot;indices&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">INT64</span></a><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>  <span class="c1"># Index 1 to gather positive class</span>
 </pre></div>
 </div>
@@ -858,7 +857,7 @@ Create a tensor to specify the index to gather
 Here, it extracts the probability for the positive class.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">gather_node</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">helper</span><span class="o">.</span><span class="n">make_node</span><span class="p">(</span>
     <span class="s2">&quot;Gather&quot;</span><span class="p">,</span>
-    <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">prob_output_name</span><span class="p">,</span> <span class="s2">&quot;indices&quot;</span><span class="p">],</span>
+    <span class="n">inputs</span><span class="o">=</span><span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">prob_output_name</span></a><span class="p">,</span> <span class="s2">&quot;indices&quot;</span><span class="p">],</span>
     <span class="n">outputs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;positive_class_prob&quot;</span><span class="p">],</span>
     <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>  <span class="c1"># Gather along columns (axis 1)</span>
 <span class="p">)</span>
@@ -898,7 +897,7 @@ Clear the existing output definitions to replace them with the new output.</p>
 <p>Define new output for the positive class probability
 Create a new output tensor specification with the name “positive_class_prob”.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">positive_class_output</span> <span class="o">=</span> <span class="n">onnx</span><span class="o">.</span><span class="n">helper</span><span class="o">.</span><span class="n">make_tensor_value_info</span><span class="p">(</span>
-    <span class="s2">&quot;positive_class_prob&quot;</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="s2">&quot;positive_class_prob&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx</span><span class="o">.</span><span class="n">TensorProto</span><span class="o">.</span><span class="n">FLOAT</span></a><span class="p">,</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 <span class="p">)</span>
 <span class="n">onnx_model</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">positive_class_output</span><span class="p">)</span>
 </pre></div>
@@ -922,7 +921,7 @@ type {
 Save the modified ONNX model to the specified output filename.
 The resulting ONNX file can then be loaded and used in different environments
 that support ONNX, such as inference servers or other machine learning frameworks.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onnx</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">,</span> <span class="n">output_filename</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">onnx</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">onnx_model</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">output_filename</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p>The model can be printed as follows.</p>
@@ -931,23 +930,23 @@ that support ONNX, such as inference servers or other machine learning framework
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;
    ir_version: 8,
-   opset_import: [&quot;ai.onnx.ml&quot; : 1, &quot;&quot; : 18],
+   opset_import: [&quot;ai.onnx.ml&quot; : 1, &quot;&quot; : 18, &quot;&quot; : 18],
    producer_name: &quot;skl2onnx&quot;,
-   producer_version: &quot;1.18.0&quot;,
+   producer_version: &quot;1.19.1&quot;,
    domain: &quot;ai.onnx&quot;,
    model_version: 0,
    doc_string: &quot;&quot;
 &gt;
-&quot;2a0b430c8e794cac873666482db85939&quot; (float[?,4] float_input) =&gt; (float[?,1] positive_class_prob)
+&quot;05f01d3ce40e4d9d969b78b0be9e706d&quot; (float[?,4] float_input) =&gt; (float[?,1] positive_class_prob)
    &lt;int64[1] indices =  {1}&gt;
 {
-   [LinearClassifier] label, probability_tensor = ai.onnx.ml.LinearClassifier &lt;classlabels_ints: ints = [0, 1, 2], coefficients: floats = [-0.442649, 0.828556, -2.36352, -0.972382, 0.269401, -0.245, -0.185949, -0.761031, 0.173248, -0.583556, 2.54947, 1.73341], intercepts: floats = [9.78245, 3.05803, -12.8405], multi_class: int = 1, post_transform: string = &quot;SOFTMAX&quot;&gt; (float_input)
+   [LinearClassifier] label, probability_tensor = ai.onnx.ml.LinearClassifier &lt;classlabels_ints: ints = [0, 1, 2], coefficients: floats = [-0.426998, 0.909799, -2.30715, -1.00512, 0.559776, -0.434449, -0.268645, -0.704307, -0.132778, -0.47535, 2.5758, 1.70943], intercepts: floats = [9.22076, 2.16403, -11.3848], multi_class: int = 1, post_transform: string = &quot;SOFTMAX&quot;&gt; (float_input)
    [Normalizer] probabilities = ai.onnx.ml.Normalizer &lt;norm: string = &quot;L1&quot;&gt; (probability_tensor)
    positive_class_prob = Gather &lt;axis: int = 1&gt; (probabilities, indices)
 }
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.020 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.059 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-output-onnx-single-probability-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/8c3c10ebb91683207100f5790fd89339/plot_output_onnx_single_probability.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_output_onnx_single_probability.ipynb</span></code></a></p>
@@ -1011,9 +1010,9 @@ that support ONNX, such as inference servers or other machine learning framework
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

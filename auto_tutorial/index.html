@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Examples - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Examples - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -381,21 +381,21 @@
 </div><div class="sphx-glr-thumbcontainer" tooltip="A scikit-learn classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that matrix into a list of dictionaries where each probabily is mapped to its class id or name. That mechanism retains the class names but is slower. Let&#x27;s see what other options are available."><img alt="" src="../_images/sphx_glr_plot_dbegin_options_zipmap_thumb.png" />
 <p><a class="reference internal" href="plot_dbegin_options_zipmap.html#sphx-glr-auto-tutorial-plot-dbegin-options-zipmap-py"><span class="std std-ref">Choose appropriate output of a classifier</span></a></p>
   <div class="sphx-glr-thumbnail-title">Choose appropriate output of a classifier</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_xgboost_thumb.png" />
-<p><a class="reference internal" href="plot_gexternal_xgboost.html#sphx-glr-auto-tutorial-plot-gexternal-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Options are used to implement different conversion for a same model. The options can be used to replace an operator MatMul by the Gemm operator and compare the processing time for both graph. Let&#x27;s see how to retrieve the options within a converter."><img alt="" src="../_images/sphx_glr_plot_lcustom_options_thumb.png" />
 <p><a class="reference internal" href="plot_lcustom_options.html#sphx-glr-auto-tutorial-plot-lcustom-options-py"><span class="std std-ref">A new converter with options</span></a></p>
   <div class="sphx-glr-thumbnail-title">A new converter with options</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_catboost_thumb.png" />
-<p><a class="reference internal" href="plot_gexternal_catboost.html#sphx-glr-auto-tutorial-plot-gexternal-catboost-py"><span class="std std-ref">Convert a pipeline with a CatBoost classifier</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="There are two ways to write a converter. The first one is less verbose and easier to understand (see k_means.py). The other is very verbose (see ada_boost.py for an example)."><img alt="" src="../_images/sphx_glr_plot_jcustom_syntax_thumb.png" />
 <p><a class="reference internal" href="plot_jcustom_syntax.html#sphx-glr-auto-tutorial-plot-jcustom-syntax-py"><span class="std std-ref">Two ways to implement a converter</span></a></p>
   <div class="sphx-glr-thumbnail-title">Two ways to implement a converter</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_catboost_thumb.png" />
+<p><a class="reference internal" href="plot_gexternal_catboost.html#sphx-glr-auto-tutorial-plot-gexternal-catboost-py"><span class="std std-ref">Convert a pipeline with a CatBoost classifier</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a regressor has one output (prediction), a transform has one output (the transformed data). This example assumes the model to convert is one of them. In that case, a new converter requires in fact two functions:"><img alt="" src="../_images/sphx_glr_plot_icustom_converter_thumb.png" />
 <p><a class="reference internal" href="plot_icustom_converter.html#sphx-glr-auto-tutorial-plot-icustom-converter-py"><span class="std std-ref">Implement a new converter</span></a></p>
   <div class="sphx-glr-thumbnail-title">Implement a new converter</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_xgboost_thumb.png" />
+<p><a class="reference internal" href="plot_gexternal_xgboost.html#sphx-glr-auto-tutorial-plot-gexternal-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example answers issues 685. It implements a custom converter for model pyod.models.iforest.IForest. This example uses l-plot-custom-converter as a start."><img alt="" src="../_images/sphx_glr_plot_wext_pyod_forest_thumb.png" />
 <p><a class="reference internal" href="plot_wext_pyod_forest.html#sphx-glr-auto-tutorial-plot-wext-pyod-forest-py"><span class="std std-ref">Converter for pyod.models.iforest.IForest</span></a></p>
   <div class="sphx-glr-thumbnail-title">Converter for pyod.models.iforest.IForest</div>
@@ -455,9 +455,9 @@
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

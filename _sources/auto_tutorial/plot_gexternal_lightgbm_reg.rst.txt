@@ -92,17 +92,17 @@ Train a LGBMRegressor
 
  .. code-block:: none
 
-    [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000475 seconds.
+    [LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000352 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 5100
     [LightGBM] [Info] Number of data points in the train set: 1000, number of used features: 20
-    [LightGBM] [Info] Start training from score 0.033823
+    [LightGBM] [Info] Start training from score 0.047562
 
 
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-8 {
+    <style>#sk-container-id-19 {
       /* Definition of color scheme common for light and dark mode */
       --sklearn-color-text: #000;
       --sklearn-color-text-muted: #666;
@@ -133,15 +133,15 @@ Train a LGBMRegressor
       }
     }
 
-    #sk-container-id-8 {
+    #sk-container-id-19 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-8 pre {
+    #sk-container-id-19 pre {
       padding: 0;
     }
 
-    #sk-container-id-8 input.sk-hidden--visually {
+    #sk-container-id-19 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -153,7 +153,7 @@ Train a LGBMRegressor
       width: 1px;
     }
 
-    #sk-container-id-8 div.sk-dashed-wrapped {
+    #sk-container-id-19 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -161,7 +161,7 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-8 div.sk-container {
+    #sk-container-id-19 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -171,7 +171,7 @@ Train a LGBMRegressor
       position: relative;
     }
 
-    #sk-container-id-8 div.sk-text-repr-fallback {
+    #sk-container-id-19 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -187,14 +187,14 @@ Train a LGBMRegressor
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-8 div.sk-parallel-item::after {
+    #sk-container-id-19 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-8 div.sk-parallel {
+    #sk-container-id-19 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -202,28 +202,28 @@ Train a LGBMRegressor
       position: relative;
     }
 
-    #sk-container-id-8 div.sk-parallel-item {
+    #sk-container-id-19 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-8 div.sk-parallel-item:first-child::after {
+    #sk-container-id-19 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-8 div.sk-parallel-item:last-child::after {
+    #sk-container-id-19 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-8 div.sk-parallel-item:only-child::after {
+    #sk-container-id-19 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-8 div.sk-serial {
+    #sk-container-id-19 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -241,14 +241,14 @@ Train a LGBMRegressor
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-8 div.sk-toggleable {
+    #sk-container-id-19 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-8 label.sk-toggleable__label {
+    #sk-container-id-19 label.sk-toggleable__label {
       cursor: pointer;
       display: flex;
       width: 100%;
@@ -261,13 +261,13 @@ Train a LGBMRegressor
       gap: 0.5em;
     }
 
-    #sk-container-id-8 label.sk-toggleable__label .caption {
+    #sk-container-id-19 label.sk-toggleable__label .caption {
       font-size: 0.6rem;
       font-weight: lighter;
       color: var(--sklearn-color-text-muted);
     }
 
-    #sk-container-id-8 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-19 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -275,13 +275,13 @@ Train a LGBMRegressor
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-8 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-19 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-8 div.sk-toggleable__content {
+    #sk-container-id-19 div.sk-toggleable__content {
       max-height: 0;
       max-width: 0;
       overflow: hidden;
@@ -290,12 +290,12 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-toggleable__content.fitted {
+    #sk-container-id-19 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-toggleable__content pre {
+    #sk-container-id-19 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -303,79 +303,79 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-19 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-8 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-19 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
       max-height: 200px;
       max-width: 100%;
       overflow: auto;
     }
 
-    #sk-container-id-8 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-19 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-8 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-19 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-19 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-8 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-19 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-19 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-8 div.sk-label label {
+    #sk-container-id-19 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-19 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-8 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-19 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-8 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-19 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-8 div.sk-label label {
+    #sk-container-id-19 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
       display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-8 div.sk-label-container {
+    #sk-container-id-19 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-8 div.sk-estimator {
+    #sk-container-id-19 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -385,18 +385,18 @@ Train a LGBMRegressor
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-8 div.sk-estimator.fitted {
+    #sk-container-id-19 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-8 div.sk-estimator:hover {
+    #sk-container-id-19 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-8 div.sk-estimator.fitted:hover {
+    #sk-container-id-19 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -484,7 +484,7 @@ Train a LGBMRegressor
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-8 a.estimator_doc_link {
+    #sk-container-id-19 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
@@ -499,25 +499,25 @@ Train a LGBMRegressor
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-8 a.estimator_doc_link.fitted {
+    #sk-container-id-19 a.estimator_doc_link.fitted {
       /* fitted */
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-8 a.estimator_doc_link:hover {
+    #sk-container-id-19 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-8 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-19 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-8" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-30" type="checkbox" checked><label for="sk-estimator-id-30" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMRegressor</div></div><div><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>LGBMRegressor(n_estimators=1000)</pre></div> </div></div></div></div>
+    </style><div id="sk-container-id-19" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-65" type="checkbox" checked><label for="sk-estimator-id-65" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMRegressor</div></div><div><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>LGBMRegressor(n_estimators=1000)</pre></div> </div></div></div></div>
     </div>
     <br />
     <br />
@@ -639,8 +639,10 @@ Discrepancies
 
  .. code-block:: none
 
-    sum of discrepancies 1 node 0.00010992635655524084
-    sum of discrepancies split node 4.182445361007939e-05 ratio: 2.6282795605666776
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMRegressor was fitted with feature names
+      warnings.warn(
+    sum of discrepancies 1 node 0.00012160677476348304
+    sum of discrepancies split node 4.63712861652565e-05 ratio: 2.6224585259529944
 
 
 
@@ -669,8 +671,8 @@ The maximum is much better too.
 
  .. code-block:: none
 
-    max discrepancies 1 node 9.335552881850617e-07
-    max discrepancies split node 2.9892391495423e-07 ratio: 3.1230531967574557
+    max discrepancies 1 node 1.223684760631727e-06
+    max discrepancies split node 4.101712844928329e-07 ratio: 2.9833506315411236
 
 
 
@@ -704,8 +706,8 @@ The processing time is slower but not much.
 
  .. code-block:: none
 
-    processing time no split 1.0977208300027996
-    processing time split 1.2429911670005822
+    processing time no split 1.527292794999994
+    processing time split 1.880056143000047
 
 
 
@@ -750,21 +752,21 @@ the parameter *split*.
 
  .. code-block:: none
 
-      0%|          | 0/12 [00:00<?, ?it/s]      8%|▊         | 1/12 [00:01<00:12,  1.11s/it]     17%|█▋        | 2/12 [00:02<00:10,  1.09s/it]     25%|██▌       | 3/12 [00:03<00:10,  1.15s/it]     33%|███▎      | 4/12 [00:04<00:08,  1.11s/it]     42%|████▏     | 5/12 [00:05<00:07,  1.12s/it]     50%|█████     | 6/12 [00:06<00:06,  1.12s/it]     58%|█████▊    | 7/12 [00:08<00:06,  1.31s/it]     67%|██████▋   | 8/12 [00:09<00:05,  1.33s/it]     75%|███████▌  | 9/12 [00:11<00:04,  1.36s/it]     83%|████████▎ | 10/12 [00:12<00:02,  1.28s/it]     92%|█████████▏| 11/12 [00:13<00:01,  1.31s/it]    100%|██████████| 12/12 [00:14<00:00,  1.24s/it]    100%|██████████| 12/12 [00:14<00:00,  1.23s/it]
-                   disc      baseline
-    split                            
-    20     1.955193e-07  9.335553e-07
-    40     3.277593e-07  9.335553e-07
-    60     3.374452e-07  9.335553e-07
-    80     3.948104e-07  9.335553e-07
-    100    2.989239e-07  9.335553e-07
-    120    2.703531e-07  9.335553e-07
-    140    3.906515e-07  9.335553e-07
-    160    3.629678e-07  9.335553e-07
-    200    4.123835e-07  9.335553e-07
-    300    6.290701e-07  9.335553e-07
-    400    5.661779e-07  9.335553e-07
-    500    6.868547e-07  9.335553e-07
+      0%|          | 0/12 [00:00<?, ?it/s]      8%|▊         | 1/12 [00:01<00:19,  1.77s/it]     17%|█▋        | 2/12 [00:03<00:15,  1.59s/it]     25%|██▌       | 3/12 [00:04<00:14,  1.59s/it]     33%|███▎      | 4/12 [00:06<00:11,  1.48s/it]     42%|████▏     | 5/12 [00:07<00:09,  1.42s/it]     50%|█████     | 6/12 [00:08<00:08,  1.45s/it]     58%|█████▊    | 7/12 [00:10<00:07,  1.41s/it]     67%|██████▋   | 8/12 [00:11<00:05,  1.44s/it]     75%|███████▌  | 9/12 [00:13<00:04,  1.39s/it]     83%|████████▎ | 10/12 [00:14<00:02,  1.36s/it]     92%|█████████▏| 11/12 [00:15<00:01,  1.39s/it]    100%|██████████| 12/12 [00:17<00:00,  1.37s/it]    100%|██████████| 12/12 [00:17<00:00,  1.43s/it]
+                   disc  baseline
+    split                        
+    20     2.992593e-07  0.000001
+    40     2.075150e-07  0.000001
+    60     2.874813e-07  0.000001
+    80     2.700104e-07  0.000001
+    100    4.101713e-07  0.000001
+    120    3.104678e-07  0.000001
+    140    3.350883e-07  0.000001
+    160    4.532249e-07  0.000001
+    200    3.900536e-07  0.000001
+    300    7.141194e-07  0.000001
+    400    6.281997e-07  0.000001
+    500    6.714246e-07  0.000001
 
 
 
@@ -799,7 +801,7 @@ Graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 19.930 seconds)
+   **Total running time of the script:** (0 minutes 24.201 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_lightgbm_reg.py:

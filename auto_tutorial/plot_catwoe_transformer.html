@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Converter for WOEEncoder from categorical_encoder - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Converter for WOEEncoder from categorical_encoder - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -344,46 +344,33 @@ cases the original encoder can handle.</p>
 <p>Let’s take the <a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html">Iris dataset</a>.
 Every feature is converter into integer.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <span class="n">InferenceSession</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OrdinalEncoder</span> <span class="k">as</span> <span class="n">SklOrdinalEncoder</span>
-<span class="kn">from</span> <span class="nn">category_encoders</span> <span class="kn">import</span> <span class="n">WOEEncoder</span><span class="p">,</span> <span class="n">OrdinalEncoder</span>
+<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">OrdinalEncoder</span></a> <span class="k">as</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="sklearn.preprocessing.OrdinalEncoder" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">SklOrdinalEncoder</span></a>
+<span class="kn">from</span> <span class="nn">category_encoders</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">WOEEncoder</span></a><span class="p">,</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">OrdinalEncoder</span></a>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">update_registered_converter</span><span class="p">,</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">get_model_alias</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.utils</span> <span class="kn">import</span> <span class="n">check_input_and_output_numbers</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.algebra.onnx_ops</span> <span class="kn">import</span> <span class="n">OnnxCast</span>
 <span class="kn">from</span> <span class="nn">skl2onnx.algebra.onnx_operator</span> <span class="kn">import</span> <span class="n">OnnxSubEstimator</span>
-<span class="kn">from</span> <span class="nn">skl2onnx.sklapi</span> <span class="kn">import</span> <span class="n">WOETransformer</span>
+<span class="kn">from</span> <span class="nn">skl2onnx.sklapi</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">WOETransformer</span></a>
 <span class="kn">import</span> <span class="nn">skl2onnx.sklapi.register</span>  <span class="c1"># noqa: F401</span>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">target</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
-<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">y</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">data</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">target</span></a>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">int64</span></a><span class="p">)[:,</span> <span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">int64</span></a><span class="p">)</span>
 
-<span class="n">woe</span> <span class="o">=</span> <span class="n">WOEEncoder</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">woe</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+<span class="n">woe</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">WOEEncoder</span></a><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">woe</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="gt">Traceback (most recent call last):</span>
-  File <span class="nb">&quot;/home/xadupre/github/sklearn-onnx/docs/tutorial/plot_catwoe_transformer.py&quot;</span>, line <span class="m">46</span>, in <span class="n">&lt;module&gt;</span>
-<span class="w">    </span><span class="n">woe</span> <span class="o">=</span> <span class="n">WOEEncoder</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="w">          </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
-  File <span class="nb">&quot;/home/xadupre/vv/this312/lib/python3.12/site-packages/category_encoders/utils.py&quot;</span>, line <span class="m">299</span>, in <span class="n">fit</span>
-<span class="w">    </span><span class="bp">self</span><span class="o">.</span><span class="n">_check_fit_inputs</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-  File <span class="nb">&quot;/home/xadupre/vv/this312/lib/python3.12/site-packages/category_encoders/utils.py&quot;</span>, line <span class="m">336</span>, in <span class="n">_check_fit_inputs</span>
-<span class="w">    </span><span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_tags</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;supervised_encoder&#39;</span><span class="p">):</span>
-<span class="w">       </span><span class="pm">^^^^^^^^^^^^^^^^</span>
-  File <span class="nb">&quot;/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py&quot;</span>, line <span class="m">417</span>, in <span class="n">_get_tags</span>
-<span class="w">    </span><span class="k">return</span> <span class="n">_to_old_tags</span><span class="p">(</span><span class="n">get_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-<span class="w">                        </span><span class="pm">^^^^^^^^^^^^^^</span>
-  File <span class="nb">&quot;/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/_tags.py&quot;</span>, line <span class="m">405</span>, in <span class="n">get_tags</span>
-<span class="w">    </span><span class="n">sklearn_tags_provider</span><span class="p">[</span><span class="n">klass</span><span class="p">]</span> <span class="o">=</span> <span class="n">klass</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">(</span><span class="n">estimator</span><span class="p">)</span>  <span class="c1"># type: ignore[attr-defined]</span>
-<span class="w">                                   </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^</span>
-  File <span class="nb">&quot;/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py&quot;</span>, line <span class="m">859</span>, in <span class="n">__sklearn_tags__</span>
-<span class="w">    </span><span class="n">tags</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__sklearn_tags__</span><span class="p">()</span>
-<span class="w">           </span><span class="pm">^^^^^^^^^^^^^^^^^^^^^^^^</span>
-<span class="gr">AttributeError</span>: <span class="n">&#39;super&#39; object has no attribute &#39;__sklearn_tags__&#39;</span>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>          0  1
+0 -1.405712  3
+1 -1.724166  3
+2 -1.724166  3
+3 -1.724166  3
+4 -1.405712  3
 </pre></div>
 </div>
 <p>Let’s look into the trained parameters of the model.
@@ -391,9 +378,34 @@ It appears that WOEEncoder uses an OrdinalEncoder
 but not the one from scikit-learn. We need to add a
 converter for this model tool.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;encoder&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">woe</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="p">),</span> <span class="n">woe</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">,</span> <span class="n">woe</span><span class="o">.</span><span class="n">mapping</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;encoder.mapping&quot;</span><span class="p">,</span> <span class="n">woe</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="o">.</span><span class="n">mapping</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;encoder.cols&quot;</span><span class="p">,</span> <span class="n">woe</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="o">.</span><span class="n">cols</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;mapping&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">woe</span><span class="o">.</span><span class="n">mapping</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;encoder.mapping&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">woe</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="o">.</span><span class="n">mapping</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;encoder.cols&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">woe</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="o">.</span><span class="n">cols</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>encoder &lt;class &#39;category_encoders.ordinal.OrdinalEncoder&#39;&gt; OrdinalEncoder(cols=[0],
+               mapping=[{&#39;col&#39;: 0, &#39;data_type&#39;: dtype(&#39;int64&#39;),
+                         &#39;mapping&#39;: 5.0    1
+4.0    2
+7.0    3
+6.0    4
+NaN   -2
+dtype: int64}])
+mapping {0: 0
+ 1   -1.405712
+ 2   -1.724166
+ 3    2.545531
+ 4    0.961411
+-1    0.000000
+-2    0.000000
+dtype: float64}
+encoder.mapping [{&#39;col&#39;: 0, &#39;mapping&#39;: 5.0    1
+4.0    2
+7.0    3
+6.0    4
+NaN   -2
+dtype: int64, &#39;data_type&#39;: dtype(&#39;int64&#39;)}]
+encoder.cols [0]
 </pre></div>
 </div>
 </section>
@@ -411,15 +423,15 @@ and then write the conversion.</p>
         <span class="n">mapping</span> <span class="o">=</span> <span class="n">column_map</span><span class="p">[</span><span class="s2">&quot;mapping&quot;</span><span class="p">]</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+            <span class="k">if</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">isnan</span></a><span class="p">(</span><span class="n">mapping</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
                 <span class="k">continue</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">ind</span><span class="p">:</span>
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">res</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">cats</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="n">cats</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">int64</span></a><span class="p">)</span>
 
-    <span class="n">skl_ord</span> <span class="o">=</span> <span class="n">SklOrdinalEncoder</span><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="n">cats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+    <span class="n">skl_ord</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.OrdinalEncoder.html#sklearn.preprocessing.OrdinalEncoder" title="sklearn.preprocessing.OrdinalEncoder" class="sphx-glr-backref-module-sklearn-preprocessing sphx-glr-backref-type-py-class"><span class="n">SklOrdinalEncoder</span></a><span class="p">(</span><span class="n">categories</span><span class="o">=</span><span class="n">cats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">int64</span></a><span class="p">)</span>
     <span class="n">skl_ord</span><span class="o">.</span><span class="n">categories_</span> <span class="o">=</span> <span class="n">cats</span>
     <span class="k">return</span> <span class="n">skl_ord</span>
 
@@ -437,17 +449,17 @@ and then write the conversion.</p>
 <span class="k">def</span> <span class="nf">ordinal_encoder_converter</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
     <span class="n">op</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span>
     <span class="n">opv</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">skl_ord</span> <span class="o">=</span> <span class="n">ordenc_to_sklearn</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">mapping</span><span class="p">)</span>
     <span class="n">cat</span> <span class="o">=</span> <span class="n">OnnxSubEstimator</span><span class="p">(</span>
-        <span class="n">skl_ord</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">skl_ord</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">output_names</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">outputs</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span>
     <span class="p">)</span>
     <span class="n">cat</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
 
 
 <span class="n">update_registered_converter</span><span class="p">(</span>
-    <span class="n">OrdinalEncoder</span><span class="p">,</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">OrdinalEncoder</span></a><span class="p">,</span>
     <span class="s2">&quot;CategoricalEncoderOrdinalEncoder&quot;</span><span class="p">,</span>
     <span class="n">ordinal_encoder_shape_calculator</span><span class="p">,</span>
     <span class="n">ordinal_encoder_converter</span><span class="p">,</span>
@@ -455,15 +467,30 @@ and then write the conversion.</p>
 </pre></div>
 </div>
 <p>Let’s compute the output one a short example.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">enc</span> <span class="o">=</span> <span class="n">OrdinalEncoder</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="n">enc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">enc</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">OrdinalEncoder</span></a><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">enc</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">enc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>   0  1
+0  1  1
+1  2  1
+2  2  1
+3  2  1
+4  1  1
 </pre></div>
 </div>
 <p>Let’s check the ONNX conversion produces the same results.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ord_onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">enc</span><span class="p">,</span> <span class="n">X</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">sess</span> <span class="o">=</span> <span class="n">InferenceSession</span><span class="p">(</span><span class="n">ord_onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]})[</span><span class="mi">0</span><span class="p">])</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">ord_onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">enc</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">ord_onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.run" title="onnxruntime.InferenceSession.run" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]})[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[1 1]
+ [2 1]
+ [2 1]
+ [2 1]
+ [1 1]]
 </pre></div>
 </div>
 <p>That works.</p>
@@ -493,7 +520,7 @@ and then write the conversion.</p>
         <span class="n">cats</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">intervals</span>
         <span class="n">ws</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span>
 
-    <span class="n">skl</span> <span class="o">=</span> <span class="n">WOETransformer</span><span class="p">(</span><span class="n">intervals</span><span class="o">=</span><span class="n">cats</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">ws</span><span class="p">,</span> <span class="n">onehot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">skl</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">WOETransformer</span></a><span class="p">(</span><span class="n">intervals</span><span class="o">=</span><span class="n">cats</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">ws</span><span class="p">,</span> <span class="n">onehot</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">skl</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">skl</span>
 
@@ -524,10 +551,10 @@ and then write the conversion.</p>
 <span class="k">def</span> <span class="nf">woe_encoder_converter</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
     <span class="n">op</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span>
     <span class="n">opv</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">target_opset</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-    <span class="n">sub</span> <span class="o">=</span> <span class="n">OnnxSubEstimator</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
-    <span class="n">cast</span> <span class="o">=</span> <span class="n">OnnxCast</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">sub</span> <span class="o">=</span> <span class="n">OnnxSubEstimator</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">ordinal_encoder</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">)</span>
+    <span class="n">cast</span> <span class="o">=</span> <span class="n">OnnxCast</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">op_version</span><span class="o">=</span><span class="n">opv</span><span class="p">,</span> <span class="n">to</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)</span>
     <span class="n">skl_ord</span> <span class="o">=</span> <span class="n">woeenc_to_sklearn</span><span class="p">(</span><span class="n">op</span><span class="o">.</span><span class="n">mapping</span><span class="p">)</span>
     <span class="n">cat</span> <span class="o">=</span> <span class="n">OnnxSubEstimator</span><span class="p">(</span>
         <span class="n">skl_ord</span><span class="p">,</span>
@@ -540,7 +567,7 @@ and then write the conversion.</p>
 
 
 <span class="n">update_registered_converter</span><span class="p">(</span>
-    <span class="n">WOEEncoder</span><span class="p">,</span>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">WOEEncoder</span></a><span class="p">,</span>
     <span class="s2">&quot;CategoricalEncoderWOEEncoder&quot;</span><span class="p">,</span>
     <span class="n">woe_encoder_shape_calculator</span><span class="p">,</span>
     <span class="n">woe_encoder_converter</span><span class="p">,</span>
@@ -549,17 +576,32 @@ and then write the conversion.</p>
 </pre></div>
 </div>
 <p>Let’s compute the output one a short example.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">woe</span> <span class="o">=</span> <span class="n">WOEEncoder</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">woe</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">woe</span> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.TransformerMixin.html#sklearn.base.TransformerMixin" title="sklearn.base.TransformerMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">WOEEncoder</span></a><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">woe</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>          0         1
+0 -1.405712 -0.035947
+1 -1.724166 -0.035947
+2 -1.724166 -0.035947
+3 -1.724166 -0.035947
+4 -1.405712 -0.035947
 </pre></div>
 </div>
 <p>Let’s check the ONNX conversion produces the same results.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">woe_onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">woe</span><span class="p">,</span> <span class="n">X</span><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
-<span class="n">sess</span> <span class="o">=</span> <span class="n">InferenceSession</span><span class="p">(</span><span class="n">woe_onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">]})[</span><span class="mi">0</span><span class="p">])</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">woe_onx</span> <span class="o">=</span> <span class="n">to_onnx</span><span class="p">(</span><span class="n">woe</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">1</span><span class="p">],</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">woe_onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.run" title="onnxruntime.InferenceSession.run" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">run</span></a><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">[:</span><span class="mi">5</span><span class="p">]})[</span><span class="mi">0</span><span class="p">])</span>
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.127 seconds)</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[-1.4057125  -0.03594739]
+ [-1.7241662  -0.03594739]
+ [-1.7241662  -0.03594739]
+ [-1.7241662  -0.03594739]
+ [-1.4057125  -0.03594739]]
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.512 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-catwoe-transformer-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7c4689d9934d62706ce0c56c0537a320/plot_catwoe_transformer.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_catwoe_transformer.ipynb</span></code></a></p>
@@ -627,9 +669,9 @@ and then write the conversion.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

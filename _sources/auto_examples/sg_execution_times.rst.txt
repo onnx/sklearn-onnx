@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.161** total execution time for 26 files **from auto_examples**:
+**01:34.015** total execution time for 26 files **from auto_examples**:
 
 .. container::
 
@@ -32,81 +32,81 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)
-     - 00:00.161
+   * - :ref:`sphx_glr_auto_examples_plot_black_op.py` (``plot_black_op.py``)
+     - 00:17.848
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_backend.py` (``plot_backend.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py` (``plot_benchmark_cdist.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_black_op.py` (``plot_black_op.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py` (``plot_convert_decision_function.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_convert_model.py` (``plot_convert_model.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_convert_syntax.py` (``plot_convert_syntax.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py` (``plot_convert_zipmap.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_custom_parser.py` (``plot_custom_parser.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_custom_parser_alternative.py` (``plot_custom_parser_alternative.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py` (``plot_errors_onnxruntime.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_gpr.py` (``plot_gpr.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_logging.py` (``plot_logging.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_metadata.py` (``plot_metadata.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_nmf.py` (``plot_nmf.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_output_onnx_single_probability.py` (``plot_output_onnx_single_probability.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)
-     - 00:00.000
+     - 00:11.608
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_tfidfvectorizer.py` (``plot_tfidfvectorizer.py``)
-     - 00:00.000
+     - 00:11.184
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_model.py` (``plot_custom_model.py``)
+     - 00:09.307
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_complex_pipeline.py` (``plot_complex_pipeline.py``)
+     - 00:06.813
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_benchmark_pipeline.py` (``plot_benchmark_pipeline.py``)
+     - 00:06.501
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_xgboost.py` (``plot_pipeline_xgboost.py``)
+     - 00:04.342
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_intermediate_outputs.py` (``plot_intermediate_outputs.py``)
+     - 00:04.306
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_syntax.py` (``plot_convert_syntax.py``)
+     - 00:03.958
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_cast_transformer.py` (``plot_cast_transformer.py``)
+     - 00:03.620
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_parser_alternative.py` (``plot_custom_parser_alternative.py``)
+     - 00:03.326
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_custom_parser.py` (``plot_custom_parser.py``)
+     - 00:03.148
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_benchmark_cdist.py` (``plot_benchmark_cdist.py``)
+     - 00:02.569
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline_lightgbm.py` (``plot_pipeline_lightgbm.py``)
+     - 00:01.660
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_onnx_operators.py` (``plot_onnx_operators.py``)
+     - 00:00.924
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_gpr.py` (``plot_gpr.py``)
+     - 00:00.764
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_nmf.py` (``plot_nmf.py``)
+     - 00:00.454
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_model.py` (``plot_convert_model.py``)
+     - 00:00.373
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_zipmap.py` (``plot_convert_zipmap.py``)
+     - 00:00.368
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_investigate_pipeline.py` (``plot_investigate_pipeline.py``)
+     - 00:00.300
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_pipeline.py` (``plot_pipeline.py``)
+     - 00:00.229
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_logging.py` (``plot_logging.py``)
+     - 00:00.155
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_convert_decision_function.py` (``plot_convert_decision_function.py``)
+     - 00:00.119
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_output_onnx_single_probability.py` (``plot_output_onnx_single_probability.py``)
+     - 00:00.059
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_errors_onnxruntime.py` (``plot_errors_onnxruntime.py``)
+     - 00:00.052
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_plot_metadata.py` (``plot_metadata.py``)
+     - 00:00.028
      - 0.0

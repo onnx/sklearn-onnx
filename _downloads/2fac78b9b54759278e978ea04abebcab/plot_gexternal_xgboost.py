@@ -27,11 +27,13 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier, XGBRegressor, DMatrix, train as train_xgb
 from skl2onnx.common.data_types import FloatTensorType
+from onnxmltools.convert.common.data_types import FloatTensorType as ml_tools_FloatTensorType
 from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
     calculate_linear_regressor_output_shapes,
 )
+from skl2onnx.convert import may_switch_bases_classes_order
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from onnxmltools.convert import convert_xgboost as convert_xgboost_booster
 
@@ -88,17 +90,20 @@ update_registered_converter(
     convert_xgboost,
     options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
 )
-
+ 
 ##################################
 # Convert again
 # +++++++++++++
 
-model_onnx = convert_sklearn(
-    pipe,
-    "pipeline_xgboost",
-    [("input", FloatTensorType([None, 2]))],
-    target_opset={"": 12, "ai.onnx.ml": 2},
-)
+with may_switch_bases_classes_order(XGBClassifier):
+    # This context should not be needed anymore once this issue
+    # is fixed in XGBoost.
+    model_onnx = convert_sklearn(
+        pipe,
+        "pipeline_xgboost",
+        [("input", FloatTensorType([None, 2]))],
+        target_opset={"": 12, "ai.onnx.ml": 2},
+    )
 
 # And save.
 with open("pipeline_xgboost.onnx", "wb") as f:
@@ -110,8 +115,9 @@ with open("pipeline_xgboost.onnx", "wb") as f:
 #
 # Predictions with XGBoost.
 
-print("predict", pipe.predict(X[:5]))
-print("predict_proba", pipe.predict_proba(X[:1]))
+with may_switch_bases_classes_order(XGBClassifier):
+    print("predict", pipe.predict(X[:5]))
+    print("predict_proba", pipe.predict_proba(X[:1]))
 
 ##########################
 # Predictions with onnxruntime.
@@ -141,14 +147,16 @@ X_train, X_test, y_train, _ = train_test_split(x, y, test_size=0.5)
 pipe = Pipeline([("scaler", StandardScaler()), ("xgb", XGBRegressor(n_estimators=3))])
 pipe.fit(X_train, y_train)
 
-print("predict", pipe.predict(X_test[:5]))
+with may_switch_bases_classes_order(XGBRegressor):
+    print("predict", pipe.predict(X_test[:5]))
 
 #############################
 # ONNX
 
-onx = to_onnx(
-    pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
-)
+with may_switch_bases_classes_order(XGBRegressor):
+    onx = to_onnx(
+        pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
+    )
 
 sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 pred_onx = sess.run(None, {"X": X_test[:5].astype(numpy.float32)})
@@ -176,7 +184,7 @@ dtrain = DMatrix(X_train, label=y_train)
 param = {"objective": "multi:softmax", "num_class": 3}
 bst = train_xgb(param, dtrain, 10)
 
-initial_type = [("float_input", FloatTensorType([None, X_train.shape[1]]))]
+initial_type = [("float_input", ml_tools_FloatTensorType([None, X_train.shape[1]]))]
 
 try:
     onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)

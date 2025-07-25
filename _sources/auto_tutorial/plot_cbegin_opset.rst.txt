@@ -111,7 +111,7 @@ ONNX
 
     ir_version: 8
     producer_name: "skl2onnx"
-    producer_version: "1.18.0"
+    producer_version: "1.19.1"
     domain: "ai.onnx"
     model_version: 0
     doc_string: ""
@@ -167,25 +167,25 @@ ONNX
         }
         attribute {
           name: "nodes_falsenodeids"
-          ints: 56
-          ints: 31
-          ints: 26
-          ints: 11
-          ints: 8
-          ints: 7
+          ints: 6
+          ints: 3
+          ints: 0
+          ints: 5
           ints: 0
           ints: 0
-          ints: 10
+          ints: 40
+          ints: 33
+          ints: 18
+          ints: 13
+          ints: 12
           ints: 0
           ints: 0
-          ints: 19
-          ints: 16
           ints: 15
           ints: 0
+          ints: 17
           ints: 0
-          ints: 18
           ints: 0
-          ints: 0
+          ints: 26
           ints: 23
           ints: 22
           ints: 0
@@ -193,108 +193,27 @@ ONNX
           ints: 25
           ints: 0
           ints: 0
-          ints: 28
-          ints: 0
           ints: 30
+          ints: 29
           ints: 0
           ints: 0
-          ints: 55
-          ints: 40
+          ints: 32
+          ints: 0
+          ints: 0
           ints: 35
           ints: 0
-          ints: 37
-          ints: 0
           ints: 39
-          ints: 0
-          ints: 0
-          ints: 48
-          ints: 45
-          ints: 44
-          ints: 0
-          ints: 0
-          ints: 47
-          ints: 0
-          ints: 0
-          ints: 52
-          ints: 51
-          ints: 0
-          ints: 0
-          ints: 54
+          ints: 38
           ints: 0
           ints: 0
           ints: 0
-          ints: 62
-          ints: 59
-          ints: 0
-          ints: 61
-          ints: 0
-          ints: 0
-          ints: 88
-          ints: 75
-          ints: 70
-          ints: 67
-          ints: 0
-          ints: 69
-          ints: 0
-          ints: 0
-          ints: 74
-          ints: 73
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 81
-          ints: 80
-          ints: 79
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 85
-          ints: 84
-          ints: 0
-          ints: 0
-          ints: 87
-          ints: 0
-          ints: 0
-          ints: 92
-          ints: 91
-          ints: 0
-          ints: 0
-          ints: 98
-          ints: 97
-          ints: 96
-          ints: 0
-          ints: 0
+          ints: 42
           ints: 0
           ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_featureids"
-          ints: 1
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -303,23 +222,6 @@ ONNX
           ints: 0
           ints: 0
           ints: 1
-          ints: 1
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 1
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -334,15 +236,8 @@ ONNX
           ints: 0
           ints: 1
           ints: 0
-          ints: 1
-          ints: 1
           ints: 0
           ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
           ints: 0
           ints: 0
           ints: 1
@@ -352,19 +247,12 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 1
           ints: 0
           ints: 0
           ints: 0
           ints: 0
           ints: 0
-          ints: 1
           ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 1
-          ints: 1
           ints: 0
           ints: 0
           ints: 0
@@ -373,62 +261,6 @@ ONNX
         }
         attribute {
           name: "nodes_hitrates"
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
           floats: 1
           floats: 1
           floats: 1
@@ -519,73 +351,12 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_modes"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
@@ -593,26 +364,9 @@ ONNX
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
@@ -634,20 +388,7 @@ ONNX
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
-          strings: "LEAF"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
@@ -655,27 +396,6 @@ ONNX
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           type: STRINGS
@@ -725,122 +445,10 @@ ONNX
           ints: 40
           ints: 41
           ints: 42
-          ints: 43
-          ints: 44
-          ints: 45
-          ints: 46
-          ints: 47
-          ints: 48
-          ints: 49
-          ints: 50
-          ints: 51
-          ints: 52
-          ints: 53
-          ints: 54
-          ints: 55
-          ints: 56
-          ints: 57
-          ints: 58
-          ints: 59
-          ints: 60
-          ints: 61
-          ints: 62
-          ints: 63
-          ints: 64
-          ints: 65
-          ints: 66
-          ints: 67
-          ints: 68
-          ints: 69
-          ints: 70
-          ints: 71
-          ints: 72
-          ints: 73
-          ints: 74
-          ints: 75
-          ints: 76
-          ints: 77
-          ints: 78
-          ints: 79
-          ints: 80
-          ints: 81
-          ints: 82
-          ints: 83
-          ints: 84
-          ints: 85
-          ints: 86
-          ints: 87
-          ints: 88
-          ints: 89
-          ints: 90
-          ints: 91
-          ints: 92
-          ints: 93
-          ints: 94
-          ints: 95
-          ints: 96
-          ints: 97
-          ints: 98
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -890,23 +498,23 @@ ONNX
           name: "nodes_truenodeids"
           ints: 1
           ints: 2
-          ints: 3
+          ints: 0
           ints: 4
-          ints: 5
-          ints: 6
           ints: 0
           ints: 0
+          ints: 7
+          ints: 8
           ints: 9
+          ints: 10
+          ints: 11
           ints: 0
           ints: 0
-          ints: 12
-          ints: 13
           ints: 14
           ints: 0
+          ints: 16
           ints: 0
-          ints: 17
           ints: 0
-          ints: 0
+          ints: 19
           ints: 20
           ints: 21
           ints: 0
@@ -915,179 +523,67 @@ ONNX
           ints: 0
           ints: 0
           ints: 27
+          ints: 28
           ints: 0
-          ints: 29
+          ints: 0
+          ints: 31
           ints: 0
           ints: 0
-          ints: 32
-          ints: 33
           ints: 34
           ints: 0
           ints: 36
+          ints: 37
           ints: 0
-          ints: 38
           ints: 0
           ints: 0
           ints: 41
-          ints: 42
-          ints: 43
-          ints: 0
-          ints: 0
-          ints: 46
-          ints: 0
-          ints: 0
-          ints: 49
-          ints: 50
-          ints: 0
-          ints: 0
-          ints: 53
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 57
-          ints: 58
-          ints: 0
-          ints: 60
-          ints: 0
-          ints: 0
-          ints: 63
-          ints: 64
-          ints: 65
-          ints: 66
-          ints: 0
-          ints: 68
-          ints: 0
-          ints: 0
-          ints: 71
-          ints: 72
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 76
-          ints: 77
-          ints: 78
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 82
-          ints: 83
-          ints: 0
-          ints: 0
-          ints: 86
-          ints: 0
-          ints: 0
-          ints: 89
-          ints: 90
-          ints: 0
-          ints: 0
-          ints: 93
-          ints: 94
-          ints: 95
-          ints: 0
-          ints: 0
           ints: 0
           ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_values"
-          floats: 2.71322227
-          floats: 1.03907096
-          floats: -4.18209648
-          floats: -3.5346272
-          floats: -3.83864307
-          floats: -5.56761122
+          floats: -4.91437864
+          floats: -5.5100522
+          floats: 0
+          floats: -5.24938059
           floats: 0
           floats: 0
-          floats: -4.26642227
+          floats: 2.12062478
+          floats: 11.1905489
+          floats: -4.31129265
+          floats: -4.75225878
+          floats: -4.76837587
           floats: 0
           floats: 0
-          floats: -1.95087612
-          floats: -4.71015692
-          floats: -5.37310076
+          floats: -4.45826435
+          floats: 0
+          floats: 6.03335953
           floats: 0
           floats: 0
-          floats: -4.61523771
+          floats: -0.714648902
+          floats: -3.90312386
+          floats: 6.56421041
           floats: 0
           floats: 0
-          floats: -5.78396
-          floats: -6.71628666
+          floats: 9.1439209
           floats: 0
           floats: 0
-          floats: -5.47960949
+          floats: 6.19892
+          floats: 2.33801
           floats: 0
           floats: 0
-          floats: -3.93837905
-          floats: 0
-          floats: -1.65389729
+          floats: -0.6312446
           floats: 0
           floats: 0
-          floats: 8.10906315
-          floats: -4.55496264
-          floats: -6.38563442
+          floats: -2.43172026
           floats: 0
-          floats: -5.19657
-          floats: 0
-          floats: 7.30478334
-          floats: 0
-          floats: 0
-          floats: -3.21892309
-          floats: -3.67675185
-          floats: -4.42827749
-          floats: 0
-          floats: 0
-          floats: 5.24977255
-          floats: 0
-          floats: 0
-          floats: 6.48864412
-          floats: 6.15042925
-          floats: 0
-          floats: 0
-          floats: 7.20358706
+          floats: -1.81629825
+          floats: -2.02227831
           floats: 0
           floats: 0
           floats: 0
-          floats: 7.31717682
-          floats: 5.47103405
-          floats: 0
-          floats: 7.02973223
-          floats: 0
-          floats: 0
-          floats: 6.55216742
-          floats: 9.5009861
-          floats: 5.81129169
-          floats: 4.40493965
-          floats: 0
-          floats: 4.89769173
-          floats: 0
-          floats: 0
-          floats: 8.99491119
-          floats: 6.41850281
-          floats: 0
-          floats: 0
-          floats: 0
-          floats: 5.87745523
-          floats: 5.26500607
-          floats: 10.7930603
-          floats: 0
-          floats: 0
-          floats: 0
-          floats: 10.2665377
-          floats: 6.05230236
-          floats: 0
-          floats: 0
-          floats: 10.8009777
-          floats: 0
-          floats: 0
-          floats: 6.69080067
-          floats: 9.14468575
-          floats: 0
-          floats: 0
-          floats: 7.25322294
-          floats: 7.00766134
-          floats: 6.98903799
-          floats: 0
-          floats: 0
+          floats: 2.43460631
           floats: 0
           floats: 0
           type: FLOATS
@@ -1121,88 +617,32 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           type: INTS
         }
         attribute {
           name: "target_nodeids"
-          ints: 6
-          ints: 7
-          ints: 9
-          ints: 10
+          ints: 2
+          ints: 4
+          ints: 5
+          ints: 11
+          ints: 12
           ints: 14
-          ints: 15
+          ints: 16
           ints: 17
-          ints: 18
           ints: 21
           ints: 22
           ints: 24
           ints: 25
-          ints: 27
+          ints: 28
           ints: 29
-          ints: 30
+          ints: 31
+          ints: 32
           ints: 34
-          ints: 36
+          ints: 37
           ints: 38
           ints: 39
-          ints: 43
-          ints: 44
-          ints: 46
-          ints: 47
-          ints: 50
-          ints: 51
-          ints: 53
-          ints: 54
-          ints: 55
-          ints: 58
-          ints: 60
-          ints: 61
-          ints: 66
-          ints: 68
-          ints: 69
-          ints: 72
-          ints: 73
-          ints: 74
-          ints: 78
-          ints: 79
-          ints: 80
-          ints: 83
-          ints: 84
-          ints: 86
-          ints: 87
-          ints: 90
-          ints: 91
-          ints: 95
-          ints: 96
-          ints: 97
-          ints: 98
+          ints: 41
+          ints: 42
           type: INTS
         }
         attribute {
@@ -1229,88 +669,32 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           type: INTS
         }
         attribute {
           name: "target_weights"
-          floats: 6
-          floats: 7
-          floats: 9
-          floats: 10
+          floats: 2
+          floats: 4
+          floats: 5
+          floats: 11
+          floats: 12
           floats: 14
-          floats: 15
+          floats: 16
           floats: 17
-          floats: 18
           floats: 21
           floats: 22
           floats: 24
           floats: 25
-          floats: 27
+          floats: 28
           floats: 29
-          floats: 30
+          floats: 31
+          floats: 32
           floats: 34
-          floats: 36
+          floats: 37
           floats: 38
           floats: 39
-          floats: 43
-          floats: 44
-          floats: 46
-          floats: 47
-          floats: 50
-          floats: 51
-          floats: 53
-          floats: 54
-          floats: 55
-          floats: 58
-          floats: 60
-          floats: 61
-          floats: 66
-          floats: 68
-          floats: 69
-          floats: 72
-          floats: 73
-          floats: 74
-          floats: 78
-          floats: 79
-          floats: 80
-          floats: 83
-          floats: 84
-          floats: 86
-          floats: 87
-          floats: 90
-          floats: 91
-          floats: 95
-          floats: 96
-          floats: 97
-          floats: 98
+          floats: 41
+          floats: 42
           type: FLOATS
         }
         domain: "ai.onnx.ml"
@@ -1351,33 +735,33 @@ ONNX
         }
         attribute {
           name: "nodes_falsenodeids"
-          ints: 48
-          ints: 15
+          ints: 20
+          ints: 19
           ints: 6
           ints: 5
           ints: 0
           ints: 0
-          ints: 14
+          ints: 12
+          ints: 9
+          ints: 0
           ints: 11
-          ints: 10
           ints: 0
           ints: 0
-          ints: 13
+          ints: 14
+          ints: 0
+          ints: 16
+          ints: 0
+          ints: 18
           ints: 0
           ints: 0
           ints: 0
+          ints: 64
           ints: 37
-          ints: 26
-          ints: 23
-          ints: 22
-          ints: 21
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 25
-          ints: 0
-          ints: 0
           ints: 34
+          ints: 27
+          ints: 26
+          ints: 0
+          ints: 0
           ints: 31
           ints: 30
           ints: 0
@@ -1388,51 +772,31 @@ ONNX
           ints: 36
           ints: 0
           ints: 0
-          ints: 39
+          ints: 53
+          ints: 46
+          ints: 43
+          ints: 42
+          ints: 0
           ints: 0
           ints: 45
-          ints: 44
-          ints: 43
           ints: 0
           ints: 0
+          ints: 50
+          ints: 49
           ints: 0
-          ints: 47
           ints: 0
-          ints: 0
-          ints: 62
-          ints: 61
-          ints: 60
-          ints: 53
-          ints: 0
-          ints: 57
-          ints: 56
+          ints: 52
           ints: 0
           ints: 0
           ints: 59
+          ints: 58
+          ints: 57
           ints: 0
           ints: 0
           ints: 0
+          ints: 61
           ints: 0
-          ints: 70
-          ints: 67
-          ints: 66
-          ints: 0
-          ints: 0
-          ints: 69
-          ints: 0
-          ints: 0
-          ints: 84
-          ints: 77
-          ints: 76
-          ints: 75
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 81
-          ints: 80
-          ints: 0
-          ints: 0
-          ints: 83
+          ints: 63
           ints: 0
           ints: 0
           ints: 0
@@ -1443,12 +807,6 @@ ONNX
           ints: 0
           ints: 1
           ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -1463,16 +821,12 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 1
           ints: 0
           ints: 0
           ints: 0
-          ints: 0
-          ints: 1
           ints: 0
           ints: 0
           ints: 1
-          ints: 0
           ints: 0
           ints: 1
           ints: 0
@@ -1490,20 +844,6 @@ ONNX
           ints: 0
           ints: 1
           ints: 1
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
           ints: 0
           ints: 0
           ints: 0
@@ -1518,8 +858,12 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
+          ints: 1
+          ints: 1
           ints: 0
           ints: 0
+          ints: 0
+          ints: 1
           ints: 0
           ints: 0
           ints: 0
@@ -1529,26 +873,6 @@ ONNX
         }
         attribute {
           name: "nodes_hitrates"
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
           floats: 1
           floats: 1
           floats: 1
@@ -1683,26 +1007,6 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           type: INTS
         }
         attribute {
@@ -1715,31 +1019,6 @@ ONNX
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
@@ -1747,30 +1026,22 @@ ONNX
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "LEAF"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
@@ -1783,10 +1054,23 @@ ONNX
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
@@ -1861,50 +1145,10 @@ ONNX
           ints: 62
           ints: 63
           ints: 64
-          ints: 65
-          ints: 66
-          ints: 67
-          ints: 68
-          ints: 69
-          ints: 70
-          ints: 71
-          ints: 72
-          ints: 73
-          ints: 74
-          ints: 75
-          ints: 76
-          ints: 77
-          ints: 78
-          ints: 79
-          ints: 80
-          ints: 81
-          ints: 82
-          ints: 83
-          ints: 84
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -1982,25 +1226,25 @@ ONNX
           ints: 0
           ints: 7
           ints: 8
-          ints: 9
+          ints: 0
+          ints: 10
           ints: 0
           ints: 0
-          ints: 12
+          ints: 13
           ints: 0
+          ints: 15
           ints: 0
-          ints: 0
-          ints: 16
           ints: 17
-          ints: 18
-          ints: 19
-          ints: 20
           ints: 0
           ints: 0
           ints: 0
+          ints: 21
+          ints: 22
+          ints: 23
           ints: 24
+          ints: 25
           ints: 0
           ints: 0
-          ints: 27
           ints: 28
           ints: 29
           ints: 0
@@ -2012,50 +1256,30 @@ ONNX
           ints: 0
           ints: 0
           ints: 38
-          ints: 0
+          ints: 39
           ints: 40
           ints: 41
-          ints: 42
           ints: 0
           ints: 0
+          ints: 44
           ints: 0
-          ints: 46
+          ints: 0
+          ints: 47
+          ints: 48
           ints: 0
           ints: 0
-          ints: 49
-          ints: 50
           ints: 51
-          ints: 52
+          ints: 0
           ints: 0
           ints: 54
           ints: 55
-          ints: 0
-          ints: 0
-          ints: 58
-          ints: 0
+          ints: 56
           ints: 0
           ints: 0
           ints: 0
-          ints: 63
-          ints: 64
-          ints: 65
+          ints: 60
           ints: 0
-          ints: 0
-          ints: 68
-          ints: 0
-          ints: 0
-          ints: 71
-          ints: 72
-          ints: 73
-          ints: 74
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 78
-          ints: 79
-          ints: 0
-          ints: 0
-          ints: 82
+          ints: 62
           ints: 0
           ints: 0
           ints: 0
@@ -2063,88 +1287,68 @@ ONNX
         }
         attribute {
           name: "nodes_values"
-          floats: -0.00189737475
-          floats: -6.72443199
-          floats: -2.99551105
-          floats: -6.96214581
+          floats: -4.13174248
+          floats: 8.62347698
+          floats: -5.17501211
+          floats: -5.86771631
           floats: 0
           floats: 0
-          floats: -0.98436594
-          floats: -7.46575165
-          floats: -2.26513195
+          floats: -4.50546074
+          floats: -4.93615389
+          floats: 0
+          floats: -4.76907063
           floats: 0
           floats: 0
-          floats: -2.53663731
+          floats: 5.71810293
           floats: 0
+          floats: -4.37862825
           floats: 0
-          floats: 0
-          floats: -1.83991909
-          floats: -3.25844979
-          floats: -3.44922
-          floats: -4.16725397
-          floats: -3.81657362
+          floats: -4.19817543
           floats: 0
           floats: 0
           floats: 0
-          floats: -5.26258659
+          floats: 2.5238018
+          floats: -2.90020013
+          floats: 9.84431553
+          floats: -3.83820748
+          floats: 6.87787867
           floats: 0
           floats: 0
-          floats: -1.98751342
-          floats: -2.5949719
-          floats: -4.45225239
+          floats: -3.7140789
+          floats: -3.76325393
           floats: 0
           floats: 0
-          floats: -6.18131924
+          floats: 7.59524107
           floats: 0
           floats: 0
-          floats: -5.19938135
+          floats: -3.17346501
           floats: 0
           floats: 0
-          floats: -1.76028526
-          floats: 0
-          floats: -1.21635449
-          floats: -1.31103992
-          floats: -3.62792015
-          floats: 0
+          floats: -1.81719685
+          floats: 7.73759
+          floats: 6.62668419
+          floats: -2.2911129
           floats: 0
           floats: 0
-          floats: -0.923936367
+          floats: 6.84645224
           floats: 0
           floats: 0
-          floats: 3.87805319
-          floats: 2.98039031
-          floats: -2.51134205
-          floats: 4.61813164
-          floats: 0
-          floats: 5.40448189
-          floats: -3.40265656
+          floats: 9.51551819
+          floats: -2.26091146
           floats: 0
           floats: 0
-          floats: 6.78415918
+          floats: -1.88877606
           floats: 0
           floats: 0
-          floats: 0
-          floats: 0
-          floats: 7.48344469
-          floats: 6.28721619
-          floats: 6.97653913
-          floats: 0
-          floats: 0
-          floats: 6.46694
-          floats: 0
-          floats: 0
-          floats: 7.14360476
-          floats: 8.25683
-          floats: 8.07404137
-          floats: 7.67820549
+          floats: 0.38286528
+          floats: 11.0070925
+          floats: 2.20380831
           floats: 0
           floats: 0
           floats: 0
-          floats: 10.4134054
-          floats: 9.2918787
+          floats: 1.63472724
           floats: 0
-          floats: 0
-          floats: 11.2974024
+          floats: 1.20069849
           floats: 0
           floats: 0
           floats: 0
@@ -2190,77 +1394,47 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           type: INTS
         }
         attribute {
           name: "target_nodeids"
           ints: 4
           ints: 5
-          ints: 9
+          ints: 8
           ints: 10
-          ints: 12
+          ints: 11
           ints: 13
-          ints: 14
-          ints: 20
-          ints: 21
-          ints: 22
-          ints: 24
+          ints: 15
+          ints: 17
+          ints: 18
+          ints: 19
           ints: 25
+          ints: 26
           ints: 29
           ints: 30
           ints: 32
           ints: 33
           ints: 35
           ints: 36
-          ints: 38
+          ints: 41
           ints: 42
-          ints: 43
           ints: 44
-          ints: 46
-          ints: 47
+          ints: 45
+          ints: 48
+          ints: 49
+          ints: 51
           ints: 52
-          ints: 55
           ints: 56
+          ints: 57
           ints: 58
-          ints: 59
           ints: 60
-          ints: 61
-          ints: 65
-          ints: 66
-          ints: 68
-          ints: 69
-          ints: 74
-          ints: 75
-          ints: 76
-          ints: 79
-          ints: 80
-          ints: 82
-          ints: 83
-          ints: 84
+          ints: 62
+          ints: 63
+          ints: 64
           type: INTS
         }
         attribute {
           name: "target_treeids"
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -2300,47 +1474,37 @@ ONNX
           name: "target_weights"
           floats: 4
           floats: 5
-          floats: 9
+          floats: 8
           floats: 10
-          floats: 12
+          floats: 11
           floats: 13
-          floats: 14
-          floats: 20
-          floats: 21
-          floats: 22
-          floats: 24
+          floats: 15
+          floats: 17
+          floats: 18
+          floats: 19
           floats: 25
+          floats: 26
           floats: 29
           floats: 30
           floats: 32
           floats: 33
           floats: 35
           floats: 36
-          floats: 38
+          floats: 41
           floats: 42
-          floats: 43
           floats: 44
-          floats: 46
-          floats: 47
+          floats: 45
+          floats: 48
+          floats: 49
+          floats: 51
           floats: 52
-          floats: 55
           floats: 56
+          floats: 57
           floats: 58
-          floats: 59
           floats: 60
-          floats: 61
-          floats: 65
-          floats: 66
-          floats: 68
-          floats: 69
-          floats: 74
-          floats: 75
-          floats: 76
-          floats: 79
-          floats: 80
-          floats: 82
-          floats: 83
-          floats: 84
+          floats: 62
+          floats: 63
+          floats: 64
           type: FLOATS
         }
         domain: "ai.onnx.ml"
@@ -2357,29 +1521,29 @@ ONNX
         }
         attribute {
           name: "nodes_falsenodeids"
-          ints: 6
-          ints: 5
-          ints: 4
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 14
-          ints: 13
-          ints: 10
-          ints: 0
-          ints: 12
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 18
-          ints: 17
-          ints: 0
-          ints: 0
           ints: 32
-          ints: 25
-          ints: 24
-          ints: 23
+          ints: 3
           ints: 0
+          ints: 9
+          ints: 6
+          ints: 0
+          ints: 8
+          ints: 0
+          ints: 0
+          ints: 17
+          ints: 16
+          ints: 15
+          ints: 14
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 25
+          ints: 22
+          ints: 21
+          ints: 0
+          ints: 0
+          ints: 24
           ints: 0
           ints: 0
           ints: 29
@@ -2389,22 +1553,93 @@ ONNX
           ints: 31
           ints: 0
           ints: 0
+          ints: 72
+          ints: 61
+          ints: 50
+          ints: 43
           ints: 40
-          ints: 37
-          ints: 36
-          ints: 0
-          ints: 0
           ints: 39
           ints: 0
           ints: 0
           ints: 42
           ints: 0
           ints: 0
+          ints: 47
+          ints: 46
+          ints: 0
+          ints: 0
+          ints: 49
+          ints: 0
+          ints: 0
+          ints: 58
+          ints: 55
+          ints: 54
+          ints: 0
+          ints: 0
+          ints: 57
+          ints: 0
+          ints: 0
+          ints: 60
+          ints: 0
+          ints: 0
+          ints: 71
+          ints: 70
+          ints: 67
+          ints: 66
+          ints: 0
+          ints: 0
+          ints: 69
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 80
+          ints: 79
+          ints: 78
+          ints: 77
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 84
+          ints: 83
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_featureids"
+          ints: 1
           ints: 0
+          ints: 0
+          ints: 1
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 1
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 1
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 1
           ints: 0
           ints: 0
           ints: 0
@@ -2418,17 +1653,6 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 1
-          ints: 0
-          ints: 0
-          ints: 0
           ints: 0
           ints: 1
           ints: 0
@@ -2444,13 +1668,79 @@ ONNX
           ints: 1
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 1
+          ints: 1
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 1
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 1
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_hitrates"
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
           floats: 1
           floats: 1
           floats: 1
@@ -2541,25 +1831,58 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_modes"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
           strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
@@ -2569,12 +1892,6 @@ ONNX
           strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
-          strings: "BRANCH_LEQ"
-          strings: "LEAF"
-          strings: "LEAF"
-          strings: "BRANCH_LEQ"
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
@@ -2586,6 +1903,63 @@ ONNX
           strings: "LEAF"
           strings: "LEAF"
           strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "LEAF"
+          strings: "BRANCH_LEQ"
+          strings: "BRANCH_LEQ"
+          strings: "LEAF"
           strings: "LEAF"
           strings: "LEAF"
           type: STRINGS
@@ -2635,10 +2009,94 @@ ONNX
           ints: 40
           ints: 41
           ints: 42
+          ints: 43
+          ints: 44
+          ints: 45
+          ints: 46
+          ints: 47
+          ints: 48
+          ints: 49
+          ints: 50
+          ints: 51
+          ints: 52
+          ints: 53
+          ints: 54
+          ints: 55
+          ints: 56
+          ints: 57
+          ints: 58
+          ints: 59
+          ints: 60
+          ints: 61
+          ints: 62
+          ints: 63
+          ints: 64
+          ints: 65
+          ints: 66
+          ints: 67
+          ints: 68
+          ints: 69
+          ints: 70
+          ints: 71
+          ints: 72
+          ints: 73
+          ints: 74
+          ints: 75
+          ints: 76
+          ints: 77
+          ints: 78
+          ints: 79
+          ints: 80
+          ints: 81
+          ints: 82
+          ints: 83
+          ints: 84
           type: INTS
         }
         attribute {
           name: "nodes_treeids"
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           ints: 0
           ints: 0
           ints: 0
@@ -2688,27 +2146,27 @@ ONNX
           name: "nodes_truenodeids"
           ints: 1
           ints: 2
-          ints: 3
           ints: 0
-          ints: 0
+          ints: 4
+          ints: 5
           ints: 0
           ints: 7
-          ints: 8
-          ints: 9
           ints: 0
+          ints: 0
+          ints: 10
           ints: 11
+          ints: 12
+          ints: 13
           ints: 0
           ints: 0
           ints: 0
-          ints: 15
-          ints: 16
           ints: 0
-          ints: 0
+          ints: 18
           ints: 19
           ints: 20
-          ints: 21
-          ints: 22
           ints: 0
+          ints: 0
+          ints: 23
           ints: 0
           ints: 0
           ints: 26
@@ -2721,59 +2179,143 @@ ONNX
           ints: 33
           ints: 34
           ints: 35
-          ints: 0
-          ints: 0
+          ints: 36
+          ints: 37
           ints: 38
           ints: 0
           ints: 0
           ints: 41
           ints: 0
           ints: 0
+          ints: 44
+          ints: 45
+          ints: 0
+          ints: 0
+          ints: 48
+          ints: 0
+          ints: 0
+          ints: 51
+          ints: 52
+          ints: 53
+          ints: 0
+          ints: 0
+          ints: 56
+          ints: 0
+          ints: 0
+          ints: 59
+          ints: 0
+          ints: 0
+          ints: 62
+          ints: 63
+          ints: 64
+          ints: 65
+          ints: 0
+          ints: 0
+          ints: 68
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 73
+          ints: 74
+          ints: 75
+          ints: 76
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 81
+          ints: 82
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
           name: "nodes_values"
-          floats: -3.99814153
-          floats: -4.30216312
-          floats: -4.42691326
+          floats: 4.39543915
+          floats: -3.1974
+          floats: 0
+          floats: 1.53005695
+          floats: 1.25531924
+          floats: 0
+          floats: 0.46847403
+          floats: 0
+          floats: 0
+          floats: 3.20477152
+          floats: 2.84214711
+          floats: 2.54921579
+          floats: 1.57987797
           floats: 0
           floats: 0
           floats: 0
-          floats: -6.90890932
-          floats: -2.23926091
-          floats: -7.51920843
           floats: 0
-          floats: -3.17204237
-          floats: 0
+          floats: 3.647861
+          floats: 3.41221929
+          floats: 3.32649326
           floats: 0
           floats: 0
-          floats: -6.63599539
-          floats: -2.03491879
+          floats: 3.47843742
           floats: 0
           floats: 0
-          floats: 0.931200206
-          floats: 4.53333521
-          floats: 2.15905
-          floats: -6.23600483
+          floats: 3.83744454
+          floats: 1.76698327
+          floats: 0
+          floats: 0
+          floats: 3.95678949
+          floats: 0
+          floats: 0
+          floats: -1.15621173
+          floats: -2.27936578
+          floats: -3.42832732
+          floats: 7.02152824
+          floats: -3.90729976
+          floats: 5.64085293
+          floats: 0
+          floats: 0
+          floats: -3.81152844
+          floats: 0
+          floats: 0
+          floats: -3.85145426
+          floats: 9.51444435
+          floats: 0
+          floats: 0
+          floats: 8.04163361
+          floats: 0
+          floats: 0
+          floats: -2.33718634
+          floats: 7.01655674
+          floats: 5.76514
+          floats: 0
+          floats: 0
+          floats: 8.78447056
+          floats: 0
+          floats: 0
+          floats: -2.33011413
+          floats: 0
+          floats: 0
+          floats: -1.36622953
+          floats: 11.9991589
+          floats: 8.1781
+          floats: 7.19285107
+          floats: 0
+          floats: 0
+          floats: 11.1368809
           floats: 0
           floats: 0
           floats: 0
-          floats: 6.61726952
-          floats: -2.50484395
+          floats: 0
+          floats: 5.14858866
+          floats: 4.61073971
+          floats: 0.295421958
+          floats: 4.4874
           floats: 0
           floats: 0
-          floats: -3.28250146
           floats: 0
           floats: 0
-          floats: 11.1687851
-          floats: 4.66552639
-          floats: 4.4671979
+          floats: 10.6296263
+          floats: -0.897378743
           floats: 0
-          floats: 0
-          floats: 6.76898813
-          floats: 0
-          floats: 0
-          floats: 4.67077875
           floats: 0
           floats: 0
           type: FLOATS
@@ -2807,32 +2349,74 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
           name: "target_nodeids"
-          ints: 3
-          ints: 4
+          ints: 2
           ints: 5
-          ints: 9
-          ints: 11
-          ints: 12
+          ints: 7
+          ints: 8
           ints: 13
+          ints: 14
+          ints: 15
           ints: 16
-          ints: 17
-          ints: 22
+          ints: 20
+          ints: 21
           ints: 23
           ints: 24
           ints: 27
           ints: 28
           ints: 30
           ints: 31
-          ints: 35
-          ints: 36
           ints: 38
           ints: 39
           ints: 41
           ints: 42
+          ints: 45
+          ints: 46
+          ints: 48
+          ints: 49
+          ints: 53
+          ints: 54
+          ints: 56
+          ints: 57
+          ints: 59
+          ints: 60
+          ints: 65
+          ints: 66
+          ints: 68
+          ints: 69
+          ints: 70
+          ints: 71
+          ints: 76
+          ints: 77
+          ints: 78
+          ints: 79
+          ints: 82
+          ints: 83
+          ints: 84
           type: INTS
         }
         attribute {
@@ -2859,32 +2443,74 @@ ONNX
           ints: 0
           ints: 0
           ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
+          ints: 0
           type: INTS
         }
         attribute {
           name: "target_weights"
-          floats: 3
-          floats: 4
+          floats: 2
           floats: 5
-          floats: 9
-          floats: 11
-          floats: 12
+          floats: 7
+          floats: 8
           floats: 13
+          floats: 14
+          floats: 15
           floats: 16
-          floats: 17
-          floats: 22
+          floats: 20
+          floats: 21
           floats: 23
           floats: 24
           floats: 27
           floats: 28
           floats: 30
           floats: 31
-          floats: 35
-          floats: 36
           floats: 38
           floats: 39
           floats: 41
           floats: 42
+          floats: 45
+          floats: 46
+          floats: 48
+          floats: 49
+          floats: 53
+          floats: 54
+          floats: 56
+          floats: 57
+          floats: 59
+          floats: 60
+          floats: 65
+          floats: 66
+          floats: 68
+          floats: 69
+          floats: 70
+          floats: 71
+          floats: 76
+          floats: 77
+          floats: 78
+          floats: 79
+          floats: 82
+          floats: 83
+          floats: 84
           type: FLOATS
         }
         domain: "ai.onnx.ml"
@@ -2944,355 +2570,24 @@ ONNX
         op_type: "LabelEncoder"
         attribute {
           name: "keys_int64s"
-          ints: 6
-          ints: 7
-          ints: 9
-          ints: 10
-          ints: 14
-          ints: 15
-          ints: 17
-          ints: 18
-          ints: 21
-          ints: 22
-          ints: 24
-          ints: 25
-          ints: 27
-          ints: 29
-          ints: 30
-          ints: 34
-          ints: 36
-          ints: 38
-          ints: 39
-          ints: 43
-          ints: 44
-          ints: 46
-          ints: 47
-          ints: 50
-          ints: 51
-          ints: 53
-          ints: 54
-          ints: 55
-          ints: 58
-          ints: 60
-          ints: 61
-          ints: 66
-          ints: 68
-          ints: 69
-          ints: 72
-          ints: 73
-          ints: 74
-          ints: 78
-          ints: 79
-          ints: 80
-          ints: 83
-          ints: 84
-          ints: 86
-          ints: 87
-          ints: 90
-          ints: 91
-          ints: 95
-          ints: 96
-          ints: 97
-          ints: 98
-          type: INTS
-        }
-        attribute {
-          name: "values_floats"
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 12
-          floats: 6
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 3
-          floats: 2
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 8
-          floats: 2
-          floats: 1
-          floats: 8
-          floats: 2
-          floats: 3
-          floats: 2
-          floats: 1
-          floats: 2
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 2
-          floats: 5
-          floats: 3
-          floats: 1
-          floats: 1
-          floats: 2
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 4
-          floats: 1
-          floats: 1
-          floats: 1
-          type: FLOATS
-        }
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "path_length0_output0"
-        output: "path_length0_Y0"
-        name: "path_length0_LabelEncoder"
-        op_type: "LabelEncoder"
-        attribute {
-          name: "keys_int64s"
-          ints: 6
-          ints: 7
-          ints: 9
-          ints: 10
-          ints: 14
-          ints: 15
-          ints: 17
-          ints: 18
-          ints: 21
-          ints: 22
-          ints: 24
-          ints: 25
-          ints: 27
-          ints: 29
-          ints: 30
-          ints: 34
-          ints: 36
-          ints: 38
-          ints: 39
-          ints: 43
-          ints: 44
-          ints: 46
-          ints: 47
-          ints: 50
-          ints: 51
-          ints: 53
-          ints: 54
-          ints: 55
-          ints: 58
-          ints: 60
-          ints: 61
-          ints: 66
-          ints: 68
-          ints: 69
-          ints: 72
-          ints: 73
-          ints: 74
-          ints: 78
-          ints: 79
-          ints: 80
-          ints: 83
-          ints: 84
-          ints: 86
-          ints: 87
-          ints: 90
-          ints: 91
-          ints: 95
-          ints: 96
-          ints: 97
-          ints: 98
-          type: INTS
-        }
-        attribute {
-          name: "values_floats"
-          floats: 7
-          floats: 7
-          floats: 7
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 5
-          floats: 6
-          floats: 6
-          floats: 6
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 4
-          floats: 4
-          floats: 5
-          floats: 5
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 6
-          floats: 6
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 6
-          type: FLOATS
-        }
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "node_sample1_output02"
-        output: "node_sample1_Y02"
-        name: "node_sample1_LabelEncoder"
-        op_type: "LabelEncoder"
-        attribute {
-          name: "keys_int64s"
+          ints: 2
           ints: 4
           ints: 5
-          ints: 9
-          ints: 10
-          ints: 12
-          ints: 13
-          ints: 14
-          ints: 20
-          ints: 21
-          ints: 22
-          ints: 24
-          ints: 25
-          ints: 29
-          ints: 30
-          ints: 32
-          ints: 33
-          ints: 35
-          ints: 36
-          ints: 38
-          ints: 42
-          ints: 43
-          ints: 44
-          ints: 46
-          ints: 47
-          ints: 52
-          ints: 55
-          ints: 56
-          ints: 58
-          ints: 59
-          ints: 60
-          ints: 61
-          ints: 65
-          ints: 66
-          ints: 68
-          ints: 69
-          ints: 74
-          ints: 75
-          ints: 76
-          ints: 79
-          ints: 80
-          ints: 82
-          ints: 83
-          ints: 84
-          type: INTS
-        }
-        attribute {
-          name: "values_floats"
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 2
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 6
-          floats: 1
-          floats: 1
-          floats: 5
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 16
-          floats: 13
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 1
-          floats: 2
-          floats: 1
-          floats: 12
-          floats: 7
-          floats: 3
-          floats: 1
-          floats: 1
-          type: FLOATS
-        }
-        domain: "ai.onnx.ml"
-      }
-      node {
-        input: "node_sample2_output02"
-        output: "node_sample2_Y02"
-        name: "node_sample2_LabelEncoder"
-        op_type: "LabelEncoder"
-        attribute {
-          name: "keys_int64s"
-          ints: 3
-          ints: 4
-          ints: 5
-          ints: 9
           ints: 11
           ints: 12
-          ints: 13
+          ints: 14
           ints: 16
           ints: 17
+          ints: 21
           ints: 22
-          ints: 23
           ints: 24
-          ints: 27
+          ints: 25
           ints: 28
-          ints: 30
+          ints: 29
           ints: 31
-          ints: 35
-          ints: 36
+          ints: 32
+          ints: 34
+          ints: 37
           ints: 38
           ints: 39
           ints: 41
@@ -3310,17 +2605,258 @@ ONNX
           floats: 1
           floats: 1
           floats: 1
-          floats: 2
-          floats: 23
-          floats: 1
-          floats: 17
-          floats: 1
+          floats: 3
+          floats: 31
+          floats: 18
           floats: 11
+          floats: 20
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          type: FLOATS
+        }
+        domain: "ai.onnx.ml"
+      }
+      node {
+        input: "path_length0_output0"
+        output: "path_length0_Y0"
+        name: "path_length0_LabelEncoder"
+        op_type: "LabelEncoder"
+        attribute {
+          name: "keys_int64s"
+          ints: 2
+          ints: 4
+          ints: 5
+          ints: 11
+          ints: 12
+          ints: 14
+          ints: 16
+          ints: 17
+          ints: 21
+          ints: 22
+          ints: 24
+          ints: 25
+          ints: 28
+          ints: 29
+          ints: 31
+          ints: 32
+          ints: 34
+          ints: 37
+          ints: 38
+          ints: 39
+          ints: 41
+          ints: 42
+          type: INTS
+        }
+        attribute {
+          name: "values_floats"
+          floats: 3
+          floats: 4
+          floats: 4
+          floats: 7
+          floats: 7
+          floats: 7
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 5
+          floats: 7
+          floats: 7
+          floats: 6
+          floats: 4
+          floats: 4
+          type: FLOATS
+        }
+        domain: "ai.onnx.ml"
+      }
+      node {
+        input: "node_sample1_output02"
+        output: "node_sample1_Y02"
+        name: "node_sample1_LabelEncoder"
+        op_type: "LabelEncoder"
+        attribute {
+          name: "keys_int64s"
+          ints: 4
+          ints: 5
+          ints: 8
+          ints: 10
+          ints: 11
+          ints: 13
+          ints: 15
+          ints: 17
+          ints: 18
+          ints: 19
+          ints: 25
+          ints: 26
+          ints: 29
+          ints: 30
+          ints: 32
+          ints: 33
+          ints: 35
+          ints: 36
+          ints: 41
+          ints: 42
+          ints: 44
+          ints: 45
+          ints: 48
+          ints: 49
+          ints: 51
+          ints: 52
+          ints: 56
+          ints: 57
+          ints: 58
+          ints: 60
+          ints: 62
+          ints: 63
+          ints: 64
+          type: INTS
+        }
+        attribute {
+          name: "values_floats"
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 2
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
           floats: 3
           floats: 2
+          floats: 5
           floats: 1
-          floats: 22
-          floats: 6
+          floats: 1
+          floats: 8
+          floats: 1
+          floats: 1
+          floats: 2
+          floats: 5
+          floats: 2
+          floats: 11
+          floats: 1
+          floats: 4
+          floats: 21
+          floats: 1
+          floats: 1
+          floats: 11
+          floats: 4
+          floats: 1
+          type: FLOATS
+        }
+        domain: "ai.onnx.ml"
+      }
+      node {
+        input: "node_sample2_output02"
+        output: "node_sample2_Y02"
+        name: "node_sample2_LabelEncoder"
+        op_type: "LabelEncoder"
+        attribute {
+          name: "keys_int64s"
+          ints: 2
+          ints: 5
+          ints: 7
+          ints: 8
+          ints: 13
+          ints: 14
+          ints: 15
+          ints: 16
+          ints: 20
+          ints: 21
+          ints: 23
+          ints: 24
+          ints: 27
+          ints: 28
+          ints: 30
+          ints: 31
+          ints: 38
+          ints: 39
+          ints: 41
+          ints: 42
+          ints: 45
+          ints: 46
+          ints: 48
+          ints: 49
+          ints: 53
+          ints: 54
+          ints: 56
+          ints: 57
+          ints: 59
+          ints: 60
+          ints: 65
+          ints: 66
+          ints: 68
+          ints: 69
+          ints: 70
+          ints: 71
+          ints: 76
+          ints: 77
+          ints: 78
+          ints: 79
+          ints: 82
+          ints: 83
+          ints: 84
+          type: INTS
+        }
+        attribute {
+          name: "values_floats"
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 10
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 2
+          floats: 2
+          floats: 1
+          floats: 2
+          floats: 3
+          floats: 3
+          floats: 4
+          floats: 1
+          floats: 2
+          floats: 3
+          floats: 1
+          floats: 1
+          floats: 2
+          floats: 2
+          floats: 10
+          floats: 5
+          floats: 11
+          floats: 1
+          floats: 1
+          floats: 2
+          floats: 1
+          floats: 9
+          floats: 2
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
+          floats: 1
           floats: 1
           floats: 1
           type: FLOATS
@@ -3336,94 +2872,74 @@ ONNX
           name: "keys_int64s"
           ints: 4
           ints: 5
-          ints: 9
+          ints: 8
           ints: 10
-          ints: 12
+          ints: 11
           ints: 13
-          ints: 14
-          ints: 20
-          ints: 21
-          ints: 22
-          ints: 24
+          ints: 15
+          ints: 17
+          ints: 18
+          ints: 19
           ints: 25
+          ints: 26
           ints: 29
           ints: 30
           ints: 32
           ints: 33
           ints: 35
           ints: 36
-          ints: 38
+          ints: 41
           ints: 42
-          ints: 43
           ints: 44
-          ints: 46
-          ints: 47
+          ints: 45
+          ints: 48
+          ints: 49
+          ints: 51
           ints: 52
-          ints: 55
           ints: 56
+          ints: 57
           ints: 58
-          ints: 59
           ints: 60
-          ints: 61
-          ints: 65
-          ints: 66
-          ints: 68
-          ints: 69
-          ints: 74
-          ints: 75
-          ints: 76
-          ints: 79
-          ints: 80
-          ints: 82
-          ints: 83
-          ints: 84
+          ints: 62
+          ints: 63
+          ints: 64
           type: INTS
         }
         attribute {
           name: "values_floats"
           floats: 5
           floats: 5
-          floats: 7
-          floats: 7
-          floats: 7
-          floats: 7
-          floats: 5
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 7
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 7
-          floats: 5
-          floats: 8
-          floats: 8
-          floats: 7
+          floats: 6
           floats: 7
           floats: 7
           floats: 6
+          floats: 7
+          floats: 8
+          floats: 8
+          floats: 3
+          floats: 7
+          floats: 7
           floats: 8
           floats: 8
           floats: 8
           floats: 8
-          floats: 5
-          floats: 4
-          floats: 6
-          floats: 6
           floats: 6
           floats: 6
           floats: 8
           floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 7
           floats: 7
           floats: 8
           floats: 8
-          floats: 8
-          floats: 8
-          floats: 5
+          floats: 3
           type: FLOATS
         }
         domain: "ai.onnx.ml"
@@ -3435,54 +2951,96 @@ ONNX
         op_type: "LabelEncoder"
         attribute {
           name: "keys_int64s"
-          ints: 3
-          ints: 4
+          ints: 2
           ints: 5
-          ints: 9
-          ints: 11
-          ints: 12
+          ints: 7
+          ints: 8
           ints: 13
+          ints: 14
+          ints: 15
           ints: 16
-          ints: 17
-          ints: 22
+          ints: 20
+          ints: 21
           ints: 23
           ints: 24
           ints: 27
           ints: 28
           ints: 30
           ints: 31
-          ints: 35
-          ints: 36
           ints: 38
           ints: 39
           ints: 41
           ints: 42
+          ints: 45
+          ints: 46
+          ints: 48
+          ints: 49
+          ints: 53
+          ints: 54
+          ints: 56
+          ints: 57
+          ints: 59
+          ints: 60
+          ints: 65
+          ints: 66
+          ints: 68
+          ints: 69
+          ints: 70
+          ints: 71
+          ints: 76
+          ints: 77
+          ints: 78
+          ints: 79
+          ints: 82
+          ints: 83
+          ints: 84
           type: INTS
         }
         attribute {
           name: "values_floats"
-          floats: 4
-          floats: 4
           floats: 3
           floats: 5
           floats: 6
           floats: 6
-          floats: 4
+          floats: 8
+          floats: 8
+          floats: 7
+          floats: 6
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 7
+          floats: 7
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 8
+          floats: 6
           floats: 5
+          floats: 7
+          floats: 7
+          floats: 6
           floats: 5
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 8
-          floats: 7
-          floats: 7
+          floats: 6
+          floats: 6
+          floats: 5
           type: FLOATS
         }
         domain: "ai.onnx.ml"
@@ -4248,12 +3806,12 @@ ONNX
       }
     }
     opset_import {
-      domain: ""
-      version: 15
-    }
-    opset_import {
       domain: "ai.onnx.ml"
       version: 2
+    }
+    opset_import {
+      domain: ""
+      version: 15
     }
 
 
@@ -4282,8 +3840,8 @@ Let's extract it.
 
  .. code-block:: none
 
-    domain: '', version: 15
     domain: 'ai.onnx.ml', version: 2
+    domain: '', version: 15
 
 
 
@@ -4335,27 +3893,30 @@ than the default one, from 1 to the last available one.
  .. code-block:: none
 
     target: 6 --> {'ai.onnx.ml': 2, '': 6} 91
-    target: 7 --> {'': 7, 'ai.onnx.ml': 2} 91
-    target: 8 --> {'': 8, 'ai.onnx.ml': 2} 91
-    target: 9 --> {'': 9, 'ai.onnx.ml': 2} 91
+    target: 7 --> {'ai.onnx.ml': 2, '': 7} 91
+    target: 8 --> {'ai.onnx.ml': 2, '': 8} 91
+    target: 9 --> {'ai.onnx.ml': 2, '': 9} 91
     target: 10 --> {'ai.onnx.ml': 2, '': 10} 91
     target: 11 --> {'ai.onnx.ml': 2, '': 11} 91
     target: 12 --> {'': 12, 'ai.onnx.ml': 2} 91
-    target: 13 --> {'': 13, 'ai.onnx.ml': 2} 91
-    target: 14 --> {'': 14, 'ai.onnx.ml': 2} 91
-    target: 15 --> {'': 15, 'ai.onnx.ml': 2} 91
-    target: 16 --> {'': 16, 'ai.onnx.ml': 2} 91
-    target: 17 --> {'': 17, 'ai.onnx.ml': 2} 91
-    target: 18 --> {'': 18, 'ai.onnx.ml': 2} 91
-    target: 19 --> {'': 19, 'ai.onnx.ml': 2} 91
-    target: 20 --> {'': 20, 'ai.onnx.ml': 2} 91
-    target: 21 --> {'': 21, 'ai.onnx.ml': 2} 91
-    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1510: UserWarning: Parameter target_opset 22 > 21 is higher than the the latest tested version.
+    target: 13 --> {'ai.onnx.ml': 2, '': 13} 91
+    target: 14 --> {'ai.onnx.ml': 2, '': 14} 91
+    target: 15 --> {'ai.onnx.ml': 2, '': 15} 91
+    target: 16 --> {'ai.onnx.ml': 2, '': 16} 91
+    target: 17 --> {'ai.onnx.ml': 2, '': 17} 91
+    target: 18 --> {'ai.onnx.ml': 2, '': 18} 91
+    target: 19 --> {'ai.onnx.ml': 2, '': 19} 91
+    target: 20 --> {'ai.onnx.ml': 2, '': 20} 91
+    target: 21 --> {'ai.onnx.ml': 2, '': 21} 91
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 22 > 21 is higher than the the latest tested version.
       warnings.warn(
     target: 22 error: RuntimeError("The model is using version 22 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
-    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1510: UserWarning: Parameter target_opset 23 > 21 is higher than the the latest tested version.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 23 > 21 is higher than the the latest tested version.
       warnings.warn(
     target: 23 error: RuntimeError("The model is using version 23 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 24 > 21 is higher than the the latest tested version.
+      warnings.warn(
+    target: 24 error: RuntimeError("The model is using version 24 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
 
 
 
@@ -4401,9 +3962,9 @@ The previous example changed the opset of the main domain
     try target_opset: {'': 9, 'ai.onnx.ml': 1}
     target: 9 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 9, 'ai.onnx.ml': 2}
-    target: 9 --> {'': 9, 'ai.onnx.ml': 2} 91
+    target: 9 --> {'ai.onnx.ml': 2, '': 9} 91
     try target_opset: {'': 9, 'ai.onnx.ml': 3}
-    target: 9 --> {'': 9, 'ai.onnx.ml': 3} 91
+    target: 9 --> {'ai.onnx.ml': 3, '': 9} 91
     try target_opset: {'': 10, 'ai.onnx.ml': 1}
     target: 10 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 10, 'ai.onnx.ml': 2}
@@ -4415,7 +3976,7 @@ The previous example changed the opset of the main domain
     try target_opset: {'': 11, 'ai.onnx.ml': 2}
     target: 11 --> {'ai.onnx.ml': 2, '': 11} 91
     try target_opset: {'': 11, 'ai.onnx.ml': 3}
-    target: 11 --> {'': 11, 'ai.onnx.ml': 3} 91
+    target: 11 --> {'ai.onnx.ml': 3, '': 11} 91
     try target_opset: {'': 12, 'ai.onnx.ml': 1}
     target: 12 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 12, 'ai.onnx.ml': 2}
@@ -4425,77 +3986,87 @@ The previous example changed the opset of the main domain
     try target_opset: {'': 13, 'ai.onnx.ml': 1}
     target: 13 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 13, 'ai.onnx.ml': 2}
-    target: 13 --> {'': 13, 'ai.onnx.ml': 2} 91
+    target: 13 --> {'ai.onnx.ml': 2, '': 13} 91
     try target_opset: {'': 13, 'ai.onnx.ml': 3}
     target: 13 --> {'': 13, 'ai.onnx.ml': 3} 91
     try target_opset: {'': 14, 'ai.onnx.ml': 1}
     target: 14 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 14, 'ai.onnx.ml': 2}
-    target: 14 --> {'': 14, 'ai.onnx.ml': 2} 91
+    target: 14 --> {'ai.onnx.ml': 2, '': 14} 91
     try target_opset: {'': 14, 'ai.onnx.ml': 3}
     target: 14 --> {'': 14, 'ai.onnx.ml': 3} 91
     try target_opset: {'': 15, 'ai.onnx.ml': 1}
     target: 15 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 15, 'ai.onnx.ml': 2}
-    target: 15 --> {'': 15, 'ai.onnx.ml': 2} 91
+    target: 15 --> {'ai.onnx.ml': 2, '': 15} 91
     try target_opset: {'': 15, 'ai.onnx.ml': 3}
-    target: 15 --> {'': 15, 'ai.onnx.ml': 3} 91
+    target: 15 --> {'ai.onnx.ml': 3, '': 15} 91
     try target_opset: {'': 16, 'ai.onnx.ml': 1}
     target: 16 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 16, 'ai.onnx.ml': 2}
-    target: 16 --> {'': 16, 'ai.onnx.ml': 2} 91
+    target: 16 --> {'ai.onnx.ml': 2, '': 16} 91
     try target_opset: {'': 16, 'ai.onnx.ml': 3}
     target: 16 --> {'': 16, 'ai.onnx.ml': 3} 91
     try target_opset: {'': 17, 'ai.onnx.ml': 1}
     target: 17 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 17, 'ai.onnx.ml': 2}
-    target: 17 --> {'': 17, 'ai.onnx.ml': 2} 91
+    target: 17 --> {'ai.onnx.ml': 2, '': 17} 91
     try target_opset: {'': 17, 'ai.onnx.ml': 3}
-    target: 17 --> {'': 17, 'ai.onnx.ml': 3} 91
+    target: 17 --> {'ai.onnx.ml': 3, '': 17} 91
     try target_opset: {'': 18, 'ai.onnx.ml': 1}
     target: 18 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 18, 'ai.onnx.ml': 2}
-    target: 18 --> {'': 18, 'ai.onnx.ml': 2} 91
+    target: 18 --> {'ai.onnx.ml': 2, '': 18} 91
     try target_opset: {'': 18, 'ai.onnx.ml': 3}
-    target: 18 --> {'': 18, 'ai.onnx.ml': 3} 91
+    target: 18 --> {'ai.onnx.ml': 3, '': 18} 91
     try target_opset: {'': 19, 'ai.onnx.ml': 1}
     target: 19 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 19, 'ai.onnx.ml': 2}
-    target: 19 --> {'': 19, 'ai.onnx.ml': 2} 91
+    target: 19 --> {'ai.onnx.ml': 2, '': 19} 91
     try target_opset: {'': 19, 'ai.onnx.ml': 3}
-    target: 19 --> {'': 19, 'ai.onnx.ml': 3} 91
+    target: 19 --> {'ai.onnx.ml': 3, '': 19} 91
     try target_opset: {'': 20, 'ai.onnx.ml': 1}
     target: 20 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 20, 'ai.onnx.ml': 2}
-    target: 20 --> {'': 20, 'ai.onnx.ml': 2} 91
+    target: 20 --> {'ai.onnx.ml': 2, '': 20} 91
     try target_opset: {'': 20, 'ai.onnx.ml': 3}
     target: 20 --> {'': 20, 'ai.onnx.ml': 3} 91
     try target_opset: {'': 21, 'ai.onnx.ml': 1}
     target: 21 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 21, 'ai.onnx.ml': 2}
-    target: 21 --> {'': 21, 'ai.onnx.ml': 2} 91
+    target: 21 --> {'ai.onnx.ml': 2, '': 21} 91
     try target_opset: {'': 21, 'ai.onnx.ml': 3}
-    target: 21 --> {'': 21, 'ai.onnx.ml': 3} 91
+    target: 21 --> {'ai.onnx.ml': 3, '': 21} 91
     try target_opset: {'': 22, 'ai.onnx.ml': 1}
-    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1510: UserWarning: Parameter target_opset 22 > 21 is higher than the the latest tested version.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 22 > 21 is higher than the the latest tested version.
       warnings.warn(
     target: 22 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 22, 'ai.onnx.ml': 2}
     target: 22 error: RuntimeError("The model is using version 22 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
     try target_opset: {'': 22, 'ai.onnx.ml': 3}
-    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1510: UserWarning: Parameter target_opset 22 > 21 is higher than the the latest tested version.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 22 > 21 is higher than the the latest tested version.
       warnings.warn(
     target: 22 error: RuntimeError("The model is using version 22 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
     try target_opset: {'': 23, 'ai.onnx.ml': 1}
-    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1510: UserWarning: Parameter target_opset 23 > 21 is higher than the the latest tested version.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 23 > 21 is higher than the the latest tested version.
       warnings.warn(
     target: 23 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
     try target_opset: {'': 23, 'ai.onnx.ml': 2}
     target: 23 error: RuntimeError("The model is using version 23 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
     try target_opset: {'': 23, 'ai.onnx.ml': 3}
-    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1510: UserWarning: Parameter target_opset 23 > 21 is higher than the the latest tested version.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 23 > 21 is higher than the the latest tested version.
       warnings.warn(
     target: 23 error: RuntimeError("The model is using version 23 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
+    try target_opset: {'': 24, 'ai.onnx.ml': 1}
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 24 > 21 is higher than the the latest tested version.
+      warnings.warn(
+    target: 24 error: RuntimeError("This converter requires at least opset 2 for domain 'ai.onnx.ml'.")
+    try target_opset: {'': 24, 'ai.onnx.ml': 2}
+    target: 24 error: RuntimeError("The model is using version 24 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
+    try target_opset: {'': 24, 'ai.onnx.ml': 3}
+    /home/xadupre/github/sklearn-onnx/skl2onnx/common/_topology.py:1654: UserWarning: Parameter target_opset 24 > 21 is higher than the the latest tested version.
+      warnings.warn(
+    target: 24 error: RuntimeError("The model is using version 24 of domain '' not supported yet by this library. You need to specify target_opset={'': 21}.")
 
 
 
@@ -4503,7 +4074,7 @@ The previous example changed the opset of the main domain
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.107 seconds)
+   **Total running time of the script:** (0 minutes 1.413 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_cbegin_opset.py:

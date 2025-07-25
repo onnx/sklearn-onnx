@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Probabilities or raw scores" href="plot_convert_decision_function.html" /><link rel="prev" title="Draw a pipeline" href="plot_pipeline.html" />
+        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Logging, verbose - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Logging, verbose - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -345,19 +345,19 @@ the iris dataset.</p>
 <span class="kn">import</span> <span class="nn">onnx</span>
 <span class="kn">import</span> <span class="nn">onnxruntime</span> <span class="k">as</span> <span class="nn">rt</span>
 <span class="kn">import</span> <span class="nn">sklearn</span>
-<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">load_iris</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="sklearn.model_selection.train_test_split" class="sphx-glr-backref-module-sklearn-model_selection sphx-glr-backref-type-py-function"><span class="n">train_test_split</span></a>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class"><span class="n">DecisionTreeClassifier</span></a>
 <span class="kn">from</span> <span class="nn">skl2onnx.common.data_types</span> <span class="kn">import</span> <span class="n">FloatTensorType</span>
 <span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">convert_sklearn</span>
 <span class="kn">import</span> <span class="nn">skl2onnx</span>
 
-<span class="n">iris</span> <span class="o">=</span> <span class="n">load_iris</span><span class="p">()</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">iris</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">iris</span><span class="o">.</span><span class="n">target</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="n">clr</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">()</span>
-<span class="n">clr</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">clr</span><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.utils.Bunch.html#sklearn.utils.Bunch" title="sklearn.utils.Bunch" class="sphx-glr-backref-module-sklearn-utils sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html#sklearn.datasets.load_iris" title="sklearn.datasets.load_iris" class="sphx-glr-backref-module-sklearn-datasets sphx-glr-backref-type-py-function"><span class="n">load_iris</span></a><span class="p">()</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span><span class="o">.</span><span class="n">data</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">iris</span><span class="o">.</span><span class="n">target</span></a>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_test</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.train_test_split.html#sklearn.model_selection.train_test_split" title="sklearn.model_selection.train_test_split" class="sphx-glr-backref-module-sklearn-model_selection sphx-glr-backref-type-py-function"><span class="n">train_test_split</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a> <span class="o">=</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class"><span class="n">DecisionTreeClassifier</span></a><span class="p">()</span>
+<a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier.fit" title="sklearn.tree.DecisionTreeClassifier.fit" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-method"><span class="n">clr</span><span class="o">.</span><span class="n">fit</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_train</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y_train</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DecisionTreeClassifier()
@@ -366,19 +366,19 @@ the iris dataset.</p>
 </section>
 <section id="convert-a-model-into-onnx">
 <h2>Convert a model into ONNX<a class="headerlink" href="#convert-a-model-into-onnx" title="Link to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">initial_type</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;float_input&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))]</span>
-<span class="n">onx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;float_input&quot;</span><span class="p">,</span> <span class="n">FloatTensorType</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="mi">4</span><span class="p">]))]</span>
+<span class="n">onx</span> <span class="o">=</span> <span class="n">convert_sklearn</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
 
-<span class="n">sess</span> <span class="o">=</span> <span class="n">rt</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
-<span class="n">input_name</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-<span class="n">label_name</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">get_outputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-<span class="n">pred_onx</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">label_name</span><span class="p">],</span> <span class="p">{</span><span class="n">input_name</span><span class="p">:</span> <span class="n">X_test</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">)})[</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">pred_onx</span><span class="p">)</span>
+<a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sess</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">rt</span><span class="o">.</span><span class="n">InferenceSession</span></a><span class="p">(</span><span class="n">onx</span><span class="o">.</span><span class="n">SerializeToString</span><span class="p">(),</span> <span class="n">providers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CPUExecutionProvider&quot;</span><span class="p">])</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">input_name</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.get_inputs" title="onnxruntime.InferenceSession.get_inputs" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">get_inputs</span></a><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label_name</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.get_outputs" title="onnxruntime.InferenceSession.get_outputs" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">get_outputs</span></a><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_onx</span></a> <span class="o">=</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession.run" title="onnxruntime.InferenceSession.run" class="sphx-glr-backref-module-onnxruntime sphx-glr-backref-type-py-method"><span class="n">sess</span><span class="o">.</span><span class="n">run</span></a><span class="p">([</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label_name</span></a><span class="p">],</span> <span class="p">{</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">input_name</span></a><span class="p">:</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X_test</span></a><span class="o">.</span><span class="n">astype</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)})[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pred_onx</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[0 2 1 2 1 2 1 0 0 0 1 1 1 2 2 1 2 2 0 2 1 2 2 0 2 1 1 1 1 1 1 1 1 2 1 1 0
- 1]
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[0 1 1 1 2 1 2 1 0 0 0 2 2 0 2 1 0 0 0 0 2 1 2 1 2 2 2 0 1 1 0 2 0 2 1 2 2
+ 0]
 </pre></div>
 </div>
 </section>
@@ -388,7 +388,7 @@ the iris dataset.</p>
 It tells which converter is called. <cite>verbose=1</cite> usually means what <em>skl2onnx</em>
 is doing to convert a pipeline. <cite>verbose=2+</cite>
 is reserved for information within converters.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">convert_sklearn</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">convert_sklearn</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[convert_sklearn] parse_sklearn_model
@@ -407,7 +407,7 @@ is reserved for information within converters.</p>
 
 ir_version: 7
 producer_name: &quot;skl2onnx&quot;
-producer_version: &quot;1.18.0&quot;
+producer_version: &quot;1.19.1&quot;
 domain: &quot;ai.onnx&quot;
 model_version: 0
 doc_string: &quot;&quot;
@@ -438,6 +438,18 @@ graph {
       ints: 0
       ints: 1
       ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
       type: INTS
     }
     attribute {
@@ -445,25 +457,49 @@ graph {
       ints: 1
       ints: 1
       ints: 1
-      ints: 4
-      ints: 4
-      ints: 4
-      ints: 5
-      ints: 5
-      ints: 5
-      ints: 8
-      ints: 8
-      ints: 8
+      ints: 6
+      ints: 6
+      ints: 6
+      ints: 7
+      ints: 7
+      ints: 7
       ints: 9
       ints: 9
       ints: 9
-      ints: 10
-      ints: 10
-      ints: 10
+      ints: 11
+      ints: 11
+      ints: 11
+      ints: 12
+      ints: 12
+      ints: 12
+      ints: 13
+      ints: 13
+      ints: 13
+      ints: 16
+      ints: 16
+      ints: 16
+      ints: 17
+      ints: 17
+      ints: 17
+      ints: 18
+      ints: 18
+      ints: 18
       type: INTS
     }
     attribute {
       name: &quot;class_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -496,6 +532,18 @@ graph {
       floats: 0
       floats: 1
       floats: 0
+      floats: 1
+      floats: 0
+      floats: 0
+      floats: 0
+      floats: 1
+      floats: 0
+      floats: 1
+      floats: 0
+      floats: 0
+      floats: 0
+      floats: 1
+      floats: 0
       floats: 0
       floats: 1
       floats: 0
@@ -517,12 +565,20 @@ graph {
       name: &quot;nodes_falsenodeids&quot;
       ints: 2
       ints: 0
-      ints: 6
-      ints: 5
+      ints: 14
+      ints: 13
+      ints: 8
+      ints: 7
       ints: 0
       ints: 0
       ints: 10
-      ints: 9
+      ints: 0
+      ints: 12
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 18
+      ints: 17
       ints: 0
       ints: 0
       ints: 0
@@ -530,10 +586,18 @@ graph {
     }
     attribute {
       name: &quot;nodes_featureids&quot;
-      ints: 2
+      ints: 3
       ints: 0
       ints: 3
       ints: 2
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 2
+      ints: 0
+      ints: 3
+      ints: 0
       ints: 0
       ints: 0
       ints: 2
@@ -545,6 +609,14 @@ graph {
     }
     attribute {
       name: &quot;nodes_hitrates&quot;
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
       floats: 1
       floats: 1
       floats: 1
@@ -571,6 +643,14 @@ graph {
       ints: 0
       ints: 0
       ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       type: INTS
     }
     attribute {
@@ -579,6 +659,14 @@ graph {
       strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
@@ -601,10 +689,26 @@ graph {
       ints: 8
       ints: 9
       ints: 10
+      ints: 11
+      ints: 12
+      ints: 13
+      ints: 14
+      ints: 15
+      ints: 16
+      ints: 17
+      ints: 18
       type: INTS
     }
     attribute {
       name: &quot;nodes_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -624,10 +728,18 @@ graph {
       ints: 0
       ints: 3
       ints: 4
+      ints: 5
+      ints: 6
       ints: 0
       ints: 0
-      ints: 7
-      ints: 8
+      ints: 9
+      ints: 0
+      ints: 11
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 15
+      ints: 16
       ints: 0
       ints: 0
       ints: 0
@@ -635,10 +747,18 @@ graph {
     }
     attribute {
       name: &quot;nodes_values&quot;
-      floats: 2.69999981
+      floats: 0.75
       floats: 0
       floats: 1.75
-      floats: 5.29999971
+      floats: 5.35
+      floats: 4.95
+      floats: 2.45
+      floats: 0
+      floats: 0
+      floats: 4.95
+      floats: 0
+      floats: 1.55
+      floats: 0
       floats: 0
       floats: 0
       floats: 4.85
@@ -681,7 +801,7 @@ graph {
     }
     domain: &quot;ai.onnx.ml&quot;
   }
-  name: &quot;4da61a0794d947c88ca182179ef062ca&quot;
+  name: &quot;21b6707aac84485f97acc71b370309e7&quot;
   input {
     name: &quot;float_input&quot;
     type {
@@ -744,15 +864,15 @@ opset_import {
 (output of converters) is processed, which node is created…
 This information may be useful when a custom converter is being
 implemented.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;skl2onnx&quot;</span><span class="p">)</span>
-<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/logging.html#logging.Logger" title="logging.Logger" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">logger</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/logging.html#logging.getLogger" title="logging.getLogger" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-function"><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span></a><span class="p">(</span><span class="s2">&quot;skl2onnx&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/logging.html#logging.Logger.setLevel" title="logging.Logger.setLevel" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-method"><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span></a><span class="p">)</span>
 
-<span class="n">convert_sklearn</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">convert_sklearn</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>ir_version: 7
 producer_name: &quot;skl2onnx&quot;
-producer_version: &quot;1.18.0&quot;
+producer_version: &quot;1.19.1&quot;
 domain: &quot;ai.onnx&quot;
 model_version: 0
 doc_string: &quot;&quot;
@@ -783,6 +903,18 @@ graph {
       ints: 0
       ints: 1
       ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
+      ints: 0
+      ints: 1
+      ints: 2
       type: INTS
     }
     attribute {
@@ -790,25 +922,49 @@ graph {
       ints: 1
       ints: 1
       ints: 1
-      ints: 4
-      ints: 4
-      ints: 4
-      ints: 5
-      ints: 5
-      ints: 5
-      ints: 8
-      ints: 8
-      ints: 8
+      ints: 6
+      ints: 6
+      ints: 6
+      ints: 7
+      ints: 7
+      ints: 7
       ints: 9
       ints: 9
       ints: 9
-      ints: 10
-      ints: 10
-      ints: 10
+      ints: 11
+      ints: 11
+      ints: 11
+      ints: 12
+      ints: 12
+      ints: 12
+      ints: 13
+      ints: 13
+      ints: 13
+      ints: 16
+      ints: 16
+      ints: 16
+      ints: 17
+      ints: 17
+      ints: 17
+      ints: 18
+      ints: 18
+      ints: 18
       type: INTS
     }
     attribute {
       name: &quot;class_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -841,6 +997,18 @@ graph {
       floats: 0
       floats: 1
       floats: 0
+      floats: 1
+      floats: 0
+      floats: 0
+      floats: 0
+      floats: 1
+      floats: 0
+      floats: 1
+      floats: 0
+      floats: 0
+      floats: 0
+      floats: 1
+      floats: 0
       floats: 0
       floats: 1
       floats: 0
@@ -862,12 +1030,20 @@ graph {
       name: &quot;nodes_falsenodeids&quot;
       ints: 2
       ints: 0
-      ints: 6
-      ints: 5
+      ints: 14
+      ints: 13
+      ints: 8
+      ints: 7
       ints: 0
       ints: 0
       ints: 10
-      ints: 9
+      ints: 0
+      ints: 12
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 18
+      ints: 17
       ints: 0
       ints: 0
       ints: 0
@@ -875,10 +1051,18 @@ graph {
     }
     attribute {
       name: &quot;nodes_featureids&quot;
-      ints: 2
+      ints: 3
       ints: 0
       ints: 3
       ints: 2
+      ints: 0
+      ints: 1
+      ints: 0
+      ints: 0
+      ints: 2
+      ints: 0
+      ints: 3
+      ints: 0
       ints: 0
       ints: 0
       ints: 2
@@ -890,6 +1074,14 @@ graph {
     }
     attribute {
       name: &quot;nodes_hitrates&quot;
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
+      floats: 1
       floats: 1
       floats: 1
       floats: 1
@@ -916,6 +1108,14 @@ graph {
       ints: 0
       ints: 0
       ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       type: INTS
     }
     attribute {
@@ -924,6 +1124,14 @@ graph {
       strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
       strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
+      strings: &quot;BRANCH_LEQ&quot;
+      strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;LEAF&quot;
       strings: &quot;BRANCH_LEQ&quot;
@@ -946,10 +1154,26 @@ graph {
       ints: 8
       ints: 9
       ints: 10
+      ints: 11
+      ints: 12
+      ints: 13
+      ints: 14
+      ints: 15
+      ints: 16
+      ints: 17
+      ints: 18
       type: INTS
     }
     attribute {
       name: &quot;nodes_treeids&quot;
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 0
       ints: 0
       ints: 0
       ints: 0
@@ -969,10 +1193,18 @@ graph {
       ints: 0
       ints: 3
       ints: 4
+      ints: 5
+      ints: 6
       ints: 0
       ints: 0
-      ints: 7
-      ints: 8
+      ints: 9
+      ints: 0
+      ints: 11
+      ints: 0
+      ints: 0
+      ints: 0
+      ints: 15
+      ints: 16
       ints: 0
       ints: 0
       ints: 0
@@ -980,10 +1212,18 @@ graph {
     }
     attribute {
       name: &quot;nodes_values&quot;
-      floats: 2.69999981
+      floats: 0.75
       floats: 0
       floats: 1.75
-      floats: 5.29999971
+      floats: 5.35
+      floats: 4.95
+      floats: 2.45
+      floats: 0
+      floats: 0
+      floats: 4.95
+      floats: 0
+      floats: 1.55
+      floats: 0
       floats: 0
       floats: 0
       floats: 4.85
@@ -1026,7 +1266,7 @@ graph {
     }
     domain: &quot;ai.onnx.ml&quot;
   }
-  name: &quot;be257cd5d5d64ede939450f40904c278&quot;
+  name: &quot;7cb1fe8a42be413090ed7a77b076fb68&quot;
   input {
     name: &quot;float_input&quot;
     type {
@@ -1083,29 +1323,29 @@ opset_import {
 </pre></div>
 </div>
 <p>And to disable it.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/logging.html#logging.Logger.setLevel" title="logging.Logger.setLevel" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-method"><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span></a><span class="p">)</span>
 
-<span class="n">convert_sklearn</span><span class="p">(</span><span class="n">clr</span><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><span class="n">initial_type</span><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">convert_sklearn</span><span class="p">(</span><a href="https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html#sklearn.tree.DecisionTreeClassifier" title="sklearn.tree.DecisionTreeClassifier" class="sphx-glr-backref-module-sklearn-tree sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">clr</span></a><span class="p">,</span> <span class="n">initial_types</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">initial_type</span></a><span class="p">,</span> <span class="n">target_opset</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 
-<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/logging.html#logging.Logger.setLevel" title="logging.Logger.setLevel" class="sphx-glr-backref-module-logging sphx-glr-backref-type-py-method"><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p><strong>Versions used for this example</strong></p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numpy:&quot;</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scikit-learn:&quot;</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <span class="n">rt</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;numpy:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">numpy</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;scikit-learn:&quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sklearn</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;onnxruntime: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rt</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;skl2onnx: &quot;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">skl2onnx</span><span class="o">.</span><span class="n">__version__</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>numpy: 2.2.0
-scikit-learn: 1.6.0
-onnx:  1.18.0
-onnxruntime:  1.21.0+cu126
-skl2onnx:  1.18.0
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>numpy: 2.3.1
+scikit-learn: 1.6.1
+onnx:  1.19.0
+onnxruntime:  1.23.0
+skl2onnx:  1.19.1
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.088 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.155 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-plot-logging-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/180b5e344e3251ffaf63d473c1d3a95f/plot_logging.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_logging.ipynb</span></code></a></p>
@@ -1192,9 +1432,9 @@ skl2onnx:  1.18.0
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=256cef93"></script>
+</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

@@ -95,7 +95,7 @@ ONNX
 
     ir_version: 10
     producer_name: "skl2onnx"
-    producer_version: "1.18.0"
+    producer_version: "1.19.1"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -156,6 +156,10 @@ ONNX
       domain: "com.microsoft"
       version: 1
     }
+    opset_import {
+      domain: ""
+      version: 21
+    }
 
 
 
@@ -186,8 +190,8 @@ with onnxruntime.
 
  .. code-block:: none
 
-    [array([[1.9999999, 1.9999999, 1.9999999],
-           [1.9999999, 2.       , 2.       ]], dtype=float32)]
+    [array([[2., 2., 2.],
+           [2., 2., 2.]], dtype=float32)]
 
 
 
@@ -255,10 +259,10 @@ scipy
 
  .. code-block:: none
 
-    {'average': np.float64(8.157823500368977e-06),
-     'deviation': np.float64(8.986884053687116e-06),
-     'max_exec': np.float64(5.3478249901672827e-05),
-     'min_exec': np.float64(2.6912999601336197e-06),
+    {'average': np.float64(1.0328576999540929e-05),
+     'deviation': np.float64(5.85567791818701e-06),
+     'max_exec': np.float64(4.154344999278692e-05),
+     'min_exec': np.float64(4.3559000005188865e-06),
      'name': 'scipy',
      'ncols': 4,
      'nrows': 2,
@@ -290,10 +294,10 @@ onnxruntime
 
  .. code-block:: none
 
-    {'average': np.float64(3.3001529995090104e-05),
-     'deviation': np.float64(3.1202860470685634e-05),
-     'max_exec': np.float64(0.00018513064987928373),
-     'min_exec': np.float64(6.747400038875639e-06),
+    {'average': np.float64(3.8050564999480236e-05),
+     'deviation': np.float64(9.388229890133921e-06),
+     'max_exec': np.float64(6.51250500027345e-05),
+     'min_exec': np.float64(2.112529999749313e-05),
      'name': 'ort',
      'ncols': 4,
      'nrows': 2,
@@ -349,12 +353,12 @@ Longer benchmark
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     75%|███████▌  | 3/4 [00:00<00:00, 12.27it/s]    100%|██████████| 4/4 [00:01<00:00,  2.39it/s]
+      0%|          | 0/4 [00:00<?, ?it/s]     75%|███████▌  | 3/4 [00:00<00:00,  9.57it/s]    100%|██████████| 4/4 [00:02<00:00,  1.43it/s]    100%|██████████| 4/4 [00:02<00:00,  1.77it/s]
            N     scipy       ort  scipy/ort
-    0     10  0.000010  0.000011   0.970933
-    1    100  0.000009  0.000009   1.026960
-    2   1000  0.000060  0.000021   2.846234
-    3  10000  0.000576  0.000137   4.211802
+    0     10  0.000012  0.000008   1.500849
+    1    100  0.000011  0.000009   1.174169
+    2   1000  0.000086  0.000028   3.027853
+    3  10000  0.000815  0.000155   5.250539
 
 
 
@@ -380,10 +384,10 @@ Longer benchmark
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -391,7 +395,7 @@ Longer benchmark
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.908 seconds)
+   **Total running time of the script:** (0 minutes 2.569 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_benchmark_cdist.py:

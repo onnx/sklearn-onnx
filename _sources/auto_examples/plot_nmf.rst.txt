@@ -84,7 +84,7 @@ Building a simple model
  .. code-block:: none
 
     original predictions
-    [(0, 0, np.float64(1.8940549474160222)), (0, 1, np.float64(0.3072445540775543)), (0, 2, np.float64(0.3072445540775543)), (0, 3, np.float64(0.10911482580878978)), (1, 0, np.float64(1.1066086343759995)), (1, 1, np.float64(0.1908350611125728)), (1, 2, np.float64(0.1908350611125728)), (1, 3, np.float64(0.0)), (2, 0, np.float64(1.1066086343759995)), (2, 1, np.float64(0.1908350611125728)), (2, 2, np.float64(0.1908350611125728)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.0146719258890748)), (3, 1, np.float64(0.0)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.9848891043175716)), (4, 0, np.float64(0.9470274737080111)), (4, 1, np.float64(0.15362227703877715)), (4, 2, np.float64(0.15362227703877715)), (4, 3, np.float64(0.05455741290439489))]
+    [(0, 0, np.float64(1.8940619439633473)), (0, 1, np.float64(0.3072432913109815)), (0, 2, np.float64(0.1091000464503179)), (0, 3, np.float64(0.3072432913109815)), (1, 0, np.float64(1.1066037222104155)), (1, 1, np.float64(0.19083096278248987)), (1, 2, np.float64(0.0)), (1, 3, np.float64(0.19083096278248987)), (2, 0, np.float64(1.014668907902116)), (2, 1, np.float64(0.0)), (2, 2, np.float64(0.9848932612757917)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.1066037222104155)), (3, 1, np.float64(0.19083096278248987)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.19083096278248987)), (4, 0, np.float64(0.9470309719816736)), (4, 1, np.float64(0.15362164565549075)), (4, 2, np.float64(0.05455002322515895)), (4, 3, np.float64(0.15362164565549075))]
 
 
 
@@ -120,7 +120,7 @@ to the function we need to convert into ONNX.
 
  .. code-block:: none
 
-    [(0, 0, np.float64(1.8940549474160222)), (0, 1, np.float64(0.3072445540775543)), (0, 2, np.float64(0.3072445540775543)), (0, 3, np.float64(0.10911482580878978)), (1, 0, np.float64(1.1066086343759995)), (1, 1, np.float64(0.1908350611125728)), (1, 2, np.float64(0.1908350611125728)), (1, 3, np.float64(0.0)), (2, 0, np.float64(1.1066086343759995)), (2, 1, np.float64(0.1908350611125728)), (2, 2, np.float64(0.1908350611125728)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.0146719258890748)), (3, 1, np.float64(0.0)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.9848891043175716)), (4, 0, np.float64(0.9470274737080111)), (4, 1, np.float64(0.15362227703877715)), (4, 2, np.float64(0.15362227703877715)), (4, 3, np.float64(0.05455741290439489))]
+    [(0, 0, np.float64(1.8940619439633473)), (0, 1, np.float64(0.3072432913109815)), (0, 2, np.float64(0.1091000464503179)), (0, 3, np.float64(0.3072432913109815)), (1, 0, np.float64(1.1066037222104155)), (1, 1, np.float64(0.19083096278248987)), (1, 2, np.float64(0.0)), (1, 3, np.float64(0.19083096278248987)), (2, 0, np.float64(1.014668907902116)), (2, 1, np.float64(0.0)), (2, 2, np.float64(0.9848932612757917)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.1066037222104155)), (3, 1, np.float64(0.19083096278248987)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.19083096278248987)), (4, 0, np.float64(0.9470309719816736)), (4, 1, np.float64(0.15362164565549075)), (4, 2, np.float64(0.05455002322515895)), (4, 3, np.float64(0.15362164565549075))]
 
 
 
@@ -178,7 +178,7 @@ it just creates an ONNX graph equivalent to function
 
     ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.18.0"
+    producer_version: "1.19.1"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -218,30 +218,30 @@ it just creates an ONNX graph equivalent to function
         dims: 2
         dims: 4
         data_type: 1
-        float_data: 1.98117924
-        float_data: 0.341655076
-        float_data: 0.341655076
+        float_data: 1.97398615
+        float_data: 0.340408832
         float_data: 0
-        float_data: 0.897486567
+        float_data: 0.340408832
+        float_data: 0.89287746
         float_data: 0
+        float_data: 0.866675794
         float_data: 0
-        float_data: 0.871143401
         name: "Ar_ArrayFeatureExtractorcst"
       }
       initializer {
         dims: 2
         dims: 5
         data_type: 1
-        float_data: 0.899282873
-        float_data: 0.55856061
-        float_data: 0.55856061
+        float_data: 0.90257144
+        float_data: 0.560593426
         float_data: 0
-        float_data: 0.449641436
-        float_data: 0.12525472
+        float_data: 0.560593426
+        float_data: 0.45128572
+        float_data: 0.125883341
         float_data: 0
+        float_data: 1.13640332
         float_data: 0
-        float_data: 1.13057053
-        float_data: 0.0626273602
+        float_data: 0.0629416704
         name: "Ar_ArrayFeatureExtractorcst1"
       }
       input {
@@ -335,7 +335,7 @@ Let's compute prediction with it.
 
  .. code-block:: none
 
-    [(0, 0, np.float32(1.894055)), (0, 1, np.float32(0.30724457)), (0, 2, np.float32(0.30724457)), (0, 3, np.float32(0.109114826)), (1, 0, np.float32(1.1066086)), (1, 1, np.float32(0.19083507)), (1, 2, np.float32(0.19083507)), (1, 3, np.float32(0.0)), (2, 0, np.float32(1.1066086)), (2, 1, np.float32(0.19083507)), (2, 2, np.float32(0.19083507)), (2, 3, np.float32(0.0)), (3, 0, np.float32(1.0146719)), (3, 1, np.float32(0.0)), (3, 2, np.float32(0.0)), (3, 3, np.float32(0.98488903)), (4, 0, np.float32(0.9470275)), (4, 1, np.float32(0.15362228)), (4, 2, np.float32(0.15362228)), (4, 3, np.float32(0.054557413))]
+    [(0, 0, np.float32(1.8940619)), (0, 1, np.float32(0.3072433)), (0, 2, np.float32(0.109100044)), (0, 3, np.float32(0.3072433)), (1, 0, np.float32(1.1066036)), (1, 1, np.float32(0.19083095)), (1, 2, np.float32(0.0)), (1, 3, np.float32(0.19083095)), (2, 0, np.float32(1.014669)), (2, 1, np.float32(0.0)), (2, 2, np.float32(0.98489326)), (2, 3, np.float32(0.0)), (3, 0, np.float32(1.1066036)), (3, 1, np.float32(0.19083095)), (3, 2, np.float32(0.0)), (3, 3, np.float32(0.19083095)), (4, 0, np.float32(0.94703096)), (4, 1, np.float32(0.15362164)), (4, 2, np.float32(0.054550022)), (4, 3, np.float32(0.15362164))]
 
 
 
@@ -400,11 +400,11 @@ The ONNX graph looks like the following.
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -412,7 +412,7 @@ The ONNX graph looks like the following.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.193 seconds)
+   **Total running time of the script:** (0 minutes 0.454 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_nmf.py:

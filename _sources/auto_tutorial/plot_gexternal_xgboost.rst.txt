@@ -34,7 +34,7 @@ how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-71
+.. GENERATED FROM PYTHON SOURCE LINES 21-73
 
 .. code-block:: Python
 
@@ -47,11 +47,13 @@ Train a XGBoost classifier
     from sklearn.preprocessing import StandardScaler
     from xgboost import XGBClassifier, XGBRegressor, DMatrix, train as train_xgb
     from skl2onnx.common.data_types import FloatTensorType
+    from onnxmltools.convert.common.data_types import FloatTensorType as ml_tools_FloatTensorType
     from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
     from skl2onnx.common.shape_calculator import (
         calculate_linear_classifier_output_shapes,
         calculate_linear_regressor_output_shapes,
     )
+    from skl2onnx.convert import may_switch_bases_classes_order
     from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
     from onnxmltools.convert import convert_xgboost as convert_xgboost_booster
 
@@ -96,12 +98,24 @@ Train a XGBoost classifier
 
  .. code-block:: none
 
-    'super' object has no attribute '__sklearn_tags__'
+    Unable to find a shape calculator for type '<class 'xgboost.sklearn.XGBClassifier'>'.
+    It usually means the pipeline being converted contains a
+    transformer or a predictor with no corresponding converter
+    implemented in sklearn-onnx. If the converted is implemented
+    in another library, you need to register
+    the converted so that it can be used by sklearn-onnx (function
+    update_registered_converter). If the model is not yet covered
+    by sklearn-onnx, you may raise an issue to
+    https://github.com/onnx/sklearn-onnx/issues
+    to get the converter implemented or even contribute to the
+    project. If the model is a custom model, a new converter must
+    be implemented. Examples can be found in the gallery.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-83
+
+.. GENERATED FROM PYTHON SOURCE LINES 74-85
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -115,7 +129,7 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-92
+.. GENERATED FROM PYTHON SOURCE LINES 85-94
 
 .. code-block:: Python
 
@@ -127,6 +141,7 @@ xgboost/shape_calculators/Classifier.py>`_.
         convert_xgboost,
         options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
     )
+ 
 
 
 
@@ -134,23 +149,25 @@ xgboost/shape_calculators/Classifier.py>`_.
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 93-95
+.. GENERATED FROM PYTHON SOURCE LINES 95-97
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-107
+.. GENERATED FROM PYTHON SOURCE LINES 97-112
 
 .. code-block:: Python
 
 
-    model_onnx = convert_sklearn(
-        pipe,
-        "pipeline_xgboost",
-        [("input", FloatTensorType([None, 2]))],
-        target_opset={"": 12, "ai.onnx.ml": 2},
-    )
+    with may_switch_bases_classes_order(XGBClassifier):
+        # This context should not be needed anymore once this issue
+        # is fixed in XGBoost.
+        model_onnx = convert_sklearn(
+            pipe,
+            "pipeline_xgboost",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset={"": 12, "ai.onnx.ml": 2},
+        )
 
     # And save.
     with open("pipeline_xgboost.onnx", "wb") as f:
@@ -158,64 +175,46 @@ Convert again
 
 
 
-.. rst-class:: sphx-glr-script-out
-
-.. code-block:: pytb
-
-    Traceback (most recent call last):
-      File "/home/xadupre/github/sklearn-onnx/docs/tutorial/plot_gexternal_xgboost.py", line 96, in <module>
-        model_onnx = convert_sklearn(
-                     ^^^^^^^^^^^^^^^^
-      File "/home/xadupre/github/sklearn-onnx/skl2onnx/convert.py", line 192, in convert_sklearn
-        topology = parse_sklearn_model(
-                   ^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 847, in parse_sklearn_model
-        outputs = parse_sklearn(
-                  ^^^^^^^^^^^^^^
-      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 757, in parse_sklearn
-        res = _parse_sklearn(scope, model, inputs, custom_parsers=custom_parsers)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 688, in _parse_sklearn
-        outputs = sklearn_parsers_map[tmodel](
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py", line 295, in _parse_sklearn_pipeline
-        ) and is_classifier(step[1]):
-              ^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 1237, in is_classifier
-        return get_tags(estimator).estimator_type == "classifier"
-               ^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/_tags.py", line 405, in get_tags
-        sklearn_tags_provider[klass] = klass.__sklearn_tags__(estimator)  # type: ignore[attr-defined]
-                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 540, in __sklearn_tags__
-        tags = super().__sklearn_tags__()
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-    AttributeError: 'super' object has no attribute '__sklearn_tags__'
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-112
+
+.. GENERATED FROM PYTHON SOURCE LINES 113-117
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-116
+.. GENERATED FROM PYTHON SOURCE LINES 117-122
 
 .. code-block:: Python
 
 
-    print("predict", pipe.predict(X[:5]))
-    print("predict_proba", pipe.predict_proba(X[:1]))
+    with may_switch_bases_classes_order(XGBClassifier):
+        print("predict", pipe.predict(X[:5]))
+        print("predict_proba", pipe.predict_proba(X[:1]))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-118
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    predict [1 2 2 1 2]
+    predict_proba [[0.1554611  0.652432   0.19210689]]
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 123-124
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-124
+.. GENERATED FROM PYTHON SOURCE LINES 124-130
 
 .. code-block:: Python
 
@@ -226,12 +225,25 @@ Predictions with onnxruntime.
     print("predict_proba", pred_onx[1][:1])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-127
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    predict [1 2 2 1 2]
+    predict_proba [{0: 0.15546110272407532, 1: 0.6524320244789124, 2: 0.19210688769817352}]
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 131-133
 
 Same example with XGBRegressor
 ++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-146
+.. GENERATED FROM PYTHON SOURCE LINES 133-153
 
 .. code-block:: Python
 
@@ -252,33 +264,59 @@ Same example with XGBRegressor
     pipe = Pipeline([("scaler", StandardScaler()), ("xgb", XGBRegressor(n_estimators=3))])
     pipe.fit(X_train, y_train)
 
-    print("predict", pipe.predict(X_test[:5]))
+    with may_switch_bases_classes_order(XGBRegressor):
+        print("predict", pipe.predict(X_test[:5]))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-148
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    predict [108.139824 104.385315 178.4701   166.48694   99.2167  ]
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 154-155
 
 ONNX
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-157
+.. GENERATED FROM PYTHON SOURCE LINES 155-165
 
 .. code-block:: Python
 
 
-    onx = to_onnx(
-        pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
-    )
+    with may_switch_bases_classes_order(XGBRegressor):
+        onx = to_onnx(
+            pipe, X_train.astype(numpy.float32), target_opset={"": 12, "ai.onnx.ml": 2}
+        )
 
     sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
     pred_onx = sess.run(None, {"X": X_test[:5].astype(numpy.float32)})
     print("predict", pred_onx[0].ravel())
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-160
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    predict [108.13983  104.38532  178.4701   166.48694   99.216705]
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 166-168
 
 Some discrepencies may appear. In that case,
 you should read :ref:`l-example-discrepencies-float-double`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-168
+.. GENERATED FROM PYTHON SOURCE LINES 170-176
 
 Same with a Booster
 +++++++++++++++++++
@@ -287,7 +325,7 @@ A booster cannot be inserted in a pipeline. It requires
 a different conversion function because it does not
 follow :epkg:`scikit-learn` API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-196
+.. GENERATED FROM PYTHON SOURCE LINES 176-204
 
 .. code-block:: Python
 
@@ -302,7 +340,7 @@ follow :epkg:`scikit-learn` API.
     param = {"objective": "multi:softmax", "num_class": 3}
     bst = train_xgb(param, dtrain, 10)
 
-    initial_type = [("float_input", FloatTensorType([None, X_train.shape[1]]))]
+    initial_type = [("float_input", ml_tools_FloatTensorType([None, X_train.shape[1]]))]
 
     try:
         onx = convert_xgboost_booster(bst, "name", initial_types=initial_type)
@@ -321,9 +359,22 @@ follow :epkg:`scikit-learn` API.
         print(pred_onx)
 
 
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 1 1 1 1
+     0 1 1 1 0 0 1 1 0 0 0 1 0]
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.032 seconds)
+   **Total running time of the script:** (0 minutes 4.385 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py:

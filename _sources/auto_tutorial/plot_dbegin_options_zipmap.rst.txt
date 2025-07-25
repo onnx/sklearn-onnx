@@ -32,7 +32,7 @@ but is slower. Let's see what other options are available.
 Train a model and convert it
 ++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-45
+.. GENERATED FROM PYTHON SOURCE LINES 20-44
 
 .. code-block:: Python
 
@@ -45,7 +45,6 @@ Train a model and convert it
     import onnxruntime as rt
     import onnx
     import skl2onnx
-    from skl2onnx.common.data_types import FloatTensorType
     from skl2onnx import to_onnx
     from sklearn.linear_model import LogisticRegression
     from sklearn.multioutput import MultiOutputClassifier
@@ -74,7 +73,7 @@ Train a model and convert it
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-51
+.. GENERATED FROM PYTHON SOURCE LINES 45-50
 
 Default behaviour: zipmap=True
 ++++++++++++++++++++++++++++++
@@ -82,7 +81,7 @@ Default behaviour: zipmap=True
 The output type for the probabilities is a list of
 dictionaries.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-58
+.. GENERATED FROM PYTHON SOURCE LINES 50-57
 
 .. code-block:: Python
 
@@ -101,26 +100,25 @@ dictionaries.
 
  .. code-block:: none
 
-    [{10: 6.341787866404047e-06, 12: 0.030411386862397194, 14: 0.9695823192596436}, {10: 0.022245943546295166, 12: 0.9420960545539856, 14: 0.035658009350299835}]
+    [{10: 0.9853358864784241, 12: 0.01466413028538227, 14: 3.883373267399293e-08}, {10: 0.0013562627136707306, 12: 0.5341124534606934, 14: 0.4645313024520874}]
     probabilities type: <class 'list'>
     type for the first observations: <class 'dict'>
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-63
+.. GENERATED FROM PYTHON SOURCE LINES 58-62
 
 Option zipmap=False
 +++++++++++++++++++
 
 Probabilities are now a matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-76
+.. GENERATED FROM PYTHON SOURCE LINES 62-74
 
 .. code-block:: Python
 
 
-    initial_type = [("float_input", FloatTensorType([None, 4]))]
     options = {id(clr): {"zipmap": False}}
     onx2 = to_onnx(clr, X_train, options=options, target_opset=12)
 
@@ -140,15 +138,15 @@ Probabilities are now a matrix.
 
  .. code-block:: none
 
-    [[6.3417879e-06 3.0411387e-02 9.6958232e-01]
-     [2.2245944e-02 9.4209605e-01 3.5658009e-02]]
+    [[9.8533589e-01 1.4664130e-02 3.8833733e-08]
+     [1.3562627e-03 5.3411245e-01 4.6453130e-01]]
     probabilities type: <class 'numpy.ndarray'>
     type for the first observations: <class 'numpy.ndarray'>
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-83
+.. GENERATED FROM PYTHON SOURCE LINES 75-81
 
 Option zipmap='columns'
 +++++++++++++++++++++++
@@ -157,7 +155,7 @@ This options removes the final operator ZipMap and splits
 the probabilities into columns. The final model produces
 one output for the label, and one output per class.
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-99
+.. GENERATED FROM PYTHON SOURCE LINES 81-97
 
 .. code-block:: Python
 
@@ -185,20 +183,20 @@ one output for the label, and one output per class.
 
  .. code-block:: none
 
-    output: 'output_label' shape=(38,) values=[14 12]...
-    output: 'i10' shape=(38,) values=[6.3417879e-06 2.2245944e-02]...
-    output: 'i12' shape=(38,) values=[0.03041139 0.94209605]...
-    output: 'i14' shape=(38,) values=[0.9695823  0.03565801]...
+    output: 'output_label' shape=(38,) values=[10 12]...
+    output: 'i10' shape=(38,) values=[0.9853359  0.00135626]...
+    output: 'i12' shape=(38,) values=[0.01466413 0.53411245]...
+    output: 'i14' shape=(38,) values=[3.8833733e-08 4.6453130e-01]...
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-102
+.. GENERATED FROM PYTHON SOURCE LINES 98-100
 
 Let's compare prediction time
 +++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-119
+.. GENERATED FROM PYTHON SOURCE LINES 100-117
 
 .. code-block:: Python
 
@@ -228,16 +226,16 @@ Let's compare prediction time
  .. code-block:: none
 
     Average time with ZipMap:
-    0.003264389200558071
+    0.003566398999964804
     Average time without ZipMap:
-    0.0027052922996517736
+    0.0027388382000481217
     Average time without ZipMap but with columns:
-    0.0026047332994494354
+    0.008876207899970723
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-127
+.. GENERATED FROM PYTHON SOURCE LINES 118-125
 
 Option zimpap=False and output_class_labels=True
 ++++++++++++++++++++++++++++++++++++++++++++++++
@@ -247,12 +245,11 @@ much faster but labels are lost in the process. Option
 `output_class_labels` can be used to expose the labels
 as a third output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-140
+.. GENERATED FROM PYTHON SOURCE LINES 125-137
 
 .. code-block:: Python
 
 
-    initial_type = [("float_input", FloatTensorType([None, 4]))]
     options = {id(clr): {"zipmap": False, "output_class_labels": True}}
     onx4 = to_onnx(clr, X_train, options=options, target_opset=12)
 
@@ -272,19 +269,19 @@ as a third output.
 
  .. code-block:: none
 
-    [[6.3417879e-06 3.0411387e-02 9.6958232e-01]
-     [2.2245944e-02 9.4209605e-01 3.5658009e-02]]
+    [[9.8533589e-01 1.4664130e-02 3.8833733e-08]
+     [1.3562627e-03 5.3411245e-01 4.6453130e-01]]
     probabilities type: <class 'numpy.ndarray'>
     class labels: [10 12 14]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-142
+.. GENERATED FROM PYTHON SOURCE LINES 138-139
 
 Processing time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-146
+.. GENERATED FROM PYTHON SOURCE LINES 139-143
 
 .. code-block:: Python
 
@@ -301,12 +298,12 @@ Processing time.
  .. code-block:: none
 
     Average time without ZipMap but with output_class_labels:
-    0.003510921600536676
+    0.003412025500006166
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-154
+.. GENERATED FROM PYTHON SOURCE LINES 144-151
 
 MultiOutputClassifier
 +++++++++++++++++++++
@@ -316,7 +313,7 @@ to predict. Instead of returning a matrix of probabilities, it returns
 a sequence of matrices. Let's first modify the labels to get
 a problem for a MultiOutputClassifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-159
+.. GENERATED FROM PYTHON SOURCE LINES 151-156
 
 .. code-block:: Python
 
@@ -342,11 +339,11 @@ a problem for a MultiOutputClassifier.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-161
+.. GENERATED FROM PYTHON SOURCE LINES 157-158
 
 Let's train a MultiOutputClassifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-175
+.. GENERATED FROM PYTHON SOURCE LINES 158-172
 
 .. code-block:: Python
 
@@ -373,26 +370,26 @@ Let's train a MultiOutputClassifier.
  .. code-block:: none
 
     MultiOutputClassifier(estimator=LogisticRegression(max_iter=500))
-    /home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py:564: UserWarning: Option zipmap is ignored for model <class 'sklearn.multioutput.MultiOutputClassifier'>. Set option zipmap to False to remove this message.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py:569: UserWarning: Option zipmap is ignored for model <class 'sklearn.multioutput.MultiOutputClassifier'>. Set option zipmap to False to remove this message.
       warnings.warn(
-    [array([[ 10, 110],
-           [ 12, 112],
-           [ 12, 114]], dtype=int64), [array([[9.6185070e-01, 3.8149051e-02, 2.1035541e-07],
-           [4.4240355e-02, 9.4647479e-01, 9.2849005e-03],
-           [8.0552045e-03, 6.3393027e-01, 3.5801452e-01]], dtype=float32), array([[7.9632753e-01, 8.7586209e-02, 1.8680112e-04, 1.1589945e-01],
-           [2.6829399e-02, 7.2040278e-01, 5.2288104e-02, 2.0047970e-01],
-           [7.8932270e-03, 3.6448562e-01, 5.4698211e-01, 8.0639035e-02]],
+    [array([[ 12, 112],
+           [ 10, 110],
+           [ 12, 112]], dtype=int64), [array([[3.4271918e-02, 9.4276208e-01, 2.2966042e-02],
+           [9.8361975e-01, 1.6380120e-02, 1.1866883e-07],
+           [2.5017133e-02, 9.3919086e-01, 3.5791978e-02]], dtype=float32), array([[2.2323465e-02, 6.9690281e-01, 6.7374893e-02, 2.1339883e-01],
+           [8.0926484e-01, 2.7745293e-02, 4.4738154e-05, 1.6294508e-01],
+           [1.6758386e-02, 5.4099339e-01, 6.5238215e-02, 3.7700996e-01]],
           dtype=float32)]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-178
+.. GENERATED FROM PYTHON SOURCE LINES 173-175
 
 Option zipmap is ignored. Labels are missing but they can be
 added back as a third output.
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-195
+.. GENERATED FROM PYTHON SOURCE LINES 175-192
 
 .. code-block:: Python
 
@@ -421,25 +418,25 @@ added back as a third output.
 
  .. code-block:: none
 
-    predicted labels [[ 10 110]
-     [ 12 112]
-     [ 12 114]]
-    predicted probabilies [array([[9.6185070e-01, 3.8149051e-02, 2.1035541e-07],
-           [4.4240355e-02, 9.4647479e-01, 9.2849005e-03],
-           [8.0552045e-03, 6.3393027e-01, 3.5801452e-01]], dtype=float32), array([[7.9632753e-01, 8.7586209e-02, 1.8680112e-04, 1.1589945e-01],
-           [2.6829399e-02, 7.2040278e-01, 5.2288104e-02, 2.0047970e-01],
-           [7.8932270e-03, 3.6448562e-01, 5.4698211e-01, 8.0639035e-02]],
+    predicted labels [[ 12 112]
+     [ 10 110]
+     [ 12 112]]
+    predicted probabilies [array([[3.4271918e-02, 9.4276208e-01, 2.2966042e-02],
+           [9.8361975e-01, 1.6380120e-02, 1.1866883e-07],
+           [2.5017133e-02, 9.3919086e-01, 3.5791978e-02]], dtype=float32), array([[2.2323465e-02, 6.9690281e-01, 6.7374893e-02, 2.1339883e-01],
+           [8.0926484e-01, 2.7745293e-02, 4.4738154e-05, 1.6294508e-01],
+           [1.6758386e-02, 5.4099339e-01, 6.5238215e-02, 3.7700996e-01]],
           dtype=float32)]
     class labels [array([10, 12, 14], dtype=int64), array([ 110,  112,  114, 1000], dtype=int64)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-197
+.. GENERATED FROM PYTHON SOURCE LINES 193-194
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-203
+.. GENERATED FROM PYTHON SOURCE LINES 194-200
 
 .. code-block:: Python
 
@@ -457,11 +454,11 @@ added back as a third output.
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -469,7 +466,7 @@ added back as a third output.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.271 seconds)
+   **Total running time of the script:** (0 minutes 1.331 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_zipmap.py:

@@ -257,8 +257,8 @@ And conversion.
 
  .. code-block:: none
 
-    (np.float64(6.04657619085458e-07), np.float64(0.0002951417065406967))
-    (np.float64(2.01757041717876e-06), np.float64(0.0005483764980468156))
+    (np.float64(6.04657619085458e-07), np.float64(0.00029514170657146715))
+    (np.float64(2.01757041717876e-06), np.float64(0.0005483764980775783))
 
 
 
@@ -266,7 +266,7 @@ And conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.045 seconds)
+   **Total running time of the script:** (0 minutes 0.014 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_mcustom_parser.py:

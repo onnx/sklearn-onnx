@@ -107,7 +107,7 @@ on github `onnx.proto
  .. code-block:: none
 
     The model is:
-    ir_version: 11
+    ir_version: 12
     producer_name: "onnx-example"
     graph {
       node {
@@ -215,7 +215,7 @@ onnx package.
     The model is:
     ir_version: 5
     producer_name: "skl2onnx"
-    producer_version: "1.18.0"
+    producer_version: "1.19.1"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -486,11 +486,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 2.2.0
-    scikit-learn: 1.6.0
-    onnx:  1.18.0
-    onnxruntime:  1.21.0+cu126
-    skl2onnx:  1.18.0
+    numpy: 2.3.1
+    scikit-learn: 1.6.1
+    onnx:  1.19.0
+    onnxruntime:  1.23.0
+    skl2onnx:  1.19.1
 
 
 
@@ -498,7 +498,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.526 seconds)
+   **Total running time of the script:** (0 minutes 0.924 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_onnx_operators.py:

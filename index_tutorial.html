@@ -4,18 +4,19 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="The easy case" href="tutorial_1_simple.html" /><link rel="prev" title="Introduction" href="introduction.html" />
+        <link rel="prefetch" href="_static/logo_main.png" as="image" />
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>Tutorial - sklearn-onnx 1.18.0 documentation</title>
+    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
+        <title>Tutorial - sklearn-onnx 1.19.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=25af2a20" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -28,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+      --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
+        --color-code-background: #2b2b2b;
+  --color-code-foreground: #f8f8f2;
   
       }
     }
@@ -172,7 +173,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">sklearn-onnx 1.18.0 documentation</div></a>
+      <a href="index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -194,12 +195,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.18.0 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -411,16 +411,16 @@ involving operator not actually implemented in
 </pre></div>
 </div>
 <p>&gt;&gt;&gt;</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">Unable</span> <span class="n">to</span> <span class="kn">import</span> <span class="nn">catboost</span> <span class="n">due</span> <span class="n">to</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span> <span class="n">size</span> <span class="n">changed</span><span class="p">,</span> <span class="n">may</span> <span class="n">indicate</span> <span class="n">binary</span> <span class="n">incompatibility</span><span class="o">.</span> <span class="n">Expected</span> <span class="mi">96</span> <span class="kn">from</span> <span class="nn">C</span> <span class="n">header</span><span class="p">,</span> <span class="n">got</span> <span class="mi">88</span> <span class="kn">from</span> <span class="nn">PyObject</span>
-    <span class="n">lightgbm</span>    <span class="mf">4.5.0</span>
-    <span class="n">numpy</span>       <span class="mf">2.2.0</span>
-    <span class="n">onnx</span>        <span class="mf">1.18.0</span>
-    <span class="n">onnxmltools</span> <span class="mf">1.13.0</span>
-    <span class="n">onnxruntime</span> <span class="mf">1.21.0</span><span class="o">+</span><span class="n">cu126</span>
-    <span class="n">scipy</span>       <span class="mf">1.14.1</span>
-    <span class="n">skl2onnx</span>    <span class="mf">1.18.0</span>
-    <span class="n">sklearn</span>     <span class="mf">1.6.0</span>
-    <span class="n">xgboost</span>     <span class="mf">2.1.3</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="n">catboost</span>    <span class="mf">1.2.8</span>
+    <span class="n">lightgbm</span>    <span class="mf">4.6.0</span>
+    <span class="n">numpy</span>       <span class="mf">2.3.1</span>
+    <span class="n">onnx</span>        <span class="mf">1.19.0</span>
+    <span class="n">onnxmltools</span> <span class="mf">1.14.0</span>
+    <span class="n">onnxruntime</span> <span class="mf">1.23.0</span>
+    <span class="n">scipy</span>       <span class="mf">1.15.2</span>
+    <span class="n">skl2onnx</span>    <span class="mf">1.19.1</span>
+    <span class="n">sklearn</span>     <span class="mf">1.7.1</span>
+    <span class="n">xgboost</span>     <span class="mf">3.0.2</span>
 </pre></div>
 </div>
 </section>
@@ -474,9 +474,9 @@ involving operator not actually implemented in
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=256cef93"></script>
+</div><script src="_static/documentation_options.js?v=f0c121d3"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

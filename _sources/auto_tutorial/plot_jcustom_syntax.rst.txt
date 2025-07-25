@@ -47,7 +47,7 @@ It basically copies what is in example
 
 
     from skl2onnx.common.data_types import guess_proto_type
-    from onnxconverter_common.onnx_ops import apply_sub
+    from skl2onnx.common._apply_operation import apply_sub
     from onnxruntime import InferenceSession
     from skl2onnx import update_registered_converter
     from skl2onnx import to_onnx
@@ -154,7 +154,7 @@ The shape calculator does not change.
 
 The converter is different.
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-144
+.. GENERATED FROM PYTHON SOURCE LINES 104-143
 
 .. code-block:: Python
 
@@ -185,7 +185,6 @@ The converter is different.
 
         op_name = scope.get_unique_operator_name("sub")
         sub_name = scope.get_unique_variable_name("sub")
-        # This function is defined in package onnxconverter_common.
         # Most common operators can be added to the graph with
         # these functions. It handles the case when specifications
         # changed accross opsets (a parameter becomes an input
@@ -205,11 +204,11 @@ The converter is different.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-146
+.. GENERATED FROM PYTHON SOURCE LINES 144-145
 
 We need to let *skl2onnx* know about the new converter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-172
+.. GENERATED FROM PYTHON SOURCE LINES 145-171
 
 .. code-block:: Python
 
@@ -247,16 +246,16 @@ We need to let *skl2onnx* know about the new converter.
 
  .. code-block:: none
 
-    (np.float64(6.04657619085458e-07), np.float64(0.0002951417065406967))
+    (np.float64(6.04657619085458e-07), np.float64(0.00029514170657146715))
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-174
+.. GENERATED FROM PYTHON SOURCE LINES 172-173
 
 Let's check it works as well with double.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-183
+.. GENERATED FROM PYTHON SOURCE LINES 173-182
 
 .. code-block:: Python
 
@@ -282,14 +281,14 @@ Let's check it works as well with double.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 184-185
+.. GENERATED FROM PYTHON SOURCE LINES 183-184
 
 The differences are smaller with double as expected.
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.060 seconds)
+   **Total running time of the script:** (0 minutes 0.047 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_jcustom_syntax.py:

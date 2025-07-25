@@ -279,45 +279,105 @@ sparse matrices to be converted into dense matrices.
 
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/home/xadupre/github/sklearn-onnx/docs/tutorial/plot_usparse_xgboost.py", line 227, in <module>
-        data_sparse = make_pipelines(df, y)
-                      ^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/github/sklearn-onnx/docs/tutorial/plot_usparse_xgboost.py", line 217, in make_pipelines
-        diff = numpy.abs(pred_onx[1].ravel() - pipe.predict_proba(df).ravel()).sum()
-                                               ^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/pipeline.py", line 896, in predict_proba
-        with _raise_or_warn_if_not_fitted(self):
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/usr/lib/python3.12/contextlib.py", line 144, in __exit__
-        next(self.gen)
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/pipeline.py", line 60, in _raise_or_warn_if_not_fitted
-        check_is_fitted(estimator)
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1756, in check_is_fitted
-        if not _is_fitted(estimator, attributes, all_or_any):
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1665, in _is_fitted
-        return estimator.__sklearn_is_fitted__()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/pipeline.py", line 1310, in __sklearn_is_fitted__
-        check_is_fitted(last_step)
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py", line 1751, in check_is_fitted
-        tags = get_tags(estimator)
-               ^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/_tags.py", line 405, in get_tags
-        sklearn_tags_provider[klass] = klass.__sklearn_tags__(estimator)  # type: ignore[attr-defined]
-                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      File "/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/base.py", line 540, in __sklearn_tags__
-        tags = super().__sklearn_tags__()
-               ^^^^^^^^^^^^^^^^^^^^^^^^
-    AttributeError: 'super' object has no attribute '__sklearn_tags__'
+      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:35] WARNING: /workspace/src/learner.cc:738: 
+    Parameters: { "use_label_encoder" } are not used.
+
+      bst.update(dtrain, iteration=i, fobj=obj)
+     75%|███████▌  | 3/4 [00:00<00:00,  3.18it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000728 seconds.
+    You can set `force_col_wise=true` to remove the overhead.
+    [LightGBM] [Info] Total Bins 53
+    [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+      warnings.warn(
+    100%|██████████| 4/4 [00:01<00:00,  3.84it/s]
+                                model  discrepencies
+    0          RandomForestClassifier       0.947052
+    1  HistGradientBoostingClassifier            NaN
+    2                   XGBClassifier      15.196619
+    3                  LGBMClassifier       0.000009
 
 
+.. raw:: html
 
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>model</th>
+          <th>discrepencies</th>
+          <th>error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>RandomForestClassifier</td>
+          <td>0.947052</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>HistGradientBoostingClassifier</td>
+          <td>NaN</td>
+          <td>Sparse data was passed for X, but dense data i...</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>XGBClassifier</td>
+          <td>15.196619</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>LGBMClassifier</td>
+          <td>0.000009</td>
+          <td>NaN</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
 
 .. GENERATED FROM PYTHON SOURCE LINES 234-240
 
@@ -341,6 +401,97 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
     stat
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|█████     | 2/4 [00:00<00:00,  2.78it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:37] WARNING: /workspace/src/learner.cc:738: 
+    Parameters: { "use_label_encoder" } are not used.
+
+      bst.update(dtrain, iteration=i, fobj=obj)
+     75%|███████▌  | 3/4 [00:01<00:00,  1.81it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.033149 seconds.
+    You can set `force_col_wise=true` to remove the overhead.
+    [LightGBM] [Info] Total Bins 53
+    [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+      warnings.warn(
+    100%|██████████| 4/4 [00:01<00:00,  2.58it/s]    100%|██████████| 4/4 [00:01<00:00,  2.42it/s]
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>model</th>
+          <th>discrepencies</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>RandomForestClassifier</td>
+          <td>0.940913</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>HistGradientBoostingClassifier</td>
+          <td>0.000005</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>XGBClassifier</td>
+          <td>2.899390</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>LGBMClassifier</td>
+          <td>0.000009</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
 .. GENERATED FROM PYTHON SOURCE LINES 249-251
 
 This is much better. Let's compare how the preprocessing
@@ -356,6 +507,33 @@ applies on the data.
     print()
     print("dense")
     print(data_dense[-1]["pipe"].steps[0][-1].transform(df)[:2])
+
+
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    sparse
+    <Compressed Sparse Row sparse matrix of dtype 'float64'
+            with 8 stored elements and shape (2, 6)>
+      Coords        Values
+      (0, 0)        -0.9006811702978088
+      (0, 1)        1.019004351971607
+      (0, 2)        0.4323732931220851
+      (0, 5)        0.9016947018779491
+      (1, 0)        -1.1430169111851105
+      (1, 1)        -0.13197947932162468
+      (1, 2)        0.4323732931220851
+      (1, 5)        0.9016947018779491
+
+    dense
+    [[-0.90068117  1.01900435  0.43237329  0.          0.          0.9016947 ]
+     [-1.14301691 -0.13197948  0.43237329  0.          0.          0.9016947 ]]
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 259-278
@@ -393,6 +571,108 @@ replace null values by nan in the onnx graph.
 
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:38] WARNING: /workspace/src/learner.cc:738: 
+    Parameters: { "use_label_encoder" } are not used.
+
+      bst.update(dtrain, iteration=i, fobj=obj)
+     75%|███████▌  | 3/4 [00:00<00:00,  3.21it/s][LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.012050 seconds.
+    You can set `force_row_wise=true` to remove the overhead.
+    And if memory is not enough, you can set `force_col_wise=true`.
+    [LightGBM] [Info] Total Bins 53
+    [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+      warnings.warn(
+    100%|██████████| 4/4 [00:01<00:00,  4.06it/s]    100%|██████████| 4/4 [00:01<00:00,  3.83it/s]
+                                model  discrepencies
+    0          RandomForestClassifier      24.634892
+    1  HistGradientBoostingClassifier            NaN
+    2                   XGBClassifier       2.899390
+    3                  LGBMClassifier       0.000009
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>model</th>
+          <th>discrepencies</th>
+          <th>error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>RandomForestClassifier</td>
+          <td>24.634892</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>HistGradientBoostingClassifier</td>
+          <td>NaN</td>
+          <td>Sparse data was passed for X, but dense data i...</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>XGBClassifier</td>
+          <td>2.899390</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>LGBMClassifier</td>
+          <td>0.000009</td>
+          <td>NaN</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
 .. GENERATED FROM PYTHON SOURCE LINES 287-296
 
 Dense, 0 replaced by nan
@@ -419,6 +699,107 @@ more explicit.
     stat
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:39] WARNING: /workspace/src/learner.cc:738: 
+    Parameters: { "use_label_encoder" } are not used.
+
+      bst.update(dtrain, iteration=i, fobj=obj)
+     75%|███████▌  | 3/4 [00:01<00:00,  2.67it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000045 seconds.
+    You can set `force_col_wise=true` to remove the overhead.
+    [LightGBM] [Info] Total Bins 53
+    [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Info] Start training from score -1.098612
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+      warnings.warn(
+    100%|██████████| 4/4 [00:01<00:00,  3.30it/s]
+                                model  discrepencies
+    0          RandomForestClassifier      41.288296
+    1  HistGradientBoostingClassifier            NaN
+    2                   XGBClassifier       2.899390
+    3                  LGBMClassifier       0.000009
+
+
+.. raw:: html
+
+    <div class="output_subarea output_html rendered_html output_result">
+    <div>
+    <style scoped>
+        .dataframe tbody tr th:only-of-type {
+            vertical-align: middle;
+        }
+
+        .dataframe tbody tr th {
+            vertical-align: top;
+        }
+
+        .dataframe thead th {
+            text-align: right;
+        }
+    </style>
+    <table border="1" class="dataframe">
+      <thead>
+        <tr style="text-align: right;">
+          <th></th>
+          <th>model</th>
+          <th>discrepencies</th>
+          <th>error</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>0</th>
+          <td>RandomForestClassifier</td>
+          <td>41.288296</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>1</th>
+          <td>HistGradientBoostingClassifier</td>
+          <td>NaN</td>
+          <td>Sparse data was passed for X, but dense data i...</td>
+        </tr>
+        <tr>
+          <th>2</th>
+          <td>XGBClassifier</td>
+          <td>2.899390</td>
+          <td>NaN</td>
+        </tr>
+        <tr>
+          <th>3</th>
+          <td>LGBMClassifier</td>
+          <td>0.000009</td>
+          <td>NaN</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    </div>
+    <br />
+    <br />
+
 .. GENERATED FROM PYTHON SOURCE LINES 306-312
 
 Conclusion
@@ -431,7 +812,7 @@ tuned depending on the model which follows the TfIdf preprocessing.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.258 seconds)
+   **Total running time of the script:** (0 minutes 4.999 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_usparse_xgboost.py:
