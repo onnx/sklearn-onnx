@@ -26,13 +26,35 @@ def convert_sklearn_ordinal_encoder(
     dimension_idx = 0
 
     # handle the 'handle_unknown=use_encoded_value' case
+    use_float = (
+        False
+        if ordinal_op.unknown_value is None
+        else isinstance(ordinal_op.unknown_value, float)
+        or np.isnan(ordinal_op.unknown_value)
+    )
     default_value = (
-        None if ordinal_op.handle_unknown == "error" else int(ordinal_op.unknown_value)
+        None
+        if ordinal_op.handle_unknown == "error"
+        else (
+            float(ordinal_op.unknown_value)
+            if use_float
+            else int(ordinal_op.unknown_value)
+        )
     )
 
     for categories in ordinal_op.categories_:
         if len(categories) == 0:
             continue
+
+        if (
+            hasattr(ordinal_op, "_infrequent_enabled")
+            and ordinal_op._infrequent_enabled
+        ):
+            default_to_infrequent_mappings = ordinal_op._default_to_infrequent_mappings[
+                input_idx
+            ]
+        else:
+            default_to_infrequent_mappings = None
 
         current_input = operator.inputs[input_idx]
         if current_input.get_second_dimension() == 1:
@@ -103,24 +125,45 @@ def convert_sklearn_ordinal_encoder(
             )
 
         # hanlde encoded_missing_value
+        key = "values_floats" if use_float else "values_int64s"
+        dtype = np.float32 if use_float else np.int64
         if not np.isnan(ordinal_op.encoded_missing_value) and (
             isinstance(categories[-1], float) and np.isnan(categories[-1])
         ):
             # sklearn always places np.nan as the last entry
-            # in its cathegories if it was in the training data
+            # in its categories if it was in the training data
             # => we simply add the 'ordinal_op.encoded_missing_value'
             # as our last entry in 'values_int64s' if it was in the training data
             encoded_missing_value = np.array(
                 [int(ordinal_op.encoded_missing_value)]
-            ).astype(np.int64)
-            attrs["values_int64s"] = np.concatenate(
-                (np.arange(len(categories) - 1).astype(np.int64), encoded_missing_value)
-            )
-        else:
-            attrs["values_int64s"] = np.arange(len(categories)).astype(np.int64)
+            ).astype(dtype)
 
-        if default_value:
-            attrs["default_int64"] = default_value
+            # handle max_categories or min_frequency
+            if default_to_infrequent_mappings is not None:
+                attrs[key] = np.concatenate(
+                    (
+                        np.array(default_to_infrequent_mappings, dtype=dtype),
+                        encoded_missing_value,
+                    )
+                )
+            else:
+                attrs[key] = np.concatenate(
+                    (
+                        np.arange(len(categories) - 1).astype(dtype),
+                        encoded_missing_value,
+                    )
+                )
+        else:
+            # handle max_categories or min_frequency
+            if default_to_infrequent_mappings is not None:
+                attrs[key] = np.array(default_to_infrequent_mappings, dtype=dtype)
+            else:
+                attrs[key] = np.arange(len(categories)).astype(dtype)
+
+        if default_value or (
+            isinstance(default_value, float) and np.isnan(default_value)
+        ):
+            attrs["default_float" if use_float else "default_int64"] = default_value
 
         result.append(scope.get_unique_variable_name("ordinal_output"))
         label_encoder_output = scope.get_unique_variable_name("label_encoder")
