@@ -2,6 +2,8 @@
 
 ## 1.20.0
 
+* Fixes missing dimension (number of features) in StackingClassifier
+  [#1201](https://github.com/onnx/sklearn-onnx/issues/1201)
 * Fixes CastTransformer output type
   [#1200](https://github.com/onnx/sklearn-onnx/issues/1200)
 * Fixes unknown_value=np.nan in OrdinalEncoder
