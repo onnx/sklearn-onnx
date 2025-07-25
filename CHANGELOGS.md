@@ -2,6 +2,8 @@
 
 ## 1.20.0
 
+* Fixes CastTransformer output type
+  [#1200](https://github.com/onnx/sklearn-onnx/issues/1200)
 * Fixes unknown_value=np.nan in OrdinalEncoder
   [#1198](https://github.com/onnx/sklearn-onnx/issues/1198)
 * Enhance OrdinalEncoder conversion to handle infrequent categories
