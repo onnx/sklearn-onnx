@@ -137,7 +137,10 @@ def convert_sklearn_stacking_classifier(
 
     merged_proba_tensor = _transform(scope, operator, container, stacking_op)
     merge_proba = scope.declare_local_variable(
-        "stack_merge_proba", operator.inputs[0].type.__class__()
+        "stack_merge_proba",
+        operator.inputs[0].type.__class__(
+            [None, stacking_op.final_estimator_.n_features_in_]
+        ),
     )
     container.add_node("Identity", [merged_proba_tensor], [merge_proba.onnx_name])
     prob = _fetch_scores(

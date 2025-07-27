@@ -91,6 +91,9 @@ def get_column_index(i, inputs):
             return 0, 0
         vi = 0
         pos = 0
+        assert (
+            len(inputs[0].type.shape) == 2
+        ), f"Unexpect rank={len(inputs[0].type.shape)} for inputs={inputs}, i={i}"
         end = inputs[0].type.shape[1] if isinstance(inputs[0].type, TensorType) else 1
         if end is None:
             raise RuntimeError(
