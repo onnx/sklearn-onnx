@@ -382,6 +382,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             "gradient boosting classifier with exponential loss",
             [("input", FloatTensorType([None, X.shape[1]]))],
             target_opset=TARGET_OPSET,
+            options={"zipmap": False},
         )
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
@@ -389,6 +390,7 @@ class TestSklearnGradientBoostingModels(unittest.TestCase):
             model,
             model_onnx,
             basename="SklearnGradientBoostingClassifierExponentialLoss",
+            backend="onnxruntime",
         )
 
 
