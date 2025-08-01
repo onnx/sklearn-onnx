@@ -10,6 +10,9 @@
   [#1198](https://github.com/onnx/sklearn-onnx/issues/1198)
 * Enhance OrdinalEncoder conversion to handle infrequent categories
   [#1195](https://github.com/onnx/sklearn-onnx/issues/1195)
+* Errors in validating Inputs and Outputs of operators raise
+  dedicated exceptions instead of generic RuntimeError
+  [#1205] (https://github.com/onnx/sklearn-onnx/pull/1205)
 
 ## 1.19.1
 

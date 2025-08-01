@@ -91,9 +91,9 @@ def get_column_index(i, inputs):
             return 0, 0
         vi = 0
         pos = 0
-        assert (
-            len(inputs[0].type.shape) == 2
-        ), f"Unexpect rank={len(inputs[0].type.shape)} for inputs={inputs}, i={i}"
+        assert len(inputs[0].type.shape) == 2, (
+            f"Unexpect rank={len(inputs[0].type.shape)} for inputs={inputs}, i={i}"
+        )
         end = inputs[0].type.shape[1] if isinstance(inputs[0].type, TensorType) else 1
         if end is None:
             raise RuntimeError(
@@ -113,9 +113,7 @@ def get_column_index(i, inputs):
                     )
                 )
             rel_end = (
-                inputs[vi].type.shape[1]
-                if isinstance(inputs[vi].type, TensorType)
-                else 1
+                inputs[vi].type.shape[1] if isinstance(inputs[vi].type, TensorType) else 1
             )
             if rel_end is None:
                 raise RuntimeError(
@@ -243,70 +241,21 @@ def check_input_and_output_numbers(
     else:
         raise RuntimeError("output_count_range must be a list or an integer")
 
-    if min_input_count is not None and len(operator.inputs) < min_input_count:
-        raise RuntimeError(
-            (
-                "For operator %s (type: %s), at least %s input(s) is(are) "
-                "required but we got %s input(s) which are %s"
-            )
-            % (
-                operator.full_name,
-                operator.type,
-                min_input_count,
-                len(operator.inputs),
-                operator.input_full_names,
-            )
-        )
+    input_count = len(operator.inputs)
+    if min_input_count is not None and input_count < min_input_count:
+        raise InvalidInputLengthException(operator, min_input_count, None)
 
-    if max_input_count is not None and len(operator.inputs) > max_input_count:
-        raise RuntimeError(
-            (
-                "For operator %s (type: %s), at most %s input(s) is(are) "
-                "supported but we got %s input(s) which are %s"
-            )
-            % (
-                operator.full_name,
-                operator.type,
-                max_input_count,
-                len(operator.inputs),
-                operator.input_full_names,
-            )
-        )
+    if max_input_count is not None and input_count > max_input_count:
+        raise InvalidInputLengthException(operator, None, max_input_count)
 
     if min_output_count is not None and len(operator.outputs) < min_output_count:
-        raise RuntimeError(
-            (
-                "For operator %s (type: %s), at least %s output(s) "
-                "is(are) produced but we got %s output(s) which are %s"
-            )
-            % (
-                operator.full_name,
-                operator.type,
-                min_output_count,
-                len(operator.outputs),
-                operator.output_full_names,
-            )
-        )
+        raise InvalidOutputLengthException(operator, min_output_count, None)
 
     if max_output_count is not None and len(operator.outputs) > max_output_count:
-        raise RuntimeError(
-            (
-                "For operator %s (type: %s), at most %s outputs(s) "
-                "is(are) supported but we got %s output(s) which are %s"
-            )
-            % (
-                operator.full_name,
-                operator.type,
-                max_output_count,
-                len(operator.outputs),
-                operator.output_full_names,
-            )
-        )
+        raise InvalidOutputLengthException(operator, None, max_output_count)
 
 
-def check_input_and_output_types(
-    operator, good_input_types=None, good_output_types=None
-):
+def check_input_and_output_types(operator, good_input_types=None, good_output_types=None):
     """
     Check if the type(s) of input(s)/output(s) is(are) correct
 
@@ -320,33 +269,162 @@ def check_input_and_output_types(
     if good_input_types is not None:
         for variable in operator.inputs:
             if type(variable.type) not in good_input_types:
-                raise RuntimeError(
-                    (
-                        "Operator %s (type: %s) got an input %s "
-                        "with a wrong type %s. Only %s are allowed"
-                    )
-                    % (
-                        operator.full_name,
-                        operator.type,
-                        variable.full_name,
-                        type(variable.type),
-                        good_input_types,
-                    )
-                )
+                raise InvalidInputTypeException(operator, variable, good_input_types)
 
     if good_output_types is not None:
         for variable in operator.outputs:
             if type(variable.type) not in good_output_types:
-                raise RuntimeError(
-                    (
-                        "Operator %s (type: %s) got an output %s "
-                        "with a wrong type %s. Only %s are allowed"
-                    )
-                    % (
-                        operator.full_name,
-                        operator.type,
-                        variable.full_name,
-                        type(variable.type),
-                        good_output_types,
-                    )
+                raise InvalidOutputTypeException(operator, variable, good_output_types)
+
+
+class InvalidInputLengthException(RuntimeError):
+    """Operator didn't receive the expected number of inputs.
+
+    :param operator: The operator which received the wrong number of inputs.
+    :param min_input_count: The minimum number of inputs expected, or None.
+    :param max_input_count: The maximum number of inputs expected, or None.
+
+    If the number of inputs is too low, max_input_count should be None.
+    If the number of inputs is too high, min_input_count should be None.
+    """
+
+    def __init__(self, operator, min_input_count, max_input_count):
+        # This allow inspecting the exception from caller handling it.
+        self.operator = operator
+        self.min_input_count = min_input_count
+        self.max_input_count = max_input_count
+
+        if min_input_count is not None:
+            msg = (
+                "For operator %s (type: %s), at least %s input(s) is(are) "
+                "required but we got %s input(s) which are %s"
+            ) % (
+                operator.full_name,
+                operator.type,
+                min_input_count,
+                len(operator.inputs),
+                operator.input_full_names,
+            )
+        elif max_input_count is not None:
+            msg = (
+                "For operator %s (type: %s), at most %s input(s) is(are) "
+                "supported but we got %s input(s) which are %s"
+            ) % (
+                operator.full_name,
+                operator.type,
+                max_input_count,
+                len(operator.inputs),
+                operator.input_full_names,
+            )
+        else:
+            msg = "Unknown inputs length error in operator %s (type: %s) with inputs %s" % (
+                operator.full_name,
+                operator.type,
+                operator.input_full_names,
+            )
+        super().__init__(msg)
+
+
+class InvalidOutputLengthException(RuntimeError):
+    """Operator didn't produce the expected number of outputs.
+
+    :param operator: The operator which produced the wrong number of outputs.
+    :param min_output_count: The minimum number of outputs expected, or None.
+    :param max_output_count: The maximum number of outputs expected, or None.
+
+    If the number of outputs is too low, max_output_count should be None.
+    If the number of outputs is too high, min_output_count should be None.
+    """
+
+    def __init__(self, operator, min_output_count, max_output_count):
+        # This allow inspecting the exception from caller handling it.
+        self.operator = operator
+        self.min_output_count = min_output_count
+        self.max_output_count = max_output_count
+
+        if min_output_count is not None:
+            msg = (
+                "For operator %s (type: %s), at least %s output(s) is(are) "
+                "required but we got %s output(s) which are %s"
+            ) % (
+                operator.full_name,
+                operator.type,
+                min_output_count,
+                len(operator.outputs),
+                operator.output_full_names,
+            )
+        elif max_output_count is not None:
+            msg = (
+                "For operator %s (type: %s), at most %s output(s) is(are) "
+                "supported but we got %s output(s) which are %s"
+            ) % (
+                operator.full_name,
+                operator.type,
+                max_output_count,
+                len(operator.outputs),
+                operator.output_full_names,
+            )
+        else:
+            msg = (
+                "Unknown outputs length error in operator %s (type: %s) with outputs %s"
+                % (
+                    operator.full_name,
+                    operator.type,
+                    operator.output_full_names,
                 )
+            )
+        super().__init__(msg)
+
+
+class InvalidInputTypeException(RuntimeError):
+    """Operator received an input with an unexpected type.
+
+    :param operator: The operator which received the wrong input type.
+    :param variable: The input variable with the wrong type.
+    :param expected_types: The list of expected input types.
+    """
+
+    def __init__(self, operator, variable, expected_types):
+        # This allow inspecting the exception from caller handling it.
+        self.operator = operator
+        self.variable = variable
+        self.expected_types = expected_types
+
+        msg = (
+            "Operator %s (type: %s) got an input %s "
+            "with a wrong type %s. Only %s are allowed"
+        ) % (
+            operator.full_name,
+            operator.type,
+            variable.full_name,
+            type(variable.type),
+            expected_types,
+        )
+        super().__init__(msg)
+
+
+class InvalidOutputTypeException(RuntimeError):
+    """Operator produced an output with an unexpected type.
+
+    :param operator: The operator which produced the wrong output type.
+    :param variable: The output variable with the wrong type.
+    :param expected_types: The list of expected output types.
+    """
+
+    def __init__(self, operator, variable, expected_types):
+        # This allow inspecting the exception from caller handling it.
+        self.operator = operator
+        self.variable = variable
+        self.expected_types = expected_types
+
+        msg = (
+            "Operator %s (type: %s) got an output %s "
+            "with a wrong type %s. Only %s are allowed"
+        ) % (
+            operator.full_name,
+            operator.type,
+            variable.full_name,
+            type(variable.type),
+            expected_types,
+        )
+        super().__init__(msg)
