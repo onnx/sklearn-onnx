@@ -1,6 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
 
-import packaging.version as pv
 import numpy as np
 from onnx.helper import make_tensor
 from sklearn import __version__
@@ -32,6 +31,8 @@ from .._supported_operators import sklearn_operator_name_map
 
 
 def _scikit_learn_before_any(any_version: str) -> bool:
+    import packaging.version as pv
+
     if ".dev" in __version__:
         return pv.Version(__version__.split(".dev")[0]) < pv.Version(any_version)
     if ".post" in __version__:
@@ -40,11 +41,17 @@ def _scikit_learn_before_any(any_version: str) -> bool:
 
 
 def _scikit_learn_before_022() -> bool:
-    return _scikit_learn_before_any("0.22")
+    return __version__[0] == "0"
 
 
 def _scikit_learn_before_131():
-    return _scikit_learn_before_any("1.3.1")
+    try:
+        return _scikit_learn_before_any("1.3.1")
+    except ImportError:
+        # introduced in 1.3.0
+        import sklearn.cluster
+
+        return not hasattr(sklearn.cluster, "HDBSCAN")
 
 
 def _samme_proba(
