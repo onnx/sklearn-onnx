@@ -11,9 +11,16 @@ from ..algebra.onnx_ops import OnnxAdd, OnnxCast, OnnxDiv, OnnxMatMul, OnnxSub
 
 def _skl150() -> bool:
     import sklearn
-    import packaging.version as pv
 
-    return pv.Version(sklearn.__version__) >= pv.Version("1.5.0")
+    try:
+        import packaging.version as pv
+
+        return pv.Version(sklearn.__version__) >= pv.Version("1.5.0")
+    except ImportError:
+        # function introduced in 1.5.0
+        import sklearn.metrics
+
+        return hasattr(sklearn.metrics, "d2_log_loss_score")
 
 
 def convert_pls_regression(
