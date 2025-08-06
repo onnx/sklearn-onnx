@@ -80,7 +80,9 @@ class TestValidationExceptions(unittest.TestCase):
         # Require at most 2 outputs
         with self.assertRaises(InvalidOutputLengthException) as cm:
             check_input_and_output_numbers(
-                operator_with_many_outputs, input_count_range=1, output_count_range=[1, 2]
+                operator_with_many_outputs,
+                input_count_range=1,
+                output_count_range=[1, 2],
             )
 
         exc = cm.exception
@@ -92,7 +94,9 @@ class TestValidationExceptions(unittest.TestCase):
     def test_invalid_input_type_exception(self):
         # Operator has FloatTensorType input but we only allow Int64TensorType
         with self.assertRaises(InvalidInputTypeException) as cm:
-            check_input_and_output_types(self.operator, good_input_types=[Int64TensorType])
+            check_input_and_output_types(
+                self.operator, good_input_types=[Int64TensorType]
+            )
 
         exc = cm.exception
         self.assertEqual(exc.operator, self.operator)
@@ -166,7 +170,9 @@ class TestValidationExceptions(unittest.TestCase):
             self.assertIsNone(e.max_output_count)
 
         try:
-            check_input_and_output_types(self.operator, good_input_types=[StringTensorType])
+            check_input_and_output_types(
+                self.operator, good_input_types=[StringTensorType]
+            )
         except InvalidInputTypeException as e:
             # Test that we can access all expected attributes
             self.assertIsNotNone(e.operator)
@@ -198,7 +204,9 @@ class TestValidationExceptions(unittest.TestCase):
             self.assertIn(self.operator.full_name, msg)  # operator name
 
         try:
-            check_input_and_output_types(self.operator, good_input_types=[StringTensorType])
+            check_input_and_output_types(
+                self.operator, good_input_types=[StringTensorType]
+            )
         except InvalidInputTypeException as e:
             msg = str(e)
             self.assertIn("LinearRegressor", msg)  # operator type

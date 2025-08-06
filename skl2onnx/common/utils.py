@@ -91,9 +91,9 @@ def get_column_index(i, inputs):
             return 0, 0
         vi = 0
         pos = 0
-        assert len(inputs[0].type.shape) == 2, (
-            f"Unexpect rank={len(inputs[0].type.shape)} for inputs={inputs}, i={i}"
-        )
+        assert (
+            len(inputs[0].type.shape) == 2
+        ), f"Unexpect rank={len(inputs[0].type.shape)} for inputs={inputs}, i={i}"
         end = inputs[0].type.shape[1] if isinstance(inputs[0].type, TensorType) else 1
         if end is None:
             raise RuntimeError(
@@ -113,7 +113,9 @@ def get_column_index(i, inputs):
                     )
                 )
             rel_end = (
-                inputs[vi].type.shape[1] if isinstance(inputs[vi].type, TensorType) else 1
+                inputs[vi].type.shape[1]
+                if isinstance(inputs[vi].type, TensorType)
+                else 1
             )
             if rel_end is None:
                 raise RuntimeError(
@@ -255,7 +257,9 @@ def check_input_and_output_numbers(
         raise InvalidOutputLengthException(operator, None, max_output_count)
 
 
-def check_input_and_output_types(operator, good_input_types=None, good_output_types=None):
+def check_input_and_output_types(
+    operator, good_input_types=None, good_output_types=None
+):
     """
     Check if the type(s) of input(s)/output(s) is(are) correct
 
@@ -317,10 +321,13 @@ class InvalidInputLengthException(RuntimeError):
                 operator.input_full_names,
             )
         else:
-            msg = "Unknown inputs length error in operator %s (type: %s) with inputs %s" % (
-                operator.full_name,
-                operator.type,
-                operator.input_full_names,
+            msg = (
+                "Unknown inputs length error in operator %s (type: %s) with inputs %s"
+                % (
+                    operator.full_name,
+                    operator.type,
+                    operator.input_full_names,
+                )
             )
         super().__init__(msg)
 
