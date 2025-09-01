@@ -2,6 +2,8 @@
 
 ## 1.20.0
 
+* Adds __sklearn_is_fitted__ to CastTransformer
+  [#1209](https://github.com/onnx/sklearn-onnx/issues/1209)
 * Fixes missing dimension (number of features) in StackingClassifier
   [#1201](https://github.com/onnx/sklearn-onnx/issues/1201)
 * Fixes CastTransformer output type
