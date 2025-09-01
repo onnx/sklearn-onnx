@@ -27,6 +27,9 @@ class CastTransformer(TransformerMixin, BaseEstimator):
     def __init__(self, *, dtype=np.float32):
         self.dtype = dtype
 
+    def __sklearn_is_fitted__(self):
+        return True
+
     def _cast(self, a, name):
         if not isinstance(a, np.ndarray):
             if hasattr(a, "values") and hasattr(a, "iloc"):
