@@ -138,7 +138,7 @@ def onnx_nearest_neighbors_indices_k(
         if keep_distances:
             return (
                 node[1],
-                OnnxMul(node[0], np.array([-1], dtype=dtype), op_version=op_version),
+                node[0]
             )
     if keep_distances:
         return (node[1], node[0])
