@@ -42,7 +42,12 @@ def convert_sklearn_ordinal_encoder(
         )
     )
 
-    for categories in ordinal_op.categories_:
+    ordinal_categories = ordinal_op.categories_
+    if hasattr(ordinal_op, "infrequent_categories_") and ordinal_op.infrequent_categories_:
+        # exclude infrequent categories if present
+        ordinal_categories = [categories for categories in ordinal_categories if categories not in ordinal_op.infrequent_categories_]
+
+    for categories in ordinal_categories:
         if len(categories) == 0:
             continue
 

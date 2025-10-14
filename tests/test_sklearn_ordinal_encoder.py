@@ -504,6 +504,75 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
+    @unittest.skipIf(
+        not max_categories_support(),
+        reason="OrdinalEncoder supports max_categories and min_frequencey since 1.3",
+    )
+    def test_model_ordinal_encoder_min_frequency_multi_column(self):
+        from onnxruntime import InferenceSession
+
+        model = OrdinalEncoder(min_frequency=3, handle_unknown="use_encoded_value", unknown_value=-1)
+        # First column: 'a' appears 4 times (frequent), 'b' 2 times (infrequent), 'c' 1 time (infrequent)
+        # Second column: 'x' appears 4 times (frequent), 'y' 2 times (infrequent), 'z' 1 time (infrequent)
+        data = np.array(
+            [
+                ["a", "x"],
+                ["a", "x"],
+                ["a", "x"],
+                ["a", "x"],
+                ["b", "y"],
+                ["b", "y"],
+                ["c", "z"],
+            ],
+            dtype=np.object_,
+        )
+        test_data = np.array(
+            [
+                ["a", "x"],  # frequent in both columns
+                ["b", "y"],  # infrequent in both columns
+                ["c", "z"],  # infrequent in both columns
+            ],
+            dtype=np.object_,
+        )
+
+        expected = model.fit_transform(data)
+        expected_test = model.transform(test_data)
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn ordinal encoder",
+            [("input", StringTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            data,
+            model,
+            model_onnx,
+            basename="SklearnOrdinalEncoderMinFrequencyMultiCol",
+        )
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(
+            None,
+            {
+                "input": data,
+            },
+        )
+        assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
+
+        # Test with test data
+        got_test = sess.run(
+            None,
+            {
+                "input": test_data,
+            },
+        )
+        assert_almost_equal(expected_test.reshape(-1), got_test[0].reshape(-1))
+
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
