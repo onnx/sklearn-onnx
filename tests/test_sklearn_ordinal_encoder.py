@@ -511,9 +511,13 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
     def test_model_ordinal_encoder_min_frequency_multi_column(self):
         from onnxruntime import InferenceSession
 
-        model = OrdinalEncoder(min_frequency=3, handle_unknown="use_encoded_value", unknown_value=-1)
-        # First column: 'a' appears 4 times (frequent), 'b' 2 times (infrequent), 'c' 1 time (infrequent)
-        # Second column: 'x' appears 4 times (frequent), 'y' 2 times (infrequent), 'z' 1 time (infrequent)
+        model = OrdinalEncoder(
+            min_frequency=3, handle_unknown="use_encoded_value", unknown_value=-1
+        )
+        # First column: 'a' appears 4 times (frequent), 'b' 2 times (infrequent),
+        #               'c' 1 time (infrequent)
+        # Second column: 'x' appears 4 times (frequent), 'y' 2 times (infrequent),
+        #                'z' 1 time (infrequent)
         data = np.array(
             [
                 ["a", "x"],
@@ -571,7 +575,6 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
             },
         )
         assert_almost_equal(expected_test.reshape(-1), got_test[0].reshape(-1))
-
 
 
 if __name__ == "__main__":

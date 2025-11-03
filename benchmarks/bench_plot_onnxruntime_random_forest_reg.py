@@ -204,7 +204,7 @@ def bench(
 def plot_results(df, verbose=False):
     nrows = max(len(set(df.max_depth)) * len(set(df.n_obs)), 2)
     ncols = max(len(set(df.n_jobs)), 2)
-    fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
+    _fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     pos = 0
     row = 0
     for n_obs in sorted(set(df.n_obs)):
