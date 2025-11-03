@@ -254,12 +254,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(
-            None,
-            {
-                "input": data,
-            },
-        )
+        got = sess.run(None, {"input": data})
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
@@ -292,12 +287,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(
-            None,
-            {
-                "input": data,
-            },
-        )
+        got = sess.run(None, {"input": data})
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
@@ -395,9 +385,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         data = np.array(
             [["a"], ["b"], ["c"], ["d"], ["a"], ["b"], ["c"], ["e"]], dtype=np.object_
         )
-
         expected = model.fit_transform(data)
-
         model_onnx = convert_sklearn(
             model,
             "scikit-learn ordinal encoder",
@@ -415,12 +403,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(
-            None,
-            {
-                "input": data,
-            },
-        )
+        got = sess.run(None, {"input": data})
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
@@ -455,12 +438,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(
-            None,
-            {
-                "input": data,
-            },
-        )
+        got = sess.run(None, {"input": data})
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
@@ -495,12 +473,7 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(
-            None,
-            {
-                "input": data_with_missing_value,
-            },
-        )
+        got = sess.run(None, {"input": data_with_missing_value})
 
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
@@ -559,21 +532,11 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
-        got = sess.run(
-            None,
-            {
-                "input": data,
-            },
-        )
+        got = sess.run(None, {"input": data})
         assert_almost_equal(expected.reshape(-1), got[0].reshape(-1))
 
         # Test with test data
-        got_test = sess.run(
-            None,
-            {
-                "input": test_data,
-            },
-        )
+        got_test = sess.run(None, {"input": test_data})
         assert_almost_equal(expected_test.reshape(-1), got_test[0].reshape(-1))
 
 
