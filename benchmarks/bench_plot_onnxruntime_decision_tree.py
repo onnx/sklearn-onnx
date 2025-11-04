@@ -149,7 +149,7 @@ def bench(n_obs, n_features, max_depths, methods, repeat=10, verbose=False):
 def plot_results(df, verbose=False):
     nrows = max(len(set(df.max_depth)) * len(set(df.n_obs)), 2)
     ncols = max(len(set(df.method)), 2)
-    fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
+    _fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     pos = 0
     row = 0
     for n_obs in sorted(set(df.n_obs)):

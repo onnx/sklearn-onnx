@@ -971,7 +971,7 @@ def make_calc_impute_donors(g: ModelComponentContainer, scope: Scope, itype: int
         _shape_dist_pot_donors0, outputs=["sym_size_int_4"]
     )
     if g.target_opset < 11:
-        unused_topk_values, neg_output_0 = op.TopK(
+        _unused_topk_values, neg_output_0 = op.TopK(
             op.Neg(dist_pot_donors),
             op.Reshape(n_neighbors, np.array([1], dtype=np.int64)),
             largest=1,
@@ -992,7 +992,7 @@ def make_calc_impute_donors(g: ModelComponentContainer, scope: Scope, itype: int
             outputs=["init_max_value"],
         )
 
-        unused_topk_values, output_0 = op.TopK(
+        _unused_topk_values, output_0 = op.TopK(
             op.Where(op.IsNaN(dist_pot_donors), init_max_value, dist_pot_donors),
             op.Reshape(n_neighbors, np.array([1], dtype=np.int64)),
             largest=0,
