@@ -219,7 +219,7 @@ def dynamic_class_creation(cache=False):
     for name in cls:
         if "_" not in name:
             continue
-        main, version = name.split("_")
+        main, _version = name.split("_")
         last = cls[main]
         last.past_version[name] = cls[name]
 
