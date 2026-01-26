@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 import unittest
 import packaging.version as pv
+from sklearn import __version__ as skl_version
 from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import __version__ as ort_version
@@ -58,12 +59,21 @@ class TestInvestigate(unittest.TestCase):
         import onnxruntime as rt
         import skl2onnx.common.data_types
 
-        lr = sklearn.linear_model.LogisticRegression(
-            C=100,
-            multi_class="multinomial",
-            solver="sag",
-            class_weight="balanced",
-            n_jobs=-1,
+        lr = (
+            sklearn.linear_model.LogisticRegression(
+                C=100,
+                solver="sag",
+                class_weight="balanced",
+                n_jobs=-1,
+            )
+            if pv.Version(skl_version) >= pv.Version("1.8.0")
+            else sklearn.linear_model.LogisticRegression(
+                C=100,
+                multi_class="multinomial",
+                solver="sag",
+                class_weight="balanced",
+                n_jobs=-1,
+            )
         )
         tf = sklearn.feature_extraction.text.TfidfVectorizer(
             token_pattern="\\w+|[^\\w\\s]+",
@@ -240,8 +250,10 @@ class TestInvestigate(unittest.TestCase):
                         ),
                     ),
                 ],
-                final_estimator=linear_model.LogisticRegression(
-                    multi_class="multinomial"
+                final_estimator=(
+                    linear_model.LogisticRegression()
+                    if pv.Version(skl_version) >= pv.Version("1.8.0")
+                    else linear_model.LogisticRegression(multi_class="multinomial")
                 ),
             )
 

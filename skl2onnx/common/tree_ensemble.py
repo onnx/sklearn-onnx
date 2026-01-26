@@ -126,7 +126,7 @@ def add_node(
     leaf_weights_are_counts,
     adjust_threshold_for_sklearn,
     dtype,
-    nodes_missing_value_tracks_true=False,
+    nodes_missing_value_tracks_true=0,  # cannot use boolean in onnx
 ):
     attr_pairs["nodes_treeids"].append(tree_id)
     attr_pairs["nodes_nodeids"].append(node_id)
