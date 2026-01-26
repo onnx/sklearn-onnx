@@ -27,7 +27,6 @@ from skl2onnx.algebra.onnx_ops import (
 )
 from test_utils import TARGET_OPSET, TARGET_IR, InferenceSessionEx as InferenceSession
 
-
 ort_version = ".".join(ort_version.split(".")[:2])
 
 

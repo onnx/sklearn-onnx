@@ -310,18 +310,12 @@ class TestSklearnPipelineWithinPipeline(unittest.TestCase):
         ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"
     )
     def test_complex_pipeline(self):
-        df = pandas.read_csv(
-            StringIO(
-                dedent(
-                    """
+        df = pandas.read_csv(StringIO(dedent("""
             CAT1,CAT2,TEXT
             A,M,clean
             B,N,text
             A,M,cleaning
-            B,N,normalizing"""
-                )
-            )
-        )
+            B,N,normalizing""")))
 
         X_train = df
         y_train = np.array([[1, 0, 1, 0], [1, 0, 1, 0]]).T

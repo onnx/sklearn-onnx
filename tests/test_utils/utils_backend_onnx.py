@@ -34,7 +34,6 @@ from .utils_backend import (
     compare_outputs,
 )
 
-
 if onnx_opset_version() >= 18:
     from onnx.reference import ReferenceEvaluator
     from onnx.reference.op_run import OpRun, RuntimeContextError

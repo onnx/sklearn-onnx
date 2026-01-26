@@ -27,7 +27,6 @@ from sklearn.ensemble import RandomForestClassifier
 from skl2onnx import to_onnx
 from skl2onnx.algebra.type_helper import guess_initial_types
 
-
 data = DataFrame(
     [
         dict(CAT1="a", CAT2="c", num1=0.5, num2=0.6, y=0),

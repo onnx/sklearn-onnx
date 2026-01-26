@@ -32,7 +32,6 @@ from sklearn.pipeline import Pipeline
 from skl2onnx import to_onnx
 from onnx.reference import ReferenceEvaluator
 
-
 X, y = load_diabetes(return_X_y=True)
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 

@@ -64,7 +64,6 @@ from test_utils import (
 )
 from onnxruntime import __version__ as ort_version
 
-
 # pv.Version does not work with development versions
 ort_version = ".".join(ort_version.split(".")[:2])
 skl_version = ".".join(skl_version.split(".")[:2])
@@ -593,9 +592,7 @@ class TestSklearnPipeline(unittest.TestCase):
                 7.8,0.88,0.0,2.6,0.098,25.0,67.0,0.9968,3.2,0.68,9.8,5,red
                 7.8,0.76,0.04,2.3,0.092,15.0,54.0,0.997,3.26,0.65,9.8,5,red
                 11.2,0.28,0.56,1.9,0.075,17.0,60.0,0.998,3.16,0.58,9.8,6,red
-                """.replace(
-            "                ", ""
-        )
+                """.replace("                ", "")
         X_train = pandas.read_csv(StringIO(text))
         for c in X_train.columns:
             if c != "color":

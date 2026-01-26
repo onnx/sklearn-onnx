@@ -13,7 +13,6 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import StringTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-
 BACKEND = (
     "onnxruntime"
     if pv.Version(onnx.__version__) < pv.Version("1.16.0")

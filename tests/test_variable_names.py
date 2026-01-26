@@ -134,8 +134,7 @@ class TestVariableNames(unittest.TestCase):
         self.assertTrue(sess is not None)
 
     def test_non_ascii_variable_name_pipeline(self):
-        data = dedent(
-            """
+        data = dedent("""
             pclass,survived,name,sex,age,sibsp,parch,ticket,fare,cabin,embarked,boat,body,home.dest
             1,1,"A",female,29.0,0,0,24160,211.3375,B5,S,2,,"MO"
             1,1,"B",male,0.9167,1,2,113781,151.55,C22 C26,S,11,,"Can"
@@ -157,8 +156,7 @@ class TestVariableNames(unittest.TestCase):
             1,1,"Q",female,50.0,0,1,PC 17558,247.5208,B58 B60,C,6,,"PQ"
             1,1,"R",female,32.0,0,0,11813,76.2917,D15,C,8,,
             1,0,"S",male,36.0,0,0,13050,75.2417,C6,C,A,,"MN"
-        """
-        ).strip(" \n")
+        """).strip(" \n")
         data = pd.read_csv(StringIO(data))
         data.rename(columns={"age": "年齢"}, inplace=True)
         X = data.drop("survived", axis=1)

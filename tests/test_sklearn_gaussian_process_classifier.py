@@ -29,7 +29,6 @@ from test_utils import (
     InferenceSessionEx as InferenceSession,
 )
 
-
 sklver_ = ".".join(sklver.split(".")[:2])
 
 

@@ -39,7 +39,6 @@ from skl2onnx.convert import may_switch_bases_classes_order
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from onnxmltools.convert import convert_xgboost as convert_xgboost_booster
 
-
 data = load_iris()
 X = data.data[:, :2]
 y = data.target

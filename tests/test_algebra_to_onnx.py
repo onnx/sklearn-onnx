@@ -29,7 +29,6 @@ from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx.proto import get_latest_tested_opset_version
 from test_utils import TARGET_OPSET
 
-
 ort_version = ort_version.split("+")[0]
 
 

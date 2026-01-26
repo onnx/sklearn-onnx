@@ -21,7 +21,6 @@ except ImportError:
 from sklearn.exceptions import ConvergenceWarning
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
-
 sklver = ".".join(sklver.split(".")[:2])
 
 

@@ -22,7 +22,6 @@ from test_utils import (
     TARGET_OPSET,
 )
 
-
 ort_version = ".".join(ort_version.split(".")[:2])
 skl_version = ".".join(sklearn_version.split(".")[:2])
 

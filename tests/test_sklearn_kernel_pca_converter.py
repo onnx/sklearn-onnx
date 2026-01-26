@@ -18,7 +18,6 @@ except ImportError:
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-
 ort_version = ".".join(ort_version.split(".")[:2])
 
 

@@ -31,7 +31,6 @@ from test_utils import (
     InferenceSessionEx as InferenceSession,
 )
 
-
 ort_version = ort_version.split("+")[0]
 skl_version = ".".join(sklearn_version.split(".")[:2])
 
