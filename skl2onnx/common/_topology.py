@@ -62,9 +62,9 @@ def _default_OPSET_TO_IR_VERSION():
         20: 9,
         21: 10,
         22: 10,
-        23: 11,
-        24: 12,
-        25: 13,
+        23: 10,  # onnx is 11, onnxruntime==1.23.2 is 10
+        24: 10,  # onnx is 12, onnxruntime==1.23.2 is 10
+        25: 10,  # onnx is 12, onnxruntime==1.23.2 is 10
     }
 
 
