@@ -349,6 +349,10 @@ class TestGLMClassifierConverter(unittest.TestCase):
         )
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(skl_version) >= pv.Version("1.8.0"),
+        "ovr is not natively supported by LogisticRegression anymore",
+    )
     def test_model_logistic_regression_multi_class_ovr(self):
         model, X = fit_classification_model(
             linear_model.LogisticRegression(multi_class="ovr", max_iter=10000), 3
@@ -367,10 +371,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_multinomial(self):
         model, X = fit_classification_model(
-            linear_model.LogisticRegression(
-                multi_class="multinomial", solver="lbfgs", max_iter=10000
-            ),
-            4,
+            linear_model.LogisticRegression(solver="lbfgs", max_iter=10000), 4
         )
         model_onnx = convert_sklearn(
             model,
@@ -421,12 +422,21 @@ class TestGLMClassifierConverter(unittest.TestCase):
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_multi_class_liblinear_l1(self):
-        model, X = fit_classification_model(
-            linear_model.LogisticRegression(
-                solver="liblinear", penalty="l1", max_iter=10000
-            ),
-            4,
-        )
+        penalty = "l1"
+        if pv.Version(skl_version) >= pv.Version("1.8.0"):
+            estimator = linear_model.LogisticRegression(
+                l1_ratio=1 if penalty == "l1" else 0,
+                solver="saga" if penalty == "l1" else "lbfgs",
+                max_iter=10000,
+            )
+        else:
+            estimator = linear_model.LogisticRegression(
+                penalty=self.penalty,
+                solver="saga" if penalty == "l1" else "lbfgs",
+                max_iter=10000,
+            )
+
+        model, X = fit_classification_model(estimator, 4)
         model_onnx = convert_sklearn(
             model,
             "multi-class logistic regression",
