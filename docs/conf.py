@@ -38,7 +38,6 @@ extensions = [
     "sphinx_runpython.epkg",
     "sphinx_runpython.gdot",
     "sphinx_runpython.runpython",
-    "sphinxcontrib.blockdiag",
 ]
 
 templates_path = ["_templates"]
