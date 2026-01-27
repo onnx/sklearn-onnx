@@ -201,7 +201,7 @@ class TestVariableNames(unittest.TestCase):
         # Invalid Feed Input Name:\u5e74\u9f62
         # onx_data = {}
         # for col in initial_type:
-        #     onx_data[col[0]] = X[col[0]].values.reshape((-1, 1))
+        #     onx_data[col[0]] = X[[col[0]]].values
         # sess.run(None, onx_data)
 
 

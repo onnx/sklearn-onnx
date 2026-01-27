@@ -220,12 +220,10 @@ def convert_one_vs_rest_classifier(
                 scope, conc_name, operator.outputs[1].full_name, container, axis=1, p=1
             )
         else:
-            abs_name = scope.get_unique_variable_name("abs_name")
             mean_name = scope.get_unique_variable_name("mean_name")
             axis_name = scope.get_unique_variable_name("axis_name")
             container.add_initializer(axis_name, onnx.TensorProto.INT64, [1], [1])
-            container.add_node("Abs", [conc_name], [abs_name])
-            container.add_node("ReduceMax", [abs_name, axis_name], [mean_name])
+            container.add_node("ReduceSum", [conc_name, axis_name], [mean_name])
             container.add_node(
                 "Div", [conc_name, mean_name], operator.outputs[1].full_name
             )

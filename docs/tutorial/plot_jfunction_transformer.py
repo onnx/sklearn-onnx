@@ -186,11 +186,7 @@ print(expected)
 ##############################
 # Then let's check with :class:`onnx.reference.ReferenceEvaluator`.
 
-feeds = {
-    "a": data["a"].values.reshape((-1, 1)),
-    "b": data["b"].values.reshape((-1, 1)),
-    "f": data["f"].values.reshape((-1, 1)),
-}
+feeds = {"a": data[["a"]].values, "b": data[["b"]].values, "f": data[["f"]].values}
 
 # verbose=10 to show intermediate results
 ref = ReferenceEvaluator(onx, verbose=0)

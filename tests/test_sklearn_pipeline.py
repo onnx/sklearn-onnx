@@ -437,9 +437,7 @@ class TestSklearnPipeline(unittest.TestCase):
             "fare": numpy.float32,
             "embarked": numpy.str_,
         }
-        inputs = {
-            k: data[k].values.astype(data_types[k]).reshape(-1, 1) for k in data.columns
-        }
+        inputs = {k: data[[k]].values.astype(data_types[k]) for k in data.columns}
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
@@ -653,7 +651,9 @@ class TestSklearnPipeline(unittest.TestCase):
 
         pred = pipe.transform(X_train)
         inputs = {c: X_train[c].values for c in X_train.columns}
-        inputs = {c: v.reshape((v.shape[0], 1)) for c, v in inputs.items()}
+        inputs = {
+            c: numpy.asarray(v).reshape((v.shape[0], 1)) for c, v in inputs.items()
+        }
         onxp = oinf.run(None, inputs)
         got = onxp[0]
         assert_almost_equal(pred, got)
@@ -713,7 +713,7 @@ class TestSklearnPipeline(unittest.TestCase):
         assert_almost_equal(expected_label, got[0])
         # sess.run(None, {'text': df})  failure
         # sess.run(None, {'text': df["text"]})  failure
-        sess.run(None, {"text": df["text"].values})  # success
+        sess.run(None, {"text": numpy.asarray(df["text"].values)})  # success
 
     @ignore_warnings(category=(FutureWarning, UserWarning))
     def test_pipeline_voting_tfidf_svc(self):
@@ -970,9 +970,9 @@ class TestSklearnPipeline(unittest.TestCase):
         expected_proba = rf_clf.predict_proba(dfx)
 
         inputs = {
-            "CAT1": dfx["CAT1"].values.reshape((-1, 1)),
-            "CAT2": dfx["CAT2"].values.reshape((-1, 1)),
-            "TEXT": dfx["TEXT"].values.reshape((-1, 1)),
+            "CAT1": dfx[["CAT1"]].values,
+            "CAT2": dfx[["CAT2"]].values,
+            "TEXT": dfx[["TEXT"]].values,
         }
         onx = to_onnx(
             rf_clf,
@@ -1078,9 +1078,9 @@ class TestSklearnPipeline(unittest.TestCase):
                     expected_proba = rf_clf.predict_proba(dfx)
 
                     inputs = {
-                        "CAT1": dfx["CAT1"].values.reshape((-1, 1)),
-                        "CAT2": dfx["CAT2"].values.reshape((-1, 1)),
-                        "TEXT": dfx["TEXT"].values.reshape((-1, 1)),
+                        "CAT1": dfx[["CAT1"]].values,
+                        "CAT2": dfx[["CAT2"]].values,
+                        "TEXT": dfx[["TEXT"]].values,
                     }
                     onx = to_onnx(
                         rf_clf,
@@ -1184,9 +1184,9 @@ class TestSklearnPipeline(unittest.TestCase):
                     expected_proba = rf_clf.predict_proba(dfx)
 
                     inputs = {
-                        "CAT1": dfx["CAT1"].values.reshape((-1, 1)),
-                        "CAT2": dfx["CAT2"].values.reshape((-1, 1)),
-                        "TEXT": dfx["TEXT"].values.reshape((-1, 1)),
+                        "CAT1": dfx[["CAT1"]].values,
+                        "CAT2": dfx[["CAT2"]].values,
+                        "TEXT": dfx[["TEXT"]].values,
                     }
                     onx = to_onnx(
                         rf_clf,
@@ -1284,9 +1284,9 @@ class TestSklearnPipeline(unittest.TestCase):
                     expected_proba = rf_clf.predict_proba(dfx)
 
                     inputs = {
-                        "CAT1": dfx["CAT1"].values.reshape((-1, 1)),
-                        "CAT2": dfx["CAT2"].values.reshape((-1, 1)),
-                        "TEXT": dfx["TEXT"].values.reshape((-1, 1)),
+                        "CAT1": dfx[["CAT1"]].values,
+                        "CAT2": dfx[["CAT2"]].values,
+                        "TEXT": dfx[["TEXT"]].values,
                     }
                     onx = to_onnx(
                         rf_clf,
@@ -1325,10 +1325,7 @@ class TestSklearnPipeline(unittest.TestCase):
         names = [i.name for i in sess.get_inputs()]
         got = sess.run(
             None,
-            {
-                names[0]: X[names[0]].values.reshape((-1, 1)),
-                names[1]: X[names[1]].values.reshape((-1, 1)),
-            },
+            {names[0]: X[[names[0]]].values, names[1]: X[[names[1]]].values},
         )
         assert_almost_equal(expected, got[0])
 
@@ -1351,7 +1348,7 @@ class TestSklearnPipeline(unittest.TestCase):
         got = sess.run(
             None,
             {
-                names[0]: X[names[0]].values.reshape((-1, 1)),
+                names[0]: numpy.asarray(X[names[0]].values).reshape((-1, 1)),
             },
         )
         assert_almost_equal(expected, got[0])
@@ -1423,9 +1420,7 @@ class TestSklearnPipeline(unittest.TestCase):
         )
         expected = regr.predict(X_test)
         names = [i.name for i in sess.get_inputs()]
-        feeds = {
-            n: X_test[c].values.reshape((-1, 1)) for n, c in zip(names, X_test.columns)
-        }
+        feeds = {n: X_test[[c]].values for n, c in zip(names, X_test.columns)}
         got = sess.run(None, feeds)
         assert_almost_equal(expected.ravel(), got[0].ravel(), decimal=4)
         if ReferenceEvaluatorEx is None:

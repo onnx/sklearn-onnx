@@ -533,7 +533,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
             onx2.SerializeToString(), providers=["CPUExecutionProvider"]
         )
 
-        inputs = {c: train_data[c].values.reshape((-1, 1)) for c in train_data.columns}
+        inputs = {c: train_data[[c]].values for c in train_data.columns}
         got2 = sess2.run(None, inputs)
 
         expected = pipe.transform(train_data)

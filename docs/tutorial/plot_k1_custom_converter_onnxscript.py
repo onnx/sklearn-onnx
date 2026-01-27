@@ -143,11 +143,7 @@ onx = to_onnx(pipe_tr, data[:1], target_opset=18, options={"zipmap": False})
 # And again the discrepancies.
 
 expected = (pipe_tr.predict(data), pipe_tr.predict_proba(data))
-feeds = {
-    "a": data["a"].values.reshape((-1, 1)),
-    "b": data["b"].values.reshape((-1, 1)),
-    "f": data["f"].values.reshape((-1, 1)),
-}
+feeds = {"a": data[["a"]].values, "b": data[["b"]].values, "f": data[["f"]].values}
 
 ref = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 got = ref.run(None, feeds)

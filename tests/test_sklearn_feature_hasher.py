@@ -443,7 +443,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
 
         dfx = df.copy()
         dfx["cat_features"] = df[cat_features].agg("#".join, axis=1)
-        feeds = dict(cat_features=dfx[["cat_features"]].values.reshape((-1, 1)))
+        feeds = dict(cat_features=dfx[["cat_features"]].values)
 
         if ReferenceEvaluator is not None:
 

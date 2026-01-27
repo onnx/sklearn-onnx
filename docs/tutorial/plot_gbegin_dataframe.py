@@ -126,7 +126,7 @@ onx2 = to_onnx(
 # where column names become keys, and column values become
 # values.
 
-inputs = {c: train_data[c].values.reshape((-1, 1)) for c in train_data.columns}
+inputs = {c: train_data[[c]].values for c in train_data.columns}
 pprint.pprint(inputs)
 
 #############################

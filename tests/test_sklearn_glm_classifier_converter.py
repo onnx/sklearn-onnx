@@ -431,7 +431,7 @@ class TestGLMClassifierConverter(unittest.TestCase):
             )
         else:
             estimator = linear_model.LogisticRegression(
-                penalty=self.penalty,
+                penalty=penalty,
                 solver="saga" if penalty == "l1" else "lbfgs",
                 max_iter=10000,
             )
@@ -744,6 +744,10 @@ class TestGLMClassifierConverter(unittest.TestCase):
         )
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    @unittest.skipIf(
+        pv.Version(skl_version) >= pv.Version("1.8.0"),
+        "boolean inputs are not supported anymore (it gives wrong results)",
+    )
     def test_model_ridge_classifier_cv_bool(self):
         model, X = fit_classification_model(
             linear_model.RidgeClassifierCV(), 2, is_bool=True
