@@ -7,6 +7,7 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal
+import sklearn
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -35,6 +36,18 @@ class Passthrough:
 
     def transform(self, X):
         return X
+
+    def __sklearn_is_fitted__(self):
+        return True
+
+    def __sklearn_tags__(self):
+        return sklearn.utils._tags.Tags(
+            estimator_type=None,
+            target_tags=sklearn.utils._tags.TargetTags(required=False),
+            transformer_tags=None,
+            regressor_tags=None,
+            classifier_tags=None,
+        )
 
 
 def parser(scope, model, inputs, custom_parsers=None):
