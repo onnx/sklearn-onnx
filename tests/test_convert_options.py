@@ -21,7 +21,6 @@ except ImportError:
 from sklearn.exceptions import ConvergenceWarning
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
-
 sklver = ".".join(sklver.split(".")[:2])
 
 
@@ -124,7 +123,7 @@ class TestConvertOptions(unittest.TestCase):
                         cls,
                         X[:1],
                         options={"zipmap": zipmap, "output_class_labels": addcl},
-                        target_opset=TARGET_OPSET,
+                        target_opset=TARGET_OPSET - 1,
                     )
                     sess = InferenceSession(
                         onx.SerializeToString(), providers=["CPUExecutionProvider"]
@@ -152,7 +151,7 @@ class TestConvertOptions(unittest.TestCase):
                                 "output_class_labels": addcl,
                             }
                         },
-                        target_opset=TARGET_OPSET,
+                        target_opset=TARGET_OPSET - 1,
                     )
                     sess = InferenceSession(
                         onx.SerializeToString(), providers=["CPUExecutionProvider"]
@@ -177,7 +176,7 @@ class TestConvertOptions(unittest.TestCase):
                         options={
                             id(cls): {"zipmap": zipmap, "output_class_labels": addcl}
                         },
-                        target_opset=TARGET_OPSET,
+                        target_opset=TARGET_OPSET - 1,
                     )
                     sess = InferenceSession(
                         onx.SerializeToString(), providers=["CPUExecutionProvider"]

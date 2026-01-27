@@ -25,9 +25,7 @@ def _get_doc_template():
                     rows.extend([name, "=" * len(name), "", doc, ""])
                 return "\n".join(rows)
 
-    return Template(
-        textwrap.dedent(
-            """
+    return Template(textwrap.dedent("""
         {% for sch in schemas %}
 
         {{format_name_with_domain(sch)}}
@@ -97,9 +95,7 @@ def _get_doc_template():
         {% endif %}
 
         {% endfor %}
-    """
-        )
-    )
+    """))
 
 
 _template_operator = _get_doc_template()
@@ -134,9 +130,7 @@ def _get_doc_template_sklearn():
                     rows.extend([name, "=" * len(name), "", doc, ""])
                 return "\n".join(rows)
 
-    return Template(
-        textwrap.dedent(
-            """
+    return Template(textwrap.dedent("""
         {% for cl in classes %}
 
         .. _l-sklops-{{cl.__name__}}:
@@ -155,9 +149,7 @@ def _get_doc_template_sklearn():
         {{format_doc(cl)}}
 
         {% endfor %}
-    """
-        )
-    )
+    """))
 
 
 _template_operator_sklearn = _get_doc_template_sklearn()

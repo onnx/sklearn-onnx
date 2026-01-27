@@ -12,6 +12,7 @@
 *.egg-info/
 dist/
 build/
+catboost_info/
 
 # PyCharm files
 .idea

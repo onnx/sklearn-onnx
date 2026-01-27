@@ -210,9 +210,7 @@ sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvide
 
 got = sess.run(
     None,
-    dict(
-        cat1=df["Cat1"].values.reshape((-1, 1)), cat2=df["Cat2"].values.reshape((-1, 1))
-    ),
+    dict(cat1=df[["Cat1"]].values, cat2=df[["Cat2"]].values),
 )
 
 

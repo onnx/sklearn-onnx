@@ -32,7 +32,6 @@ from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.tutorial import measure_time
 
-
 N = 11000
 X, y = make_regression(N, n_features=10)
 X_train, X_test, y_train, y_test = train_test_split(X, y, train_size=0.01)

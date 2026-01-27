@@ -331,9 +331,9 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
         expected = pipe.transform(dfx_test)
 
         inputs = {
-            "CAT1": dfx_test["CAT1"].values.reshape((-1, 1)),
-            "CAT2": dfx_test["CAT2"].values.reshape((-1, 1)),
-            "TEXT": dfx_test["TEXT"].values.reshape((-1, 1)),
+            "CAT1": dfx_test[["CAT1"]].values,
+            "CAT2": dfx_test[["CAT2"]].values,
+            "TEXT": dfx_test[["TEXT"]].values,
         }
         onx = to_onnx(pipe, dfx_test, target_opset=TARGET_OPSET)
         sess = InferenceSession(
@@ -369,9 +369,9 @@ class TestSklearnPipelineConcatTfIdf(unittest.TestCase):
         expected = pipe.transform(dfx_test)
 
         inputs = {
-            "CAT1": dfx_test["CAT1"].values.reshape((-1, 1)),
-            "CAT2": dfx_test["CAT2"].values.reshape((-1, 1)),
-            "TEXT": dfx_test["TEXT"].values.reshape((-1, 1)),
+            "CAT1": dfx_test[["CAT1"]].values,
+            "CAT2": dfx_test[["CAT2"]].values,
+            "TEXT": dfx_test[["TEXT"]].values,
         }
         onx = to_onnx(
             pipe,

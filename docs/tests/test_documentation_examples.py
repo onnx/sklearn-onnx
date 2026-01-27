@@ -6,6 +6,8 @@ import sys
 import importlib
 import subprocess
 import time
+import packaging.version as pv
+import onnxruntime
 from skl2onnx import __file__ as onnxrt_backend_dev_file
 
 VERBOSE = 0
@@ -98,6 +100,13 @@ class TestDocumentationExamples(unittest.TestCase):
                         import onnxmltools  # noqa: F401
                     except ImportError as e:
                         reason = str(e)
+
+                if (
+                    not reason
+                    and name in {"plot_k2_custom_converter_ndonnx.py"}
+                    and pv.Version(onnxruntime.__version__) < pv.Version("1.24")
+                ):
+                    reason = "fails discrepancies"
 
                 if reason:
 

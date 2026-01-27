@@ -100,6 +100,8 @@ class TestSklearnPipeline(unittest.TestCase):
                 data[col].fillna(0, inplace=True)
             elif dtype in ["O"]:
                 data[col].fillna("N/A", inplace=True)
+            elif dtype in ["str"]:
+                data[col] = data[col].astype(object)
 
         full_df = data.drop("survived", axis=1)
         full_labels = data["survived"]

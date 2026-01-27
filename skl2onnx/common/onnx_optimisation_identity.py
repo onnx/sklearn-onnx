@@ -13,7 +13,6 @@ from ._onnx_optimisation_common import (
     _apply_remove_node_fct_node,
 )
 
-
 logger = getLogger("skl2onnx")
 
 

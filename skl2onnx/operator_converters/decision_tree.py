@@ -68,7 +68,7 @@ def populate_tree_attributes(model, name, dtype):
         attrs["nodes_modes"].append(mode)
         attrs["nodes_truenodeids"].append(left)
         attrs["nodes_falsenodeids"].append(right)
-        attrs["nodes_missing_value_tracks_true"].append(False)
+        attrs["nodes_missing_value_tracks_true"].append(0)  # cannot use boolean in onnx
         attrs["nodes_hitrates"].append(1.0)
         attrs["nodes_values"].append(thresh)
         if mode == "LEAF":

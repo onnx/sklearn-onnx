@@ -112,8 +112,8 @@ class TestSklearnDictVectorizerConverter(unittest.TestCase):
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         inp = {
-            "ALL_LOWER": numpy.array([1], dtype=numpy.float32),
-            "NEXT_ALL_LOWER": numpy.array([1], dtype=numpy.float32),
+            "ALL_LOWER": numpy.array(1, dtype=numpy.float32),
+            "NEXT_ALL_LOWER": numpy.array(1, dtype=numpy.float32),
         }
         res = sess.run(None, {"input": inp})
         assert_almost_equal(expected[0].ravel(), res[0].ravel())

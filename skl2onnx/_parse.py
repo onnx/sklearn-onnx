@@ -65,7 +65,6 @@ from .common.utils_classifier import get_label_classes
 from .common.utils_sklearn import _process_options
 from .sklapi import CastTransformer
 
-
 do_not_merge_columns = tuple(
     filter(
         lambda op: op is not None, [OrdinalEncoder, OneHotEncoder, ColumnTransformer]

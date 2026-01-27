@@ -407,6 +407,13 @@ def _guess_numpy_type(data_type, dims):
             return Complex64TensorType(dims)
         if data_type == np.complex128:
             return Complex128TensorType(dims)
+    try:
+        import pandas
+
+        if isinstance(data_type, pandas.StringDtype):
+            return StringTensorType(dims)
+    except ImportError:
+        pass
     raise NotImplementedError(
         "Unsupported data_type %r (type=%r). You may raise an issue "
         "at https://github.com/onnx/sklearn-onnx/issues."

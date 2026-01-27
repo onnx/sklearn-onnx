@@ -85,6 +85,10 @@ def max_onnxruntime_opset():
     <https://github.com/microsoft/onnxruntime/blob/main/docs/Versioning.md>`_.
     """
     vi = pv.Version(ort_version.split("+")[0])
+    if vi >= pv.Version("1.20.0"):
+        return 23
+    if vi >= pv.Version("1.19.0"):
+        return 22
     if vi >= pv.Version("1.18.0"):
         return 21
     if vi >= pv.Version("1.17.0"):

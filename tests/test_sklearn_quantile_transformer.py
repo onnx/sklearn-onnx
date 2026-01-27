@@ -3,6 +3,7 @@
 """
 Tests scikit-learn's polynomial features converter.
 """
+
 import unittest
 import numpy as np
 from sklearn.preprocessing import QuantileTransformer

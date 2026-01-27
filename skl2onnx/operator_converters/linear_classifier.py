@@ -53,11 +53,11 @@ def convert_sklearn_linear_classifier(
         # fit_intercept = False
         intercepts = [0.0] * number_of_classes if number_of_classes != 2 else [0.0]
     else:
-        intercepts = op.intercept_.tolist()
+        intercepts = op.intercept_.astype(float).tolist()
 
     if number_of_classes == 2:
-        coefficients = list(map(lambda x: -1 * x, coefficients)) + coefficients
-        intercepts = list(map(lambda x: -1 * x, intercepts)) + intercepts
+        coefficients = list(map(lambda x: -1.0 * x, coefficients)) + coefficients
+        intercepts = list(map(lambda x: -1.0 * x, intercepts)) + intercepts
 
     multi_class = 0
     use_ovr = False

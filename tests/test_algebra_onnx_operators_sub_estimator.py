@@ -31,7 +31,7 @@ class ValidatorClassifier(BaseEstimator, ClassifierMixin):
         ClassifierMixin.__init__(self)
         BaseEstimator.__init__(self)
         if estimator is None:
-            estimator = LogisticRegression(solver="liblinear")
+            estimator = LogisticRegression(solver="lbfgs")
         self.estimator = estimator
         self.threshold = threshold
 

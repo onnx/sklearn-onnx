@@ -23,7 +23,6 @@ from ..proto import TensorProto
 from .utils import get_domain
 from .graph_builder_opset import Opset
 
-
 dict_apply_operation = {}
 logger = getLogger("skl2onnx")
 

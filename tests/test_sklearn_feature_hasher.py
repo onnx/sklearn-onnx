@@ -443,7 +443,7 @@ class TestSklearnFeatureHasher(unittest.TestCase):
 
         dfx = df.copy()
         dfx["cat_features"] = df[cat_features].agg("#".join, axis=1)
-        feeds = dict(cat_features=dfx["cat_features"].values.reshape((-1, 1)))
+        feeds = dict(cat_features=dfx[["cat_features"]].values)
 
         if ReferenceEvaluator is not None:
 
@@ -579,12 +579,4 @@ class TestSklearnFeatureHasher(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    import logging
-
-    logger = logging.getLogger("skl2onnx")
-    logger.setLevel(logging.ERROR)
-    logger = logging.getLogger("onnx-extended")
-    logger.setLevel(logging.ERROR)
-
-    TestSklearnFeatureHasher().test_feature_hasher_pipeline_list()
     unittest.main(verbosity=2)
