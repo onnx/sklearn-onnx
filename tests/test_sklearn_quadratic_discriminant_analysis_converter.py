@@ -218,7 +218,7 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
         y = np.array([1, 1, 1, 2, 2, 2, 1, 2])
         X_test = np.array([[-0.8, -1, 0], [-1, -1.6, 0], [1, 1.5, 1], [3.1, 2.1, 1]])
 
-        skl_model = QuadraticDiscriminantAnalysis(solver="eigen", shrinkage="auto")
+        skl_model = QuadraticDiscriminantAnalysis()
         skl_model.fit(X, y)
 
         onnx_model = convert_sklearn(
