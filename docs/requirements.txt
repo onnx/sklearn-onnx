@@ -24,7 +24,6 @@ pytest
 pytest-cov
 skl2onnx
 sphinx
-sphinxcontrib-blockdiag
 sphinx-gallery
 sphinx-runpython
 tabulate
