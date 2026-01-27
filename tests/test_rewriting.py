@@ -9,7 +9,7 @@ from numpy.testing import assert_almost_equal
 from onnx.reference import ReferenceEvaluator
 
 
-class TestRewritign(unittest.TestCase):
+class TestRewriting(unittest.TestCase):
     def test_lp_normalization(self):
         model = oh.make_model(
             oh.make_graph(

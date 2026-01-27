@@ -93,7 +93,7 @@ except Exception as e:
 #
 # ONNX is more precise than numpy about shapes so it is important
 # to make sure the shapes of the inputs and outputs are 2D.
-# Inputs of the converter are creared with ``ndx.argument``.
+# Inputs of the converter are created with ``ndx.argument``.
 # Constants are not just python constant but typed arrays
 # to avoid missing casts in ONNX.
 
@@ -113,7 +113,7 @@ def growth_converter_ndonnx(scope, operator, container):
     # the expression to convert, it could be move into a function
     # called both by the converter and the model
     # (X[0] - X[1]) / X[1] * 100
-    growth = (x[:, :1] - x[:, :1]) / x[:, :1] * ndx.asarray([100], dtype=x.dtype)
+    growth = (x[:, :1] - x[:, 1:]) / x[:, :1] * ndx.asarray([100], dtype=x.dtype)
 
     # conversion into onnx, how to specify the opset?
     proto = ndx.build({"x": x}, {"y": growth})
