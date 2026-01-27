@@ -2,7 +2,7 @@
 black
 jinja2
 ndonnx
-onnxruntime-extensions
+onnxruntime-extensions; sys_platform != 'darwin'
 onnxscript
 pandas
 py-cpuinfo
