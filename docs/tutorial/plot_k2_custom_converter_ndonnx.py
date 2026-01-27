@@ -157,8 +157,8 @@ feeds = {"a": data[["a"]].values, "b": data[["b"]].values, "f": data[["f"]].valu
 
 ref = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 got = ref.run(None, feeds)
-assert_allclose(expected[0], got[0])
 assert_allclose(expected[1], got[1])
+assert_allclose(expected[0], got[0])
 
 
 # %%
