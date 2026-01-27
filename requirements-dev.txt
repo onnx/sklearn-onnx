@@ -1,6 +1,7 @@
 # tests
 black
 jinja2
+ndonnx
 onnxruntime-extensions
 onnxscript
 pandas

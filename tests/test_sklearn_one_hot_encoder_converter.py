@@ -527,8 +527,6 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         for t in init:
             self.assertEqual(t[1].shape, [None, 1])
         onx2 = to_onnx(pipe, initial_types=init)
-        with open("kkkk.onnx", "wb") as f:
-            f.write(onx2.SerializeToString())
         sess2 = InferenceSession(
             onx2.SerializeToString(), providers=["CPUExecutionProvider"]
         )

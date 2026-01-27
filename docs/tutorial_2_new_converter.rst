@@ -44,6 +44,7 @@ an example.
     auto_tutorial/plot_jcustom_syntax
     auto_tutorial/plot_jfunction_transformer
     auto_tutorial/plot_k1_custom_converter_onnxscript
+    auto_tutorial/plot_k2_custom_converter_ndonnx
     auto_tutorial/plot_kcustom_converter_wrapper
     auto_tutorial/plot_lcustom_options
     auto_tutorial/plot_mcustom_parser
