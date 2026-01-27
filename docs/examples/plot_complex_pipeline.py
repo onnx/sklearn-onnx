@@ -198,7 +198,7 @@ print("predict_proba", clf.predict_proba(X_test[:2]))
 # with the *reshape*.
 
 X_test2 = X_test.drop(to_drop, axis=1)
-inputs = {c: X_test2[c].values for c in X_test2.columns}
+inputs = {c: np.asarray(X_test2[c].values) for c in X_test2.columns}
 for c in numeric_features:
     inputs[c] = inputs[c].astype(np.float32)
 for k in inputs:

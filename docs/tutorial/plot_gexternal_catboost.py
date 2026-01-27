@@ -38,6 +38,25 @@ from skl2onnx._parse import _apply_zipmap, _get_sklearn_operator_name
 from catboost import CatBoostClassifier
 from catboost.utils import convert_to_onnx_object
 
+# %%
+# Quick fix for scikit-learn 1.8.0
+if not hasattr(CatBoostClassifier, "__sklearn_tags__"):
+    import sklearn
+
+    def __sklearn_tags__(self):
+        return sklearn.utils._tags.Tags(
+            estimator_type=None,
+            target_tags=sklearn.utils._tags.TargetTags(required=False),
+            transformer_tags=None,
+            regressor_tags=None,
+            classifier_tags=None,
+        )
+
+    CatBoostClassifier.__sklearn_tags__ = __sklearn_tags__
+
+# %%
+# Let's train the model.
+
 data = load_iris()
 X = data.data[:, :2]
 y = data.target
@@ -47,12 +66,13 @@ numpy.random.shuffle(ind)
 X = X[ind, :].copy()
 y = y[ind].copy()
 
+
 pipe = Pipeline(
     [("scaler", StandardScaler()), ("lgbm", CatBoostClassifier(n_estimators=3))]
 )
 pipe.fit(X, y)
 
-######################################
+# %%
 # Register the converter for CatBoostClassifier
 # +++++++++++++++++++++++++++++++++++++++++++++
 #
@@ -133,7 +153,7 @@ update_registered_converter(
     options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
 )
 
-##################################
+# %%
 # Convert
 # +++++++
 
@@ -148,7 +168,7 @@ model_onnx = convert_sklearn(
 with open("pipeline_catboost.onnx", "wb") as f:
     f.write(model_onnx.SerializeToString())
 
-###########################
+# %%
 # Compare the predictions
 # +++++++++++++++++++++++
 #
@@ -157,7 +177,7 @@ with open("pipeline_catboost.onnx", "wb") as f:
 print("predict", pipe.predict(X[:5]))
 print("predict_proba", pipe.predict_proba(X[:1]))
 
-##########################
+# %%
 # Predictions with onnxruntime.
 
 sess = rt.InferenceSession("pipeline_catboost.onnx", providers=["CPUExecutionProvider"])
