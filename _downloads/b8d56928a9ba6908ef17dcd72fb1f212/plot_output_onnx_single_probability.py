@@ -51,10 +51,12 @@ initial_type = [("float_input", FloatTensorType([None, X_test.shape[1]]))]
 # Convert the model to ONNX format.
 # - target_opset=18 specifies the version of ONNX operators to use.
 # - options={...} sets parameters for the conversion:
+#
 #   - "zipmap": False ensures that the output is a raw array
 #   - of probabilities instead of a dictionary.
 #   - "output_class_labels": False ensures that the output
 #     contains only probabilities, not class labels.
+#
 # ONNX (Open Neural Network Exchange) is an open format for
 # representing machine learning models.
 # It allows interoperability between different machine learning frameworks,
@@ -96,10 +98,12 @@ indices = onnx.helper.make_tensor(
 
 ################################################
 # Create a "Gather" node in the ONNX graph to extract the probability of the positive class.
+#
 # - inputs: [prob_output_name, "indices"] specify the inputs
 #   to this node (probability tensor and index tensor).
 # - outputs: ["positive_class_prob"] specify the name of the output of this node.
 # - axis=1 indicates gathering along the columns (features) of the probability tensor.
+#
 # A "Gather" node is used to extract specific elements from a tensor.
 # Here, it extracts the probability for the positive class.
 gather_node = onnx.helper.make_node(

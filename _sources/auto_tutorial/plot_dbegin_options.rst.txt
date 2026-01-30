@@ -383,8 +383,8 @@ decision path. It can be enabled by option *decision_path*.
 
  .. code-block:: none
 
-    [[1 0 1 0 1 1 0 1 0 1]
-     [1 0 1 0 1 1 0 1 0 1]]
+    [[1 0 0 0 1 1 0 1 0 1]
+     [1 0 0 0 1 1 0 1 0 1]]
 
 
 
@@ -433,8 +433,8 @@ Let's display the last one.
 
  .. code-block:: none
 
-    [['10101' '10101']
-     ['10101' '10101']]
+    [['10001' '10101']
+     ['10001' '10101']]
 
 
 
@@ -558,7 +558,7 @@ supported options while running the conversion.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.145 seconds)
+   **Total running time of the script:** (0 minutes 0.135 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options.py:

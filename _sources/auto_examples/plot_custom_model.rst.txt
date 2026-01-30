@@ -267,7 +267,7 @@ Let's fit t-SNE...
         x_min, x_max = numpy.min(Xp, 0), numpy.max(Xp, 0)
         X = (Xp - x_min) / (x_max - x_min)
 
-        fig, ax = plt.subplots(1, 2, figsize=figsize)
+        _fig, ax = plt.subplots(1, 2, figsize=figsize)
         for i in range(X.shape[0]):
             ax[0].text(
                 X[i, 0],
@@ -577,8 +577,8 @@ We now compare the prediction.
  .. code-block:: none
 
     ptsne_knn.tranform
-     [[ 1.0108883  -1.6273482 ]
-     [ 1.3526459   0.40301967]]
+     [[ 0.1792845   0.7067502 ]
+     [-0.27657354 -0.9149268 ]]
 
 
 
@@ -605,7 +605,7 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    transform [[ 1.0108882 -1.6273482]]
+    transform [[0.1792845 0.7067502]]
 
 
 
@@ -632,7 +632,7 @@ which does not allow multiple predictions at a time. Let's call
 
  .. code-block:: none
 
-    transform [[1.3526459  0.40301967]]
+    transform [[-0.27657354 -0.9149268 ]]
 
 
 
@@ -704,11 +704,11 @@ Display the ONNX graph
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -716,7 +716,7 @@ Display the ONNX graph
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 9.307 seconds)
+   **Total running time of the script:** (0 minutes 7.884 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_custom_model.py:

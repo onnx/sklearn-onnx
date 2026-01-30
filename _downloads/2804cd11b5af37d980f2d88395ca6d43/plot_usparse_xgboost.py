@@ -49,7 +49,6 @@ from skl2onnx.common.shape_calculator import calculate_linear_classifier_output_
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
 
-
 update_registered_converter(
     XGBClassifier,
     "XGBoostXGBClassifier",

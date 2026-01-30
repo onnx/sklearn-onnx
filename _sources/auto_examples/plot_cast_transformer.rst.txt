@@ -44,7 +44,7 @@ This is not a typical example, it is build to make it fails
 based on the assumption ``(x / y)`` is usually different from
 ``x * ( 1 / y)`` on a computer.
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-49
+.. GENERATED FROM PYTHON SOURCE LINES 31-48
 
 .. code-block:: Python
 
@@ -72,12 +72,11 @@ based on the assumption ``(x / y)`` is usually different from
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 50-51
+.. GENERATED FROM PYTHON SOURCE LINES 49-50
 
 The weird data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-62
+.. GENERATED FROM PYTHON SOURCE LINES 50-61
 
 .. code-block:: Python
 
@@ -99,11 +98,11 @@ The weird data.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-64
+.. GENERATED FROM PYTHON SOURCE LINES 62-63
 
 A simple model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-71
+.. GENERATED FROM PYTHON SOURCE LINES 63-70
 
 .. code-block:: Python
 
@@ -121,11 +120,11 @@ A simple model.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+.. GENERATED FROM PYTHON SOURCE LINES 71-72
 
 Conversion into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-76
+.. GENERATED FROM PYTHON SOURCE LINES 72-75
 
 .. code-block:: Python
 
@@ -139,11 +138,11 @@ Conversion into ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
 
 And the maximum difference.
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-89
+.. GENERATED FROM PYTHON SOURCE LINES 77-88
 
 .. code-block:: Python
 
@@ -171,11 +170,11 @@ And the maximum difference.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-91
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 The graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-109
+.. GENERATED FROM PYTHON SOURCE LINES 90-108
 
 .. code-block:: Python
 
@@ -215,7 +214,7 @@ The graph.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-124
+.. GENERATED FROM PYTHON SOURCE LINES 109-123
 
 New pipeline
 ++++++++++++
@@ -232,7 +231,7 @@ change the conversion (remove node Scaler by using option
 `'div'`) and to use double by inserting an explicit
 Cast.
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-150
+.. GENERATED FROM PYTHON SOURCE LINES 123-149
 
 .. code-block:: Python
 
@@ -270,16 +269,16 @@ Cast.
 
  .. code-block:: none
 
-    2.9884569130445016e-05
+    2.9884569016758178e-05
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-152
+.. GENERATED FROM PYTHON SOURCE LINES 150-151
 
 The graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-170
+.. GENERATED FROM PYTHON SOURCE LINES 151-169
 
 .. code-block:: Python
 
@@ -319,11 +318,11 @@ The graph.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-172
+.. GENERATED FROM PYTHON SOURCE LINES 170-171
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-182
+.. GENERATED FROM PYTHON SOURCE LINES 171-181
 
 .. code-block:: Python
 
@@ -345,11 +344,11 @@ The graph.
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -357,7 +356,7 @@ The graph.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 3.620 seconds)
+   **Total running time of the script:** (0 minutes 2.590 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_cast_transformer.py:

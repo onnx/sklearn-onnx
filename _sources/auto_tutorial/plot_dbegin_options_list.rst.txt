@@ -77,20 +77,21 @@ of operators is for model *GaussianMixture*.
       --sklearn-color-fitted-level-1: #d4ebff;
       --sklearn-color-fitted-level-2: #b3dbfd;
       --sklearn-color-fitted-level-3: cornflowerblue;
+    }
 
+    #sk-container-id-13.light {
       /* Specific color for light theme */
-      --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-      --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
-      --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+      --sklearn-color-text-on-default-background: black;
+      --sklearn-color-background: white;
+      --sklearn-color-border-box: black;
       --sklearn-color-icon: #696969;
+    }
 
-      @media (prefers-color-scheme: dark) {
-        /* Redefinition of color scheme for dark theme */
-        --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
-        --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-icon: #878787;
-      }
+    #sk-container-id-13.dark {
+      --sklearn-color-text-on-default-background: white;
+      --sklearn-color-background: #111;
+      --sklearn-color-border-box: white;
+      --sklearn-color-icon: #878787;
     }
 
     #sk-container-id-13 {
@@ -216,8 +217,8 @@ of operators is for model *GaussianMixture*.
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
-      align-items: start;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
       gap: 0.5em;
     }
 
@@ -242,9 +243,7 @@ of operators is for model *GaussianMixture*.
     /* Toggleable content - dropdown */
 
     #sk-container-id-13 div.sk-toggleable__content {
-      max-height: 0;
-      max-width: 0;
-      overflow: hidden;
+      display: none;
       text-align: left;
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-0);
@@ -270,9 +269,9 @@ of operators is for model *GaussianMixture*.
 
     #sk-container-id-13 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
-      max-height: 200px;
-      max-width: 100%;
-      overflow: auto;
+      display: block;
+      width: 100%;
+      overflow: visible;
     }
 
     #sk-container-id-13 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
@@ -326,7 +325,6 @@ of operators is for model *GaussianMixture*.
     #sk-container-id-13 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
-      display: inline-block;
       line-height: 1.2em;
     }
 
@@ -372,7 +370,7 @@ of operators is for model *GaussianMixture*.
       font-size: smaller;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1em;
       height: 1em;
       width: 1em;
@@ -380,16 +378,17 @@ of operators is for model *GaussianMixture*.
       margin-left: 0.5em;
       text-align: center;
       /* unfitted */
-      border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-      color: var(--sklearn-color-unfitted-level-1);
+      border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-3);
     }
 
     .sk-estimator-doc-link.fitted,
     a:link.sk-estimator-doc-link.fitted,
     a:visited.sk-estimator-doc-link.fitted {
       /* fitted */
-      border: var(--sklearn-color-fitted-level-1) 1pt solid;
-      color: var(--sklearn-color-fitted-level-1);
+      background-color: var(--sklearn-color-fitted-level-0);
+      border: var(--sklearn-color-fitted-level-3) 1pt solid;
+      color: var(--sklearn-color-fitted-level-3);
     }
 
     /* On hover */
@@ -399,7 +398,8 @@ of operators is for model *GaussianMixture*.
     .sk-estimator-doc-link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-0);
       text-decoration: none;
     }
 
@@ -409,7 +409,8 @@ of operators is for model *GaussianMixture*.
     .sk-estimator-doc-link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-fitted-level-0);
       text-decoration: none;
     }
 
@@ -449,7 +450,7 @@ of operators is for model *GaussianMixture*.
       font-size: 1rem;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1rem;
       height: 1rem;
       width: 1rem;
@@ -461,6 +462,7 @@ of operators is for model *GaussianMixture*.
 
     #sk-container-id-13 a.estimator_doc_link.fitted {
       /* fitted */
+      background-color: var(--sklearn-color-fitted-level-0);
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
@@ -477,7 +479,489 @@ of operators is for model *GaussianMixture*.
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-13" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GaussianMixture()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-43" type="checkbox" checked><label for="sk-estimator-id-43" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GaussianMixture</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.mixture.GaussianMixture.html">?<span>Documentation for GaussianMixture</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>GaussianMixture()</pre></div> </div></div></div></div>
+
+    .estimator-table {
+        font-family: monospace;
+    }
+
+    .estimator-table summary {
+        padding: .5rem;
+        cursor: pointer;
+    }
+
+    .estimator-table summary::marker {
+        font-size: 0.7rem;
+    }
+
+    .estimator-table details[open] {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .estimator-table .parameters-table {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(odd) {
+        background-color: #fff;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(even) {
+        background-color: #f6f6f6;
+    }
+
+    .estimator-table .parameters-table tr:hover {
+        background-color: #e0e0e0;
+    }
+
+    .estimator-table table td {
+        border: 1px solid rgba(106, 105, 104, 0.232);
+    }
+
+    /*
+        `table td`is set in notebook with right text-align.
+        We need to overwrite it.
+    */
+    .estimator-table table td.param {
+        text-align: left;
+        position: relative;
+        padding: 0;
+    }
+
+    .user-set td {
+        color:rgb(255, 94, 0);
+        text-align: left !important;
+    }
+
+    .user-set td.value {
+        color:rgb(255, 94, 0);
+        background-color: transparent;
+    }
+
+    .default td {
+        color: black;
+        text-align: left !important;
+    }
+
+    .user-set td i,
+    .default td i {
+        color: black;
+    }
+
+    /*
+        Styles for parameter documentation links
+        We need styling for visited so jupyter doesn't overwrite it
+    */
+    a.param-doc-link,
+    a.param-doc-link:link,
+    a.param-doc-link:visited {
+        text-decoration: underline dashed;
+        text-underline-offset: .3em;
+        color: inherit;
+        display: block;
+        padding: .5em;
+    }
+
+    /* "hack" to make the entire area of the cell containing the link clickable */
+    a.param-doc-link::before {
+        position: absolute;
+        content: "";
+        inset: 0;
+    }
+
+    .param-doc-description {
+        display: none;
+        position: absolute;
+        z-index: 9999;
+        left: 0;
+        padding: .5ex;
+        margin-left: 1.5em;
+        color: var(--sklearn-color-text);
+        box-shadow: .3em .3em .4em #999;
+        width: max-content;
+        text-align: left;
+        max-height: 10em;
+        overflow-y: auto;
+
+        /* unfitted */
+        background: var(--sklearn-color-unfitted-level-0);
+        border: thin solid var(--sklearn-color-unfitted-level-3);
+    }
+
+    /* Fitted state for parameter tooltips */
+    .fitted .param-doc-description {
+        /* fitted */
+        background: var(--sklearn-color-fitted-level-0);
+        border: thin solid var(--sklearn-color-fitted-level-3);
+    }
+
+    .param-doc-link:hover .param-doc-description {
+        display: block;
+    }
+
+    .copy-paste-icon {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        background-position: 0;
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+    }
+    </style><body><div id="sk-container-id-13" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>GaussianMixture()</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-43" type="checkbox" checked><label for="sk-estimator-id-43" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GaussianMixture</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html">?<span>Documentation for GaussianMixture</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_components',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=n_components,-int%2C%20default%3D1">
+                n_components
+                <span class="param-doc-description">n_components: int, default=1<br><br>The number of mixture components.</span>
+            </a>
+        </td>
+                <td class="value">1</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('covariance_type',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=covariance_type,-%7B%27full%27%2C%20%27tied%27%2C%20%27diag%27%2C%20%27spherical%27%7D%2C%20default%3D%27full%27">
+                covariance_type
+                <span class="param-doc-description">covariance_type: {'full', 'tied', 'diag', 'spherical'}, default='full'<br><br>String describing the type of covariance parameters to use.<br>Must be one of:<br><br>- 'full': each component has its own general covariance matrix.<br>- 'tied': all components share the same general covariance matrix.<br>- 'diag': each component has its own diagonal covariance matrix.<br>- 'spherical': each component has its own single variance.<br><br>For an example of using `covariance_type`, refer to<br>:ref:`sphx_glr_auto_examples_mixture_plot_gmm_selection.py`.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;full&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('tol',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=tol,-float%2C%20default%3D1e-3">
+                tol
+                <span class="param-doc-description">tol: float, default=1e-3<br><br>The convergence threshold. EM iterations will stop when the<br>lower bound average gain is below this threshold.</span>
+            </a>
+        </td>
+                <td class="value">0.001</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('reg_covar',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=reg_covar,-float%2C%20default%3D1e-6">
+                reg_covar
+                <span class="param-doc-description">reg_covar: float, default=1e-6<br><br>Non-negative regularization added to the diagonal of covariance.<br>Allows to assure that the covariance matrices are all positive.</span>
+            </a>
+        </td>
+                <td class="value">1e-06</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_iter',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=max_iter,-int%2C%20default%3D100">
+                max_iter
+                <span class="param-doc-description">max_iter: int, default=100<br><br>The number of EM iterations to perform.</span>
+            </a>
+        </td>
+                <td class="value">100</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=n_init,-int%2C%20default%3D1">
+                n_init
+                <span class="param-doc-description">n_init: int, default=1<br><br>The number of initializations to perform. The best results are kept.</span>
+            </a>
+        </td>
+                <td class="value">1</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('init_params',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=init_params,-%7B%27kmeans%27%2C%20%27k-means%2B%2B%27%2C%20%27random%27%2C%20%27random_from_data%27%7D%2C%20%20%20%20%20default%3D%27kmeans%27">
+                init_params
+                <span class="param-doc-description">init_params: {'kmeans', 'k-means++', 'random', 'random_from_data'},     default='kmeans'<br><br>The method used to initialize the weights, the means and the<br>precisions.<br>String must be one of:<br><br>- 'kmeans' : responsibilities are initialized using kmeans.<br>- 'k-means++' : use the k-means++ method to initialize.<br>- 'random' : responsibilities are initialized randomly.<br>- 'random_from_data' : initial means are randomly selected data points.<br><br>.. versionchanged:: v1.1<br>    `init_params` now accepts 'random_from_data' and 'k-means++' as<br>    initialization methods.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;kmeans&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('weights_init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=weights_init,-array-like%20of%20shape%20%28n_components%2C%20%29%2C%20default%3DNone">
+                weights_init
+                <span class="param-doc-description">weights_init: array-like of shape (n_components, ), default=None<br><br>The user-provided initial weights.<br>If it is None, weights are initialized using the `init_params` method.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('means_init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=means_init,-array-like%20of%20shape%20%28n_components%2C%20n_features%29%2C%20default%3DNone">
+                means_init
+                <span class="param-doc-description">means_init: array-like of shape (n_components, n_features), default=None<br><br>The user-provided initial means,<br>If it is None, means are initialized using the `init_params` method.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('precisions_init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=precisions_init,-array-like%2C%20default%3DNone">
+                precisions_init
+                <span class="param-doc-description">precisions_init: array-like, default=None<br><br>The user-provided initial precisions (inverse of the covariance<br>matrices).<br>If it is None, precisions are initialized using the 'init_params'<br>method.<br>The shape depends on 'covariance_type'::<br><br>    (n_components,)                        if 'spherical',<br>    (n_features, n_features)               if 'tied',<br>    (n_components, n_features)             if 'diag',<br>    (n_components, n_features, n_features) if 'full'</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('random_state',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=random_state,-int%2C%20RandomState%20instance%20or%20None%2C%20default%3DNone">
+                random_state
+                <span class="param-doc-description">random_state: int, RandomState instance or None, default=None<br><br>Controls the random seed given to the method chosen to initialize the<br>parameters (see `init_params`).<br>In addition, it controls the generation of random samples from the<br>fitted distribution (see the method `sample`).<br>Pass an int for reproducible output across multiple function calls.<br>See :term:`Glossary <random_state>`.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('warm_start',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=warm_start,-bool%2C%20default%3DFalse">
+                warm_start
+                <span class="param-doc-description">warm_start: bool, default=False<br><br>If 'warm_start' is True, the solution of the last fitting is used as<br>initialization for the next call of fit(). This can speed up<br>convergence when fit is called several times on similar problems.<br>In that case, 'n_init' is ignored and only a single initialization<br>occurs upon the first call.<br>See :term:`the Glossary <warm_start>`.</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=verbose,-int%2C%20default%3D0">
+                verbose
+                <span class="param-doc-description">verbose: int, default=0<br><br>Enable verbose output. If 1 then it prints the current<br>initialization and each iteration step. If greater than 1 then<br>it prints also the log probability and the time needed<br>for each step.</span>
+            </a>
+        </td>
+                <td class="value">0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose_interval',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.mixture.GaussianMixture.html#:~:text=verbose_interval,-int%2C%20default%3D10">
+                verbose_interval
+                <span class="param-doc-description">verbose_interval: int, default=10<br><br>Number of iteration done before the next print.</span>
+            </a>
+        </td>
+                <td class="value">10</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div></div></div><script>function copyToClipboard(text, element) {
+        // Get the parameter prefix from the closest toggleable content
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+        const originalStyle = element.style;
+        const computedStyle = window.getComputedStyle(element);
+        const originalWidth = computedStyle.width;
+        const originalHTML = element.innerHTML.replace('Copied!', '');
+
+        navigator.clipboard.writeText(fullParamName)
+            .then(() => {
+                element.style.width = originalWidth;
+                element.style.color = 'green';
+                element.innerHTML = "Copied!";
+
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+                element.style.color = 'red';
+                element.innerHTML = "Failed!";
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            });
+        return false;
+    }
+
+    document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const paramName = element.parentElement.nextElementSibling
+            .textContent.trim().split(' ')[0];
+        const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+        element.setAttribute('title', fullParamName);
+    });
+
+
+    /**
+     * Adapted from Skrub
+     * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+     * @returns "light" or "dark"
+     */
+    function detectTheme(element) {
+        const body = document.querySelector('body');
+
+        // Check VSCode theme
+        const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+        const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+        if (themeKindAttr && themeNameAttr) {
+            const themeKind = themeKindAttr.toLowerCase();
+            const themeName = themeNameAttr.toLowerCase();
+
+            if (themeKind.includes("dark") || themeName.includes("dark")) {
+                return "dark";
+            }
+            if (themeKind.includes("light") || themeName.includes("light")) {
+                return "light";
+            }
+        }
+
+        // Check Jupyter theme
+        if (body.getAttribute('data-jp-theme-light') === 'false') {
+            return 'dark';
+        } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+            return 'light';
+        }
+
+        // Guess based on a parent element's color
+        const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+        const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+        if (match) {
+            const [r, g, b] = [
+                parseFloat(match[1]),
+                parseFloat(match[2]),
+                parseFloat(match[3])
+            ];
+
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+            const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (luma > 180) {
+                // If the text is very bright we have a dark theme
+                return 'dark';
+            }
+            if (luma < 75) {
+                // If the text is very dark we have a light theme
+                return 'light';
+            }
+            // Otherwise fall back to the next heuristic.
+        }
+
+        // Fallback to system preference
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+
+    function forceTheme(elementId) {
+        const estimatorElement = document.querySelector(`#${elementId}`);
+        if (estimatorElement === null) {
+            console.error(`Element with id ${elementId} not found.`);
+        } else {
+            const theme = detectTheme(estimatorElement);
+            estimatorElement.classList.add(theme);
+        }
+    }
+
+    forceTheme('sk-container-id-13');</script></body>
     </div>
     <br />
     <br />
@@ -515,12 +999,12 @@ Default conversion
 
  .. code-block:: none
 
-    [-5.91543251 -3.35684834 -3.51614607 -1.34841419 -2.9119838 ]
-    [[-5.915433 ]
-     [-3.3568475]
-     [-3.516146 ]
-     [-1.3484137]
-     [-2.9119852]]
+    [-2.45038103 -1.97770428 -3.07147859 -1.26344799 -8.59497141]
+    [[-2.450383 ]
+     [-1.9777043]
+     [-3.0714796]
+     [-1.263448 ]
+     [-8.594974 ]]
 
 
 
@@ -562,12 +1046,12 @@ produces in that case.
 
  .. code-block:: none
 
-    [-5.91543251 -3.35684834 -3.51614607 -1.34841419 -2.9119838 ]
-    [[-5.915433 ]
-     [-3.3568475]
-     [-3.5161455]
-     [-1.3484137]
-     [-2.9119852]]
+    [-2.45038103 -1.97770428 -3.07147859 -1.26344799 -8.59497141]
+    [[-2.450383 ]
+     [-1.9777043]
+     [-3.0714796]
+     [-1.2634475]
+     [-8.594974 ]]
 
 
 
@@ -604,8 +1088,8 @@ Processing time
 
  .. code-block:: none
 
-    0.5571775649998472
-    0.2685296859999653
+    0.3786912069990649
+    0.30927414700272493
 
 
 
@@ -655,7 +1139,7 @@ a blacklisted operator (or only whitelisted operators),
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.920 seconds)
+   **Total running time of the script:** (0 minutes 0.727 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_list.py:

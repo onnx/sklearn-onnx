@@ -119,8 +119,8 @@ Compute the prediction with ONNX Runtime
 
  .. code-block:: none
 
-    [2 0 0 2 0 2 2 2 1 2 2 2 2 0 2 0 0 1 2 0 1 0 2 2 1 2 0 0 0 1 1 0 1 2 1 1 1
-     1]
+    [2 2 2 0 1 0 0 1 2 0 0 1 2 0 1 1 1 2 2 0 1 2 1 0 0 2 2 1 0 2 2 1 1 0 1 0 0
+     0]
 
 
 
@@ -156,8 +156,17 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    [2 0 0 2 0 2 2 2 1 2 2 2 2 0 2 0 0 1 2 0 1 0 2 2 1 2 0 0 0 1 1 0 1 2 1 1 1
-     1]
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/linear_model/_logistic.py:406: ConvergenceWarning: lbfgs failed to converge after 100 iteration(s) (status=1):
+    STOP: TOTAL NO. OF ITERATIONS REACHED LIMIT
+
+    Increase the number of iterations to improve the convergence (max_iter=100).
+    You might also want to scale the data as shown in:
+        https://scikit-learn.org/stable/modules/preprocessing.html
+    Please also refer to the documentation for alternative solver options:
+        https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression
+      n_iter_i = _check_optimize_result(
+    [2 2 2 0 1 0 0 1 2 0 0 1 2 0 1 1 1 2 2 0 1 2 1 0 0 2 2 1 0 2 2 1 1 0 1 0 0
+     0]
 
 
 
@@ -184,11 +193,11 @@ Full example with a logistic regression
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -196,7 +205,7 @@ Full example with a logistic regression
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.373 seconds)
+   **Total running time of the script:** (0 minutes 0.355 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_convert_model.py:

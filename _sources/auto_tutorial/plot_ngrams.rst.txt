@@ -82,20 +82,21 @@ A simple example impossible to convert
       --sklearn-color-fitted-level-1: #d4ebff;
       --sklearn-color-fitted-level-2: #b3dbfd;
       --sklearn-color-fitted-level-3: cornflowerblue;
+    }
 
+    #sk-container-id-10.light {
       /* Specific color for light theme */
-      --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-      --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
-      --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+      --sklearn-color-text-on-default-background: black;
+      --sklearn-color-background: white;
+      --sklearn-color-border-box: black;
       --sklearn-color-icon: #696969;
+    }
 
-      @media (prefers-color-scheme: dark) {
-        /* Redefinition of color scheme for dark theme */
-        --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
-        --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-icon: #878787;
-      }
+    #sk-container-id-10.dark {
+      --sklearn-color-text-on-default-background: white;
+      --sklearn-color-background: #111;
+      --sklearn-color-border-box: white;
+      --sklearn-color-icon: #878787;
     }
 
     #sk-container-id-10 {
@@ -221,8 +222,8 @@ A simple example impossible to convert
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
-      align-items: start;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
       gap: 0.5em;
     }
 
@@ -247,9 +248,7 @@ A simple example impossible to convert
     /* Toggleable content - dropdown */
 
     #sk-container-id-10 div.sk-toggleable__content {
-      max-height: 0;
-      max-width: 0;
-      overflow: hidden;
+      display: none;
       text-align: left;
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-0);
@@ -275,9 +274,9 @@ A simple example impossible to convert
 
     #sk-container-id-10 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
-      max-height: 200px;
-      max-width: 100%;
-      overflow: auto;
+      display: block;
+      width: 100%;
+      overflow: visible;
     }
 
     #sk-container-id-10 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
@@ -331,7 +330,6 @@ A simple example impossible to convert
     #sk-container-id-10 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
-      display: inline-block;
       line-height: 1.2em;
     }
 
@@ -377,7 +375,7 @@ A simple example impossible to convert
       font-size: smaller;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1em;
       height: 1em;
       width: 1em;
@@ -385,16 +383,17 @@ A simple example impossible to convert
       margin-left: 0.5em;
       text-align: center;
       /* unfitted */
-      border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-      color: var(--sklearn-color-unfitted-level-1);
+      border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-3);
     }
 
     .sk-estimator-doc-link.fitted,
     a:link.sk-estimator-doc-link.fitted,
     a:visited.sk-estimator-doc-link.fitted {
       /* fitted */
-      border: var(--sklearn-color-fitted-level-1) 1pt solid;
-      color: var(--sklearn-color-fitted-level-1);
+      background-color: var(--sklearn-color-fitted-level-0);
+      border: var(--sklearn-color-fitted-level-3) 1pt solid;
+      color: var(--sklearn-color-fitted-level-3);
     }
 
     /* On hover */
@@ -404,7 +403,8 @@ A simple example impossible to convert
     .sk-estimator-doc-link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-0);
       text-decoration: none;
     }
 
@@ -414,7 +414,8 @@ A simple example impossible to convert
     .sk-estimator-doc-link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-fitted-level-0);
       text-decoration: none;
     }
 
@@ -454,7 +455,7 @@ A simple example impossible to convert
       font-size: 1rem;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1rem;
       height: 1rem;
       width: 1rem;
@@ -466,6 +467,7 @@ A simple example impossible to convert
 
     #sk-container-id-10 a.estimator_doc_link.fitted {
       /* fitted */
+      background-color: var(--sklearn-color-fitted-level-0);
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
@@ -482,7 +484,601 @@ A simple example impossible to convert
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-10" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>TfidfVectorizer(ngram_range=(1, 2), token_pattern=&#x27;\\b[a-z ]{1,10}\\b&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-34" type="checkbox" checked><label for="sk-estimator-id-34" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>TfidfVectorizer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">?<span>Documentation for TfidfVectorizer</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>TfidfVectorizer(ngram_range=(1, 2), token_pattern=&#x27;\\b[a-z ]{1,10}\\b&#x27;)</pre></div> </div></div></div></div>
+
+    .estimator-table {
+        font-family: monospace;
+    }
+
+    .estimator-table summary {
+        padding: .5rem;
+        cursor: pointer;
+    }
+
+    .estimator-table summary::marker {
+        font-size: 0.7rem;
+    }
+
+    .estimator-table details[open] {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .estimator-table .parameters-table {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(odd) {
+        background-color: #fff;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(even) {
+        background-color: #f6f6f6;
+    }
+
+    .estimator-table .parameters-table tr:hover {
+        background-color: #e0e0e0;
+    }
+
+    .estimator-table table td {
+        border: 1px solid rgba(106, 105, 104, 0.232);
+    }
+
+    /*
+        `table td`is set in notebook with right text-align.
+        We need to overwrite it.
+    */
+    .estimator-table table td.param {
+        text-align: left;
+        position: relative;
+        padding: 0;
+    }
+
+    .user-set td {
+        color:rgb(255, 94, 0);
+        text-align: left !important;
+    }
+
+    .user-set td.value {
+        color:rgb(255, 94, 0);
+        background-color: transparent;
+    }
+
+    .default td {
+        color: black;
+        text-align: left !important;
+    }
+
+    .user-set td i,
+    .default td i {
+        color: black;
+    }
+
+    /*
+        Styles for parameter documentation links
+        We need styling for visited so jupyter doesn't overwrite it
+    */
+    a.param-doc-link,
+    a.param-doc-link:link,
+    a.param-doc-link:visited {
+        text-decoration: underline dashed;
+        text-underline-offset: .3em;
+        color: inherit;
+        display: block;
+        padding: .5em;
+    }
+
+    /* "hack" to make the entire area of the cell containing the link clickable */
+    a.param-doc-link::before {
+        position: absolute;
+        content: "";
+        inset: 0;
+    }
+
+    .param-doc-description {
+        display: none;
+        position: absolute;
+        z-index: 9999;
+        left: 0;
+        padding: .5ex;
+        margin-left: 1.5em;
+        color: var(--sklearn-color-text);
+        box-shadow: .3em .3em .4em #999;
+        width: max-content;
+        text-align: left;
+        max-height: 10em;
+        overflow-y: auto;
+
+        /* unfitted */
+        background: var(--sklearn-color-unfitted-level-0);
+        border: thin solid var(--sklearn-color-unfitted-level-3);
+    }
+
+    /* Fitted state for parameter tooltips */
+    .fitted .param-doc-description {
+        /* fitted */
+        background: var(--sklearn-color-fitted-level-0);
+        border: thin solid var(--sklearn-color-fitted-level-3);
+    }
+
+    .param-doc-link:hover .param-doc-description {
+        display: block;
+    }
+
+    .copy-paste-icon {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        background-position: 0;
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+    }
+    </style><body><div id="sk-container-id-10" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>TfidfVectorizer(ngram_range=(1, 2), token_pattern=&#x27;\\b[a-z ]{1,10}\\b&#x27;)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-34" type="checkbox" checked><label for="sk-estimator-id-34" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>TfidfVectorizer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html">?<span>Documentation for TfidfVectorizer</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('input',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=input,-%7B%27filename%27%2C%20%27file%27%2C%20%27content%27%7D%2C%20default%3D%27content%27">
+                input
+                <span class="param-doc-description">input: {'filename', 'file', 'content'}, default='content'<br><br>- If `'filename'`, the sequence passed as an argument to fit is<br>  expected to be a list of filenames that need reading to fetch<br>  the raw content to analyze.<br><br>- If `'file'`, the sequence items must have a 'read' method (file-like<br>  object) that is called to fetch the bytes in memory.<br><br>- If `'content'`, the input is expected to be a sequence of items that<br>  can be of type string or byte.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;content&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('encoding',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=encoding,-str%2C%20default%3D%27utf-8%27">
+                encoding
+                <span class="param-doc-description">encoding: str, default='utf-8'<br><br>If bytes or files are given to analyze, this encoding is used to<br>decode.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;utf-8&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('decode_error',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=decode_error,-%7B%27strict%27%2C%20%27ignore%27%2C%20%27replace%27%7D%2C%20default%3D%27strict%27">
+                decode_error
+                <span class="param-doc-description">decode_error: {'strict', 'ignore', 'replace'}, default='strict'<br><br>Instruction on what to do if a byte sequence is given to analyze that<br>contains characters not of the given `encoding`. By default, it is<br>'strict', meaning that a UnicodeDecodeError will be raised. Other<br>values are 'ignore' and 'replace'.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;strict&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('strip_accents',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=strip_accents,-%7B%27ascii%27%2C%20%27unicode%27%7D%20or%20callable%2C%20default%3DNone">
+                strip_accents
+                <span class="param-doc-description">strip_accents: {'ascii', 'unicode'} or callable, default=None<br><br>Remove accents and perform other character normalization<br>during the preprocessing step.<br>'ascii' is a fast method that only works on characters that have<br>a direct ASCII mapping.<br>'unicode' is a slightly slower method that works on any characters.<br>None (default) means no character normalization is performed.<br><br>Both 'ascii' and 'unicode' use NFKD normalization from<br>:func:`unicodedata.normalize`.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('lowercase',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=lowercase,-bool%2C%20default%3DTrue">
+                lowercase
+                <span class="param-doc-description">lowercase: bool, default=True<br><br>Convert all characters to lowercase before tokenizing.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('preprocessor',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=preprocessor,-callable%2C%20default%3DNone">
+                preprocessor
+                <span class="param-doc-description">preprocessor: callable, default=None<br><br>Override the preprocessing (string transformation) stage while<br>preserving the tokenizing and n-grams generation steps.<br>Only applies if ``analyzer`` is not callable.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('tokenizer',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=tokenizer,-callable%2C%20default%3DNone">
+                tokenizer
+                <span class="param-doc-description">tokenizer: callable, default=None<br><br>Override the string tokenization step while preserving the<br>preprocessing and n-grams generation steps.<br>Only applies if ``analyzer == 'word'``.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('analyzer',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=analyzer,-%7B%27word%27%2C%20%27char%27%2C%20%27char_wb%27%7D%20or%20callable%2C%20default%3D%27word%27">
+                analyzer
+                <span class="param-doc-description">analyzer: {'word', 'char', 'char_wb'} or callable, default='word'<br><br>Whether the feature should be made of word or character n-grams.<br>Option 'char_wb' creates character n-grams only from text inside<br>word boundaries; n-grams at the edges of words are padded with space.<br><br>If a callable is passed it is used to extract the sequence of features<br>out of the raw, unprocessed input.<br><br>.. versionchanged:: 0.21<br>    Since v0.21, if ``input`` is ``'filename'`` or ``'file'``, the data<br>    is first read from the file and then passed to the given callable<br>    analyzer.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;word&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('stop_words',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=stop_words,-%7B%27english%27%7D%2C%20list%2C%20default%3DNone">
+                stop_words
+                <span class="param-doc-description">stop_words: {'english'}, list, default=None<br><br>If a string, it is passed to _check_stop_list and the appropriate stop<br>list is returned. 'english' is currently the only supported string<br>value.<br>There are several known issues with 'english' and you should<br>consider an alternative (see :ref:`stop_words`).<br><br>If a list, that list is assumed to contain stop words, all of which<br>will be removed from the resulting tokens.<br>Only applies if ``analyzer == 'word'``.<br><br>If None, no stop words will be used. In this case, setting `max_df`<br>to a higher value, such as in the range (0.7, 1.0), can automatically detect<br>and filter stop words based on intra corpus document frequency of terms.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('token_pattern',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=token_pattern,-str%2C%20default%3Dr%22%28%3Fu%29%5C%5Cb%5C%5Cw%5C%5Cw%2B%5C%5Cb%22">
+                token_pattern
+                <span class="param-doc-description">token_pattern: str, default=r"(?u)\\b\\w\\w+\\b"<br><br>Regular expression denoting what constitutes a "token", only used<br>if ``analyzer == 'word'``. The default regexp selects tokens of 2<br>or more alphanumeric characters (punctuation is completely ignored<br>and always treated as a token separator).<br><br>If there is a capturing group in token_pattern then the<br>captured group content, not the entire match, becomes the token.<br>At most one capturing group is permitted.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;\\b[a-z ]{1,10}\\b&#x27;</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('ngram_range',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=ngram_range,-tuple%20%28min_n%2C%20max_n%29%2C%20default%3D%281%2C%201%29">
+                ngram_range
+                <span class="param-doc-description">ngram_range: tuple (min_n, max_n), default=(1, 1)<br><br>The lower and upper boundary of the range of n-values for different<br>n-grams to be extracted. All values of n such that min_n <= n <= max_n<br>will be used. For example an ``ngram_range`` of ``(1, 1)`` means only<br>unigrams, ``(1, 2)`` means unigrams and bigrams, and ``(2, 2)`` means<br>only bigrams.<br>Only applies if ``analyzer`` is not callable.</span>
+            </a>
+        </td>
+                <td class="value">(1, ...)</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_df',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=max_df,-float%20or%20int%2C%20default%3D1.0">
+                max_df
+                <span class="param-doc-description">max_df: float or int, default=1.0<br><br>When building the vocabulary ignore terms that have a document<br>frequency strictly higher than the given threshold (corpus-specific<br>stop words).<br>If float in range [0.0, 1.0], the parameter represents a proportion of<br>documents, integer absolute counts.<br>This parameter is ignored if vocabulary is not None.</span>
+            </a>
+        </td>
+                <td class="value">1.0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('min_df',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=min_df,-float%20or%20int%2C%20default%3D1">
+                min_df
+                <span class="param-doc-description">min_df: float or int, default=1<br><br>When building the vocabulary ignore terms that have a document<br>frequency strictly lower than the given threshold. This value is also<br>called cut-off in the literature.<br>If float in range of [0.0, 1.0], the parameter represents a proportion<br>of documents, integer absolute counts.<br>This parameter is ignored if vocabulary is not None.</span>
+            </a>
+        </td>
+                <td class="value">1</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_features',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=max_features,-int%2C%20default%3DNone">
+                max_features
+                <span class="param-doc-description">max_features: int, default=None<br><br>If not None, build a vocabulary that only consider the top<br>`max_features` ordered by term frequency across the corpus.<br>Otherwise, all features are used.<br><br>This parameter is ignored if vocabulary is not None.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('vocabulary',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=vocabulary,-Mapping%20or%20iterable%2C%20default%3DNone">
+                vocabulary
+                <span class="param-doc-description">vocabulary: Mapping or iterable, default=None<br><br>Either a Mapping (e.g., a dict) where keys are terms and values are<br>indices in the feature matrix, or an iterable over terms. If not<br>given, a vocabulary is determined from the input documents.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('binary',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=binary,-bool%2C%20default%3DFalse">
+                binary
+                <span class="param-doc-description">binary: bool, default=False<br><br>If True, all non-zero term counts are set to 1. This does not mean<br>outputs will have only 0/1 values, only that the tf term in tf-idf<br>is binary. (Set `binary` to True, `use_idf` to False and<br>`norm` to None to get 0/1 outputs).</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('dtype',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=dtype,-dtype%2C%20default%3Dfloat64">
+                dtype
+                <span class="param-doc-description">dtype: dtype, default=float64<br><br>Type of the matrix returned by fit_transform() or transform().</span>
+            </a>
+        </td>
+                <td class="value">&lt;class &#x27;numpy.float64&#x27;&gt;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('norm',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=norm,-%7B%27l1%27%2C%20%27l2%27%7D%20or%20None%2C%20default%3D%27l2%27">
+                norm
+                <span class="param-doc-description">norm: {'l1', 'l2'} or None, default='l2'<br><br>Each output row will have unit norm, either:<br><br>- 'l2': Sum of squares of vector elements is 1. The cosine<br>  similarity between two vectors is their dot product when l2 norm has<br>  been applied.<br>- 'l1': Sum of absolute values of vector elements is 1.<br>  See :func:`~sklearn.preprocessing.normalize`.<br>- None: No normalization.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;l2&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('use_idf',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=use_idf,-bool%2C%20default%3DTrue">
+                use_idf
+                <span class="param-doc-description">use_idf: bool, default=True<br><br>Enable inverse-document-frequency reweighting. If False, idf(t) = 1.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('smooth_idf',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=smooth_idf,-bool%2C%20default%3DTrue">
+                smooth_idf
+                <span class="param-doc-description">smooth_idf: bool, default=True<br><br>Smooth idf weights by adding one to document frequencies, as if an<br>extra document was seen containing every term in the collection<br>exactly once. Prevents zero divisions.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('sublinear_tf',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html#:~:text=sublinear_tf,-bool%2C%20default%3DFalse">
+                sublinear_tf
+                <span class="param-doc-description">sublinear_tf: bool, default=False<br><br>Apply sublinear tf scaling, i.e. replace tf with 1 + log(tf).</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div></div></div><script>function copyToClipboard(text, element) {
+        // Get the parameter prefix from the closest toggleable content
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+        const originalStyle = element.style;
+        const computedStyle = window.getComputedStyle(element);
+        const originalWidth = computedStyle.width;
+        const originalHTML = element.innerHTML.replace('Copied!', '');
+
+        navigator.clipboard.writeText(fullParamName)
+            .then(() => {
+                element.style.width = originalWidth;
+                element.style.color = 'green';
+                element.innerHTML = "Copied!";
+
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+                element.style.color = 'red';
+                element.innerHTML = "Failed!";
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            });
+        return false;
+    }
+
+    document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const paramName = element.parentElement.nextElementSibling
+            .textContent.trim().split(' ')[0];
+        const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+        element.setAttribute('title', fullParamName);
+    });
+
+
+    /**
+     * Adapted from Skrub
+     * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+     * @returns "light" or "dark"
+     */
+    function detectTheme(element) {
+        const body = document.querySelector('body');
+
+        // Check VSCode theme
+        const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+        const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+        if (themeKindAttr && themeNameAttr) {
+            const themeKind = themeKindAttr.toLowerCase();
+            const themeName = themeNameAttr.toLowerCase();
+
+            if (themeKind.includes("dark") || themeName.includes("dark")) {
+                return "dark";
+            }
+            if (themeKind.includes("light") || themeName.includes("light")) {
+                return "light";
+            }
+        }
+
+        // Check Jupyter theme
+        if (body.getAttribute('data-jp-theme-light') === 'false') {
+            return 'dark';
+        } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+            return 'light';
+        }
+
+        // Guess based on a parent element's color
+        const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+        const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+        if (match) {
+            const [r, g, b] = [
+                parseFloat(match[1]),
+                parseFloat(match[2]),
+                parseFloat(match[3])
+            ];
+
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+            const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (luma > 180) {
+                // If the text is very bright we have a dark theme
+                return 'dark';
+            }
+            if (luma < 75) {
+                // If the text is very dark we have a light theme
+                return 'light';
+            }
+            // Otherwise fall back to the next heuristic.
+        }
+
+        // Fallback to system preference
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+
+    function forceTheme(elementId) {
+        const estimatorElement = document.querySelector(`#${elementId}`);
+        if (estimatorElement === null) {
+            console.error(`Element with id ${elementId} not found.`);
+        } else {
+            const theme = detectTheme(estimatorElement);
+            estimatorElement.classList.add(theme);
+        }
+    }
+
+    forceTheme('sk-container-id-10');</script></body>
     </div>
     <br />
     <br />
@@ -667,7 +1263,7 @@ Let's check if there are discrepancies...
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.101 seconds)
+   **Total running time of the script:** (0 minutes 0.052 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_ngrams.py:

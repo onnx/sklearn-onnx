@@ -70,9 +70,7 @@ on the Boston dataset.
 
  .. code-block:: none
 
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:452: ConvergenceWarning: The optimal value found for dimension 0 of parameter k1__sigma_0 is close to the specified upper bound 100000.0. Increasing the bound and calling fit again may find a better value.
-      warnings.warn(
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:442: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/gaussian_process/kernels.py:440: ConvergenceWarning: The optimal value found for dimension 0 of parameter k2__length_scale is close to the specified lower bound 1e-05. Decreasing the bound and calling fit again may find a better value.
       warnings.warn(
     GaussianProcessRegressor(alpha=1.0,
                              kernel=DotProduct(sigma_0=1) + RBF(length_scale=1))
@@ -147,9 +145,9 @@ the fixed dimensions by an empty value.
 
  .. code-block:: none
 
-    [100.315979   158.71972656 134.34814453 149.08435059 113.38873291
-     124.66339111 163.16369629 143.5949707  145.91064453 190.05358887]
-    [-53248.]
+    [159.940192   166.19826119 166.65995006 163.64849758 172.54954943
+     161.20649004 173.96918469 164.42000719 137.24086433 159.84459205]
+    [160.46094]
 
 
 
@@ -177,9 +175,8 @@ differences.
 
  .. code-block:: none
 
-    [53450.00366211 53452.51953125 53452.95153809 53455.44708252
-     53460.27514648]
-    min(Y)-max(Y): 39.0 332.0
+    [2.24454804 2.28118992 2.32942913 2.58722674 2.8058361 ]
+    min(Y)-max(Y): 43.0 332.0
 
 
 
@@ -226,7 +223,7 @@ will be dumped as doubles and not as floats anymore.
 
  .. code-block:: none
 
-    [100.31582765]
+    [159.940192]
 
 
 
@@ -252,8 +249,9 @@ The new differences look much better.
 
  .. code-block:: none
 
-    [0.00612018 0.00635238 0.00669051 0.00719862 0.00763542]
-    min(Y)-max(Y): 39.0 332.0
+    [9.30020860e-09 1.05505222e-08 1.10885310e-08 1.11092504e-08
+     1.14844738e-08]
+    min(Y)-max(Y): 43.0 332.0
 
 
 
@@ -358,12 +356,12 @@ predict at least once and then converting again.
 
  .. code-block:: none
 
-    [array([[100.31582765],
-           [158.71855798],
-           [134.34822088],
-           [149.0801781 ],
-           [113.38941371]]),
-     array([0., 0., 0., 0., 0.])]
+    [array([[159.940192  ],
+           [166.1982612 ],
+           [166.65995005],
+           [163.64849758],
+           [172.54954943]]),
+     array([1.00649701, 1.00690362, 1.00924269, 1.01138391, 1.00610929])]
 
 
 
@@ -387,9 +385,9 @@ Let's compare with *scikit-learn* prediction.
 
  .. code-block:: none
 
-    (array([100.315979  , 158.71972656, 134.34814453, 149.08435059,
-           113.38726807]),
-     array([1.01359849, 1.01227192, 1.00741782, 1.00668201, 1.0090939 ]))
+    (array([159.940192  , 166.19826119, 166.65995006, 163.64849758,
+           172.54954943]),
+     array([1.00649806, 1.00690484, 1.00924143, 1.0113849 , 1.00610881]))
 
 
 
@@ -421,7 +419,8 @@ It looks good. Let's do a better checks.
 
  .. code-block:: none
 
-    [  1.02410261 168.13500527 298.00327908 317.31394382 357.80585252]
+    [1.53174450e-06 1.55622777e-06 1.65915098e-06 1.67595929e-06
+     1.73165499e-06]
 
 
 
@@ -450,11 +449,11 @@ There are some discrepencies but it seems reasonable.
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -462,7 +461,7 @@ There are some discrepencies but it seems reasonable.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.764 seconds)
+   **Total running time of the script:** (0 minutes 2.928 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_gpr.py:

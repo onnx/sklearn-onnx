@@ -45,7 +45,6 @@ from sklearn.tree import DecisionTreeRegressor
 from skl2onnx.sklapi import CastTransformer
 from skl2onnx import to_onnx
 
-
 ################################
 # The weird data.
 

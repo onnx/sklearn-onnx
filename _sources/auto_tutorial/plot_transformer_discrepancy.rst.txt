@@ -247,7 +247,7 @@ Execution with ONNX
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.030 seconds)
+   **Total running time of the script:** (0 minutes 0.018 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_transformer_discrepancy.py:

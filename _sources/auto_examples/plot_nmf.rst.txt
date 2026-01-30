@@ -37,7 +37,7 @@ gradient descent.
 Building a simple model
 +++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-59
+.. GENERATED FROM PYTHON SOURCE LINES 25-58
 
 .. code-block:: Python
 
@@ -54,7 +54,6 @@ Building a simple model
     from skl2onnx.algebra.onnx_ops import OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum
     from skl2onnx.common.data_types import FloatTensorType
     from onnxruntime import InferenceSession
-
 
     mat = np.array(
         [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
@@ -84,17 +83,17 @@ Building a simple model
  .. code-block:: none
 
     original predictions
-    [(0, 0, np.float64(1.8940619439633473)), (0, 1, np.float64(0.3072432913109815)), (0, 2, np.float64(0.1091000464503179)), (0, 3, np.float64(0.3072432913109815)), (1, 0, np.float64(1.1066037222104155)), (1, 1, np.float64(0.19083096278248987)), (1, 2, np.float64(0.0)), (1, 3, np.float64(0.19083096278248987)), (2, 0, np.float64(1.014668907902116)), (2, 1, np.float64(0.0)), (2, 2, np.float64(0.9848932612757917)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.1066037222104155)), (3, 1, np.float64(0.19083096278248987)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.19083096278248987)), (4, 0, np.float64(0.9470309719816736)), (4, 1, np.float64(0.15362164565549075)), (4, 2, np.float64(0.05455002322515895)), (4, 3, np.float64(0.15362164565549075))]
+    [(0, 0, np.float64(1.8940570076830285)), (0, 1, np.float64(0.3072441822407282)), (0, 2, np.float64(0.10911047375804805)), (0, 3, np.float64(0.3072441822407282)), (1, 0, np.float64(1.1066071879294734)), (1, 1, np.float64(0.19083385427868077)), (1, 2, np.float64(0.0)), (1, 3, np.float64(0.19083385427868077)), (2, 0, np.float64(1.0146710371562229)), (2, 1, np.float64(0.0)), (2, 2, np.float64(0.9848903284716739)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.1066071879294734)), (3, 1, np.float64(0.19083385427868077)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.19083385427868077)), (4, 0, np.float64(0.9470285038415143)), (4, 1, np.float64(0.1536220911203641)), (4, 2, np.float64(0.05455523687902403)), (4, 3, np.float64(0.1536220911203641))]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-62
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 Let's rewrite the prediction in a way it is closer
 to the function we need to convert into ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-76
+.. GENERATED FROM PYTHON SOURCE LINES 61-75
 
 .. code-block:: Python
 
@@ -120,12 +119,12 @@ to the function we need to convert into ONNX.
 
  .. code-block:: none
 
-    [(0, 0, np.float64(1.8940619439633473)), (0, 1, np.float64(0.3072432913109815)), (0, 2, np.float64(0.1091000464503179)), (0, 3, np.float64(0.3072432913109815)), (1, 0, np.float64(1.1066037222104155)), (1, 1, np.float64(0.19083096278248987)), (1, 2, np.float64(0.0)), (1, 3, np.float64(0.19083096278248987)), (2, 0, np.float64(1.014668907902116)), (2, 1, np.float64(0.0)), (2, 2, np.float64(0.9848932612757917)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.1066037222104155)), (3, 1, np.float64(0.19083096278248987)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.19083096278248987)), (4, 0, np.float64(0.9470309719816736)), (4, 1, np.float64(0.15362164565549075)), (4, 2, np.float64(0.05455002322515895)), (4, 3, np.float64(0.15362164565549075))]
+    [(0, 0, np.float64(1.8940570076830285)), (0, 1, np.float64(0.3072441822407282)), (0, 2, np.float64(0.10911047375804805)), (0, 3, np.float64(0.3072441822407282)), (1, 0, np.float64(1.1066071879294734)), (1, 1, np.float64(0.19083385427868077)), (1, 2, np.float64(0.0)), (1, 3, np.float64(0.19083385427868077)), (2, 0, np.float64(1.0146710371562229)), (2, 1, np.float64(0.0)), (2, 2, np.float64(0.9848903284716739)), (2, 3, np.float64(0.0)), (3, 0, np.float64(1.1066071879294734)), (3, 1, np.float64(0.19083385427868077)), (3, 2, np.float64(0.0)), (3, 3, np.float64(0.19083385427868077)), (4, 0, np.float64(0.9470285038415143)), (4, 1, np.float64(0.1536220911203641)), (4, 2, np.float64(0.05455523687902403)), (4, 3, np.float64(0.1536220911203641))]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-87
+.. GENERATED FROM PYTHON SOURCE LINES 76-86
 
 Conversion into ONNX
 ++++++++++++++++++++
@@ -138,7 +137,7 @@ The following converter does not need to be registered,
 it just creates an ONNX graph equivalent to function
 *predict* implemented above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-113
+.. GENERATED FROM PYTHON SOURCE LINES 86-112
 
 .. code-block:: Python
 
@@ -178,7 +177,7 @@ it just creates an ONNX graph equivalent to function
 
     ir_version: 7
     producer_name: "skl2onnx"
-    producer_version: "1.19.1"
+    producer_version: "1.20.0"
     domain: "ai.onnx"
     model_version: 0
     graph {
@@ -218,13 +217,13 @@ it just creates an ONNX graph equivalent to function
         dims: 2
         dims: 4
         data_type: 1
-        float_data: 1.97398615
-        float_data: 0.340408832
+        float_data: 1.97894239
+        float_data: 0.341267616
         float_data: 0
-        float_data: 0.340408832
-        float_data: 0.89287746
+        float_data: 0.341267616
+        float_data: 0.896073699
         float_data: 0
-        float_data: 0.866675794
+        float_data: 0.869773805
         float_data: 0
         name: "Ar_ArrayFeatureExtractorcst"
       }
@@ -232,16 +231,16 @@ it just creates an ONNX graph equivalent to function
         dims: 2
         dims: 5
         data_type: 1
-        float_data: 0.90257144
-        float_data: 0.560593426
+        float_data: 0.900302768
+        float_data: 0.559191227
         float_data: 0
-        float_data: 0.560593426
-        float_data: 0.45128572
-        float_data: 0.125883341
+        float_data: 0.559191227
+        float_data: 0.450151384
+        float_data: 0.125446945
         float_data: 0
-        float_data: 1.13640332
+        float_data: 1.13235223
         float_data: 0
-        float_data: 0.0629416704
+        float_data: 0.0627234727
         name: "Ar_ArrayFeatureExtractorcst1"
       }
       input {
@@ -297,11 +296,11 @@ it just creates an ONNX graph equivalent to function
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-115
+.. GENERATED FROM PYTHON SOURCE LINES 113-114
 
 Let's compute prediction with it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-137
+.. GENERATED FROM PYTHON SOURCE LINES 114-136
 
 .. code-block:: Python
 
@@ -335,16 +334,16 @@ Let's compute prediction with it.
 
  .. code-block:: none
 
-    [(0, 0, np.float32(1.8940619)), (0, 1, np.float32(0.3072433)), (0, 2, np.float32(0.109100044)), (0, 3, np.float32(0.3072433)), (1, 0, np.float32(1.1066036)), (1, 1, np.float32(0.19083095)), (1, 2, np.float32(0.0)), (1, 3, np.float32(0.19083095)), (2, 0, np.float32(1.014669)), (2, 1, np.float32(0.0)), (2, 2, np.float32(0.98489326)), (2, 3, np.float32(0.0)), (3, 0, np.float32(1.1066036)), (3, 1, np.float32(0.19083095)), (3, 2, np.float32(0.0)), (3, 3, np.float32(0.19083095)), (4, 0, np.float32(0.94703096)), (4, 1, np.float32(0.15362164)), (4, 2, np.float32(0.054550022)), (4, 3, np.float32(0.15362164))]
+    [(0, 0, np.float32(1.894057)), (0, 1, np.float32(0.30724418)), (0, 2, np.float32(0.10911047)), (0, 3, np.float32(0.30724418)), (1, 0, np.float32(1.1066072)), (1, 1, np.float32(0.19083385)), (1, 2, np.float32(0.0)), (1, 3, np.float32(0.19083385)), (2, 0, np.float32(1.0146711)), (2, 1, np.float32(0.0)), (2, 2, np.float32(0.9848903)), (2, 3, np.float32(0.0)), (3, 0, np.float32(1.1066072)), (3, 1, np.float32(0.19083385)), (3, 2, np.float32(0.0)), (3, 3, np.float32(0.19083385)), (4, 0, np.float32(0.9470285)), (4, 1, np.float32(0.15362209)), (4, 2, np.float32(0.054555234)), (4, 3, np.float32(0.15362209))]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-139
+.. GENERATED FROM PYTHON SOURCE LINES 137-138
 
 The ONNX graph looks like the following.
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-151
+.. GENERATED FROM PYTHON SOURCE LINES 138-150
 
 .. code-block:: Python
 
@@ -378,11 +377,11 @@ The ONNX graph looks like the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-153
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-159
+.. GENERATED FROM PYTHON SOURCE LINES 152-158
 
 .. code-block:: Python
 
@@ -400,11 +399,11 @@ The ONNX graph looks like the following.
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -412,7 +411,7 @@ The ONNX graph looks like the following.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.454 seconds)
+   **Total running time of the script:** (0 minutes 0.274 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_nmf.py:
