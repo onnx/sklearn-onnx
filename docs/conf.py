@@ -22,7 +22,7 @@ release = version
 
 extensions = [
     "sphinx.ext.intersphinx",
-    "sphinx.ext.imgmath",
+    "sphinx.ext.mathjax",
     "sphinx.ext.ifconfig",
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
