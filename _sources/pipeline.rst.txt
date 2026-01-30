@@ -58,22 +58,43 @@ useful for building complex pipelines such as the following one:
 
 Which we can represent as:
 
-.. blockdiag::
+.. graphviz::
 
-    blockdiag {
-        orientation=portrait;
-        features -> numeric_features;
-        features -> categorical_features;
-        numeric_features -> SimpleImputer -> StandardScaler -> LogisticRegression;
-        categorical_features -> OneHotEncoder -> TruncatedSVD -> LogisticRegression;
+   digraph pipeline {
+       rankdir=TB;
 
-        group {
-            numeric_features; SimpleImputer; StandardScaler;
-        }
-        group {
-            categorical_features; OneHotEncoder; TruncatedSVD;
-        }
-    }
+       features;
+       numeric_features;
+       categorical_features;
+
+       SimpleImputer;
+       StandardScaler;
+       OneHotEncoder;
+       TruncatedSVD;
+       LogisticRegression;
+
+       features -> numeric_features;
+       features -> categorical_features;
+
+       numeric_features -> SimpleImputer -> StandardScaler -> LogisticRegression;
+       categorical_features -> OneHotEncoder -> TruncatedSVD -> LogisticRegression;
+
+       subgraph cluster_numeric {
+           label = "Numeric pipeline";
+           style = dashed;
+           numeric_features;
+           SimpleImputer;
+           StandardScaler;
+       }
+
+       subgraph cluster_categorical {
+           label = "Categorical pipeline";
+           style = dashed;
+           categorical_features;
+           OneHotEncoder;
+           TruncatedSVD;
+       }
+   }
 
 Once fitted, the model is converted into *ONNX*:
 

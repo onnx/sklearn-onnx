@@ -105,20 +105,21 @@ The pipeline.
       --sklearn-color-fitted-level-1: #d4ebff;
       --sklearn-color-fitted-level-2: #b3dbfd;
       --sklearn-color-fitted-level-3: cornflowerblue;
+    }
 
+    #sk-container-id-14.light {
       /* Specific color for light theme */
-      --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-      --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
-      --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+      --sklearn-color-text-on-default-background: black;
+      --sklearn-color-background: white;
+      --sklearn-color-border-box: black;
       --sklearn-color-icon: #696969;
+    }
 
-      @media (prefers-color-scheme: dark) {
-        /* Redefinition of color scheme for dark theme */
-        --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
-        --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-icon: #878787;
-      }
+    #sk-container-id-14.dark {
+      --sklearn-color-text-on-default-background: white;
+      --sklearn-color-background: #111;
+      --sklearn-color-border-box: white;
+      --sklearn-color-icon: #878787;
     }
 
     #sk-container-id-14 {
@@ -244,8 +245,8 @@ The pipeline.
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
-      align-items: start;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
       gap: 0.5em;
     }
 
@@ -270,9 +271,7 @@ The pipeline.
     /* Toggleable content - dropdown */
 
     #sk-container-id-14 div.sk-toggleable__content {
-      max-height: 0;
-      max-width: 0;
-      overflow: hidden;
+      display: none;
       text-align: left;
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-0);
@@ -298,9 +297,9 @@ The pipeline.
 
     #sk-container-id-14 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
-      max-height: 200px;
-      max-width: 100%;
-      overflow: auto;
+      display: block;
+      width: 100%;
+      overflow: visible;
     }
 
     #sk-container-id-14 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
@@ -354,7 +353,6 @@ The pipeline.
     #sk-container-id-14 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
-      display: inline-block;
       line-height: 1.2em;
     }
 
@@ -400,7 +398,7 @@ The pipeline.
       font-size: smaller;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1em;
       height: 1em;
       width: 1em;
@@ -408,16 +406,17 @@ The pipeline.
       margin-left: 0.5em;
       text-align: center;
       /* unfitted */
-      border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-      color: var(--sklearn-color-unfitted-level-1);
+      border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-3);
     }
 
     .sk-estimator-doc-link.fitted,
     a:link.sk-estimator-doc-link.fitted,
     a:visited.sk-estimator-doc-link.fitted {
       /* fitted */
-      border: var(--sklearn-color-fitted-level-1) 1pt solid;
-      color: var(--sklearn-color-fitted-level-1);
+      background-color: var(--sklearn-color-fitted-level-0);
+      border: var(--sklearn-color-fitted-level-3) 1pt solid;
+      color: var(--sklearn-color-fitted-level-3);
     }
 
     /* On hover */
@@ -427,7 +426,8 @@ The pipeline.
     .sk-estimator-doc-link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-0);
       text-decoration: none;
     }
 
@@ -437,7 +437,8 @@ The pipeline.
     .sk-estimator-doc-link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-fitted-level-0);
       text-decoration: none;
     }
 
@@ -477,7 +478,7 @@ The pipeline.
       font-size: 1rem;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1rem;
       height: 1rem;
       width: 1rem;
@@ -489,6 +490,7 @@ The pipeline.
 
     #sk-container-id-14 a.estimator_doc_link.fitted {
       /* fitted */
+      background-color: var(--sklearn-color-fitted-level-0);
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
@@ -505,9 +507,542 @@ The pipeline.
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-14" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
-                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
-                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-45" type="checkbox" ><label for="sk-estimator-id-45" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted"><pre>StandardScaler()</pre></div> </div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-46" type="checkbox" ><label for="sk-estimator-id-46" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>KMeans</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.cluster.KMeans.html">?<span>Documentation for KMeans</span></a></div></label><div class="sk-toggleable__content fitted"><pre>KMeans(n_clusters=3, n_init=3)</pre></div> </div></div></div></div></div></div>
+
+    .estimator-table {
+        font-family: monospace;
+    }
+
+    .estimator-table summary {
+        padding: .5rem;
+        cursor: pointer;
+    }
+
+    .estimator-table summary::marker {
+        font-size: 0.7rem;
+    }
+
+    .estimator-table details[open] {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .estimator-table .parameters-table {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(odd) {
+        background-color: #fff;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(even) {
+        background-color: #f6f6f6;
+    }
+
+    .estimator-table .parameters-table tr:hover {
+        background-color: #e0e0e0;
+    }
+
+    .estimator-table table td {
+        border: 1px solid rgba(106, 105, 104, 0.232);
+    }
+
+    /*
+        `table td`is set in notebook with right text-align.
+        We need to overwrite it.
+    */
+    .estimator-table table td.param {
+        text-align: left;
+        position: relative;
+        padding: 0;
+    }
+
+    .user-set td {
+        color:rgb(255, 94, 0);
+        text-align: left !important;
+    }
+
+    .user-set td.value {
+        color:rgb(255, 94, 0);
+        background-color: transparent;
+    }
+
+    .default td {
+        color: black;
+        text-align: left !important;
+    }
+
+    .user-set td i,
+    .default td i {
+        color: black;
+    }
+
+    /*
+        Styles for parameter documentation links
+        We need styling for visited so jupyter doesn't overwrite it
+    */
+    a.param-doc-link,
+    a.param-doc-link:link,
+    a.param-doc-link:visited {
+        text-decoration: underline dashed;
+        text-underline-offset: .3em;
+        color: inherit;
+        display: block;
+        padding: .5em;
+    }
+
+    /* "hack" to make the entire area of the cell containing the link clickable */
+    a.param-doc-link::before {
+        position: absolute;
+        content: "";
+        inset: 0;
+    }
+
+    .param-doc-description {
+        display: none;
+        position: absolute;
+        z-index: 9999;
+        left: 0;
+        padding: .5ex;
+        margin-left: 1.5em;
+        color: var(--sklearn-color-text);
+        box-shadow: .3em .3em .4em #999;
+        width: max-content;
+        text-align: left;
+        max-height: 10em;
+        overflow-y: auto;
+
+        /* unfitted */
+        background: var(--sklearn-color-unfitted-level-0);
+        border: thin solid var(--sklearn-color-unfitted-level-3);
+    }
+
+    /* Fitted state for parameter tooltips */
+    .fitted .param-doc-description {
+        /* fitted */
+        background: var(--sklearn-color-fitted-level-0);
+        border: thin solid var(--sklearn-color-fitted-level-3);
+    }
+
+    .param-doc-link:hover .param-doc-description {
+        display: block;
+    }
+
+    .copy-paste-icon {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        background-position: 0;
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+    }
+    </style><body><div id="sk-container-id-14" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;std&#x27;, StandardScaler()),
+                    (&#x27;km&#x27;, KMeans(n_clusters=3, n_init=3))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-44" type="checkbox" ><label for="sk-estimator-id-44" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('steps',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=steps,-list%20of%20tuples">
+                steps
+                <span class="param-doc-description">steps: list of tuples<br><br>List of (name of step, estimator) tuples that are to be chained in<br>sequential order. To be compatible with the scikit-learn API, all steps<br>must define `fit`. All non-last steps must also define `transform`. See<br>:ref:`Combining Estimators <combining_estimators>` for more details.</span>
+            </a>
+        </td>
+                <td class="value">[(&#x27;std&#x27;, ...), (&#x27;km&#x27;, ...)]</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('transform_input',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=transform_input,-list%20of%20str%2C%20default%3DNone">
+                transform_input
+                <span class="param-doc-description">transform_input: list of str, default=None<br><br>The names of the :term:`metadata` parameters that should be transformed by the<br>pipeline before passing it to the step consuming it.<br><br>This enables transforming some input arguments to ``fit`` (other than ``X``)<br>to be transformed by the steps of the pipeline up to the step which requires<br>them. Requirement is defined via :ref:`metadata routing <metadata_routing>`.<br>For instance, this can be used to pass a validation set through the pipeline.<br><br>You can only set this if metadata routing is enabled, which you<br>can enable using ``sklearn.set_config(enable_metadata_routing=True)``.<br><br>.. versionadded:: 1.6</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('memory',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=memory,-str%20or%20object%20with%20the%20joblib.Memory%20interface%2C%20default%3DNone">
+                memory
+                <span class="param-doc-description">memory: str or object with the joblib.Memory interface, default=None<br><br>Used to cache the fitted transformers of the pipeline. The last step<br>will never be cached, even if it is a transformer. By default, no<br>caching is performed. If a string is given, it is the path to the<br>caching directory. Enabling caching triggers a clone of the transformers<br>before fitting. Therefore, the transformer instance given to the<br>pipeline cannot be inspected directly. Use the attribute ``named_steps``<br>or ``steps`` to inspect estimators within the pipeline. Caching the<br>transformers is advantageous when fitting is time consuming. See<br>:ref:`sphx_glr_auto_examples_neighbors_plot_caching_nearest_neighbors.py`<br>for an example on how to enable caching.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=verbose,-bool%2C%20default%3DFalse">
+                verbose
+                <span class="param-doc-description">verbose: bool, default=False<br><br>If True, the time elapsed while fitting each step will be printed as it<br>is completed.</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-45" type="checkbox" ><label for="sk-estimator-id-45" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>StandardScaler</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.preprocessing.StandardScaler.html">?<span>Documentation for StandardScaler</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="std__">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('copy',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.preprocessing.StandardScaler.html#:~:text=copy,-bool%2C%20default%3DTrue">
+                copy
+                <span class="param-doc-description">copy: bool, default=True<br><br>If False, try to avoid a copy and do inplace scaling instead.<br>This is not guaranteed to always work inplace; e.g. if the data is<br>not a NumPy array or scipy.sparse CSR matrix, a copy may still be<br>returned.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('with_mean',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.preprocessing.StandardScaler.html#:~:text=with_mean,-bool%2C%20default%3DTrue">
+                with_mean
+                <span class="param-doc-description">with_mean: bool, default=True<br><br>If True, center the data before scaling.<br>This does not work (and will raise an exception) when attempted on<br>sparse matrices, because centering them entails building a dense<br>matrix which in common use cases is likely to be too large to fit in<br>memory.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('with_std',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.preprocessing.StandardScaler.html#:~:text=with_std,-bool%2C%20default%3DTrue">
+                with_std
+                <span class="param-doc-description">with_std: bool, default=True<br><br>If True, scale the data to unit variance (or equivalently,<br>unit standard deviation).</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-46" type="checkbox" ><label for="sk-estimator-id-46" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>KMeans</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html">?<span>Documentation for KMeans</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="km__">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_clusters',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=n_clusters,-int%2C%20default%3D8">
+                n_clusters
+                <span class="param-doc-description">n_clusters: int, default=8<br><br>The number of clusters to form as well as the number of<br>centroids to generate.<br><br>For an example of how to choose an optimal value for `n_clusters` refer to<br>:ref:`sphx_glr_auto_examples_cluster_plot_kmeans_silhouette_analysis.py`.</span>
+            </a>
+        </td>
+                <td class="value">3</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=init,-%7B%27k-means%2B%2B%27%2C%20%27random%27%7D%2C%20callable%20or%20array-like%20of%20shape%20%20%20%20%20%20%20%20%20%20%20%20%20%28n_clusters%2C%20n_features%29%2C%20default%3D%27k-means%2B%2B%27">
+                init
+                <span class="param-doc-description">init: {'k-means++', 'random'}, callable or array-like of shape             (n_clusters, n_features), default='k-means++'<br><br>Method for initialization:<br><br>* 'k-means++' : selects initial cluster centroids using sampling             based on an empirical probability distribution of the points'             contribution to the overall inertia. This technique speeds up             convergence. The algorithm implemented is "greedy k-means++". It             differs from the vanilla k-means++ by making several trials at             each sampling step and choosing the best centroid among them.<br><br>* 'random': choose `n_clusters` observations (rows) at random from         data for the initial centroids.<br><br>* If an array is passed, it should be of shape (n_clusters, n_features)        and gives the initial centers.<br><br>* If a callable is passed, it should take arguments X, n_clusters and a        random state and return an initialization.<br><br>For an example of how to use the different `init` strategies, see<br>:ref:`sphx_glr_auto_examples_cluster_plot_kmeans_digits.py`.<br><br>For an evaluation of the impact of initialization, see the example<br>:ref:`sphx_glr_auto_examples_cluster_plot_kmeans_stability_low_dim_dense.py`.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;k-means++&#x27;</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=n_init,-%27auto%27%20or%20int%2C%20default%3D%27auto%27">
+                n_init
+                <span class="param-doc-description">n_init: 'auto' or int, default='auto'<br><br>Number of times the k-means algorithm is run with different centroid<br>seeds. The final results is the best output of `n_init` consecutive runs<br>in terms of inertia. Several runs are recommended for sparse<br>high-dimensional problems (see :ref:`kmeans_sparse_high_dim`).<br><br>When `n_init='auto'`, the number of runs depends on the value of init:<br>10 if using `init='random'` or `init` is a callable;<br>1 if using `init='k-means++'` or `init` is an array-like.<br><br>.. versionadded:: 1.2<br>   Added 'auto' option for `n_init`.<br><br>.. versionchanged:: 1.4<br>   Default value for `n_init` changed to `'auto'`.</span>
+            </a>
+        </td>
+                <td class="value">3</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_iter',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=max_iter,-int%2C%20default%3D300">
+                max_iter
+                <span class="param-doc-description">max_iter: int, default=300<br><br>Maximum number of iterations of the k-means algorithm for a<br>single run.</span>
+            </a>
+        </td>
+                <td class="value">300</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('tol',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=tol,-float%2C%20default%3D1e-4">
+                tol
+                <span class="param-doc-description">tol: float, default=1e-4<br><br>Relative tolerance with regards to Frobenius norm of the difference<br>in the cluster centers of two consecutive iterations to declare<br>convergence.</span>
+            </a>
+        </td>
+                <td class="value">0.0001</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=verbose,-int%2C%20default%3D0">
+                verbose
+                <span class="param-doc-description">verbose: int, default=0<br><br>Verbosity mode.</span>
+            </a>
+        </td>
+                <td class="value">0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('random_state',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=random_state,-int%2C%20RandomState%20instance%20or%20None%2C%20default%3DNone">
+                random_state
+                <span class="param-doc-description">random_state: int, RandomState instance or None, default=None<br><br>Determines random number generation for centroid initialization. Use<br>an int to make the randomness deterministic.<br>See :term:`Glossary <random_state>`.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('copy_x',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=copy_x,-bool%2C%20default%3DTrue">
+                copy_x
+                <span class="param-doc-description">copy_x: bool, default=True<br><br>When pre-computing distances it is more numerically accurate to center<br>the data first. If copy_x is True (default), then the original data is<br>not modified. If False, the original data is modified, and put back<br>before the function returns, but small numerical differences may be<br>introduced by subtracting and then adding the data mean. Note that if<br>the original data is not C-contiguous, a copy will be made even if<br>copy_x is False. If the original data is sparse, but not in CSR format,<br>a copy will be made even if copy_x is False.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('algorithm',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.cluster.KMeans.html#:~:text=algorithm,-%7B%22lloyd%22%2C%20%22elkan%22%7D%2C%20default%3D%22lloyd%22">
+                algorithm
+                <span class="param-doc-description">algorithm: {"lloyd", "elkan"}, default="lloyd"<br><br>K-means algorithm to use. The classical EM-style algorithm is `"lloyd"`.<br>The `"elkan"` variation can be more efficient on some datasets with<br>well-defined clusters, by using the triangle inequality. However it's<br>more memory intensive due to the allocation of an extra array of shape<br>`(n_samples, n_clusters)`.<br><br>.. versionchanged:: 0.18<br>    Added Elkan algorithm<br><br>.. versionchanged:: 1.1<br>    Renamed "full" to "lloyd", and deprecated "auto" and "full".<br>    Changed "auto" to use "lloyd" instead of "elkan".</span>
+            </a>
+        </td>
+                <td class="value">&#x27;lloyd&#x27;</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div></div></div></div></div><script>function copyToClipboard(text, element) {
+        // Get the parameter prefix from the closest toggleable content
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+        const originalStyle = element.style;
+        const computedStyle = window.getComputedStyle(element);
+        const originalWidth = computedStyle.width;
+        const originalHTML = element.innerHTML.replace('Copied!', '');
+
+        navigator.clipboard.writeText(fullParamName)
+            .then(() => {
+                element.style.width = originalWidth;
+                element.style.color = 'green';
+                element.innerHTML = "Copied!";
+
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+                element.style.color = 'red';
+                element.innerHTML = "Failed!";
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            });
+        return false;
+    }
+
+    document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const paramName = element.parentElement.nextElementSibling
+            .textContent.trim().split(' ')[0];
+        const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+        element.setAttribute('title', fullParamName);
+    });
+
+
+    /**
+     * Adapted from Skrub
+     * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+     * @returns "light" or "dark"
+     */
+    function detectTheme(element) {
+        const body = document.querySelector('body');
+
+        // Check VSCode theme
+        const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+        const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+        if (themeKindAttr && themeNameAttr) {
+            const themeKind = themeKindAttr.toLowerCase();
+            const themeName = themeNameAttr.toLowerCase();
+
+            if (themeKind.includes("dark") || themeName.includes("dark")) {
+                return "dark";
+            }
+            if (themeKind.includes("light") || themeName.includes("light")) {
+                return "light";
+            }
+        }
+
+        // Check Jupyter theme
+        if (body.getAttribute('data-jp-theme-light') === 'false') {
+            return 'dark';
+        } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+            return 'light';
+        }
+
+        // Guess based on a parent element's color
+        const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+        const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+        if (match) {
+            const [r, g, b] = [
+                parseFloat(match[1]),
+                parseFloat(match[2]),
+                parseFloat(match[3])
+            ];
+
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+            const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (luma > 180) {
+                // If the text is very bright we have a dark theme
+                return 'dark';
+            }
+            if (luma < 75) {
+                // If the text is very dark we have a light theme
+                return 'light';
+            }
+            // Otherwise fall back to the next heuristic.
+        }
+
+        // Fallback to system preference
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+
+    function forceTheme(elementId) {
+        const estimatorElement = document.querySelector(`#${elementId}`);
+        if (estimatorElement === null) {
+            console.error(`Element with id ${elementId} not found.`);
+        } else {
+            const theme = detectTheme(estimatorElement);
+            estimatorElement.classList.add(theme);
+        }
+    }
+
+    forceTheme('sk-container-id-14');</script></body>
     </div>
     <br />
     <br />
@@ -553,156 +1088,156 @@ cache the overloaded methods *transform* keeps.
  .. code-block:: none
 
 
-    array([[3.04731565, 0.16691922, 3.90105048],
-           [2.53765667, 1.05008012, 3.89969118],
-           [2.8534191 , 0.70223132, 4.08275531],
-           [2.74622964, 0.95461003, 4.08107334],
-           [3.23237193, 0.35053394, 4.02752145],
-           [3.48845737, 1.15922234, 3.84344238],
-           [3.04980527, 0.52431514, 4.11468249],
-           [2.90441631, 0.13441315, 3.87710094],
-           [2.76651178, 1.4735953 , 4.28118798],
-           [2.6666299 , 0.84235354, 3.94465298],
-           [3.27919712, 0.74060536, 3.85127337],
-           [2.95563885, 0.30307356, 3.97956436],
-           [2.66465535, 1.08829832, 4.04591428],
-           [3.06103061, 1.38230617, 4.50871998],
-           [3.87938657, 1.58899913, 4.10425124],
-           [4.51669438, 2.34530067, 4.47566454],
-           [3.58762514, 1.1553485 , 3.97299158],
-           [2.98512391, 0.17213393, 3.82533283],
-           [3.32956199, 1.16389168, 3.67087693],
-           [3.45834067, 0.81319337, 4.03145794],
-           [2.73958458, 0.50120097, 3.57505244],
-           [3.23074088, 0.61712537, 3.86923945],
-           [3.50566186, 0.66747441, 4.42022781],
-           [2.4750801 , 0.51155505, 3.47802339],
-           [2.8736682 , 0.38345232, 3.8892069 ],
-           [2.42225934, 1.04291694, 3.76676185],
-           [2.74731742, 0.24845351, 3.69412992],
-           [2.99076871, 0.25714597, 3.80890374],
-           [2.87391396, 0.2611406 , 3.78824565],
-           [2.75790131, 0.70011574, 3.98744779],
-           [2.60379694, 0.85497633, 3.90292713],
-           [2.66975272, 0.52152421, 3.48410551],
-           [4.09438407, 1.52253885, 4.45342411],
-           [4.22214621, 1.82234641, 4.40895404],
-           [2.58864695, 0.82260166, 3.86530846],
-           [2.75335951, 0.60043553, 3.91302139],
-           [2.999389  , 0.60703836, 3.7203448 ],
-           [3.32859606, 0.41861164, 4.16574085],
-           [2.85880737, 1.28372352, 4.29823638],
-           [2.87114889, 0.16719611, 3.81424762],
-           [3.04765881, 0.16490106, 3.92166326],
-           [2.70488461, 2.72505665, 4.50242861],
-           [3.02636161, 0.9507447 , 4.30808784],
-           [2.79904696, 0.48729268, 3.61429734],
-           [3.31203486, 0.87083853, 3.83944771],
-           [2.51304561, 1.07390656, 3.89419068],
-           [3.48756201, 0.81546763, 4.07280665],
-           [2.87514706, 0.77022366, 4.12394547],
-           [3.29502383, 0.67120692, 3.90226132],
-           [2.80290905, 0.35513147, 3.87052324],
-           [2.05944499, 3.43556314, 0.9527343 ],
-           [1.57420922, 2.9747863 , 0.91533955],
-           [1.85627645, 3.52176851, 0.6991334 ],
-           [0.81977325, 3.37169191, 2.55294274],
-           [1.08188141, 3.37366488, 0.98171662],
-           [0.41559238, 2.7993061 , 1.67145475],
-           [1.75089133, 3.01695781, 0.94903551],
-           [1.3054677 , 2.81936231, 3.16550893],
-           [1.26497468, 3.2240354 , 1.03500423],
-           [0.66027189, 2.69540221, 2.28485901],
-           [1.79458962, 3.67188095, 3.59062915],
-           [0.90090717, 2.71474217, 1.32750103],
-           [1.15615482, 3.57454207, 2.60882281],
-           [0.82846537, 3.00417652, 1.15164743],
-           [0.7161265 , 2.34736206, 1.91677593],
-           [1.61900765, 3.14784569, 0.91938068],
-           [0.89305298, 2.69864257, 1.54559525],
-           [0.48160791, 2.66850781, 1.98816804],
-           [1.19881076, 4.00685571, 2.2104156 ],
-           [0.48795536, 2.9111416 , 2.32130025],
-           [1.49602283, 3.04351709, 1.09155949],
-           [0.62552403, 2.82390229, 1.49525468],
-           [0.90399583, 3.70843522, 1.52048216],
-           [0.69344472, 2.98843992, 1.4110861 ],
-           [1.04278165, 2.99074759, 1.17226863],
-           [1.37965904, 3.13914603, 0.93245527],
-           [1.42318454, 3.58065437, 0.99964865],
-           [1.61092178, 3.59787573, 0.41699742],
-           [0.7588276 , 2.95535251, 1.20525347],
-           [0.60280715, 2.61712971, 2.30054805],
-           [0.70912153, 3.03724529, 2.5441796 ],
-           [0.79425838, 2.96618351, 2.62458034],
-           [0.31391047, 2.71773006, 1.88550818],
-           [0.72639669, 3.44369296, 1.2765473 ],
-           [0.9578884 , 2.64549177, 1.75825155],
-           [1.83883648, 2.75522333, 1.33978733],
-           [1.65128962, 3.30521622, 0.71260555],
-           [1.06192984, 3.76176356, 2.08134113],
-           [0.85377093, 2.39781055, 1.74666846],
-           [0.41758567, 3.02333265, 2.26242483],
-           [0.33048259, 2.92302464, 2.12172553],
-           [0.99615987, 2.87894547, 1.12220529],
-           [0.25549279, 2.89750284, 1.97352593],
-           [1.33587433, 3.01599101, 3.2031426 ],
-           [0.20110153, 2.79890287, 1.90698574],
-           [0.85870837, 2.40014831, 1.70298258],
-           [0.61211268, 2.57682121, 1.6668071 ],
-           [0.85882898, 2.86194221, 1.26766899],
-           [1.09695347, 2.61357618, 2.91712098],
-           [0.38833729, 2.66524256, 1.75577427],
-           [2.5012404 , 4.2420242 , 1.0918546 ],
-           [0.92015293, 3.5923261 , 1.37898965],
-           [2.3460413 , 4.4461714 , 0.61533733],
-           [1.37537194, 3.7069135 , 0.64037065],
-           [1.93680867, 4.1234534 , 0.49148505],
-           [2.97325888, 5.03573504, 1.30938606],
-           [1.14289326, 3.38471765, 2.6019388 ],
-           [2.42763947, 4.58333402, 0.97719501],
-           [1.65576504, 4.38346835, 1.31984222],
-           [3.4249117 , 4.78218736, 1.61700085],
-           [1.90971055, 3.62917997, 0.4469887 ],
-           [1.29266937, 3.91108898, 0.9070538 ],
-           [2.00571419, 4.1195457 , 0.28701748],
-           [1.03296583, 3.8538939 , 1.7839299 ],
-           [1.54437256, 3.93228102, 1.3928708 ],
-           [2.09882765, 3.9004045 , 0.68129057],
-           [1.59624925, 3.70929828, 0.33306798],
-           [4.04228067, 5.16667811, 2.24280811],
-           [3.13108094, 5.59206313, 1.88051097],
-           [1.17369301, 4.0595081 , 2.24060385],
-           [2.47497267, 4.31907189, 0.64593529],
-           [1.04109807, 3.44883957, 1.48873586],
-           [2.95941231, 5.19705273, 1.54093757],
-           [1.03607405, 3.66188818, 1.01844967],
-           [2.35220999, 4.0048474 , 0.61341103],
-           [2.52679968, 4.26239611, 0.786576  ],
-           [0.99715764, 3.4764269 , 0.93620274],
-           [1.21104872, 3.28685101, 0.8130537 ],
-           [1.57955582, 4.06724081, 0.73703291],
-           [2.21952527, 4.16299138, 0.79795731],
-           [2.46401818, 4.71948935, 1.11257122],
-           [4.0726311 , 5.10470559, 2.31231128],
-           [1.66681009, 4.14760691, 0.78525226],
-           [0.98336185, 3.41503341, 0.97686289],
-           [0.92929783, 3.66012734, 1.46832263],
-           [3.05337662, 5.09008925, 1.3692878 ],
-           [2.49347287, 4.00041166, 1.10609628],
-           [1.66406596, 3.59345432, 0.41554383],
-           [1.15070886, 3.20642858, 0.94210414],
-           [2.17245566, 4.10202725, 0.33887736],
-           [2.27944809, 4.28777875, 0.62347517],
-           [2.26277812, 4.17709068, 0.57349609],
-           [0.92015293, 3.5923261 , 1.37898965],
-           [2.44823886, 4.32158336, 0.64919807],
-           [2.62180347, 4.3459761 , 0.93691617],
-           [2.02412194, 4.13081941, 0.51118153],
-           [1.17215474, 3.99933061, 1.396946  ],
-           [1.649638  , 3.76205335, 0.31254892],
-           [2.35342278, 3.79343916, 1.09600723],
-           [1.18085642, 3.26840383, 1.00795325]])
+    array([[3.12119834, 0.21295824, 3.98940603],
+           [2.6755083 , 0.99604549, 4.01793312],
+           [2.97416665, 0.65198444, 4.19343668],
+           [2.88014429, 0.9034561 , 4.19784749],
+           [3.30022609, 0.40215457, 4.11157152],
+           [3.50554424, 1.21154793, 3.89893116],
+           [3.14856384, 0.50244932, 4.21638048],
+           [2.99184826, 0.09132468, 3.97313411],
+           [2.92515933, 1.42174651, 4.40757189],
+           [2.79398956, 0.78993078, 4.05764261],
+           [3.32125333, 0.78999385, 3.92088109],
+           [3.0493632 , 0.27618123, 4.07853631],
+           [2.80635045, 1.03497888, 4.16440431],
+           [3.21220972, 1.33482453, 4.63069748],
+           [3.88834965, 1.63865558, 4.14619343],
+           [4.4998303 , 2.39898792, 4.49547518],
+           [3.60978017, 1.20748818, 4.02966144],
+           [3.05594182, 0.21618828, 3.91388548],
+           [3.34493953, 1.20986655, 3.72562039],
+           [3.50065397, 0.86706182, 4.10101938],
+           [2.80825681, 0.50401564, 3.66383713],
+           [3.27800809, 0.66826437, 3.94496718],
+           [3.58990876, 0.68658071, 4.51061335],
+           [2.55934697, 0.47945627, 3.57996434],
+           [2.96493153, 0.36345425, 3.98817445],
+           [2.55682739, 0.99023912, 3.88431906],
+           [2.8279719 , 0.22683089, 3.79088782],
+           [3.05970831, 0.2947186 , 3.89539875],
+           [2.95425291, 0.25361098, 3.88085622],
+           [2.87745051, 0.65019824, 4.09851673],
+           [2.73238773, 0.80138328, 4.01796142],
+           [2.73361981, 0.52309257, 3.57350896],
+           [4.11853014, 1.57658655, 4.5037664 ],
+           [4.22845606, 1.87652483, 4.4465301 ],
+           [2.71452112, 0.76858489, 3.97906378],
+           [2.86508665, 0.54896332, 4.01986385],
+           [3.0573692 , 0.63079314, 3.80064093],
+           [3.40284985, 0.45982568, 4.25136846],
+           [3.00742655, 1.2336976 , 4.42052558],
+           [2.95472117, 0.14580827, 3.90865188],
+           [3.12324651, 0.20261743, 4.01192633],
+           [2.90164193, 2.67055552, 4.64398605],
+           [3.15411688, 0.90927099, 4.42154566],
+           [2.8613548 , 0.50081008, 3.70483773],
+           [3.34606471, 0.92159916, 3.9078554 ],
+           [2.65231058, 1.01946042, 4.01421067],
+           [3.53206587, 0.86953764, 4.14238152],
+           [2.99813103, 0.72275914, 4.23577398],
+           [3.34116935, 0.72324305, 3.97409784],
+           [2.90222887, 0.30295342, 3.97223984],
+           [1.9003878 , 3.43619989, 0.95288059],
+           [1.41851492, 2.97232682, 0.99352148],
+           [1.68457079, 3.51850037, 0.72661726],
+           [0.96940962, 3.33264308, 2.69898424],
+           [0.9112523 , 3.35747592, 1.11074501],
+           [0.35721918, 2.77550662, 1.8143491 ],
+           [1.59351202, 3.01808184, 1.00650285],
+           [1.50213315, 2.77360088, 3.31296552],
+           [1.11632078, 3.21148368, 1.14114175],
+           [0.77921299, 2.66294828, 2.42994048],
+           [1.97194958, 3.62389817, 3.73666782],
+           [0.77530513, 2.70011145, 1.45918639],
+           [1.25941769, 3.53658932, 2.74268279],
+           [0.66155141, 2.98813829, 1.28976474],
+           [0.73833453, 2.32311723, 2.05251547],
+           [1.46572707, 3.14311522, 0.98780965],
+           [0.80185102, 2.68234835, 1.67700171],
+           [0.568386  , 2.63954211, 2.12682734],
+           [1.19987895, 3.97369206, 2.33743839],
+           [0.67881532, 2.87494798, 2.46667974],
+           [1.34222961, 3.03853641, 1.1880022 ],
+           [0.53061062, 2.8022861 , 1.63233668],
+           [0.79234309, 3.68305664, 1.65142259],
+           [0.57371215, 2.96833851, 1.54593744],
+           [0.90589785, 2.9760862 , 1.2933375 ],
+           [1.22490527, 3.13002382, 1.03085926],
+           [1.26783271, 3.56679427, 1.09304603],
+           [1.42114042, 3.5903606 , 0.52050254],
+           [0.58974672, 2.93839428, 1.34712856],
+           [0.76432091, 2.58203512, 2.44164622],
+           [0.89738242, 2.99796537, 2.69027665],
+           [0.98549851, 2.92597852, 2.76965187],
+           [0.3921368 , 2.68907313, 2.02829879],
+           [0.54223583, 3.42215998, 1.4211892 ],
+           [0.90567816, 2.62771445, 1.88799766],
+           [1.70872911, 2.75915071, 1.39853465],
+           [1.48190142, 3.30075052, 0.78009974],
+           [1.06129323, 3.73017167, 2.2083069 ],
+           [0.81863359, 2.37943811, 1.87666989],
+           [0.599882  , 2.98789866, 2.41035271],
+           [0.4914813 , 2.89079656, 2.26782134],
+           [0.84409423, 2.86642713, 1.25085451],
+           [0.38941349, 2.86642575, 2.11791607],
+           [1.53271026, 2.96966239, 3.35089399],
+           [0.30831638, 2.77003779, 2.05312152],
+           [0.81726253, 2.38255534, 1.83091351],
+           [0.56428027, 2.55559903, 1.80454586],
+           [0.72672271, 2.8455521 , 1.39825227],
+           [1.28805849, 2.56987887, 3.06324547],
+           [0.38163798, 2.64007308, 1.89861511],
+           [2.31271244, 4.24274589, 1.0584579 ],
+           [0.76585766, 3.57067982, 1.5185265 ],
+           [2.14762671, 4.44150237, 0.52472   ],
+           [1.17645413, 3.69480186, 0.77236486],
+           [1.73594932, 4.11613683, 0.53031563],
+           [2.78128346, 5.03326801, 1.2022172 ],
+           [1.22550604, 3.3503222 , 2.74462238],
+           [2.2426558 , 4.577021  , 0.92275933],
+           [1.50462864, 4.363498  , 1.40314162],
+           [3.22975724, 4.79334275, 1.48323372],
+           [1.71837714, 3.62749566, 0.4787491 ],
+           [1.10409694, 3.89360823, 1.0325986 ],
+           [1.80475907, 4.1132966 , 0.27818948],
+           [0.94858807, 3.82688169, 1.91870424],
+           [1.39433359, 3.91538879, 1.49910975],
+           [1.90677079, 3.89835633, 0.68622715],
+           [1.39713702, 3.70128288, 0.46463058],
+           [3.85224062, 5.18341242, 2.10127163],
+           [2.95786451, 5.58136629, 1.83092395],
+           [1.17790381, 4.02615768, 2.37017622],
+           [2.27442972, 4.31907679, 0.52540209],
+           [0.91211061, 3.4288432 , 1.62249456],
+           [2.77937737, 5.19031307, 1.47042293],
+           [0.84735471, 3.64273089, 1.15814207],
+           [2.15695444, 4.00723617, 0.520093  ],
+           [2.33581345, 4.2637671 , 0.66660166],
+           [0.79774043, 3.45930032, 1.08324891],
+           [1.022307  , 3.27575645, 0.94925151],
+           [1.3842265 , 4.05342943, 0.84098317],
+           [2.03854964, 4.1585729 , 0.75748198],
+           [2.28297732, 4.71100584, 1.07124861],
+           [3.88774921, 5.12224641, 2.17345728],
+           [1.47357101, 4.13401784, 0.87682321],
+           [0.7964005 , 3.39830644, 1.11534598],
+           [0.80521086, 3.63719075, 1.59782917],
+           [2.8607372 , 5.08776655, 1.25982873],
+           [2.3101089 , 4.00416552, 1.07214028],
+           [1.46990247, 3.58815834, 0.51434392],
+           [0.97017134, 3.19454679, 1.0762733 ],
+           [1.97333575, 4.09907253, 0.23050145],
+           [2.07939567, 4.28416057, 0.57373487],
+           [2.06609741, 4.17402084, 0.51130902],
+           [0.76585766, 3.57067982, 1.5185265 ],
+           [2.24723796, 4.32128686, 0.54141867],
+           [2.42521977, 4.3480018 , 0.85128501],
+           [1.82594618, 4.1240495 , 0.52475835],
+           [1.03093862, 3.97564407, 1.52100812],
+           [1.44892686, 3.7539635 , 0.44371189],
+           [2.17585453, 3.7969924 , 1.08437101],
+           [1.00508668, 3.25638099, 1.13739231]])
 
 
 
@@ -750,7 +1285,7 @@ ONNX and scikit-learn outputs.
     difference 4.799262827148709e-07
     ----------------------------
     KMeans(n_clusters=3, n_init=3)
-    difference 1.6719496572781267e-06
+    difference 1.095537650763756e-06
 
 
 
@@ -785,8 +1320,8 @@ fails due to nan values or a dimension mismatch.
  .. code-block:: none
 
 
-    [array([1, 1]), array([[3.0473158 , 0.16691935, 3.9010506 ],
-           [2.5376565 , 1.05008   , 3.8996909 ]], dtype=float32)]
+    [array([1, 1]), array([[3.1211984 , 0.21295893, 3.9894059 ],
+           [2.675508  , 0.99604493, 4.017933  ]], dtype=float32)]
 
 
 
@@ -812,8 +1347,8 @@ And to get a sense of the intermediate results.
 
  .. code-block:: none
 
-     +C Ad_Addcst: float32:(3,) in [1.0728117227554321, 5.101926803588867]
-     +C Ge_Gemmcst: float32:(3, 4) in [-1.3031082153320312, 1.0335986614227295]
+     +C Ad_Addcst: float32:(3,) in [0.9830552339553833, 5.035177230834961]
+     +C Ge_Gemmcst: float32:(3, 4) in [-1.3049873113632202, 1.1359702348709106]
      +C Mu_Mulcst: float32:(1,) in [0.0, 0.0]
      +I X: float32:(2, 4) in [0.20000000298023224, 5.099999904632568]
     Scaler(X) -> variable
@@ -823,25 +1358,25 @@ And to get a sense of the intermediate results.
     Mul(Re_reduced0, Mu_Mulcst) -> Mu_C0
      + Mu_C0: float32:(2, 1) in [0.0, 0.0]
     Gemm(variable, Ge_Gemmcst, Mu_C0) -> Ge_Y0
-     + Ge_Y0: float32:(2, 3) in [-10.450262069702148, 7.452452182769775]
+     + Ge_Y0: float32:(2, 3) in [-10.366023063659668, 7.967348575592041]
     Add(Re_reduced0, Ge_Y0) -> Ad_C01
-     + Ad_C01: float32:(2, 3) in [-5.0740647315979, 12.313563346862793]
+     + Ad_C01: float32:(2, 3) in [-4.98982572555542, 12.817853927612305]
     Add(Ad_Addcst, Ad_C01) -> Ad_C0
-     + Ad_C0: float32:(2, 3) in [0.027862071990966797, 15.218194961547852]
+     + Ad_C0: float32:(2, 3) in [0.045351505279541016, 16.143783569335938]
     ArgMin(Ad_C0) -> label
      + label: int64:(2,) in [1, 1]
     Sqrt(Ad_C0) -> scores
-     + scores: float32:(2, 3) in [0.16691935062408447, 3.901050567626953]
+     + scores: float32:(2, 3) in [0.2129589319229126, 4.017932891845703]
 
-    [array([1, 1]), array([[3.0473158 , 0.16691935, 3.9010506 ],
-           [2.5376565 , 1.05008   , 3.8996909 ]], dtype=float32)]
+    [array([1, 1]), array([[3.1211984 , 0.21295893, 3.9894059 ],
+           [2.675508  , 0.99604493, 4.017933  ]], dtype=float32)]
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.139 seconds)
+   **Total running time of the script:** (0 minutes 0.067 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_fbegin_investigate.py:

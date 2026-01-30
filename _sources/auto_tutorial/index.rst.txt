@@ -20,7 +20,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_ngrams_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_ngrams.py`
+  :doc:`/auto_tutorial/plot_ngrams`
 
 .. raw:: html
 
@@ -37,7 +37,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_abegin_convert_pipeline_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_abegin_convert_pipeline.py`
+  :doc:`/auto_tutorial/plot_abegin_convert_pipeline`
 
 .. raw:: html
 
@@ -54,7 +54,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_lightgbm_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm.py`
+  :doc:`/auto_tutorial/plot_gexternal_lightgbm`
 
 .. raw:: html
 
@@ -71,7 +71,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_dbegin_options_list_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_list.py`
+  :doc:`/auto_tutorial/plot_dbegin_options_list`
 
 .. raw:: html
 
@@ -88,7 +88,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_cbegin_opset_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_cbegin_opset.py`
+  :doc:`/auto_tutorial/plot_cbegin_opset`
 
 .. raw:: html
 
@@ -105,7 +105,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_fbegin_investigate_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_fbegin_investigate.py`
+  :doc:`/auto_tutorial/plot_fbegin_investigate`
 
 .. raw:: html
 
@@ -122,7 +122,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_cst_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_gbegin_cst.py`
+  :doc:`/auto_tutorial/plot_gbegin_cst`
 
 .. raw:: html
 
@@ -139,7 +139,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_transformer_discrepancy_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_transformer_discrepancy.py`
+  :doc:`/auto_tutorial/plot_transformer_discrepancy`
 
 .. raw:: html
 
@@ -156,7 +156,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gconverting_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_gconverting.py`
+  :doc:`/auto_tutorial/plot_gconverting`
 
 .. raw:: html
 
@@ -173,7 +173,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_woe_transformer_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_woe_transformer.py`
+  :doc:`/auto_tutorial/plot_woe_transformer`
 
 .. raw:: html
 
@@ -190,7 +190,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_bbegin_measure_time_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_bbegin_measure_time.py`
+  :doc:`/auto_tutorial/plot_bbegin_measure_time`
 
 .. raw:: html
 
@@ -207,7 +207,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gbegin_dataframe_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_gbegin_dataframe.py`
+  :doc:`/auto_tutorial/plot_gbegin_dataframe`
 
 .. raw:: html
 
@@ -224,7 +224,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_dbegin_options_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_dbegin_options.py`
+  :doc:`/auto_tutorial/plot_dbegin_options`
 
 .. raw:: html
 
@@ -241,7 +241,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_kcustom_converter_wrapper_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_kcustom_converter_wrapper.py`
+  :doc:`/auto_tutorial/plot_kcustom_converter_wrapper`
 
 .. raw:: html
 
@@ -258,7 +258,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_ebegin_float_double_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_ebegin_float_double.py`
+  :doc:`/auto_tutorial/plot_ebegin_float_double`
 
 .. raw:: html
 
@@ -275,11 +275,28 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_lightgbm_reg_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm_reg.py`
+  :doc:`/auto_tutorial/plot_gexternal_lightgbm_reg`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Convert a pipeline with a LightGBM regressor</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="A pipeline including a custom estimator cannot be automatically converted into onnx because there is no converter able to convert custom python code into ONNX. A custom converter needs to be written specifically for it.">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_k1_custom_converter_onnxscript_thumb.png
+    :alt:
+
+  :doc:`/auto_tutorial/plot_k1_custom_converter_onnxscript`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Implement a custom converter with onnxscript</div>
     </div>
 
 
@@ -292,7 +309,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_mcustom_parser_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_mcustom_parser.py`
+  :doc:`/auto_tutorial/plot_mcustom_parser`
 
 .. raw:: html
 
@@ -309,11 +326,28 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_dbegin_options_zipmap_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_dbegin_options_zipmap.py`
+  :doc:`/auto_tutorial/plot_dbegin_options_zipmap`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Choose appropriate output of a classifier</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="ndonnx aims at converting a code using numpy into ONNX. It is tracing the execution path by storing every operation applied on a tracing object. It may work with a scikit-learn if it supports the Array API. That means every estimator in a pipeline must be part of the following list Array API support (Estimators).">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_k2_custom_converter_ndonnx_thumb.png
+    :alt:
+
+  :doc:`/auto_tutorial/plot_k2_custom_converter_ndonnx`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Implement a custom converter with ndonnx</div>
     </div>
 
 
@@ -326,7 +360,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_lcustom_options_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_lcustom_options.py`
+  :doc:`/auto_tutorial/plot_lcustom_options`
 
 .. raw:: html
 
@@ -343,28 +377,11 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_jcustom_syntax_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_jcustom_syntax.py`
+  :doc:`/auto_tutorial/plot_jcustom_syntax`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Two ways to implement a converter</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it.">
-
-.. only:: html
-
-  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_catboost_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_auto_tutorial_plot_gexternal_catboost.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
     </div>
 
 
@@ -377,7 +394,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_icustom_converter_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_icustom_converter.py`
+  :doc:`/auto_tutorial/plot_icustom_converter`
 
 .. raw:: html
 
@@ -394,11 +411,28 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_xgboost_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py`
+  :doc:`/auto_tutorial/plot_gexternal_xgboost`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it.">
+
+.. only:: html
+
+  .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_gexternal_catboost_thumb.png
+    :alt:
+
+  :doc:`/auto_tutorial/plot_gexternal_catboost`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
     </div>
 
 
@@ -411,7 +445,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_wext_pyod_forest_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_wext_pyod_forest.py`
+  :doc:`/auto_tutorial/plot_wext_pyod_forest`
 
 .. raw:: html
 
@@ -428,7 +462,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_catwoe_transformer_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_catwoe_transformer.py`
+  :doc:`/auto_tutorial/plot_catwoe_transformer`
 
 .. raw:: html
 
@@ -445,7 +479,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_jfunction_transformer_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_jfunction_transformer.py`
+  :doc:`/auto_tutorial/plot_jfunction_transformer`
 
 .. raw:: html
 
@@ -462,7 +496,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_usparse_xgboost_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py`
+  :doc:`/auto_tutorial/plot_usparse_xgboost`
 
 .. raw:: html
 
@@ -479,7 +513,7 @@ Examples
   .. image:: /auto_tutorial/images/thumb/sphx_glr_plot_weird_pandas_and_hash_thumb.png
     :alt:
 
-  :ref:`sphx_glr_auto_tutorial_plot_weird_pandas_and_hash.py`
+  :doc:`/auto_tutorial/plot_weird_pandas_and_hash`
 
 .. raw:: html
 
@@ -513,13 +547,15 @@ Examples
    /auto_tutorial/plot_kcustom_converter_wrapper
    /auto_tutorial/plot_ebegin_float_double
    /auto_tutorial/plot_gexternal_lightgbm_reg
+   /auto_tutorial/plot_k1_custom_converter_onnxscript
    /auto_tutorial/plot_mcustom_parser
    /auto_tutorial/plot_dbegin_options_zipmap
+   /auto_tutorial/plot_k2_custom_converter_ndonnx
    /auto_tutorial/plot_lcustom_options
    /auto_tutorial/plot_jcustom_syntax
-   /auto_tutorial/plot_gexternal_catboost
    /auto_tutorial/plot_icustom_converter
    /auto_tutorial/plot_gexternal_xgboost
+   /auto_tutorial/plot_gexternal_catboost
    /auto_tutorial/plot_wext_pyod_forest
    /auto_tutorial/plot_catwoe_transformer
    /auto_tutorial/plot_jfunction_transformer

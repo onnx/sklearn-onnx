@@ -1,14 +1,14 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="../../../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
-        <link rel="prefetch" href="../../../_static/logo_main.png" as="image" />
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html"><link rel="search" title="Search" href="../../../search.html">
+        <link rel="prefetch" href="../../../_static/logo_main.png" as="image">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
-        <title>skl2onnx.common._container - sklearn-onnx 1.19.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=25af2a20" />
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>skl2onnx.common._container - sklearn-onnx 1.20.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
@@ -28,14 +28,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #2b2b2b;
-  --color-code-foreground: #f8f8f2;
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #2b2b2b;
-  --color-code-foreground: #f8f8f2;
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
       }
     }
@@ -150,14 +150,10 @@
   </symbol>
 </svg>
 
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
 <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
@@ -167,17 +163,15 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">sklearn-onnx 1.20.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
           <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
           <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -185,8 +179,7 @@
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
   </header>
@@ -198,7 +191,7 @@
     <img class="sidebar-logo" src="../../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.20.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -208,8 +201,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../introduction.html">Introduction</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../index_tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1_simple.html">The easy case</a><input aria-label="Toggle navigation of The easy case" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_cbegin_opset.html">What is the opset number?</a></li>
@@ -223,36 +216,38 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gconverting.html">Modify the ONNX graph</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_1-5_external.html">Using converters from other libraries</a><input aria-label="Toggle navigation of Using converters from other libraries" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input aria-label="Toggle navigation of A custom converter for a custom model" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_k1_custom_converter_onnxscript.html">Implement a custom converter with onnxscript</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_k2_custom_converter_ndonnx.html">Implement a custom converter with ndonnx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_4_advanced.html">Advanced scenarios</a><input aria-label="Toggle navigation of Advanced scenarios" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_woe_transformer.html">Converter for WOE</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../tutorial_2-5_extlib.html">Write converters for other libraries</a><input aria-label="Toggle navigation of Write converters for other libraries" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../auto_tutorial/plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api_summary.html">API Summary</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../auto_examples/index.html">Gallery of examples</a><input aria-label="Toggle navigation of Gallery of examples" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
@@ -304,8 +299,7 @@
         </a>
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -313,43 +307,41 @@
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for skl2onnx.common._container</h1><div class="highlight"><pre>
 <span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 
-<span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">import</span> <span class="nn">pprint</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">coo_matrix</span>
-<span class="kn">from</span> <span class="nn">onnx</span> <span class="kn">import</span> <span class="n">SparseTensorProto</span><span class="p">,</span> <span class="n">ValueInfoProto</span>
-<span class="kn">from</span> <span class="nn">onnx.defs</span> <span class="kn">import</span> <span class="n">onnx_opset_version</span><span class="p">,</span> <span class="n">get_all_schemas_with_history</span>
-<span class="kn">from</span> <span class="nn">onnx.helper</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pprint</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">getLogger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.sparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">coo_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">SparseTensorProto</span><span class="p">,</span> <span class="n">ValueInfoProto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnx.defs</span><span class="w"> </span><span class="kn">import</span> <span class="n">onnx_opset_version</span><span class="p">,</span> <span class="n">get_all_schemas_with_history</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnx.helper</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">make_node</span><span class="p">,</span>
     <span class="n">make_tensor</span><span class="p">,</span>
     <span class="n">make_attribute</span><span class="p">,</span>
     <span class="n">make_sparse_tensor</span><span class="p">,</span>
     <span class="n">make_tensor_value_info</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">import</span> <span class="nn">onnx.onnx_cpp2py_export.defs</span> <span class="k">as</span> <span class="nn">C</span>
-<span class="kn">from</span> <span class="nn">..proto</span> <span class="kn">import</span> <span class="n">TensorProto</span>
-<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">get_domain</span>
-<span class="kn">from</span> <span class="nn">.graph_builder_opset</span> <span class="kn">import</span> <span class="n">Opset</span>
-
+<span class="kn">import</span><span class="w"> </span><span class="nn">onnx.onnx_cpp2py_export.defs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">C</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..proto</span><span class="w"> </span><span class="kn">import</span> <span class="n">TensorProto</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_domain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.graph_builder_opset</span><span class="w"> </span><span class="kn">import</span> <span class="n">Opset</span>
 
 <span class="n">dict_apply_operation</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;skl2onnx&quot;</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_get_operation_list</span><span class="p">(</span><span class="n">use_shortlist</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_operation_list</span><span class="p">(</span><span class="n">use_shortlist</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Investigates this module to extract all ONNX functions</span>
 <span class="sd">    which needs to be converted with these functions.</span>
@@ -388,7 +380,7 @@
     <span class="k">return</span> <span class="n">res</span>
 
 
-<span class="k">def</span> <span class="nf">_build_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">defined_options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">,</span> <span class="n">allowed_options</span><span class="p">,</span> <span class="n">fail</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_build_options</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">defined_options</span><span class="p">,</span> <span class="n">default_values</span><span class="p">,</span> <span class="n">allowed_options</span><span class="p">,</span> <span class="n">fail</span><span class="p">):</span>
     <span class="n">opts</span> <span class="o">=</span> <span class="p">{}</span> <span class="k">if</span> <span class="n">default_values</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">default_values</span>
     <span class="k">if</span> <span class="n">defined_options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">opts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">defined_options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">),</span> <span class="p">{}))</span>
@@ -423,13 +415,13 @@
 <span class="n">_apply_operation_specific</span> <span class="o">=</span> <span class="n">_get_operation_list</span><span class="p">()</span>
 
 
-<span class="k">class</span> <span class="nc">_WhiteBlackContainer</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_WhiteBlackContainer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_white_op</span> <span class="o">=</span> <span class="n">white_op</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_black_op</span> <span class="o">=</span> <span class="n">black_op</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
-    <span class="k">def</span> <span class="nf">is_allowed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_allowed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tells if a node is white listed or not black listed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -441,7 +433,7 @@
         <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">check_white_black_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_white_black_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node_type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks a node type is allowed according to white</span>
 <span class="sd">        and black lists.</span>
@@ -451,21 +443,21 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_black_op</span> <span class="ow">and</span> <span class="n">node_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_black_op</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Operator &#39;</span><span class="si">{}</span><span class="s2">&#39; is black listed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">node_type</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log debug information while converting a model.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
-<span class="k">class</span> <span class="nc">RawModelContainerNode</span><span class="p">(</span><span class="n">_WhiteBlackContainer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RawModelContainerNode</span><span class="p">(</span><span class="n">_WhiteBlackContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This node is the carrier of the model we want to convert.</span>
 <span class="sd">    It provides an abstract layer so that our parsing</span>
 <span class="sd">    framework can work with models generated by different tools.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param raw_model: *scikit-learn* model to convert</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -475,11 +467,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_raw_model</span> <span class="o">=</span> <span class="n">raw_model</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">raw_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_model</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function should return a list of strings. Each string</span>
 <span class="sd">        corresponds to an input variable name.</span>
@@ -488,7 +480,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This function should return a list of strings. Each string</span>
 <span class="sd">        corresponds to an output variable name.</span>
@@ -499,7 +491,7 @@
 
 <div class="viewcode-block" id="SklearnModelContainerNode">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.SklearnModelContainerNode">[docs]</a>
-<span class="k">class</span> <span class="nc">SklearnModelContainerNode</span><span class="p">(</span><span class="n">RawModelContainerNode</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SklearnModelContainerNode</span><span class="p">(</span><span class="n">RawModelContainerNode</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Main container for one *scikit-learn* model.</span>
 <span class="sd">    Every converter adds nodes to an existing container</span>
@@ -507,7 +499,7 @@
 <span class="sd">    :class:`Topology &lt;skl2onnx.common._topology.Topology&gt;`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SklearnModelContainerNode</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">sklearn_model</span><span class="p">,</span> <span class="n">white_op</span><span class="o">=</span><span class="n">white_op</span><span class="p">,</span> <span class="n">black_op</span><span class="o">=</span><span class="n">black_op</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span>
         <span class="p">)</span>
@@ -517,20 +509,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">input_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">]</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">output_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">variable</span><span class="o">.</span><span class="n">onnx_name</span> <span class="k">for</span> <span class="n">variable</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="c1"># The order of adding variables matters. The final model&#39;s</span>
         <span class="c1"># input names are sequentially added as this list</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">add_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="c1"># The order of adding variables matters. The final model&#39;s</span>
         <span class="c1"># output names are sequentially added as this list</span>
         <span class="k">if</span> <span class="n">variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputs</span><span class="p">:</span>
@@ -540,14 +532,14 @@
 
 <div class="viewcode-block" id="ModelComponentContainer">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer">[docs]</a>
-<span class="k">class</span> <span class="nc">ModelComponentContainer</span><span class="p">(</span><span class="n">_WhiteBlackContainer</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelComponentContainer</span><span class="p">(</span><span class="n">_WhiteBlackContainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    In the conversion phase, this class is used to collect all materials</span>
 <span class="sd">    required to build an *ONNX* *GraphProto*, which is encapsulated in a</span>
 <span class="sd">    *ONNX* *ModelProto*.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">target_opset</span><span class="p">,</span>
         <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -605,13 +597,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">local_functions</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">main_opset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">main_opset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span>
 
-    <span class="k">def</span> <span class="nf">make_local_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_local_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">optimize</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">local_functions</span><span class="p">[</span><span class="n">domain</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">container</span>
 
-    <span class="k">def</span> <span class="nf">swap_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">swap_names</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Swaps variables names.</span>
 
@@ -689,7 +681,7 @@
                 <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="s2">&quot;n-&quot;</span><span class="p">,</span> <span class="n">node</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">res</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Shows internal information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -716,7 +708,7 @@
                 <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nod</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rows</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_make_value_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_value_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="n">value_info</span> <span class="o">=</span> <span class="n">ValueInfoProto</span><span class="p">()</span>
         <span class="n">value_info</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">full_name</span>
         <span class="n">value_info</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">CopyFrom</span><span class="p">(</span><span class="n">variable</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">to_onnx_type</span><span class="p">())</span>
@@ -726,7 +718,7 @@
 
 <div class="viewcode-block" id="ModelComponentContainer.add_input">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_input">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds our *Variable* object defined _parser.py into the the input</span>
 <span class="sd">        list of the final ONNX model.</span>
@@ -736,17 +728,17 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_value_info</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span></div>
 
 
-    <span class="k">def</span> <span class="nf">make_tensor_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_tensor_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_tensor_value_info</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">name</span>
 
-    <span class="k">def</span> <span class="nf">make_tensor_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_tensor_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">make_tensor_value_info</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">name</span>
 
 <div class="viewcode-block" id="ModelComponentContainer.add_output">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_output">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds our *Variable* object defined *_parser.py* into the the</span>
 <span class="sd">        output list of the final ONNX model.</span>
@@ -756,7 +748,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_value_info</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span></div>
 
 
-    <span class="k">def</span> <span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">options</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds an option, for example,</span>
 <span class="sd">        ``add_options(id(clr), {&#39;raw_scores&#39;: True})``</span>
@@ -778,7 +770,7 @@
 
 <div class="viewcode-block" id="ModelComponentContainer.add_initializer">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_initializer">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_initializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_initializer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">content</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a *TensorProto* into the initializer list of the final</span>
 <span class="sd">        ONNX model.</span>
@@ -873,7 +865,7 @@
                     <span class="s2">&quot;Unable to make a tensor name=</span><span class="si">%r</span><span class="s2"> &quot;</span>
                     <span class="s2">&quot;onnx_type=</span><span class="si">%r</span><span class="s2"> shape=</span><span class="si">%r</span><span class="s2"> content-type=</span><span class="si">%r</span><span class="s2">.&quot;</span>
                     <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">onnx_type</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
         <span class="k">if</span> <span class="n">tensor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">cached_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -925,10 +917,10 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Either tensor or sparse_tensor should be defined.&quot;</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">add_value_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_value_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">value_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_value_info</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_check_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_operator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op_type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks that if *op_type* is one of the operators defined in</span>
 <span class="sd">        :mod:`skl2onnx.common._apply_container`, then it was called</span>
@@ -954,7 +946,7 @@
 
 <div class="viewcode-block" id="ModelComponentContainer.add_node">
 <a class="viewcode-back" href="../../../api_summary.html#skl2onnx.common._container.ModelComponentContainer.add_node">[docs]</a>
-    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_node</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">op_type</span><span class="p">,</span>
         <span class="n">inputs</span><span class="p">,</span>
@@ -1026,7 +1018,7 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;inputs or outputs are wrong, inputs=</span><span class="si">%r</span><span class="s2">, outputs=</span><span class="si">%r</span><span class="s2">, node=</span><span class="si">%r</span><span class="s2">.&quot;</span>
                 <span class="s2">&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">op_type</span><span class="p">)</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="k">if</span> <span class="n">common</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;inputs and outputs cannot have &quot;</span>
@@ -1075,7 +1067,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Unable to create node </span><span class="si">{</span><span class="n">op_type</span><span class="si">!r}</span><span class="s2"> with name=</span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> and &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;attributes=</span><span class="si">{</span><span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">new_attrs</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
-            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
         <span class="n">node</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">op_domain</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">node_domain_version_pair_sets</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">op_domain</span><span class="p">,</span> <span class="n">op_version</span><span class="p">))</span>
@@ -1100,7 +1092,7 @@
             <span class="p">)</span></div>
 
 
-    <span class="k">def</span> <span class="nf">target_opset_any_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">target_opset_any_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">):</span>
         <span class="n">target_opset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_all</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target_opset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">target_opset</span><span class="p">:</span>
@@ -1121,10 +1113,10 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">target_opset_onnx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">target_opset_onnx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_opset_any_domain</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_get_op_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">op_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_op_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">op_type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determines the highest version of operator</span>
 <span class="sd">        *op_type* below or equal to *target_opset*.</span>
@@ -1155,7 +1147,7 @@
             <span class="s2">&quot;in domain &#39;</span><span class="si">{}</span><span class="s2">&#39;. Available versions: </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">op_type</span><span class="p">,</span> <span class="n">domain</span><span class="p">,</span> <span class="n">vers</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_build_op_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_op_version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">schema</span> <span class="ow">in</span> <span class="n">get_all_schemas_with_history</span><span class="p">():</span>
             <span class="n">dom</span> <span class="o">=</span> <span class="n">schema</span><span class="o">.</span><span class="n">domain</span>
@@ -1168,7 +1160,7 @@
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">res</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_op_versions</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">_get_allowed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_allowed_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">model</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">registered_models</span><span class="p">[</span><span class="s2">&quot;aliases&quot;</span><span class="p">]:</span>
@@ -1191,7 +1183,7 @@
             <span class="s2">&quot;for model &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">clname</span><span class="p">)</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">validate_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operator</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Validates every operator allows the options</span>
 <span class="sd">        given by the user at converter time</span>
@@ -1200,7 +1192,7 @@
         <span class="n">skl_op</span> <span class="o">=</span> <span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">skl_op</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fail</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns additional options for a model.</span>
 <span class="sd">        It first looks by class then by id (``id(model)``).</span>
@@ -1218,7 +1210,7 @@
             <span class="n">fail</span><span class="o">=</span><span class="n">fail</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">has_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">option_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_options</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">option_name</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Tells if a model allows one specific options.</span>
 
@@ -1228,7 +1220,7 @@
         <span class="n">opts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_allowed_options</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">option_name</span> <span class="ow">in</span> <span class="n">opts</span>
 
-    <span class="k">def</span> <span class="nf">ensure_topological_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ensure_topological_order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensures and modifies the order of nodes to have</span>
 <span class="sd">        a topological order (every node in the list</span>
@@ -1289,7 +1281,7 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_ops</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
 
-            <span class="k">def</span> <span class="nf">nstr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">nstr</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
                     <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> -- #</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">order</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
                 <span class="k">return</span> <span class="n">name</span>
@@ -1408,7 +1400,7 @@
         <span class="n">map_nodes</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">node</span><span class="p">)):</span> <span class="n">node</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">map_nodes</span><span class="p">[</span><span class="n">_</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">topo</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">get_op_builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_op_builder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Opset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span></div>
 
 </pre></div>
@@ -1443,9 +1435,9 @@
       
     </aside>
   </div>
-</div><script src="../../../_static/documentation_options.js?v=f0c121d3"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+</div><script src="../../../_static/documentation_options.js?v=2a6ef5f7"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

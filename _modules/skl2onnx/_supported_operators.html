@@ -1,20 +1,21 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="../../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
+        <link rel="prefetch" href="../../_static/logo_main.png" as="image">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
-        <title>skl2onnx._supported_operators - sklearn-onnx 1.19.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>skl2onnx._supported_operators - sklearn-onnx 1.20.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -149,14 +150,10 @@
   </symbol>
 </svg>
 
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
 <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
@@ -166,17 +163,15 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
+      <a href="../../index.html"><div class="brand">sklearn-onnx 1.20.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
           <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
           <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -184,8 +179,7 @@
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
   </header>
@@ -193,12 +187,11 @@
     <div class="sidebar-container">
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
-  
   <div class="sidebar-logo-container">
     <img class="sidebar-logo" src="../../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.20.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -208,8 +201,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../index_tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_1_simple.html">The easy case</a><input aria-label="Toggle navigation of The easy case" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_cbegin_opset.html">What is the opset number?</a></li>
@@ -223,36 +216,38 @@
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_gconverting.html">Modify the ONNX graph</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_1-5_external.html">Using converters from other libraries</a><input aria-label="Toggle navigation of Using converters from other libraries" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_2_new_converter.html">A custom converter for a custom model</a><input aria-label="Toggle navigation of A custom converter for a custom model" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_k1_custom_converter_onnxscript.html">Implement a custom converter with onnxscript</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_k2_custom_converter_ndonnx.html">Implement a custom converter with ndonnx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_4_advanced.html">Advanced scenarios</a><input aria-label="Toggle navigation of Advanced scenarios" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_woe_transformer.html">Converter for WOE</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../tutorial_2-5_extlib.html">Write converters for other libraries</a><input aria-label="Toggle navigation of Write converters for other libraries" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../auto_tutorial/plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api_summary.html">API Summary</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../auto_examples/index.html">Gallery of examples</a><input aria-label="Toggle navigation of Gallery of examples" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
@@ -304,8 +299,7 @@
         </a>
         <div class="content-icon-container">
           <div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -313,8 +307,7 @@
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
@@ -322,14 +315,14 @@
 <span></span><span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 
 
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="c1"># Calibrated classifier CV</span>
-<span class="kn">from</span> <span class="nn">sklearn.calibration</span> <span class="kn">import</span> <span class="n">CalibratedClassifierCV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.calibration</span><span class="w"> </span><span class="kn">import</span> <span class="n">CalibratedClassifierCV</span>
 
 <span class="c1"># Linear classifiers</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LogisticRegression</span><span class="p">,</span>
     <span class="n">LogisticRegressionCV</span><span class="p">,</span>
     <span class="n">PassiveAggressiveClassifier</span><span class="p">,</span>
@@ -338,10 +331,10 @@
     <span class="n">RidgeClassifierCV</span><span class="p">,</span>
     <span class="n">SGDClassifier</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">OneClassSVM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSVC</span><span class="p">,</span> <span class="n">OneClassSVM</span>
 
 <span class="c1"># Linear regressors</span>
-<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ARDRegression</span><span class="p">,</span>
     <span class="n">BayesianRidge</span><span class="p">,</span>
     <span class="n">ElasticNet</span><span class="p">,</span>
@@ -370,49 +363,49 @@
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">GammaRegressor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">GammaRegressor</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># available since sklearn&gt;=1.1</span>
     <span class="n">GammaRegressor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">QuantileRegressor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantileRegressor</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># available since sklearn&gt;=1.0</span>
     <span class="n">QuantileRegressor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">PoissonRegressor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">PoissonRegressor</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># available since sklearn&gt;=0.23</span>
     <span class="n">PoissonRegressor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">TweedieRegressor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">TweedieRegressor</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># available since sklearn&gt;=0.23</span>
     <span class="n">TweedieRegressor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">SGDOneClassSVM</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.linear_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">SGDOneClassSVM</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># available since sklearn&gt;=1.0</span>
     <span class="n">SGDOneClassSVM</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVR</span>
-<span class="kn">from</span> <span class="nn">sklearn.discriminant_analysis</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearSVR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.discriminant_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LinearDiscriminantAnalysis</span><span class="p">,</span>
     <span class="n">QuadraticDiscriminantAnalysis</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Mixture</span>
-<span class="kn">from</span> <span class="nn">sklearn.mixture</span> <span class="kn">import</span> <span class="n">GaussianMixture</span><span class="p">,</span> <span class="n">BayesianGaussianMixture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.mixture</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianMixture</span><span class="p">,</span> <span class="n">BayesianGaussianMixture</span>
 
 <span class="c1"># Multi-class</span>
-<span class="kn">from</span> <span class="nn">sklearn.multiclass</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.multiclass</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ConstantPredictor</span><span class="p">,</span>
     <span class="n">OneVsRestClassifier</span><span class="p">,</span>
     <span class="n">OneVsOneClassifier</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Tree-based models</span>
-<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AdaBoostClassifier</span><span class="p">,</span>
     <span class="n">AdaBoostRegressor</span><span class="p">,</span>
     <span class="n">BaggingClassifier</span><span class="p">,</span>
@@ -429,17 +422,17 @@
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">VotingRegressor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">VotingRegressor</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># New in 0.21</span>
     <span class="n">VotingRegressor</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">StackingClassifier</span><span class="p">,</span> <span class="n">StackingRegressor</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="n">StackingClassifier</span><span class="p">,</span> <span class="n">StackingRegressor</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># New in 0.22</span>
     <span class="n">StackingClassifier</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">StackingRegressor</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.tree</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DecisionTreeClassifier</span><span class="p">,</span>
     <span class="n">DecisionTreeRegressor</span><span class="p">,</span>
     <span class="n">ExtraTreeClassifier</span><span class="p">,</span>
@@ -447,24 +440,24 @@
 <span class="p">)</span>
 
 <span class="c1"># Gaussian processes</span>
-<span class="kn">from</span> <span class="nn">sklearn.gaussian_process</span> <span class="kn">import</span> <span class="n">GaussianProcessClassifier</span><span class="p">,</span> <span class="n">GaussianProcessRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.gaussian_process</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianProcessClassifier</span><span class="p">,</span> <span class="n">GaussianProcessRegressor</span>
 
 <span class="c1"># GridSearchCV</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GridSearchCV</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">TunedThresholdClassifierCV</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">TunedThresholdClassifierCV</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">TunedThresholdClassifierCV</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="c1"># MultiOutput</span>
-<span class="kn">from</span> <span class="nn">sklearn.multioutput</span> <span class="kn">import</span> <span class="n">MultiOutputClassifier</span><span class="p">,</span> <span class="n">MultiOutputRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.multioutput</span><span class="w"> </span><span class="kn">import</span> <span class="n">MultiOutputClassifier</span><span class="p">,</span> <span class="n">MultiOutputRegressor</span>
 
 <span class="c1"># Support vector machines</span>
-<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">NuSVC</span><span class="p">,</span> <span class="n">NuSVR</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">SVR</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.svm</span><span class="w"> </span><span class="kn">import</span> <span class="n">NuSVC</span><span class="p">,</span> <span class="n">NuSVR</span><span class="p">,</span> <span class="n">SVC</span><span class="p">,</span> <span class="n">SVR</span>
 
 <span class="c1"># K-nearest neighbors</span>
-<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">KNeighborsClassifier</span><span class="p">,</span>
     <span class="n">KNeighborsRegressor</span><span class="p">,</span>
     <span class="n">LocalOutlierFactor</span><span class="p">,</span>
@@ -474,7 +467,7 @@
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">KNeighborsTransformer</span><span class="p">,</span>
         <span class="n">NeighborhoodComponentsAnalysis</span><span class="p">,</span>
     <span class="p">)</span>
@@ -484,47 +477,47 @@
     <span class="n">NeighborhoodComponentsAnalysis</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="c1"># Naive Bayes</span>
-<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.naive_bayes</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">BernoulliNB</span><span class="p">,</span>
     <span class="n">GaussianNB</span><span class="p">,</span>
     <span class="n">MultinomialNB</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">CategoricalNB</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.naive_bayes</span><span class="w"> </span><span class="kn">import</span> <span class="n">CategoricalNB</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># scikit-learn versions &lt;= 0.21</span>
     <span class="n">CategoricalNB</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">ComplementNB</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.naive_bayes</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComplementNB</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># scikit-learn versions &lt;= 0.19</span>
     <span class="n">ComplementNB</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="c1"># Neural Networks</span>
-<span class="kn">from</span> <span class="nn">sklearn.neural_network</span> <span class="kn">import</span> <span class="n">MLPClassifier</span><span class="p">,</span> <span class="n">MLPRegressor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neural_network</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLPClassifier</span><span class="p">,</span> <span class="n">MLPRegressor</span>
 
 <span class="c1"># Clustering</span>
-<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">MiniBatchKMeans</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">KMeans</span><span class="p">,</span> <span class="n">MiniBatchKMeans</span>
 
 <span class="c1"># Operators for preprocessing and feature engineering</span>
-<span class="kn">from</span> <span class="nn">sklearn.cross_decomposition</span> <span class="kn">import</span> <span class="n">PLSRegression</span>
-<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.cross_decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PLSRegression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">KernelPCA</span><span class="p">,</span>
     <span class="n">IncrementalPCA</span><span class="p">,</span>
     <span class="n">PCA</span><span class="p">,</span>
     <span class="n">TruncatedSVD</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_extraction</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.feature_extraction</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">DictVectorizer</span><span class="p">,</span>
     <span class="n">FeatureHasher</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.feature_extraction.text</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">CountVectorizer</span><span class="p">,</span>
     <span class="n">TfidfTransformer</span><span class="p">,</span>
     <span class="n">TfidfVectorizer</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.feature_selection</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">GenericUnivariateSelect</span><span class="p">,</span>
     <span class="n">RFE</span><span class="p">,</span>
     <span class="n">RFECV</span><span class="p">,</span>
@@ -539,34 +532,34 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="c1"># 0.20</span>
-    <span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">SimpleImputer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.impute</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleImputer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># 0.19</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span> <span class="k">as</span> <span class="n">SimpleImputer</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Binarizer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Imputer</span> <span class="k">as</span> <span class="n">SimpleImputer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Binarizer</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Imputer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># removed in 0.21</span>
     <span class="n">Imputer</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.impute</span> <span class="kn">import</span> <span class="n">KNNImputer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.impute</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNNImputer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># New in 0.22</span>
     <span class="n">KNNImputer</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">KBinsDiscretizer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">KBinsDiscretizer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># not available in 0.19</span>
     <span class="n">KBinsDiscretizer</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">TargetEncoder</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TargetEncoder</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># Not available in scikit-learn &lt; 1.3</span>
     <span class="n">TargetEncoder</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">LabelBinarizer</span><span class="p">,</span>
     <span class="n">LabelEncoder</span><span class="p">,</span>
     <span class="n">Normalizer</span><span class="p">,</span>
@@ -574,11 +567,11 @@
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OrdinalEncoder</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrdinalEncoder</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># Not available in scikit-learn &lt; 0.20.0</span>
     <span class="n">OrdinalEncoder</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">FunctionTransformer</span><span class="p">,</span>
     <span class="n">KernelCenterer</span><span class="p">,</span>
     <span class="n">MaxAbsScaler</span><span class="p">,</span>
@@ -589,19 +582,19 @@
 <span class="p">)</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PowerTransformer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">PowerTransformer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># Not available in scikit-learn &lt; 0.20.0</span>
     <span class="n">PowerTransformer</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">QuantileTransformer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">QuantileTransformer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># Not available in scikit-learn &lt; 0.19.0</span>
     <span class="n">QuantileTransformer</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
         <span class="n">HistGradientBoostingClassifier</span><span class="p">,</span>
         <span class="n">HistGradientBoostingRegressor</span><span class="p">,</span>
     <span class="p">)</span>
@@ -609,7 +602,7 @@
     <span class="c1"># Second verification as these models still require</span>
     <span class="c1"># manual activation.</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">sklearn.ensemble._hist_gradient_boosting.gradient_boosting</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.ensemble._hist_gradient_boosting.gradient_boosting</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
             <span class="n">HistGradientBoostingClassifier</span><span class="p">,</span>
             <span class="n">HistGradientBoostingRegressor</span><span class="p">,</span>
         <span class="p">)</span>
@@ -617,20 +610,20 @@
         <span class="n">HistGradientBoostingRegressor</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">HistGradientBoostingClassifier</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.random_projection</span> <span class="kn">import</span> <span class="n">GaussianRandomProjection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.random_projection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianRandomProjection</span>
 
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">sklearn.compose</span> <span class="kn">import</span> <span class="n">ColumnTransformer</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.compose</span><span class="w"> </span><span class="kn">import</span> <span class="n">ColumnTransformer</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="c1"># ColumnTransformer was introduced in 0.20.</span>
     <span class="n">ColumnTransformer</span> <span class="o">=</span> <span class="kc">None</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">FeatureUnion</span>
 
 <span class="c1"># Custom extension</span>
-<span class="kn">from</span> <span class="nn">.sklapi</span> <span class="kn">import</span> <span class="n">CastRegressor</span><span class="p">,</span> <span class="n">CastTransformer</span><span class="p">,</span> <span class="n">ReplaceTransformer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.sklapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">CastRegressor</span><span class="p">,</span> <span class="n">CastTransformer</span><span class="p">,</span> <span class="n">ReplaceTransformer</span>
 
-<span class="kn">from</span> <span class="nn">.common._registration</span> <span class="kn">import</span> <span class="n">register_converter</span><span class="p">,</span> <span class="n">register_shape_calculator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.common._registration</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_converter</span><span class="p">,</span> <span class="n">register_shape_calculator</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;skl2onnx&quot;</span><span class="p">)</span>
 
@@ -693,7 +686,7 @@
 <span class="c1"># Associate scikit-learn types with our operator names. If two</span>
 <span class="c1"># scikit-learn models share a single name, it means their are</span>
 <span class="c1"># equivalent in terms of conversion.</span>
-<span class="k">def</span> <span class="nf">build_sklearn_operator_name_map</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_sklearn_operator_name_map</span><span class="p">():</span>
     <span class="n">res</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">k</span><span class="p">:</span> <span class="s2">&quot;Sklearn&quot;</span> <span class="o">+</span> <span class="n">k</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span>
@@ -856,7 +849,7 @@
 
 <div class="viewcode-block" id="update_registered_converter">
 <a class="viewcode-back" href="../../api_summary.html#skl2onnx.update_registered_converter">[docs]</a>
-<span class="k">def</span> <span class="nf">update_registered_converter</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_registered_converter</span><span class="p">(</span>
     <span class="n">model</span><span class="p">,</span> <span class="n">alias</span><span class="p">,</span> <span class="n">shape_fct</span><span class="p">,</span> <span class="n">convert_fct</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -914,19 +907,19 @@
     <span class="n">register_converter</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">convert_fct</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
     <span class="n">register_shape_calculator</span><span class="p">(</span><span class="n">alias</span><span class="p">,</span> <span class="n">shape_fct</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="n">overwrite</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">parser</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="kn">from</span> <span class="nn">._parse</span> <span class="kn">import</span> <span class="n">update_registered_parser</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">._parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">update_registered_parser</span>
 
         <span class="n">update_registered_parser</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">parser</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">options</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span>
         <span class="s2">&quot;zipmap&quot;</span> <span class="ow">in</span> <span class="n">options</span> <span class="ow">or</span> <span class="s2">&quot;output_class_labels&quot;</span> <span class="ow">in</span> <span class="n">options</span>
     <span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">._parse</span> <span class="kn">import</span> <span class="n">_parse_sklearn_classifier</span><span class="p">,</span> <span class="n">update_registered_parser</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">._parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">_parse_sklearn_classifier</span><span class="p">,</span> <span class="n">update_registered_parser</span>
 
         <span class="n">update_registered_parser</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">_parse_sklearn_classifier</span><span class="p">)</span></div>
 
 
 
-<span class="k">def</span> <span class="nf">_get_sklearn_operator_name</span><span class="p">(</span><span class="n">model_type</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_get_sklearn_operator_name</span><span class="p">(</span><span class="n">model_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get operator name of the input argument</span>
 
@@ -944,7 +937,7 @@
     <span class="k">return</span> <span class="n">alias</span>
 
 
-<span class="k">def</span> <span class="nf">get_model_alias</span><span class="p">(</span><span class="n">model_type</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_model_alias</span><span class="p">(</span><span class="n">model_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get alias model. Raise an exception if not found.</span>
 
@@ -997,9 +990,9 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=f0c121d3"></script>
-    <script src="../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
-    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+</div><script src="../../_static/documentation_options.js?v=2a6ef5f7"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

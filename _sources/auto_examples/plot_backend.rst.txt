@@ -32,7 +32,7 @@ to run predictions using this runtime.
 Let's use the API to compute the prediction
 of a simple logistic regression model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-33
+.. GENERATED FROM PYTHON SOURCE LINES 20-32
 
 .. code-block:: Python
 
@@ -55,12 +55,11 @@ of a simple logistic regression model.
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 34-35
+.. GENERATED FROM PYTHON SOURCE LINES 33-34
 
 Let's create an ONNX graph first.
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-44
+.. GENERATED FROM PYTHON SOURCE LINES 34-43
 
 .. code-block:: Python
 
@@ -80,11 +79,11 @@ Let's create an ONNX graph first.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-46
+.. GENERATED FROM PYTHON SOURCE LINES 44-45
 
 Let's use ONNX backend API to test it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 46-57
+.. GENERATED FROM PYTHON SOURCE LINES 45-56
 
 .. code-block:: Python
 
@@ -113,12 +112,12 @@ Let's use ONNX backend API to test it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-60
+.. GENERATED FROM PYTHON SOURCE LINES 57-59
 
 The device depends on how the package was compiled,
 GPU or CPU.
 
-.. GENERATED FROM PYTHON SOURCE LINES 60-62
+.. GENERATED FROM PYTHON SOURCE LINES 59-61
 
 .. code-block:: Python
 
@@ -137,12 +136,12 @@ GPU or CPU.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-65
+.. GENERATED FROM PYTHON SOURCE LINES 62-64
 
 The backend can also directly load the model
 without using *onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-75
+.. GENERATED FROM PYTHON SOURCE LINES 64-74
 
 .. code-block:: Python
 
@@ -170,17 +169,17 @@ without using *onnx*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-79
+.. GENERATED FROM PYTHON SOURCE LINES 75-78
 
 The backend API is implemented by other frameworks
 and makes it easier to switch between multiple runtimes
 with the same API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-82
+.. GENERATED FROM PYTHON SOURCE LINES 80-81
 
 **Versions used for this example**
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-88
+.. GENERATED FROM PYTHON SOURCE LINES 81-87
 
 .. code-block:: Python
 
@@ -198,11 +197,11 @@ with the same API.
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -210,7 +209,7 @@ with the same API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 11.608 seconds)
+   **Total running time of the script:** (0 minutes 0.738 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_backend.py:

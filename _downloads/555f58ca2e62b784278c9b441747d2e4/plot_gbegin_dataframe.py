@@ -27,7 +27,6 @@ from sklearn.ensemble import RandomForestClassifier
 from skl2onnx import to_onnx
 from skl2onnx.algebra.type_helper import guess_initial_types
 
-
 data = DataFrame(
     [
         dict(CAT1="a", CAT2="c", num1=0.5, num2=0.6, y=0),
@@ -127,7 +126,7 @@ onx2 = to_onnx(
 # where column names become keys, and column values become
 # values.
 
-inputs = {c: train_data[c].values.reshape((-1, 1)) for c in train_data.columns}
+inputs = {c: train_data[[c]].values for c in train_data.columns}
 pprint.pprint(inputs)
 
 #############################

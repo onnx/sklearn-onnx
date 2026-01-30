@@ -1,15 +1,15 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Convert a pipeline with a XGBoost model" href="plot_gexternal_xgboost.html" /><link rel="prev" title="Convert a pipeline with a LightGBM classifier" href="plot_gexternal_lightgbm.html" />
-        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="Convert a pipeline with a XGBoost model" href="plot_gexternal_xgboost.html"><link rel="prev" title="Convert a pipeline with a LightGBM classifier" href="plot_gexternal_lightgbm.html">
+        <link rel="prefetch" href="../_static/logo_main.png" as="image">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
-        <title>Convert a pipeline with a LightGBM regressor - sklearn-onnx 1.19.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Convert a pipeline with a LightGBM regressor - sklearn-onnx 1.20.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
@@ -29,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #2b2b2b;
-  --color-code-foreground: #f8f8f2;
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #2b2b2b;
-  --color-code-foreground: #f8f8f2;
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
       }
     }
@@ -151,14 +151,10 @@
   </symbol>
 </svg>
 
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
 <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
@@ -168,17 +164,15 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.20.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
           <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
           <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -186,8 +180,7 @@
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
   </header>
@@ -199,7 +192,7 @@
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.20.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -209,8 +202,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input aria-label="Toggle navigation of The easy case" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_cbegin_opset.html">What is the opset number?</a></li>
@@ -224,36 +217,38 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_gconverting.html">Modify the ONNX graph</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input aria-label="Toggle navigation of Using converters from other libraries" checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
 <li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Convert a pipeline with a LightGBM regressor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input aria-label="Toggle navigation of A custom converter for a custom model" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_k1_custom_converter_onnxscript.html">Implement a custom converter with onnxscript</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_k2_custom_converter_ndonnx.html">Implement a custom converter with ndonnx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input aria-label="Toggle navigation of Advanced scenarios" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_woe_transformer.html">Converter for WOE</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input aria-label="Toggle navigation of Write converters for other libraries" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_summary.html">API Summary</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Gallery of examples</a><input aria-label="Toggle navigation of Gallery of examples" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
@@ -311,8 +306,7 @@
   </a>
 </div>
 <div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -320,8 +314,7 @@
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
@@ -339,39 +332,38 @@ discrepancies even when it is used with float tensors.</p>
 <p>Library <em>lightgbm</em> is implemented with double. A random forest regressor
 with multiple trees computes its prediction by adding the prediction of
 every tree. After being converting into ONNX, this summation becomes
-<img class="math" src="../_images/math/a2d1c2f56276e05e34f6d2fc904dc71680fc1914.png" alt="\left[\sum\right]_{i=1}^F float(T_i(x))"/>,
+<span class="math notranslate nohighlight">\(\left[\sum\right]_{i=1}^F float(T_i(x))\)</span>,
 where <em>F</em> is the number of trees in the forest,
-<img class="math" src="../_images/math/e524285af5f7483272c35f37cc163163c3e478dc.png" alt="T_i(x)"/> the output of tree <em>i</em> and <img class="math" src="../_images/math/c4db1c515ae99a7a1062382cd305c1692428c162.png" alt="\left[\sum\right]"/>
+<span class="math notranslate nohighlight">\(T_i(x)\)</span> the output of tree <em>i</em> and <span class="math notranslate nohighlight">\(\left[\sum\right]\)</span>
 a float addition. The discrepancy can be expressed as
-<img class="math" src="../_images/math/51210b969861f7df2fe22a76b7d03477a0aa7ce6.png" alt="D(x) = |\left[\sum\right]_{i=1}^F float(T_i(x)) -
-\sum_{i=1}^F T_i(x)|"/>.
+<span class="math notranslate nohighlight">\(D(x) = |\left[\sum\right]_{i=1}^F float(T_i(x)) -
+\sum_{i=1}^F T_i(x)|\)</span>.
 This grows with the number of trees in the forest.</p>
 <p>To reduce the impact, an option was added to split the node
 <em>TreeEnsembleRegressor</em> into multiple ones and to do a summation
 with double this time. If we assume the node if split into <em>a</em> nodes,
 the discrepancies then become
-<img class="math" src="../_images/math/070692ac1405bf91a81a00816ad6fcaf5be87264.png" alt="D'(x) = |\sum_{k=1}^a \left[\sum\right]_{i=1}^{F/a}
-float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
+<span class="math notranslate nohighlight">\(D'(x) = |\sum_{k=1}^a \left[\sum\right]_{i=1}^{F/a}
+float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|\)</span>.</p>
 <section id="train-a-lgbmregressor">
 <h2>Train a LGBMRegressor<a class="headerlink" href="#train-a-lgbmregressor" title="Link to this heading">¶</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">packaging.version</span> <span class="k">as</span> <span class="nn">pv</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">timeit</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">from</span> <span class="nn">lightgbm</span> <span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.RegressorMixin.html#sklearn.base.RegressorMixin" title="sklearn.base.RegressorMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMRegressor</span></a>
-<span class="kn">from</span> <span class="nn">onnxruntime</span> <span class="kn">import</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a>
-<span class="kn">from</span> <span class="nn">skl2onnx</span> <span class="kn">import</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">update_registered_converter</span>
-<span class="kn">from</span> <span class="nn">skl2onnx.common.shape_calculator</span> <span class="kn">import</span> <span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">packaging.version</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">timeit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">lightgbm</span><span class="w"> </span><span class="kn">import</span> <a href="https://scikit-learn.org/stable/modules/generated/sklearn.base.RegressorMixin.html#sklearn.base.RegressorMixin" title="sklearn.base.RegressorMixin" class="sphx-glr-backref-module-sklearn-base sphx-glr-backref-type-py-class"><span class="n">LGBMRegressor</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnxruntime</span><span class="w"> </span><span class="kn">import</span> <a href="https://onnxruntime.ai/docs/api/python/api_summary.html#onnxruntime.InferenceSession" title="onnxruntime.capi.onnxruntime_inference_collection.InferenceSession" class="sphx-glr-backref-module-onnxruntime-capi-onnxruntime_inference_collection sphx-glr-backref-type-py-class"><span class="n">InferenceSession</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">skl2onnx</span><span class="w"> </span><span class="kn">import</span> <span class="n">to_onnx</span><span class="p">,</span> <span class="n">update_registered_converter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">skl2onnx.common.shape_calculator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">calculate_linear_regressor_output_shapes</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">onnxmltools</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oml_version</span></a>
-<span class="kn">from</span> <span class="nn">onnxmltools.convert.lightgbm.operator_converters.LightGbm</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnxmltools</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oml_version</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">onnxmltools.convert.lightgbm.operator_converters.LightGbm</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">convert_lightgbm</span><span class="p">,</span>
 <span class="p">)</span>
-
 
 <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a> <span class="o">=</span> <span class="mi">1000</span>
 <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.randn.html#numpy.random.randn" title="numpy.random.randn" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">N</span></a><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
@@ -383,11 +375,12 @@ float(T_{ak + i}(x)) - \sum_{i=1}^F T_i(x)|"/>.</p>
 <span class="n">reg</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">X</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000352 seconds.
-You can set `force_col_wise=true` to remove the overhead.
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.000314 seconds.
+You can set `force_row_wise=true` to remove the overhead.
+And if memory is not enough, you can set `force_col_wise=true`.
 [LightGBM] [Info] Total Bins 5100
 [LightGBM] [Info] Number of data points in the train set: 1000, number of used features: 20
-[LightGBM] [Info] Start training from score 0.047562
+[LightGBM] [Info] Start training from score 0.008891
 </pre></div>
 </div>
 <div class="output_subarea output_html rendered_html output_result">
@@ -406,20 +399,21 @@ You can set `force_col_wise=true` to remove the overhead.
   --sklearn-color-fitted-level-1: #d4ebff;
   --sklearn-color-fitted-level-2: #b3dbfd;
   --sklearn-color-fitted-level-3: cornflowerblue;
+}
 
+#sk-container-id-19.light {
   /* Specific color for light theme */
-  --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-  --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
-  --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
+  --sklearn-color-text-on-default-background: black;
+  --sklearn-color-background: white;
+  --sklearn-color-border-box: black;
   --sklearn-color-icon: #696969;
+}
 
-  @media (prefers-color-scheme: dark) {
-    /* Redefinition of color scheme for dark theme */
-    --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-    --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
-    --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-    --sklearn-color-icon: #878787;
-  }
+#sk-container-id-19.dark {
+  --sklearn-color-text-on-default-background: white;
+  --sklearn-color-background: #111;
+  --sklearn-color-border-box: white;
+  --sklearn-color-icon: #878787;
 }
 
 #sk-container-id-19 {
@@ -545,8 +539,8 @@ clickable and can be expanded/collapsed.
   padding: 0.5em;
   box-sizing: border-box;
   text-align: center;
-  align-items: start;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: 0.5em;
 }
 
@@ -571,9 +565,7 @@ clickable and can be expanded/collapsed.
 /* Toggleable content - dropdown */
 
 #sk-container-id-19 div.sk-toggleable__content {
-  max-height: 0;
-  max-width: 0;
-  overflow: hidden;
+  display: none;
   text-align: left;
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-0);
@@ -599,9 +591,9 @@ clickable and can be expanded/collapsed.
 
 #sk-container-id-19 input.sk-toggleable__control:checked~div.sk-toggleable__content {
   /* Expand drop-down */
-  max-height: 200px;
-  max-width: 100%;
-  overflow: auto;
+  display: block;
+  width: 100%;
+  overflow: visible;
 }
 
 #sk-container-id-19 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
@@ -655,7 +647,6 @@ clickable and can be expanded/collapsed.
 #sk-container-id-19 div.sk-label label {
   font-family: monospace;
   font-weight: bold;
-  display: inline-block;
   line-height: 1.2em;
 }
 
@@ -701,7 +692,7 @@ a:visited.sk-estimator-doc-link {
   font-size: smaller;
   line-height: 1em;
   font-family: monospace;
-  background-color: var(--sklearn-color-background);
+  background-color: var(--sklearn-color-unfitted-level-0);
   border-radius: 1em;
   height: 1em;
   width: 1em;
@@ -709,16 +700,17 @@ a:visited.sk-estimator-doc-link {
   margin-left: 0.5em;
   text-align: center;
   /* unfitted */
-  border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-  color: var(--sklearn-color-unfitted-level-1);
+  border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-3);
 }
 
 .sk-estimator-doc-link.fitted,
 a:link.sk-estimator-doc-link.fitted,
 a:visited.sk-estimator-doc-link.fitted {
   /* fitted */
-  border: var(--sklearn-color-fitted-level-1) 1pt solid;
-  color: var(--sklearn-color-fitted-level-1);
+  background-color: var(--sklearn-color-fitted-level-0);
+  border: var(--sklearn-color-fitted-level-3) 1pt solid;
+  color: var(--sklearn-color-fitted-level-3);
 }
 
 /* On hover */
@@ -728,7 +720,8 @@ div.sk-label-container:hover .sk-estimator-doc-link:hover,
 .sk-estimator-doc-link:hover {
   /* unfitted */
   background-color: var(--sklearn-color-unfitted-level-3);
-  color: var(--sklearn-color-background);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-unfitted-level-0);
   text-decoration: none;
 }
 
@@ -738,7 +731,8 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 .sk-estimator-doc-link.fitted:hover {
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
-  color: var(--sklearn-color-background);
+  border: var(--sklearn-color-fitted-level-0) 1pt solid;
+  color: var(--sklearn-color-fitted-level-0);
   text-decoration: none;
 }
 
@@ -778,7 +772,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   font-size: 1rem;
   line-height: 1em;
   font-family: monospace;
-  background-color: var(--sklearn-color-background);
+  background-color: var(--sklearn-color-unfitted-level-0);
   border-radius: 1rem;
   height: 1rem;
   width: 1rem;
@@ -790,6 +784,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 
 #sk-container-id-19 a.estimator_doc_link.fitted {
   /* fitted */
+  background-color: var(--sklearn-color-fitted-level-0);
   border: var(--sklearn-color-fitted-level-1) 1pt solid;
   color: var(--sklearn-color-fitted-level-1);
 }
@@ -806,7 +801,455 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
   /* fitted */
   background-color: var(--sklearn-color-fitted-level-3);
 }
-</style><div id="sk-container-id-19" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-65" type="checkbox" checked><label for="sk-estimator-id-65" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMRegressor</div></div><div><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>LGBMRegressor(n_estimators=1000)</pre></div> </div></div></div></div>
+
+.estimator-table {
+    font-family: monospace;
+}
+
+.estimator-table summary {
+    padding: .5rem;
+    cursor: pointer;
+}
+
+.estimator-table summary::marker {
+    font-size: 0.7rem;
+}
+
+.estimator-table details[open] {
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+    padding-bottom: 0.3rem;
+}
+
+.estimator-table .parameters-table {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    margin-top: 0;
+}
+
+.estimator-table .parameters-table tr:nth-child(odd) {
+    background-color: #fff;
+}
+
+.estimator-table .parameters-table tr:nth-child(even) {
+    background-color: #f6f6f6;
+}
+
+.estimator-table .parameters-table tr:hover {
+    background-color: #e0e0e0;
+}
+
+.estimator-table table td {
+    border: 1px solid rgba(106, 105, 104, 0.232);
+}
+
+/*
+    `table td`is set in notebook with right text-align.
+    We need to overwrite it.
+*/
+.estimator-table table td.param {
+    text-align: left;
+    position: relative;
+    padding: 0;
+}
+
+.user-set td {
+    color:rgb(255, 94, 0);
+    text-align: left !important;
+}
+
+.user-set td.value {
+    color:rgb(255, 94, 0);
+    background-color: transparent;
+}
+
+.default td {
+    color: black;
+    text-align: left !important;
+}
+
+.user-set td i,
+.default td i {
+    color: black;
+}
+
+/*
+    Styles for parameter documentation links
+    We need styling for visited so jupyter doesn't overwrite it
+*/
+a.param-doc-link,
+a.param-doc-link:link,
+a.param-doc-link:visited {
+    text-decoration: underline dashed;
+    text-underline-offset: .3em;
+    color: inherit;
+    display: block;
+    padding: .5em;
+}
+
+/* "hack" to make the entire area of the cell containing the link clickable */
+a.param-doc-link::before {
+    position: absolute;
+    content: "";
+    inset: 0;
+}
+
+.param-doc-description {
+    display: none;
+    position: absolute;
+    z-index: 9999;
+    left: 0;
+    padding: .5ex;
+    margin-left: 1.5em;
+    color: var(--sklearn-color-text);
+    box-shadow: .3em .3em .4em #999;
+    width: max-content;
+    text-align: left;
+    max-height: 10em;
+    overflow-y: auto;
+
+    /* unfitted */
+    background: var(--sklearn-color-unfitted-level-0);
+    border: thin solid var(--sklearn-color-unfitted-level-3);
+}
+
+/* Fitted state for parameter tooltips */
+.fitted .param-doc-description {
+    /* fitted */
+    background: var(--sklearn-color-fitted-level-0);
+    border: thin solid var(--sklearn-color-fitted-level-3);
+}
+
+.param-doc-link:hover .param-doc-description {
+    display: block;
+}
+
+.copy-paste-icon {
+    background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-size: 14px 14px;
+    background-position: 0;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+}
+</style><body><div id="sk-container-id-19" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>LGBMRegressor(n_estimators=1000)</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-65" type="checkbox" checked><label for="sk-estimator-id-65" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>LGBMRegressor</div></div><div><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+        <div class="estimator-table">
+            <details>
+                <summary>Parameters</summary>
+                <table class="parameters-table">
+                  <tbody>
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('boosting_type',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">boosting_type</td>
+            <td class="value">&#x27;gbdt&#x27;</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('num_leaves',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">num_leaves</td>
+            <td class="value">31</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('max_depth',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">max_depth</td>
+            <td class="value">-1</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('learning_rate',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">learning_rate</td>
+            <td class="value">0.1</td>
+        </tr>
+
+
+        <tr class="user-set">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('n_estimators',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">n_estimators</td>
+            <td class="value">1000</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('subsample_for_bin',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">subsample_for_bin</td>
+            <td class="value">200000</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('objective',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">objective</td>
+            <td class="value">None</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('class_weight',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">class_weight</td>
+            <td class="value">None</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('min_split_gain',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">min_split_gain</td>
+            <td class="value">0.0</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('min_child_weight',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">min_child_weight</td>
+            <td class="value">0.001</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('min_child_samples',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">min_child_samples</td>
+            <td class="value">20</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('subsample',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">subsample</td>
+            <td class="value">1.0</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('subsample_freq',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">subsample_freq</td>
+            <td class="value">0</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('colsample_bytree',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">colsample_bytree</td>
+            <td class="value">1.0</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('reg_alpha',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">reg_alpha</td>
+            <td class="value">0.0</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('reg_lambda',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">reg_lambda</td>
+            <td class="value">0.0</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('random_state',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">random_state</td>
+            <td class="value">None</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('n_jobs',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">n_jobs</td>
+            <td class="value">None</td>
+        </tr>
+
+
+        <tr class="default">
+            <td><i class="copy-paste-icon"
+                 onclick="copyToClipboard('importance_type',
+                          this.parentElement.nextElementSibling)"
+            ></i></td>
+            <td class="param">importance_type</td>
+            <td class="value">&#x27;split&#x27;</td>
+        </tr>
+
+                  </tbody>
+                </table>
+            </details>
+        </div>
+    </div></div></div></div></div><script>function copyToClipboard(text, element) {
+    // Get the parameter prefix from the closest toggleable content
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+    const originalStyle = element.style;
+    const computedStyle = window.getComputedStyle(element);
+    const originalWidth = computedStyle.width;
+    const originalHTML = element.innerHTML.replace('Copied!', '');
+
+    navigator.clipboard.writeText(fullParamName)
+        .then(() => {
+            element.style.width = originalWidth;
+            element.style.color = 'green';
+            element.innerHTML = "Copied!";
+
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        })
+        .catch(err => {
+            console.error('Failed to copy:', err);
+            element.style.color = 'red';
+            element.innerHTML = "Failed!";
+            setTimeout(() => {
+                element.innerHTML = originalHTML;
+                element.style = originalStyle;
+            }, 2000);
+        });
+    return false;
+}
+
+document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+    const toggleableContent = element.closest('.sk-toggleable__content');
+    const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+    const paramName = element.parentElement.nextElementSibling
+        .textContent.trim().split(' ')[0];
+    const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+    element.setAttribute('title', fullParamName);
+});
+
+
+/**
+ * Adapted from Skrub
+ * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+ * @returns "light" or "dark"
+ */
+function detectTheme(element) {
+    const body = document.querySelector('body');
+
+    // Check VSCode theme
+    const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+    const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+    if (themeKindAttr && themeNameAttr) {
+        const themeKind = themeKindAttr.toLowerCase();
+        const themeName = themeNameAttr.toLowerCase();
+
+        if (themeKind.includes("dark") || themeName.includes("dark")) {
+            return "dark";
+        }
+        if (themeKind.includes("light") || themeName.includes("light")) {
+            return "light";
+        }
+    }
+
+    // Check Jupyter theme
+    if (body.getAttribute('data-jp-theme-light') === 'false') {
+        return 'dark';
+    } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+        return 'light';
+    }
+
+    // Guess based on a parent element's color
+    const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+    const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+    if (match) {
+        const [r, g, b] = [
+            parseFloat(match[1]),
+            parseFloat(match[2]),
+            parseFloat(match[3])
+        ];
+
+        // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+        const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+        if (luma > 180) {
+            // If the text is very bright we have a dark theme
+            return 'dark';
+        }
+        if (luma < 75) {
+            // If the text is very dark we have a light theme
+            return 'light';
+        }
+        // Otherwise fall back to the next heuristic.
+    }
+
+    // Fallback to system preference
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+
+function forceTheme(elementId) {
+    const estimatorElement = document.querySelector(`#${elementId}`);
+    if (estimatorElement === null) {
+        console.error(`Element with id ${elementId} not found.`);
+    } else {
+        const theme = detectTheme(estimatorElement);
+        estimatorElement.classList.add(theme);
+    }
+}
+
+forceTheme('sk-container-id-19');</script></body>
 </div>
 <br />
 <br /></section>
@@ -816,7 +1259,7 @@ div.sk-label-container:hover .sk-estimator-doc-link.fitted:hover,
 <a class="reference external" href="https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/lightgbm/operator_converters/LightGbm.py">onnxmltools…LightGbm.py</a>.
 and the shape calculator:
 <a class="reference external" href="https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/lightgbm/shape_calculators/Regressor.py">onnxmltools…Regressor.py</a>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">skl2onnx_convert_lightgbm</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">skl2onnx_convert_lightgbm</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">operator</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
     <span class="n">options</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_options</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">raw_operator</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;split&quot;</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">pv</span><span class="o">.</span><span class="n">Version</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">oml_version</span></a><span class="p">)</span> <span class="o">&lt;</span> <span class="n">pv</span><span class="o">.</span><span class="n">Version</span><span class="p">(</span><span class="s2">&quot;1.9.2&quot;</span><span class="p">):</span>
@@ -879,10 +1322,10 @@ trees per node TreeEnsembleRegressor.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sum of discrepancies split node&quot;</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disp_split</span></a><span class="p">,</span> <span class="s2">&quot;ratio:&quot;</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disp</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disp_split</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMRegressor was fitted with feature names
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMRegressor was fitted with feature names
   warnings.warn(
-sum of discrepancies 1 node 0.00012160677476348304
-sum of discrepancies split node 4.63712861652565e-05 ratio: 2.6224585259529944
+sum of discrepancies 1 node 0.00012196094005948507
+sum of discrepancies split node 4.600063792427767e-05 ratio: 2.651288016054185
 </pre></div>
 </div>
 <p>The sum of the discrepancies were reduced 4, 5 times.
@@ -894,8 +1337,8 @@ The maximum is much better too.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;max discrepancies split node&quot;</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc_split</span></a><span class="p">,</span> <span class="s2">&quot;ratio:&quot;</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc</span></a> <span class="o">/</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc_split</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>max discrepancies 1 node 1.223684760631727e-06
-max discrepancies split node 4.101712844928329e-07 ratio: 2.9833506315411236
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>max discrepancies 1 node 1.2361176167097199e-06
+max discrepancies split node 3.5262577346983903e-07 ratio: 3.505465878305824
 </pre></div>
 </div>
 </section>
@@ -912,8 +1355,8 @@ max discrepancies split node 4.101712844928329e-07 ratio: 2.9833506315411236
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>processing time no split 1.527292794999994
-processing time split 1.880056143000047
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>processing time no split 1.5174094659960247
+processing time split 1.7237651600007666
 </pre></div>
 </div>
 </section>
@@ -936,44 +1379,44 @@ the parameter <em>split</em>.</p>
     <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc_split</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">numpy</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">got_split</span></a> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">expected</span></a><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
     <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">res</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc_split</span></a><span class="p">))</span>
 
-<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">res</span></a><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;split&quot;</span><span class="p">)</span>
-<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="p">[</span><span class="s2">&quot;baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc</span></a>
-<span class="nb">print</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="p">)</span>
+<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a> <span class="o">=</span> <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class"><span class="n">DataFrame</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">res</span></a><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;split&quot;</span><span class="p">)</span>
+<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="p">[</span><span class="s2">&quot;baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">disc</span></a>
+<span class="nb">print</span><span class="p">(</span><a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  0%|          | 0/12 [00:00&lt;?, ?it/s]
-  8%|▊         | 1/12 [00:01&lt;00:19,  1.77s/it]
- 17%|█▋        | 2/12 [00:03&lt;00:15,  1.59s/it]
- 25%|██▌       | 3/12 [00:04&lt;00:14,  1.59s/it]
- 33%|███▎      | 4/12 [00:06&lt;00:11,  1.48s/it]
- 42%|████▏     | 5/12 [00:07&lt;00:09,  1.42s/it]
- 50%|█████     | 6/12 [00:08&lt;00:08,  1.45s/it]
- 58%|█████▊    | 7/12 [00:10&lt;00:07,  1.41s/it]
- 67%|██████▋   | 8/12 [00:11&lt;00:05,  1.44s/it]
- 75%|███████▌  | 9/12 [00:13&lt;00:04,  1.39s/it]
- 83%|████████▎ | 10/12 [00:14&lt;00:02,  1.36s/it]
- 92%|█████████▏| 11/12 [00:15&lt;00:01,  1.39s/it]
-100%|██████████| 12/12 [00:17&lt;00:00,  1.37s/it]
-100%|██████████| 12/12 [00:17&lt;00:00,  1.43s/it]
+  8%|▊         | 1/12 [00:01&lt;00:16,  1.53s/it]
+ 17%|█▋        | 2/12 [00:02&lt;00:13,  1.38s/it]
+ 25%|██▌       | 3/12 [00:03&lt;00:11,  1.29s/it]
+ 33%|███▎      | 4/12 [00:05&lt;00:10,  1.32s/it]
+ 42%|████▏     | 5/12 [00:06&lt;00:08,  1.28s/it]
+ 50%|█████     | 6/12 [00:07&lt;00:07,  1.23s/it]
+ 58%|█████▊    | 7/12 [00:08&lt;00:06,  1.25s/it]
+ 67%|██████▋   | 8/12 [00:10&lt;00:05,  1.30s/it]
+ 75%|███████▌  | 9/12 [00:11&lt;00:03,  1.22s/it]
+ 83%|████████▎ | 10/12 [00:12&lt;00:02,  1.16s/it]
+ 92%|█████████▏| 11/12 [00:13&lt;00:01,  1.26s/it]
+100%|██████████| 12/12 [00:15&lt;00:00,  1.21s/it]
+100%|██████████| 12/12 [00:15&lt;00:00,  1.26s/it]
                disc  baseline
 split
-20     2.992593e-07  0.000001
-40     2.075150e-07  0.000001
-60     2.874813e-07  0.000001
-80     2.700104e-07  0.000001
-100    4.101713e-07  0.000001
-120    3.104678e-07  0.000001
-140    3.350883e-07  0.000001
-160    4.532249e-07  0.000001
-200    3.900536e-07  0.000001
-300    7.141194e-07  0.000001
-400    6.281997e-07  0.000001
-500    6.714246e-07  0.000001
+20     2.431784e-07  0.000001
+40     2.413315e-07  0.000001
+60     2.932076e-07  0.000001
+80     3.181528e-07  0.000001
+100    3.526258e-07  0.000001
+120    3.461343e-07  0.000001
+140    3.878296e-07  0.000001
+160    4.182918e-07  0.000001
+200    6.583164e-07  0.000001
+300    7.289334e-07  0.000001
+400    5.353826e-07  0.000001
+500    6.243104e-07  0.000001
 </pre></div>
 </div>
 <p>Graph.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_</span></a><span class="p">,</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.core.frame.DataFrame" class="sphx-glr-backref-module-pandas-core-frame sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+<a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="pandas.DataFrame" class="sphx-glr-backref-module-pandas sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">df</span></a><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
     <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Sum of discrepancies against split</span><span class="se">\n</span><span class="s2">split = number of tree per node&quot;</span><span class="p">,</span>
     <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="o">=</span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="p">,</span>
 <span class="p">)</span>
@@ -981,7 +1424,7 @@ split
 <span class="c1"># plt.show()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" srcset="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" alt="Sum of discrepancies against split split = number of tree per node" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 24.201 seconds)</p>
+<img src="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" srcset="../_images/sphx_glr_plot_gexternal_lightgbm_reg_001.png" alt="Sum of discrepancies against split split = number of tree per node" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 21.746 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorial-plot-gexternal-lightgbm-reg-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/e601ca27aac94923ef430c7db5fcd9ff/plot_gexternal_lightgbm_reg.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">plot_gexternal_lightgbm_reg.ipynb</span></code></a></p>
@@ -1070,9 +1513,10 @@ split
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+</div><script src="../_static/documentation_options.js?v=2a6ef5f7"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     </body>
 </html>

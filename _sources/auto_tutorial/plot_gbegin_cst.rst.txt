@@ -34,7 +34,7 @@ Train and convert a model
 We download one model from the :epkg:`ONNX Zoo` but the model
 could be trained and produced by another converter library.
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-43
+.. GENERATED FROM PYTHON SOURCE LINES 20-42
 
 .. code-block:: Python
 
@@ -51,7 +51,6 @@ could be trained and produced by another converter library.
         add_output_initializer,
         select_model_inputs_outputs,
     )
-
 
     data = load_iris()
     X, y = data.data.astype(numpy.float32), data.target
@@ -75,13 +74,13 @@ could be trained and produced by another converter library.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-47
+.. GENERATED FROM PYTHON SOURCE LINES 43-46
 
 Add training parameter
 ++++++++++++++++++++++
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-52
+.. GENERATED FROM PYTHON SOURCE LINES 46-51
 
 .. code-block:: Python
 
@@ -97,12 +96,12 @@ Add training parameter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-55
+.. GENERATED FROM PYTHON SOURCE LINES 52-54
 
 Inference
 +++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-63
+.. GENERATED FROM PYTHON SOURCE LINES 54-62
 
 .. code-block:: Python
 
@@ -124,16 +123,16 @@ Inference
 
     output names: ['label', 'probabilities', 'C', 'l1_ratio']
     outputs
-    [array([2, 1], dtype=int64),
-     array([[3.9809980e-05, 1.0255881e-01, 8.9740139e-01],
-           [1.2807048e-02, 9.5152801e-01, 3.5664950e-02]], dtype=float32),
+    [array([1, 0], dtype=int64),
+     array([[5.9809415e-03, 7.6346982e-01, 2.3054925e-01],
+           [9.9756885e-01, 2.4311407e-03, 5.1608839e-10]], dtype=float32),
      array([2.]),
      array([0.5])]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-74
+.. GENERATED FROM PYTHON SOURCE LINES 63-73
 
 The major draw back of this solution is increase the prediction
 time as onnxruntime copies the constants for every prediction.
@@ -146,7 +145,7 @@ Select outputs
 Next function removes unneeded outputs from a model,
 not only the constants. Next model only keeps the probabilities.
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-88
+.. GENERATED FROM PYTHON SOURCE LINES 73-87
 
 .. code-block:: Python
 
@@ -174,13 +173,13 @@ not only the constants. Next model only keeps the probabilities.
 
     output names: ['probabilities']
     outputs
-    [array([[3.9809980e-05, 1.0255881e-01, 8.9740139e-01],
-           [1.2807048e-02, 9.5152801e-01, 3.5664950e-02]], dtype=float32)]
+    [array([[5.9809415e-03, 7.6346982e-01, 2.3054925e-01],
+           [9.9756885e-01, 2.4311407e-03, 5.1608839e-10]], dtype=float32)]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-94
+.. GENERATED FROM PYTHON SOURCE LINES 88-93
 
 This example only uses ONNX graph in memory and never saves or loads a
 model. This can be done by using the following snippets of code.
@@ -188,7 +187,7 @@ model. This can be done by using the following snippets of code.
 Save a model
 ++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-98
+.. GENERATED FROM PYTHON SOURCE LINES 93-97
 
 .. code-block:: Python
 
@@ -203,12 +202,12 @@ Save a model
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-101
+.. GENERATED FROM PYTHON SOURCE LINES 98-100
 
 Load a model
 ++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-110
+.. GENERATED FROM PYTHON SOURCE LINES 100-109
 
 .. code-block:: Python
 
@@ -231,8 +230,8 @@ Load a model
 
     output names: ['probabilities']
     outputs
-    [array([[3.9809980e-05, 1.0255881e-01, 8.9740139e-01],
-           [1.2807048e-02, 9.5152801e-01, 3.5664950e-02]], dtype=float32)]
+    [array([[5.9809415e-03, 7.6346982e-01, 2.3054925e-01],
+           [9.9756885e-01, 2.4311407e-03, 5.1608839e-10]], dtype=float32)]
 
 
 
@@ -240,7 +239,7 @@ Load a model
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.066 seconds)
+   **Total running time of the script:** (0 minutes 0.052 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gbegin_cst.py:

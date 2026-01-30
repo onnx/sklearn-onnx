@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:04.385** total execution time for 54 files **from all galleries**:
+**00:00.246** total execution time for 56 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py` (``tutorial/plot_gexternal_xgboost.py``)
-     - 00:04.385
+   * - :ref:`sphx_glr_auto_tutorial_plot_weird_pandas_and_hash.py` (``tutorial/plot_weird_pandas_and_hash.py``)
+     - 00:00.246
      - 0.0
    * - :ref:`sphx_glr_auto_examples_plot_backend.py` (``examples/plot_backend.py``)
      - 00:00.000
@@ -158,6 +158,9 @@ Computation times
    * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_lightgbm_reg.py` (``tutorial/plot_gexternal_lightgbm_reg.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_auto_tutorial_plot_gexternal_xgboost.py` (``tutorial/plot_gexternal_xgboost.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_icustom_converter.py` (``tutorial/plot_icustom_converter.py``)
      - 00:00.000
      - 0.0
@@ -165,6 +168,12 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_jfunction_transformer.py` (``tutorial/plot_jfunction_transformer.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_tutorial_plot_k1_custom_converter_onnxscript.py` (``tutorial/plot_k1_custom_converter_onnxscript.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_auto_tutorial_plot_k2_custom_converter_ndonnx.py` (``tutorial/plot_k2_custom_converter_ndonnx.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_kcustom_converter_wrapper.py` (``tutorial/plot_kcustom_converter_wrapper.py``)
@@ -183,9 +192,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_usparse_xgboost.py` (``tutorial/plot_usparse_xgboost.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_auto_tutorial_plot_weird_pandas_and_hash.py` (``tutorial/plot_weird_pandas_and_hash.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_auto_tutorial_plot_wext_pyod_forest.py` (``tutorial/plot_wext_pyod_forest.py``)

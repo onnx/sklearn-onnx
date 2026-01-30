@@ -191,7 +191,7 @@ inputs = {c: X_test2[c].values for c in X_test2.columns}
 for c in numeric_features:
     inputs[c] = inputs[c].astype(np.float32)
 for k in inputs:
-    inputs[k] = inputs[k].reshape((inputs[k].shape[0], 1))
+    inputs[k] = np.asarray(inputs[k]).reshape((inputs[k].shape[0], 1))
 
 ################################
 # We are ready to run *onnxruntime*.

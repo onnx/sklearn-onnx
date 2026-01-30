@@ -50,7 +50,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
 
-
 # limit the list of categories to make running this example faster.
 categories = ["alt.atheism", "talk.religion.misc"]
 train = fetch_20newsgroups(

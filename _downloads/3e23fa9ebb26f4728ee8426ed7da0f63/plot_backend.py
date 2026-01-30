@@ -29,7 +29,6 @@ from onnxruntime import get_device
 import numpy as np
 import onnxruntime.backend as backend
 
-
 #######################################
 # Let's create an ONNX graph first.
 

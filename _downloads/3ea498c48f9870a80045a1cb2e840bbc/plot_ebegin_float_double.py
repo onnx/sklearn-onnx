@@ -161,18 +161,18 @@ print(diff(skl, ort))
 # The discrepencies are significant.
 # The ONNX model keeps float at every step.
 #
-# .. blockdiag::
+# .. graphviz::
 #
-#    diagram {
-#      x_float32 -> normalizer -> y_float32 -> dtree -> z_float32
+#    digraph {
+#      x_float32 -> normalizer -> y_float32 -> dtree -> z_float32;
 #    }
 #
 # In :epkg:`scikit-learn`:
 #
-# .. blockdiag::
+# .. graphviz::
 #
-#    diagram {
-#      x_float32 -> normalizer -> y_double -> dtree -> z_double
+#    digraph {
+#      x_float32 -> normalizer -> y_double -> dtree -> z_double;
 #    }
 #
 # CastTransformer
@@ -184,11 +184,11 @@ print(diff(skl, ort))
 # to compromise by casting the output of the normalizer into
 # float in the :epkg:`scikit-learn` pipeline.
 #
-# .. blockdiag::
+# .. graphviz::
 #
-#    diagram {
+#    digraph {
 #      x_float32 -> normalizer -> y_double ->
-#      cast -> y_float -> dtree -> z_float
+#      cast -> y_float -> dtree -> z_float;
 #    }
 #
 

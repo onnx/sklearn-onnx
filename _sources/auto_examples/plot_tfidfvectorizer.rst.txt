@@ -36,7 +36,7 @@ It replicates the same pipeline taken from *scikit-learn* documentation
 but reduces it to the part ONNX actually supports without implementing
 a custom converter. Let's get the data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-67
+.. GENERATED FROM PYTHON SOURCE LINES 23-66
 
 .. code-block:: Python
 
@@ -70,7 +70,6 @@ a custom converter. Let's get the data.
     from sklearn.metrics import classification_report
     from sklearn.linear_model import LogisticRegression
 
-
     # limit the list of categories to make running this example faster.
     categories = ["alt.atheism", "talk.religion.misc"]
     train = fetch_20newsgroups(
@@ -91,13 +90,13 @@ a custom converter. Let's get the data.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-71
+.. GENERATED FROM PYTHON SOURCE LINES 67-70
 
 The first transform extract two fields from the data.
 We take it out form the pipeline and assume
 the data is defined by two text columns.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-106
+.. GENERATED FROM PYTHON SOURCE LINES 70-105
 
 .. code-block:: Python
 
@@ -143,12 +142,12 @@ the data is defined by two text columns.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
+.. GENERATED FROM PYTHON SOURCE LINES 106-108
 
 The pipeline is almost the same except
 we remove the custom features.
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-150
+.. GENERATED FROM PYTHON SOURCE LINES 108-149
 
 .. code-block:: Python
 
@@ -214,7 +213,7 @@ we remove the custom features.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-160
+.. GENERATED FROM PYTHON SOURCE LINES 150-159
 
 ONNX conversion
 +++++++++++++++
@@ -226,7 +225,7 @@ and is currently being implementing. The current implementation
 only considers a list of separators which can is defined
 in variable *seps*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-192
+.. GENERATED FROM PYTHON SOURCE LINES 159-191
 
 .. code-block:: Python
 
@@ -269,11 +268,11 @@ in variable *seps*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-194
+.. GENERATED FROM PYTHON SOURCE LINES 192-193
 
 And save.
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-197
+.. GENERATED FROM PYTHON SOURCE LINES 193-196
 
 .. code-block:: Python
 
@@ -287,11 +286,11 @@ And save.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-199
+.. GENERATED FROM PYTHON SOURCE LINES 197-198
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 199-207
+.. GENERATED FROM PYTHON SOURCE LINES 198-206
 
 .. code-block:: Python
 
@@ -314,16 +313,16 @@ Predictions with onnxruntime.
     --- [" Re: Jews can't hide from keith@cco."
      'Deletions...\n\nSo, you consider the german poster\'s remark anti-semitic?  Perhaps you\nimply that anyone in Germany who doesn\'t agree with israely policy in a\nnazi?  Pray tell, how does it even qualify as "casual anti-semitism"? \nIf the term doesn\'t apply, why then bring it up?\n\nYour own bigotry is shining through.  \n-- ']
     predict [1]
-    predict_proba [{0: 0.4391101002693176, 1: 0.5608898997306824}]
+    predict_proba [{0: 0.43877097964286804, 1: 0.5612289905548096}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-209
+.. GENERATED FROM PYTHON SOURCE LINES 207-208
 
 With *scikit-learn*:
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-212
+.. GENERATED FROM PYTHON SOURCE LINES 208-211
 
 .. code-block:: Python
 
@@ -339,25 +338,25 @@ With *scikit-learn*:
  .. code-block:: none
 
     [0]
-    [[0.72449529 0.27550471]]
+    [[0.72630748 0.27369252]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-216
+.. GENERATED FROM PYTHON SOURCE LINES 212-215
 
 There are discrepencies for this model because
 the tokenization is not exactly the same.
 This is a work in progress.
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-222
+.. GENERATED FROM PYTHON SOURCE LINES 217-221
 
 Display the ONNX graph
 ++++++++++++++++++++++
 
 Finally, let's see the graph converted with *sklearn-onnx*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-239
+.. GENERATED FROM PYTHON SOURCE LINES 221-238
 
 .. code-block:: Python
 
@@ -399,7 +398,7 @@ Finally, let's see the graph converted with *sklearn-onnx*.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 11.184 seconds)
+   **Total running time of the script:** (0 minutes 8.570 seconds)
 
 
 .. _sphx_glr_download_auto_examples_plot_tfidfvectorizer.py:

@@ -100,7 +100,7 @@ dictionaries.
 
  .. code-block:: none
 
-    [{10: 0.9853358864784241, 12: 0.01466413028538227, 14: 3.883373267399293e-08}, {10: 0.0013562627136707306, 12: 0.5341124534606934, 14: 0.4645313024520874}]
+    [{10: 7.888656000432093e-06, 12: 0.028723130002617836, 14: 0.9712689518928528}, {10: 1.6195890850667638e-07, 12: 0.008782343938946724, 14: 0.9912174940109253}]
     probabilities type: <class 'list'>
     type for the first observations: <class 'dict'>
 
@@ -138,8 +138,8 @@ Probabilities are now a matrix.
 
  .. code-block:: none
 
-    [[9.8533589e-01 1.4664130e-02 3.8833733e-08]
-     [1.3562627e-03 5.3411245e-01 4.6453130e-01]]
+    [[7.8886560e-06 2.8723130e-02 9.7126895e-01]
+     [1.6195891e-07 8.7823439e-03 9.9121749e-01]]
     probabilities type: <class 'numpy.ndarray'>
     type for the first observations: <class 'numpy.ndarray'>
 
@@ -183,10 +183,10 @@ one output for the label, and one output per class.
 
  .. code-block:: none
 
-    output: 'output_label' shape=(38,) values=[10 12]...
-    output: 'i10' shape=(38,) values=[0.9853359  0.00135626]...
-    output: 'i12' shape=(38,) values=[0.01466413 0.53411245]...
-    output: 'i14' shape=(38,) values=[3.8833733e-08 4.6453130e-01]...
+    output: 'output_label' shape=(38,) values=[14 14]...
+    output: 'i10' shape=(38,) values=[7.8886560e-06 1.6195891e-07]...
+    output: 'i12' shape=(38,) values=[0.02872313 0.00878234]...
+    output: 'i14' shape=(38,) values=[0.97126895 0.9912175 ]...
 
 
 
@@ -226,11 +226,11 @@ Let's compare prediction time
  .. code-block:: none
 
     Average time with ZipMap:
-    0.003566398999964804
+    0.006013637700380059
     Average time without ZipMap:
-    0.0027388382000481217
+    0.0018747422996966633
     Average time without ZipMap but with columns:
-    0.008876207899970723
+    0.0029320066998479886
 
 
 
@@ -269,8 +269,8 @@ as a third output.
 
  .. code-block:: none
 
-    [[9.8533589e-01 1.4664130e-02 3.8833733e-08]
-     [1.3562627e-03 5.3411245e-01 4.6453130e-01]]
+    [[7.8886560e-06 2.8723130e-02 9.7126895e-01]
+     [1.6195891e-07 8.7823439e-03 9.9121749e-01]]
     probabilities type: <class 'numpy.ndarray'>
     class labels: [10 12 14]
 
@@ -298,7 +298,7 @@ Processing time.
  .. code-block:: none
 
     Average time without ZipMap but with output_class_labels:
-    0.003412025500006166
+    0.0019766365025134292
 
 
 
@@ -370,15 +370,15 @@ Let's train a MultiOutputClassifier.
  .. code-block:: none
 
     MultiOutputClassifier(estimator=LogisticRegression(max_iter=500))
-    /home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py:569: UserWarning: Option zipmap is ignored for model <class 'sklearn.multioutput.MultiOutputClassifier'>. Set option zipmap to False to remove this message.
+    /home/xadupre/github/sklearn-onnx/skl2onnx/_parse.py:582: UserWarning: Option zipmap is ignored for model <class 'sklearn.multioutput.MultiOutputClassifier'>. Set option zipmap to False to remove this message.
       warnings.warn(
-    [array([[ 12, 112],
-           [ 10, 110],
-           [ 12, 112]], dtype=int64), [array([[3.4271918e-02, 9.4276208e-01, 2.2966042e-02],
-           [9.8361975e-01, 1.6380120e-02, 1.1866883e-07],
-           [2.5017133e-02, 9.3919086e-01, 3.5791978e-02]], dtype=float32), array([[2.2323465e-02, 6.9690281e-01, 6.7374893e-02, 2.1339883e-01],
-           [8.0926484e-01, 2.7745293e-02, 4.4738154e-05, 1.6294508e-01],
-           [1.6758386e-02, 5.4099339e-01, 6.5238215e-02, 3.7700996e-01]],
+    [array([[ 10, 110],
+           [ 14, 114],
+           [ 14, 114]], dtype=int64), [array([[9.6331292e-01, 3.6686804e-02, 3.1316745e-07],
+           [1.3207483e-04, 1.0198733e-01, 8.9788061e-01],
+           [4.0349053e-04, 1.9789213e-01, 8.0170435e-01]], dtype=float32), array([[6.0537982e-01, 6.7578614e-02, 2.8624981e-05, 3.2701299e-01],
+           [3.8744797e-04, 1.6307302e-01, 4.3756142e-01, 3.9897814e-01],
+           [8.7575515e-04, 2.1151876e-01, 4.4912148e-01, 3.3848402e-01]],
           dtype=float32)]]
 
 
@@ -418,14 +418,14 @@ added back as a third output.
 
  .. code-block:: none
 
-    predicted labels [[ 12 112]
-     [ 10 110]
-     [ 12 112]]
-    predicted probabilies [array([[3.4271918e-02, 9.4276208e-01, 2.2966042e-02],
-           [9.8361975e-01, 1.6380120e-02, 1.1866883e-07],
-           [2.5017133e-02, 9.3919086e-01, 3.5791978e-02]], dtype=float32), array([[2.2323465e-02, 6.9690281e-01, 6.7374893e-02, 2.1339883e-01],
-           [8.0926484e-01, 2.7745293e-02, 4.4738154e-05, 1.6294508e-01],
-           [1.6758386e-02, 5.4099339e-01, 6.5238215e-02, 3.7700996e-01]],
+    predicted labels [[ 10 110]
+     [ 14 114]
+     [ 14 114]]
+    predicted probabilies [array([[9.6331292e-01, 3.6686804e-02, 3.1316745e-07],
+           [1.3207483e-04, 1.0198733e-01, 8.9788061e-01],
+           [4.0349053e-04, 1.9789213e-01, 8.0170435e-01]], dtype=float32), array([[6.0537982e-01, 6.7578614e-02, 2.8624981e-05, 3.2701299e-01],
+           [3.8744797e-04, 1.6307302e-01, 4.3756142e-01, 3.9897814e-01],
+           [8.7575515e-04, 2.1151876e-01, 4.4912148e-01, 3.3848402e-01]],
           dtype=float32)]
     class labels [array([10, 12, 14], dtype=int64), array([ 110,  112,  114, 1000], dtype=int64)]
 
@@ -454,11 +454,11 @@ added back as a third output.
 
  .. code-block:: none
 
-    numpy: 2.3.1
-    scikit-learn: 1.6.1
-    onnx:  1.19.0
-    onnxruntime:  1.23.0
-    skl2onnx:  1.19.1
+    numpy: 2.4.1
+    scikit-learn: 1.8.0
+    onnx:  1.21.0
+    onnxruntime:  1.24.0
+    skl2onnx:  1.20.0
 
 
 
@@ -466,7 +466,7 @@ added back as a third output.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.331 seconds)
+   **Total running time of the script:** (0 minutes 1.499 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_dbegin_options_zipmap.py:

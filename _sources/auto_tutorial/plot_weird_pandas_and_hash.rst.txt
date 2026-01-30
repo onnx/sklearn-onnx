@@ -27,7 +27,7 @@ A game of finding it goes wrong and there are multiple places.
 Initial example
 +++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-71
+.. GENERATED FROM PYTHON SOURCE LINES 13-79
 
 .. code-block:: Python
 
@@ -36,7 +36,15 @@ Initial example
     import numpy as np
     from pandas import DataFrame
     from onnxruntime import InferenceSession, SessionOptions
-    from onnxruntime_extensions import get_library_path
+
+    try:
+        from onnxruntime_extensions import get_library_path
+    except ImportError:
+        print(
+            "onnxruntime_extensions is missing, "
+            "some scenarios with FeatureHasher are not supported."
+        )
+        get_library_path = None
     from sklearn.feature_extraction import FeatureHasher
     from sklearn.compose import ColumnTransformer
     from sklearn.pipeline import Pipeline
@@ -93,11 +101,17 @@ Initial example
 
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    onnxruntime_extensions is missing, some scenarios with FeatureHasher are not supported.
+
 
 .. raw:: html
 
     <div class="output_subarea output_html rendered_html output_result">
-    <style>#sk-container-id-22 {
+    <style>#sk-container-id-1 {
       /* Definition of color scheme common for light and dark mode */
       --sklearn-color-text: #000;
       --sklearn-color-text-muted: #666;
@@ -112,31 +126,32 @@ Initial example
       --sklearn-color-fitted-level-1: #d4ebff;
       --sklearn-color-fitted-level-2: #b3dbfd;
       --sklearn-color-fitted-level-3: cornflowerblue;
-
-      /* Specific color for light theme */
-      --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-      --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, white)));
-      --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, black)));
-      --sklearn-color-icon: #696969;
-
-      @media (prefers-color-scheme: dark) {
-        /* Redefinition of color scheme for dark theme */
-        --sklearn-color-text-on-default-background: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-background: var(--sg-background-color, var(--theme-background, var(--jp-layout-color0, #111)));
-        --sklearn-color-border-box: var(--sg-text-color, var(--theme-code-foreground, var(--jp-content-font-color1, white)));
-        --sklearn-color-icon: #878787;
-      }
     }
 
-    #sk-container-id-22 {
+    #sk-container-id-1.light {
+      /* Specific color for light theme */
+      --sklearn-color-text-on-default-background: black;
+      --sklearn-color-background: white;
+      --sklearn-color-border-box: black;
+      --sklearn-color-icon: #696969;
+    }
+
+    #sk-container-id-1.dark {
+      --sklearn-color-text-on-default-background: white;
+      --sklearn-color-background: #111;
+      --sklearn-color-border-box: white;
+      --sklearn-color-icon: #878787;
+    }
+
+    #sk-container-id-1 {
       color: var(--sklearn-color-text);
     }
 
-    #sk-container-id-22 pre {
+    #sk-container-id-1 pre {
       padding: 0;
     }
 
-    #sk-container-id-22 input.sk-hidden--visually {
+    #sk-container-id-1 input.sk-hidden--visually {
       border: 0;
       clip: rect(1px 1px 1px 1px);
       clip: rect(1px, 1px, 1px, 1px);
@@ -148,7 +163,7 @@ Initial example
       width: 1px;
     }
 
-    #sk-container-id-22 div.sk-dashed-wrapped {
+    #sk-container-id-1 div.sk-dashed-wrapped {
       border: 1px dashed var(--sklearn-color-line);
       margin: 0 0.4em 0.5em 0.4em;
       box-sizing: border-box;
@@ -156,7 +171,7 @@ Initial example
       background-color: var(--sklearn-color-background);
     }
 
-    #sk-container-id-22 div.sk-container {
+    #sk-container-id-1 div.sk-container {
       /* jupyter's `normalize.less` sets `[hidden] { display: none; }`
          but bootstrap.min.css set `[hidden] { display: none !important; }`
          so we also need the `!important` here to be able to override the
@@ -166,7 +181,7 @@ Initial example
       position: relative;
     }
 
-    #sk-container-id-22 div.sk-text-repr-fallback {
+    #sk-container-id-1 div.sk-text-repr-fallback {
       display: none;
     }
 
@@ -182,14 +197,14 @@ Initial example
 
     /* Parallel-specific style estimator block */
 
-    #sk-container-id-22 div.sk-parallel-item::after {
+    #sk-container-id-1 div.sk-parallel-item::after {
       content: "";
       width: 100%;
       border-bottom: 2px solid var(--sklearn-color-text-on-default-background);
       flex-grow: 1;
     }
 
-    #sk-container-id-22 div.sk-parallel {
+    #sk-container-id-1 div.sk-parallel {
       display: flex;
       align-items: stretch;
       justify-content: center;
@@ -197,28 +212,28 @@ Initial example
       position: relative;
     }
 
-    #sk-container-id-22 div.sk-parallel-item {
+    #sk-container-id-1 div.sk-parallel-item {
       display: flex;
       flex-direction: column;
     }
 
-    #sk-container-id-22 div.sk-parallel-item:first-child::after {
+    #sk-container-id-1 div.sk-parallel-item:first-child::after {
       align-self: flex-end;
       width: 50%;
     }
 
-    #sk-container-id-22 div.sk-parallel-item:last-child::after {
+    #sk-container-id-1 div.sk-parallel-item:last-child::after {
       align-self: flex-start;
       width: 50%;
     }
 
-    #sk-container-id-22 div.sk-parallel-item:only-child::after {
+    #sk-container-id-1 div.sk-parallel-item:only-child::after {
       width: 0;
     }
 
     /* Serial-specific style estimator block */
 
-    #sk-container-id-22 div.sk-serial {
+    #sk-container-id-1 div.sk-serial {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -236,14 +251,14 @@ Initial example
 
     /* Pipeline and ColumnTransformer style (default) */
 
-    #sk-container-id-22 div.sk-toggleable {
+    #sk-container-id-1 div.sk-toggleable {
       /* Default theme specific background. It is overwritten whether we have a
       specific estimator or a Pipeline/ColumnTransformer */
       background-color: var(--sklearn-color-background);
     }
 
     /* Toggleable label */
-    #sk-container-id-22 label.sk-toggleable__label {
+    #sk-container-id-1 label.sk-toggleable__label {
       cursor: pointer;
       display: flex;
       width: 100%;
@@ -251,18 +266,18 @@ Initial example
       padding: 0.5em;
       box-sizing: border-box;
       text-align: center;
-      align-items: start;
-      justify-content: space-between;
+      align-items: center;
+      justify-content: center;
       gap: 0.5em;
     }
 
-    #sk-container-id-22 label.sk-toggleable__label .caption {
+    #sk-container-id-1 label.sk-toggleable__label .caption {
       font-size: 0.6rem;
       font-weight: lighter;
       color: var(--sklearn-color-text-muted);
     }
 
-    #sk-container-id-22 label.sk-toggleable__label-arrow:before {
+    #sk-container-id-1 label.sk-toggleable__label-arrow:before {
       /* Arrow on the left of the label */
       content: "▸";
       float: left;
@@ -270,27 +285,25 @@ Initial example
       color: var(--sklearn-color-icon);
     }
 
-    #sk-container-id-22 label.sk-toggleable__label-arrow:hover:before {
+    #sk-container-id-1 label.sk-toggleable__label-arrow:hover:before {
       color: var(--sklearn-color-text);
     }
 
     /* Toggleable content - dropdown */
 
-    #sk-container-id-22 div.sk-toggleable__content {
-      max-height: 0;
-      max-width: 0;
-      overflow: hidden;
+    #sk-container-id-1 div.sk-toggleable__content {
+      display: none;
       text-align: left;
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-22 div.sk-toggleable__content.fitted {
+    #sk-container-id-1 div.sk-toggleable__content.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-22 div.sk-toggleable__content pre {
+    #sk-container-id-1 div.sk-toggleable__content pre {
       margin: 0.2em;
       border-radius: 0.25em;
       color: var(--sklearn-color-text);
@@ -298,79 +311,78 @@ Initial example
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-22 div.sk-toggleable__content.fitted pre {
+    #sk-container-id-1 div.sk-toggleable__content.fitted pre {
       /* unfitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
-    #sk-container-id-22 input.sk-toggleable__control:checked~div.sk-toggleable__content {
+    #sk-container-id-1 input.sk-toggleable__control:checked~div.sk-toggleable__content {
       /* Expand drop-down */
-      max-height: 200px;
-      max-width: 100%;
-      overflow: auto;
+      display: block;
+      width: 100%;
+      overflow: visible;
     }
 
-    #sk-container-id-22 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
+    #sk-container-id-1 input.sk-toggleable__control:checked~label.sk-toggleable__label-arrow:before {
       content: "▾";
     }
 
     /* Pipeline/ColumnTransformer-specific style */
 
-    #sk-container-id-22 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-label input.sk-toggleable__control:checked~label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-22 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-label.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator-specific style */
 
     /* Colorize estimator box */
-    #sk-container-id-22 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-estimator input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-22 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-estimator.fitted input.sk-toggleable__control:checked~label.sk-toggleable__label {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
-    #sk-container-id-22 div.sk-label label.sk-toggleable__label,
-    #sk-container-id-22 div.sk-label label {
+    #sk-container-id-1 div.sk-label label.sk-toggleable__label,
+    #sk-container-id-1 div.sk-label label {
       /* The background is the default theme color */
       color: var(--sklearn-color-text-on-default-background);
     }
 
     /* On hover, darken the color of the background */
-    #sk-container-id-22 div.sk-label:hover label.sk-toggleable__label {
+    #sk-container-id-1 div.sk-label:hover label.sk-toggleable__label {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
     /* Label box, darken color on hover, fitted */
-    #sk-container-id-22 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
+    #sk-container-id-1 div.sk-label.fitted:hover label.sk-toggleable__label.fitted {
       color: var(--sklearn-color-text);
       background-color: var(--sklearn-color-fitted-level-2);
     }
 
     /* Estimator label */
 
-    #sk-container-id-22 div.sk-label label {
+    #sk-container-id-1 div.sk-label label {
       font-family: monospace;
       font-weight: bold;
-      display: inline-block;
       line-height: 1.2em;
     }
 
-    #sk-container-id-22 div.sk-label-container {
+    #sk-container-id-1 div.sk-label-container {
       text-align: center;
     }
 
     /* Estimator-specific */
-    #sk-container-id-22 div.sk-estimator {
+    #sk-container-id-1 div.sk-estimator {
       font-family: monospace;
       border: 1px dotted var(--sklearn-color-border-box);
       border-radius: 0.25em;
@@ -380,18 +392,18 @@ Initial example
       background-color: var(--sklearn-color-unfitted-level-0);
     }
 
-    #sk-container-id-22 div.sk-estimator.fitted {
+    #sk-container-id-1 div.sk-estimator.fitted {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-0);
     }
 
     /* on hover */
-    #sk-container-id-22 div.sk-estimator:hover {
+    #sk-container-id-1 div.sk-estimator:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-2);
     }
 
-    #sk-container-id-22 div.sk-estimator.fitted:hover {
+    #sk-container-id-1 div.sk-estimator.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-2);
     }
@@ -407,7 +419,7 @@ Initial example
       font-size: smaller;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1em;
       height: 1em;
       width: 1em;
@@ -415,16 +427,17 @@ Initial example
       margin-left: 0.5em;
       text-align: center;
       /* unfitted */
-      border: var(--sklearn-color-unfitted-level-1) 1pt solid;
-      color: var(--sklearn-color-unfitted-level-1);
+      border: var(--sklearn-color-unfitted-level-3) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-3);
     }
 
     .sk-estimator-doc-link.fitted,
     a:link.sk-estimator-doc-link.fitted,
     a:visited.sk-estimator-doc-link.fitted {
       /* fitted */
-      border: var(--sklearn-color-fitted-level-1) 1pt solid;
-      color: var(--sklearn-color-fitted-level-1);
+      background-color: var(--sklearn-color-fitted-level-0);
+      border: var(--sklearn-color-fitted-level-3) 1pt solid;
+      color: var(--sklearn-color-fitted-level-3);
     }
 
     /* On hover */
@@ -434,7 +447,8 @@ Initial example
     .sk-estimator-doc-link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-unfitted-level-0);
       text-decoration: none;
     }
 
@@ -444,7 +458,8 @@ Initial example
     .sk-estimator-doc-link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
-      color: var(--sklearn-color-background);
+      border: var(--sklearn-color-fitted-level-0) 1pt solid;
+      color: var(--sklearn-color-fitted-level-0);
       text-decoration: none;
     }
 
@@ -479,12 +494,12 @@ Initial example
 
     /* "?"-specific style due to the `<a>` HTML tag */
 
-    #sk-container-id-22 a.estimator_doc_link {
+    #sk-container-id-1 a.estimator_doc_link {
       float: right;
       font-size: 1rem;
       line-height: 1em;
       font-family: monospace;
-      background-color: var(--sklearn-color-background);
+      background-color: var(--sklearn-color-unfitted-level-0);
       border-radius: 1rem;
       height: 1rem;
       width: 1rem;
@@ -494,25 +509,159 @@ Initial example
       border: var(--sklearn-color-unfitted-level-1) 1pt solid;
     }
 
-    #sk-container-id-22 a.estimator_doc_link.fitted {
+    #sk-container-id-1 a.estimator_doc_link.fitted {
       /* fitted */
+      background-color: var(--sklearn-color-fitted-level-0);
       border: var(--sklearn-color-fitted-level-1) 1pt solid;
       color: var(--sklearn-color-fitted-level-1);
     }
 
     /* On hover */
-    #sk-container-id-22 a.estimator_doc_link:hover {
+    #sk-container-id-1 a.estimator_doc_link:hover {
       /* unfitted */
       background-color: var(--sklearn-color-unfitted-level-3);
       color: var(--sklearn-color-background);
       text-decoration: none;
     }
 
-    #sk-container-id-22 a.estimator_doc_link.fitted:hover {
+    #sk-container-id-1 a.estimator_doc_link.fitted:hover {
       /* fitted */
       background-color: var(--sklearn-color-fitted-level-3);
     }
-    </style><div id="sk-container-id-22" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
+
+    .estimator-table {
+        font-family: monospace;
+    }
+
+    .estimator-table summary {
+        padding: .5rem;
+        cursor: pointer;
+    }
+
+    .estimator-table summary::marker {
+        font-size: 0.7rem;
+    }
+
+    .estimator-table details[open] {
+        padding-left: 0.1rem;
+        padding-right: 0.1rem;
+        padding-bottom: 0.3rem;
+    }
+
+    .estimator-table .parameters-table {
+        margin-left: auto !important;
+        margin-right: auto !important;
+        margin-top: 0;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(odd) {
+        background-color: #fff;
+    }
+
+    .estimator-table .parameters-table tr:nth-child(even) {
+        background-color: #f6f6f6;
+    }
+
+    .estimator-table .parameters-table tr:hover {
+        background-color: #e0e0e0;
+    }
+
+    .estimator-table table td {
+        border: 1px solid rgba(106, 105, 104, 0.232);
+    }
+
+    /*
+        `table td`is set in notebook with right text-align.
+        We need to overwrite it.
+    */
+    .estimator-table table td.param {
+        text-align: left;
+        position: relative;
+        padding: 0;
+    }
+
+    .user-set td {
+        color:rgb(255, 94, 0);
+        text-align: left !important;
+    }
+
+    .user-set td.value {
+        color:rgb(255, 94, 0);
+        background-color: transparent;
+    }
+
+    .default td {
+        color: black;
+        text-align: left !important;
+    }
+
+    .user-set td i,
+    .default td i {
+        color: black;
+    }
+
+    /*
+        Styles for parameter documentation links
+        We need styling for visited so jupyter doesn't overwrite it
+    */
+    a.param-doc-link,
+    a.param-doc-link:link,
+    a.param-doc-link:visited {
+        text-decoration: underline dashed;
+        text-underline-offset: .3em;
+        color: inherit;
+        display: block;
+        padding: .5em;
+    }
+
+    /* "hack" to make the entire area of the cell containing the link clickable */
+    a.param-doc-link::before {
+        position: absolute;
+        content: "";
+        inset: 0;
+    }
+
+    .param-doc-description {
+        display: none;
+        position: absolute;
+        z-index: 9999;
+        left: 0;
+        padding: .5ex;
+        margin-left: 1.5em;
+        color: var(--sklearn-color-text);
+        box-shadow: .3em .3em .4em #999;
+        width: max-content;
+        text-align: left;
+        max-height: 10em;
+        overflow-y: auto;
+
+        /* unfitted */
+        background: var(--sklearn-color-unfitted-level-0);
+        border: thin solid var(--sklearn-color-unfitted-level-3);
+    }
+
+    /* Fitted state for parameter tooltips */
+    .fitted .param-doc-description {
+        /* fitted */
+        background: var(--sklearn-color-fitted-level-0);
+        border: thin solid var(--sklearn-color-fitted-level-3);
+    }
+
+    .param-doc-link:hover .param-doc-description {
+        display: block;
+    }
+
+    .copy-paste-icon {
+        background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48IS0tIUZvbnQgQXdlc29tZSBGcmVlIDYuNy4yIGJ5IEBmb250YXdlc29tZSAtIGh0dHBzOi8vZm9udGF3ZXNvbWUuY29tIExpY2Vuc2UgLSBodHRwczovL2ZvbnRhd2Vzb21lLmNvbS9saWNlbnNlL2ZyZWUgQ29weXJpZ2h0IDIwMjUgRm9udGljb25zLCBJbmMuLS0+PHBhdGggZD0iTTIwOCAwTDMzMi4xIDBjMTIuNyAwIDI0LjkgNS4xIDMzLjkgMTQuMWw2Ny45IDY3LjljOSA5IDE0LjEgMjEuMiAxNC4xIDMzLjlMNDQ4IDMzNmMwIDI2LjUtMjEuNSA0OC00OCA0OGwtMTkyIDBjLTI2LjUgMC00OC0yMS41LTQ4LTQ4bDAtMjg4YzAtMjYuNSAyMS41LTQ4IDQ4LTQ4ek00OCAxMjhsODAgMCAwIDY0LTY0IDAgMCAyNTYgMTkyIDAgMC0zMiA2NCAwIDAgNDhjMCAyNi41LTIxLjUgNDgtNDggNDhMNDggNTEyYy0yNi41IDAtNDgtMjEuNS00OC00OEwwIDE3NmMwLTI2LjUgMjEuNS00OCA0OC00OHoiLz48L3N2Zz4=);
+        background-repeat: no-repeat;
+        background-size: 14px 14px;
+        background-position: 0;
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        cursor: pointer;
+    }
+    </style><body><div id="sk-container-id-1" class="sk-top-container"><div class="sk-text-repr-fallback"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
                      ColumnTransformer(sparse_threshold=0.0,
                                        transformers=[(&#x27;cat_preprocessor&#x27;,
                                                       FeatureHasher(alternate_sign=False,
@@ -521,32 +670,747 @@ Initial example
                                                                     n_features=8),
                                                       &#x27;cat_features&#x27;)])),
                     (&#x27;classifier&#x27;,
-                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-78" type="checkbox" ><label for="sk-estimator-id-78" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted"><pre>Pipeline(steps=[(&#x27;preprocessor&#x27;,
-                     ColumnTransformer(sparse_threshold=0.0,
-                                       transformers=[(&#x27;cat_preprocessor&#x27;,
-                                                      FeatureHasher(alternate_sign=False,
-                                                                    dtype=&lt;class &#x27;numpy.float32&#x27;&gt;,
-                                                                    input_type=&#x27;string&#x27;,
-                                                                    n_features=8),
-                                                      &#x27;cat_features&#x27;)])),
-                    (&#x27;classifier&#x27;,
-                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre></div> </div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-79" type="checkbox" ><label for="sk-estimator-id-79" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>preprocessor: ColumnTransformer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></div></label><div class="sk-toggleable__content fitted"><pre>ColumnTransformer(sparse_threshold=0.0,
-                      transformers=[(&#x27;cat_preprocessor&#x27;,
-                                     FeatureHasher(alternate_sign=False,
-                                                   dtype=&lt;class &#x27;numpy.float32&#x27;&gt;,
-                                                   input_type=&#x27;string&#x27;,
-                                                   n_features=8),
-                                     &#x27;cat_features&#x27;)])</pre></div> </div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-80" type="checkbox" ><label for="sk-estimator-id-80" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>cat_preprocessor</div></div></label><div class="sk-toggleable__content fitted"><pre>cat_features</pre></div> </div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-81" type="checkbox" ><label for="sk-estimator-id-81" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>FeatureHasher</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.feature_extraction.FeatureHasher.html">?<span>Documentation for FeatureHasher</span></a></div></label><div class="sk-toggleable__content fitted"><pre>FeatureHasher(alternate_sign=False, dtype=&lt;class &#x27;numpy.float32&#x27;&gt;,
-                  input_type=&#x27;string&#x27;, n_features=8)</pre></div> </div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-82" type="checkbox" ><label for="sk-estimator-id-82" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GradientBoostingClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.6/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html">?<span>Documentation for GradientBoostingClassifier</span></a></div></label><div class="sk-toggleable__content fitted"><pre>GradientBoostingClassifier(max_depth=2, n_estimators=2)</pre></div> </div></div></div></div></div></div>
+                     GradientBoostingClassifier(max_depth=2, n_estimators=2))])</pre><b>In a Jupyter environment, please rerun this cell to show the HTML representation or trust the notebook. <br />On GitHub, the HTML representation is unable to render, please try loading this page with nbviewer.org.</b></div><div class="sk-container" hidden><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-1" type="checkbox" ><label for="sk-estimator-id-1" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>Pipeline</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html">?<span>Documentation for Pipeline</span></a><span class="sk-estimator-doc-link fitted">i<span>Fitted</span></span></div></label><div class="sk-toggleable__content fitted" data-param-prefix="">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('steps',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=steps,-list%20of%20tuples">
+                steps
+                <span class="param-doc-description">steps: list of tuples<br><br>List of (name of step, estimator) tuples that are to be chained in<br>sequential order. To be compatible with the scikit-learn API, all steps<br>must define `fit`. All non-last steps must also define `transform`. See<br>:ref:`Combining Estimators <combining_estimators>` for more details.</span>
+            </a>
+        </td>
+                <td class="value">[(&#x27;preprocessor&#x27;, ...), (&#x27;classifier&#x27;, ...)]</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('transform_input',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=transform_input,-list%20of%20str%2C%20default%3DNone">
+                transform_input
+                <span class="param-doc-description">transform_input: list of str, default=None<br><br>The names of the :term:`metadata` parameters that should be transformed by the<br>pipeline before passing it to the step consuming it.<br><br>This enables transforming some input arguments to ``fit`` (other than ``X``)<br>to be transformed by the steps of the pipeline up to the step which requires<br>them. Requirement is defined via :ref:`metadata routing <metadata_routing>`.<br>For instance, this can be used to pass a validation set through the pipeline.<br><br>You can only set this if metadata routing is enabled, which you<br>can enable using ``sklearn.set_config(enable_metadata_routing=True)``.<br><br>.. versionadded:: 1.6</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('memory',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=memory,-str%20or%20object%20with%20the%20joblib.Memory%20interface%2C%20default%3DNone">
+                memory
+                <span class="param-doc-description">memory: str or object with the joblib.Memory interface, default=None<br><br>Used to cache the fitted transformers of the pipeline. The last step<br>will never be cached, even if it is a transformer. By default, no<br>caching is performed. If a string is given, it is the path to the<br>caching directory. Enabling caching triggers a clone of the transformers<br>before fitting. Therefore, the transformer instance given to the<br>pipeline cannot be inspected directly. Use the attribute ``named_steps``<br>or ``steps`` to inspect estimators within the pipeline. Caching the<br>transformers is advantageous when fitting is time consuming. See<br>:ref:`sphx_glr_auto_examples_neighbors_plot_caching_nearest_neighbors.py`<br>for an example on how to enable caching.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.pipeline.Pipeline.html#:~:text=verbose,-bool%2C%20default%3DFalse">
+                verbose
+                <span class="param-doc-description">verbose: bool, default=False<br><br>If True, the time elapsed while fitting each step will be printed as it<br>is completed.</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div><div class="sk-serial"><div class="sk-item sk-dashed-wrapped"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-2" type="checkbox" ><label for="sk-estimator-id-2" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>preprocessor: ColumnTransformer</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html">?<span>Documentation for preprocessor: ColumnTransformer</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="preprocessor__">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('transformers',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=transformers,-list%20of%20tuples">
+                transformers
+                <span class="param-doc-description">transformers: list of tuples<br><br>List of (name, transformer, columns) tuples specifying the<br>transformer objects to be applied to subsets of the data.<br><br>name : str<br>    Like in Pipeline and FeatureUnion, this allows the transformer and<br>    its parameters to be set using ``set_params`` and searched in grid<br>    search.<br>transformer : {'drop', 'passthrough'} or estimator<br>    Estimator must support :term:`fit` and :term:`transform`.<br>    Special-cased strings 'drop' and 'passthrough' are accepted as<br>    well, to indicate to drop the columns or to pass them through<br>    untransformed, respectively.<br>columns :  str, array-like of str, int, array-like of int,                 array-like of bool, slice or callable<br>    Indexes the data on its second axis. Integers are interpreted as<br>    positional columns, while strings can reference DataFrame columns<br>    by name.  A scalar string or int should be used where<br>    ``transformer`` expects X to be a 1d array-like (vector),<br>    otherwise a 2d array will be passed to the transformer.<br>    A callable is passed the input data `X` and can return any of the<br>    above. To select multiple columns by name or dtype, you can use<br>    :obj:`make_column_selector`.</span>
+            </a>
+        </td>
+                <td class="value">[(&#x27;cat_preprocessor&#x27;, ...)]</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('remainder',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=remainder,-%7B%27drop%27%2C%20%27passthrough%27%7D%20or%20estimator%2C%20default%3D%27drop%27">
+                remainder
+                <span class="param-doc-description">remainder: {'drop', 'passthrough'} or estimator, default='drop'<br><br>By default, only the specified columns in `transformers` are<br>transformed and combined in the output, and the non-specified<br>columns are dropped. (default of ``'drop'``).<br>By specifying ``remainder='passthrough'``, all remaining columns that<br>were not specified in `transformers`, but present in the data passed<br>to `fit` will be automatically passed through. This subset of columns<br>is concatenated with the output of the transformers. For dataframes,<br>extra columns not seen during `fit` will be excluded from the output<br>of `transform`.<br>By setting ``remainder`` to be an estimator, the remaining<br>non-specified columns will use the ``remainder`` estimator. The<br>estimator must support :term:`fit` and :term:`transform`.<br>Note that using this feature requires that the DataFrame columns<br>input at :term:`fit` and :term:`transform` have identical order.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;drop&#x27;</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('sparse_threshold',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=sparse_threshold,-float%2C%20default%3D0.3">
+                sparse_threshold
+                <span class="param-doc-description">sparse_threshold: float, default=0.3<br><br>If the output of the different transformers contains sparse matrices,<br>these will be stacked as a sparse matrix if the overall density is<br>lower than this value. Use ``sparse_threshold=0`` to always return<br>dense.  When the transformed output consists of all dense data, the<br>stacked result will be dense, and this keyword will be ignored.</span>
+            </a>
+        </td>
+                <td class="value">0.0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_jobs',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=n_jobs,-int%2C%20default%3DNone">
+                n_jobs
+                <span class="param-doc-description">n_jobs: int, default=None<br><br>Number of jobs to run in parallel.<br>``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.<br>``-1`` means using all processors. See :term:`Glossary <n_jobs>`<br>for more details.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('transformer_weights',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=transformer_weights,-dict%2C%20default%3DNone">
+                transformer_weights
+                <span class="param-doc-description">transformer_weights: dict, default=None<br><br>Multiplicative weights for features per transformer. The output of the<br>transformer is multiplied by these weights. Keys are transformer names,<br>values the weights.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=verbose,-bool%2C%20default%3DFalse">
+                verbose
+                <span class="param-doc-description">verbose: bool, default=False<br><br>If True, the time elapsed while fitting each transformer will be<br>printed as it is completed.</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose_feature_names_out',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=verbose_feature_names_out,-bool%2C%20str%20or%20Callable%5B%5Bstr%2C%20str%5D%2C%20str%5D%2C%20default%3DTrue">
+                verbose_feature_names_out
+                <span class="param-doc-description">verbose_feature_names_out: bool, str or Callable[[str, str], str], default=True<br><br>- If True, :meth:`ColumnTransformer.get_feature_names_out` will prefix<br>  all feature names with the name of the transformer that generated that<br>  feature. It is equivalent to setting<br>  `verbose_feature_names_out="{transformer_name}__{feature_name}"`.<br>- If False, :meth:`ColumnTransformer.get_feature_names_out` will not<br>  prefix any feature names and will error if feature names are not<br>  unique.<br>- If ``Callable[[str, str], str]``,<br>  :meth:`ColumnTransformer.get_feature_names_out` will rename all the features<br>  using the name of the transformer. The first argument of the callable is the<br>  transformer name and the second argument is the feature name. The returned<br>  string will be the new feature name.<br>- If ``str``, it must be a string ready for formatting. The given string will<br>  be formatted using two field names: ``transformer_name`` and ``feature_name``.<br>  e.g. ``"{feature_name}__{transformer_name}"``. See :meth:`str.format` method<br>  from the standard library for more info.<br><br>.. versionadded:: 1.0<br><br>.. versionchanged:: 1.6<br>    `verbose_feature_names_out` can be a callable or a string to be formatted.</span>
+            </a>
+        </td>
+                <td class="value">True</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('force_int_remainder_cols',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.compose.ColumnTransformer.html#:~:text=force_int_remainder_cols,-bool%2C%20default%3DFalse">
+                force_int_remainder_cols
+                <span class="param-doc-description">force_int_remainder_cols: bool, default=False<br><br>This parameter has no effect.<br><br>.. note::<br>    If you do not access the list of columns for the remainder columns<br>    in the `transformers_` fitted attribute, you do not need to set<br>    this parameter.<br><br>.. versionadded:: 1.5<br><br>.. versionchanged:: 1.7<br>   The default value for `force_int_remainder_cols` will change from<br>   `True` to `False` in version 1.7.<br><br>.. deprecated:: 1.7<br>   `force_int_remainder_cols` is deprecated and will be removed in 1.9.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;deprecated&#x27;</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div><div class="sk-parallel"><div class="sk-parallel-item"><div class="sk-item"><div class="sk-label-container"><div class="sk-label fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-3" type="checkbox" ><label for="sk-estimator-id-3" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>cat_preprocessor</div></div></label><div class="sk-toggleable__content fitted" data-param-prefix="preprocessor__cat_preprocessor__"><pre>cat_features</pre></div></div></div><div class="sk-serial"><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-4" type="checkbox" ><label for="sk-estimator-id-4" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>FeatureHasher</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.FeatureHasher.html">?<span>Documentation for FeatureHasher</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="preprocessor__cat_preprocessor__">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_features',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.FeatureHasher.html#:~:text=n_features,-int%2C%20default%3D2%2A%2A20">
+                n_features
+                <span class="param-doc-description">n_features: int, default=2**20<br><br>The number of features (columns) in the output matrices. Small numbers<br>of features are likely to cause hash collisions, but large numbers<br>will cause larger coefficient dimensions in linear learners.</span>
+            </a>
+        </td>
+                <td class="value">8</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('input_type',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.FeatureHasher.html#:~:text=input_type,-str%2C%20default%3D%27dict%27">
+                input_type
+                <span class="param-doc-description">input_type: str, default='dict'<br><br>Choose a string from {'dict', 'pair', 'string'}.<br>Either "dict" (the default) to accept dictionaries over<br>(feature_name, value); "pair" to accept pairs of (feature_name, value);<br>or "string" to accept single strings.<br>feature_name should be a string, while value should be a number.<br>In the case of "string", a value of 1 is implied.<br>The feature_name is hashed to find the appropriate column for the<br>feature. The value's sign might be flipped in the output (but see<br>non_negative, below).</span>
+            </a>
+        </td>
+                <td class="value">&#x27;string&#x27;</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('dtype',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.FeatureHasher.html#:~:text=dtype,-numpy%20dtype%2C%20default%3Dnp.float64">
+                dtype
+                <span class="param-doc-description">dtype: numpy dtype, default=np.float64<br><br>The type of feature values. Passed to scipy.sparse matrix constructors<br>as the dtype argument. Do not set this to bool, np.boolean or any<br>unsigned integer type.</span>
+            </a>
+        </td>
+                <td class="value">&lt;class &#x27;numpy.float32&#x27;&gt;</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('alternate_sign',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.feature_extraction.FeatureHasher.html#:~:text=alternate_sign,-bool%2C%20default%3DTrue">
+                alternate_sign
+                <span class="param-doc-description">alternate_sign: bool, default=True<br><br>When True, an alternating sign is added to the features as to<br>approximately conserve the inner product in the hashed space even for<br>small n_features. This approach is similar to sparse random projection.<br><br>.. versionchanged:: 0.19<br>    ``alternate_sign`` replaces the now deprecated ``non_negative``<br>    parameter.</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div></div></div></div></div></div><div class="sk-item"><div class="sk-estimator fitted sk-toggleable"><input class="sk-toggleable__control sk-hidden--visually" id="sk-estimator-id-5" type="checkbox" ><label for="sk-estimator-id-5" class="sk-toggleable__label fitted sk-toggleable__label-arrow"><div><div>GradientBoostingClassifier</div></div><div><a class="sk-estimator-doc-link fitted" rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html">?<span>Documentation for GradientBoostingClassifier</span></a></div></label><div class="sk-toggleable__content fitted" data-param-prefix="classifier__">
+            <div class="estimator-table">
+                <details>
+                    <summary>Parameters</summary>
+                    <table class="parameters-table">
+                      <tbody>
+                    
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('loss',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=loss,-%7B%27log_loss%27%2C%20%27exponential%27%7D%2C%20default%3D%27log_loss%27">
+                loss
+                <span class="param-doc-description">loss: {'log_loss', 'exponential'}, default='log_loss'<br><br>The loss function to be optimized. 'log_loss' refers to binomial and<br>multinomial deviance, the same as used in logistic regression.<br>It is a good choice for classification with probabilistic outputs.<br>For loss 'exponential', gradient boosting recovers the AdaBoost algorithm.</span>
+            </a>
+        </td>
+                <td class="value">&#x27;log_loss&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('learning_rate',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=learning_rate,-float%2C%20default%3D0.1">
+                learning_rate
+                <span class="param-doc-description">learning_rate: float, default=0.1<br><br>Learning rate shrinks the contribution of each tree by `learning_rate`.<br>There is a trade-off between learning_rate and n_estimators.<br>Values must be in the range `[0.0, inf)`.<br><br>For an example of the effects of this parameter and its interaction with<br>``subsample``, see<br>:ref:`sphx_glr_auto_examples_ensemble_plot_gradient_boosting_regularization.py`.</span>
+            </a>
+        </td>
+                <td class="value">0.1</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_estimators',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=n_estimators,-int%2C%20default%3D100">
+                n_estimators
+                <span class="param-doc-description">n_estimators: int, default=100<br><br>The number of boosting stages to perform. Gradient boosting<br>is fairly robust to over-fitting so a large number usually<br>results in better performance.<br>Values must be in the range `[1, inf)`.</span>
+            </a>
+        </td>
+                <td class="value">2</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('subsample',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=subsample,-float%2C%20default%3D1.0">
+                subsample
+                <span class="param-doc-description">subsample: float, default=1.0<br><br>The fraction of samples to be used for fitting the individual base<br>learners. If smaller than 1.0 this results in Stochastic Gradient<br>Boosting. `subsample` interacts with the parameter `n_estimators`.<br>Choosing `subsample < 1.0` leads to a reduction of variance<br>and an increase in bias.<br>Values must be in the range `(0.0, 1.0]`.</span>
+            </a>
+        </td>
+                <td class="value">1.0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('criterion',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=criterion,-%7B%27friedman_mse%27%2C%20%27squared_error%27%7D%2C%20default%3D%27friedman_mse%27">
+                criterion
+                <span class="param-doc-description">criterion: {'friedman_mse', 'squared_error'}, default='friedman_mse'<br><br>The function to measure the quality of a split. Supported criteria are<br>'friedman_mse' for the mean squared error with improvement score by<br>Friedman, 'squared_error' for mean squared error. The default value of<br>'friedman_mse' is generally the best as it can provide a better<br>approximation in some cases.<br><br>.. versionadded:: 0.18</span>
+            </a>
+        </td>
+                <td class="value">&#x27;friedman_mse&#x27;</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('min_samples_split',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=min_samples_split,-int%20or%20float%2C%20default%3D2">
+                min_samples_split
+                <span class="param-doc-description">min_samples_split: int or float, default=2<br><br>The minimum number of samples required to split an internal node:<br><br>- If int, values must be in the range `[2, inf)`.<br>- If float, values must be in the range `(0.0, 1.0]` and `min_samples_split`<br>  will be `ceil(min_samples_split * n_samples)`.<br><br>.. versionchanged:: 0.18<br>   Added float values for fractions.</span>
+            </a>
+        </td>
+                <td class="value">2</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('min_samples_leaf',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=min_samples_leaf,-int%20or%20float%2C%20default%3D1">
+                min_samples_leaf
+                <span class="param-doc-description">min_samples_leaf: int or float, default=1<br><br>The minimum number of samples required to be at a leaf node.<br>A split point at any depth will only be considered if it leaves at<br>least ``min_samples_leaf`` training samples in each of the left and<br>right branches.  This may have the effect of smoothing the model,<br>especially in regression.<br><br>- If int, values must be in the range `[1, inf)`.<br>- If float, values must be in the range `(0.0, 1.0)` and `min_samples_leaf`<br>  will be `ceil(min_samples_leaf * n_samples)`.<br><br>.. versionchanged:: 0.18<br>   Added float values for fractions.</span>
+            </a>
+        </td>
+                <td class="value">1</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('min_weight_fraction_leaf',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=min_weight_fraction_leaf,-float%2C%20default%3D0.0">
+                min_weight_fraction_leaf
+                <span class="param-doc-description">min_weight_fraction_leaf: float, default=0.0<br><br>The minimum weighted fraction of the sum total of weights (of all<br>the input samples) required to be at a leaf node. Samples have<br>equal weight when sample_weight is not provided.<br>Values must be in the range `[0.0, 0.5]`.</span>
+            </a>
+        </td>
+                <td class="value">0.0</td>
+            </tr>
+    
+
+            <tr class="user-set">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_depth',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=max_depth,-int%20or%20None%2C%20default%3D3">
+                max_depth
+                <span class="param-doc-description">max_depth: int or None, default=3<br><br>Maximum depth of the individual regression estimators. The maximum<br>depth limits the number of nodes in the tree. Tune this parameter<br>for best performance; the best value depends on the interaction<br>of the input variables. If None, then nodes are expanded until<br>all leaves are pure or until all leaves contain less than<br>min_samples_split samples.<br>If int, values must be in the range `[1, inf)`.</span>
+            </a>
+        </td>
+                <td class="value">2</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('min_impurity_decrease',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=min_impurity_decrease,-float%2C%20default%3D0.0">
+                min_impurity_decrease
+                <span class="param-doc-description">min_impurity_decrease: float, default=0.0<br><br>A node will be split if this split induces a decrease of the impurity<br>greater than or equal to this value.<br>Values must be in the range `[0.0, inf)`.<br><br>The weighted impurity decrease equation is the following::<br><br>    N_t / N * (impurity - N_t_R / N_t * right_impurity<br>                        - N_t_L / N_t * left_impurity)<br><br>where ``N`` is the total number of samples, ``N_t`` is the number of<br>samples at the current node, ``N_t_L`` is the number of samples in the<br>left child, and ``N_t_R`` is the number of samples in the right child.<br><br>``N``, ``N_t``, ``N_t_R`` and ``N_t_L`` all refer to the weighted sum,<br>if ``sample_weight`` is passed.<br><br>.. versionadded:: 0.19</span>
+            </a>
+        </td>
+                <td class="value">0.0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('init',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=init,-estimator%20or%20%27zero%27%2C%20default%3DNone">
+                init
+                <span class="param-doc-description">init: estimator or 'zero', default=None<br><br>An estimator object that is used to compute the initial predictions.<br>``init`` has to provide :term:`fit` and :term:`predict_proba`. If<br>'zero', the initial raw predictions are set to zero. By default, a<br>``DummyEstimator`` predicting the classes priors is used.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('random_state',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=random_state,-int%2C%20RandomState%20instance%20or%20None%2C%20default%3DNone">
+                random_state
+                <span class="param-doc-description">random_state: int, RandomState instance or None, default=None<br><br>Controls the random seed given to each Tree estimator at each<br>boosting iteration.<br>In addition, it controls the random permutation of the features at<br>each split (see Notes for more details).<br>It also controls the random splitting of the training data to obtain a<br>validation set if `n_iter_no_change` is not None.<br>Pass an int for reproducible output across multiple function calls.<br>See :term:`Glossary <random_state>`.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_features',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=max_features,-%7B%27sqrt%27%2C%20%27log2%27%7D%2C%20int%20or%20float%2C%20default%3DNone">
+                max_features
+                <span class="param-doc-description">max_features: {'sqrt', 'log2'}, int or float, default=None<br><br>The number of features to consider when looking for the best split:<br><br>- If int, values must be in the range `[1, inf)`.<br>- If float, values must be in the range `(0.0, 1.0]` and the features<br>  considered at each split will be `max(1, int(max_features * n_features_in_))`.<br>- If 'sqrt', then `max_features=sqrt(n_features)`.<br>- If 'log2', then `max_features=log2(n_features)`.<br>- If None, then `max_features=n_features`.<br><br>Choosing `max_features < n_features` leads to a reduction of variance<br>and an increase in bias.<br><br>Note: the search for a split does not stop until at least one<br>valid partition of the node samples is found, even if it requires to<br>effectively inspect more than ``max_features`` features.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('verbose',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=verbose,-int%2C%20default%3D0">
+                verbose
+                <span class="param-doc-description">verbose: int, default=0<br><br>Enable verbose output. If 1 then it prints progress and performance<br>once in a while (the more trees the lower the frequency). If greater<br>than 1 then it prints progress and performance for every tree.<br>Values must be in the range `[0, inf)`.</span>
+            </a>
+        </td>
+                <td class="value">0</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('max_leaf_nodes',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=max_leaf_nodes,-int%2C%20default%3DNone">
+                max_leaf_nodes
+                <span class="param-doc-description">max_leaf_nodes: int, default=None<br><br>Grow trees with ``max_leaf_nodes`` in best-first fashion.<br>Best nodes are defined as relative reduction in impurity.<br>Values must be in the range `[2, inf)`.<br>If `None`, then unlimited number of leaf nodes.</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('warm_start',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=warm_start,-bool%2C%20default%3DFalse">
+                warm_start
+                <span class="param-doc-description">warm_start: bool, default=False<br><br>When set to ``True``, reuse the solution of the previous call to fit<br>and add more estimators to the ensemble, otherwise, just erase the<br>previous solution. See :term:`the Glossary <warm_start>`.</span>
+            </a>
+        </td>
+                <td class="value">False</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('validation_fraction',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=validation_fraction,-float%2C%20default%3D0.1">
+                validation_fraction
+                <span class="param-doc-description">validation_fraction: float, default=0.1<br><br>The proportion of training data to set aside as validation set for<br>early stopping. Values must be in the range `(0.0, 1.0)`.<br>Only used if ``n_iter_no_change`` is set to an integer.<br><br>.. versionadded:: 0.20</span>
+            </a>
+        </td>
+                <td class="value">0.1</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('n_iter_no_change',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=n_iter_no_change,-int%2C%20default%3DNone">
+                n_iter_no_change
+                <span class="param-doc-description">n_iter_no_change: int, default=None<br><br>``n_iter_no_change`` is used to decide if early stopping will be used<br>to terminate training when validation score is not improving. By<br>default it is set to None to disable early stopping. If set to a<br>number, it will set aside ``validation_fraction`` size of the training<br>data as validation and terminate training when validation score is not<br>improving in all of the previous ``n_iter_no_change`` numbers of<br>iterations. The split is stratified.<br>Values must be in the range `[1, inf)`.<br>See<br>:ref:`sphx_glr_auto_examples_ensemble_plot_gradient_boosting_early_stopping.py`.<br><br>.. versionadded:: 0.20</span>
+            </a>
+        </td>
+                <td class="value">None</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('tol',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=tol,-float%2C%20default%3D1e-4">
+                tol
+                <span class="param-doc-description">tol: float, default=1e-4<br><br>Tolerance for the early stopping. When the loss is not improving<br>by at least tol for ``n_iter_no_change`` iterations (if set to a<br>number), the training stops.<br>Values must be in the range `[0.0, inf)`.<br><br>.. versionadded:: 0.20</span>
+            </a>
+        </td>
+                <td class="value">0.0001</td>
+            </tr>
+    
+
+            <tr class="default">
+                <td><i class="copy-paste-icon"
+                     onclick="copyToClipboard('ccp_alpha',
+                              this.parentElement.nextElementSibling)"
+                ></i></td>
+                <td class="param">
+            <a class="param-doc-link"
+                rel="noreferrer" target="_blank" href="https://scikit-learn.org/1.8/modules/generated/sklearn.ensemble.GradientBoostingClassifier.html#:~:text=ccp_alpha,-non-negative%20float%2C%20default%3D0.0">
+                ccp_alpha
+                <span class="param-doc-description">ccp_alpha: non-negative float, default=0.0<br><br>Complexity parameter used for Minimal Cost-Complexity Pruning. The<br>subtree with the largest cost complexity that is smaller than<br>``ccp_alpha`` will be chosen. By default, no pruning is performed.<br>Values must be in the range `[0.0, inf)`.<br>See :ref:`minimal_cost_complexity_pruning` for details. See<br>:ref:`sphx_glr_auto_examples_tree_plot_cost_complexity_pruning.py`<br>for an example of such pruning.<br><br>.. versionadded:: 0.22</span>
+            </a>
+        </td>
+                <td class="value">0.0</td>
+            </tr>
+    
+                      </tbody>
+                    </table>
+                </details>
+            </div>
+        </div></div></div></div></div></div></div><script>function copyToClipboard(text, element) {
+        // Get the parameter prefix from the closest toggleable content
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const fullParamName = paramPrefix ? `${paramPrefix}${text}` : text;
+
+        const originalStyle = element.style;
+        const computedStyle = window.getComputedStyle(element);
+        const originalWidth = computedStyle.width;
+        const originalHTML = element.innerHTML.replace('Copied!', '');
+
+        navigator.clipboard.writeText(fullParamName)
+            .then(() => {
+                element.style.width = originalWidth;
+                element.style.color = 'green';
+                element.innerHTML = "Copied!";
+
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Failed to copy:', err);
+                element.style.color = 'red';
+                element.innerHTML = "Failed!";
+                setTimeout(() => {
+                    element.innerHTML = originalHTML;
+                    element.style = originalStyle;
+                }, 2000);
+            });
+        return false;
+    }
+
+    document.querySelectorAll('.copy-paste-icon').forEach(function(element) {
+        const toggleableContent = element.closest('.sk-toggleable__content');
+        const paramPrefix = toggleableContent ? toggleableContent.dataset.paramPrefix : '';
+        const paramName = element.parentElement.nextElementSibling
+            .textContent.trim().split(' ')[0];
+        const fullParamName = paramPrefix ? `${paramPrefix}${paramName}` : paramName;
+
+        element.setAttribute('title', fullParamName);
+    });
+
+
+    /**
+     * Adapted from Skrub
+     * https://github.com/skrub-data/skrub/blob/403466d1d5d4dc76a7ef569b3f8228db59a31dc3/skrub/_reporting/_data/templates/report.js#L789
+     * @returns "light" or "dark"
+     */
+    function detectTheme(element) {
+        const body = document.querySelector('body');
+
+        // Check VSCode theme
+        const themeKindAttr = body.getAttribute('data-vscode-theme-kind');
+        const themeNameAttr = body.getAttribute('data-vscode-theme-name');
+
+        if (themeKindAttr && themeNameAttr) {
+            const themeKind = themeKindAttr.toLowerCase();
+            const themeName = themeNameAttr.toLowerCase();
+
+            if (themeKind.includes("dark") || themeName.includes("dark")) {
+                return "dark";
+            }
+            if (themeKind.includes("light") || themeName.includes("light")) {
+                return "light";
+            }
+        }
+
+        // Check Jupyter theme
+        if (body.getAttribute('data-jp-theme-light') === 'false') {
+            return 'dark';
+        } else if (body.getAttribute('data-jp-theme-light') === 'true') {
+            return 'light';
+        }
+
+        // Guess based on a parent element's color
+        const color = window.getComputedStyle(element.parentNode, null).getPropertyValue('color');
+        const match = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)\s*$/i);
+        if (match) {
+            const [r, g, b] = [
+                parseFloat(match[1]),
+                parseFloat(match[2]),
+                parseFloat(match[3])
+            ];
+
+            // https://en.wikipedia.org/wiki/HSL_and_HSV#Lightness
+            const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+
+            if (luma > 180) {
+                // If the text is very bright we have a dark theme
+                return 'dark';
+            }
+            if (luma < 75) {
+                // If the text is very dark we have a light theme
+                return 'light';
+            }
+            // Otherwise fall back to the next heuristic.
+        }
+
+        // Fallback to system preference
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+
+    function forceTheme(elementId) {
+        const estimatorElement = document.querySelector(`#${elementId}`);
+        if (estimatorElement === null) {
+            console.error(`Element with id ${elementId} not found.`);
+        } else {
+            const theme = detectTheme(estimatorElement);
+            estimatorElement.classList.add(theme);
+        }
+    }
+
+    forceTheme('sk-container-id-1');</script></body>
     </div>
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-73
+.. GENERATED FROM PYTHON SOURCE LINES 80-81
 
 Conversion to ONNX.
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-80
+.. GENERATED FROM PYTHON SOURCE LINES 81-88
 
 .. code-block:: Python
 
@@ -564,11 +1428,11 @@ Conversion to ONNX.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-82
+.. GENERATED FROM PYTHON SOURCE LINES 89-90
 
 There are many discrepancies?
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-96
+.. GENERATED FROM PYTHON SOURCE LINES 90-104
 
 .. code-block:: Python
 
@@ -595,33 +1459,33 @@ There are many discrepancies?
  .. code-block:: none
 
     expected probabilities
-    [[0.53360884 0.46639116]
-     [0.53637279 0.46362721]
-     [0.61595526 0.38404474]
-     [0.61595526 0.38404474]
+    [[0.53637279 0.46362721]
      [0.46226277 0.53773723]
+     [0.61595526 0.38404474]
+     [0.61595526 0.38404474]
+     [0.53360884 0.46639116]
      [0.61595526 0.38404474]
      [0.61595526 0.38404474]]
     onnx probabilities
     [[0.6159553  0.3840447 ]
-     [0.5363728  0.46362722]
-     [0.5363728  0.46362722]
+     [0.4622628  0.5377372 ]
+     [0.4622628  0.5377372 ]
      [0.6159553  0.3840447 ]
      [0.6159553  0.3840447 ]
      [0.6159553  0.3840447 ]
-     [0.53360885 0.46639115]]
+     [0.5363728  0.46362722]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-101
+.. GENERATED FROM PYTHON SOURCE LINES 105-109
 
 Let's check the feature hasher
 ++++++++++++++++++++++++++++++
 
 We just remove the classifier.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-145
+.. GENERATED FROM PYTHON SOURCE LINES 109-153
 
 .. code-block:: Python
 
@@ -697,7 +1561,7 @@ We just remove the classifier.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-157
+.. GENERATED FROM PYTHON SOURCE LINES 154-165
 
 Nothing seems to be working.
 
@@ -711,7 +1575,7 @@ The type list is expected by scikit-learn and it can process a variable
 number of elements per list. onnxruntime cannot do that.
 It must be changed into the following.
 
-.. GENERATED FROM PYTHON SOURCE LINES 157-225
+.. GENERATED FROM PYTHON SOURCE LINES 165-231
 
 .. code-block:: Python
 
@@ -771,9 +1635,7 @@ It must be changed into the following.
 
     got = sess.run(
         None,
-        dict(
-            cat1=df["Cat1"].values.reshape((-1, 1)), cat2=df["Cat2"].values.reshape((-1, 1))
-        ),
+        dict(cat1=df[["Cat1"]].values, cat2=df[["Cat2"]].values),
     )
 
 
@@ -811,7 +1673,7 @@ It must be changed into the following.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-236
+.. GENERATED FROM PYTHON SOURCE LINES 232-242
 
 This is not the original pipeline. It has 16 columns instead of 8
 but it does produce the same results.
@@ -824,7 +1686,7 @@ Second proposal
 We use the same initial pipeline but we tweak the input
 onnxruntime receives.
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-286
+.. GENERATED FROM PYTHON SOURCE LINES 242-299
 
 .. code-block:: Python
 
@@ -863,20 +1725,27 @@ onnxruntime receives.
 
 
     so = SessionOptions()
-    so.register_custom_ops_library(get_library_path())
-    sess = InferenceSession(onx.SerializeToString(), so, providers=["CPUExecutionProvider"])
+    if get_library_path:
+        so.register_custom_ops_library(get_library_path())
+        sess = InferenceSession(
+            onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
+        )
 
-    # We merged both columns cat1 and cat2 into a single cat_features.
-    df_fixed = DataFrame()
-    df_fixed["cat_features"] = np.array([f"{a}#{b}" for a, b in X_train["cat_features"]])
+        # We merged both columns cat1 and cat2 into a single cat_features.
+        df_fixed = DataFrame()
+        df_fixed["cat_features"] = np.array(
+            [f"{a}#{b}" for a, b in X_train["cat_features"]]
+        )
 
-    got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
+        got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
 
-    print("expected original hashed features")
-    print(expected)
+        print("expected original hashed features")
+        print(expected)
 
-    print("onnx fixed original hashed features")
-    print(got[0])
+        print("onnx fixed original hashed features")
+        print(got[0])
+    else:
+        print("onnxruntime-extensions is missing, cannot do this.")
 
 
 
@@ -886,27 +1755,12 @@ onnxruntime receives.
 
  .. code-block:: none
 
-    expected original hashed features
-    [[0. 0. 1. 0. 0. 0. 1. 0.]
-     [0. 0. 0. 0. 0. 1. 1. 0.]
-     [0. 0. 0. 1. 0. 0. 1. 0.]
-     [0. 0. 0. 0. 1. 0. 1. 0.]
-     [0. 0. 0. 0. 0. 0. 0. 2.]
-     [0. 2. 0. 0. 0. 0. 0. 0.]
-     [0. 0. 0. 0. 0. 0. 2. 0.]]
-    onnx fixed original hashed features
-    [[0. 0. 1. 0. 0. 0. 1. 0.]
-     [0. 0. 0. 0. 0. 1. 1. 0.]
-     [0. 0. 0. 1. 0. 0. 1. 0.]
-     [0. 0. 0. 0. 1. 0. 1. 0.]
-     [0. 0. 0. 0. 0. 0. 0. 2.]
-     [0. 2. 0. 0. 0. 0. 0. 0.]
-     [0. 0. 0. 0. 0. 0. 2. 0.]]
+    onnxruntime-extensions is missing, cannot do this.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-293
+.. GENERATED FROM PYTHON SOURCE LINES 300-306
 
 It works now.
 
@@ -915,7 +1769,7 @@ Sparsity?
 
 Let's try with the classifier now and no `sparse_threshold=0.0`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-339
+.. GENERATED FROM PYTHON SOURCE LINES 306-356
 
 .. code-block:: Python
 
@@ -954,16 +1808,20 @@ Let's try with the classifier now and no `sparse_threshold=0.0`.
     )
 
     so = SessionOptions()
-    so.register_custom_ops_library(get_library_path())
-    sess = InferenceSession(onx.SerializeToString(), so, providers=["CPUExecutionProvider"])
-    got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
+    if get_library_path:
+        so.register_custom_ops_library(get_library_path())
+        sess = InferenceSession(
+            onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
 
+        print("expected probabilies")
+        print(expected)
 
-    print("expected probabilies")
-    print(expected)
-
-    print("onnx probabilies")
-    print(got[1])
+        print("onnx probabilies")
+        print(got[1])
+    else:
+        print("onnxruntime-extensions is missing, cannot do this.")
 
 
 
@@ -973,27 +1831,12 @@ Let's try with the classifier now and no `sparse_threshold=0.0`.
 
  .. code-block:: none
 
-    expected probabilies
-    [[0.53360884 0.46639116]
-     [0.46226277 0.53773723]
-     [0.61595526 0.38404474]
-     [0.61595526 0.38404474]
-     [0.53637279 0.46362721]
-     [0.61595526 0.38404474]
-     [0.61595526 0.38404474]]
-    onnx probabilies
-    [[0.53360885 0.46639115]
-     [0.4622628  0.5377372 ]
-     [0.6159553  0.3840447 ]
-     [0.6159553  0.3840447 ]
-     [0.5363728  0.46362722]
-     [0.6159553  0.3840447 ]
-     [0.6159553  0.3840447 ]]
+    onnxruntime-extensions is missing, cannot do this.
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 340-347
+.. GENERATED FROM PYTHON SOURCE LINES 357-364
 
 scikit-learn keeps the sparse outputs from
 the FeatureHasher. onnxruntime does not support
@@ -1003,7 +1846,7 @@ missing sparse value and zero.
 That does not seem to be the case for this model but
 other models or libraries may behave differently.
 
-.. GENERATED FROM PYTHON SOURCE LINES 347-349
+.. GENERATED FROM PYTHON SOURCE LINES 364-366
 
 .. code-block:: Python
 
@@ -1038,7 +1881,7 @@ other models or libraries may behave differently.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.693 seconds)
+   **Total running time of the script:** (0 minutes 0.246 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_weird_pandas_and_hash.py:

@@ -1,15 +1,15 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="../">
-  <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <head><meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
-        <link rel="prefetch" href="../_static/logo_main.png" as="image" />
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html">
+        <link rel="prefetch" href="../_static/logo_main.png" as="image">
 
-    <!-- Generated with Sphinx 8.1.3 and Furo 2025.07.19 -->
-        <title>Examples - sklearn-onnx 1.19.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=25af2a20" />
+    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+        <title>Examples - sklearn-onnx 1.20.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
@@ -29,14 +29,14 @@
   }
   @media not print {
     body[data-theme="dark"] {
-      --color-code-background: #2b2b2b;
-  --color-code-foreground: #f8f8f2;
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
     }
     @media (prefers-color-scheme: dark) {
       body:not([data-theme="light"]) {
-        --color-code-background: #2b2b2b;
-  --color-code-foreground: #f8f8f2;
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
   
       }
     }
@@ -151,14 +151,10 @@
   </symbol>
 </svg>
 
-<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
-<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
-<label class="overlay sidebar-overlay" for="__navigation">
-  <div class="visually-hidden">Hide navigation sidebar</div>
-</label>
-<label class="overlay toc-overlay" for="__toc">
-  <div class="visually-hidden">Hide table of contents sidebar</div>
-</label>
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle site navigation sidebar">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc" aria-label="Toggle table of contents sidebar">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
 
 <a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
 
@@ -168,17 +164,15 @@
   <header class="mobile-header">
     <div class="header-left">
       <label class="nav-overlay-icon" for="__navigation">
-        <div class="visually-hidden">Toggle site navigation sidebar</div>
-        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-menu"></use></svg></span>
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">sklearn-onnx 1.19.1 documentation</div></a>
+      <a href="../index.html"><div class="brand">sklearn-onnx 1.20.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
-        <button class="theme-toggle">
-          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+        <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
           <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
           <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
           <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -186,8 +180,7 @@
         </button>
       </div>
       <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
-        <div class="visually-hidden">Toggle table of contents sidebar</div>
-        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
       </label>
     </div>
   </header>
@@ -199,7 +192,7 @@
     <img class="sidebar-logo" src="../_static/logo_main.png" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">sklearn-onnx 1.19.1 documentation</span>
+  <span class="sidebar-brand-text">sklearn-onnx 1.20.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -209,8 +202,8 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Tutorial</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of The easy case</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../index_tutorial.html">Tutorial</a><input aria-label="Toggle navigation of Tutorial" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1_simple.html">The easy case</a><input aria-label="Toggle navigation of The easy case" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_abegin_convert_pipeline.html">Train and deploy a scikit-learn pipeline</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_bbegin_measure_time.html">Benchmark ONNX conversion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_cbegin_opset.html">What is the opset number?</a></li>
@@ -224,36 +217,38 @@
 <li class="toctree-l3"><a class="reference internal" href="plot_gconverting.html">Modify the ONNX graph</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of Using converters from other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_1-5_external.html">Using converters from other libraries</a><input aria-label="Toggle navigation of Using converters from other libraries" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_lightgbm.html">Convert a pipeline with a LightGBM classifier</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_lightgbm_reg.html">Convert a pipeline with a LightGBM regressor</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_xgboost.html">Convert a pipeline with a XGBoost model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_gexternal_catboost.html">Convert a pipeline with a CatBoost classifier</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of A custom converter for a custom model</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2_new_converter.html">A custom converter for a custom model</a><input aria-label="Toggle navigation of A custom converter for a custom model" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_icustom_converter.html">Implement a new converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_jcustom_syntax.html">Two ways to implement a converter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_jfunction_transformer.html">Issues with FunctionTransformer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_k1_custom_converter_onnxscript.html">Implement a custom converter with onnxscript</a></li>
+<li class="toctree-l3"><a class="reference internal" href="plot_k2_custom_converter_ndonnx.html">Implement a custom converter with ndonnx</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_kcustom_converter_wrapper.html">Implement a new converter using other converters</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_lcustom_options.html">A new converter with options</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_mcustom_parser.html">Change the number of outputs by adding a parser</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle navigation of Advanced scenarios</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_4_advanced.html">Advanced scenarios</a><input aria-label="Toggle navigation of Advanced scenarios" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_ngrams.html">Tricky issue when converting CountVectorizer or TfidfVectorizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_usparse_xgboost.html">TfIdf and sparse matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="plot_woe_transformer.html">Converter for WOE</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle navigation of Write converters for other libraries</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../tutorial_2-5_extlib.html">Write converters for other libraries</a><input aria-label="Toggle navigation of Write converters for other libraries" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="plot_wext_pyod_forest.html">Converter for pyod.models.iforest.IForest</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api_summary.html">API Summary</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Gallery of examples</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle navigation of Gallery of examples</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../auto_examples/index.html">Gallery of examples</a><input aria-label="Toggle navigation of Gallery of examples" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_metadata.html">Metadata</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_backend.html">ONNX Runtime Backend for ONNX</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../auto_examples/plot_pipeline.html">Draw a pipeline</a></li>
@@ -311,8 +306,7 @@
   </a>
 </div>
 <div class="theme-toggle-container theme-toggle-content">
-            <button class="theme-toggle">
-              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+            <button class="theme-toggle" aria-label="Toggle Light / Dark / Auto color theme">
               <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
               <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
               <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
@@ -320,96 +314,101 @@
             </button>
           </div>
           <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
-            <div class="visually-hidden">Toggle table of contents sidebar</div>
-            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+            <span class="icon"><svg><use href="#svg-toc"></use></svg></span>
           </label>
         </div>
         <article role="main" id="furo-main-content">
           <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h1>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This issue is described at scikit-learn/issues/13733. If a CountVectorizer or a TfidfVectorizer produces a token with a space, skl2onnx cannot know if it a bi-grams or a unigram with a space."><img alt="" src="../_images/sphx_glr_plot_ngrams_thumb.png" />
-<p><a class="reference internal" href="plot_ngrams.html#sphx-glr-auto-tutorial-plot-ngrams-py"><span class="std std-ref">Tricky issue when converting CountVectorizer or TfidfVectorizer</span></a></p>
+<p><a class="reference internal" href="plot_ngrams.html"><span class="doc">Tricky issue when converting CountVectorizer or TfidfVectorizer</span></a></p>
   <div class="sphx-glr-thumbnail-title">Tricky issue when converting CountVectorizer or TfidfVectorizer</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This program starts from an example in scikit-learn documentation: Plot individual and voting regression predictions, converts it into ONNX and finally computes the predictions a different runtime."><img alt="" src="../_images/sphx_glr_plot_abegin_convert_pipeline_thumb.png" />
-<p><a class="reference internal" href="plot_abegin_convert_pipeline.html#sphx-glr-auto-tutorial-plot-abegin-convert-pipeline-py"><span class="std std-ref">Train and deploy a scikit-learn pipeline</span></a></p>
+<p><a class="reference internal" href="plot_abegin_convert_pipeline.html"><span class="doc">Train and deploy a scikit-learn pipeline</span></a></p>
   <div class="sphx-glr-thumbnail-title">Train and deploy a scikit-learn pipeline</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a LightGBM model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a LGBMClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_lightgbm_thumb.png" />
-<p><a class="reference internal" href="plot_gexternal_lightgbm.html#sphx-glr-auto-tutorial-plot-gexternal-lightgbm-py"><span class="std std-ref">Convert a pipeline with a LightGBM classifier</span></a></p>
+<p><a class="reference internal" href="plot_gexternal_lightgbm.html"><span class="doc">Convert a pipeline with a LightGBM classifier</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a pipeline with a LightGBM classifier</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Some runtimes do not implement a runtime for every available operator in ONNX. The converter does not know that but it is possible to black some operators. Most of the converters do not change their behaviour, they fail if they use a black listed operator, a couple of them produces a different ONNX graph."><img alt="" src="../_images/sphx_glr_plot_dbegin_options_list_thumb.png" />
-<p><a class="reference internal" href="plot_dbegin_options_list.html#sphx-glr-auto-tutorial-plot-dbegin-options-list-py"><span class="std std-ref">Black list operators when converting</span></a></p>
+<p><a class="reference internal" href="plot_dbegin_options_list.html"><span class="doc">Black list operators when converting</span></a></p>
   <div class="sphx-glr-thumbnail-title">Black list operators when converting</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Every library is versioned. scikit-learn may change the implementation of a specific model. That happens for example with the SVC model where the parameter break_ties was added in 0.22. ONNX does also have a version called opset number. Operator ArgMin was added in opset 1 and changed in opset 11, 12, 13. Sometimes, it is updated to extend the list of types it supports, sometimes, it moves a parameter into the input list. The runtime used to deploy the model does not implement a new version, in that case, a model must be converted by usually using the most recent opset supported by the runtime, we call that opset the targeted opset. An ONNX graph only contains one unique opset, every node must be described following the specifications defined by the latest opset below the targeted opset."><img alt="" src="../_images/sphx_glr_plot_cbegin_opset_thumb.png" />
-<p><a class="reference internal" href="plot_cbegin_opset.html#sphx-glr-auto-tutorial-plot-cbegin-opset-py"><span class="std std-ref">What is the opset number?</span></a></p>
+<p><a class="reference internal" href="plot_cbegin_opset.html"><span class="doc">What is the opset number?</span></a></p>
   <div class="sphx-glr-thumbnail-title">What is the opset number?</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="There are many reasons why a user wants more than using the converted model into ONNX. Intermediate results may be needed, the output of every node in the graph. The ONNX may need to be altered to remove some nodes. Transfer learning is usually removing the last layers of a deep neural network. Another reaason is debugging. It often happens that the runtime fails to compute the predictions due to a shape mismatch. Then it is useful the get the shape of every intermediate result. This example looks into two ways of doing it."><img alt="" src="../_images/sphx_glr_plot_fbegin_investigate_thumb.png" />
-<p><a class="reference internal" href="plot_fbegin_investigate.html#sphx-glr-auto-tutorial-plot-fbegin-investigate-py"><span class="std std-ref">Intermediate results and investigation</span></a></p>
+<p><a class="reference internal" href="plot_fbegin_investigate.html"><span class="doc">Intermediate results and investigation</span></a></p>
   <div class="sphx-glr-thumbnail-title">Intermediate results and investigation</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Once a model is converted it can be useful to store an array as a constant in the graph an retrieve it through an output. This allows the user to store training parameters or other informations like a vocabulary. Last sections shows how to remove an output or to promote an intermediate result to an output."><img alt="" src="../_images/sphx_glr_plot_gbegin_cst_thumb.png" />
-<p><a class="reference internal" href="plot_gbegin_cst.html#sphx-glr-auto-tutorial-plot-gbegin-cst-py"><span class="std std-ref">Store arrays in one onnx graph</span></a></p>
+<p><a class="reference internal" href="plot_gbegin_cst.html"><span class="doc">Store arrays in one onnx graph</span></a></p>
   <div class="sphx-glr-thumbnail-title">Store arrays in one onnx graph</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer is one transform for which the corresponding converted onnx model may produce different results. The larger the vocabulary is, the higher the probability to get different result is. This example proposes a equivalent model with no discrepancies."><img alt="" src="../_images/sphx_glr_plot_transformer_discrepancy_thumb.png" />
-<p><a class="reference internal" href="plot_transformer_discrepancy.html#sphx-glr-auto-tutorial-plot-transformer-discrepancy-py"><span class="std std-ref">Dealing with discrepancies (tf-idf)</span></a></p>
+<p><a class="reference internal" href="plot_transformer_discrepancy.html"><span class="doc">Dealing with discrepancies (tf-idf)</span></a></p>
   <div class="sphx-glr-thumbnail-title">Dealing with discrepancies (tf-idf)</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to change the default ONNX graph such as renaming the inputs or outputs names."><img alt="" src="../_images/sphx_glr_plot_gconverting_thumb.png" />
-<p><a class="reference internal" href="plot_gconverting.html#sphx-glr-auto-tutorial-plot-gconverting-py"><span class="std std-ref">Modify the ONNX graph</span></a></p>
+<p><a class="reference internal" href="plot_gconverting.html"><span class="doc">Modify the ONNX graph</span></a></p>
   <div class="sphx-glr-thumbnail-title">Modify the ONNX graph</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="WOE means Weights of Evidence. It consists in checking that a feature X belongs to a series of regions - intervals -. The results is the label of every intervals containing the feature."><img alt="" src="../_images/sphx_glr_plot_woe_transformer_thumb.png" />
-<p><a class="reference internal" href="plot_woe_transformer.html#sphx-glr-auto-tutorial-plot-woe-transformer-py"><span class="std std-ref">Converter for WOE</span></a></p>
+<p><a class="reference internal" href="plot_woe_transformer.html"><span class="doc">Converter for WOE</span></a></p>
   <div class="sphx-glr-thumbnail-title">Converter for WOE</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Example l-simple-deploy-1 converts a simple model. This example takes a similar example but on random data and compares the processing time required by each option to compute predictions."><img alt="" src="../_images/sphx_glr_plot_bbegin_measure_time_thumb.png" />
-<p><a class="reference internal" href="plot_bbegin_measure_time.html#sphx-glr-auto-tutorial-plot-bbegin-measure-time-py"><span class="std std-ref">Benchmark ONNX conversion</span></a></p>
+<p><a class="reference internal" href="plot_bbegin_measure_time.html"><span class="doc">Benchmark ONNX conversion</span></a></p>
   <div class="sphx-glr-thumbnail-title">Benchmark ONNX conversion</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="A pipeline usually ingests data as a matrix. It may be converted in a matrix if all the data share the same type. But data held in a dataframe have usually multiple types, float, integer or string for categories. ONNX also supports that case."><img alt="" src="../_images/sphx_glr_plot_gbegin_dataframe_thumb.png" />
-<p><a class="reference internal" href="plot_gbegin_dataframe.html#sphx-glr-auto-tutorial-plot-gbegin-dataframe-py"><span class="std std-ref">Dataframe as an input</span></a></p>
+<p><a class="reference internal" href="plot_gbegin_dataframe.html"><span class="doc">Dataframe as an input</span></a></p>
   <div class="sphx-glr-thumbnail-title">Dataframe as an input</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="There is not one way to convert a model. A new operator might have been added in a newer version of ONNX and that speeds up the converted model. The rational choice would be to use this new operator but what means the associated runtime has an implementation for it. What if two different users needs two different conversion for the same model? Let&#x27;s see how this may be done."><img alt="" src="../_images/sphx_glr_plot_dbegin_options_thumb.png" />
-<p><a class="reference internal" href="plot_dbegin_options.html#sphx-glr-auto-tutorial-plot-dbegin-options-py"><span class="std std-ref">One model, many possible conversions with options</span></a></p>
+<p><a class="reference internal" href="plot_dbegin_options.html"><span class="doc">One model, many possible conversions with options</span></a></p>
   <div class="sphx-glr-thumbnail-title">One model, many possible conversions with options</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="In many cases, a custom models leverages existing models which already have an associated converter. To convert this patchwork, existing converters must be called. This example shows how to do that. Example l-plot-custom-converter can be rewritten by using a PCA. We could then reuse the converter associated to this model."><img alt="" src="../_images/sphx_glr_plot_kcustom_converter_wrapper_thumb.png" />
-<p><a class="reference internal" href="plot_kcustom_converter_wrapper.html#sphx-glr-auto-tutorial-plot-kcustom-converter-wrapper-py"><span class="std std-ref">Implement a new converter using other converters</span></a></p>
+<p><a class="reference internal" href="plot_kcustom_converter_wrapper.html"><span class="doc">Implement a new converter using other converters</span></a></p>
   <div class="sphx-glr-thumbnail-title">Implement a new converter using other converters</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Most models in scikit-learn do computation with double, not float. Most models in deep learning use float because that&#x27;s the most common situation with GPU. ONNX was initially created to facilitate the deployment of deep learning models and that explains why many converters assume the converted models should use float. That assumption does not usually harm the predictions, the conversion to float introduce small discrepencies compare to double predictions. That assumption is usually true if the prediction function is continuous, y = f(x), then dy = f&#x27;(x) dx. We can determine an upper bound to the discrepencies : \Delta(y) \leqslant \sup_x \left\Vert f&#x27;(x)\right\Vert dx. dx is the discrepency introduced by a float conversion, dx = x - numpy.float32(x)."><img alt="" src="../_images/sphx_glr_plot_ebegin_float_double_thumb.png" />
-<p><a class="reference internal" href="plot_ebegin_float_double.html#sphx-glr-auto-tutorial-plot-ebegin-float-double-py"><span class="std std-ref">Issues when switching to float</span></a></p>
+<p><a class="reference internal" href="plot_ebegin_float_double.html"><span class="doc">Issues when switching to float</span></a></p>
   <div class="sphx-glr-thumbnail-title">Issues when switching to float</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="The discrepancies observed when using float and TreeEnsemble operator (see l-example-discrepencies-float-double) explains why the converter for LGBMRegressor may introduce significant discrepancies even when it is used with float tensors."><img alt="" src="../_images/sphx_glr_plot_gexternal_lightgbm_reg_thumb.png" />
-<p><a class="reference internal" href="plot_gexternal_lightgbm_reg.html#sphx-glr-auto-tutorial-plot-gexternal-lightgbm-reg-py"><span class="std std-ref">Convert a pipeline with a LightGBM regressor</span></a></p>
+<p><a class="reference internal" href="plot_gexternal_lightgbm_reg.html"><span class="doc">Convert a pipeline with a LightGBM regressor</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a pipeline with a LightGBM regressor</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="A pipeline including a custom estimator cannot be automatically converted into onnx because there is no converter able to convert custom python code into ONNX. A custom converter needs to be written specifically for it."><img alt="" src="../_images/sphx_glr_plot_k1_custom_converter_onnxscript_thumb.png" />
+<p><a class="reference internal" href="plot_k1_custom_converter_onnxscript.html"><span class="doc">Implement a custom converter with onnxscript</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Implement a custom converter with onnxscript</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a regressor has one output (prediction), a transform has one output (the transformed data). What if it is not the case? The following example creates a custom converter and a custom parser which defines the number of outputs expected by the converted model."><img alt="" src="../_images/sphx_glr_plot_mcustom_parser_thumb.png" />
-<p><a class="reference internal" href="plot_mcustom_parser.html#sphx-glr-auto-tutorial-plot-mcustom-parser-py"><span class="std std-ref">Change the number of outputs by adding a parser</span></a></p>
+<p><a class="reference internal" href="plot_mcustom_parser.html"><span class="doc">Change the number of outputs by adding a parser</span></a></p>
   <div class="sphx-glr-thumbnail-title">Change the number of outputs by adding a parser</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="A scikit-learn classifier usually returns a matrix of probabilities. By default, sklearn-onnx converts that matrix into a list of dictionaries where each probabily is mapped to its class id or name. That mechanism retains the class names but is slower. Let&#x27;s see what other options are available."><img alt="" src="../_images/sphx_glr_plot_dbegin_options_zipmap_thumb.png" />
-<p><a class="reference internal" href="plot_dbegin_options_zipmap.html#sphx-glr-auto-tutorial-plot-dbegin-options-zipmap-py"><span class="std std-ref">Choose appropriate output of a classifier</span></a></p>
+<p><a class="reference internal" href="plot_dbegin_options_zipmap.html"><span class="doc">Choose appropriate output of a classifier</span></a></p>
   <div class="sphx-glr-thumbnail-title">Choose appropriate output of a classifier</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="ndonnx aims at converting a code using numpy into ONNX. It is tracing the execution path by storing every operation applied on a tracing object. It may work with a scikit-learn if it supports the Array API. That means every estimator in a pipeline must be part of the following list Array API support (Estimators)."><img alt="" src="../_images/sphx_glr_plot_k2_custom_converter_ndonnx_thumb.png" />
+<p><a class="reference internal" href="plot_k2_custom_converter_ndonnx.html"><span class="doc">Implement a custom converter with ndonnx</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Implement a custom converter with ndonnx</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="Options are used to implement different conversion for a same model. The options can be used to replace an operator MatMul by the Gemm operator and compare the processing time for both graph. Let&#x27;s see how to retrieve the options within a converter."><img alt="" src="../_images/sphx_glr_plot_lcustom_options_thumb.png" />
-<p><a class="reference internal" href="plot_lcustom_options.html#sphx-glr-auto-tutorial-plot-lcustom-options-py"><span class="std std-ref">A new converter with options</span></a></p>
+<p><a class="reference internal" href="plot_lcustom_options.html"><span class="doc">A new converter with options</span></a></p>
   <div class="sphx-glr-thumbnail-title">A new converter with options</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="There are two ways to write a converter. The first one is less verbose and easier to understand (see k_means.py). The other is very verbose (see ada_boost.py for an example)."><img alt="" src="../_images/sphx_glr_plot_jcustom_syntax_thumb.png" />
-<p><a class="reference internal" href="plot_jcustom_syntax.html#sphx-glr-auto-tutorial-plot-jcustom-syntax-py"><span class="std std-ref">Two ways to implement a converter</span></a></p>
+<p><a class="reference internal" href="plot_jcustom_syntax.html"><span class="doc">Two ways to implement a converter</span></a></p>
   <div class="sphx-glr-thumbnail-title">Two ways to implement a converter</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_catboost_thumb.png" />
-<p><a class="reference internal" href="plot_gexternal_catboost.html#sphx-glr-auto-tutorial-plot-gexternal-catboost-py"><span class="std std-ref">Convert a pipeline with a CatBoost classifier</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="By default, sklearn-onnx assumes that a classifier has two outputs (label and probabilities), a regressor has one output (prediction), a transform has one output (the transformed data). This example assumes the model to convert is one of them. In that case, a new converter requires in fact two functions:"><img alt="" src="../_images/sphx_glr_plot_icustom_converter_thumb.png" />
-<p><a class="reference internal" href="plot_icustom_converter.html#sphx-glr-auto-tutorial-plot-icustom-converter-py"><span class="std std-ref">Implement a new converter</span></a></p>
+<p><a class="reference internal" href="plot_icustom_converter.html"><span class="doc">Implement a new converter</span></a></p>
   <div class="sphx-glr-thumbnail-title">Implement a new converter</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a XGBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a XGBClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_xgboost_thumb.png" />
-<p><a class="reference internal" href="plot_gexternal_xgboost.html#sphx-glr-auto-tutorial-plot-gexternal-xgboost-py"><span class="std std-ref">Convert a pipeline with a XGBoost model</span></a></p>
+<p><a class="reference internal" href="plot_gexternal_xgboost.html"><span class="doc">Convert a pipeline with a XGBoost model</span></a></p>
   <div class="sphx-glr-thumbnail-title">Convert a pipeline with a XGBoost model</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="sklearn-onnx only converts scikit-learn models into ONNX but many libraries implement scikit-learn API so that their models can be included in a scikit-learn pipeline. This example considers a pipeline including a CatBoost model. sklearn-onnx can convert the whole pipeline as long as it knows the converter associated to a CatBoostClassifier. Let&#x27;s see how to do it."><img alt="" src="../_images/sphx_glr_plot_gexternal_catboost_thumb.png" />
+<p><a class="reference internal" href="plot_gexternal_catboost.html"><span class="doc">Convert a pipeline with a CatBoost classifier</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Convert a pipeline with a CatBoost classifier</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example answers issues 685. It implements a custom converter for model pyod.models.iforest.IForest. This example uses l-plot-custom-converter as a start."><img alt="" src="../_images/sphx_glr_plot_wext_pyod_forest_thumb.png" />
-<p><a class="reference internal" href="plot_wext_pyod_forest.html#sphx-glr-auto-tutorial-plot-wext-pyod-forest-py"><span class="std std-ref">Converter for pyod.models.iforest.IForest</span></a></p>
+<p><a class="reference internal" href="plot_wext_pyod_forest.html"><span class="doc">Converter for pyod.models.iforest.IForest</span></a></p>
   <div class="sphx-glr-thumbnail-title">Converter for pyod.models.iforest.IForest</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="WOEEncoder is a transformer implemented in categorical_encoder and as such, any converter would not be included in sklearn-onnx which only implements converters for scikit-learn models. Anyhow, this example demonstrates how to implement a custom converter for WOEEncoder. This code is not fully tested for all possible cases the original encoder can handle."><img alt="" src="../_images/sphx_glr_plot_catwoe_transformer_thumb.png" />
-<p><a class="reference internal" href="plot_catwoe_transformer.html#sphx-glr-auto-tutorial-plot-catwoe-transformer-py"><span class="std std-ref">Converter for WOEEncoder from categorical_encoder</span></a></p>
+<p><a class="reference internal" href="plot_catwoe_transformer.html"><span class="doc">Converter for WOEEncoder from categorical_encoder</span></a></p>
   <div class="sphx-glr-thumbnail-title">Converter for WOEEncoder from categorical_encoder</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="A pipeline including a FunctionTransformer cannot be automatically converted into onnx because there is no converter able to convert custom python code into ONNX. A custom converter needs to be written specifically for it."><img alt="" src="../_images/sphx_glr_plot_jfunction_transformer_thumb.png" />
-<p><a class="reference internal" href="plot_jfunction_transformer.html#sphx-glr-auto-tutorial-plot-jfunction-transformer-py"><span class="std std-ref">Issues with FunctionTransformer</span></a></p>
+<p><a class="reference internal" href="plot_jfunction_transformer.html"><span class="doc">Issues with FunctionTransformer</span></a></p>
   <div class="sphx-glr-thumbnail-title">Issues with FunctionTransformer</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="TfidfVectorizer usually creates sparse data. If the data is sparse enough, matrices usually stays as sparse all along the pipeline until the predictor is trained. Sparse matrices do not consider null and missing values as they are not present in the datasets. Because some predictors do the difference, this ambiguity may introduces discrepencies when converter into ONNX. This example looks into several configurations."><img alt="" src="../_images/sphx_glr_plot_usparse_xgboost_thumb.png" />
-<p><a class="reference internal" href="plot_usparse_xgboost.html#sphx-glr-auto-tutorial-plot-usparse-xgboost-py"><span class="std std-ref">TfIdf and sparse matrices</span></a></p>
+<p><a class="reference internal" href="plot_usparse_xgboost.html"><span class="doc">TfIdf and sparse matrices</span></a></p>
   <div class="sphx-glr-thumbnail-title">TfIdf and sparse matrices</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="A game of finding it goes wrong and there are multiple places."><img alt="" src="../_images/sphx_glr_plot_weird_pandas_and_hash_thumb.png" />
-<p><a class="reference internal" href="plot_weird_pandas_and_hash.html#sphx-glr-auto-tutorial-plot-weird-pandas-and-hash-py"><span class="std std-ref">FeatureHasher, pandas values and unexpected discrepancies</span></a></p>
+<p><a class="reference internal" href="plot_weird_pandas_and_hash.html"><span class="doc">FeatureHasher, pandas values and unexpected discrepancies</span></a></p>
   <div class="sphx-glr-thumbnail-title">FeatureHasher, pandas values and unexpected discrepancies</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
@@ -455,9 +454,9 @@
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=f0c121d3"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+</div><script src="../_static/documentation_options.js?v=2a6ef5f7"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

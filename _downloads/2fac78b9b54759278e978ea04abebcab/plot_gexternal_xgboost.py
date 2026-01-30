@@ -27,7 +27,9 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier, XGBRegressor, DMatrix, train as train_xgb
 from skl2onnx.common.data_types import FloatTensorType
-from onnxmltools.convert.common.data_types import FloatTensorType as ml_tools_FloatTensorType
+from onnxmltools.convert.common.data_types import (
+    FloatTensorType as ml_tools_FloatTensorType,
+)
 from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
 from skl2onnx.common.shape_calculator import (
     calculate_linear_classifier_output_shapes,
@@ -36,7 +38,6 @@ from skl2onnx.common.shape_calculator import (
 from skl2onnx.convert import may_switch_bases_classes_order
 from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
 from onnxmltools.convert import convert_xgboost as convert_xgboost_booster
-
 
 data = load_iris()
 X = data.data[:, :2]
@@ -90,7 +91,7 @@ update_registered_converter(
     convert_xgboost,
     options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
 )
- 
+
 ##################################
 # Convert again
 # +++++++++++++

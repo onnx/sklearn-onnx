@@ -34,7 +34,7 @@ how to do it.
 Train a XGBoost classifier
 ++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-73
+.. GENERATED FROM PYTHON SOURCE LINES 21-74
 
 .. code-block:: Python
 
@@ -47,7 +47,9 @@ Train a XGBoost classifier
     from sklearn.preprocessing import StandardScaler
     from xgboost import XGBClassifier, XGBRegressor, DMatrix, train as train_xgb
     from skl2onnx.common.data_types import FloatTensorType
-    from onnxmltools.convert.common.data_types import FloatTensorType as ml_tools_FloatTensorType
+    from onnxmltools.convert.common.data_types import (
+        FloatTensorType as ml_tools_FloatTensorType,
+    )
     from skl2onnx import convert_sklearn, to_onnx, update_registered_converter
     from skl2onnx.common.shape_calculator import (
         calculate_linear_classifier_output_shapes,
@@ -56,7 +58,6 @@ Train a XGBoost classifier
     from skl2onnx.convert import may_switch_bases_classes_order
     from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
     from onnxmltools.convert import convert_xgboost as convert_xgboost_booster
-
 
     data = load_iris()
     X = data.data[:, :2]
@@ -94,28 +95,10 @@ Train a XGBoost classifier
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Unable to find a shape calculator for type '<class 'xgboost.sklearn.XGBClassifier'>'.
-    It usually means the pipeline being converted contains a
-    transformer or a predictor with no corresponding converter
-    implemented in sklearn-onnx. If the converted is implemented
-    in another library, you need to register
-    the converted so that it can be used by sklearn-onnx (function
-    update_registered_converter). If the model is not yet covered
-    by sklearn-onnx, you may raise an issue to
-    https://github.com/onnx/sklearn-onnx/issues
-    to get the converter implemented or even contribute to the
-    project. If the model is a custom model, a new converter must
-    be implemented. Examples can be found in the gallery.
 
 
 
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 74-85
+.. GENERATED FROM PYTHON SOURCE LINES 75-86
 
 Register the converter for XGBClassifier
 ++++++++++++++++++++++++++++++++++++++++
@@ -129,7 +112,7 @@ and the shape calculator:
 <https://github.com/onnx/onnxmltools/blob/main/onnxmltools/convert/
 xgboost/shape_calculators/Classifier.py>`_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-94
+.. GENERATED FROM PYTHON SOURCE LINES 86-95
 
 .. code-block:: Python
 
@@ -141,7 +124,6 @@ xgboost/shape_calculators/Classifier.py>`_.
         convert_xgboost,
         options={"nocl": [True, False], "zipmap": [True, False, "columns"]},
     )
- 
 
 
 
@@ -149,12 +131,13 @@ xgboost/shape_calculators/Classifier.py>`_.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+
+.. GENERATED FROM PYTHON SOURCE LINES 96-98
 
 Convert again
 +++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-112
+.. GENERATED FROM PYTHON SOURCE LINES 98-113
 
 .. code-block:: Python
 
@@ -180,14 +163,14 @@ Convert again
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-117
+.. GENERATED FROM PYTHON SOURCE LINES 114-118
 
 Compare the predictions
 +++++++++++++++++++++++
 
 Predictions with XGBoost.
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-122
+.. GENERATED FROM PYTHON SOURCE LINES 118-123
 
 .. code-block:: Python
 
@@ -204,17 +187,17 @@ Predictions with XGBoost.
 
  .. code-block:: none
 
-    predict [1 2 2 1 2]
-    predict_proba [[0.1554611  0.652432   0.19210689]]
+    predict [1 2 0 0 1]
+    predict_proba [[0.16120274 0.51211417 0.32668313]]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-124
+.. GENERATED FROM PYTHON SOURCE LINES 124-125
 
 Predictions with onnxruntime.
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-130
+.. GENERATED FROM PYTHON SOURCE LINES 125-131
 
 .. code-block:: Python
 
@@ -232,18 +215,18 @@ Predictions with onnxruntime.
 
  .. code-block:: none
 
-    predict [1 2 2 1 2]
-    predict_proba [{0: 0.15546110272407532, 1: 0.6524320244789124, 2: 0.19210688769817352}]
+    predict [1 2 0 0 1]
+    predict_proba [{0: 0.16120274364948273, 1: 0.5121141672134399, 2: 0.3266831338405609}]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-133
+.. GENERATED FROM PYTHON SOURCE LINES 132-134
 
 Same example with XGBRegressor
 ++++++++++++++++++++++++++++++
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-153
+.. GENERATED FROM PYTHON SOURCE LINES 134-154
 
 .. code-block:: Python
 
@@ -275,16 +258,16 @@ Same example with XGBRegressor
 
  .. code-block:: none
 
-    predict [108.139824 104.385315 178.4701   166.48694   99.2167  ]
+    predict [162.33238  228.84361  142.87488  105.68909  124.655975]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 154-155
+.. GENERATED FROM PYTHON SOURCE LINES 155-156
 
 ONNX
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-165
+.. GENERATED FROM PYTHON SOURCE LINES 156-166
 
 .. code-block:: Python
 
@@ -306,17 +289,17 @@ ONNX
 
  .. code-block:: none
 
-    predict [108.13983  104.38532  178.4701   166.48694   99.216705]
+    predict [162.33238  228.84361  142.87488  105.68909  124.655975]
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-168
+.. GENERATED FROM PYTHON SOURCE LINES 167-169
 
 Some discrepencies may appear. In that case,
 you should read :ref:`l-example-discrepencies-float-double`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-176
+.. GENERATED FROM PYTHON SOURCE LINES 171-177
 
 Same with a Booster
 +++++++++++++++++++
@@ -325,7 +308,7 @@ A booster cannot be inserted in a pipeline. It requires
 a different conversion function because it does not
 follow :epkg:`scikit-learn` API.
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-204
+.. GENERATED FROM PYTHON SOURCE LINES 177-205
 
 .. code-block:: Python
 
@@ -365,7 +348,7 @@ follow :epkg:`scikit-learn` API.
 
  .. code-block:: none
 
-    [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 1 1 1 1
+    [0 0 1 1 0 1 0 1 0 1 0 0 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 1 1 1 0 1 1 0 1 1 1
      0 1 1 1 0 0 1 1 0 0 0 1 0]
 
 
@@ -374,7 +357,7 @@ follow :epkg:`scikit-learn` API.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.385 seconds)
+   **Total running time of the script:** (0 minutes 4.351 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_gexternal_xgboost.py:

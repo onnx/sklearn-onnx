@@ -40,7 +40,7 @@ Imports, setups
 All imports. It also registered onnx converters for :epkg:`xgboost`
 and *lightgbm*.
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-69
+.. GENERATED FROM PYTHON SOURCE LINES 26-68
 
 .. code-block:: Python
 
@@ -70,7 +70,6 @@ and *lightgbm*.
     from onnxmltools.convert.xgboost.operator_converters.XGBoost import convert_xgboost
     from onnxmltools.convert.lightgbm.operator_converters.LightGbm import convert_lightgbm
 
-
     update_registered_converter(
         XGBClassifier,
         "XGBoostXGBClassifier",
@@ -94,14 +93,14 @@ and *lightgbm*.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-74
+.. GENERATED FROM PYTHON SOURCE LINES 69-73
 
 Artificial datasets
 +++++++++++++++++++++++++++
 
 Iris + a text column.
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-92
+.. GENERATED FROM PYTHON SOURCE LINES 73-91
 
 .. code-block:: Python
 
@@ -130,7 +129,7 @@ Iris + a text column.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-99
+.. GENERATED FROM PYTHON SOURCE LINES 92-98
 
 Train ensemble after sparse
 +++++++++++++++++++++++++++
@@ -139,7 +138,7 @@ The example use the Iris datasets with artifical text datasets
 preprocessed with a tf-idf. `sparse_threshold=1.` avoids
 sparse matrices to be converted into dense matrices.
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-233
+.. GENERATED FROM PYTHON SOURCE LINES 98-232
 
 .. code-block:: Python
 
@@ -285,12 +284,13 @@ sparse matrices to be converted into dense matrices.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:35] WARNING: /workspace/src/learner.cc:738: 
+      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:199: UserWarning: [18:57:54] WARNING: /workspace/src/learner.cc:790: 
     Parameters: { "use_label_encoder" } are not used.
 
       bst.update(dtrain, iteration=i, fobj=obj)
-     75%|███████▌  | 3/4 [00:00<00:00,  3.18it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000728 seconds.
-    You can set `force_col_wise=true` to remove the overhead.
+     75%|███████▌  | 3/4 [00:03<00:01,  1.09s/it][LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.002691 seconds.
+    You can set `force_row_wise=true` to remove the overhead.
+    And if memory is not enough, you can set `force_col_wise=true`.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
     [LightGBM] [Info] Start training from score -1.098612
@@ -311,14 +311,14 @@ sparse matrices to be converted into dense matrices.
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
       warnings.warn(
-    100%|██████████| 4/4 [00:01<00:00,  3.84it/s]
+    100%|██████████| 4/4 [00:03<00:00,  1.19it/s]
                                 model  discrepencies
-    0          RandomForestClassifier       0.947052
+    0          RandomForestClassifier       0.000004
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier      15.196619
-    3                  LGBMClassifier       0.000009
+    2                   XGBClassifier      27.755104
+    3                  LGBMClassifier       0.000008
 
 
 .. raw:: html
@@ -351,7 +351,7 @@ sparse matrices to be converted into dense matrices.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>0.947052</td>
+          <td>0.000004</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -363,13 +363,13 @@ sparse matrices to be converted into dense matrices.
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>15.196619</td>
+          <td>27.755104</td>
           <td>NaN</td>
         </tr>
         <tr>
           <th>3</th>
           <td>LGBMClassifier</td>
-          <td>0.000009</td>
+          <td>0.000008</td>
           <td>NaN</td>
         </tr>
       </tbody>
@@ -379,7 +379,7 @@ sparse matrices to be converted into dense matrices.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-240
+.. GENERATED FROM PYTHON SOURCE LINES 233-239
 
 Sparse data hurts.
 
@@ -388,7 +388,7 @@ Dense data
 
 Let's replace sparse data with dense by using `sparse_threshold=0.`
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-248
+.. GENERATED FROM PYTHON SOURCE LINES 239-247
 
 .. code-block:: Python
 
@@ -408,11 +408,11 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]     50%|█████     | 2/4 [00:00<00:00,  2.78it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:37] WARNING: /workspace/src/learner.cc:738: 
+      0%|          | 0/4 [00:00<?, ?it/s]     50%|█████     | 2/4 [00:00<00:00,  2.98it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:199: UserWarning: [18:57:58] WARNING: /workspace/src/learner.cc:790: 
     Parameters: { "use_label_encoder" } are not used.
 
       bst.update(dtrain, iteration=i, fobj=obj)
-     75%|███████▌  | 3/4 [00:01<00:00,  1.81it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.033149 seconds.
+     75%|███████▌  | 3/4 [00:02<00:00,  1.10it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000036 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
@@ -434,9 +434,9 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
       warnings.warn(
-    100%|██████████| 4/4 [00:01<00:00,  2.58it/s]    100%|██████████| 4/4 [00:01<00:00,  2.42it/s]
+    100%|██████████| 4/4 [00:02<00:00,  1.61it/s]
 
 
 .. raw:: html
@@ -468,22 +468,22 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>0.940913</td>
+          <td>0.320004</td>
         </tr>
         <tr>
           <th>1</th>
           <td>HistGradientBoostingClassifier</td>
-          <td>0.000005</td>
+          <td>0.000006</td>
         </tr>
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>2.899390</td>
+          <td>1.658395</td>
         </tr>
         <tr>
           <th>3</th>
           <td>LGBMClassifier</td>
-          <td>0.000009</td>
+          <td>0.000008</td>
         </tr>
       </tbody>
     </table>
@@ -492,12 +492,12 @@ Let's replace sparse data with dense by using `sparse_threshold=0.`
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 249-251
+.. GENERATED FROM PYTHON SOURCE LINES 248-250
 
 This is much better. Let's compare how the preprocessing
 applies on the data.
 
-.. GENERATED FROM PYTHON SOURCE LINES 251-258
+.. GENERATED FROM PYTHON SOURCE LINES 250-257
 
 .. code-block:: Python
 
@@ -536,7 +536,7 @@ applies on the data.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 259-278
+.. GENERATED FROM PYTHON SOURCE LINES 258-277
 
 This shows `RandomForestClassifier
 <https://scikit-learn.org/stable/modules/generated/
@@ -558,7 +558,7 @@ Dense data with nan
 Let's keep sparse data in the scikit-learn pipeline but
 replace null values by nan in the onnx graph.
 
-.. GENERATED FROM PYTHON SOURCE LINES 278-286
+.. GENERATED FROM PYTHON SOURCE LINES 277-285
 
 .. code-block:: Python
 
@@ -578,11 +578,11 @@ replace null values by nan in the onnx graph.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:38] WARNING: /workspace/src/learner.cc:738: 
+      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:199: UserWarning: [18:58:00] WARNING: /workspace/src/learner.cc:790: 
     Parameters: { "use_label_encoder" } are not used.
 
       bst.update(dtrain, iteration=i, fobj=obj)
-     75%|███████▌  | 3/4 [00:00<00:00,  3.21it/s][LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.012050 seconds.
+     75%|███████▌  | 3/4 [00:01<00:00,  2.22it/s][LightGBM] [Info] Auto-choosing row-wise multi-threading, the overhead of testing was 0.013844 seconds.
     You can set `force_row_wise=true` to remove the overhead.
     And if memory is not enough, you can set `force_col_wise=true`.
     [LightGBM] [Info] Total Bins 53
@@ -605,14 +605,14 @@ replace null values by nan in the onnx graph.
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
       warnings.warn(
-    100%|██████████| 4/4 [00:01<00:00,  4.06it/s]    100%|██████████| 4/4 [00:01<00:00,  3.83it/s]
+    100%|██████████| 4/4 [00:01<00:00,  2.93it/s]    100%|██████████| 4/4 [00:01<00:00,  2.74it/s]
                                 model  discrepencies
-    0          RandomForestClassifier      24.634892
+    0          RandomForestClassifier      29.852329
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier       2.899390
-    3                  LGBMClassifier       0.000009
+    2                   XGBClassifier       1.658395
+    3                  LGBMClassifier       0.000008
 
 
 .. raw:: html
@@ -645,7 +645,7 @@ replace null values by nan in the onnx graph.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>24.634892</td>
+          <td>29.852329</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -657,13 +657,13 @@ replace null values by nan in the onnx graph.
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>2.899390</td>
+          <td>1.658395</td>
           <td>NaN</td>
         </tr>
         <tr>
           <th>3</th>
           <td>LGBMClassifier</td>
-          <td>0.000009</td>
+          <td>0.000008</td>
           <td>NaN</td>
         </tr>
       </tbody>
@@ -673,7 +673,7 @@ replace null values by nan in the onnx graph.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-296
+.. GENERATED FROM PYTHON SOURCE LINES 286-295
 
 Dense, 0 replaced by nan
 ++++++++++++++++++++++++
@@ -685,7 +685,7 @@ A new converter is added to the list of supported models.
 It is equivalent to the previous options except it is
 more explicit.
 
-.. GENERATED FROM PYTHON SOURCE LINES 296-305
+.. GENERATED FROM PYTHON SOURCE LINES 295-304
 
 .. code-block:: Python
 
@@ -706,11 +706,11 @@ more explicit.
 
  .. code-block:: none
 
-      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:183: UserWarning: [09:45:39] WARNING: /workspace/src/learner.cc:738: 
+      0%|          | 0/4 [00:00<?, ?it/s]/home/xadupre/vv/this312/lib/python3.12/site-packages/xgboost/training.py:199: UserWarning: [18:58:02] WARNING: /workspace/src/learner.cc:790: 
     Parameters: { "use_label_encoder" } are not used.
 
       bst.update(dtrain, iteration=i, fobj=obj)
-     75%|███████▌  | 3/4 [00:01<00:00,  2.67it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.000045 seconds.
+     75%|███████▌  | 3/4 [00:01<00:00,  1.60it/s][LightGBM] [Info] Auto-choosing col-wise multi-threading, the overhead of testing was 0.035384 seconds.
     You can set `force_col_wise=true` to remove the overhead.
     [LightGBM] [Info] Total Bins 53
     [LightGBM] [Info] Number of data points in the train set: 150, number of used features: 5
@@ -732,14 +732,14 @@ more explicit.
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
     [LightGBM] [Warning] No further splits with positive gain, best gain: -inf
-    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2735: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
+    /home/xadupre/vv/this312/lib/python3.12/site-packages/sklearn/utils/validation.py:2691: UserWarning: X does not have valid feature names, but LGBMClassifier was fitted with feature names
       warnings.warn(
-    100%|██████████| 4/4 [00:01<00:00,  3.30it/s]
+    100%|██████████| 4/4 [00:02<00:00,  2.07it/s]    100%|██████████| 4/4 [00:02<00:00,  1.94it/s]
                                 model  discrepencies
-    0          RandomForestClassifier      41.288296
+    0          RandomForestClassifier      48.987951
     1  HistGradientBoostingClassifier            NaN
-    2                   XGBClassifier       2.899390
-    3                  LGBMClassifier       0.000009
+    2                   XGBClassifier       1.658395
+    3                  LGBMClassifier       0.000008
 
 
 .. raw:: html
@@ -772,7 +772,7 @@ more explicit.
         <tr>
           <th>0</th>
           <td>RandomForestClassifier</td>
-          <td>41.288296</td>
+          <td>48.987951</td>
           <td>NaN</td>
         </tr>
         <tr>
@@ -784,13 +784,13 @@ more explicit.
         <tr>
           <th>2</th>
           <td>XGBClassifier</td>
-          <td>2.899390</td>
+          <td>1.658395</td>
           <td>NaN</td>
         </tr>
         <tr>
           <th>3</th>
           <td>LGBMClassifier</td>
-          <td>0.000009</td>
+          <td>0.000008</td>
           <td>NaN</td>
         </tr>
       </tbody>
@@ -800,7 +800,7 @@ more explicit.
     <br />
     <br />
 
-.. GENERATED FROM PYTHON SOURCE LINES 306-312
+.. GENERATED FROM PYTHON SOURCE LINES 305-311
 
 Conclusion
 ++++++++++
@@ -812,7 +812,7 @@ tuned depending on the model which follows the TfIdf preprocessing.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 4.999 seconds)
+   **Total running time of the script:** (0 minutes 9.417 seconds)
 
 
 .. _sphx_glr_download_auto_tutorial_plot_usparse_xgboost.py:
