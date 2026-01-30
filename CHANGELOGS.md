@@ -1,5 +1,7 @@
 # Change Logs
 
+## 1.21.0
+
 ## 1.20.0
 
 * Update CI to scikit-learn==1.8.0
