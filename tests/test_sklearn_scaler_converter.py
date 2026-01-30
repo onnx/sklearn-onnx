@@ -29,7 +29,6 @@ from skl2onnx.common.data_types import (
 )
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-
 ort_version = ".".join(ort_version.split(".")[:2])
 
 

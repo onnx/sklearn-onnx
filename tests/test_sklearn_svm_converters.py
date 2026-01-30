@@ -26,7 +26,6 @@ from test_utils import (
     InferenceSessionEx as InferenceSession,
 )
 
-
 ort_version = ort_version.split("+")[0]
 
 

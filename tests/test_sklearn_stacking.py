@@ -9,6 +9,7 @@ from numpy.testing import assert_almost_equal
 from onnx import TensorProto
 import pandas
 from onnxruntime import InferenceSession
+import sklearn
 from sklearn import __version__ as sklearn_version
 from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LinearRegression, LogisticRegression
@@ -291,8 +292,8 @@ class TestStackingConverter(unittest.TestCase):
         res = sess.run(
             None,
             {
-                "text": X_train.text.values.reshape((-1, 1)),
-                "val": X_train.val.values.reshape((-1, 1)),
+                "text": numpy.asarray(X_train.text.values).reshape((-1, 1)),
+                "val": numpy.asarray(X_train.val.values).reshape((-1, 1)),
             },
         )
         assert_almost_equal(pipeline.predict(X_train), res[0])
@@ -396,6 +397,18 @@ class TestStackingConverter(unittest.TestCase):
             def transform(self, X):
                 return X
 
+            def __sklearn_is_fitted__(self):
+                return True
+
+            def __sklearn_tags__(self):
+                return sklearn.utils._tags.Tags(
+                    estimator_type=None,
+                    target_tags=sklearn.utils._tags.TargetTags(required=False),
+                    transformer_tags=None,
+                    regressor_tags=None,
+                    classifier_tags=None,
+                )
+
         def shape_calculator(operator):
             pass
 
@@ -484,6 +497,18 @@ class TestStackingConverter(unittest.TestCase):
 
             def transform(self, X):
                 return X
+
+            def __sklearn_is_fitted__(self):
+                return True
+
+            def __sklearn_tags__(self):
+                return sklearn.utils._tags.Tags(
+                    estimator_type=None,
+                    target_tags=sklearn.utils._tags.TargetTags(required=False),
+                    transformer_tags=None,
+                    regressor_tags=None,
+                    classifier_tags=None,
+                )
 
         def shape_calculator(operator):
             pass

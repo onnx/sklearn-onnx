@@ -40,7 +40,6 @@ from skl2onnx.common.data_types import FloatTensorType, StringTensorType
 from skl2onnx.common.utils_sklearn import _process_options, _process_pipeline_options
 from test_utils import dump_data_and_model, fit_regression_model, TARGET_OPSET
 
-
 ort_version = ort_version.split("+")[0]
 
 

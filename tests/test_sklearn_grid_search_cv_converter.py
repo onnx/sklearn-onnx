@@ -32,9 +32,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_binary_float(self):
         tuned_parameters = [{"C": np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
-            LogisticRegression(
-                random_state=42, max_iter=100, solver="lbfgs", multi_class="ovr"
-            ),
+            LogisticRegression(random_state=42, max_iter=100, solver="lbfgs"),
             tuned_parameters,
             cv=5,
         )
@@ -75,9 +73,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_binary_int(self):
         tuned_parameters = [{"C": np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
-            LogisticRegression(
-                random_state=42, max_iter=100, solver="lbfgs", multi_class="ovr"
-            ),
+            LogisticRegression(random_state=42, max_iter=100, solver="lbfgs"),
             tuned_parameters,
             cv=5,
         )
@@ -96,9 +92,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_multiclass_int(self):
         tuned_parameters = [{"C": np.logspace(-1, 0, 4)}]
         clf = GridSearchCV(
-            LogisticRegression(
-                random_state=42, max_iter=100, solver="lbfgs", multi_class="multinomial"
-            ),
+            LogisticRegression(random_state=42, max_iter=100, solver="lbfgs"),
             tuned_parameters,
             cv=5,
         )
@@ -197,9 +191,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_binary_float_nozipmap(self):
         tuned_parameters = [{"C": np.logspace(-1, 0, 30)}]
         clf = GridSearchCV(
-            LogisticRegression(
-                random_state=42, max_iter=100, solver="lbfgs", multi_class="ovr"
-            ),
+            LogisticRegression(random_state=42, max_iter=100, solver="lbfgs"),
             tuned_parameters,
             cv=5,
         )

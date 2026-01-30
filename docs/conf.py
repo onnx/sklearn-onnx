@@ -10,7 +10,6 @@ import skl2onnx
 sys.path.append(os.path.abspath("exts"))
 from github_link import make_linkcode_resolve
 
-
 # -- Project information -----------------------------------------------------
 
 project = "sklearn-onnx"
@@ -39,7 +38,6 @@ extensions = [
     "sphinx_runpython.epkg",
     "sphinx_runpython.gdot",
     "sphinx_runpython.runpython",
-    "sphinxcontrib.blockdiag",
 ]
 
 templates_path = ["_templates"]

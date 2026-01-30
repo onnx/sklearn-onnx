@@ -28,7 +28,6 @@ from test_utils import (
     InferenceSessionEx as InferenceSession,
 )
 
-
 ort_version = ".".join(ort_version.split(".")[:2])
 
 BACKEND = (

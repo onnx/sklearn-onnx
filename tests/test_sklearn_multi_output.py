@@ -19,7 +19,6 @@ from onnxruntime import __version__ as ort_version
 from skl2onnx import to_onnx
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-
 skl_ver = ".".join(skl_ver.split(".")[:2])
 ort_version = ort_version.split("+")[0]
 

@@ -12,7 +12,6 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
 
-
 ort_version = ort_version.split("+")[0]
 
 

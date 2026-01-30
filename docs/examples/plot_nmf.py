@@ -36,7 +36,6 @@ from skl2onnx.algebra.onnx_ops import OnnxArrayFeatureExtractor, OnnxMul, OnnxRe
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
 
-
 mat = np.array(
     [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
     dtype=np.float64,

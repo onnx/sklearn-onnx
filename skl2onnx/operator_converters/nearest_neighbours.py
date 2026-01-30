@@ -208,7 +208,7 @@ def onnx_nearest_neighbors_indices_radius(
     )
     minus_range = OnnxAdd(
         OnnxNeg(
-            OnnxCumSum(minus, np.array([1], dtype=np.int64), op_version=opv),
+            OnnxCumSum(minus, np.array(1, dtype=np.int64), op_version=opv),
             op_version=opv,
         ),
         minus,

@@ -54,7 +54,6 @@ from onnxmltools.convert.lightgbm.operator_converters.LightGbm import (
     convert_lightgbm,
 )
 
-
 N = 1000
 X = numpy.random.randn(N, 20)
 y = numpy.random.randn(N) + numpy.random.randn(N) * 100 * numpy.random.randint(

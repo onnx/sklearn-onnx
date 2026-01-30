@@ -4,13 +4,13 @@
 Main entry point to the converter from the *scikit-learn* to *onnx*.
 """
 
-__version__ = "1.19.1"
+__version__ = "1.20.0"
 __author__ = "Microsoft"
 __producer__ = "skl2onnx"
 __producer_version__ = __version__
 __domain__ = "ai.onnx"
 __model_version__ = 0
-__max_supported_opset__ = 21  # Converters are tested up to this version.
+__max_supported_opset__ = 22  # Converters are tested up to this version.
 
 
 from .convert import convert_sklearn, to_onnx, wrap_as_onnx_mixin

@@ -220,7 +220,8 @@ def missing_ops():
         cls = getattr(mod, "__all__", None)
         if cls is None:
             cls = list(mod.__dict__)
-        cls = [mod.__dict__[cl] for cl in cls]
+        cls = [mod.__dict__.get(cl, None) for cl in cls]
+        cls = [c for c in cls if c]
         for cl in cls:
             try:
                 issub = issubclass(cl, BaseEstimator)

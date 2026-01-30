@@ -22,7 +22,6 @@ from test_utils import (
     TARGET_OPSET,
 )
 
-
 ort_version = ".".join(ort_version.split(".")[:2])
 skl_version = ".".join(sklearn_version.split(".")[:2])
 
@@ -147,11 +146,21 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                 2,
                 n_features=7,
             )
-        else:
+        elif pv.Version(skl_version) < pv.Version("1.7"):
             model, X_test = fit_classification_model(
                 AdaBoostClassifier(
                     n_estimators=5,
                     algorithm="SAMME",
+                    random_state=42,
+                    estimator=DecisionTreeClassifier(max_depth=6, random_state=42),
+                ),
+                2,
+                n_features=7,
+            )
+        else:
+            model, X_test = fit_classification_model(
+                AdaBoostClassifier(
+                    n_estimators=5,
                     random_state=42,
                     estimator=DecisionTreeClassifier(max_depth=6, random_state=42),
                 ),
@@ -181,11 +190,20 @@ class TestSklearnAdaBoostModels(unittest.TestCase):
                 ),
                 2,
             )
-        else:
+        elif pv.Version(skl_version) < pv.Version("1.7"):
             model, X_test = fit_classification_model(
                 AdaBoostClassifier(
                     n_estimators=5,
                     algorithm="SAMME",
+                    random_state=42,
+                    estimator=DecisionTreeClassifier(max_depth=6, random_state=42),
+                ),
+                2,
+            )
+        else:
+            model, X_test = fit_classification_model(
+                AdaBoostClassifier(
+                    n_estimators=5,
                     random_state=42,
                     estimator=DecisionTreeClassifier(max_depth=6, random_state=42),
                 ),
