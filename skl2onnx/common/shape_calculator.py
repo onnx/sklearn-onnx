@@ -63,6 +63,25 @@ def _infer_linear_classifier_output_types(operator):
     op = operator.raw_operator
     class_labels = get_label_classes(operator.scope_inst, op)
 
+    # If the probability output was declared as DoubleTensorType at parse time
+    # (based on the initial input type), but the input type was later changed
+    # to FloatTensorType by the concat shape calculator (e.g. when mixing float64
+    # and float32 inputs in a ColumnTransformer), we need to update the probability
+    # output type accordingly. This prevents type mismatches when the tree/classifier
+    # converters produce float32 probabilities for float32 inputs.
+    inp0 = operator.inputs[0].type
+    prob_out = operator.outputs[1].type if len(operator.outputs) > 1 else None
+    if (
+        prob_out is not None
+        and isinstance(prob_out, DoubleTensorType)
+        and not isinstance(inp0, DoubleTensorType)
+    ):
+        # Downcast probability type from double to float to match the actual
+        # input type (which changed from double to float after shape propagation).
+        _update_prob_type = FloatTensorType
+    else:
+        _update_prob_type = None
+
     number_of_classes = len(class_labels)
     if all(isinstance(i, np.ndarray) for i in class_labels):
         class_labels = np.concatenate(class_labels)
@@ -86,11 +105,17 @@ def _infer_linear_classifier_output_types(operator):
                 and isinstance(op.classes_[0], np.ndarray)
                 else [N, number_of_classes]
             )
-            operator.outputs[1].type.shape = shape
+            if _update_prob_type is not None:
+                operator.outputs[1].set_type(_update_prob_type(shape=shape))
+            else:
+                operator.outputs[1].type.shape = shape
         else:
             # For binary LinearSVC, we produce probability of
             # the positive class
-            operator.outputs[1].type.shape = [N, 1]
+            if _update_prob_type is not None:
+                operator.outputs[1].set_type(_update_prob_type(shape=[N, 1]))
+            else:
+                operator.outputs[1].type.shape = [N, 1]
     elif all(isinstance(i, (numbers.Real, bool, np.bool_)) for i in class_labels):
         shape = (
             [N, len(op.classes_)]
@@ -111,11 +136,17 @@ def _infer_linear_classifier_output_types(operator):
                 and isinstance(op.classes_[0], np.ndarray)
                 else [N, number_of_classes]
             )
-            operator.outputs[1].type.shape = shape
+            if _update_prob_type is not None:
+                operator.outputs[1].set_type(_update_prob_type(shape=shape))
+            else:
+                operator.outputs[1].type.shape = shape
         else:
             # For binary LinearSVC, we produce probability of
             # the positive class
-            operator.outputs[1].type.shape = [N, 1]
+            if _update_prob_type is not None:
+                operator.outputs[1].set_type(_update_prob_type(shape=[N, 1]))
+            else:
+                operator.outputs[1].type.shape = [N, 1]
     else:
         raise ValueError("Label types must be all integers or all strings.")
 
