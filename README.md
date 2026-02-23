@@ -1,6 +1,6 @@
 <!--- SPDX-License-Identifier: Apache-2.0 -->
 
-<p align="center"><img width="50%" src="docs/logo_main.png" /></p>
+<p align="center"><img width="50%" src="https://onnx.ai/sklearn-onnx/_static/logo_main.png" /></p>
 
 [![PyPI - Version](https://img.shields.io/pypi/v/skl2onnx.svg)](https://pypi.org/project/skl2onnx)
 [![Linux](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml/badge.svg)](https://github.com/onnx/sklearn-onnx/actions/workflows/linux-ci.yml)

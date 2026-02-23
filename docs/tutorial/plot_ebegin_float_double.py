@@ -163,7 +163,7 @@ print(diff(skl, ort))
 #
 # .. graphviz::
 #
-#    diagram diagram {
+#    digraph {
 #      x_float32 -> normalizer -> y_float32 -> dtree -> z_float32;
 #    }
 #
@@ -171,7 +171,7 @@ print(diff(skl, ort))
 #
 # .. graphviz::
 #
-#    diagram diagram {
+#    digraph {
 #      x_float32 -> normalizer -> y_double -> dtree -> z_double;
 #    }
 #
@@ -186,7 +186,7 @@ print(diff(skl, ort))
 #
 # .. graphviz::
 #
-#    diagram diagram {
+#    digraph {
 #      x_float32 -> normalizer -> y_double ->
 #      cast -> y_float -> dtree -> z_float;
 #    }
