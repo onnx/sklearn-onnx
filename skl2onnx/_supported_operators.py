@@ -136,6 +136,11 @@ try:
 except ImportError:
     TunedThresholdClassifierCV = None
 
+try:
+    from sklearn.model_selection import FixedThresholdClassifier
+except ImportError:
+    FixedThresholdClassifier = None
+
 # MultiOutput
 from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 
@@ -401,6 +406,7 @@ def build_sklearn_operator_name_map():
             ExtraTreesRegressor,
             FeatureHasher,
             FeatureUnion,
+            FixedThresholdClassifier,
             FunctionTransformer,
             GammaRegressor,
             GaussianNB,
@@ -480,6 +486,7 @@ def build_sklearn_operator_name_map():
             TfidfVectorizer,
             TfidfTransformer,
             TruncatedSVD,
+            FixedThresholdClassifier,
             TunedThresholdClassifierCV,
             TweedieRegressor,
             VarianceThreshold,
