@@ -58,6 +58,7 @@ from . import ransac_regressor
 from . import replace_op
 from . import scaler_op
 from . import sequence
+from . import spline_transformer
 from . import sgd_classifier
 from . import sgd_oneclass_svm
 from . import stacking
@@ -127,6 +128,7 @@ __all__ = [
     replace_op,
     scaler_op,
     sequence,
+    spline_transformer,
     sgd_classifier,
     sgd_oneclass_svm,
     stacking,
