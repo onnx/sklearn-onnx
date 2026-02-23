@@ -486,7 +486,6 @@ def build_sklearn_operator_name_map():
             TfidfVectorizer,
             TfidfTransformer,
             TruncatedSVD,
-            FixedThresholdClassifier,
             TunedThresholdClassifierCV,
             TweedieRegressor,
             VarianceThreshold,
