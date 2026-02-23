@@ -127,7 +127,7 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
             target_opset=TARGET_OPSET - 1,
             options={"zipmap": False},
         )
-        self.assertTrue(model_onnx is not None)
+        self.assertIsNot(model_onnx, None)
         dump_data_and_model(
             X_test[:10].astype(np.float32),
             model,
