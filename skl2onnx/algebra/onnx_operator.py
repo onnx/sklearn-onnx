@@ -28,7 +28,6 @@ from ..helpers.onnx_helper import infer_outputs
 from .graph_state import GraphState, GraphStateVar
 from .type_helper import _guess_type
 
-
 logger = getLogger("skl2onnx")
 
 

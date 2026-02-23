@@ -52,3 +52,6 @@ class ReplaceTransformer(TransformerMixin, BaseEstimator):
         Casts array X.
         """
         return self._replace(X)
+
+    def __sklearn_is_fitted__(self):
+        return True

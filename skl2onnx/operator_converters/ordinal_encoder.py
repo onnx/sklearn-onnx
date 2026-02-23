@@ -42,7 +42,9 @@ def convert_sklearn_ordinal_encoder(
         )
     )
 
-    for categories in ordinal_op.categories_:
+    ordinal_categories = ordinal_op.categories_
+
+    for categories in ordinal_categories:
         if len(categories) == 0:
             continue
 

@@ -31,7 +31,6 @@ from skl2onnx.helpers.onnx_helper import (
     select_model_inputs_outputs,
 )
 
-
 data = load_iris()
 X, y = data.data.astype(numpy.float32), data.target
 X_train, X_test, y_train, y_test = train_test_split(X, y)

@@ -20,7 +20,6 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 from onnxruntime import InferenceSession
 
-
 ##############################
 # Implementations to benchmark.
 ##############################
@@ -80,7 +79,7 @@ def bench(
 
                 for n in n_obs:
                     for method in methods:
-                        fct1, fct2, fct3 = fcts[method]
+                        fct1, fct2, _fct3 = fcts[method]
 
                         if not allow_configuration(
                             n=n,
@@ -153,7 +152,7 @@ def bench(
 def plot_results(df, verbose=False):
     nrows = max(len(set(df.max_depth)) * len(set(df.n_obs)), 2)
     ncols = 2
-    fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
+    _fig, ax = plt.subplots(nrows, ncols, figsize=(ncols * 4, nrows * 4))
     pos = 0
     row = 0
     for n_obs in sorted(set(df.n_obs)):

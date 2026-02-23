@@ -25,7 +25,7 @@ X, y = iris.data, iris.target
 X = X.astype(numpy.float32)
 X_train, X_test, y_train, y_test = train_test_split(X, y)
 
-clr = LogisticRegression(solver="liblinear")
+clr = LogisticRegression()
 clr.fit(X_train, y_train)
 
 

@@ -247,8 +247,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         reason="need more recent version of scikit-learn",
     )
     def test_voting_classifier_one_more_input(self):
-        csv_x = dedent(
-            """
+        csv_x = dedent("""
         checking_status,duration,credit_history,purpose,credit_amount,savings_status,###
         employment,installment_commitment,personal_status,other_parties,residence_since,###
         property_magnitude,age,other_payment_plans,housing,existing_credits,job,###
@@ -277,10 +276,7 @@ class TestVotingClassifierConverter(unittest.TestCase):
         real estate,61,none,own,1,unskilled resident,1,none,yes
         0<=X<200,30,critical/other existing credit,new car,5234.0,<100,unemployed,4,###
         male mar/wid,none,2,car,28,none,own,2,high qualif/self emp/mgmt,1,none,yes
-        """.replace(
-                "###\n        ", ""
-            )
-        )
+        """.replace("###\n        ", ""))
 
         X = pandas.read_csv(StringIO(csv_x))
         self.assertEqual(X.shape, (10, 20))

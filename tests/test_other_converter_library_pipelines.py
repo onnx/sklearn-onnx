@@ -6,6 +6,8 @@ Tests scikit-learn's binarizer converter.
 
 import unittest
 import numpy
+import packaging.version as pv
+from sklearn import __version__ as skl_version
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.datasets import load_iris
 from sklearn.preprocessing import StandardScaler
@@ -30,7 +32,15 @@ class MyCustomClassifier(BaseEstimator, ClassifierMixin):
         BaseEstimator.__init__(self)
         ClassifierMixin.__init__(self)
         self.penalty = penalty
-        self.estimator = LogisticRegression(penalty=self.penalty, solver="liblinear")
+        if pv.Version(skl_version) >= pv.Version("1.8.0"):
+            self.estimator = LogisticRegression(
+                l1_ratio=1 if penalty == "l1" else 0,
+                solver="saga" if penalty == "l1" else "lbfgs",
+            )
+        else:
+            self.estimator = LogisticRegression(
+                penalty=self.penalty, solver="saga" if penalty == "l1" else "lbfgs"
+            )
 
     def fit(self, X, y, sample_weight=None):
         self.estimator_ = self.estimator.fit(X, y, sample_weight=sample_weight)

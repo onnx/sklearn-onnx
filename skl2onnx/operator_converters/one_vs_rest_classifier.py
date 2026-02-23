@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
+import onnx
 from sklearn.base import is_regressor
 from sklearn.svm import LinearSVC
 from ..proto import onnx_proto
@@ -213,10 +214,18 @@ def convert_one_vs_rest_classifier(
 
         if use_raw_scores:
             apply_identity(scope, conc_name, operator.outputs[1].full_name, container)
-        else:
+        elif container.main_opset < 22:
             # normalizes the outputs
             apply_normalization(
                 scope, conc_name, operator.outputs[1].full_name, container, axis=1, p=1
+            )
+        else:
+            mean_name = scope.get_unique_variable_name("mean_name")
+            axis_name = scope.get_unique_variable_name("axis_name")
+            container.add_initializer(axis_name, onnx.TensorProto.INT64, [1], [1])
+            container.add_node("ReduceSum", [conc_name, axis_name], [mean_name])
+            container.add_node(
+                "Div", [conc_name, mean_name], operator.outputs[1].full_name
             )
 
         # extracts the labels

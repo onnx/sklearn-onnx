@@ -1,7 +1,13 @@
 # Change Logs
 
+## 1.21.0
+
 ## 1.20.0
 
+* Update CI to scikit-learn==1.8.0
+  [#1219](https://github.com/onnx/sklearn-onnx/issues/1219)
+* When creating OrdinalExporter, respect infrequent categories attribute
+  [#1217](https://github.com/onnx/sklearn-onnx/issues/1217)
 * Adds __sklearn_is_fitted__ to CastTransformer
   [#1209](https://github.com/onnx/sklearn-onnx/issues/1209)
 * Fixes missing dimension (number of features) in StackingClassifier

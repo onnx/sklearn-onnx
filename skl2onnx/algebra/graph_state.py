@@ -18,7 +18,6 @@ from ..common.data_types import (
 from ..common._topology import Variable
 from ..common._registration import get_shape_calculator, get_converter
 
-
 logger = getLogger("skl2onnx")
 
 

@@ -6,6 +6,8 @@ import sys
 import importlib
 import subprocess
 import time
+import packaging.version as pv
+import onnxruntime
 from skl2onnx import __file__ as onnxrt_backend_dev_file
 
 VERBOSE = 0
@@ -41,7 +43,7 @@ class TestDocumentationExamples(unittest.TestCase):
             cmds = [sys.executable, "-u", os.path.join(fold, name)]
             p = subprocess.Popen(cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             res = p.communicate()
-            out, err = res
+            _out, err = res
             st = err.decode("ascii", errors="ignore")
             if st and "Traceback" in st:
                 if '"dot" not found in path.' in st:
@@ -98,6 +100,13 @@ class TestDocumentationExamples(unittest.TestCase):
                         import onnxmltools  # noqa: F401
                     except ImportError as e:
                         reason = str(e)
+
+                if (
+                    not reason
+                    and name in {"plot_k2_custom_converter_ndonnx.py"}
+                    and pv.Version(onnxruntime.__version__) < pv.Version("1.24")
+                ):
+                    reason = "fails discrepancies"
 
                 if reason:
 

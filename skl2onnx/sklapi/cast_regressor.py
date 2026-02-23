@@ -47,6 +47,9 @@ class CastRegressor(RegressorMixin, BaseEstimator):
         self.estimator.fit(X, y=y, sample_weight=sample_weight)
         return self
 
+    def __sklearn_is_fitted__(self) -> bool:
+        return True
+
     def predict(self, X, y=None):
         """
         Predicts and casts the prediction.

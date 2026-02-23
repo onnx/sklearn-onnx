@@ -15,7 +15,15 @@ import logging
 import numpy as np
 from pandas import DataFrame
 from onnxruntime import InferenceSession, SessionOptions
-from onnxruntime_extensions import get_library_path
+
+try:
+    from onnxruntime_extensions import get_library_path
+except ImportError:
+    print(
+        "onnxruntime_extensions is missing, "
+        "some scenarios with FeatureHasher are not supported."
+    )
+    get_library_path = None
 from sklearn.feature_extraction import FeatureHasher
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -210,9 +218,7 @@ sess = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvide
 
 got = sess.run(
     None,
-    dict(
-        cat1=df["Cat1"].values.reshape((-1, 1)), cat2=df["Cat2"].values.reshape((-1, 1))
-    ),
+    dict(cat1=df[["Cat1"]].values, cat2=df[["Cat2"]].values),
 )
 
 
@@ -268,20 +274,27 @@ expected = pipe_hash.transform(X_train)
 
 
 so = SessionOptions()
-so.register_custom_ops_library(get_library_path())
-sess = InferenceSession(onx.SerializeToString(), so, providers=["CPUExecutionProvider"])
+if get_library_path:
+    so.register_custom_ops_library(get_library_path())
+    sess = InferenceSession(
+        onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
+    )
 
-# We merged both columns cat1 and cat2 into a single cat_features.
-df_fixed = DataFrame()
-df_fixed["cat_features"] = np.array([f"{a}#{b}" for a, b in X_train["cat_features"]])
+    # We merged both columns cat1 and cat2 into a single cat_features.
+    df_fixed = DataFrame()
+    df_fixed["cat_features"] = np.array(
+        [f"{a}#{b}" for a, b in X_train["cat_features"]]
+    )
 
-got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
+    got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
 
-print("expected original hashed features")
-print(expected)
+    print("expected original hashed features")
+    print(expected)
 
-print("onnx fixed original hashed features")
-print(got[0])
+    print("onnx fixed original hashed features")
+    print(got[0])
+else:
+    print("onnxruntime-extensions is missing, cannot do this.")
 
 ############################################
 # It works now.
@@ -325,16 +338,20 @@ onx = to_onnx(
 )
 
 so = SessionOptions()
-so.register_custom_ops_library(get_library_path())
-sess = InferenceSession(onx.SerializeToString(), so, providers=["CPUExecutionProvider"])
-got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
+if get_library_path:
+    so.register_custom_ops_library(get_library_path())
+    sess = InferenceSession(
+        onx.SerializeToString(), so, providers=["CPUExecutionProvider"]
+    )
+    got = sess.run(None, {"cat_features": df_fixed[["cat_features"]].values})
 
+    print("expected probabilies")
+    print(expected)
 
-print("expected probabilies")
-print(expected)
-
-print("onnx probabilies")
-print(got[1])
+    print("onnx probabilies")
+    print(got[1])
+else:
+    print("onnxruntime-extensions is missing, cannot do this.")
 
 ###########################################
 # scikit-learn keeps the sparse outputs from

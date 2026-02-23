@@ -445,7 +445,8 @@ def convert_sklearn_ada_boost_classifier(
             this_operator.outputs.append(var_name)
             proba_name = var_name
 
-        if op.algorithm == "SAMME.R":
+        if hasattr(op, "algorithm") and op.algorithm == "SAMME.R":
+            # remove in https://github.com/scikit-learn/scikit-learn/pull/29997
             cur_proba_name = _samme_r_proba(
                 scope, container, proba_name.onnx_name, len(classes), dtype, proto_dtype
             )

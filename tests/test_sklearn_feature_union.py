@@ -14,7 +14,6 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
 
-
 ort_version = ort_version.split("+")[0]
 
 

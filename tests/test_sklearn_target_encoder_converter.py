@@ -150,10 +150,7 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         )
         got = sess.run(
             None,
-            {
-                "cat": data["cat"].values.reshape((-1, 1)),
-                "num": data["num"].values.reshape((-1, 1)),
-            },
+            {"cat": data[["cat"]].values, "num": data[["num"]].values},
         )
         assert_almost_equal(expected, got[0].ravel())
 
@@ -198,9 +195,9 @@ class TestSklearnTargetEncoderConverter(unittest.TestCase):
         got = sess.run(
             None,
             {
-                "C1": data["C1"].values.reshape((-1, 1)),
-                "C2": data["C2"].values.reshape((-1, 1)),
-                "num": data["num"].values.reshape((-1, 1)),
+                "C1": data[["C1"]].values,
+                "C2": data[["C2"]].values,
+                "num": data[["num"]].values,
             },
         )
         assert_almost_equal(expected, got[0].ravel())

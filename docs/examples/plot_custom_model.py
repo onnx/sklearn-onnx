@@ -234,7 +234,7 @@ def plot_embedding(Xp, y, imgs, title=None, figsize=(12, 4)):
     x_min, x_max = numpy.min(Xp, 0), numpy.max(Xp, 0)
     X = (Xp - x_min) / (x_max - x_min)
 
-    fig, ax = plt.subplots(1, 2, figsize=figsize)
+    _fig, ax = plt.subplots(1, 2, figsize=figsize)
     for i in range(X.shape[0]):
         ax[0].text(
             X[i, 0],
