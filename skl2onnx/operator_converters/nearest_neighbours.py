@@ -155,6 +155,7 @@ def onnx_nearest_neighbors_indices_radius(
     keep_distances=False,
     optim=None,
     proto_dtype=None,
+    outlier_label=None,
     **kwargs,
 ):
     """
@@ -168,6 +169,7 @@ def onnx_nearest_neighbors_indices_radius(
     :param keep_distance: returns the distances as well (second position)
     :param optim: implements specific optimisations,
         ``'cdist'`` replaces *Scan* operator by operator *CDist*
+    param outlier_label:
     :param kwargs: additional parameters for function @see fn onnx_cdist
     :return: 3 squares matrices, indices or -1, distance or 0,
         based on the fact that the distance is below the radius,
@@ -200,6 +202,8 @@ def onnx_nearest_neighbors_indices_radius(
     zero = OnnxCast(
         OnnxConstantOfShape(shape, op_version=opv), op_version=opv, to=proto_dtype
     )
+
+    # if outlier_label is None, -1 fails ArrayFeatureExtractor.
     tensor_value = py_make_float_array(-1, dtype=dtype, as_tensor=True)
     minus = OnnxCast(
         OnnxConstantOfShape(shape, op_version=opv, value=tensor_value),
@@ -325,6 +329,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
             keep_distances=True,
             proto_dtype=proto_type,
             optim=options.get("optim", None),
+            outlier_label=op.outlier_label_,
             **distance_kwargs,
         )
         top_indices, top_distances, binary = three
