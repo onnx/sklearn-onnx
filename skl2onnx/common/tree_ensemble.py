@@ -240,7 +240,7 @@ def get_left_categories_from_bitset(bitset):
         for bit_idx in range(32):
             if word & (1 << bit_idx):
                 categories.append(float(word_idx * 32 + bit_idx))
-    return categories
+    return sorted(categories)
 
 
 def add_tree_to_attribute_pairs_hist_gradient_boosting(

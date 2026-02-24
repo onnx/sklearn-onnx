@@ -271,9 +271,9 @@ def _build_hgb_tree_ensemble(scope, container, op, preprocessed_name, dtype, n_t
                     membership_values_list.append(left_cats)
                 else:
                     mode = 0  # BRANCH_LEQ
-                    try:
+                    if "threshold" in node.dtype.names:
                         split_val = float(node["threshold"])
-                    except (ValueError, KeyError):
+                    else:
                         split_val = float(node["num_threshold"])
 
                 all_nodes_modes.append(mode)
