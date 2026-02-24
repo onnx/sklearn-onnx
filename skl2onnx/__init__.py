@@ -15,7 +15,7 @@ __max_supported_opset__ = 22  # Converters are tested up to this version.
 
 from .convert import convert_sklearn, to_onnx, wrap_as_onnx_mixin
 from ._supported_operators import update_registered_converter, get_model_alias
-from ._parse import update_registered_parser
+from ._parse import update_registered_parser, parse_sklearn_submodel
 from .proto import get_latest_tested_opset_version
 
 
