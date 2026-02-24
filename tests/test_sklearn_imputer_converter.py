@@ -24,6 +24,11 @@ except ImportError:
     # changed in 0.20
     SimpleImputer = None
 
+try:
+    from sklearn.impute import IterativeImputer
+except ImportError:
+    IterativeImputer = None
+
 from onnxruntime import __version__ as ort_version
 
 from skl2onnx.sklapi import CastTransformer
@@ -382,6 +387,71 @@ class TestSklearnImputerConverter(unittest.TestCase):
         self.assertIsNotNone(model_onnx.graph.node)
         self.assertEqual(len(model_onnx.graph.output), 1)
         self._check_outputs_strings(model, model_onnx, data)
+
+
+@unittest.skipIf(IterativeImputer is None, reason="IterativeImputer not available")
+class TestSklearnIterativeImputerConverter(unittest.TestCase):
+    def _run_test(self, model, data, decimal=4):
+        X = np.array(data, dtype=np.float32)
+        model_onnx = convert_sklearn(
+            model,
+            "iterative_imputer",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx.graph.node)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"],
+        )
+        result = sess.run(None, {"input": X})[0]
+        expected = model.transform(X).astype(np.float32)
+        assert_almost_equal(expected, result, decimal=decimal)
+
+    def test_iterative_imputer_default(self):
+        model = IterativeImputer(random_state=0)
+        data = [[1, 2], [np.nan, 3], [7, 6]]
+        model.fit(data)
+        self._run_test(model, data)
+
+    def test_iterative_imputer_some_missing(self):
+        model = IterativeImputer(random_state=0, max_iter=2)
+        data = [[1, 2, 3], [np.nan, 3, 5], [7, 6, np.nan], [4, np.nan, 2]]
+        model.fit(data)
+        self._run_test(model, data)
+
+    def test_iterative_imputer_no_missing_in_test(self):
+        """Transform data with no missing values (pass through unchanged)."""
+        model = IterativeImputer(random_state=0)
+        train = [[1, 2], [np.nan, 3], [7, 6]]
+        model.fit(train)
+        test = [[2, 3], [5, 6], [1, 4]]
+        self._run_test(model, test)
+
+    def test_iterative_imputer_in_pipeline(self):
+        model = Pipeline(
+            [
+                ("imputer", IterativeImputer(random_state=0, max_iter=1)),
+                ("dt", DecisionTreeRegressor(max_depth=2)),
+            ]
+        )
+        data = np.array([[1, 2], [np.nan, 3], [7, 6]], dtype=np.float32)
+        y = [0, 1, 0]
+        model.fit(data, y)
+        model_onnx = convert_sklearn(
+            model,
+            "iterative_imputer_pipeline",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx.graph.node)
+        sess = InferenceSession(
+            model_onnx.SerializeToString(),
+            providers=["CPUExecutionProvider"],
+        )
+        result = sess.run(None, {"input": data})[0]
+        expected = model.predict(data).reshape(-1, 1).astype(np.float32)
+        assert_almost_equal(expected, result, decimal=4)
 
 
 if __name__ == "__main__":
