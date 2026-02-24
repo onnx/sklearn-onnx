@@ -114,9 +114,9 @@ class TestSklearnSplineTransformer(unittest.TestCase):
     def test_spline_transformer_extrapolation_constant(self):
         """Test extrapolation='constant' with out-of-range values."""
         X_train = self._get_train_data()
-        model = SplineTransformer(
-            n_knots=4, degree=3, extrapolation="constant"
-        ).fit(X_train)
+        model = SplineTransformer(n_knots=4, degree=3, extrapolation="constant").fit(
+            X_train
+        )
         rng = np.random.default_rng(0)
         X_test = np.vstack(
             [
@@ -141,9 +141,9 @@ class TestSklearnSplineTransformer(unittest.TestCase):
     def test_spline_transformer_extrapolation_linear(self):
         """Test extrapolation='linear' with out-of-range values."""
         X_train = self._get_train_data()
-        model = SplineTransformer(
-            n_knots=4, degree=3, extrapolation="linear"
-        ).fit(X_train)
+        model = SplineTransformer(n_knots=4, degree=3, extrapolation="linear").fit(
+            X_train
+        )
         rng = np.random.default_rng(0)
         X_test = np.vstack(
             [
@@ -168,9 +168,9 @@ class TestSklearnSplineTransformer(unittest.TestCase):
     def test_spline_transformer_extrapolation_continue(self):
         """Test extrapolation='continue' (polynomial extension)."""
         X_train = self._get_train_data()
-        model = SplineTransformer(
-            n_knots=4, degree=3, extrapolation="continue"
-        ).fit(X_train)
+        model = SplineTransformer(n_knots=4, degree=3, extrapolation="continue").fit(
+            X_train
+        )
         rng = np.random.default_rng(0)
         X_test = np.vstack(
             [
@@ -195,9 +195,9 @@ class TestSklearnSplineTransformer(unittest.TestCase):
     def test_spline_transformer_extrapolation_periodic(self):
         """Test extrapolation='periodic'."""
         X_train = self._get_train_data()
-        model = SplineTransformer(
-            n_knots=5, degree=2, extrapolation="periodic"
-        ).fit(X_train)
+        model = SplineTransformer(n_knots=5, degree=2, extrapolation="periodic").fit(
+            X_train
+        )
         rng = np.random.default_rng(0)
         X_test = np.vstack(
             [

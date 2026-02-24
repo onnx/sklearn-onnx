@@ -20,7 +20,7 @@ from onnx import TensorProto
 from ..common._registration import register_converter
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_numpy_type, guess_proto_type
+from ..common.data_types import guess_numpy_type
 from ..algebra.onnx_ops import (
     OnnxAdd,
     OnnxSub,
@@ -190,9 +190,7 @@ def convert_sklearn_spline_transformer(
 
         # Extract feature column: shape [n_samples, 1] then flatten to [n_samples].
         col_2d = OnnxGather(X, np.array(f_idx, dtype=np.int64), axis=1, op_version=opv)
-        x_col = OnnxReshape(
-            col_2d, np.array([-1], dtype=np.int64), op_version=opv
-        )
+        x_col = OnnxReshape(col_2d, np.array([-1], dtype=np.int64), op_version=opv)
 
         if extrapolation == "periodic":
             n_valid = m - k - 1
@@ -200,17 +198,19 @@ def convert_sklearn_spline_transformer(
             if period > 0:
                 # x_mapped = xmin + (x - xmin) % period
                 # Using: a % b = a - b * floor(a / b)
-                x_shifted = OnnxSub(x_col, np.array([xmin], dtype=dtype), op_version=opv)
-                x_div = OnnxDiv(x_shifted, np.array([period], dtype=dtype), op_version=opv)
+                x_shifted = OnnxSub(
+                    x_col, np.array([xmin], dtype=dtype), op_version=opv
+                )
+                x_div = OnnxDiv(
+                    x_shifted, np.array([period], dtype=dtype), op_version=opv
+                )
                 x_floor = OnnxFloor(x_div, op_version=opv)
                 x_mod = OnnxSub(
                     x_shifted,
                     OnnxMul(np.array([period], dtype=dtype), x_floor, op_version=opv),
                     op_version=opv,
                 )
-                x_col = OnnxAdd(
-                    np.array([xmin], dtype=dtype), x_mod, op_version=opv
-                )
+                x_col = OnnxAdd(np.array([xmin], dtype=dtype), x_mod, op_version=opv)
                 x_col = OnnxReshape(
                     x_col, np.array([-1], dtype=np.int64), op_version=opv
                 )
@@ -245,9 +245,7 @@ def convert_sklearn_spline_transformer(
             f_max = spl(xmax_f64).astype(dtype)  # [n_splines]
 
             # Reshape x_col to [n_samples, 1] for broadcasting.
-            x_2d = OnnxReshape(
-                x_col, np.array([-1, 1], dtype=np.int64), op_version=opv
-            )
+            x_2d = OnnxReshape(x_col, np.array([-1, 1], dtype=np.int64), op_version=opv)
             below = OnnxLess(x_2d, np.array([[xmin]], dtype=dtype), op_version=opv)
             above = OnnxNot(
                 OnnxLessOrEqual(x_2d, np.array([[xmax]], dtype=dtype), op_version=opv),
@@ -271,9 +269,7 @@ def convert_sklearn_spline_transformer(
             # For degree <= 1 sklearn widens the extrapolation range by 1.
             deg = degree if degree > 1 else degree + 1
 
-            x_2d = OnnxReshape(
-                x_col, np.array([-1, 1], dtype=np.int64), op_version=opv
-            )
+            x_2d = OnnxReshape(x_col, np.array([-1, 1], dtype=np.int64), op_version=opv)
             below = OnnxLess(x_2d, np.array([[xmin]], dtype=dtype), op_version=opv)
             above = OnnxNot(
                 OnnxLessOrEqual(x_2d, np.array([[xmax]], dtype=dtype), op_version=opv),
@@ -295,9 +291,7 @@ def convert_sklearn_spline_transformer(
 
             # extrap_below[j] = f_min_masked[j] + (x - xmin) * fp_min_masked[j]
             # Broadcasting: [n_samples, 1] * [1, n_splines] -> [n_samples, n_splines]
-            dx_below = OnnxSub(
-                x_2d, np.array([[xmin]], dtype=dtype), op_version=opv
-            )
+            dx_below = OnnxSub(x_2d, np.array([[xmin]], dtype=dtype), op_version=opv)
             extrap_below = OnnxAdd(
                 f_min_masked.reshape(1, -1),
                 OnnxMul(dx_below, fp_min_masked.reshape(1, -1), op_version=opv),
@@ -305,9 +299,7 @@ def convert_sklearn_spline_transformer(
             )
 
             # extrap_above[j] = f_max_masked[j] + (x - xmax) * fp_max_masked[j]
-            dx_above = OnnxSub(
-                x_2d, np.array([[xmax]], dtype=dtype), op_version=opv
-            )
+            dx_above = OnnxSub(x_2d, np.array([[xmax]], dtype=dtype), op_version=opv)
             extrap_above = OnnxAdd(
                 f_max_masked.reshape(1, -1),
                 OnnxMul(dx_above, fp_max_masked.reshape(1, -1), op_version=opv),
