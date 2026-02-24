@@ -235,6 +235,12 @@ except ImportError:
     # New in 0.22
     KNNImputer = None
 try:
+    from sklearn.experimental import enable_iterative_imputer  # noqa
+    from sklearn.impute import IterativeImputer
+except ImportError:
+    # Not available in older versions
+    IterativeImputer = None
+try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
     # not available in 0.19
@@ -422,6 +428,7 @@ def build_sklearn_operator_name_map():
             Imputer,
             IncrementalPCA,
             IsolationForest,
+            IterativeImputer,
             KMeans,
             LabelBinarizer,
             LabelEncoder,
