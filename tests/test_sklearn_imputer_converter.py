@@ -25,7 +25,6 @@ except ImportError:
     SimpleImputer = None
 
 try:
-    from sklearn.experimental import enable_iterative_imputer  # noqa
     from sklearn.impute import IterativeImputer
 except ImportError:
     IterativeImputer = None
