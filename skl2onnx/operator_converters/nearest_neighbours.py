@@ -222,7 +222,17 @@ def onnx_nearest_neighbors_indices_radius(
 
     dist_only = OnnxWhere(less, dist, zero, op_version=opv)
     dist_only.set_onnx_name_prefix("nndist")
-    indices = OnnxWhere(less, minus_range, minus, op_version=opv)
+    if outlier_label is None:
+        # -1 fails ArrayFeatureExtractor; use 0 as a safe fallback index
+        # when no outlier label is defined (binary mask will zero out these values)
+        zero_int = OnnxCast(
+            OnnxConstantOfShape(shape, op_version=opv),
+            op_version=opv,
+            to=onnx_proto.TensorProto.INT64,
+        )
+        indices = OnnxWhere(less, minus_range, zero_int, op_version=opv)
+    else:
+        indices = OnnxWhere(less, minus_range, minus, op_version=opv)
     indices.set_onnx_name_prefix("nnind")
     binary = OnnxCast(less, to=proto_dtype, op_version=opv)
     binary.set_onnx_name_prefix("nnbin")
@@ -329,7 +339,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
             keep_distances=True,
             proto_dtype=proto_type,
             optim=options.get("optim", None),
-            outlier_label=op.outlier_label_,
+            outlier_label=op.outlier_label_ if hasattr(op, "outlier_label_") else None,
             **distance_kwargs,
         )
         top_indices, top_distances, binary = three
