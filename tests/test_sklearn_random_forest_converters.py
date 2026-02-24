@@ -543,9 +543,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         X_train, X_test, y_train, _ = train_test_split(
             X, y, test_size=0.5, random_state=42
         )
-        model = HistGradientBoostingRegressor(
-            max_iter=50, max_depth=5, random_state=42
-        )
+        model = HistGradientBoostingRegressor(max_iter=50, max_depth=5, random_state=42)
         model.fit(X_train, y_train)
 
         model_onnx = convert_sklearn(
@@ -579,8 +577,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         threshold truncation (GitHub issue: HGB significant discrepancies)."""
         numpy.random.seed(42)
         X, y = make_classification(
-            n_samples=1000, n_features=10, n_informative=5,
-            n_classes=2, random_state=42
+            n_samples=1000, n_features=10, n_informative=5, n_classes=2, random_state=42
         )
         X = X.astype(numpy.float32)
         X_train, X_test, y_train, _ = train_test_split(
