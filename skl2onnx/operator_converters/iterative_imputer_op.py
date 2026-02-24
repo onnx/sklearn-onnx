@@ -60,9 +60,7 @@ def convert_sklearn_iterative_imputer(
         )
     else:
         mv_name = scope.get_unique_variable_name("missing_val")
-        container.add_initializer(
-            mv_name, proto_type, [], [dtype(missing_values)]
-        )
+        container.add_initializer(mv_name, proto_type, [], [dtype(missing_values)])
         container.add_node(
             "Equal",
             [X_orig_name, mv_name],
@@ -72,9 +70,7 @@ def convert_sklearn_iterative_imputer(
 
     # Step 1: Initial imputation using initial_imputer_ (a SimpleImputer).
     # _parse_sklearn declares the sub-operator which will be converted later.
-    init_imp_outputs = _parse_sklearn(
-        scope, op.initial_imputer_, operator.inputs
-    )
+    init_imp_outputs = _parse_sklearn(scope, op.initial_imputer_, operator.inputs)
     current_x_name = init_imp_outputs[0].full_name
 
     # Precompute per-feature constants that are reused across iterations.
@@ -83,9 +79,9 @@ def convert_sklearn_iterative_imputer(
     # with 0 at feat_idx.  These are constant and shared across all steps
     # that target the same feature.
     unique_feat_indices = {int(t.feat_idx) for t in op.imputation_sequence_}
-    col_idx_names = {}   # feat_idx -> initializer name holding [feat_idx]
+    col_idx_names = {}  # feat_idx -> initializer name holding [feat_idx]
     upd_mask_names = {}  # feat_idx -> initializer name for update mask
-    kp_mask_names = {}   # feat_idx -> initializer name for keep mask
+    kp_mask_names = {}  # feat_idx -> initializer name for keep mask
 
     for fi in sorted(unique_feat_indices):
         col_idx_name = scope.get_unique_variable_name("col_idx_f%d" % fi)
@@ -119,7 +115,7 @@ def convert_sklearn_iterative_imputer(
         )
         kp_mask_names[fi] = kp_mask_name
 
-    # Step 2: Unroll all (iteration × feature) steps from imputation_sequence_.
+    # Step 2: Unroll all (iteration x feature) steps from imputation_sequence_.
     # sklearn stores the full sequence for all iterations so we iterate once.
     for step_idx, triplet in enumerate(op.imputation_sequence_):
         feat_idx = int(triplet.feat_idx)
@@ -152,13 +148,13 @@ def convert_sklearn_iterative_imputer(
         # --- Apply sub-estimator to get predictions ---
         try:
             est_op_type = sklearn_operator_name_map[type(estimator)]
-        except KeyError:
+        except KeyError as e:
             raise RuntimeError(
-                "IterativeImputer uses estimator %r which is not supported "
-                "by sklearn-onnx. You may raise an issue at "
-                "https://github.com/onnx/sklearn-onnx/issues."
-                % type(estimator).__name__
-            )
+                f"IterativeImputer uses estimator {estimator.__class__.__name__!r} "
+                f"which is not supported "
+                f"by sklearn-onnx. You may raise an issue at "
+                f"https://github.com/onnx/sklearn-onnx/issues."
+            ) from e
         est_operator = scope.declare_local_operator(est_op_type, estimator)
         est_operator.inputs.append(nb_x_var)
 
@@ -243,6 +239,4 @@ def convert_sklearn_iterative_imputer(
     )
 
 
-register_converter(
-    "SklearnIterativeImputer", convert_sklearn_iterative_imputer
-)
+register_converter("SklearnIterativeImputer", convert_sklearn_iterative_imputer)

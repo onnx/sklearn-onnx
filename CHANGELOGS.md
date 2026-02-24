@@ -2,6 +2,9 @@
 
 ## 1.21.0
 
+* Add converter for IterativeImputer
+  [#1230](https://github.com/onnx/sklearn-onnx/issues/1230)
+
 ## 1.20.0
 
 * Update CI to scikit-learn==1.8.0
