@@ -36,7 +36,6 @@ class TestInvestigate2025(unittest.TestCase):
         )
         self.assertTrue(onnx_model is not None)
 
-
     @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
     def test_issue_1197_elasticnet_dataframe(self):
         # https://github.com/onnx/sklearn-onnx/issues/1197
