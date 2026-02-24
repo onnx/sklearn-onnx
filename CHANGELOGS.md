@@ -2,7 +2,12 @@
 
 ## 1.21.0
 
+* Fix to_onnx failure on LinearRegressor with multi-column DataFrame input [#1234](https://github.com/onnx/sklearn-onnx/issues/1234)
+* Add converter for IterativeImputer [#1230](https://github.com/onnx/sklearn-onnx/issues/1230)
+* Fix float64+OHE mixed ColumnTransformer input type inference regression [#1229](https://github.com/onnx/sklearn-onnx/issues/1229)
 * Fix converter for RadiusNeighborsClassifier, RadiusNeighborsRegressor [#1219](https://github.com/onnx/sklearn-onnx/issues/1219)
+* Add ONNX converter for SplineTransformer [#1228](https://github.com/onnx/sklearn-onnx/issues/1228)
+
 
 ## 1.20.0
 

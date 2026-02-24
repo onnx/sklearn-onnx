@@ -17,6 +17,7 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder, FunctionTransfo
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
+    DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
     StringTensorType,
@@ -178,6 +179,46 @@ class TestConcatOutputType(unittest.TestCase):
         assert (
             out_type == right_type
         ), "The `concat` output does not have the expected output type."
+
+    @unittest.skipIf(ColumnTransformer is None, reason="too old scikit-learn")
+    def test_concat_float64_float32_output_type(self):
+        # Regression test: float64 numeric inputs mixed with float32 OHE outputs
+        # should produce float32 concat output, not float64.
+        # In version 1.14.1+, this was broken: DoubleTensorType was preferred
+        # over FloatTensorType, causing tree models (XGBoost, etc.) to receive
+        # float64 inputs instead of float32, resulting in score mismatches.
+        data_dict = {
+            "num": [1.0, 2.0, 3.0],
+            "cat": ["a", "b", "a"],
+        }
+        data = pd.DataFrame.from_dict(data_dict)
+
+        col_transformer = ColumnTransformer(
+            transformers=[
+                ("num", "passthrough", ["num"]),
+                ("cat", OneHotEncoder(), ["cat"]),
+            ],
+        )
+        col_transformer.fit(data)
+
+        # num column as float64, cat column as string
+        initial_types = [
+            ("num", DoubleTensorType([None, 1])),
+            ("cat", StringTensorType([None, 1])),
+        ]
+
+        onx = convert_sklearn(
+            col_transformer, initial_types=initial_types, target_opset=TARGET_OPSET
+        )
+
+        # The concat output should be float32, not float64,
+        # so that tree models (XGBoost, etc.) receive float32 inputs.
+        out_type = onx.graph.output[0].type.tensor_type.elem_type
+        right_type = FloatTensorType().to_onnx_type().tensor_type.elem_type
+        assert out_type == right_type, (
+            "Mixed float64/float32 concat should produce float32 output, "
+            "got elem_type={} instead of {}.".format(out_type, right_type)
+        )
 
 
 if __name__ == "__main__":
