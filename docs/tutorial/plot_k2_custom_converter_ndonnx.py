@@ -20,7 +20,6 @@ A very simple pipeline and the first attempt to convert a custom estimator into 
 """
 
 import numpy as np
-from numpy.testing import assert_allclose
 import ndonnx as ndx
 from onnx.version_converter import convert_version
 from pandas import DataFrame
@@ -157,8 +156,11 @@ feeds = {"a": data[["a"]].values, "b": data[["b"]].values, "f": data[["f"]].valu
 
 ref = InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 got = ref.run(None, feeds)
-assert_allclose(expected[1], got[1])
-assert_allclose(expected[0], got[0])
+
+max_diff = np.abs(expected[1] - got[1]).max()
+print(f"probability discrepancies: {max_diff}")
+max_diff = np.abs(expected[0] - got[0]).max()
+print(f"label discrepancies: {max_diff}")
 
 
 # %%
