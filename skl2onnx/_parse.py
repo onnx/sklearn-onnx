@@ -753,7 +753,9 @@ def parse_sklearn_submodel(scope, model, inputs, custom_parsers=None, alias=None
 
         update_registered_parser(MyMetaEstimator, my_meta_estimator_parser)
     """
-    return _parse_sklearn(scope, model, inputs, custom_parsers=custom_parsers, alias=alias)
+    return _parse_sklearn(
+        scope, model, inputs, custom_parsers=custom_parsers, alias=alias
+    )
 
 
 def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
