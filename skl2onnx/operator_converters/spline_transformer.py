@@ -162,9 +162,6 @@ def convert_sklearn_spline_transformer(
     dtype = guess_numpy_type(op_in.type)
     if dtype != np.float64:
         dtype = np.float32
-    proto_dtype = guess_proto_type(op_in.type)
-    if proto_dtype != TensorProto.DOUBLE:
-        proto_dtype = TensorProto.FLOAT
 
     n_features = op.n_features_in_
     n_splines = op.bsplines_[0].c.shape[1]
