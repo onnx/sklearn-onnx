@@ -286,6 +286,12 @@ except ImportError:
     QuantileTransformer = None
 
 try:
+    from sklearn.preprocessing import SplineTransformer
+except ImportError:
+    # Not available in scikit-learn < 1.0
+    SplineTransformer = None
+
+try:
     from sklearn.ensemble import (
         HistGradientBoostingClassifier,
         HistGradientBoostingRegressor,
@@ -480,6 +486,7 @@ def build_sklearn_operator_name_map():
             SGDClassifier,
             SGDOneClassSVM,
             SimpleImputer,
+            SplineTransformer,
             StackingClassifier,
             StackingRegressor,
             SVC,

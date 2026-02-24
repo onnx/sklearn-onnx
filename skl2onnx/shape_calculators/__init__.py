@@ -46,6 +46,7 @@ from . import random_trees_embedding
 from . import replace_op
 from . import scaler
 from . import sequence
+from . import spline_transformer
 from . import sgd_oneclass_svm
 from . import svd
 from . import support_vector_machines
@@ -101,6 +102,7 @@ __all__ = [
     replace_op,
     scaler,
     sequence,
+    spline_transformer,
     sgd_oneclass_svm,
     svd,
     support_vector_machines,
