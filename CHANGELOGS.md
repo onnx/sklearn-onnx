@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix converter for RadiusNeighborsClassifier, RadiusNeighborsRegressor [#1219](https://github.com/onnx/sklearn-onnx/issues/1219)
+
 ## 1.20.0
 
 * Update CI to scikit-learn==1.8.0

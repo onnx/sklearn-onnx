@@ -155,6 +155,7 @@ def onnx_nearest_neighbors_indices_radius(
     keep_distances=False,
     optim=None,
     proto_dtype=None,
+    outlier_label=None,
     **kwargs,
 ):
     """
@@ -168,11 +169,16 @@ def onnx_nearest_neighbors_indices_radius(
     :param keep_distance: returns the distances as well (second position)
     :param optim: implements specific optimisations,
         ``'cdist'`` replaces *Scan* operator by operator *CDist*
+    param outlier_label:
     :param kwargs: additional parameters for function @see fn onnx_cdist
     :return: 3 squares matrices, indices or -1, distance or 0,
         based on the fact that the distance is below the radius,
         binary weights
     """
+    if outlier_label is not None:
+        raise NotImplementedError(
+            f"The convertor for is not implemented when {outlier_label=}."
+        )
     opv = op_version
     if optim == "cdist":
         from skl2onnx.algebra.custom_ops import OnnxCDist
@@ -200,6 +206,7 @@ def onnx_nearest_neighbors_indices_radius(
     zero = OnnxCast(
         OnnxConstantOfShape(shape, op_version=opv), op_version=opv, to=proto_dtype
     )
+
     tensor_value = py_make_float_array(-1, dtype=dtype, as_tensor=True)
     minus = OnnxCast(
         OnnxConstantOfShape(shape, op_version=opv, value=tensor_value),
@@ -315,6 +322,10 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
         )
         top_distances = None
     elif radius is not None:
+        if training_labels is None:
+            raise NotImplementedError(
+                f"Missing training_labels, these are needed to convert {type(op)}."
+            )
         three = onnx_nearest_neighbors_indices_radius(
             X,
             neighb,
@@ -325,6 +336,7 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
             keep_distances=True,
             proto_dtype=proto_type,
             optim=options.get("optim", None),
+            outlier_label=getattr(op, "outlier_label_", None),
             **distance_kwargs,
         )
         top_indices, top_distances, binary = three
@@ -364,12 +376,24 @@ def _convert_nearest_neighbors(operator, container, k=None, radius=None):
                 "requires opset >= 9."
             )
 
-        if training_labels.dtype == np.int32:
-            training_labels = training_labels.astype(np.int64)
-        flattened = OnnxFlatten(top_indices, op_version=opv)
-        extracted = OnnxArrayFeatureExtractor(
-            training_labels, flattened, op_version=opv
+        new_labels = np.zeros(
+            (*training_labels.shape[:-1], training_labels.shape[-1] + 1),
+            dtype=(
+                training_labels.dtype if training_labels.dtype != np.int32 else np.int64
+            ),
         )
+        new_labels[..., :-1] = training_labels[..., :]
+        new_labels[..., -1] = max(abs(training_labels.max()) * 123456789, 123456789)
+
+        flattened = OnnxFlatten(top_indices, op_version=opv)
+        # There could be negative value for rejected neighbours, we give very high distance.
+        flattened = OnnxWhere(
+            OnnxEqual(flattened, np.array([-1], dtype=np.int64), op_version=opv),
+            np.array([training_labels.shape[-1]], dtype=np.int64),
+            flattened,
+            op_version=opv,
+        )
+        extracted = OnnxArrayFeatureExtractor(new_labels, flattened, op_version=opv)
         reshaped = OnnxReshapeApi13(extracted, shape, op_version=opv)
 
         if ndim > 1:
