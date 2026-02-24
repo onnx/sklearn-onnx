@@ -137,7 +137,9 @@ def calculate_linear_regressor_output_shapes(operator):
 
 
 def _calculate_linear_regressor_output_shapes(operator, enable_type_checking=True):
-    check_input_and_output_numbers(operator, input_count_range=1, output_count_range=1)
+    check_input_and_output_numbers(
+        operator, input_count_range=[1, None], output_count_range=1
+    )
     if enable_type_checking:
         check_input_and_output_types(
             operator,
