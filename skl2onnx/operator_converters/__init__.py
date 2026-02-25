@@ -26,6 +26,7 @@ from . import gradient_boosting
 from . import grid_search_cv
 from . import id_op
 from . import imputer_op
+from . import iterative_imputer_op
 from . import isolation_forest
 from . import kernel_pca
 from . import k_bins_discretiser
@@ -58,6 +59,7 @@ from . import ransac_regressor
 from . import replace_op
 from . import scaler_op
 from . import sequence
+from . import spline_transformer
 from . import sgd_classifier
 from . import sgd_oneclass_svm
 from . import stacking
@@ -95,6 +97,7 @@ __all__ = [
     grid_search_cv,
     id_op,
     imputer_op,
+    iterative_imputer_op,
     isolation_forest,
     kernel_pca,
     k_bins_discretiser,
@@ -127,6 +130,7 @@ __all__ = [
     replace_op,
     scaler_op,
     sequence,
+    spline_transformer,
     sgd_classifier,
     sgd_oneclass_svm,
     stacking,
