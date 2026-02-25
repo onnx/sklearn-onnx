@@ -982,15 +982,13 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         n = 500
         X = numpy.column_stack(
             [
-                rng.uniform(0, 10, n).astype(numpy.float32),   # numerical
+                rng.uniform(0, 10, n).astype(numpy.float32),  # numerical
                 rng.choice([0, 1, 2], n).astype(numpy.float32),  # categorical
-                rng.uniform(0, 5, n).astype(numpy.float32),    # numerical
-                rng.choice([0, 1], n).astype(numpy.float32),   # categorical
+                rng.uniform(0, 5, n).astype(numpy.float32),  # numerical
+                rng.choice([0, 1], n).astype(numpy.float32),  # categorical
             ]
         )
-        y = (
-            X[:, 0] + X[:, 1] * 3 + X[:, 2] * 2 + X[:, 3] * 4
-        ).astype(numpy.float32)
+        y = (X[:, 0] + X[:, 1] * 3 + X[:, 2] * 2 + X[:, 3] * 4).astype(numpy.float32)
 
         model = HistGradientBoostingRegressor(
             categorical_features=[1, 3], max_iter=10, max_depth=3

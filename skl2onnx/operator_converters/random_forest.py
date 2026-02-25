@@ -87,7 +87,9 @@ def _build_hgb_categorical_preproc(scope, container, operator, op, dtype):
 
         # Flatten to 1-D for LabelEncoder
         col_flat_name = scope.get_unique_variable_name(f"cat_col_flat_{orig_col}")
-        apply_reshape(scope, col_raw_name, col_flat_name, container, desired_shape=(-1,))
+        apply_reshape(
+            scope, col_raw_name, col_flat_name, container, desired_shape=(-1,)
+        )
 
         # Apply LabelEncoder: known -> index; unknown -> NaN
         keys = categories.tolist()
@@ -120,7 +122,9 @@ def _build_hgb_categorical_preproc(scope, container, operator, op, dtype):
 
         # Reshape back to [N, 1]
         col_2d_name = scope.get_unique_variable_name(f"cat_col_2d_{orig_col}")
-        apply_reshape(scope, col_encoded_name, col_2d_name, container, desired_shape=(-1, 1))
+        apply_reshape(
+            scope, col_encoded_name, col_2d_name, container, desired_shape=(-1, 1)
+        )
         output_parts.append(col_2d_name)
 
     # ------------------------------------------------------------------
@@ -160,7 +164,9 @@ def _build_hgb_categorical_preproc(scope, container, operator, op, dtype):
     return preprocessed_name
 
 
-def _build_hgb_tree_ensemble(scope, container, op, preprocessed_name, dtype, n_targets=1):
+def _build_hgb_tree_ensemble(
+    scope, container, op, preprocessed_name, dtype, n_targets=1
+):
     """Build a ``TreeEnsemble`` (ai.onnx.ml opset 5) node for an HGB predictor.
 
     This supports both numerical splits (BRANCH_LEQ) and categorical splits
@@ -373,7 +379,11 @@ def _build_hgb_tree_ensemble(scope, container, op, preprocessed_name, dtype, n_t
     baseline_name = scope.get_unique_variable_name("hgb_baseline")
     container.add_initializer(
         baseline_name,
-        onnx_proto.TensorProto.FLOAT if dtype == np.float32 else onnx_proto.TensorProto.DOUBLE,
+        (
+            onnx_proto.TensorProto.FLOAT
+            if dtype == np.float32
+            else onnx_proto.TensorProto.DOUBLE
+        ),
         baseline.shape,
         baseline.tolist(),
     )
@@ -540,8 +550,11 @@ def convert_sklearn_random_forest_classifier(
             ones_name = scope.get_unique_variable_name("hgb_cls_ones")
             container.add_initializer(
                 ones_name,
-                onnx_proto.TensorProto.FLOAT if dtype == np.float32
-                else onnx_proto.TensorProto.DOUBLE,
+                (
+                    onnx_proto.TensorProto.FLOAT
+                    if dtype == np.float32
+                    else onnx_proto.TensorProto.DOUBLE
+                ),
                 [],
                 [1.0],
             )
