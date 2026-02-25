@@ -141,7 +141,11 @@ class Variable:
                     onnx_name,
                 )
             else:
-                raise TypeError("onnx_name must be a string not %r." % onnx_name)
+                exc_type = ValueError if isinstance(onnx_name, str) else TypeError
+                raise exc_type(
+                    f"onnx_name must be a string not {onnx_name!r} "
+                    f"and should avoid brackets."
+                )
 
         if type is not None:
             shape = type.shape
