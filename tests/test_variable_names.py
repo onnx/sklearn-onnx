@@ -217,7 +217,6 @@ class TestVariableNames(unittest.TestCase):
         #     onx_data[col[0]] = X[[col[0]]].values
         # sess.run(None, onx_data)
 
-
     def test_input_name_with_dot_preserved(self):
         """Input names with dots (e.g. 'home.dest') must not be silently renamed."""
         scaler = StandardScaler()
