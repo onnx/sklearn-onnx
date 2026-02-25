@@ -89,6 +89,8 @@ def get_default_opset_for_domain(domain):
     if domain == "":
         return main_opset
     if domain == "ai.onnx.ml":
+        if main_opset >= 21:
+            return 5
         if main_opset >= 18:
             return 3
         if main_opset >= 6:

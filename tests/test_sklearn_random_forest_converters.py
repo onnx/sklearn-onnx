@@ -915,6 +915,196 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         assert exp_path == got_path.ravel().tolist()
         assert exp_leaf.tolist() == res[3].tolist()
 
+    # ------------------------------------------------------------------
+    # Tests for HistGradientBoosting with categorical_features
+    # ------------------------------------------------------------------
+
+    @unittest.skipIf(
+        HistGradientBoostingRegressor is None,
+        reason="scikit-learn 0.24+",
+    )
+    @unittest.skipIf(
+        _sklearn_version() < pv.Version("1.0"),
+        reason="categorical_features requires scikit-learn >= 1.0",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_hgb_regressor_categorical(self):
+        """HGB regressor with categorical_features produces correct ONNX output."""
+        rng = numpy.random.RandomState(42)
+        n = 500
+        X = numpy.column_stack(
+            [
+                rng.uniform(0, 10, n).astype(numpy.float32),
+                rng.choice([0, 1, 2], n).astype(numpy.float32),
+            ]
+        )
+        y = (X[:, 0] + X[:, 1] * 5).astype(numpy.float32)
+
+        model = HistGradientBoostingRegressor(
+            categorical_features=[1], max_iter=10, max_depth=3
+        )
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "HGBRegressorCategorical",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        X_test = X[:20]
+        onnx_pred = sess.run(None, {"input": X_test})[0].ravel()
+        sklearn_pred = model.predict(X_test)
+        assert_almost_equal(onnx_pred, sklearn_pred, decimal=4)
+
+        # Test with unknown category (should be treated as missing)
+        X_unk = numpy.array([[5.0, 99.0]], dtype=numpy.float32)
+        onnx_unk = sess.run(None, {"input": X_unk})[0].ravel()
+        sklearn_unk = model.predict(X_unk)
+        assert_almost_equal(onnx_unk, sklearn_unk, decimal=4)
+
+    @unittest.skipIf(
+        HistGradientBoostingRegressor is None,
+        reason="scikit-learn 0.24+",
+    )
+    @unittest.skipIf(
+        _sklearn_version() < pv.Version("1.0"),
+        reason="categorical_features requires scikit-learn >= 1.0",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_hgb_regressor_categorical_multiple(self):
+        """HGB regressor with multiple categorical features."""
+        rng = numpy.random.RandomState(42)
+        n = 500
+        X = numpy.column_stack(
+            [
+                rng.uniform(0, 10, n).astype(numpy.float32),  # numerical
+                rng.choice([0, 1, 2], n).astype(numpy.float32),  # categorical
+                rng.uniform(0, 5, n).astype(numpy.float32),  # numerical
+                rng.choice([0, 1], n).astype(numpy.float32),  # categorical
+            ]
+        )
+        y = (X[:, 0] + X[:, 1] * 3 + X[:, 2] * 2 + X[:, 3] * 4).astype(numpy.float32)
+
+        model = HistGradientBoostingRegressor(
+            categorical_features=[1, 3], max_iter=10, max_depth=3
+        )
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "HGBRegressorMultiCategorical",
+            [("input", FloatTensorType([None, 4]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        X_test = X[:20]
+        onnx_pred = sess.run(None, {"input": X_test})[0].ravel()
+        sklearn_pred = model.predict(X_test)
+        assert_almost_equal(onnx_pred, sklearn_pred, decimal=4)
+
+    @unittest.skipIf(
+        HistGradientBoostingClassifier is None,
+        reason="scikit-learn 0.24+",
+    )
+    @unittest.skipIf(
+        _sklearn_version() < pv.Version("1.0"),
+        reason="categorical_features requires scikit-learn >= 1.0",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_hgb_classifier_categorical_binary(self):
+        """HGB binary classifier with categorical_features produces correct ONNX output."""
+        rng = numpy.random.RandomState(42)
+        n = 500
+        X = numpy.column_stack(
+            [
+                rng.uniform(0, 10, n).astype(numpy.float32),
+                rng.choice([0, 1, 2], n).astype(numpy.float32),
+            ]
+        )
+        y = (X[:, 0] + X[:, 1] * 2 > 7).astype(int)
+
+        model = HistGradientBoostingClassifier(
+            categorical_features=[1], max_iter=10, max_depth=3
+        )
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "HGBClassifierCategoricalBinary",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        X_test = X[:20]
+        outputs = sess.run(None, {"input": X_test})
+        onnx_labels = outputs[0]
+        onnx_proba = outputs[1]
+        sklearn_labels = model.predict(X_test)
+        sklearn_proba = model.predict_proba(X_test)
+        assert (onnx_labels == sklearn_labels).all()
+        assert_almost_equal(onnx_proba, sklearn_proba, decimal=4)
+
+    @unittest.skipIf(
+        HistGradientBoostingClassifier is None,
+        reason="scikit-learn 0.24+",
+    )
+    @unittest.skipIf(
+        _sklearn_version() < pv.Version("1.0"),
+        reason="categorical_features requires scikit-learn >= 1.0",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_hgb_classifier_categorical_multiclass(self):
+        """HGB multi-class classifier with categorical_features."""
+        rng = numpy.random.RandomState(42)
+        n = 500
+        X = numpy.column_stack(
+            [
+                rng.uniform(0, 10, n).astype(numpy.float32),
+                rng.choice([0, 1, 2], n).astype(numpy.float32),
+            ]
+        )
+        y = numpy.digitize(X[:, 0] + X[:, 1] * 2, [5, 10, 15])
+
+        model = HistGradientBoostingClassifier(
+            categorical_features=[1], max_iter=10, max_depth=3
+        )
+        model.fit(X, y)
+
+        model_onnx = convert_sklearn(
+            model,
+            "HGBClassifierCategoricalMulti",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        X_test = X[:20]
+        outputs = sess.run(None, {"input": X_test})
+        onnx_labels = outputs[0]
+        onnx_proba = outputs[1]
+        sklearn_labels = model.predict(X_test)
+        sklearn_proba = model.predict_proba(X_test)
+        assert (onnx_labels == sklearn_labels).all()
+        assert_almost_equal(onnx_proba, sklearn_proba, decimal=4)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
