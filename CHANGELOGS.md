@@ -2,6 +2,7 @@
 
 ## 1.21.0
 
+* Fix significant output discrepancies in HistGradientBoosting ONNX conversion for float32 inputs [#1227](https://github.com/onnx/sklearn-onnx/issues/1227)
 * Fix input names silently renamed to C-style identifiers, breaking inference [#1235](https://github.com/onnx/sklearn-onnx/issues/1235)
 * Expose parse_sklearn_submodel as public API for meta-estimator parsing [#1233](https://github.com/onnx/sklearn-onnx/issues/1233)
 * Fix to_onnx failure on LinearRegressor with multi-column DataFrame input [#1234](https://github.com/onnx/sklearn-onnx/issues/1234)
