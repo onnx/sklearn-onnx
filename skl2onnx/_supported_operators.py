@@ -83,6 +83,9 @@ from sklearn.discriminant_analysis import (
 # Mixture
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 
+# Dummy estimators
+from sklearn.dummy import DummyClassifier, DummyRegressor
+
 # Multi-class
 from sklearn.multiclass import (
     _ConstantPredictor,
@@ -344,6 +347,7 @@ sklearn_classifier_list = list(
             CalibratedClassifierCV,
             ComplementNB,
             DecisionTreeClassifier,
+            DummyClassifier,
             ExtraTreeClassifier,
             ExtraTreesClassifier,
             GaussianNB,
@@ -407,6 +411,8 @@ def build_sklearn_operator_name_map():
             DictVectorizer,
             DecisionTreeClassifier,
             DecisionTreeRegressor,
+            DummyClassifier,
+            DummyRegressor,
             ExtraTreeClassifier,
             ExtraTreeRegressor,
             ExtraTreesClassifier,
