@@ -526,6 +526,89 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
     def test_model_hgb_classifier_nan_multi(self):
         self.common_test_model_hgb_classifier(True, n_classes=3)
 
+    @unittest.skipIf(
+        HistGradientBoostingRegressor is None,
+        reason="scikit-learn 0.22 + manual activation",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_hgb_regressor_float32_precision(self):
+        """Verify that float32 HGB regressor ONNX output closely matches
+        sklearn, addressing the precision loss caused by float64->float32
+        threshold truncation (GitHub issue: HGB significant discrepancies)."""
+        numpy.random.seed(42)
+        X, y = make_regression(
+            n_features=10, n_samples=1000, n_targets=1, random_state=42
+        )
+        X = X.astype(numpy.float32)
+        X_train, X_test, y_train, _ = train_test_split(
+            X, y, test_size=0.5, random_state=42
+        )
+        model = HistGradientBoostingRegressor(max_iter=50, max_depth=5, random_state=42)
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model,
+            "hgb_regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(model_onnx.SerializeToString())
+        X_test32 = X_test[:50].astype(numpy.float32)
+        skl_pred = model.predict(X_test32)
+        onnx_pred = sess.run(None, {"input": X_test32})[0].ravel()
+
+        # Relative error should be very small (< 1e-4) after the fix.
+        rel_error = numpy.max(
+            numpy.abs(skl_pred - onnx_pred) / (numpy.abs(skl_pred) + 1e-8)
+        )
+        assert rel_error < 1e-4, (
+            f"HGB regressor float32 relative error {rel_error:.2e} too large; "
+            "threshold precision fix may have regressed."
+        )
+
+    @unittest.skipIf(
+        HistGradientBoostingClassifier is None,
+        reason="scikit-learn 0.22 + manual activation",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_hgb_classifier_float32_precision(self):
+        """Verify that float32 HGB classifier ONNX output closely matches
+        sklearn, addressing the precision loss caused by float64->float32
+        threshold truncation (GitHub issue: HGB significant discrepancies)."""
+        numpy.random.seed(42)
+        X, y = make_classification(
+            n_samples=1000, n_features=10, n_informative=5, n_classes=2, random_state=42
+        )
+        X = X.astype(numpy.float32)
+        X_train, X_test, y_train, _ = train_test_split(
+            X, y, test_size=0.5, random_state=42
+        )
+        model = HistGradientBoostingClassifier(
+            max_iter=50, max_depth=5, random_state=42
+        )
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model,
+            "hgb_classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={model.__class__: {"zipmap": False}},
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(model_onnx.SerializeToString())
+        X_test32 = X_test[:50].astype(numpy.float32)
+        skl_proba = model.predict_proba(X_test32)
+        onnx_proba = sess.run(None, {"input": X_test32})[1]
+
+        # Relative error should be very small (< 1e-4) after the fix.
+        rel_error = numpy.max(
+            numpy.abs(skl_proba - onnx_proba) / (numpy.abs(skl_proba) + 1e-8)
+        )
+        assert rel_error < 1e-4, (
+            f"HGB classifier float32 relative error {rel_error:.2e} too large; "
+            "threshold precision fix may have regressed."
+        )
+
     @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_multilabel(self):
         model, X_test = fit_multilabel_classification_model(

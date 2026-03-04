@@ -702,7 +702,7 @@ def convert_sklearn_random_forest_classifier(
             estimator_count = len(op.estimators_)
             tree_weight = 1.0 / estimator_count
         elif hasattr(op, "_predictors"):
-            # HistGradientBoostingRegressor
+            # HistGradientBoostingClassifier
             estimator_count = len(op._predictors)
             tree_weight = 1.0
         else:
@@ -736,7 +736,7 @@ def convert_sklearn_random_forest_classifier(
                         tree_weight,
                         0,
                         False,
-                        False,
+                        adjust_threshold_for_sklearn=hasattr(op, "_predictors"),
                         dtype=dtype,
                     )
                 else:
@@ -749,7 +749,7 @@ def convert_sklearn_random_forest_classifier(
                             tree_weight,
                             cl,
                             False,
-                            False,
+                            adjust_threshold_for_sklearn=hasattr(op, "_predictors"),
                             dtype=dtype,
                         )
 
@@ -1058,7 +1058,15 @@ def convert_sklearn_random_forest_regressor_converter(
                 )
             tree = op._predictors[tree_id][0]
             add_tree_to_attribute_pairs_hist_gradient_boosting(
-                attrs, False, tree, tree_id, tree_weight, 0, False, False, dtype=dtype
+                attrs,
+                False,
+                tree,
+                tree_id,
+                tree_weight,
+                0,
+                False,
+                adjust_threshold_for_sklearn=hasattr(op, "_predictors"),
+                dtype=dtype,
             )
 
     if hasattr(op, "_baseline_prediction"):
