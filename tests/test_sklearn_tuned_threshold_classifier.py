@@ -148,11 +148,13 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
         X, y = make_classification(
             n_samples=1_000, weights=[0.9, 0.1], class_sep=0.8, random_state=42
         )
+        X = X.astype(np.float32)
+        y = y.astype(np.float32)
         X_train, X_test, y_train, _ = train_test_split(
             X, y, stratify=y, random_state=42
         )
         classifier = RandomForestClassifier(random_state=0)
-        model = FixedThresholdClassifier(classifier, threshold=0.4).fit(
+        model = FixedThresholdClassifier(classifier, threshold=np.float32(0.4)).fit(
             X_train, y_train
         )
 
