@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, macos-latest]
-        sklearn_version: ['==1.8.0', '==1.7.1', '==1.6.1' , '==1.5.2', '==1.4.2']
+        sklearn_version: ['==1.8.0', '==1.7.1', '==1.6.1', '==1.5.2', '==1.4.2']
         include:
           - sklearn_version: '==1.8.0'
             python_version: '3.13'
