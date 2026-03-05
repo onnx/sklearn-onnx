@@ -1,10 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from ..common._registration import register_shape_calculator
-from ..common.data_types import (
-    DoubleTensorType,
-    FloatTensorType,
-    Int64TensorType,
+from ..common.data_types import DoubleTensorType, FloatTensorType
 from ..common.shape_calculator import calculate_linear_classifier_output_shapes
 
 

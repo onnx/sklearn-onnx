@@ -6,10 +6,7 @@ import unittest
 import numpy as np
 from sklearn.dummy import DummyClassifier, DummyRegressor
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import (
-    DoubleTensorType,
-    FloatTensorType,
-)
+from skl2onnx.common.data_types import DoubleTensorType, FloatTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
@@ -34,9 +31,7 @@ class TestDummyRegressorConverter(unittest.TestCase):
         X = np.array([[1, 2], [3, 4], [5, 6]], dtype=np.float32)
         model = DummyRegressor(strategy="mean")
         model.fit(X, np.array([1.0, 2.0, 3.0]))
-        self._run_regressor_test(
-            model, X, np.float32, "SklearnDummyRegressorMeanFloat"
-        )
+        self._run_regressor_test(model, X, np.float32, "SklearnDummyRegressorMeanFloat")
 
     def test_dummy_regressor_mean_double(self):
         X = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float64)
