@@ -14,3 +14,7 @@ def tuned_threshold_classifier_shape_calculator(operator):
 register_shape_calculator(
     "SklearnTunedThresholdClassifierCV", tuned_threshold_classifier_shape_calculator
 )
+
+register_shape_calculator(
+    "SklearnFixedThresholdClassifier", tuned_threshold_classifier_shape_calculator
+)

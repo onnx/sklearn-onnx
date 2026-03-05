@@ -4,6 +4,7 @@ import numpy as np
 from ..common._apply_operation import (
     apply_cast,
     apply_add,
+    apply_concat,
     apply_sqrt,
     apply_div,
     apply_sub,
@@ -37,6 +38,16 @@ def convert_sklearn_linear_regressor(
     op = operator.raw_operator
     use_linear_op = container.is_allowed({"LinearRegressor"})
 
+    # When a DataFrame is passed to to_onnx, each column becomes a separate
+    # input. Concatenate multiple inputs into a single matrix before proceeding.
+    if len(operator.inputs) > 1:
+        merged_input_name = scope.get_unique_variable_name("merged_input")
+        apply_concat(
+            scope, operator.input_full_names, merged_input_name, container, axis=1
+        )
+    else:
+        merged_input_name = operator.inputs[0].full_name
+
     if not use_linear_op or type(operator.inputs[0].type) in (DoubleTensorType,):
         proto_dtype = guess_proto_type(operator.inputs[0].type)
         coef = scope.get_unique_variable_name("coef")
@@ -58,7 +69,7 @@ def convert_sklearn_linear_regressor(
         multiplied = scope.get_unique_variable_name("multiplied")
         container.add_node(
             "MatMul",
-            [operator.inputs[0].full_name, coef],
+            [merged_input_name, coef],
             multiplied,
             name=scope.get_unique_operator_name("MatMul"),
         )
@@ -84,13 +95,13 @@ def convert_sklearn_linear_regressor(
     if len(op.coef_.shape) == 2:
         attrs["targets"] = op.coef_.shape[0]
 
-    input_name = operator.input_full_names
+    input_name = merged_input_name
     if type(operator.inputs[0].type) in (BooleanTensorType, Int64TensorType):
         cast_input_name = scope.get_unique_variable_name("cast_input")
 
         apply_cast(
             scope,
-            operator.input_full_names,
+            merged_input_name,
             cast_input_name,
             container,
             to=(

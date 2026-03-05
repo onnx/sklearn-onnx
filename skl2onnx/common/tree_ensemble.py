@@ -219,6 +219,30 @@ def add_tree_to_attribute_pairs(
         )
 
 
+def get_left_categories_from_bitset(bitset):
+    """
+    Extract the category integer values that go to the left branch
+    from an 8-element uint32 bitset used by HistGradientBoosting.
+
+    Parameters
+    ----------
+    bitset : array-like of shape (8,), dtype uint32
+        Each element is a 32-bit word; bit k of word w means category
+        value ``w * 32 + k`` goes to the left branch.
+
+    Returns
+    -------
+    list of float
+        Sorted list of category values (as float) routed left.
+    """
+    categories = []
+    for word_idx, word in enumerate(bitset):
+        for bit_idx in range(32):
+            if word & (1 << bit_idx):
+                categories.append(float(word_idx * 32 + bit_idx))
+    return sorted(categories)
+
+
 def add_tree_to_attribute_pairs_hist_gradient_boosting(
     attr_pairs,
     is_classifier,

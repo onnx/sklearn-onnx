@@ -217,6 +217,59 @@ class TestVariableNames(unittest.TestCase):
         #     onx_data[col[0]] = X[[col[0]]].values
         # sess.run(None, onx_data)
 
+    def test_input_name_with_dot_preserved(self):
+        """Input names with dots (e.g. 'home.dest') must not be silently renamed."""
+        scaler = StandardScaler()
+        X = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float32)
+        scaler.fit(X)
+        initial_types = [("home.dest", FloatTensorType([None, 2]))]
+        model_onnx = convert_sklearn(
+            scaler, initial_types=initial_types, target_opset=TARGET_OPSET
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        input_name = sess.get_inputs()[0].name
+        self.assertEqual(input_name, "home.dest")
+        got = sess.run(None, {"home.dest": X})
+        self.assertIsNotNone(got)
+
+    def test_input_name_with_plus_preserved(self):
+        """Input names with plus signs must not be silently renamed."""
+        scaler = StandardScaler()
+        X = np.array([[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]], dtype=np.float32)
+        scaler.fit(X)
+        initial_types = [("a+b", FloatTensorType([None, 2]))]
+        model_onnx = convert_sklearn(
+            scaler, initial_types=initial_types, target_opset=TARGET_OPSET
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        input_name = sess.get_inputs()[0].name
+        self.assertEqual(input_name, "a+b")
+        got = sess.run(None, {"a+b": X})
+        self.assertIsNotNone(got)
+
+    def test_multiple_input_names_with_special_chars_preserved(self):
+        """Multiple input names with special characters must all be preserved."""
+        from sklearn.impute import SimpleImputer
+
+        imp = SimpleImputer(strategy="mean")
+        X = np.array([[1.0], [2.0], [3.0]], dtype=np.float32)
+        imp.fit(X)
+        initial_types = [
+            ("feat.1", FloatTensorType([None, 1])),
+        ]
+        model_onnx = convert_sklearn(
+            imp, initial_types=initial_types, target_opset=TARGET_OPSET
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        input_names = [inp.name for inp in sess.get_inputs()]
+        self.assertIn("feat.1", input_names)
+
 
 if __name__ == "__main__":
     unittest.main()
