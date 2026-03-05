@@ -3,6 +3,7 @@
 ## 1.21.0
 
 * Supports DummyRegressor and DummyClassifier [#1238](https://github.com/onnx/sklearn-onnx/issues/1238)
+* Fix HistGradientBoosting conversion with categorical_features [#1236](https://github.com/onnx/sklearn-onnx/issues/1236)
 * Fix TunedThresholdClassifierCV converter threshold application; add FixedThresholdClassifier converter [#1226](https://github.com/onnx/sklearn-onnx/issues/1226)
 * Fix significant output discrepancies in HistGradientBoosting ONNX conversion for float32 inputs [#1227](https://github.com/onnx/sklearn-onnx/issues/1227)
 * Fix input names silently renamed to C-style identifiers, breaking inference [#1235](https://github.com/onnx/sklearn-onnx/issues/1235)
