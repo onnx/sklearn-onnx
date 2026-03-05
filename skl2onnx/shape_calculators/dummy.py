@@ -5,8 +5,6 @@ from ..common.data_types import (
     DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
-    StringTensorType,
-)
 from ..common.shape_calculator import calculate_linear_classifier_output_shapes
 
 
