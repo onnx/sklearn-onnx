@@ -14,7 +14,7 @@ jobs:
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx-weekly'
-            onnxrt_version: 'onnxruntime>=1.23.2'
+            onnxrt_version: 'onnxruntime>=1.24.3'
             python_version: '3.13'
           - sklearn_version: '==1.7.1'
             documentation: 1
@@ -70,7 +70,7 @@ jobs:
             numpy_version: '>=2'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx<1.16.0'
-            onnxrt_version: 'onnxruntime==1.18.1'
+            onnxrt_version: 'onnxruntime==1.19.2'
             sklearn_version: '==1.5.2'
 
     steps:
