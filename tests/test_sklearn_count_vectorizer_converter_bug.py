@@ -32,10 +32,10 @@ def _skl150() -> bool:
     return pv.Version(sklearn.__version__) >= pv.Version("1.5.0")
 
 
-def _onnx120() -> bool:
+def _onnx121() -> bool:
     import packaging.version as pv
 
-    return pv.Version(onnx.__version__) >= pv.Version("1.20.0")
+    return pv.Version(onnx.__version__) >= pv.Version("1.21.0")
 
 
 class TestSklearnCountVectorizerBug(unittest.TestCase):
@@ -116,7 +116,7 @@ class TestSklearnCountVectorizerBug(unittest.TestCase):
     @unittest.skipIf(
         not _skl150(), reason="This issue is solved by using scikit-learn>=1.5.0"
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     def test_model_count_vectorizer_short_length(self):
         corpus = [
             "This is the first document.",

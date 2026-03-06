@@ -65,10 +65,10 @@ def _sklearn_version():
     return pv.Version(v)
 
 
-def _onnx120() -> bool:
+def _onnx121() -> bool:
     import packaging.version as pv
 
-    return pv.Version(onnx.__version__) >= pv.Version("1.20.0")
+    return pv.Version(onnx.__version__) >= pv.Version("1.21.0")
 
 
 ort_version = ".".join(ort_version.split(".")[:2])
@@ -396,7 +396,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
@@ -412,7 +412,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
@@ -489,7 +489,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         reason="issue with nan for earlier ort",
     )
     @ignore_warnings(category=FutureWarning)
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
 
@@ -504,7 +504,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
@@ -521,7 +521,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan_multi(self):
         self.common_test_model_hgb_classifier(False, n_classes=3)
@@ -533,7 +533,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         HistGradientBoostingClassifier is None,
         reason="scikit-learn 0.22 + manual activation",
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan_multi(self):
         self.common_test_model_hgb_classifier(True, n_classes=3)
@@ -542,7 +542,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         HistGradientBoostingRegressor is None,
         reason="scikit-learn 0.22 + manual activation",
     )
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_float32_precision(self):
         """Verify that float32 HGB regressor ONNX output closely matches
@@ -584,7 +584,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         reason="scikit-learn 0.22 + manual activation",
     )
     @ignore_warnings(category=FutureWarning)
-    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     def test_model_hgb_classifier_float32_precision(self):
         """Verify that float32 HGB classifier ONNX output closely matches
         sklearn, addressing the precision loss caused by float64->float32
