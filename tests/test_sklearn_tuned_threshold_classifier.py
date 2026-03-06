@@ -27,6 +27,13 @@ def has_fixed_threshold_classifier():
     return True
 
 
+def _onnx120() -> bool:
+    import onnx
+    import packaging.version as pv
+
+    return pv.Version(onnx.__version__) >= pv.Version("1.20.0")
+
+
 class TestSklearnTunedThresholdClassifierConverter(unittest.TestCase):
     @unittest.skipIf(
         not has_tuned_theshold_classifier(),
@@ -140,6 +147,7 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
         reason="FixedThresholdClassifier not available",
     )
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
     def test_fixed_threshold_classifier_threshold_applied(self):
         """Verify that the fixed threshold is actually applied in the ONNX model."""
         from sklearn.model_selection import FixedThresholdClassifier
