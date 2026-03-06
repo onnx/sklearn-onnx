@@ -51,6 +51,13 @@ def skl12():
     return pv.Version(vers) >= pv.Version("1.2")
 
 
+def _onnx121() -> bool:
+    import onnx
+    import packaging.version as pv
+
+    return pv.Version(onnx.__version__) >= pv.Version("1.21.0")
+
+
 class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
     def test_model_calibrated_classifier_cv_float(self):
@@ -264,7 +271,7 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
-    @unittest.skipIf(not skl12(), reason="base_estimator")
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     def test_model_calibrated_classifier_cv_hgbt(self):
         data = load_iris()
         X, y = data.data, data.target
