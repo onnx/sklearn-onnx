@@ -4,6 +4,7 @@ import unittest
 import numpy as np
 from sklearn.datasets import make_classification
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.utils._testing import ignore_warnings
 from skl2onnx import to_onnx
@@ -159,7 +160,7 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
         X_train, X_test, y_train, _ = train_test_split(
             X, y, stratify=y, random_state=42
         )
-        classifier = RandomForestClassifier(random_state=0)
+        classifier = LogisticRegression(random_state=0)
         model = FixedThresholdClassifier(classifier, threshold=np.float32(0.42)).fit(
             X_train, y_train
         )
