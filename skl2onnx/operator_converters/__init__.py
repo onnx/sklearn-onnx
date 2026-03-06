@@ -15,6 +15,7 @@ from . import cross_decomposition
 from . import decision_tree
 from . import decomposition
 from . import dict_vectoriser
+from . import dummy
 from . import feature_hasher
 from . import feature_selection
 from . import flatten_op
@@ -86,6 +87,7 @@ __all__ = [
     decision_tree,
     decomposition,
     dict_vectoriser,
+    dummy,
     feature_hasher,
     feature_selection,
     flatten_op,
