@@ -489,6 +489,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         reason="issue with nan for earlier ort",
     )
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
 
@@ -503,6 +504,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
+    @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
