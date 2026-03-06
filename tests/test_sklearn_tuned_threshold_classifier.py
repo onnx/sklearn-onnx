@@ -75,7 +75,6 @@ class TestSklearnTunedThresholdClassifierConverter(unittest.TestCase):
     )
     @ignore_warnings(category=FutureWarning)
     def test_tuned_threshold_classifier_threshold_applied(self):
-        """Verify that the tuned threshold is actually applied in the ONNX model."""
         from sklearn.model_selection import TunedThresholdClassifierCV
         import onnxruntime as rt
 
@@ -149,7 +148,6 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     @unittest.skipIf(not _onnx120(), reason="onnx runtime not tested previously")
     def test_fixed_threshold_classifier_threshold_applied(self):
-        """Verify that the fixed threshold is actually applied in the ONNX model."""
         from sklearn.model_selection import FixedThresholdClassifier
         import onnxruntime as rt
 
@@ -162,7 +160,7 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
             X, y, stratify=y, random_state=42
         )
         classifier = RandomForestClassifier(random_state=0)
-        model = FixedThresholdClassifier(classifier, threshold=np.float32(0.4)).fit(
+        model = FixedThresholdClassifier(classifier, threshold=np.float32(0.42)).fit(
             X_train, y_train
         )
 
@@ -184,7 +182,6 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
     )
     @ignore_warnings(category=FutureWarning)
     def test_fixed_threshold_classifier_auto(self):
-        """Test FixedThresholdClassifier with threshold='auto'."""
         from sklearn.model_selection import FixedThresholdClassifier
         import onnxruntime as rt
 
