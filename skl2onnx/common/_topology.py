@@ -889,17 +889,17 @@ class Scope:
 
     def _get_allowed_options(self, model, fail=True):
         if self.registered_models is not None:
-            if type(model) not in self.registered_models["aliases"]:
-                if fail:
-                    raise NotImplementedError(
-                        "No registered models, no known allowed options "
-                        "for model '{}'.".format(model.__class__.__name__)
-                    )
-                return {}
-            alias = self.registered_models["aliases"][type(model)]
-            conv = self.registered_models["conv"][alias]
-            allowed = conv.get_allowed_options()
-            return allowed
+            for cls in type(model).__mro__:
+                if cls in self.registered_models["aliases"]:
+                    alias = self.registered_models["aliases"][cls]
+                    conv = self.registered_models["conv"][alias]
+                    return conv.get_allowed_options()
+            if fail:
+                raise NotImplementedError(
+                    "No registered models, no known allowed options "
+                    "for model '{}'.".format(model.__class__.__name__)
+                )
+            return {}
         raise NotImplementedError(
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__)
