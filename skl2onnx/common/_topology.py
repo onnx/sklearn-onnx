@@ -889,8 +889,18 @@ class Scope:
 
     def _get_allowed_options(self, model, fail=True):
         if self.registered_models is not None:
-            for cls in type(model).__mro__:
+            model_cls = type(model)
+            for cls in model_cls.__mro__:
                 if cls in self.registered_models["aliases"]:
+                    if cls is not model_cls:
+                        warnings.warn(
+                            "Class '{}' is not registered; using converter "
+                            "registered for parent class '{}'.".format(
+                                model_cls.__name__, cls.__name__
+                            ),
+                            UserWarning,
+                            stacklevel=0,
+                        )
                     alias = self.registered_models["aliases"][cls]
                     conv = self.registered_models["conv"][alias]
                     return conv.get_allowed_options()
