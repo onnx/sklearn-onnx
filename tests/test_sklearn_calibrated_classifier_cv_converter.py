@@ -11,7 +11,7 @@ from numpy.testing import assert_almost_equal
 from onnxruntime import __version__ as ort_version
 from sklearn import __version__ as sklearn_version
 from sklearn.calibration import CalibratedClassifierCV
-from sklearn.datasets import load_digits, load_iris
+from sklearn.datasets import load_digits, load_iris, make_classification
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 
 try:
@@ -433,6 +433,40 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                     model_onnx,
                     basename=f"SklearnCalibratedClassifierBinary{name}SVC2",
                 )
+
+    @unittest.skipIf(
+        pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
+    )
+    @ignore_warnings(category=(FutureWarning, ConvergenceWarning, DeprecationWarning))
+    def test_model_calibrated_classifier_cv_sigmoid_pipeline(self):
+        from sklearn.ensemble import GradientBoostingClassifier
+        from sklearn.pipeline import Pipeline
+        from sklearn.preprocessing import FunctionTransformer
+
+        X, y = make_classification(n_samples=500, n_features=20, random_state=42)
+        X = np.abs(X).astype(np.float32)
+
+        clf = GradientBoostingClassifier(n_estimators=20, random_state=42)
+        pipe = Pipeline([("id", FunctionTransformer()), ("clf", clf)])
+
+        for ensemble in [True, False]:
+            with self.subTest(ensemble=ensemble):
+                cal = CalibratedClassifierCV(pipe, method="sigmoid", ensemble=ensemble)
+                cal.fit(X, y)
+
+                model_onnx = convert_sklearn(
+                    cal,
+                    "unused",
+                    [("input", FloatTensorType([None, X.shape[1]]))],
+                    target_opset=TARGET_OPSET,
+                    options={id(cal): {"zipmap": False}},
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                res = sess.run(None, {"input": X[:20]})
+                assert_almost_equal(cal.predict_proba(X[:20]), res[1], decimal=4)
 
 
 if __name__ == "__main__":
