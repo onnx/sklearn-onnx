@@ -9,6 +9,7 @@ from . import class_labels
 from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
+from . import dummy
 from . import ensemble_shapes
 from . import feature_selection
 from . import feature_hasher
@@ -65,6 +66,7 @@ __all__ = [
     concat,
     cross_decomposition,
     dict_vectorizer,
+    dummy,
     ensemble_shapes,
     feature_hasher,
     feature_selection,
