@@ -7,6 +7,7 @@ import pprint
 from logging import getLogger
 from collections import OrderedDict
 import numpy as np
+from sklearn import pipeline
 from onnx import onnx_pb as onnx_proto
 from onnx.helper import (
     make_graph,
@@ -889,17 +890,26 @@ class Scope:
 
     def _get_allowed_options(self, model, fail=True):
         if self.registered_models is not None:
-            if type(model) not in self.registered_models["aliases"]:
-                if fail:
-                    raise NotImplementedError(
-                        "No registered models, no known allowed options "
-                        "for model '{}'.".format(model.__class__.__name__)
-                    )
-                return {}
-            alias = self.registered_models["aliases"][type(model)]
-            conv = self.registered_models["conv"][alias]
-            allowed = conv.get_allowed_options()
-            return allowed
+            aliases = self.registered_models["aliases"]
+            model_cls = type(model)
+            lookup_cls = None
+            if model_cls in aliases:
+                lookup_cls = model_cls
+            elif (
+                isinstance(model, pipeline.Pipeline)
+                and pipeline.Pipeline in aliases
+            ):
+                lookup_cls = pipeline.Pipeline
+            if lookup_cls is not None:
+                alias = aliases[lookup_cls]
+                conv = self.registered_models["conv"][alias]
+                return conv.get_allowed_options()
+            if fail:
+                raise NotImplementedError(
+                    "No registered models, no known allowed options "
+                    "for model '{}'.".format(model.__class__.__name__)
+                )
+            return {}
         raise NotImplementedError(
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__)
