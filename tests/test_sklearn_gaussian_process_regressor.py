@@ -1062,6 +1062,42 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD,
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_gpr_rbf_fitted_return_std_normalize_y_1d(self):
+        # When y is one-dimensional, _y_train_std and _y_train_mean
+        # are numpy scalars: the converter used to pass the bare
+        # scalar to OnnxMul and raised a TypeError.
+        gp = GaussianProcessRegressor(
+            kernel=DotProduct() + WhiteKernel(),
+            alpha=1e-2,
+            normalize_y=True,
+            random_state=0,
+        )
+        gp.fit(Xtrain_, Ytrain_.ravel())
+        assert np.ndim(gp._y_train_std) == 0
+
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        gp.predict(Xtrain_, return_std=True)
+        model_onnx = to_onnx(
+            gp,
+            initial_types=[("X", DoubleTensorType([None, None]))],
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(
+            gp,
+            model_onnx,
+            Xtest_.astype(np.float64),
+            predict_attributes=options[GaussianProcessRegressor],
+            decimal=3,
+            disable_optimisation=True,
+        )
+
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD,
+    )
     @unittest.skipIf(TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_return_std_dot_product_true(self):
