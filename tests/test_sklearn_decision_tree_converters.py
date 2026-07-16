@@ -12,7 +12,7 @@ from sklearn.tree import (
     ExtraTreeClassifier,
     ExtraTreeRegressor,
 )
-from sklearn.datasets import make_classification
+from sklearn.datasets import make_classification, make_regression
 from skl2onnx.common.data_types import (
     BooleanTensorType,
     FloatTensorType,
@@ -37,6 +37,11 @@ from test_utils import (
 )
 
 ort_version = ort_version.split("+")[0]
+
+
+def _supports_missing_go_to_left():
+    tree = DecisionTreeClassifier(max_depth=1).fit([[0.0], [1.0]], [0, 1]).tree_
+    return hasattr(tree, "missing_go_to_left")
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
@@ -362,6 +367,64 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         self.assertIsNotNone(model_onnx)
         dump_data_and_model(
             X, model, model_onnx, basename="SklearnExtraTreeRegressionBool-Dec4"
+        )
+
+    @unittest.skipIf(
+        not _supports_missing_go_to_left(),
+        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+    )
+    def test_decision_tree_classifier_nan(self):
+        rng = np.random.RandomState(12345)
+        X, y = make_classification(
+            n_features=10, n_samples=1000, n_informative=4, random_state=42
+        )
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = np.nan
+        X = X.astype(np.float32)
+
+        model = DecisionTreeClassifier(max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(np.asarray(model.tree_.missing_go_to_left).any())
+
+        model_onnx = convert_sklearn(
+            model,
+            "decision tree classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnDecisionTreeClassifierNan"
+        )
+
+    @unittest.skipIf(
+        not _supports_missing_go_to_left(),
+        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+    )
+    def test_decision_tree_regressor_nan(self):
+        rng = np.random.RandomState(12345)
+        X, y = make_regression(n_features=10, n_samples=1000, random_state=42)
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = np.nan
+        X = X.astype(np.float32)
+        y = y.astype(np.float32)
+
+        model = DecisionTreeRegressor(max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(np.asarray(model.tree_.missing_go_to_left).any())
+
+        model_onnx = convert_sklearn(
+            model,
+            "decision tree regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnDecisionTreeRegressorNan-Dec4"
         )
 
 
