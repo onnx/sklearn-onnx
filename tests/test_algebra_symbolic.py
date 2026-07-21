@@ -181,12 +181,14 @@ class TestAlgebraSymbolic(unittest.TestCase):
             )
             return onx, matrices
 
+        import onnxruntime as ort
+
         dim = 5
         for nbnode in range(1, 4):
             onx = generate_onnx_graph(dim, nbnode)[0]
             X = rand(1, dim)
             try:
-                sess = InferenceSession(
+                sess = ort.InferenceSession(
                     onx.SerializeToString(), providers=["CPUExecutionProvider"]
                 )
             except InvalidGraph as e:

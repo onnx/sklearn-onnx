@@ -5,12 +5,6 @@ import warnings
 import numpy as np
 from numpy.testing import assert_almost_equal
 from onnxruntime import InferenceSession
-
-try:
-    from onnxruntime.capi.onnxruntime_pybind11_state import Fail, InvalidArgument
-except ImportError:
-    Fail = RuntimeError
-    InvalidArgument = RuntimeError
 from sklearn.base import TransformerMixin, BaseEstimator
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
@@ -105,16 +99,9 @@ class TestOnnxDeprecation(unittest.TestCase):
         self.assertTrue(mes is not None)
         self.assertIn("will be removed", str(mes))
 
-        try:
-            sess = InferenceSession(
-                onx.SerializeToString(), providers=["CPUExecutionProvider"]
-            )
-        except (Fail, InvalidArgument) as e:
-            if "till opset" in str(e) or "ValidateOpsetForDomain" in str(e):
-                raise unittest.SkipTest(
-                    f"onnxruntime does not support the opset used by the model: {e}"
-                )
-            raise
+        sess = InferenceSession(
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
 
         exp = dec.transform(X.astype(np.float32))
         got = sess.run(None, {"X": X.astype(np.float32)})[0]

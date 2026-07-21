@@ -7,12 +7,13 @@ from numpy.testing import assert_almost_equal
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.datasets import load_iris
 from sklearn.decomposition import PCA
+from onnxruntime import InferenceSession
 from skl2onnx import to_onnx
 from skl2onnx.algebra.onnx_ops import OnnxIdentity
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
 from skl2onnx import update_registered_converter
 from onnxruntime import __version__ as ortv
-from test_utils import TARGET_OPSET, InferenceSessionEx as InferenceSession
+from test_utils import TARGET_OPSET
 
 
 class DecorrelateTransformer(TransformerMixin, BaseEstimator):

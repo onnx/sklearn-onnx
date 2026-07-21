@@ -384,7 +384,6 @@ if onnx_opset_version() >= 18:
                 "opsets": self.opsets,
                 "verbose": self.verbose,
                 "new_ops": self.new_ops_,
-                "existing_functions": self.functions_.copy(),
                 "evaluator_cls": self.__class__,
             }
             if self.input_types_:

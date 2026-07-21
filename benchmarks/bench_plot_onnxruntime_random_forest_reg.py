@@ -171,7 +171,7 @@ def bench(
                                 r2 = 0
                                 for X in Xs:
                                     p2 = fct3(X)
-                                    r2 += 1  # noqa: SIM113
+                                    r2 += 1
                                     if r2 >= repeated:
                                         break
                                 end = time()
