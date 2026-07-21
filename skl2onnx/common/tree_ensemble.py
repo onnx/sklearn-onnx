@@ -240,7 +240,7 @@ def add_tree_to_attribute_pairs_hist_gradient_boosting(
             threshold = 0.0
             left_child_id = 0
             right_child_id = 0
-            missing = False
+            missing = 0  # cannot use boolean in onnx
         else:
             mode = "BRANCH_LEQ"
             feat_id = node["feature_idx"]
@@ -250,7 +250,7 @@ def add_tree_to_attribute_pairs_hist_gradient_boosting(
                 threshold = node["num_threshold"]
             left_child_id = node["left"]
             right_child_id = node["right"]
-            missing = node["missing_go_to_left"]
+            missing = int(node["missing_go_to_left"])  # cannot use boolean in onnx
 
         add_node(
             attr_pairs,
