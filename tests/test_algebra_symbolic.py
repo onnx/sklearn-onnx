@@ -170,11 +170,13 @@ class TestAlgebraSymbolic(unittest.TestCase):
             for _i in range(nbnode - 1):
                 i2 = list(rand(1, dim).ravel())
                 matrices.append(i2)
-                node = OnnxScaler(i1, offset=i2, scale=scale)
+                node = OnnxScaler(i1, offset=i2, scale=scale, op_version=1)
                 i1 = node
             i2 = list(rand(1, dim).ravel())
             matrices.append(i2)
-            node = OnnxScaler(i1, offset=i2, scale=scale, output_names=["Y"])
+            node = OnnxScaler(
+                i1, offset=i2, scale=scale, output_names=["Y"], op_version=1
+            )
             onx = node.to_onnx(
                 [(input_name, FloatTensorType((None, dim)))],
                 outputs=[("Y", FloatTensorType((None, dim)))],

@@ -1773,7 +1773,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
         input_data = data.astype(np.float32)
         initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
-        onnx_model = convert_sklearn(imputer, initial_types=initial_type)
+        onnx_model = convert_sklearn(
+            imputer, initial_types=initial_type, target_opset=TARGET_OPSET
+        )
         # with open("test_knn_imputer_one_nan.onnx", "wb") as f:
         #     f.write(onnx_model.SerializeToString())
 
