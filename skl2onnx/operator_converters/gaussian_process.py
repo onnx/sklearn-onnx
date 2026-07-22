@@ -194,8 +194,12 @@ def convert_gaussian_process_regressor(
 
             if hasattr(op, "_y_train_std"):
                 # y_var = y_var * self._y_train_std**2
+                # _y_train_std is a scalar when y is one-dimensional,
+                # OnnxMul requires an array.
                 ys0_var = OnnxMul(
-                    ys0_var, (op._y_train_std**2).astype(dtype), op_version=opv
+                    ys0_var,
+                    np.atleast_1d(op._y_train_std**2).astype(dtype),
+                    op_version=opv,
                 )
 
             # var = np.sqrt(ys0_var)
