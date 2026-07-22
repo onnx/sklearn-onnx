@@ -1064,6 +1064,42 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         pv.Version(ort_version) <= pv.Version(THRESHOLD),
         reason="onnxruntime %s" % THRESHOLD,
     )
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_gpr_rbf_fitted_return_std_normalize_y_1d(self):
+        # When y is one-dimensional, _y_train_std and _y_train_mean
+        # are numpy scalars: the converter used to pass the bare
+        # scalar to OnnxMul and raised a TypeError.
+        gp = GaussianProcessRegressor(
+            kernel=DotProduct() + WhiteKernel(),
+            alpha=1e-2,
+            normalize_y=True,
+            random_state=0,
+        )
+        gp.fit(Xtrain_, Ytrain_.ravel())
+        assert np.ndim(gp._y_train_std) == 0
+
+        options = {GaussianProcessRegressor: {"return_std": True}}
+        gp.predict(Xtrain_, return_std=True)
+        model_onnx = to_onnx(
+            gp,
+            initial_types=[("X", DoubleTensorType([None, None]))],
+            options=options,
+            target_opset=TARGET_OPSET,
+        )
+        self.assertTrue(model_onnx is not None)
+        self.check_outputs(
+            gp,
+            model_onnx,
+            Xtest_.astype(np.float64),
+            predict_attributes=options[GaussianProcessRegressor],
+            decimal=3,
+            disable_optimisation=True,
+        )
+
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version(THRESHOLD),
+        reason="onnxruntime %s" % THRESHOLD,
+    )
     @unittest.skipIf(TARGET_OPSET >= 12, reason="TARGET_OPSET < 12")
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_return_std_dot_product_true(self):
@@ -1589,6 +1625,62 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                 m1 = res
                 m2 = ker(x, x)
                 assert_almost_equal(m2, m1, decimal=5)
+
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_kernel_matern_kernel_nu25(self):
+        # Regression test for incorrect use of `type` instead of `dtype`
+        # in the nu=2.5 branch of convert_kernel (_gp_kernels.py).
+        ker = Matern(nu=2.5)
+
+        x = np.random.randn(4, 3)
+        x[0, 0] = x[1, 1] = x[2, 2] = 2.0
+        x[3, 2] = 1.5
+
+        for dtype, tensor_type, x_cast in [
+            (np.float64, DoubleTensorType, np.float64),
+            (np.float32, FloatTensorType, np.float32),
+        ]:
+            with self.subTest(dtype=dtype):
+                # X, X
+                onx = convert_kernel(
+                    ker,
+                    "X",
+                    output_names=["Y"],
+                    dtype=dtype,
+                    op_version=_TARGET_OPSET_,
+                )
+                model_onnx = onx.to_onnx(
+                    inputs=[("X", tensor_type([None, None]))],
+                    target_opset=TARGET_OPSET,
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                res = sess.run(None, {"X": x.astype(x_cast)})[0]
+                m2 = ker(x)
+                assert_almost_equal(m2, res, decimal=3)
+
+                # X, x_train
+                onx = convert_kernel(
+                    ker,
+                    "X",
+                    x_train=x.astype(dtype),
+                    output_names=["Y"],
+                    dtype=dtype,
+                    op_version=_TARGET_OPSET_,
+                )
+                model_onnx = onx.to_onnx(
+                    inputs=[("X", tensor_type([None, None]))],
+                    target_opset=TARGET_OPSET,
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                res = sess.run(None, {"X": x.astype(x_cast)})[0]
+                m2 = ker(x, x)
+                assert_almost_equal(m2, res, decimal=3)
 
     def test_issue_1073_multidimension_process(self):
         # multioutput gpr
