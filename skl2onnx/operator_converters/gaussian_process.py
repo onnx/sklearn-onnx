@@ -53,11 +53,13 @@ from ._gp_kernels import convert_kernel_diag, convert_kernel, _zero_vector_of_si
 def _needs_float64_computation(op, input_dtype):
     if input_dtype == np.float64:
         return False
-    return (
+    alpha_is_float64 = (
         hasattr(op, "alpha_")
         and op.alpha_ is not None
         and op.alpha_.dtype == np.float64
-    ) or (hasattr(op, "L_") and op.L_ is not None and op.L_.dtype == np.float64)
+    )
+    l_is_float64 = hasattr(op, "L_") and op.L_ is not None and op.L_.dtype == np.float64
+    return alpha_is_float64 or l_is_float64
 
 
 def convert_gaussian_process_regressor(
