@@ -1665,7 +1665,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                 onx = convert_kernel(
                     ker,
                     "X",
-                    x_train=x,
+                    x_train=x.astype(dtype),
                     output_names=["Y"],
                     dtype=dtype,
                     op_version=_TARGET_OPSET_,
