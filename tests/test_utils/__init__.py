@@ -89,12 +89,14 @@ def max_onnxruntime_opset():
         return 25
     if vi >= pv.Version("1.22.0"):
         return 24
-    if vi >= pv.Version("1.20.0"):
+    if vi >= pv.Version("1.21.0"):
         return 23
-    if vi >= pv.Version("1.19.0"):
-        return 22
-    if vi >= pv.Version("1.18.0"):
+    if vi >= pv.Version("1.20.0"):
         return 21
+    if vi >= pv.Version("1.19.0"):
+        return 20
+    if vi >= pv.Version("1.18.0"):
+        return 20
     if vi >= pv.Version("1.17.0"):
         return 20
     if vi >= pv.Version("1.15.0"):
