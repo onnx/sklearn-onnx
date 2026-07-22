@@ -86,11 +86,11 @@ def max_onnxruntime_opset():
     """
     vi = pv.Version(ort_version.split("+")[0])
     if vi >= pv.Version("1.23.0"):
-        return 25
-    if vi >= pv.Version("1.22.0"):
-        return 24
-    if vi >= pv.Version("1.21.0"):
         return 23
+    if vi >= pv.Version("1.22.0"):
+        return 22
+    if vi >= pv.Version("1.21.0"):
+        return 21
     if vi >= pv.Version("1.20.0"):
         return 21
     if vi >= pv.Version("1.19.0"):
