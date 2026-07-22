@@ -69,9 +69,27 @@ def convert_gaussian_process_regressor(
     opv = container.target_opset
     if opv is None:
         raise RuntimeError("container.target_opset must not be None")
-    dtype = guess_numpy_type(X.type)
-    if dtype != np.float64:
-        dtype = np.float32
+    input_dtype = guess_numpy_type(X.type)
+    if input_dtype != np.float64:
+        input_dtype = np.float32
+    dtype = input_dtype
+    if (
+        input_dtype != np.float64
+        and (
+            (
+                hasattr(op, "alpha_")
+                and op.alpha_ is not None
+                and op.alpha_.dtype == np.float64
+            )
+            or (
+                hasattr(op, "L_")
+                and op.L_ is not None
+                and op.L_.dtype == np.float64
+            )
+        )
+    ):
+        # Keep GPR computations in float64 when the fitted estimator uses float64.
+        dtype = np.float64
 
     options = container.get_options(
         op, dict(return_cov=False, return_std=False, optim=None)
@@ -111,9 +129,14 @@ def convert_gaussian_process_regressor(
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
         # y_mean = self._y_train_mean + y_mean * self._y_train_std
 
+        x_in = X
+        if dtype != input_dtype:
+            x_in = OnnxCast(
+                X, to=onnx_proto.TensorProto.DOUBLE, op_version=opv
+            )
         k_trans = convert_kernel(
             kernel,
-            X,
+            x_in,
             x_train=op.X_train_.astype(dtype),
             dtype=dtype,
             optim=options.get("optim", None),
@@ -153,8 +176,15 @@ def convert_gaussian_process_regressor(
             y_mean,
             np.array([-1, mean_y.shape[0]], dtype=np.int64),
             op_version=opv,
-            output_names=out[:1],
+            output_names=out[:1] if dtype == input_dtype else None,
         )
+        if dtype != input_dtype:
+            y_mean_reshaped = OnnxCast(
+                y_mean_reshaped,
+                to=onnx_proto.TensorProto.FLOAT,
+                op_version=opv,
+                output_names=out[:1],
+            )
         outputs = [y_mean_reshaped]
 
         if options["return_cov"]:
@@ -204,7 +234,18 @@ def convert_gaussian_process_regressor(
 
             # var = np.sqrt(ys0_var)
             var = OnnxSqrt(ys0_var, op_version=opv)
-            var = OnnxTranspose(var, output_names=out[1:], op_version=opv)
+            var = OnnxTranspose(
+                var,
+                output_names=out[1:] if dtype == input_dtype else None,
+                op_version=opv,
+            )
+            if dtype != input_dtype:
+                var = OnnxCast(
+                    var,
+                    to=onnx_proto.TensorProto.FLOAT,
+                    op_version=opv,
+                    output_names=out[1:],
+                )
             var.set_onnx_name_prefix("gprv")
             outputs.append(var)
 
