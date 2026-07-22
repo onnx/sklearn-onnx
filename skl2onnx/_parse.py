@@ -536,8 +536,11 @@ def _apply_zipmap(zipmap_options, scope, model, input_type, probability_tensor):
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(model, dict(zipmap=True))
+    svc_no_probability = model.__class__ in [NuSVC, SVC] and getattr(
+        model, "probability", False
+    ) in [False, "deprecated"]
     no_zipmap = (isinstance(options["zipmap"], bool) and not options["zipmap"]) or (
-        model.__class__ in [NuSVC, SVC] and not model.probability
+        svc_no_probability
     )
     probability_tensor = _parse_sklearn_simple_model(
         scope, model, inputs, custom_parsers=custom_parsers

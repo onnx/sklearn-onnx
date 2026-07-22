@@ -12,7 +12,7 @@ jobs:
         # them into a single job.
         include:
           - os: ubuntu-latest
-            sklearn_version: '==1.8.0'
+            sklearn_version: '==1.9.0'
             documentation: 1
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'

@@ -390,7 +390,7 @@ def convert_kernel(
             K = OnnxMul(dist, np.array([5**0.5], dtype=dtype), op_version=op_version)
             exp_k = OnnxExp(OnnxNeg(K, op_version=op_version), op_version=op_version)
             k_12 = OnnxAdd(
-                OnnxAdd(K, np.array([1], dtype=type), op_version=op_version),
+                OnnxAdd(K, np.array([1], dtype=dtype), op_version=op_version),
                 OnnxDiv(
                     OnnxMul(K, K, op_version=op_version),
                     np.array([3], dtype=dtype),
