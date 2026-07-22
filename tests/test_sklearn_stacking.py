@@ -680,6 +680,7 @@ class TestStackingConverter(unittest.TestCase):
             X_train[:1].astype(np.float32),
             verbose=1,
             options={"zipmap": False},
+            target_opset=TARGET_OPSET,
         )
         sess = InferenceSession(
             model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]

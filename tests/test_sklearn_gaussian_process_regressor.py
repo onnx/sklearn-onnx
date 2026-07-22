@@ -9,6 +9,7 @@ import packaging.version as pv
 import numpy as np
 import pandas as pd
 from numpy.testing import assert_almost_equal, assert_allclose
+from sklearn import __version__ as skl_version
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.datasets import load_iris, make_regression, make_friedman2
@@ -777,6 +778,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
         reason="onnxruntime %s" % THRESHOLD,
     )
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    @unittest.skipIf(pv.Version(skl_version) < pv.Version("1.8.0"), reason="unstable")
     def test_gpr_cosine_fitted_true_float(self):
         gp = GaussianProcessRegressor(
             alpha=1e-5,
