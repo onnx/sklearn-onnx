@@ -1707,7 +1707,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         imputer = KNNImputer(n_neighbors=3, metric="nan_euclidean")
         imputer.fit(data)
         initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
-        onnx_model = convert_sklearn(imputer, initial_types=initial_type)
+        onnx_model = convert_sklearn(
+            imputer, initial_types=initial_type, target_opset=TARGET_OPSET
+        )
         input_data = data.astype(numpy.float32)
         expected = imputer.transform(input_data)
         got = ReferenceEvaluator(onnx_model, verbose=0).run(

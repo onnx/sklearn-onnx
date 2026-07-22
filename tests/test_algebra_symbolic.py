@@ -180,6 +180,7 @@ class TestAlgebraSymbolic(unittest.TestCase):
             onx = node.to_onnx(
                 [(input_name, FloatTensorType((None, dim)))],
                 outputs=[("Y", FloatTensorType((None, dim)))],
+                target_opset=TARGET_OPSET,
             )
             return onx, matrices
 
