@@ -58,8 +58,10 @@ def _needs_float64_computation(op, input_dtype):
         and op.alpha_ is not None
         and op.alpha_.dtype == np.float64
     )
-    l_is_float64 = hasattr(op, "L_") and op.L_ is not None and op.L_.dtype == np.float64
-    return alpha_is_float64 or l_is_float64
+    ell_is_float64 = (
+        hasattr(op, "L_") and op.L_ is not None and op.L_.dtype == np.float64
+    )
+    return alpha_is_float64 or ell_is_float64
 
 
 def convert_gaussian_process_regressor(
