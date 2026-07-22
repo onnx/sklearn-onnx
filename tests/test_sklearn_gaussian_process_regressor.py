@@ -1590,6 +1590,62 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
                 m2 = ker(x, x)
                 assert_almost_equal(m2, m1, decimal=5)
 
+    @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
+    def test_kernel_matern_kernel_nu25(self):
+        # Regression test for incorrect use of `type` instead of `dtype`
+        # in the nu=2.5 branch of convert_kernel (_gp_kernels.py).
+        ker = Matern(nu=2.5)
+
+        x = np.random.randn(4, 3)
+        x[0, 0] = x[1, 1] = x[2, 2] = 2.0
+        x[3, 2] = 1.5
+
+        for dtype, tensor_type, x_cast in [
+            (np.float64, DoubleTensorType, np.float64),
+            (np.float32, FloatTensorType, np.float32),
+        ]:
+            with self.subTest(dtype=dtype):
+                # X, X
+                onx = convert_kernel(
+                    ker,
+                    "X",
+                    output_names=["Y"],
+                    dtype=dtype,
+                    op_version=_TARGET_OPSET_,
+                )
+                model_onnx = onx.to_onnx(
+                    inputs=[("X", tensor_type([None, None]))],
+                    target_opset=TARGET_OPSET,
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                res = sess.run(None, {"X": x.astype(x_cast)})[0]
+                m2 = ker(x)
+                assert_almost_equal(m2, res, decimal=3)
+
+                # X, x_train
+                onx = convert_kernel(
+                    ker,
+                    "X",
+                    x_train=x,
+                    output_names=["Y"],
+                    dtype=dtype,
+                    op_version=_TARGET_OPSET_,
+                )
+                model_onnx = onx.to_onnx(
+                    inputs=[("X", tensor_type([None, None]))],
+                    target_opset=TARGET_OPSET,
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                res = sess.run(None, {"X": x.astype(x_cast)})[0]
+                m2 = ker(x, x)
+                assert_almost_equal(m2, res, decimal=3)
+
     def test_issue_1073_multidimension_process(self):
         # multioutput gpr
         n_samples, n_features, n_targets = 1000, 8, 3
