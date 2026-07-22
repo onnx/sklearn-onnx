@@ -50,6 +50,15 @@ except ImportError:
 from ._gp_kernels import convert_kernel_diag, convert_kernel, _zero_vector_of_size
 
 
+def _needs_float64_computation(op, input_dtype):
+    if input_dtype == np.float64:
+        return False
+    return (
+        (hasattr(op, "alpha_") and op.alpha_ is not None and op.alpha_.dtype == np.float64)
+        or (hasattr(op, "L_") and op.L_ is not None and op.L_.dtype == np.float64)
+    )
+
+
 def convert_gaussian_process_regressor(
     scope: Scope, operator: Operator, container: ModelComponentContainer
 ):
@@ -73,21 +82,7 @@ def convert_gaussian_process_regressor(
     if input_dtype != np.float64:
         input_dtype = np.float32
     dtype = input_dtype
-    if (
-        input_dtype != np.float64
-        and (
-            (
-                hasattr(op, "alpha_")
-                and op.alpha_ is not None
-                and op.alpha_.dtype == np.float64
-            )
-            or (
-                hasattr(op, "L_")
-                and op.L_ is not None
-                and op.L_.dtype == np.float64
-            )
-        )
-    ):
+    if _needs_float64_computation(op, input_dtype):
         # Keep GPR computations in float64 when the fitted estimator uses float64.
         dtype = np.float64
 
@@ -129,14 +124,14 @@ def convert_gaussian_process_regressor(
         # y_mean = K_trans.dot(self.alpha_)  # Line 4 (y_mean = f_star)
         # y_mean = self._y_train_mean + y_mean * self._y_train_std
 
-        x_in = X
+        x_computation = X
         if dtype != input_dtype:
-            x_in = OnnxCast(
+            x_computation = OnnxCast(
                 X, to=onnx_proto.TensorProto.DOUBLE, op_version=opv
             )
         k_trans = convert_kernel(
             kernel,
-            x_in,
+            x_computation,
             x_train=op.X_train_.astype(dtype),
             dtype=dtype,
             optim=options.get("optim", None),
