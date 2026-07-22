@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Updated CI to test scikit-learn==1.9.0 while keeping scikit-learn==1.8.0
+  [#1257](https://github.com/onnx/sklearn-onnx/issues/1257)
 * Supports DummyRegressor and DummyClassifier [#1238](https://github.com/onnx/sklearn-onnx/issues/1238)
 * Fix TunedThresholdClassifierCV converter threshold application; add FixedThresholdClassifier converter [#1226](https://github.com/onnx/sklearn-onnx/issues/1226)
 * Fix significant output discrepancies in HistGradientBoosting ONNX conversion for float32 inputs [#1227](https://github.com/onnx/sklearn-onnx/issues/1227)
