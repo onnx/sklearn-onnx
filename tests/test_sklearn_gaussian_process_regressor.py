@@ -842,7 +842,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_gpr_rbf_fitted_false(self):
         gp = GaussianProcessRegressor(
-            alpha=1e-5, n_restarts_optimizer=25, normalize_y=False
+            alpha=1e-5, n_restarts_optimizer=25, normalize_y=False, random_state=0
         )
         gp.fit(Xtrain_, Ytrain_)
 
@@ -904,7 +904,7 @@ class TestSklearnGaussianProcessRegressor(unittest.TestCase):
             gp,
             model_onnx,
             verbose=False,
-            basename="SklearnGaussianProcessRBFStd-Out0",
+            basename="SklearnGaussianProcessRBFStd-Out0-Dec4",
             disable_optimisation=True,
         )
 
