@@ -139,7 +139,7 @@ def add_node(
     attr_pairs["nodes_truenodeids"].append(true_child_id)
     attr_pairs["nodes_falsenodeids"].append(false_child_id)
     attr_pairs["nodes_missing_value_tracks_true"].append(
-        nodes_missing_value_tracks_true
+        int(nodes_missing_value_tracks_true)  # cannot use boolean in onnx
     )
     attr_pairs["nodes_hitrates"].append(1.0)
 

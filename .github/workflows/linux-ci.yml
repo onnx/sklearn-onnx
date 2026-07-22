@@ -6,66 +6,85 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
-        sklearn_version: ['==1.8.0'] #, '==1.7.1', '==1.6.1', '==1.5.2']
+        # Every job is defined as a full entry under `include` so that each one
+        # runs as a separate job. Sharing a value (e.g. sklearn_version) across
+        # entries in a top-level matrix vector would make GitHub Actions collapse
+        # them into a single job.
         include:
-          - sklearn_version: '==1.8.0'
+          - os: ubuntu-latest
+            sklearn_version: '==1.8.0'
             documentation: 1
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx-weekly'
-            onnxrt_version: 'onnxruntime>=1.24.3'
+            onnxrt_version: 'onnxruntime<1.25.0'
             python_version: '3.13'
-          - sklearn_version: '==1.7.1'
+          - os: ubuntu-latest
+            sklearn_version: '==1.8.0'
             documentation: 1
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
-            onnx_version: '1.20.0'
+            onnx_version: 'onnx==1.22.0'
+            onnxrt_version: 'onnxruntime==1.24.4'
+            python_version: '3.13'
+          - os: ubuntu-latest
+            sklearn_version: '==1.7.1'
+            documentation: 0
+            numpy_version: '>=2.0'
+            scipy_version: '>=1.7.0'
+            onnx_version: 'onnx==1.20.0'
             onnxrt_version: 'onnxruntime==1.23.2'
             python_version: '3.13'
-          - sklearn_version: '==1.7.1'
+          - os: ubuntu-latest
+            sklearn_version: '==1.7.1'
             documentation: 0
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.19.1'
             onnxrt_version: 'onnxruntime==1.22.1'
             python_version: '3.13'
-          - sklearn_version: '==1.6.1'
+          - os: ubuntu-latest
+            sklearn_version: '==1.6.1'
             documentation: 0
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.19.1'
             onnxrt_version: 'onnxruntime==1.22.1'
             python_version: '3.12'
-          - sklearn_version: '==1.6.1'
+          - os: ubuntu-latest
+            sklearn_version: '==1.6.1'
             documentation: 0
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.18.0'
             onnxrt_version: 'onnxruntime==1.21.1'
             python_version: '3.12'
-          - sklearn_version: '==1.5.2'
+          - os: ubuntu-latest
+            sklearn_version: '==1.5.2'
             documentation: 0
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.17.0'
             onnxrt_version: 'onnxruntime==1.20.1'
             python_version: '3.11'
-          - sklearn_version: '==1.5.2'
+          - os: ubuntu-latest
+            sklearn_version: '==1.5.2'
             documentation: 0
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.16.0'
             onnxrt_version: 'onnxruntime==1.19.2'
             python_version: '3.12'
-          - python_version: '3.12'
+          - os: ubuntu-latest
+            python_version: '3.12'
             documentation: 0
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
             onnx_version: 'onnx==1.16.0'
             onnxrt_version: 'onnxruntime==1.19.2'
             sklearn_version: '==1.5.2'
-          - python_version: '3.11'
+          - os: ubuntu-latest
+            python_version: '3.11'
             documentation: 0
             numpy_version: '>=2'
             scipy_version: '>=1.7.0'
