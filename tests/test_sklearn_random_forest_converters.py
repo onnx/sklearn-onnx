@@ -71,6 +71,13 @@ def _onnx121() -> bool:
     return pv.Version(onnx.__version__) >= pv.Version("1.21.0")
 
 
+def _supports_missing_go_to_left():
+    tree = RandomForestClassifier(n_estimators=1, max_depth=1).fit(
+        [[0.0], [1.0]], [0, 1]
+    )
+    return hasattr(tree.estimators_[0].tree_, "missing_go_to_left")
+
+
 ort_version = ".".join(ort_version.split(".")[:2])
 
 BACKEND = (
@@ -537,6 +544,103 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan_multi(self):
         self.common_test_model_hgb_classifier(True, n_classes=3)
+
+    @unittest.skipIf(
+        not _supports_missing_go_to_left(),
+        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_random_forest_classifier_nan(self):
+        rng = numpy.random.RandomState(12345)
+        X, y = make_classification(
+            n_features=10, n_samples=1000, n_informative=4, random_state=42
+        )
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = numpy.nan
+        X = X.astype(numpy.float32)
+
+        model = RandomForestClassifier(n_estimators=10, max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(
+            any(e.tree_.missing_go_to_left.any() for e in model.estimators_)
+        )
+
+        model_onnx = convert_sklearn(
+            model,
+            "random forest classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnRandomForestClassifierNan"
+        )
+
+    @unittest.skipIf(
+        not _supports_missing_go_to_left(),
+        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_extra_trees_classifier_nan(self):
+        rng = numpy.random.RandomState(12345)
+        X, y = make_classification(
+            n_features=10, n_samples=1000, n_informative=4, random_state=42
+        )
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = numpy.nan
+        X = X.astype(numpy.float32)
+
+        model = ExtraTreesClassifier(n_estimators=10, max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(
+            any(e.tree_.missing_go_to_left.any() for e in model.estimators_)
+        )
+
+        model_onnx = convert_sklearn(
+            model,
+            "extra trees classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnExtraTreesClassifierNan"
+        )
+
+    @unittest.skipIf(
+        not _supports_missing_go_to_left(),
+        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_random_forest_regressor_nan(self):
+        rng = numpy.random.RandomState(12345)
+        X, y = make_regression(n_features=10, n_samples=1000, random_state=42)
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = numpy.nan
+        X = X.astype(numpy.float32)
+        y = y.astype(numpy.float32)
+
+        model = RandomForestRegressor(n_estimators=10, max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(
+            any(e.tree_.missing_go_to_left.any() for e in model.estimators_)
+        )
+
+        model_onnx = convert_sklearn(
+            model,
+            "random forest regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnRandomForestRegressorNan-Dec4"
+        )
 
     @unittest.skipIf(
         HistGradientBoostingRegressor is None,
