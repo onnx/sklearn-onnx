@@ -151,7 +151,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
     def test_grid_search_gaussian_regressor_float(self):
         tuned_parameters = [{"alpha": np.logspace(-4, -0.5, 4)}]
         clf = GridSearchCV(GaussianProcessRegressor(), tuned_parameters, cv=5)
-        model, X = fit_regression_model(clf)
+        model, X = fit_regression_model(clf, factor=0.003)
         model_onnx = convert_sklearn(
             model,
             "GridSearchCV",
@@ -163,7 +163,7 @@ class TestSklearnGridSearchCVModels(unittest.TestCase):
             X,
             model,
             model_onnx,
-            basename="SklearnGridSearchGaussianRegressionFloat-OneOffArray-Dec4",
+            basename="SklearnGridSearchGaussianRegressionFloat-OneOffArray-Dec2",
         )
 
     @unittest.skipIf(
