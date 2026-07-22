@@ -168,11 +168,9 @@ def bench(
                             # measures treelite
                             if fct3 is not None:
                                 st = time()
-                                r2 = 0
-                                for X in Xs:
+                                for r2, X in enumerate(Xs):
                                     p2 = fct3(X)
-                                    r2 += 1
-                                    if r2 >= repeated:
+                                    if r2 + 1 >= repeated:
                                         break
                                 end = time()
                                 obs["time_lite"] = (end - st) / repeated
