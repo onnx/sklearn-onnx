@@ -6,6 +6,7 @@ import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
 from pandas import DataFrame
+import sklearn
 from sklearn.tree import (
     DecisionTreeClassifier,
     DecisionTreeRegressor,
@@ -39,9 +40,15 @@ from test_utils import (
 ort_version = ort_version.split("+")[0]
 
 
-def _supports_missing_go_to_left():
-    tree = DecisionTreeClassifier(max_depth=1).fit([[0.0], [1.0]], [0, 1]).tree_
-    return hasattr(tree, "missing_go_to_left")
+def _sklearn_version():
+    # Remove development version 0.22.dev0 becomes 0.22.
+    v = ".".join(sklearn.__version__.split(".")[:2])
+    return pv.Version(v)
+
+
+# The "best" splitter used by decision trees learned to route NaN at fit time
+# in scikit-learn 1.3. Fitting on data holding NaN raises ValueError before it.
+_NAN_BEST_SPLITTER = _sklearn_version() >= pv.Version("1.3")
 
 
 class TestSklearnDecisionTreeModels(unittest.TestCase):
@@ -370,8 +377,8 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        not _supports_missing_go_to_left(),
-        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+        not _NAN_BEST_SPLITTER,
+        reason="scikit-learn < 1.3 does not accept NaN in DecisionTree",
     )
     def test_decision_tree_classifier_nan(self):
         rng = np.random.RandomState(12345)
@@ -400,8 +407,8 @@ class TestSklearnDecisionTreeModels(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        not _supports_missing_go_to_left(),
-        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+        not _NAN_BEST_SPLITTER,
+        reason="scikit-learn < 1.3 does not accept NaN in DecisionTree",
     )
     def test_decision_tree_regressor_nan(self):
         rng = np.random.RandomState(12345)

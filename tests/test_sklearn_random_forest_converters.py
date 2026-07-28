@@ -71,11 +71,12 @@ def _onnx121() -> bool:
     return pv.Version(onnx.__version__) >= pv.Version("1.21.0")
 
 
-def _supports_missing_go_to_left():
-    tree = RandomForestClassifier(n_estimators=1, max_depth=1).fit(
-        [[0.0], [1.0]], [0, 1]
-    )
-    return hasattr(tree.estimators_[0].tree_, "missing_go_to_left")
+# scikit-learn learned to route NaN at fit time one splitter at a time:
+# 1.3 for the "best" splitter (decision trees, random forests) and 1.6 for the
+# "random" splitter (extra trees). Fitting on data holding NaN raises
+# ValueError before those versions.
+_NAN_BEST_SPLITTER = _sklearn_version() >= pv.Version("1.3")
+_NAN_RANDOM_SPLITTER = _sklearn_version() >= pv.Version("1.6")
 
 
 ort_version = ".".join(ort_version.split(".")[:2])
@@ -546,8 +547,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         self.common_test_model_hgb_classifier(True, n_classes=3)
 
     @unittest.skipIf(
-        not _supports_missing_go_to_left(),
-        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+        not _NAN_BEST_SPLITTER,
+        reason="scikit-learn < 1.3 does not accept NaN in RandomForest",
     )
     @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_nan(self):
@@ -579,8 +580,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        not _supports_missing_go_to_left(),
-        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+        not _NAN_RANDOM_SPLITTER,
+        reason="scikit-learn < 1.6 does not accept NaN in ExtraTrees",
     )
     @ignore_warnings(category=FutureWarning)
     def test_model_extra_trees_classifier_nan(self):
@@ -612,8 +613,8 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         )
 
     @unittest.skipIf(
-        not _supports_missing_go_to_left(),
-        reason="tree_.missing_go_to_left is missing in this scikit-learn version",
+        not _NAN_BEST_SPLITTER,
+        reason="scikit-learn < 1.3 does not accept NaN in RandomForest",
     )
     @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_regressor_nan(self):
