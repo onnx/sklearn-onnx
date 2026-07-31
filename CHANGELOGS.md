@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix BayesianRidge standard-deviation conversion to use the correct
+  predictive variance.
 * Updated CI to test scikit-learn==1.9.0 while keeping scikit-learn==1.8.0
   [#1257](https://github.com/onnx/sklearn-onnx/issues/1257)
 * Supports DummyRegressor and DummyClassifier [#1238](https://github.com/onnx/sklearn-onnx/issues/1238)

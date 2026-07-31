@@ -1,12 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import numpy as np
+from sklearn import __version__ as sklearn_version
+
 from ..common._apply_operation import (
     apply_cast,
     apply_add,
     apply_concat,
     apply_sqrt,
     apply_div,
+    apply_mul,
     apply_sub,
     apply_reshape,
 )
@@ -30,6 +33,15 @@ from ..algebra.onnx_ops import (
     OnnxReshape,
     OnnxSigmoid,
 )
+
+
+def _sklearn_version_release():
+    try:
+        import packaging.version as pv
+
+        return pv.Version(sklearn_version).release[:2]
+    except ImportError:
+        return tuple(int(part) for part in sklearn_version.split(".")[:2])
 
 
 def convert_sklearn_linear_regressor(
@@ -132,26 +144,30 @@ def convert_sklearn_bayesian_ridge(
         return
 
     proto_dtype = guess_proto_type(operator.inputs[0].type)
-    if hasattr(op, "normalize") and op.normalize:
-        # if self.normalize:
-        #     X = (X - self.X_offset_) / self.X_scale_
+    sklearn_release = _sklearn_version_release()
+    # Before 1.2, normalize=True centered and scaled the variance features.
+    # Starting with 1.9, predict always centers them without scaling.
+    legacy_normalize = sklearn_release < (1, 2) and getattr(op, "_normalize", False)
+    if sklearn_release >= (1, 9) or legacy_normalize:
         offset = scope.get_unique_variable_name("offset")
         container.add_initializer(
             offset, proto_dtype, op.X_offset_.shape, op.X_offset_.ravel().tolist()
         )
-        scale = scope.get_unique_variable_name("scale")
-        container.add_initializer(
-            scale, proto_dtype, op.X_scale_.shape, op.X_scale_.ravel().tolist()
-        )
         centered = scope.get_unique_variable_name("centered")
         apply_sub(scope, [operator.inputs[0].full_name, offset], centered, container)
-        scaled = scope.get_unique_variable_name("scaled")
-        apply_div(scope, [centered, scale], scaled, container)
-        input_name = scaled
+        input_name = centered
+        if legacy_normalize:
+            scale = scope.get_unique_variable_name("scale")
+            container.add_initializer(
+                scale, proto_dtype, op.X_scale_.shape, op.X_scale_.ravel().tolist()
+            )
+            scaled = scope.get_unique_variable_name("scaled")
+            apply_div(scope, [centered, scale], scaled, container)
+            input_name = scaled
     else:
         input_name = operator.inputs[0].full_name
 
-    # sigmas_squared_data = (np.dot(X, self.sigma_) * X).sum(axis=1)
+    # Compute the row-wise quadratic form x.T @ sigma_ @ x.
     sigma = scope.get_unique_variable_name("sigma")
     container.add_initializer(
         sigma, proto_dtype, op.sigma_.shape, op.sigma_.ravel().tolist()
@@ -163,11 +179,13 @@ def convert_sklearn_bayesian_ridge(
         sigmaed0,
         name=scope.get_unique_operator_name("MatMul"),
     )
+    weighted = scope.get_unique_variable_name("weighted")
+    apply_mul(scope, [sigmaed0, input_name], weighted, container)
     sigmaed = scope.get_unique_variable_name("sigma")
     if container.target_opset < 13:
         container.add_node(
             "ReduceSum",
-            sigmaed0,
+            weighted,
             sigmaed,
             axes=[1],
             name=scope.get_unique_operator_name("ReduceSum"),
@@ -177,7 +195,7 @@ def convert_sklearn_bayesian_ridge(
         container.add_initializer(axis_name, onnx_proto.TensorProto.INT64, [1], [1])
         container.add_node(
             "ReduceSum",
-            [sigmaed0, axis_name],
+            [weighted, axis_name],
             sigmaed,
             name=scope.get_unique_operator_name("ReduceSum"),
         )
