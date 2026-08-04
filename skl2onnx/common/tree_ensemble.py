@@ -183,6 +183,9 @@ def add_tree_to_attribute_pairs(
     adjust_threshold_for_sklearn=False,
     dtype=None,
 ):
+    # scikit-learn >= 1.3/1.4 trees route NaN per-node via missing_go_to_left,
+    # learned at fit time; trees fitted by older sklearn lack the attribute.
+    missing_go_to_left = getattr(tree, "missing_go_to_left", None)
     for i in range(tree.node_count):
         node_id = i
         weight = tree.value[i]
@@ -193,12 +196,16 @@ def add_tree_to_attribute_pairs(
             threshold = tree.threshold[i]
             left_child_id = int(tree.children_left[i])
             right_child_id = int(tree.children_right[i])
+            missing = (
+                int(missing_go_to_left[i]) if missing_go_to_left is not None else 0
+            )
         else:
             mode = "LEAF"
             feat_id = 0
             threshold = 0.0
             left_child_id = 0
             right_child_id = 0
+            missing = 0
 
         add_node(
             attr_pairs,
@@ -216,6 +223,7 @@ def add_tree_to_attribute_pairs(
             leaf_weights_are_counts,
             adjust_threshold_for_sklearn=adjust_threshold_for_sklearn,
             dtype=dtype,
+            nodes_missing_value_tracks_true=missing,
         )
 
 
