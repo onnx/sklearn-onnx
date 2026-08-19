@@ -5,6 +5,7 @@ from sklearn import __version__ as skl_version
 from sklearn.utils._testing import ignore_warnings
 from sklearn.exceptions import ConvergenceWarning
 from onnxruntime import __version__ as ort_version
+from test_utils import TARGET_OPSET
 
 
 class TestInvestigate(unittest.TestCase):
@@ -284,7 +285,6 @@ class TestInvestigate(unittest.TestCase):
                 assert modelengine is not None
 
     def test_issue_1129_lr(self):
-
         import numpy as np
         from numpy.testing import assert_almost_equal
         import pandas as pd
@@ -329,7 +329,10 @@ class TestInvestigate(unittest.TestCase):
 
                 # Convert the model to ONNX
                 onnx_model = skl2onnx.to_onnx(
-                    model, x.values, options={"zipmap": False}
+                    model,
+                    x.values,
+                    options={"zipmap": False},
+                    target_opset=TARGET_OPSET,
                 )
                 # Take predictions and probabilities with ONNX
                 sess = InferenceSession(
