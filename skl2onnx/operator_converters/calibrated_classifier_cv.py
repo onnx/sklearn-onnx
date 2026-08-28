@@ -10,6 +10,7 @@ from ..common._apply_operation import (
     apply_div,
     apply_exp,
     apply_mul,
+    apply_reducesum,
     apply_reshape,
     apply_sub,
 )
@@ -234,23 +235,7 @@ def _transform_isotonic(scope, container, model, T, k, proto_type):
         name=scope.get_unique_operator_name("Less"),
     )
     apply_cast(scope, below_name, below_int_name, container, to=TensorProto.INT64)
-    if container.target_opset < 13:
-        container.add_node(
-            "ReduceSum",
-            below_int_name,
-            segment_name,
-            axes=[1],
-            name=scope.get_unique_operator_name("ReduceSum"),
-        )
-    else:
-        axis_name = scope.get_unique_variable_name("axis")
-        container.add_initializer(axis_name, TensorProto.INT64, [1], [1])
-        container.add_node(
-            "ReduceSum",
-            [below_int_name, axis_name],
-            segment_name,
-            name=scope.get_unique_operator_name("ReduceSum"),
-        )
+    apply_reducesum(scope, below_int_name, segment_name, container, axes=[1])
 
     x0_name = scope.get_unique_variable_name("x0")
     x1_name = scope.get_unique_variable_name("x1")
@@ -333,12 +318,12 @@ def convert_calibrated_classifier_base_estimator(
     #       |                          |          |                          |
     #       |if model.method='sigmoid' |          |if model.method='isotonic'|
     #       |                          |          |                          |
-    #       V                          V          |if out_of_bounds='clip'   |
+    #       V                          V          |linear interpolation      |
     #      MUL <-------- a -------->  MUL         V                          V
-    #       |                          |          CLIP     ...             CLIP
+    #       |                          |          INTERP   ...           INTERP
     #       V                          V          |                          |
     #  a_df_prod [M, 1]  ... a_df_prod [M, 1]     V                          V
-    #       |                          |  clipped_df [M, 1]...clipped_df [M, 1]
+    #       |                          |  interp_df [M, 1] ... interp_df [M, 1]
     #       V                          V          |                          |
     #      ADD <--------- b ---------> ADD        '-------------------.------'
     #         |                          |                            |
