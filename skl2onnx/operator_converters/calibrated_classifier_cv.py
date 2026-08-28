@@ -133,8 +133,8 @@ def _transform_sigmoid(scope, container, model, df_col_name, k, proto_type):
 def _transform_isotonic(scope, container, model, T, k, proto_type):
     """
     Isotonic calibration method
-    The calibrator is the piecewise linear function *IsotonicRegression.predict*
-    interpolates between its thresholds.
+    The calibrator is written as the piecewise linear function
+    *IsotonicRegression.predict* interpolates between its thresholds.
     """
     if hasattr(model, "calibrators_"):
         # scikit-learn<1.1
@@ -148,6 +148,42 @@ def _transform_isotonic(scope, container, model, T, k, proto_type):
             "calibrators, check the model was trained, "
             "type=%r." % type(model)
         )
+
+    # thresholds can be too close together for single precision
+    cast_df_name = scope.get_unique_variable_name("cast_df")
+    apply_cast(scope, T, cast_df_name, container, to=TensorProto.DOUBLE)
+    T = cast_df_name
+
+    if calibrators[k].out_of_bounds == "clip":
+        clip_min_name = scope.get_unique_variable_name("clip_min")
+        clip_max_name = scope.get_unique_variable_name("clip_max")
+        lower_df_name = scope.get_unique_variable_name("lower_df")
+        clipped_df_name = scope.get_unique_variable_name("clipped_df")
+        container.add_initializer(
+            clip_min_name, TensorProto.DOUBLE, [], [calibrators[k].X_min_]
+        )
+        container.add_initializer(
+            clip_max_name, TensorProto.DOUBLE, [], [calibrators[k].X_max_]
+        )
+        # Max and Min, Clip takes no double bounds before opset 12
+        container.add_node(
+            "Max",
+            [T, clip_min_name],
+            lower_df_name,
+            name=scope.get_unique_operator_name("Max"),
+        )
+        container.add_node(
+            "Min",
+            [lower_df_name, clip_max_name],
+            clipped_df_name,
+            name=scope.get_unique_operator_name("Min"),
+        )
+        T = clipped_df_name
+
+    reshaped_df_name = scope.get_unique_variable_name("reshaped_df")
+    below_name = scope.get_unique_variable_name("below_segment_x")
+    below_int_name = scope.get_unique_variable_name("below_segment_x_int")
+    segment_name = scope.get_unique_variable_name("segment")
 
     if hasattr(calibrators[k], "_X_"):
         atX, atY = "_X_", "_y_"
@@ -173,68 +209,35 @@ def _transform_isotonic(scope, container, model, T, k, proto_type):
         knots_x = np.hstack([knots_x, knots_x + 1])
         knots_y = np.hstack([knots_y, knots_y])
 
+    segment_x_name = scope.get_unique_variable_name("segment_x")
+    lower_x_name = scope.get_unique_variable_name("lower_x")
+    upper_x_name = scope.get_unique_variable_name("upper_x")
+    lower_y_name = scope.get_unique_variable_name("lower_y")
+    upper_y_name = scope.get_unique_variable_name("upper_y")
+
     # The segment holding T is the number of upper bounds T is greater than.
     # Repeating the last segment keeps that index in range whatever T is.
-    segments = {
-        "segment_x": knots_x[1:],
-        "lower_x": np.hstack([knots_x[:-1], knots_x[-2:-1]]),
-        "upper_x": np.hstack([knots_x[1:], knots_x[-1:]]),
-        "lower_y": np.hstack([knots_y[:-1], knots_y[-2:-1]]),
-        "upper_y": np.hstack([knots_y[1:], knots_y[-1:]]),
-    }
-    names = {}
-    for key, values in segments.items():
-        names[key] = scope.get_unique_variable_name(key)
-        # thresholds can be too close together for single precision
-        container.add_initializer(names[key], TensorProto.DOUBLE, [len(values)], values)
-
-    cast_df_name = scope.get_unique_variable_name("cast_df")
-    apply_cast(scope, T, cast_df_name, container, to=TensorProto.DOUBLE)
-    T = cast_df_name
-
-    if calibrators[k].out_of_bounds == "clip":
-        min_name = scope.get_unique_variable_name("clip_min")
-        max_name = scope.get_unique_variable_name("clip_max")
-        lower_df_name = scope.get_unique_variable_name("lower_df")
-        clipped_df_name = scope.get_unique_variable_name("clipped_df")
-        container.add_initializer(
-            min_name, TensorProto.DOUBLE, [], [calibrators[k].X_min_]
-        )
-        container.add_initializer(
-            max_name, TensorProto.DOUBLE, [], [calibrators[k].X_max_]
-        )
-        # Max and Min rather than Clip, which takes no double bounds before opset 12
-        container.add_node(
-            "Max",
-            [T, min_name],
-            lower_df_name,
-            name=scope.get_unique_operator_name("Max"),
-        )
-        container.add_node(
-            "Min",
-            [lower_df_name, max_name],
-            clipped_df_name,
-            name=scope.get_unique_operator_name("Min"),
-        )
-        T = clipped_df_name
-
-    reshaped_df_name = scope.get_unique_variable_name("reshaped_df")
-    passed_name = scope.get_unique_variable_name("passed_segment_x")
-    passed_int_name = scope.get_unique_variable_name("passed_segment_x_int")
-    segment_name = scope.get_unique_variable_name("segment")
+    for name, values in [
+        (segment_x_name, knots_x[1:]),
+        (lower_x_name, np.hstack([knots_x[:-1], knots_x[-2:-1]])),
+        (upper_x_name, np.hstack([knots_x[1:], knots_x[-1:]])),
+        (lower_y_name, np.hstack([knots_y[:-1], knots_y[-2:-1]])),
+        (upper_y_name, np.hstack([knots_y[1:], knots_y[-1:]])),
+    ]:
+        container.add_initializer(name, TensorProto.DOUBLE, [len(values)], values)
 
     apply_reshape(scope, T, reshaped_df_name, container, desired_shape=(-1, 1))
     container.add_node(
         "Less",
-        [names["segment_x"], reshaped_df_name],
-        passed_name,
+        [segment_x_name, reshaped_df_name],
+        below_name,
         name=scope.get_unique_operator_name("Less"),
     )
-    apply_cast(scope, passed_name, passed_int_name, container, to=TensorProto.INT64)
+    apply_cast(scope, below_name, below_int_name, container, to=TensorProto.INT64)
     if container.target_opset < 13:
         container.add_node(
             "ReduceSum",
-            passed_int_name,
+            below_int_name,
             segment_name,
             axes=[1],
             name=scope.get_unique_operator_name("ReduceSum"),
@@ -244,18 +247,25 @@ def _transform_isotonic(scope, container, model, T, k, proto_type):
         container.add_initializer(axis_name, TensorProto.INT64, [1], [1])
         container.add_node(
             "ReduceSum",
-            [passed_int_name, axis_name],
+            [below_int_name, axis_name],
             segment_name,
             name=scope.get_unique_operator_name("ReduceSum"),
         )
 
-    gathered = {}
-    for key in ["lower_x", "upper_x", "lower_y", "upper_y"]:
-        gathered[key] = scope.get_unique_variable_name("gathered_%s" % key)
+    x0_name = scope.get_unique_variable_name("x0")
+    x1_name = scope.get_unique_variable_name("x1")
+    y0_name = scope.get_unique_variable_name("y0")
+    y1_name = scope.get_unique_variable_name("y1")
+    for data_name, gathered_name in [
+        (lower_x_name, x0_name),
+        (upper_x_name, x1_name),
+        (lower_y_name, y0_name),
+        (upper_y_name, y1_name),
+    ]:
         container.add_node(
             "Gather",
-            [names[key], segment_name],
-            gathered[key],
+            [data_name, segment_name],
+            gathered_name,
             name=scope.get_unique_operator_name("Gather"),
         )
 
@@ -266,36 +276,13 @@ def _transform_isotonic(scope, container, model, T, k, proto_type):
     ratio_name = scope.get_unique_variable_name("ratio")
     interpolated_name = scope.get_unique_variable_name("interpolated")
 
-    apply_sub(
-        scope,
-        [gathered["upper_y"], gathered["lower_y"]],
-        delta_y_name,
-        container,
-        broadcast=0,
-    )
-    apply_sub(
-        scope,
-        [gathered["upper_x"], gathered["lower_x"]],
-        delta_x_name,
-        container,
-        broadcast=0,
-    )
-    apply_sub(
-        scope,
-        [reshaped_df_name, gathered["lower_x"]],
-        offset_name,
-        container,
-        broadcast=0,
-    )
+    apply_sub(scope, [y1_name, y0_name], delta_y_name, container, broadcast=0)
+    apply_sub(scope, [x1_name, x0_name], delta_x_name, container, broadcast=0)
+    apply_sub(scope, [reshaped_df_name, x0_name], offset_name, container, broadcast=0)
     apply_mul(scope, [delta_y_name, offset_name], scaled_name, container, broadcast=0)
     apply_div(scope, [scaled_name, delta_x_name], ratio_name, container, broadcast=0)
-    apply_add(
-        scope,
-        [gathered["lower_y"], ratio_name],
-        interpolated_name,
-        container,
-        broadcast=0,
-    )
+    apply_add(scope, [y0_name, ratio_name], interpolated_name, container, broadcast=0)
+
     if proto_type2 == TensorProto.DOUBLE:
         return interpolated_name
 
