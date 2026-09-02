@@ -1,5 +1,13 @@
 name: CI Linux
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   run:
     name: Py==${{ matrix.python_version }} - sklearn${{ matrix.sklearn_version }} - ${{ matrix.onnxrt_version }}
@@ -94,10 +102,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python_version }}
 
