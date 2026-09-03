@@ -200,7 +200,7 @@ class GraphState:
                     np.uint8,
                 ),
             ):
-                return [self._add_constant(var)]
+                return [self._add_constant(var, scope=self.scope)]
             if hasattr(var, "ConstantValue"):
                 return [self._add_constant(var.ConstantValue, scope=self.scope)]
             if isinstance(var, str):
