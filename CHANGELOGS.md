@@ -2,6 +2,7 @@
 
 ## 1.21.0
 
+* Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
 * Fix BayesianRidge standard-deviation conversion to use the correct
   predictive variance.
 * Updated CI to test scikit-learn==1.9.0 while keeping scikit-learn==1.8.0
