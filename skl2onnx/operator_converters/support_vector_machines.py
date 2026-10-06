@@ -212,11 +212,11 @@ def convert_sklearn_svm_classifier(
     use_raw_scores = options["raw_scores"]
 
     if operator.type in ["SklearnSVC", "SklearnNuSVC"] or isinstance(op, (SVC, NuSVC)):
-        if len(op.probA_) > 0:
+        if not use_raw_scores and len(op.probA_) > 0:
             svm_attrs["prob_a"] = op.probA_.astype(np.float32)
         else:
             handles_ovr = True
-        if len(op.probB_) > 0:
+        if not use_raw_scores and len(op.probB_) > 0:
             svm_attrs["prob_b"] = op.probB_.astype(np.float32)
 
         if (
