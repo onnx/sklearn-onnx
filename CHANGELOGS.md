@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
+  the converted model returned the raw prediction instead of applying the exponential link
 * Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
 * Fix BayesianRidge standard-deviation conversion to use the correct
   predictive variance.

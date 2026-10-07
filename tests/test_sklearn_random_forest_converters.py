@@ -425,6 +425,29 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
 
+    @unittest.skipIf(
+        HistGradientBoostingRegressor is None,
+        reason="scikit-learn 0.22 + manual activation",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_hgb_regressor_log_link(self):
+        # poisson and gamma losses predict exp(raw prediction)
+        X, y = make_regression(n_features=5, n_samples=200, random_state=42)
+        X = X.astype(numpy.float32)
+        y = numpy.exp(y / numpy.abs(y).max())
+        for loss in ("poisson", "gamma"):
+            with self.subTest(loss=loss):
+                model = HistGradientBoostingRegressor(
+                    loss=loss, max_iter=5, max_depth=2
+                ).fit(X, y)
+                model_onnx = to_onnx(model, X[:1], target_opset=TARGET_OPSET)
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                got = sess.run(None, {sess.get_inputs()[0].name: X})[0]
+                assert_almost_equal(model.predict(X), got.ravel(), decimal=4)
+
     def common_test_model_hgb_classifier(self, add_nan=False, n_classes=2):
         model = HistGradientBoostingClassifier(max_iter=5, max_depth=2)
         X, y = make_classification(

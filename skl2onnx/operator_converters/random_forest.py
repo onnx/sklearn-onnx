@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomTreesEmbedding
 from ..common._apply_operation import (
     apply_cast,
     apply_concat,
+    apply_exp,
     apply_reshape,
     apply_transpose,
 )
@@ -541,14 +542,26 @@ def convert_sklearn_random_forest_regressor_converter(
             ):
                 attrs[k] = np.array(attrs[k], dtype=dtype).ravel()
 
+    # HistGradientBoostingRegressor with loss='poisson' or 'gamma' predicts
+    # through a log link: prediction = exp(raw prediction).
+    link = getattr(getattr(op, "_loss", None), "link", None)
+    log_link = hasattr(op, "_predictors") and type(link).__name__ == "LogLink"
+    tree_output = (
+        scope.get_unique_variable_name("raw_prediction")
+        if log_link
+        else operator.outputs[0].full_name
+    )
+
     container.add_node(
         op_type,
         input_name,
-        operator.outputs[0].full_name,
+        tree_output,
         op_domain=op_domain,
         op_version=op_version,
         **attrs,
     )
+    if log_link:
+        apply_exp(scope, tree_output, operator.outputs[0].full_name, container)
 
     if hasattr(op, "n_trees_per_iteration_"):
         # HistGradientBoostingRegressor does not implement decision_path.
