@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Add support for temperature scaling in CalibratedClassifierCV
+  [#1267](https://github.com/onnx/sklearn-onnx/issues/1267)
 * Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
 * Fix BayesianRidge standard-deviation conversion to use the correct
   predictive variance.
