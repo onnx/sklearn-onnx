@@ -2,6 +2,9 @@
 
 ## 1.21.0
 
+* Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum
+  absolute value) and keep rows of zeros at zero with double inputs
+  [#793](https://github.com/onnx/sklearn-onnx/issues/793)
 * Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
 * Fix BayesianRidge standard-deviation conversion to use the correct
   predictive variance.

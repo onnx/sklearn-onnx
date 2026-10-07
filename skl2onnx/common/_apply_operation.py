@@ -176,12 +176,15 @@ def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
     Adds operator Normalizer if *use_float* is true,
     otherwise, uses *ReduceSum* + *Div*. *Normalizer*
     always produces float according to ONNX speciciations.
+    Norm MAX always uses the second way: ONNX Normalizer divides
+    by the maximum while scikit-learn divides by the maximum
+    absolute value.
     """
     input = inputs[0] if isinstance(inputs, list) else inputs
     output = outputs[0] if isinstance(outputs, list) else outputs
     use_normalizer = container.is_allowed({"Normalizer"})
 
-    if use_normalizer and use_float:
+    if use_normalizer and use_float and norm != "MAX":
         container.add_node(
             "Normalizer",
             input,
@@ -190,81 +193,89 @@ def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
             norm=norm,
             name=scope.get_unique_operator_name("Normalizer"),
         )
-    else:
-        # Normalizer only produces floats.
-        if norm == "L1":
-            norm = scope.get_unique_variable_name("norm")
-            norm_abs = scope.get_unique_variable_name("norm_abs")
-            container.add_node(
-                "Abs", input, norm_abs, name=scope.get_unique_operator_name("Abs")
-            )
+        return
 
-            if container.target_opset < 13:
-                container.add_node(
-                    "ReduceSum",
-                    norm_abs,
-                    norm,
-                    axes=[1],
-                    keepdims=1,
-                    name=scope.get_unique_operator_name("ReduceSum"),
-                )
-            else:
-                axis_name = scope.get_unique_variable_name("axis")
-                container.add_initializer(
-                    axis_name, onnx_proto.TensorProto.INT64, [1], [1]
-                )
-                container.add_node(
-                    "ReduceSum",
-                    [norm_abs, axis_name],
-                    norm,
-                    keepdims=1,
-                    name=scope.get_unique_operator_name("ReduceSum"),
-                )
-            apply_div(
-                scope,
-                [input, norm],
-                output,
-                container,
-                operator_name=scope.get_unique_operator_name("NormalizerNorm"),
-            )
-        elif norm == "L2":
-            norm = scope.get_unique_variable_name("norm")
-            norm2 = scope.get_unique_variable_name("norm2")
-            if container.target_opset < 18:
-                container.add_node(
-                    "ReduceSumSquare",
-                    input,
-                    norm,
-                    axes=[1],
-                    keepdims=1,
-                    name=scope.get_unique_operator_name("ReduceSumSquare"),
-                )
-            else:
-                axis_name = scope.get_unique_variable_name("axis")
-                container.add_initializer(
-                    axis_name, onnx_proto.TensorProto.INT64, [1], [1]
-                )
-                container.add_node(
-                    "ReduceSumSquare",
-                    [input, axis_name],
-                    norm,
-                    keepdims=1,
-                    name=scope.get_unique_operator_name("ReduceSumSquare"),
-                )
+    def _reduce(op_type, reduce_input, reduce_output):
+        # ReduceSum takes axes as an input from opset 13,
+        # the other reductions from opset 18.
+        if container.target_opset < (13 if op_type == "ReduceSum" else 18):
             container.add_node(
-                "Sqrt", [norm], norm2, name=scope.get_unique_operator_name("Sqrt")
-            )
-            apply_div(
-                scope,
-                [input, norm2],
-                output,
-                container,
-                operator_name=scope.get_unique_operator_name("NormalizerNorm"),
+                op_type,
+                reduce_input,
+                reduce_output,
+                axes=[1],
+                keepdims=1,
+                name=scope.get_unique_operator_name(op_type),
             )
         else:
-            raise NotImplementedError(
-                "Normalization not implemented for norm %r." % norm
+            axis_name = scope.get_unique_variable_name("axis")
+            container.add_initializer(axis_name, onnx_proto.TensorProto.INT64, [1], [1])
+            container.add_node(
+                op_type,
+                [reduce_input, axis_name],
+                reduce_output,
+                keepdims=1,
+                name=scope.get_unique_operator_name(op_type),
             )
+
+    # Normalizer only produces floats.
+    norm_name = scope.get_unique_variable_name("norm")
+    if norm in ("L1", "MAX"):
+        norm_abs = scope.get_unique_variable_name("norm_abs")
+        container.add_node(
+            "Abs", input, norm_abs, name=scope.get_unique_operator_name("Abs")
+        )
+        _reduce("ReduceSum" if norm == "L1" else "ReduceMax", norm_abs, norm_name)
+    elif norm == "L2":
+        norm2 = scope.get_unique_variable_name("norm2")
+        _reduce("ReduceSumSquare", input, norm2)
+        container.add_node(
+            "Sqrt", [norm2], norm_name, name=scope.get_unique_operator_name("Sqrt")
+        )
+    else:
+        raise NotImplementedError("Normalization not implemented for norm %r." % norm)
+
+    if container.target_opset < 11:
+        # Equal does not support floats before opset 11.
+        apply_div(
+            scope,
+            [input, norm_name],
+            output,
+            container,
+            operator_name=scope.get_unique_operator_name("NormalizerNorm"),
+        )
+        return
+
+    # As scikit-learn does, rows with a null norm (only zeros) are left
+    # unchanged. norm - norm gives a zero of the right type.
+    zero_name = scope.get_unique_variable_name("zero")
+    container.add_node(
+        "Sub",
+        [norm_name, norm_name],
+        zero_name,
+        name=scope.get_unique_operator_name("Sub"),
+    )
+    is_zero = scope.get_unique_variable_name("is_zero")
+    container.add_node(
+        "Equal",
+        [norm_name, zero_name],
+        is_zero,
+        name=scope.get_unique_operator_name("Equal"),
+    )
+    divided = scope.get_unique_variable_name("divided")
+    apply_div(
+        scope,
+        [input, norm_name],
+        divided,
+        container,
+        operator_name=scope.get_unique_operator_name("NormalizerNorm"),
+    )
+    container.add_node(
+        "Where",
+        [is_zero, input, divided],
+        output,
+        name=scope.get_unique_operator_name("Where"),
+    )
 
 
 def _create_name_or_use_existing_one(scope, op_type, name):

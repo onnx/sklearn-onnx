@@ -123,6 +123,33 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
             basename="SklearnNormalizerL2Double-SkipDim1",
         )
 
+    def test_model_normalizer_max_and_zero_rows(self):
+        # norm="max" divides by the maximum absolute value, and a row of
+        # zeros stays zeros
+        x = numpy.array(
+            [[-3, 1, 2], [0, 0, 0], [1, -0.5, 0.25], [-1, -2, -4]],
+            dtype=numpy.float64,
+        )
+        for norm in ["max", "l1", "l2"]:
+            for dtype, tensor_type in [
+                (numpy.float32, FloatTensorType),
+                (numpy.float64, DoubleTensorType),
+            ]:
+                with self.subTest(norm=norm, dtype=dtype):
+                    model = Normalizer(norm=norm).fit(x)
+                    model_onnx = convert_sklearn(
+                        model,
+                        "scikit-learn normalizer",
+                        [("input", tensor_type([None, 3]))],
+                        target_opset=TARGET_OPSET,
+                    )
+                    dump_data_and_model(
+                        x.astype(dtype),
+                        model,
+                        model_onnx,
+                        basename=f"SklearnNormalizer{norm}{dtype.__name__}Zero",
+                    )
+
     def test_model_normalizer_float_noshape(self):
         model = Normalizer(norm="l2")
         x = numpy.random.randn(10, 3).astype(numpy.float32)
