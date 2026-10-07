@@ -155,11 +155,16 @@ def convert_quadratic_discriminant_analysis_classifier(
 
     classes = scope.get_unique_variable_name("classes")
     container.add_initializer(classes, class_type, [n_classes], class_labels)
+    labels_2d = scope.get_unique_variable_name("labels_2d")
     container.add_node(
         "ArrayFeatureExtractor",
         [classes, argmax_out],
-        [operator.outputs[0].full_name],
+        [labels_2d],
         op_domain="ai.onnx.ml",
+    )
+    # ArrayFeatureExtractor returns shape (1, N), the label is 1D like predict
+    apply_reshape(
+        scope, labels_2d, operator.outputs[0].full_name, container, desired_shape=(-1,)
     )
 
     df_max = scope.get_unique_variable_name("df_max")

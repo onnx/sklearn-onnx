@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* QuadraticDiscriminantAnalysis: the label output is 1D (shape `(N,)`) like `predict`,
+  it was `(1, N)`
 * Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
 * Fix BayesianRidge standard-deviation conversion to use the correct
   predictive variance.
