@@ -2,19 +2,16 @@
 
 
 """
-Inspect a pipeline
-==================
+Save and load a model
+=====================
 
-There is no other way to look into one model stored
-in ONNX format than looking into its node with
-*onnx*. This example demonstrates
-how to retrieve a model in *json*
-format.
+This example demonstrates how to save a model in ONNX format
+and load it again with *onnx*.
 
-Retrieve a model in JSON format
-+++++++++++++++++++++++++++++++
+Save a model in ONNX format
++++++++++++++++++++++++++++
 
-That's the most simple way.
+First, create a model and write it to a file.
 """
 
 import skl2onnx
