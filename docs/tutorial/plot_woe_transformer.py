@@ -26,7 +26,7 @@ to weight 55 and and the second one to 107.
 import os
 import numpy as np
 import pandas as pd
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 from onnxruntime import InferenceSession
 import matplotlib.pyplot as plt
 from skl2onnx import to_onnx
@@ -97,15 +97,8 @@ print(sess.run(None, {"X": X})[0])
 #
 # onehot=False
 
-pydot_graph = GetPydotGraph(
-    onx1.graph,
-    name=onx1.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("woe1.dot")
+with open("woe1.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(onx1))
 
 os.system("dot -O -Gdpi=300 -Tpng woe1.dot")
 
@@ -117,15 +110,8 @@ ax.axis("off")
 #######################################
 # onehot=True
 
-pydot_graph = GetPydotGraph(
-    onx2.graph,
-    name=onx2.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("woe2.dot")
+with open("woe2.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(onx2))
 
 os.system("dot -O -Gdpi=300 -Tpng woe2.dot")
 

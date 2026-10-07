@@ -35,7 +35,7 @@ import os
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 from onnxruntime import InferenceSession
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
@@ -88,15 +88,8 @@ print(md1)
 ################################
 # The graph.
 
-pydot_graph = GetPydotGraph(
-    onx1.graph,
-    name=onx1.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("cast1.dot")
+with open("cast1.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(onx1))
 
 os.system("dot -O -Gdpi=300 -Tpng cast1.dot")
 
@@ -149,15 +142,8 @@ print(md2)
 ################################
 # The graph.
 
-pydot_graph = GetPydotGraph(
-    onx2.graph,
-    name=onx2.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("cast2.dot")
+with open("cast2.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(onx2))
 
 os.system("dot -O -Gdpi=300 -Tpng cast2.dot")
 

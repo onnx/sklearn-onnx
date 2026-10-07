@@ -63,6 +63,7 @@ from test_utils import (
     ReferenceEvaluatorEx,
 )
 from onnxruntime import __version__ as ort_version
+import onnx
 
 # pv.Version does not work with development versions
 ort_version = ".".join(ort_version.split(".")[:2])
@@ -99,6 +100,29 @@ class PipeConcatenateInput:
 
 
 class TestSklearnPipeline(unittest.TestCase):
+    @unittest.skipIf(
+        onnx.defs.onnx_opset_version() < 26
+        or pv.Version(ort_version) < pv.Version("1.30"),
+        reason="ONNX opset 26 requires ONNX 1.23 and ONNX Runtime 1.30",
+    )
+    def test_pipeline_opset_26(self):
+        data = numpy.array([[0, 0], [1, 1]], dtype=numpy.float32)
+        model = Pipeline([("scaler", StandardScaler())]).fit(data)
+        model_onnx = convert_sklearn(
+            model,
+            initial_types=[("input", FloatTensorType([None, 2]))],
+            target_opset=26,
+        )
+        self.assertEqual(model_onnx.ir_version, 13)
+        self.assertEqual(
+            next(op.version for op in model_onnx.opset_import if op.domain == ""), 26
+        )
+        onnx.checker.check_model(model_onnx)
+        result = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        ).run(None, {"input": data})[0]
+        assert_almost_equal(result, model.transform(data))
+
     @ignore_warnings(category=FutureWarning)
     def test_pipeline(self):
         data = numpy.array([[0, 0], [0, 0], [1, 1], [1, 1]], dtype=numpy.float32)
@@ -307,22 +331,10 @@ class TestSklearnPipeline(unittest.TestCase):
         )
 
         if __name__ == "__main__":
-            try:
-                from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-            except ImportError:
-                return
+            from onnx_array_api.plotting.dot_plot import to_dot
 
-            pydot_graph = GetPydotGraph(
-                model_onnx.graph,
-                name=model_onnx.graph.name,
-                rankdir="TP",
-                node_producer=GetOpNodeProducer("docstring"),
-            )
-            pydot_graph.write_dot("graph.dot")
-
-            import os
-
-            os.system("dot -O -G=300 -Tpng graph.dot")
+            with open("graph.dot", "w", encoding="utf-8") as f:
+                f.write(to_dot(model_onnx))
 
     @unittest.skipIf(
         ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"

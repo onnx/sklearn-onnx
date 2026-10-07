@@ -23,7 +23,7 @@ import sklearn
 import numpy
 import matplotlib.pyplot as plt
 import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 from onnx import ModelProto
 import onnx
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
@@ -47,9 +47,7 @@ with open(filename, "wb") as f:
 #################################
 # Draw a model with ONNX
 # ++++++++++++++++++++++
-# We use `net_drawer.py
-# <https://github.com/onnx/onnx/blob/main/onnx/tools/net_drawer.py>`_
-# included in *onnx* package.
+# We use *onnx-array-api* to produce a DOT graph.
 # We use *onnx* to load the model
 # in a different way than before.
 
@@ -61,13 +59,8 @@ with open(filename, "rb") as fid:
 
 ###################################
 # We convert it into a graph.
-pydot_graph = GetPydotGraph(
-    model.graph,
-    name=model.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring"),
-)
-pydot_graph.write_dot("graph.dot")
+with open("graph.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model))
 
 #######################################
 # Then into an image

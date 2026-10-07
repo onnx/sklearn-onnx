@@ -23,7 +23,7 @@ a custom converter. Let's get the data.
 
 import matplotlib.pyplot as plt
 import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
@@ -219,15 +219,8 @@ print(pipeline.predict_proba(train_data[:1]))
 #
 # Finally, let's see the graph converted with *sklearn-onnx*.
 
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_tfidf.dot")
+with open("pipeline_tfidf.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model_onnx))
 
 os.system("dot -O -Gdpi=300 -Tpng pipeline_tfidf.dot")
 

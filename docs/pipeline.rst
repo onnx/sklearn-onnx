@@ -117,10 +117,9 @@ It can be represented as a
 
 ::
 
-    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-    pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TP",
-                                node_producer=GetOpNodeProducer("docstring"))
-    pydot_graph.write_dot("graph.dot")
+    from onnx_array_api.plotting.dot_plot import to_dot
+    with open("graph.dot", "w", encoding="utf-8") as f:
+        f.write(to_dot(model_onnx))
 
     import os
     os.system('dot -O -Tpng graph.dot'

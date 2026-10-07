@@ -31,7 +31,7 @@ import onnx
 import sklearn
 import matplotlib.pyplot as plt
 import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 from skl2onnx.helpers.onnx_helper import select_model_inputs_outputs
 from skl2onnx.helpers.onnx_helper import save_onnx_model
 from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
@@ -253,15 +253,8 @@ print("textual features", numT[0][:1])
 #
 # Finally, let's see both subgraphs. First, numerical pipeline.
 
-pydot_graph = GetPydotGraph(
-    num_onnx.graph,
-    name=num_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_titanic_num.dot")
+with open("pipeline_titanic_num.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(num_onnx))
 
 os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic_num.dot")
 
@@ -273,15 +266,8 @@ ax.axis("off")
 ######################################
 # Then textual pipeline.
 
-pydot_graph = GetPydotGraph(
-    text_onnx.graph,
-    name=text_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_titanic_text.dot")
+with open("pipeline_titanic_text.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(text_onnx))
 
 os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic_text.dot")
 

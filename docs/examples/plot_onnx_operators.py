@@ -44,7 +44,7 @@ import matplotlib.pyplot as plt
 import onnx
 from onnx import helper
 from onnx import TensorProto
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 
 # Create one input (ValueInfoProto)
 X = helper.make_tensor_value_info("X", TensorProto.FLOAT, [None, 2])
@@ -171,15 +171,8 @@ print(Y)
 # Display the ONNX graph
 # ++++++++++++++++++++++
 
-pydot_graph = GetPydotGraph(
-    model_def.graph,
-    name=model_def.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_transpose2x.dot")
+with open("pipeline_transpose2x.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model_def))
 
 os.system("dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot")
 

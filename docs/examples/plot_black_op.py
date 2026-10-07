@@ -27,7 +27,7 @@ import os
 from timeit import timeit
 import numpy as np
 import matplotlib.pyplot as plt
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 from onnxruntime import InferenceSession
 from sklearn.mixture import GaussianMixture
 from sklearn.datasets import load_iris
@@ -61,15 +61,8 @@ print(sess.run(None, {"X": xt})[2])
 ##################################
 # Display the ONNX graph.
 
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("mixture.dot")
+with open("mixture.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model_onnx))
 
 os.system("dot -O -Gdpi=300 -Tpng mixture.dot")
 
@@ -105,15 +98,8 @@ print(sess2.run(None, {"X": xt})[2])
 ##################################
 # Display the ONNX graph.
 
-pydot_graph = GetPydotGraph(
-    model_onnx2.graph,
-    name=model_onnx2.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("mixture2.dot")
+with open("mixture2.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model_onnx2))
 
 os.system("dot -O -Gdpi=300 -Tpng mixture2.dot")
 

@@ -45,7 +45,7 @@ import inspect
 import os
 import numpy
 import onnx
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 from matplotlib import offsetbox
 import matplotlib.pyplot as plt
@@ -428,15 +428,8 @@ print("transform", pred_onx[0])
 # Display the ONNX graph
 # ++++++++++++++++++++++
 
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_tsne.dot")
+with open("pipeline_tsne.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model_onnx))
 
 os.system("dot -O -Gdpi=300 -Tpng pipeline_tsne.dot")
 

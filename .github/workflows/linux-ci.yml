@@ -24,6 +24,14 @@ jobs:
             documentation: 1
             numpy_version: '>=2.0'
             scipy_version: '>=1.7.0'
+            onnx_version: 'onnx==1.23.2'
+            onnxrt_version: 'onnxruntime==1.30.0'
+            python_version: '3.13'
+          - os: ubuntu-latest
+            sklearn_version: '==1.9.0'
+            documentation: 1
+            numpy_version: '>=2.0'
+            scipy_version: '>=1.7.0'
             onnx_version: 'onnx-weekly'
             onnxrt_version: 'onnxruntime<1.25.0'
             python_version: '3.13'

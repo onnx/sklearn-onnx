@@ -37,7 +37,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from skl2onnx import update_registered_converter
 import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
+from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
@@ -258,15 +258,8 @@ print("onnx", results[2])
 # Display the ONNX graph
 # ++++++++++++++++++++++
 
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("validator_classifier.dot")
+with open("validator_classifier.dot", "w", encoding="utf-8") as f:
+    f.write(to_dot(model_onnx))
 
 os.system("dot -O -Gdpi=300 -Tpng validator_classifier.dot")
 
