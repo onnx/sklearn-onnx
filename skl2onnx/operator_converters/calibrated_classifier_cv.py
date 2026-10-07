@@ -39,7 +39,10 @@ def _transform_temperature(
     beta_name = scope.get_unique_variable_name("temperature_beta")
     unity_name = scope.get_unique_variable_name("temperature_unity")
     container.add_initializer(beta_name, proto_type, [], [calibrators[0].beta_])
-    if not (n_classes == 2 and raw_scores):
+    # Binary decision scores become (-s, s), whose row sums cannot be one.
+    # All other responses need sklearn's probability-to-logit detection.
+    check_probabilities = n_classes != 2 or not raw_scores
+    if check_probabilities:
         container.add_initializer(unity_name, proto_type, [], [1.0])
 
     if n_classes == 2:
@@ -72,7 +75,7 @@ def _transform_temperature(
         scores_name = binary_name
 
     logits_name = scores_name
-    if not (n_classes == 2 and raw_scores):
+    if check_probabilities:
         # _convert_to_logits checks the whole batch, including multiclass
         # decision scores: values in [0, 1] and every row sum close to 1.
         zero_name = scope.get_unique_variable_name("temperature_zero")

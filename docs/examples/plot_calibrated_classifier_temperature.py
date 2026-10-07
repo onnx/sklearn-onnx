@@ -30,7 +30,6 @@ from sklearn.frozen import FrozenEstimator
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 import skl2onnx
-from skl2onnx import to_onnx
 
 iris = load_iris()
 X, y = iris.data.astype(numpy.float32), iris.target
@@ -64,7 +63,9 @@ print(calibrated)
 # Disabling ZipMap returns the probabilities as a tensor rather than
 # a list of dictionaries (see :ref:`l-rf-example-zipmap`).
 
-onx = to_onnx(calibrated, X_test[:1], target_opset=18, options={"zipmap": False})
+onx = skl2onnx.to_onnx(
+    calibrated, X_test[:1], target_opset=18, options={"zipmap": False}
+)
 sess = rt.InferenceSession(onx.SerializeToString(), providers=["CPUExecutionProvider"])
 pred_onx, proba_onx = sess.run(None, {"X": X_test})
 
