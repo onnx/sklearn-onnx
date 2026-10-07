@@ -435,7 +435,10 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         X, y = make_regression(n_features=5, n_samples=200, random_state=42)
         X = X.astype(numpy.float32)
         y = numpy.exp(y / numpy.abs(y).max())
-        for loss in ("poisson", "gamma"):
+        losses = ("poisson",)
+        if _sklearn_version() >= pv.Version("1.3"):
+            losses += ("gamma",)
+        for loss in losses:
             with self.subTest(loss=loss):
                 model = HistGradientBoostingRegressor(
                     loss=loss, max_iter=5, max_depth=2
