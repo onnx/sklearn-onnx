@@ -9,6 +9,7 @@ from ..common._apply_operation import (
     apply_concat,
     apply_div,
     apply_exp,
+    apply_log,
     apply_mul,
     apply_reducesum,
     apply_reshape,
@@ -20,6 +21,11 @@ from ..common.data_types import Int64TensorType, guess_proto_type
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 from sklearn.ensemble import RandomForestClassifier
+
+try:
+    from sklearn.frozen import FrozenEstimator
+except ImportError:
+    FrozenEstimator = None
 
 
 def _handle_zeros(
@@ -383,6 +389,8 @@ def convert_calibrated_classifier_base_estimator(
     base_model = (
         model.estimator if hasattr(model, "estimator") else model.base_estimator
     )
+    if FrozenEstimator is not None and isinstance(base_model, FrozenEstimator):
+        base_model = base_model.estimator
     op_type = sklearn_operator_name_map[type(base_model)]
     n_classes = (
         len(model.classes_) if hasattr(model, "classes_") else len(base_model.classes_)
@@ -390,10 +398,12 @@ def convert_calibrated_classifier_base_estimator(
     prob_name = [None] * n_classes
 
     this_operator = scope.declare_local_operator(op_type, base_model)
-    if (
+    use_raw_scores = (
         container.has_options(base_model, "raw_scores")
         and type(base_model) not in model_proba
-    ):
+        and (model.method != "temperature" or hasattr(base_model, "decision_function"))
+    )
+    if use_raw_scores:
         container.add_options(id(base_model), {"raw_scores": True})
         scope.add_options(id(base_model), {"raw_scores": True})
     this_operator.inputs = operator.inputs
@@ -404,6 +414,41 @@ def convert_calibrated_classifier_base_estimator(
     this_operator.outputs.append(label_name)
     this_operator.outputs.append(df_name)
     df_inp = df_name.full_name
+
+    if model.method == "temperature":
+        calibrators = (
+            model.calibrators if hasattr(model, "calibrators") else model.calibrators_
+        )
+        logits = df_inp
+        if not use_raw_scores:
+            epsilon = scope.get_unique_variable_name("epsilon")
+            zero = scope.get_unique_variable_name("zero")
+            clipped = scope.get_unique_variable_name("clipped_probabilities")
+            offset = scope.get_unique_variable_name("offset")
+            logits = scope.get_unique_variable_name("logits")
+            container.add_initializer(epsilon, proto_type2, [], [1e-12])
+            container.add_initializer(zero, proto_type2, [], [0])
+            container.add_node(
+                "Max",
+                [df_inp, zero],
+                clipped,
+                name=scope.get_unique_operator_name("Max"),
+            )
+            apply_add(scope, [clipped, epsilon], offset, container)
+            apply_log(scope, offset, logits, container)
+        beta = scope.get_unique_variable_name("beta")
+        scaled = scope.get_unique_variable_name("scaled_logits")
+        probabilities = scope.get_unique_variable_name("temperature_probabilities")
+        container.add_initializer(beta, proto_type2, [], [calibrators[0].beta_])
+        apply_mul(scope, [logits, beta], scaled, container)
+        container.add_node(
+            "Softmax",
+            scaled,
+            probabilities,
+            axis=1,
+            name=scope.get_unique_operator_name("Softmax"),
+        )
+        return probabilities
 
     for k in range(n_classes):
         cur_k = k

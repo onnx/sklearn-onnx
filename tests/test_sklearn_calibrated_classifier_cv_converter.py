@@ -19,6 +19,7 @@ try:
 except ImportError:
     HistGradientBoostingClassifier = None
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC, LinearSVC
@@ -507,6 +508,59 @@ class TestSklearnCalibratedClassifierCVConverters(unittest.TestCase):
                     )
                     res = sess.run(None, {"input": X_test})
                     assert_almost_equal(model.predict_proba(X_test), res[1], decimal=4)
+
+    @unittest.skipIf(
+        pv.Version(".".join(sklearn_version.split(".")[:2])) < pv.Version("1.8"),
+        reason="temperature calibration requires scikit-learn 1.8",
+    )
+    def test_model_calibrated_classifier_cv_temperature(self):
+        from sklearn.frozen import FrozenEstimator
+
+        X, y = load_iris(return_X_y=True)
+        X = X.astype(np.float32)
+        for binary in (False, True):
+            X_data = X[y != 2] if binary else X
+            y_data = y[y != 2] if binary else y
+            X_train, X_cal, y_train, y_cal = train_test_split(
+                X_data, y_data, test_size=0.5, stratify=y_data, random_state=42
+            )
+            for estimator in (
+                LogisticRegression(max_iter=1000),
+                RandomForestClassifier(n_estimators=10, random_state=42),
+                SVC(),
+                KNeighborsClassifier(),
+            ):
+                for frozen in (False, True):
+                    with self.subTest(
+                        binary=binary, estimator=estimator, frozen=frozen
+                    ):
+                        base = (
+                            FrozenEstimator(estimator.fit(X_train, y_train))
+                            if frozen
+                            else estimator
+                        )
+                        model = CalibratedClassifierCV(
+                            base, method="temperature", cv=2
+                        ).fit(
+                            X_cal if frozen else X_train,
+                            y_cal if frozen else y_train,
+                        )
+                        model_onnx = convert_sklearn(
+                            model,
+                            "temperature",
+                            [("input", FloatTensorType([None, X.shape[1]]))],
+                            target_opset=18,
+                            options={id(model): {"zipmap": False}},
+                        )
+                        sess = InferenceSession(
+                            model_onnx.SerializeToString(),
+                            providers=["CPUExecutionProvider"],
+                        )
+                        actual = sess.run(None, {"input": X_data[-20:]})
+                        assert_almost_equal(
+                            model.predict_proba(X_data[-20:]), actual[1], decimal=4
+                        )
+                        assert_almost_equal(model.predict(X_data[-20:]), actual[0])
 
 
 if __name__ == "__main__":
