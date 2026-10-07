@@ -18,11 +18,8 @@ Train a XGBoost classifier
 ++++++++++++++++++++++++++
 """
 
-import os
 import numpy
-import matplotlib.pyplot as plt
 import onnx
-from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 import sklearn
 from sklearn.datasets import load_iris
@@ -131,20 +128,6 @@ sess = rt.InferenceSession("pipeline_xgboost.onnx", providers=["CPUExecutionProv
 pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
 print("predict", pred_onx[0])
 print("predict_proba", pred_onx[1][:1])
-
-##################################
-# Display the ONNX graph
-# ++++++++++++++++++++++
-
-with open("pipeline.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx))
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline.dot")
-
-image = plt.imread("pipeline.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
 
 #################################
 # **Versions used for this example**

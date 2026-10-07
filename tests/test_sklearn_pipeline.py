@@ -330,12 +330,6 @@ class TestSklearnPipeline(unittest.TestCase):
             basename="SklearnPipelineColumnTransformerPipeliner",
         )
 
-        if __name__ == "__main__":
-            from onnx_array_api.plotting.dot_plot import to_dot
-
-            with open("graph.dot", "w", encoding="utf-8") as f:
-                f.write(to_dot(model_onnx))
-
     @unittest.skipIf(
         ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"
     )

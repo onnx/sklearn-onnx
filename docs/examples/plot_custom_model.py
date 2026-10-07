@@ -42,10 +42,8 @@ And to predict on a test set:
 """
 
 import inspect
-import os
 import numpy
 import onnx
-from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 from matplotlib import offsetbox
 import matplotlib.pyplot as plt
@@ -423,20 +421,6 @@ print("transform", pred_onx[0])
 
 pred_onx = sess.run(None, {"input": X_test[1:2].astype(numpy.float32)})
 print("transform", pred_onx[0])
-
-##################################
-# Display the ONNX graph
-# ++++++++++++++++++++++
-
-with open("pipeline_tsne.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx))
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline_tsne.dot")
-
-image = plt.imread("pipeline_tsne.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
 
 #################################
 # **Versions used for this example**

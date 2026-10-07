@@ -31,11 +31,8 @@ based on the assumption ``(x / y)`` is usually different from
 
 import onnxruntime
 import onnx
-import os
 import math
 import numpy as np
-import matplotlib.pyplot as plt
-from onnx_array_api.plotting.dot_plot import to_dot
 from onnxruntime import InferenceSession
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
@@ -85,19 +82,6 @@ def maxdiff(a1, a2):
 md1 = maxdiff(exp1, got1)
 print(md1)
 
-################################
-# The graph.
-
-with open("cast1.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(onx1))
-
-os.system("dot -O -Gdpi=300 -Tpng cast1.dot")
-
-image = plt.imread("cast1.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
 ########################################
 # New pipeline
 # ++++++++++++
@@ -138,19 +122,6 @@ got2 = sess2.run(None, {"X": Xi_test})[0]
 md2 = maxdiff(exp2, got2)
 
 print(md2)
-
-################################
-# The graph.
-
-with open("cast2.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(onx2))
-
-os.system("dot -O -Gdpi=300 -Tpng cast2.dot")
-
-image = plt.imread("cast2.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
 
 #################################
 # **Versions used for this example**

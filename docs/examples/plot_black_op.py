@@ -23,11 +23,8 @@ of operators is for model *GaussianMixture*.
 import onnxruntime
 import onnx
 import numpy
-import os
 from timeit import timeit
 import numpy as np
-import matplotlib.pyplot as plt
-from onnx_array_api.plotting.dot_plot import to_dot
 from onnxruntime import InferenceSession
 from sklearn.mixture import GaussianMixture
 from sklearn.datasets import load_iris
@@ -58,20 +55,6 @@ print(model.score_samples(xt))
 print(sess.run(None, {"X": xt})[2])
 
 
-##################################
-# Display the ONNX graph.
-
-with open("mixture.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx))
-
-os.system("dot -O -Gdpi=300 -Tpng mixture.dot")
-
-image = plt.imread("mixture.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
-
 ###################################
 # Conversion without ReduceLogSumExp
 # ++++++++++++++++++++++++++++++++++
@@ -94,20 +77,6 @@ sess2 = InferenceSession(
 xt = X_test[:5].astype(np.float32)
 print(model.score_samples(xt))
 print(sess2.run(None, {"X": xt})[2])
-
-##################################
-# Display the ONNX graph.
-
-with open("mixture2.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx2))
-
-os.system("dot -O -Gdpi=300 -Tpng mixture2.dot")
-
-image = plt.imread("mixture2.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
 
 #######################################
 # Processing time

@@ -36,8 +36,6 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from skl2onnx import update_registered_converter
-import os
-from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
@@ -49,7 +47,6 @@ from skl2onnx.algebra.onnx_ops import (
     OnnxIdentity,
 )
 from skl2onnx.algebra.onnx_operator import OnnxSubEstimator
-import matplotlib.pyplot as plt
 
 
 class ValidatorClassifier(BaseEstimator, ClassifierMixin):
@@ -255,19 +252,6 @@ print("onnx", results[2])
 ##################################
 # It looks good.
 #
-# Display the ONNX graph
-# ++++++++++++++++++++++
-
-with open("validator_classifier.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx))
-
-os.system("dot -O -Gdpi=300 -Tpng validator_classifier.dot")
-
-image = plt.imread("validator_classifier.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
 #################################
 # **Versions used for this example**
 

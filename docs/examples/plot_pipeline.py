@@ -2,13 +2,13 @@
 
 
 """
-Draw a pipeline
-===============
+Inspect a pipeline
+==================
 
 There is no other way to look into one model stored
 in ONNX format than looking into its node with
 *onnx*. This example demonstrates
-how to draw a model and to retrieve it in *json*
+how to retrieve a model in *json*
 format.
 
 Retrieve a model in JSON format
@@ -21,9 +21,6 @@ import skl2onnx
 import onnxruntime
 import sklearn
 import numpy
-import matplotlib.pyplot as plt
-import os
-from onnx_array_api.plotting.dot_plot import to_dot
 from onnx import ModelProto
 import onnx
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
@@ -45,32 +42,15 @@ with open(filename, "wb") as f:
 
 
 #################################
-# Draw a model with ONNX
+# Load a model with ONNX
 # ++++++++++++++++++++++
-# We use *onnx-array-api* to produce a DOT graph.
-# We use *onnx* to load the model
-# in a different way than before.
+# We use *onnx* to load the model in a different way than before.
 
 
 model = ModelProto()
 with open(filename, "rb") as fid:
     content = fid.read()
     model.ParseFromString(content)
-
-###################################
-# We convert it into a graph.
-with open("graph.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model))
-
-#######################################
-# Then into an image
-os.system("dot -O -Tpng graph.dot")
-
-################################
-# Which we display...
-image = plt.imread("graph.dot.png")
-plt.imshow(image)
-plt.axis("off")
 
 #################################
 # **Versions used for this example**

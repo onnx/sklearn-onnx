@@ -23,12 +23,9 @@ checks that every of them belongs to two intervals,
 to weight 55 and and the second one to 107.
 """
 
-import os
 import numpy as np
 import pandas as pd
-from onnx_array_api.plotting.dot_plot import to_dot
 from onnxruntime import InferenceSession
-import matplotlib.pyplot as plt
 from skl2onnx import to_onnx
 from skl2onnx.sklapi import WOETransformer
 
@@ -90,35 +87,6 @@ print(sess.run(None, {"X": X})[0])
 onx2 = to_onnx(woe2, X)
 sess = InferenceSession(onx2.SerializeToString(), providers=["CPUExecutionProvider"])
 print(sess.run(None, {"X": X})[0])
-
-################################################
-# ONNX Graphs
-# +++++++++++
-#
-# onehot=False
-
-with open("woe1.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(onx1))
-
-os.system("dot -O -Gdpi=300 -Tpng woe1.dot")
-
-image = plt.imread("woe1.dot.png")
-fig, ax = plt.subplots(figsize=(10, 10))
-ax.imshow(image)
-ax.axis("off")
-
-#######################################
-# onehot=True
-
-with open("woe2.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(onx2))
-
-os.system("dot -O -Gdpi=300 -Tpng woe2.dot")
-
-image = plt.imread("woe2.dot.png")
-fig, ax = plt.subplots(figsize=(10, 10))
-ax.imshow(image)
-ax.axis("off")
 
 ########################################
 # Half-line

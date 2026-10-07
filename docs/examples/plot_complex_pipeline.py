@@ -30,15 +30,12 @@ does not handle string type. This cannot be part of the final ONNX pipeline
 and must be removed. Look for comment starting with ``---`` below.
 """
 
-import os
 import pprint
 import pandas as pd
 import numpy as np
 from numpy.testing import assert_almost_equal
 import onnx
-from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
-import matplotlib.pyplot as plt
 import sklearn
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -239,23 +236,6 @@ print("predict_proba", pred_onx[1][:2])
 assert_almost_equal(clf.predict_proba(X_test), pred_onx[1])
 
 ##################################
-# .. _l-plot-complex-pipeline-graph:
-#
-# Display the ONNX graph
-# ++++++++++++++++++++++
-#
-# Finally, let's see the graph converted with *sklearn-onnx*.
-
-with open("pipeline_titanic.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx))
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic.dot")
-
-image = plt.imread("pipeline_titanic.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
 #################################
 # **Versions used for this example**
 

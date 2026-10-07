@@ -21,9 +21,6 @@ but reduces it to the part ONNX actually supports without implementing
 a custom converter. Let's get the data.
 """
 
-import matplotlib.pyplot as plt
-import os
-from onnx_array_api.plotting.dot_plot import to_dot
 import onnxruntime as rt
 from skl2onnx.common.data_types import StringTensorType
 from skl2onnx import convert_sklearn
@@ -212,19 +209,3 @@ print(pipeline.predict_proba(train_data[:1]))
 # There are discrepencies for this model because
 # the tokenization is not exactly the same.
 # This is a work in progress.
-
-##################################
-# Display the ONNX graph
-# ++++++++++++++++++++++
-#
-# Finally, let's see the graph converted with *sklearn-onnx*.
-
-with open("pipeline_tfidf.dot", "w", encoding="utf-8") as f:
-    f.write(to_dot(model_onnx))
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline_tfidf.dot")
-
-image = plt.imread("pipeline_tfidf.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
