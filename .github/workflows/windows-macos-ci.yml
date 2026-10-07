@@ -109,14 +109,14 @@ jobs:
             python_version: '3.11'
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
-            onnx_version: 'onnx>=1.16.0'
+            onnx_version: 'onnx==1.16.0'
             onnxrt_version: 'onnxruntime<1.20.0'
           - os: macos-latest
             sklearn_version: '==1.4.2'
             python_version: '3.11'
             numpy_version: '>=1.21.1,<2.0'
             scipy_version: '>=1.7.0'
-            onnx_version: 'onnx>=1.16.0'
+            onnx_version: 'onnx==1.16.0'
             onnxrt_version: 'onnxruntime<1.20.0'
           - os: windows-latest
             sklearn_version: '==1.2.2'
