@@ -242,6 +242,22 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="Weighted42Soft", target_opset=TARGET_OPSET
         )
 
+    def test_voting_soft_multi_weights_list_with_drop(self):
+        # weights given as a list, and a dropped estimator before a kept one
+        model = VotingClassifier(
+            voting="soft",
+            flatten_transform=False,
+            weights=[1, 5, 3],
+            estimators=[
+                ("lr", LogisticRegression()),
+                ("dropped", "drop"),
+                ("dt", DecisionTreeClassifier(max_depth=2)),
+            ],
+        )
+        dump_multiple_classification(
+            model, suffix="WeightsListDropSoft", target_opset=TARGET_OPSET
+        )
+
     @unittest.skipIf(
         pv.Version(sklver) < pv.Version("1.1.0"),
         reason="need more recent version of scikit-learn",
