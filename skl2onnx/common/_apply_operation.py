@@ -171,14 +171,17 @@ def apply_reshape(
         container.add_node("Reshape", input_name, output_name, op_version=5, name=name)
 
 
-def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
+def apply_normalizer(scope, inputs, outputs, container, norm, use_float, dtype=None):
     """
     Adds operator Normalizer if *use_float* is true,
     otherwise, uses *ReduceSum* + *Div*. *Normalizer*
     always produces float according to ONNX speciciations.
     Norm MAX always uses the second way: ONNX Normalizer divides
     by the maximum while scikit-learn divides by the maximum
-    absolute value.
+    absolute value. With the second way, rows with a null norm
+    are left unchanged. If *dtype* (the numpy type of the input)
+    is given, rows with a norm below ``10 * eps`` are left unchanged
+    as well, like scikit-learn does.
     """
     input = inputs[0] if isinstance(inputs, list) else inputs
     output = outputs[0] if isinstance(outputs, list) else outputs
@@ -235,7 +238,40 @@ def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
     else:
         raise NotImplementedError("Normalization not implemented for norm %r." % norm)
 
-    if container.target_opset < 11:
+    is_zero = scope.get_unique_variable_name("is_zero")
+    if dtype is not None and container.target_opset >= 9:
+        # As scikit-learn does (_handle_zeros_in_scale), rows with a norm
+        # below 10 * eps are left unchanged.
+        threshold_name = scope.get_unique_variable_name("threshold")
+        container.add_initializer(
+            threshold_name,
+            np_dtype_to_tensor_dtype(np.dtype(dtype)),
+            [],
+            [float(10 * np.finfo(dtype).eps)],
+        )
+        container.add_node(
+            "Less",
+            [norm_name, threshold_name],
+            is_zero,
+            name=scope.get_unique_operator_name("Less"),
+        )
+    elif container.target_opset >= 11:
+        # Rows with a null norm (only zeros) are left unchanged.
+        # norm - norm gives a zero of the right type.
+        zero_name = scope.get_unique_variable_name("zero")
+        container.add_node(
+            "Sub",
+            [norm_name, norm_name],
+            zero_name,
+            name=scope.get_unique_operator_name("Sub"),
+        )
+        container.add_node(
+            "Equal",
+            [norm_name, zero_name],
+            is_zero,
+            name=scope.get_unique_operator_name("Equal"),
+        )
+    else:
         # Equal does not support floats before opset 11.
         apply_div(
             scope,
@@ -246,22 +282,6 @@ def apply_normalizer(scope, inputs, outputs, container, norm, use_float):
         )
         return
 
-    # As scikit-learn does, rows with a null norm (only zeros) are left
-    # unchanged. norm - norm gives a zero of the right type.
-    zero_name = scope.get_unique_variable_name("zero")
-    container.add_node(
-        "Sub",
-        [norm_name, norm_name],
-        zero_name,
-        name=scope.get_unique_operator_name("Sub"),
-    )
-    is_zero = scope.get_unique_variable_name("is_zero")
-    container.add_node(
-        "Equal",
-        [norm_name, zero_name],
-        is_zero,
-        name=scope.get_unique_operator_name("Equal"),
-    )
     divided = scope.get_unique_variable_name("divided")
     apply_div(
         scope,

@@ -150,6 +150,44 @@ class TestSklearnNormalizerConverter(unittest.TestCase):
                         basename=f"SklearnNormalizer{norm}{dtype.__name__}Zero",
                     )
 
+    def test_model_normalizer_max_int64(self):
+        x = numpy.array([[-3, 1, 2], [0, 0, 0], [1, -5, 4]], dtype=numpy.int64)
+        model = Normalizer(norm="max").fit(x)
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn normalizer",
+            [("input", Int64TensorType([None, 3]))],
+            target_opset=TARGET_OPSET,
+        )
+        dump_data_and_model(x, model, model_onnx, basename="SklearnNormalizerMaxInt64")
+
+    def test_model_normalizer_tiny_rows(self):
+        # scikit-learn leaves rows whose norm is below 10 * eps unchanged
+        for norm, dtype, tensor_type in [
+            ("max", numpy.float32, FloatTensorType),
+            ("max", numpy.float64, DoubleTensorType),
+            ("l1", numpy.float64, DoubleTensorType),
+            ("l2", numpy.float64, DoubleTensorType),
+        ]:
+            eps = numpy.finfo(dtype).eps
+            x = numpy.array(
+                [[eps, 0, -eps], [1, -0.5, 0.25], [eps * 100, 0, 0]], dtype=dtype
+            )
+            with self.subTest(norm=norm, dtype=dtype):
+                model = Normalizer(norm=norm).fit(x)
+                model_onnx = convert_sklearn(
+                    model,
+                    "scikit-learn normalizer",
+                    [("input", tensor_type([None, 3]))],
+                    target_opset=TARGET_OPSET,
+                )
+                dump_data_and_model(
+                    x,
+                    model,
+                    model_onnx,
+                    basename=f"SklearnNormalizer{norm}{dtype.__name__}Tiny",
+                )
+
     def test_model_normalizer_float_noshape(self):
         model = Normalizer(norm="l2")
         x = numpy.random.randn(10, 3).astype(numpy.float32)
