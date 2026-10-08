@@ -7,7 +7,8 @@ import unittest
 import numpy as np
 import packaging.version as pv
 from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-from onnxruntime import __version__ as ort_version
+from numpy.testing import assert_array_equal
+from onnxruntime import InferenceSession, __version__ as ort_version
 from onnx import __version__ as onnx_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, DoubleTensorType
@@ -279,6 +280,33 @@ class TestQuadraticDiscriminantAnalysisConverter(unittest.TestCase):
             onnx_model,
             basename="SklearnQDA_3c2f_Double",
         )
+
+    @unittest.skipIf(
+        pv.Version(sklearn.__version__) < pv.Version("1.0"), reason="scikit-learn<1.0"
+    )
+    @unittest.skipIf(
+        pv.Version(onnx_version) < pv.Version("1.11"), reason="fails with onnx 1.10"
+    )
+    def test_model_qda_label_shape(self):
+        # the label is 1D, like predict
+        X = np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]])
+        y = np.array([1, 1, 1, 2, 2, 2])
+        X_test = np.array([[-0.8, -1], [0.8, 1], [0.1, 0.2]], dtype=np.float32)
+        skl_model = QuadraticDiscriminantAnalysis().fit(X, y)
+
+        onnx_model = convert_sklearn(
+            skl_model,
+            "scikit-learn QDA",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertEqual(len(onnx_model.graph.output[0].type.tensor_type.shape.dim), 1)
+        sess = InferenceSession(
+            onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        label = sess.run(None, {"input": X_test})[0]
+        assert_array_equal(label, skl_model.predict(X_test))
 
 
 if __name__ == "__main__":
