@@ -112,22 +112,6 @@ Once fitted, the model is converted into *ONNX*:
     means the model was not trained. The converter tries to access an attribute
     created by method `fit`.
 
-It can be represented as a
-`DOT <https://en.wikipedia.org/wiki/DOT_(graph_description_language)>`_ graph:
-
-::
-
-    from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
-    pydot_graph = GetPydotGraph(model_onnx.graph, name=model_onnx.graph.name, rankdir="TP",
-                                node_producer=GetOpNodeProducer("docstring"))
-    pydot_graph.write_dot("graph.dot")
-
-    import os
-    os.system('dot -O -Tpng graph.dot'
-
-.. image:: pipeline.png
-    :width: 1000
-
 Parser, shape calculator, converter
 ===================================
 

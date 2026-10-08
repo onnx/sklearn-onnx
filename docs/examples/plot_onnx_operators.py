@@ -38,13 +38,10 @@ on github `onnx.proto
 
 import onnxruntime
 import numpy
-import os
 import numpy as np
-import matplotlib.pyplot as plt
 import onnx
 from onnx import helper
 from onnx import TensorProto
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 
 # Create one input (ValueInfoProto)
 X = helper.make_tensor_value_info("X", TensorProto.FLOAT, [None, 2])
@@ -166,27 +163,6 @@ def predict_with_onnxruntime(model_def, *inputs):
 
 Y = predict_with_onnxruntime(model_def, X)
 print(Y)
-
-##################################
-# Display the ONNX graph
-# ++++++++++++++++++++++
-
-pydot_graph = GetPydotGraph(
-    model_def.graph,
-    name=model_def.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_transpose2x.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline_transpose2x.dot")
-
-image = plt.imread("pipeline_transpose2x.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
 
 #################################
 # **Versions used for this example**
