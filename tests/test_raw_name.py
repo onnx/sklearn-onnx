@@ -11,25 +11,10 @@ from test_utils import TARGET_OPSET
 
 
 class RawNameTest(unittest.TestCase):
-    _raw_names = (
-        "float_input",
-        "float_input--",
-        "float_input(",
-        "float_input)",
-    )
-
     @staticmethod
     def _load_data():
         iris = load_iris()
         return iris.data[:, :2], iris.target
-
-    @staticmethod
-    def _train_model(X, y):
-        return LogisticRegression().fit(X, y)
-
-    @staticmethod
-    def _get_initial_types(X, raw_name):
-        return [(raw_name, FloatTensorType([None, X.shape[1]]))]
 
     @staticmethod
     def _predict(clr_onnx, X):
@@ -47,17 +32,32 @@ class RawNameTest(unittest.TestCase):
         correct predictions.
         """
         X, y = self._load_data()
-        clr = self._train_model(X, y)
+        clr = LogisticRegression().fit(X, y)
         pred = clr.predict(X)
-        for raw_name in self._raw_names:
+        for raw_name in (
+            "float_input",
+            "float_input--",
+            "float_input(",
+            "float_input)",
+        ):
             with self.subTest(raw_name=raw_name):
-                clr_onnx = convert_sklearn(
-                    clr,
-                    initial_types=self._get_initial_types(X, raw_name),
-                    target_opset=TARGET_OPSET,
-                )
-                pred_onnx = self._predict(clr_onnx, X)
-                assert_almost_equal(pred, pred_onnx)
+                if "(" in raw_name:
+                    with self.assertRaises(ValueError):
+                        convert_sklearn(
+                            clr,
+                            initial_types=[
+                                (raw_name, FloatTensorType([None, X.shape[1]]))
+                            ],
+                            target_opset=TARGET_OPSET,
+                        )
+                else:
+                    clr_onnx = convert_sklearn(
+                        clr,
+                        initial_types=[(raw_name, FloatTensorType([None, X.shape[1]]))],
+                        target_opset=TARGET_OPSET,
+                    )
+                    pred_onnx = self._predict(clr_onnx, X)
+                    assert_almost_equal(pred, pred_onnx)
 
 
 if __name__ == "__main__":

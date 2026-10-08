@@ -4,20 +4,19 @@ import pprint
 import numpy as np
 from onnx import TensorProto
 from ..common._apply_operation import (
-    apply_abs,
     apply_add,
     apply_cast,
     apply_concat,
-    apply_clip,
     apply_div,
     apply_exp,
     apply_mul,
+    apply_reducesum,
     apply_reshape,
     apply_sub,
 )
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
-from ..common.data_types import guess_numpy_type, Int64TensorType, guess_proto_type
+from ..common.data_types import Int64TensorType, guess_proto_type
 from ..common._registration import register_converter
 from .._supported_operators import sklearn_operator_name_map
 from sklearn.ensemble import RandomForestClassifier
@@ -132,12 +131,11 @@ def _transform_sigmoid(scope, container, model, df_col_name, k, proto_type):
     return sigmoid_predict_result_name
 
 
-def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
+def _transform_isotonic(scope, container, model, T, k, proto_type):
     """
     Isotonic calibration method
-    This function can only handle one instance at a time because
-    ArrayFeatureExtractor can only extract based on the last axis,
-    so we can't fetch different columns for different rows.
+    The calibrator is written as the piecewise linear function
+    *IsotonicRegression.predict* interpolates between its thresholds.
     """
     if hasattr(model, "calibrators_"):
         # scikit-learn<1.1
@@ -152,26 +150,41 @@ def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
             "type=%r." % type(model)
         )
 
+    # thresholds can be too close together for single precision
+    cast_df_name = scope.get_unique_variable_name("cast_df")
+    apply_cast(scope, T, cast_df_name, container, to=TensorProto.DOUBLE)
+    T = cast_df_name
+
     if calibrators[k].out_of_bounds == "clip":
+        clip_min_name = scope.get_unique_variable_name("clip_min")
+        clip_max_name = scope.get_unique_variable_name("clip_max")
+        lower_df_name = scope.get_unique_variable_name("lower_df")
         clipped_df_name = scope.get_unique_variable_name("clipped_df")
-        apply_clip(
-            scope,
-            T,
+        container.add_initializer(
+            clip_min_name, TensorProto.DOUBLE, [], [calibrators[k].X_min_]
+        )
+        container.add_initializer(
+            clip_max_name, TensorProto.DOUBLE, [], [calibrators[k].X_max_]
+        )
+        # Max and Min, Clip takes no double bounds before opset 12
+        container.add_node(
+            "Max",
+            [T, clip_min_name],
+            lower_df_name,
+            name=scope.get_unique_operator_name("Max"),
+        )
+        container.add_node(
+            "Min",
+            [lower_df_name, clip_max_name],
             clipped_df_name,
-            container,
-            operator_name=scope.get_unique_operator_name("Clip"),
-            max=np.array(calibrators[k].X_max_, dtype=dtype),
-            min=np.array(calibrators[k].X_min_, dtype=dtype),
+            name=scope.get_unique_operator_name("Min"),
         )
         T = clipped_df_name
 
     reshaped_df_name = scope.get_unique_variable_name("reshaped_df")
-    calibrator_x_name = scope.get_unique_variable_name("calibrator_x")
-    calibrator_y_name = scope.get_unique_variable_name("calibrator_y")
-    distance_name = scope.get_unique_variable_name("distance")
-    absolute_distance_name = scope.get_unique_variable_name("absolute_distance")
-    nearest_x_index_name = scope.get_unique_variable_name("nearest_x_index")
-    nearest_y_name = scope.get_unique_variable_name("nearest_y")
+    below_name = scope.get_unique_variable_name("below_segment_x")
+    below_int_name = scope.get_unique_variable_name("below_segment_x_int")
+    segment_name = scope.get_unique_variable_name("segment")
 
     if hasattr(calibrators[k], "_X_"):
         atX, atY = "_X_", "_y_"
@@ -190,48 +203,79 @@ def _transform_isotonic(scope, container, model, T, k, dtype, proto_type):
     if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
         proto_type2 = TensorProto.FLOAT
 
-    container.add_initializer(
-        calibrator_x_name,
-        proto_type2,
-        [len(getattr(calibrators[k], atX))],
-        getattr(calibrators[k], atX),
-    )
-    container.add_initializer(
-        calibrator_y_name,
-        proto_type2,
-        [len(getattr(calibrators[k], atY))],
-        getattr(calibrators[k], atY),
-    )
+    knots_x = np.array(getattr(calibrators[k], atX), dtype=np.float64).ravel()
+    knots_y = np.array(getattr(calibrators[k], atY), dtype=np.float64).ravel()
+    if len(knots_x) == 1:
+        # constant calibrator, written as a flat segment
+        knots_x = np.hstack([knots_x, knots_x + 1])
+        knots_y = np.hstack([knots_y, knots_y])
+
+    segment_x_name = scope.get_unique_variable_name("segment_x")
+    lower_x_name = scope.get_unique_variable_name("lower_x")
+    upper_x_name = scope.get_unique_variable_name("upper_x")
+    lower_y_name = scope.get_unique_variable_name("lower_y")
+    upper_y_name = scope.get_unique_variable_name("upper_y")
+
+    # The segment holding T is the number of upper bounds T is greater than.
+    # Repeating the last segment keeps that index in range whatever T is.
+    for name, values in [
+        (segment_x_name, knots_x[1:]),
+        (lower_x_name, np.hstack([knots_x[:-1], knots_x[-2:-1]])),
+        (upper_x_name, np.hstack([knots_x[1:], knots_x[-1:]])),
+        (lower_y_name, np.hstack([knots_y[:-1], knots_y[-2:-1]])),
+        (upper_y_name, np.hstack([knots_y[1:], knots_y[-1:]])),
+    ]:
+        container.add_initializer(name, TensorProto.DOUBLE, [len(values)], values)
 
     apply_reshape(scope, T, reshaped_df_name, container, desired_shape=(-1, 1))
-    apply_sub(
-        scope,
-        [reshaped_df_name, calibrator_x_name],
-        distance_name,
-        container,
-        broadcast=1,
-    )
-    apply_abs(scope, distance_name, absolute_distance_name, container)
     container.add_node(
-        "ArgMin",
-        absolute_distance_name,
-        nearest_x_index_name,
-        axis=1,
-        name=scope.get_unique_operator_name("ArgMin"),
+        "Less",
+        [segment_x_name, reshaped_df_name],
+        below_name,
+        name=scope.get_unique_operator_name("Less"),
     )
-    container.add_node(
-        "ArrayFeatureExtractor",
-        [calibrator_y_name, nearest_x_index_name],
-        nearest_y_name,
-        op_domain="ai.onnx.ml",
-        name=scope.get_unique_operator_name("ArrayFeatureExtractor"),
-    )
+    apply_cast(scope, below_name, below_int_name, container, to=TensorProto.INT64)
+    apply_reducesum(scope, below_int_name, segment_name, container, axes=[1])
 
-    nearest_y_name_reshaped = scope.get_unique_variable_name("nearest_y_name_reshaped")
-    apply_reshape(
-        scope, nearest_y_name, nearest_y_name_reshaped, container, desired_shape=(-1, 1)
+    x0_name = scope.get_unique_variable_name("x0")
+    x1_name = scope.get_unique_variable_name("x1")
+    y0_name = scope.get_unique_variable_name("y0")
+    y1_name = scope.get_unique_variable_name("y1")
+    for data_name, gathered_name in [
+        (lower_x_name, x0_name),
+        (upper_x_name, x1_name),
+        (lower_y_name, y0_name),
+        (upper_y_name, y1_name),
+    ]:
+        container.add_node(
+            "Gather",
+            [data_name, segment_name],
+            gathered_name,
+            name=scope.get_unique_operator_name("Gather"),
+        )
+
+    delta_y_name = scope.get_unique_variable_name("delta_y")
+    delta_x_name = scope.get_unique_variable_name("delta_x")
+    offset_name = scope.get_unique_variable_name("offset")
+    scaled_name = scope.get_unique_variable_name("scaled")
+    ratio_name = scope.get_unique_variable_name("ratio")
+    interpolated_name = scope.get_unique_variable_name("interpolated")
+
+    apply_sub(scope, [y1_name, y0_name], delta_y_name, container, broadcast=0)
+    apply_sub(scope, [x1_name, x0_name], delta_x_name, container, broadcast=0)
+    apply_sub(scope, [reshaped_df_name, x0_name], offset_name, container, broadcast=0)
+    apply_mul(scope, [delta_y_name, offset_name], scaled_name, container, broadcast=0)
+    apply_div(scope, [scaled_name, delta_x_name], ratio_name, container, broadcast=0)
+    apply_add(scope, [y0_name, ratio_name], interpolated_name, container, broadcast=0)
+
+    if proto_type2 == TensorProto.DOUBLE:
+        return interpolated_name
+
+    cast_interpolated_name = scope.get_unique_variable_name("cast_interpolated")
+    apply_cast(
+        scope, interpolated_name, cast_interpolated_name, container, to=proto_type2
     )
-    return nearest_y_name_reshaped
+    return cast_interpolated_name
 
 
 def convert_calibrated_classifier_base_estimator(
@@ -274,12 +318,12 @@ def convert_calibrated_classifier_base_estimator(
     #       |                          |          |                          |
     #       |if model.method='sigmoid' |          |if model.method='isotonic'|
     #       |                          |          |                          |
-    #       V                          V          |if out_of_bounds='clip'   |
+    #       V                          V          |linear interpolation      |
     #      MUL <-------- a -------->  MUL         V                          V
-    #       |                          |          CLIP     ...             CLIP
+    #       |                          |          INTERP   ...           INTERP
     #       V                          V          |                          |
     #  a_df_prod [M, 1]  ... a_df_prod [M, 1]     V                          V
-    #       |                          |  clipped_df [M, 1]...clipped_df [M, 1]
+    #       |                          |  interp_df [M, 1] ... interp_df [M, 1]
     #       V                          V          |                          |
     #      ADD <--------- b ---------> ADD        '-------------------.------'
     #         |                          |                            |
@@ -336,10 +380,6 @@ def convert_calibrated_classifier_base_estimator(
     proto_type2 = proto_type
     if proto_type2 not in (TensorProto.FLOAT, TensorProto.DOUBLE):
         proto_type2 = TensorProto.FLOAT
-    dtype = guess_numpy_type(operator.inputs[0].type)
-    if dtype != np.float64:
-        dtype = np.float32
-
     base_model = (
         model.estimator if hasattr(model, "estimator") else model.base_estimator
     )
@@ -389,9 +429,7 @@ def convert_calibrated_classifier_base_estimator(
         if model.method == "sigmoid":
             T = _transform_sigmoid(scope, container, model, df_col_name, k, proto_type)
         else:
-            T = _transform_isotonic(
-                scope, container, model, df_col_name, k, dtype, proto_type
-            )
+            T = _transform_isotonic(scope, container, model, df_col_name, k, proto_type)
 
         prob_name[k] = T
         if n_classes == 2:

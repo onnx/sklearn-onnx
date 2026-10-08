@@ -536,8 +536,11 @@ def _apply_zipmap(zipmap_options, scope, model, input_type, probability_tensor):
 
 def _parse_sklearn_classifier(scope, model, inputs, custom_parsers=None):
     options = scope.get_options(model, dict(zipmap=True))
+    svc_no_probability = model.__class__ in [NuSVC, SVC] and getattr(
+        model, "probability", False
+    ) in [False, "deprecated"]
     no_zipmap = (isinstance(options["zipmap"], bool) and not options["zipmap"]) or (
-        model.__class__ in [NuSVC, SVC] and not model.probability
+        svc_no_probability
     )
     probability_tensor = _parse_sklearn_simple_model(
         scope, model, inputs, custom_parsers=custom_parsers
@@ -714,6 +717,48 @@ def _parse_sklearn(scope, model, inputs, custom_parsers=None, alias=None):
             scope, model, inputs, custom_parsers=custom_parsers
         )
     return outputs
+
+
+def parse_sklearn_submodel(scope, model, inputs, custom_parsers=None, alias=None):
+    """
+    Public API to parse a sub-model (inner estimator) within a custom
+    meta-estimator parser registered via
+    :func:`update_registered_parser <skl2onnx.update_registered_parser>`.
+
+    This is a delegate function. It does nothing but invokes the
+    correct parsing function according to the input model's type.
+    Use this function inside a custom parser to recursively parse
+    the inner estimators of a meta-estimator.
+
+    :param scope: Scope object
+    :param model: A scikit-learn object (e.g., OneHotEncoder
+        and LogisticRegression)
+    :param inputs: A list of variables
+    :param custom_parsers: parsers determines which outputs is expected
+        for which particular task, default parsers are defined for
+        classifiers, regressors, pipeline but they can be rewritten,
+        *custom_parsers* is a dictionary ``{ type: fct_parser(scope,
+        model, inputs, custom_parsers=None) }``
+    :param alias: alias of the model (None if based on the model class)
+    :return: The output variables produced by the input model
+
+    Example usage inside a custom meta-estimator parser::
+
+        from skl2onnx import update_registered_parser, parse_sklearn_submodel
+
+        def my_meta_estimator_parser(scope, model, inputs, custom_parsers=None):
+            # parse the inner estimator recursively
+            inner_outputs = parse_sklearn_submodel(
+                scope, model.inner_estimator_, inputs,
+                custom_parsers=custom_parsers
+            )
+            return inner_outputs
+
+        update_registered_parser(MyMetaEstimator, my_meta_estimator_parser)
+    """
+    return _parse_sklearn(
+        scope, model, inputs, custom_parsers=custom_parsers, alias=alias
+    )
 
 
 def parse_sklearn(scope, model, inputs, custom_parsers=None, final_types=None):
@@ -903,7 +948,11 @@ def update_registered_parser(model, parser_fct):
 
     :param model: model class
     :param parser_fct: parser, signature is the same as
-        :func:`parse_sklearn <skl2onnx._parse.parse_sklearn>`
+        :func:`parse_sklearn <skl2onnx._parse.parse_sklearn>`.
+        To recursively parse inner (sub) estimators from within a
+        custom parser, use the public API
+        :func:`parse_sklearn_submodel
+        <skl2onnx.parse_sklearn_submodel>`.
     """
     check_signature(parser_fct, _parse_sklearn_classifier)
     sklearn_parsers_map[model] = parser_fct

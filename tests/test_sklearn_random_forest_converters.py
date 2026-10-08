@@ -65,6 +65,20 @@ def _sklearn_version():
     return pv.Version(v)
 
 
+def _onnx121() -> bool:
+    import packaging.version as pv
+
+    return pv.Version(onnx.__version__) >= pv.Version("1.21.0")
+
+
+# scikit-learn learned to route NaN at fit time one splitter at a time:
+# 1.3 for the "best" splitter (decision trees, random forests) and 1.6 for the
+# "random" splitter (extra trees). Fitting on data holding NaN raises
+# ValueError before those versions.
+_NAN_BEST_SPLITTER = _sklearn_version() >= pv.Version("1.3")
+_NAN_RANDOM_SPLITTER = _sklearn_version() >= pv.Version("1.6")
+
+
 ort_version = ".".join(ort_version.split(".")[:2])
 
 BACKEND = (
@@ -390,6 +404,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nonan(self):
         self.common_test_model_hgb_regressor(False)
@@ -405,6 +420,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_regressor_nan(self):
         self.common_test_model_hgb_regressor(True)
@@ -481,6 +497,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         reason="issue with nan for earlier ort",
     )
     @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     def test_model_hgb_classifier_nonan(self):
         self.common_test_model_hgb_classifier(False)
 
@@ -495,6 +512,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan(self):
         self.common_test_model_hgb_classifier(True)
@@ -511,6 +529,7 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         pv.Version(ort_version) < pv.Version("1.2.0"),
         reason="issue with nan for earlier ort",
     )
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nonan_multi(self):
         self.common_test_model_hgb_classifier(False, n_classes=3)
@@ -522,9 +541,192 @@ class TestSklearnTreeEnsembleModels(unittest.TestCase):
         HistGradientBoostingClassifier is None,
         reason="scikit-learn 0.22 + manual activation",
     )
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
     @ignore_warnings(category=FutureWarning)
     def test_model_hgb_classifier_nan_multi(self):
         self.common_test_model_hgb_classifier(True, n_classes=3)
+
+    @unittest.skipIf(
+        not _NAN_BEST_SPLITTER,
+        reason="scikit-learn < 1.3 does not accept NaN in RandomForest",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_random_forest_classifier_nan(self):
+        rng = numpy.random.RandomState(12345)
+        X, y = make_classification(
+            n_features=10, n_samples=1000, n_informative=4, random_state=42
+        )
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = numpy.nan
+        X = X.astype(numpy.float32)
+
+        model = RandomForestClassifier(n_estimators=10, max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(
+            any(e.tree_.missing_go_to_left.any() for e in model.estimators_)
+        )
+
+        model_onnx = convert_sklearn(
+            model,
+            "random forest classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnRandomForestClassifierNan"
+        )
+
+    @unittest.skipIf(
+        not _NAN_RANDOM_SPLITTER,
+        reason="scikit-learn < 1.6 does not accept NaN in ExtraTrees",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_extra_trees_classifier_nan(self):
+        rng = numpy.random.RandomState(12345)
+        X, y = make_classification(
+            n_features=10, n_samples=1000, n_informative=4, random_state=42
+        )
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = numpy.nan
+        X = X.astype(numpy.float32)
+
+        model = ExtraTreesClassifier(n_estimators=10, max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(
+            any(e.tree_.missing_go_to_left.any() for e in model.estimators_)
+        )
+
+        model_onnx = convert_sklearn(
+            model,
+            "extra trees classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+            options={"zipmap": False},
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnExtraTreesClassifierNan"
+        )
+
+    @unittest.skipIf(
+        not _NAN_BEST_SPLITTER,
+        reason="scikit-learn < 1.3 does not accept NaN in RandomForest",
+    )
+    @ignore_warnings(category=FutureWarning)
+    def test_model_random_forest_regressor_nan(self):
+        rng = numpy.random.RandomState(12345)
+        X, y = make_regression(n_features=10, n_samples=1000, random_state=42)
+        rows = rng.randint(0, X.shape[0] - 1, X.shape[0] // 3)
+        cols = rng.randint(0, X.shape[1] - 1, X.shape[0] // 3)
+        X[rows, cols] = numpy.nan
+        X = X.astype(numpy.float32)
+        y = y.astype(numpy.float32)
+
+        model = RandomForestRegressor(n_estimators=10, max_depth=5, random_state=42)
+        model.fit(X, y)
+        self.assertTrue(
+            any(e.tree_.missing_go_to_left.any() for e in model.estimators_)
+        )
+
+        model_onnx = convert_sklearn(
+            model,
+            "random forest regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        self.assertIsNotNone(model_onnx)
+        dump_data_and_model(
+            X, model, model_onnx, basename="SklearnRandomForestRegressorNan-Dec4"
+        )
+
+    @unittest.skipIf(
+        HistGradientBoostingRegressor is None,
+        reason="scikit-learn 0.22 + manual activation",
+    )
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
+    @ignore_warnings(category=FutureWarning)
+    def test_model_hgb_regressor_float32_precision(self):
+        """Verify that float32 HGB regressor ONNX output closely matches
+        sklearn, addressing the precision loss caused by float64->float32
+        threshold truncation (GitHub issue: HGB significant discrepancies)."""
+        numpy.random.seed(42)
+        X, y = make_regression(
+            n_features=10, n_samples=1000, n_targets=1, random_state=42
+        )
+        X = X.astype(numpy.float32)
+        X_train, X_test, y_train, _ = train_test_split(
+            X, y, test_size=0.5, random_state=42
+        )
+        model = HistGradientBoostingRegressor(max_iter=50, max_depth=5, random_state=42)
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model,
+            "hgb_regressor",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(model_onnx.SerializeToString())
+        X_test32 = X_test[:50].astype(numpy.float32)
+        skl_pred = model.predict(X_test32)
+        onnx_pred = sess.run(None, {"input": X_test32})[0].ravel()
+
+        # Relative error should be very small (< 1e-4) after the fix.
+        rel_error = numpy.max(
+            numpy.abs(skl_pred - onnx_pred) / (numpy.abs(skl_pred) + 1e-8)
+        )
+        assert rel_error < 1e-4, (
+            f"HGB regressor float32 relative error {rel_error:.2e} too large; "
+            "threshold precision fix may have regressed."
+        )
+
+    @unittest.skipIf(
+        HistGradientBoostingClassifier is None,
+        reason="scikit-learn 0.22 + manual activation",
+    )
+    @ignore_warnings(category=FutureWarning)
+    @unittest.skipIf(not _onnx121(), reason="onnx runtime not tested previously")
+    def test_model_hgb_classifier_float32_precision(self):
+        """Verify that float32 HGB classifier ONNX output closely matches
+        sklearn, addressing the precision loss caused by float64->float32
+        threshold truncation (GitHub issue: HGB significant discrepancies)."""
+        numpy.random.seed(42)
+        X, y = make_classification(
+            n_samples=1000, n_features=10, n_informative=5, n_classes=2, random_state=42
+        )
+        X = X.astype(numpy.float32)
+        X_train, X_test, y_train, _ = train_test_split(
+            X, y, test_size=0.5, random_state=42
+        )
+        model = HistGradientBoostingClassifier(
+            max_iter=50, max_depth=5, random_state=42
+        )
+        model.fit(X_train, y_train)
+
+        model_onnx = convert_sklearn(
+            model,
+            "hgb_classifier",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={model.__class__: {"zipmap": False}},
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(model_onnx.SerializeToString())
+        X_test32 = X_test[:50].astype(numpy.float32)
+        skl_proba = model.predict_proba(X_test32)
+        onnx_proba = sess.run(None, {"input": X_test32})[1]
+
+        # Relative error should be very small (< 1e-4) after the fix.
+        rel_error = numpy.max(
+            numpy.abs(skl_proba - onnx_proba) / (numpy.abs(skl_proba) + 1e-8)
+        )
+        assert rel_error < 1e-4, (
+            f"HGB classifier float32 relative error {rel_error:.2e} too large; "
+            "threshold precision fix may have regressed."
+        )
 
     @ignore_warnings(category=FutureWarning)
     def test_model_random_forest_classifier_multilabel(self):

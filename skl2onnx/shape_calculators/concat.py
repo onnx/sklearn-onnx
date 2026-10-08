@@ -52,8 +52,8 @@ def calculate_sklearn_concat(operator):
                 )
             for ts in [
                 StringTensorType,
-                DoubleTensorType,
                 FloatTensorType,
+                DoubleTensorType,
                 Int64TensorType,
                 BooleanTensorType,
             ]:

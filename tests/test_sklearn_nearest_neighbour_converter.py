@@ -1695,6 +1695,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         sys.platform != "linux" and pv.Version(skl_version) < pv.Version("1.6.0"),
         "investigate why topk returns different results",
     )
+    @unittest.skipIf(
+        pv.Version(sklearn_version) < pv.Version("1.8.0"), reason="unstable"
+    )
     def test_sklearn_knn_imputer_issue_2025(self):
         # This test is about having nan or the fact TopK
         # does not handle largest=1 in opset < 11.
@@ -1707,7 +1710,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         imputer = KNNImputer(n_neighbors=3, metric="nan_euclidean")
         imputer.fit(data)
         initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
-        onnx_model = convert_sklearn(imputer, initial_types=initial_type)
+        onnx_model = convert_sklearn(
+            imputer, initial_types=initial_type, target_opset=TARGET_OPSET
+        )
         input_data = data.astype(numpy.float32)
         expected = imputer.transform(input_data)
         got = ReferenceEvaluator(onnx_model, verbose=0).run(
@@ -1773,7 +1778,9 @@ class TestNearestNeighbourConverter(unittest.TestCase):
 
         input_data = data.astype(np.float32)
         initial_type = [("float_input", FloatTensorType([None, data.shape[1]]))]
-        onnx_model = convert_sklearn(imputer, initial_types=initial_type)
+        onnx_model = convert_sklearn(
+            imputer, initial_types=initial_type, target_opset=TARGET_OPSET
+        )
         # with open("test_knn_imputer_one_nan.onnx", "wb") as f:
         #     f.write(onnx_model.SerializeToString())
 

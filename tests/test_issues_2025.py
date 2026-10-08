@@ -36,6 +36,40 @@ class TestInvestigate2025(unittest.TestCase):
         )
         self.assertTrue(onnx_model is not None)
 
+    @ignore_warnings(category=(ConvergenceWarning, FutureWarning))
+    def test_issue_1197_elasticnet_dataframe(self):
+        # https://github.com/onnx/sklearn-onnx/issues/1197
+        # to_onnx fails on ElasticNet when input is a DataFrame with multiple columns
+        import numpy as np
+        from numpy.testing import assert_allclose
+        from pandas import DataFrame
+        from sklearn.linear_model import ElasticNet
+        from skl2onnx import to_onnx
+        from onnxruntime import InferenceSession
+
+        np.random.seed(42)
+        n_samples, n_features = 100, 12
+        X = np.random.randn(n_samples, n_features).astype(np.float64)
+        y = X @ np.random.randn(n_features) + np.random.randn(n_samples)
+
+        col_names = [f"feat_{i}" for i in range(n_features)]
+        df = DataFrame(X, columns=col_names)
+
+        lr = ElasticNet(alpha=0.2, l1_ratio=0.2, random_state=42)
+        lr.fit(df, y)
+
+        # This should not raise an error
+        onx = to_onnx(lr, df)
+
+        # Validate predictions match sklearn
+        sess = InferenceSession(
+            onx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        inputs = {c: df[[c]].values for c in df.columns}
+        ort_pred = sess.run(None, inputs)[0]
+        skl_pred = lr.predict(df).reshape(-1, 1)
+        assert_allclose(ort_pred, skl_pred, rtol=1e-5)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

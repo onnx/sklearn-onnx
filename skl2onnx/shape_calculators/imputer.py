@@ -58,3 +58,6 @@ register_shape_calculator(
     "SklearnSimpleImputer", calculate_sklearn_imputer_output_shapes
 )
 register_shape_calculator("SklearnBinarizer", calculate_sklearn_imputer_output_shapes)
+register_shape_calculator(
+    "SklearnIterativeImputer", calculate_sklearn_imputer_output_shapes
+)

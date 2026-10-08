@@ -83,6 +83,9 @@ from sklearn.discriminant_analysis import (
 # Mixture
 from sklearn.mixture import GaussianMixture, BayesianGaussianMixture
 
+# Dummy estimators
+from sklearn.dummy import DummyClassifier, DummyRegressor
+
 # Multi-class
 from sklearn.multiclass import (
     _ConstantPredictor,
@@ -135,6 +138,11 @@ try:
     from sklearn.model_selection import TunedThresholdClassifierCV
 except ImportError:
     TunedThresholdClassifierCV = None
+
+try:
+    from sklearn.model_selection import FixedThresholdClassifier
+except ImportError:
+    FixedThresholdClassifier = None
 
 # MultiOutput
 from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
@@ -235,6 +243,12 @@ except ImportError:
     # New in 0.22
     KNNImputer = None
 try:
+    from sklearn.experimental import enable_iterative_imputer  # noqa
+    from sklearn.impute import IterativeImputer
+except ImportError:
+    # Not available in older versions
+    IterativeImputer = None
+try:
     from sklearn.preprocessing import KBinsDiscretizer
 except ImportError:
     # not available in 0.19
@@ -278,6 +292,12 @@ try:
 except ImportError:
     # Not available in scikit-learn < 0.19.0
     QuantileTransformer = None
+
+try:
+    from sklearn.preprocessing import SplineTransformer
+except ImportError:
+    # Not available in scikit-learn < 1.0
+    SplineTransformer = None
 
 try:
     from sklearn.ensemble import (
@@ -332,6 +352,7 @@ sklearn_classifier_list = list(
             CalibratedClassifierCV,
             ComplementNB,
             DecisionTreeClassifier,
+            DummyClassifier,
             ExtraTreeClassifier,
             ExtraTreesClassifier,
             GaussianNB,
@@ -395,12 +416,15 @@ def build_sklearn_operator_name_map():
             DictVectorizer,
             DecisionTreeClassifier,
             DecisionTreeRegressor,
+            DummyClassifier,
+            DummyRegressor,
             ExtraTreeClassifier,
             ExtraTreeRegressor,
             ExtraTreesClassifier,
             ExtraTreesRegressor,
             FeatureHasher,
             FeatureUnion,
+            FixedThresholdClassifier,
             FunctionTransformer,
             GammaRegressor,
             GaussianNB,
@@ -416,6 +440,7 @@ def build_sklearn_operator_name_map():
             Imputer,
             IncrementalPCA,
             IsolationForest,
+            IterativeImputer,
             KMeans,
             LabelBinarizer,
             LabelEncoder,
@@ -473,6 +498,7 @@ def build_sklearn_operator_name_map():
             SGDClassifier,
             SGDOneClassSVM,
             SimpleImputer,
+            SplineTransformer,
             StackingClassifier,
             StackingRegressor,
             SVC,

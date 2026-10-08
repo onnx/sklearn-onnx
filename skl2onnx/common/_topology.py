@@ -7,6 +7,7 @@ import pprint
 from logging import getLogger
 from collections import OrderedDict
 import numpy as np
+from sklearn import pipeline
 from onnx import onnx_pb as onnx_proto
 from onnx.helper import (
     make_graph,
@@ -65,6 +66,7 @@ def _default_OPSET_TO_IR_VERSION():
         23: 10,  # onnx is 11, onnxruntime==1.23.2 is 10
         24: 10,  # onnx is 12, onnxruntime==1.23.2 is 10
         25: 10,  # onnx is 12, onnxruntime==1.23.2 is 10
+        26: 13,
     }
 
 
@@ -141,7 +143,11 @@ class Variable:
                     onnx_name,
                 )
             else:
-                raise TypeError("onnx_name must be a string not %r." % onnx_name)
+                exc_type = ValueError if isinstance(onnx_name, str) else TypeError
+                raise exc_type(
+                    f"onnx_name must be a string not {onnx_name!r} "
+                    f"and should avoid brackets."
+                )
 
         if type is not None:
             shape = type.shape
@@ -766,7 +772,9 @@ class Scope:
         if rename:
             name = self._naming(seed, self.onnx_variable_names)
         else:
-            name = Topology._generate_unique_name(seed, self.onnx_variable_names)
+            name = Topology._generate_unique_name(
+                seed, self.onnx_variable_names, rename=False
+            )
         return name
 
     def get_unique_operator_name(self, seed):
@@ -883,17 +891,23 @@ class Scope:
 
     def _get_allowed_options(self, model, fail=True):
         if self.registered_models is not None:
-            if type(model) not in self.registered_models["aliases"]:
-                if fail:
-                    raise NotImplementedError(
-                        "No registered models, no known allowed options "
-                        "for model '{}'.".format(model.__class__.__name__)
-                    )
-                return {}
-            alias = self.registered_models["aliases"][type(model)]
-            conv = self.registered_models["conv"][alias]
-            allowed = conv.get_allowed_options()
-            return allowed
+            aliases = self.registered_models["aliases"]
+            model_cls = type(model)
+            lookup_cls = None
+            if model_cls in aliases:
+                lookup_cls = model_cls
+            elif isinstance(model, pipeline.Pipeline) and pipeline.Pipeline in aliases:
+                lookup_cls = pipeline.Pipeline
+            if lookup_cls is not None:
+                alias = aliases[lookup_cls]
+                conv = self.registered_models["conv"][alias]
+                return conv.get_allowed_options()
+            if fail:
+                raise NotImplementedError(
+                    "No registered models, no known allowed options "
+                    "for model '{}'.".format(model.__class__.__name__)
+                )
+            return {}
         raise NotImplementedError(
             "No registered models, no known allowed options "
             "for model '{}'.".format(model.__class__.__name__)
@@ -1033,23 +1047,28 @@ class Topology:
         return self.scopes[0]
 
     @staticmethod
-    def _generate_unique_name(seed, existing_names):
+    def _generate_unique_name(seed, existing_names, rename=True):
         """
         Produce an unique string based on the seed
         :param seed: a string
         :param existing_names: a set containing strings which cannot be
                                produced
+        :param rename: if True, the seed is modified to comply with
+                       C-style naming convention; if False, the seed
+                       is used as-is (only uniqueness is ensured)
         :return: a string similar to the seed
         """
         if seed == "":
             raise ValueError("Name seed must be a non-empty string.")
 
-        # Make the seed meet C-style naming convention
-        # Only alphabets and numbers are allowed
-        seed = re.sub("[^\\w+]", "_", seed)
-        # The first symbol cannot be a number
-        if re.match("^[0-9]", seed):
-            seed = "_" + seed
+        if rename:
+            # Make the seed meet C-style naming convention
+            # Special characters are replaced with underscores;
+            # only alphabets, numbers, and underscores are kept
+            seed = re.sub("[^\\w]", "_", seed)
+            # The first symbol cannot be a number
+            if re.match("^[0-9]", seed):
+                seed = "_" + seed
 
         # If seed has never been seen, we return it as it is. Otherwise,
         # we will append an number to make it unique.

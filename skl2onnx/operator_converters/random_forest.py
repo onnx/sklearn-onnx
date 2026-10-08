@@ -116,6 +116,11 @@ def convert_sklearn_random_forest_classifier(
     attr_dtype = dtype if op_version >= 3 else np.float32
     op = operator.raw_operator
 
+    # For HistGradientBoosting models with float32 inputs, the float64
+    # thresholds must be adjusted so that float32 comparisons in ONNX give
+    # the same routing decisions as sklearn's float64 comparisons.
+    hgb_adjust = hasattr(op, "_predictors") and dtype == np.float32
+
     if hasattr(op, "n_outputs_"):
         n_outputs = int(op.n_outputs_)
         options = container.get_options(
@@ -155,7 +160,7 @@ def convert_sklearn_random_forest_classifier(
             estimator_count = len(op.estimators_)
             tree_weight = 1.0 / estimator_count
         elif hasattr(op, "_predictors"):
-            # HistGradientBoostingRegressor
+            # HistGradientBoostingClassifier
             estimator_count = len(op._predictors)
             tree_weight = 1.0
         else:
@@ -189,7 +194,7 @@ def convert_sklearn_random_forest_classifier(
                         tree_weight,
                         0,
                         False,
-                        False,
+                        adjust_threshold_for_sklearn=hgb_adjust,
                         dtype=dtype,
                     )
                 else:
@@ -202,7 +207,7 @@ def convert_sklearn_random_forest_classifier(
                             tree_weight,
                             cl,
                             False,
-                            False,
+                            adjust_threshold_for_sklearn=hgb_adjust,
                             dtype=dtype,
                         )
 
@@ -447,6 +452,12 @@ def convert_sklearn_random_forest_regressor_converter(
     if dtype != np.float64:
         dtype = np.float32
     op = operator.raw_operator
+
+    # For HistGradientBoosting models with float32 inputs, the float64
+    # thresholds must be adjusted so that float32 comparisons in ONNX give
+    # the same routing decisions as sklearn's float64 comparisons.
+    hgb_adjust = hasattr(op, "_predictors") and dtype == np.float32
+
     attrs = get_default_tree_regressor_attribute_pairs()
     attrs["name"] = scope.get_unique_operator_name(op_type)
 
@@ -489,7 +500,15 @@ def convert_sklearn_random_forest_regressor_converter(
                 )
             tree = op._predictors[tree_id][0]
             add_tree_to_attribute_pairs_hist_gradient_boosting(
-                attrs, False, tree, tree_id, tree_weight, 0, False, False, dtype=dtype
+                attrs,
+                False,
+                tree,
+                tree_id,
+                tree_weight,
+                0,
+                False,
+                adjust_threshold_for_sklearn=hgb_adjust,
+                dtype=dtype,
             )
 
     if hasattr(op, "_baseline_prediction"):

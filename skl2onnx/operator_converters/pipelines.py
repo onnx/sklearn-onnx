@@ -15,11 +15,17 @@ def convert_pipeline(
 ):
     model = operator.raw_operator
     inputs = operator.inputs
+    use_raw_scores = scope.get_options(operator.raw_operator, dict(raw_scores=False))[
+        "raw_scores"
+    ]
     for step in model.steps:
         step_model = step[1]
         if is_classifier(step_model) or isinstance(step_model, Pipeline):
             scope.add_options(id(step_model), options={"zipmap": False})
             container.add_options(id(step_model), options={"zipmap": False})
+            if use_raw_scores and container.has_options(step_model, "raw_scores"):
+                container.add_options(id(step_model), {"raw_scores": True})
+                scope.add_options(id(step_model), {"raw_scores": True})
         outputs = _parse_sklearn(scope, step_model, inputs, custom_parsers=None)
         inputs = outputs
     if len(outputs) != len(operator.outputs):

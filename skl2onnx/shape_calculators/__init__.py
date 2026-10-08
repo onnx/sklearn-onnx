@@ -9,6 +9,7 @@ from . import class_labels
 from . import concat
 from . import cross_decomposition
 from . import dict_vectorizer
+from . import dummy
 from . import ensemble_shapes
 from . import feature_selection
 from . import feature_hasher
@@ -46,6 +47,7 @@ from . import random_trees_embedding
 from . import replace_op
 from . import scaler
 from . import sequence
+from . import spline_transformer
 from . import sgd_oneclass_svm
 from . import svd
 from . import support_vector_machines
@@ -64,6 +66,7 @@ __all__ = [
     concat,
     cross_decomposition,
     dict_vectorizer,
+    dummy,
     ensemble_shapes,
     feature_hasher,
     feature_selection,
@@ -101,6 +104,7 @@ __all__ = [
     replace_op,
     scaler,
     sequence,
+    spline_transformer,
     sgd_oneclass_svm,
     svd,
     support_vector_machines,
