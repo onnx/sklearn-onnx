@@ -8,6 +8,7 @@ import subprocess
 import time
 import packaging.version as pv
 import onnxruntime
+from sklearn import __version__ as sklearn_version
 from skl2onnx import __file__ as onnxrt_backend_dev_file
 
 VERBOSE = 0
@@ -75,6 +76,10 @@ class TestDocumentationExamples(unittest.TestCase):
                 if not name.endswith(".py") or not name.startswith("plot_"):
                     continue
                 reason = None
+                if name == "plot_calibrated_classifier_temperature.py" and pv.Version(
+                    ".".join(sklearn_version.split(".")[:2])
+                ) < pv.Version("1.8"):
+                    reason = "Temperature scaling requires scikit-learn >= 1.8."
                 if name in {"plot_woe_transformer.py"}:
                     reason = "dot not available"
                 if name in {

@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Add support for temperature scaling in CalibratedClassifierCV
+  [#1267](https://github.com/onnx/sklearn-onnx/issues/1267)
 * Fix VotingClassifier and VotingRegressor conversion when `weights` is a list
   or an estimator is set to `'drop'`
 * QuadraticDiscriminantAnalysis: the label output is 1D (shape `(N,)`) like `predict`,
