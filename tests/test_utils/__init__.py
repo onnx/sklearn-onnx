@@ -140,10 +140,8 @@ TARGET_OPSET = int(
     )
 )
 
-# opset-ml == 4 still not implemented in onnxruntime
-value_ml = 5
-if TARGET_OPSET <= 23:
-    value_ml = 3
+# The converters currently emit ai.onnx.ml operators up to version 3.
+value_ml = 3
 if TARGET_OPSET <= 16:
     value_ml = 2
 if TARGET_OPSET <= 11:
