@@ -25,9 +25,6 @@ import onnxmltools
 import skl2onnx
 import onnx
 import sklearn
-import matplotlib.pyplot as plt
-import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from onnxruntime.capi.onnxruntime_pybind11_state import Fail as OrtFail
 from skl2onnx import convert_sklearn, update_registered_converter
@@ -125,27 +122,6 @@ if sess is not None:
     pred_onx = sess.run(None, {"input": X[:5].astype(numpy.float32)})
     print("predict", pred_onx[0])
     print("predict_proba", pred_onx[1][:1])
-
-##################################
-# Display the ONNX graph
-# ++++++++++++++++++++++
-
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline.dot")
-
-image = plt.imread("pipeline.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
 
 #################################
 # **Versions used for this example**

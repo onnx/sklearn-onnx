@@ -31,15 +31,12 @@ from sklearn.datasets import load_iris
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from skl2onnx import update_registered_converter
-import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnxruntime as rt
 from skl2onnx.common._apply_operation import apply_identity, apply_cast, apply_greater
 from skl2onnx import to_onnx, get_model_alias
 from skl2onnx.proto import onnx_proto
 from skl2onnx.common._registration import get_shape_calculator
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
-import matplotlib.pyplot as plt
 
 
 class ValidatorClassifier(BaseEstimator, ClassifierMixin):
@@ -278,26 +275,6 @@ print("onnx", results[2])
 ##################################
 # It looks good.
 #
-# Display the ONNX graph
-# ++++++++++++++++++++++
-
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("validator_classifier.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng validator_classifier.dot")
-
-image = plt.imread("validator_classifier.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
 #################################
 # **Versions used for this example**
 
