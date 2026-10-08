@@ -4,6 +4,11 @@
 
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
   the converted model returned the raw prediction instead of applying the exponential link
+* Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum
+  absolute value) and keep rows of zeros at zero with double inputs
+  [#793](https://github.com/onnx/sklearn-onnx/issues/793)
+* Add support for temperature scaling in CalibratedClassifierCV
+  [#1267](https://github.com/onnx/sklearn-onnx/issues/1267)
 * Fix VotingClassifier and VotingRegressor conversion when `weights` is a list
   or an estimator is set to `'drop'`
 * QuadraticDiscriminantAnalysis: the label output is 1D (shape `(N,)`) like `predict`,
