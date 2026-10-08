@@ -34,8 +34,10 @@ def convert_voting_regressor(
         this_operator.outputs.append(var_name)
         var_name = var_name.onnx_name
 
-        if op.weights is not None:
-            val = op.weights[i] / op.weights.sum()
+        # weights of the fitted (not dropped) estimators, aligned with estimators_
+        weights = op._weights_not_none
+        if weights is not None:
+            val = weights[i] / sum(weights)
         else:
             val = 1.0 / len(op.estimators_)
 
