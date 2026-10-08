@@ -2,6 +2,7 @@
 
 ## 1.21.0
 
+* Fix HistGradientBoosting conversion with categorical_features [#1236](https://github.com/onnx/sklearn-onnx/issues/1236)
 * SGDClassifier with `loss='modified_huber'`: the multiclass label follows the
   decision function like `predict`, instead of the (possibly tied) probabilities
 * Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
