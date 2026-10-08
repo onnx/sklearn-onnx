@@ -85,6 +85,8 @@ def max_onnxruntime_opset():
     <https://github.com/microsoft/onnxruntime/blob/main/docs/Versioning.md>`_.
     """
     vi = pv.Version(ort_version.split("+")[0])
+    if vi >= pv.Version("1.30.0"):
+        return 26
     if vi >= pv.Version("1.23.0"):
         return 23
     if vi >= pv.Version("1.23.0"):
@@ -138,10 +140,8 @@ TARGET_OPSET = int(
     )
 )
 
-# opset-ml == 4 still not implemented in onnxruntime
-value_ml = 5
-if TARGET_OPSET <= 23:
-    value_ml = 3
+# The converters currently emit ai.onnx.ml operators up to version 3.
+value_ml = 3
 if TARGET_OPSET <= 16:
     value_ml = 2
 if TARGET_OPSET <= 11:
