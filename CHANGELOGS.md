@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix VotingClassifier and VotingRegressor conversion when `weights` is a list
+  or an estimator is set to `'drop'`
 * QuadraticDiscriminantAnalysis: the label output is 1D (shape `(N,)`) like `predict`,
   it was `(1, N)`
 * SGDClassifier with `loss='modified_huber'`: the multiclass label follows the
