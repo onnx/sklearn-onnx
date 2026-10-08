@@ -355,9 +355,15 @@ def convert_sklearn_sgd_classifier(
             apply_identity(scope, scores, operator.outputs[1].full_name, container)
         proba = operator.outputs[1].full_name
 
+    # With modified_huber, several classes can share the same clipped
+    # probability, scikit-learn predicts with the decision function instead.
+    label_input = proba
+    if sgd_op.loss == "modified_huber" and len(classes) > 2:
+        label_input = scores
+
     container.add_node(
         "ArgMax",
-        proba,
+        label_input,
         predicted_label_name,
         name=scope.get_unique_operator_name("ArgMax"),
         axis=1,
