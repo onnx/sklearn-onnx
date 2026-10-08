@@ -12,7 +12,7 @@ def calculate_quadratic_discriminant_analysis_shapes(operator):
         label_tensor_type = Int64TensorType
 
     n_clasess = len(classes)
-    operator.outputs[0].type = label_tensor_type([1, None])
+    operator.outputs[0].type = label_tensor_type([None])
     operator.outputs[1].type.shape = [None, n_clasess]
 
 
