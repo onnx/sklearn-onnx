@@ -7,7 +7,8 @@ import packaging.version as pv
 import numpy as np
 from sklearn import __version__ as skl_version
 from sklearn.linear_model import SGDClassifier
-from onnxruntime import __version__ as ort_version
+from numpy.testing import assert_array_equal
+from onnxruntime import InferenceSession, __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -449,6 +450,30 @@ class TestSGDClassifierConverter(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx, basename="SklearnSGDClassifierMultiLogInt"
         )
+
+    def test_model_sgd_multi_class_modified_huber_label(self):
+        # Rows whose scores are all below -1 get the same clipped probability
+        # for every class: the label must follow the decision function.
+        rng = np.random.RandomState(0)
+        X = rng.randn(60, 4).astype(np.float32)
+        y = (X[:, 0] + X[:, 1] > 0).astype(int) + (X[:, 2] > 0.5)
+        model = SGDClassifier(loss="modified_huber", random_state=0).fit(X, y)
+        proba = model.predict_proba(X)
+        self.assertTrue((proba.max(axis=1) == proba.min(axis=1)).any())
+
+        model_onnx = convert_sklearn(
+            model,
+            "scikit-learn SGD modified_huber",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            options={id(model): {"zipmap": False}},
+            target_opset=TARGET_OPSET,
+        )
+        sess = InferenceSession(
+            model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        label, got_proba = sess.run(None, {"input": X})
+        assert_array_equal(label, model.predict(X))
+        np.testing.assert_allclose(got_proba, proba, atol=1e-5)
 
     def test_model_multi_class_nocl(self):
         model, X = fit_classification_model(
