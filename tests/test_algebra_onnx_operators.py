@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
-import warnings
+
 from io import BytesIO
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -373,7 +373,7 @@ class TestOnnxOperators(unittest.TestCase):
         X = np.array([[1, 2], [3, 4]], dtype=np.float32)
         model_def = onx.to_onnx(
             {"X": X},
-            outputs=[("Y", FloatTensorType([None, 2]))],
+            outputs=[("Y", FloatTensorType([1, None]))],
             target_opset=TARGET_OPSET,
         )
         sess = InferenceSession(
@@ -471,10 +471,9 @@ class TestOnnxOperators(unittest.TestCase):
         assert_almost_equal(exp, got[0])
 
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]], dtype=np.float32)
-        pads = np.array([0, 2, 0, 0], dtype=np.int64)
-        constant_value = np.array([0.0], dtype=np.float32)
+        pads = np.array([0, 1, 0, 0], dtype=np.int64)
         exp = np.array(
-            [[0, 1.2, 1.0, 1.2], [0, 3.4, 2.3, 3.4], [0, 5.7, 4.5, 5.7]],
+            [[1.2, 1.0, 1.2], [3.4, 2.3, 3.4], [5.7, 4.5, 5.7]],
             dtype=np.float32,
         )
         onx = OnnxPad(
@@ -485,10 +484,7 @@ class TestOnnxOperators(unittest.TestCase):
             model_def.SerializeToString(), providers=["CPUExecutionProvider"]
         )
         got = oinf.run(None, {"data": data, "pads": pads})
-        try:
-            assert_almost_equal(exp, got[0])
-        except AssertionError as e:
-            warnings.warn(e)
+        assert_almost_equal(exp, got[0])
 
         data = np.array([[1.0, 1.2], [2.3, 3.4], [4.5, 5.7]], dtype=np.float32)
         pads = np.array([0, 2, 0, 0], dtype=np.int64)

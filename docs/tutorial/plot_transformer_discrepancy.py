@@ -68,8 +68,10 @@ strings = numpy.array(
     [
         "This a sentence.",
         "This a sentence with more characters $^*&'(-...",
-        """var = ClassName(var2, user=mail@anywhere.com, pwd"""
-        """=")_~-('&]@^\\`|[{#")""",
+        (
+            """var = ClassName(var2, user=mail@anywhere.com, pwd"""
+            """=")_~-('&]@^\\`|[{#")"""
+        ),
         "c79857654",
         "https://complex-url.com/;76543u3456?g=hhh&amp;h=23",
         "01-03-05T11:12:13",

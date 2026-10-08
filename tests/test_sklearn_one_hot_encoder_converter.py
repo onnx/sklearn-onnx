@@ -526,7 +526,7 @@ class TestSklearnOneHotEncoderConverter(unittest.TestCase):
         self.assertEqual([i[0] for i in init], "CAT1 CAT2 num1 num2".split())
         for t in init:
             self.assertEqual(t[1].shape, [None, 1])
-        onx2 = to_onnx(pipe, initial_types=init)
+        onx2 = to_onnx(pipe, initial_types=init, target_opset=TARGET_OPSET)
         sess2 = InferenceSession(
             onx2.SerializeToString(), providers=["CPUExecutionProvider"]
         )

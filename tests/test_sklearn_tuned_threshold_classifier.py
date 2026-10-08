@@ -98,6 +98,7 @@ class TestSklearnTunedThresholdClassifierConverter(unittest.TestCase):
             classifier_tuned,
             initial_types=[("X", FloatTensorType([None, X_train.shape[1]]))],
             options={"zipmap": False},
+            target_opset=TARGET_OPSET,
         )
 
         sess = rt.InferenceSession(model_onnx.SerializeToString())
@@ -169,6 +170,7 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
             model,
             initial_types=[("X", FloatTensorType([None, X_train.shape[1]]))],
             options={"zipmap": False},
+            target_opset=TARGET_OPSET,
         )
 
         sess = rt.InferenceSession(model_onnx.SerializeToString())
@@ -201,6 +203,7 @@ class TestSklearnFixedThresholdClassifierConverter(unittest.TestCase):
             model,
             initial_types=[("X", FloatTensorType([None, X_train.shape[1]]))],
             options={"zipmap": False},
+            target_opset=TARGET_OPSET,
         )
 
         sess = rt.InferenceSession(model_onnx.SerializeToString())

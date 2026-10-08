@@ -38,11 +38,7 @@ def convert_sklearn_gradient_boosting_classifier(
 
     transform = "LOGISTIC" if op.n_classes_ == 2 else "SOFTMAX"
     if op.init == "zero":
-        loss = op._loss if hasattr(op, "_loss") else op.loss_
-        if hasattr(loss, "K"):
-            base_values = np.zeros(loss.K)
-        else:
-            base_values = np.zeros(1)
+        base_values = np.zeros(op.estimators_.shape[1])
     elif op.init is None:
         if hasattr(op.estimators_[0, 0], "n_features_in_"):
             # sklearn >= 1.2

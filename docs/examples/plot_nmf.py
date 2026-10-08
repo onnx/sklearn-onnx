@@ -23,14 +23,11 @@ Building a simple model
 
 """
 
-import os
 import skl2onnx
 import onnxruntime
 import sklearn
 from sklearn.decomposition import NMF
 import numpy as np
-import matplotlib.pyplot as plt
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 import onnx
 from skl2onnx.algebra.onnx_ops import OnnxArrayFeatureExtractor, OnnxMul, OnnxReduceSum
 from skl2onnx.common.data_types import FloatTensorType
@@ -132,20 +129,6 @@ for i in range(mat.shape[0]):
 
 print(onnx_preds)
 
-
-###################################
-# The ONNX graph looks like the following.
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring"),
-)
-pydot_graph.write_dot("graph_nmf.dot")
-os.system("dot -O -Tpng graph_nmf.dot")
-image = plt.imread("graph_nmf.dot.png")
-plt.imshow(image)
-plt.axis("off")
 
 #################################
 # **Versions used for this example**

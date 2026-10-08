@@ -29,9 +29,6 @@ and must be removed. Look for comment starting with ``---`` below.
 import skl2onnx
 import onnx
 import sklearn
-import matplotlib.pyplot as plt
-import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from skl2onnx.helpers.onnx_helper import select_model_inputs_outputs
 from skl2onnx.helpers.onnx_helper import save_onnx_model
 from skl2onnx.helpers.onnx_helper import enumerate_model_node_outputs
@@ -218,8 +215,7 @@ for out in enumerate_model_node_outputs(model_onnx):
 ################################
 # Not that easy to tell which one is what as the *ONNX*
 # has more operators than the original *scikit-learn* pipelines.
-# The graph at :ref:`l-plot-complex-pipeline-graph`
-# helps up to find the outputs of both numerical
+# The converted model's node outputs help us find the outputs of both numerical
 # and textual pipeline: *variable1*, *variable2*.
 # Let's look into the numerical pipeline first.
 
@@ -246,49 +242,6 @@ sess = rt.InferenceSession(
 )
 numT = sess.run(None, inputs)
 print("textual features", numT[0][:1])
-
-##################################
-# Display the sub-ONNX graph
-# ++++++++++++++++++++++++++
-#
-# Finally, let's see both subgraphs. First, numerical pipeline.
-
-pydot_graph = GetPydotGraph(
-    num_onnx.graph,
-    name=num_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_titanic_num.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic_num.dot")
-
-image = plt.imread("pipeline_titanic_num.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
-######################################
-# Then textual pipeline.
-
-pydot_graph = GetPydotGraph(
-    text_onnx.graph,
-    name=text_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("pipeline_titanic_text.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng pipeline_titanic_text.dot")
-
-image = plt.imread("pipeline_titanic_text.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
 
 #################################
 # **Versions used for this example**

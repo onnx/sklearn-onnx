@@ -49,7 +49,7 @@ def calculate_bayesian_ridge_output_shapes(operator):
     else:
         operator.outputs[0].type = cls_type([N, 1])
 
-    if len(operator.inputs) == 2:
+    if len(operator.outputs) == 2:
         # option return_std is True
         operator.outputs[1].type = cls_type([N, 1])
 
