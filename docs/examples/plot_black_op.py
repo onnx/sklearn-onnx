@@ -23,11 +23,8 @@ of operators is for model *GaussianMixture*.
 import onnxruntime
 import onnx
 import numpy
-import os
 from timeit import timeit
 import numpy as np
-import matplotlib.pyplot as plt
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from onnxruntime import InferenceSession
 from sklearn.mixture import GaussianMixture
 from sklearn.datasets import load_iris
@@ -58,27 +55,6 @@ print(model.score_samples(xt))
 print(sess.run(None, {"X": xt})[2])
 
 
-##################################
-# Display the ONNX graph.
-
-pydot_graph = GetPydotGraph(
-    model_onnx.graph,
-    name=model_onnx.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("mixture.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng mixture.dot")
-
-image = plt.imread("mixture.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
-
 ###################################
 # Conversion without ReduceLogSumExp
 # ++++++++++++++++++++++++++++++++++
@@ -101,27 +77,6 @@ sess2 = InferenceSession(
 xt = X_test[:5].astype(np.float32)
 print(model.score_samples(xt))
 print(sess2.run(None, {"X": xt})[2])
-
-##################################
-# Display the ONNX graph.
-
-pydot_graph = GetPydotGraph(
-    model_onnx2.graph,
-    name=model_onnx2.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer(
-        "docstring", color="yellow", fillcolor="yellow", style="filled"
-    ),
-)
-pydot_graph.write_dot("mixture2.dot")
-
-os.system("dot -O -Gdpi=300 -Tpng mixture2.dot")
-
-image = plt.imread("mixture2.dot.png")
-fig, ax = plt.subplots(figsize=(40, 20))
-ax.imshow(image)
-ax.axis("off")
-
 
 #######################################
 # Processing time

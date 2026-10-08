@@ -2,28 +2,22 @@
 
 
 """
-Draw a pipeline
-===============
+Save and load a model
+=====================
 
-There is no other way to look into one model stored
-in ONNX format than looking into its node with
-*onnx*. This example demonstrates
-how to draw a model and to retrieve it in *json*
-format.
+This example demonstrates how to save a model in ONNX format
+and load it again with *onnx*.
 
-Retrieve a model in JSON format
-+++++++++++++++++++++++++++++++
+Save a model in ONNX format
++++++++++++++++++++++++++++
 
-That's the most simple way.
+First, create a model and write it to a file.
 """
 
 import skl2onnx
 import onnxruntime
 import sklearn
 import numpy
-import matplotlib.pyplot as plt
-import os
-from onnx.tools.net_drawer import GetPydotGraph, GetOpNodeProducer
 from onnx import ModelProto
 import onnx
 from skl2onnx.algebra.onnx_ops import OnnxAdd, OnnxMul
@@ -45,39 +39,15 @@ with open(filename, "wb") as f:
 
 
 #################################
-# Draw a model with ONNX
+# Load a model with ONNX
 # ++++++++++++++++++++++
-# We use `net_drawer.py
-# <https://github.com/onnx/onnx/blob/main/onnx/tools/net_drawer.py>`_
-# included in *onnx* package.
-# We use *onnx* to load the model
-# in a different way than before.
+# We use *onnx* to load the model in a different way than before.
 
 
 model = ModelProto()
 with open(filename, "rb") as fid:
     content = fid.read()
     model.ParseFromString(content)
-
-###################################
-# We convert it into a graph.
-pydot_graph = GetPydotGraph(
-    model.graph,
-    name=model.graph.name,
-    rankdir="TB",
-    node_producer=GetOpNodeProducer("docstring"),
-)
-pydot_graph.write_dot("graph.dot")
-
-#######################################
-# Then into an image
-os.system("dot -O -Tpng graph.dot")
-
-################################
-# Which we display...
-image = plt.imread("graph.dot.png")
-plt.imshow(image)
-plt.axis("off")
 
 #################################
 # **Versions used for this example**
