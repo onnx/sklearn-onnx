@@ -50,6 +50,32 @@ class TestVotingRegressorConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
+    def test_model_voting_regression_weights_list_with_drop(self):
+        # weights given as a list, and a dropped estimator before a kept one
+        model = VotingRegressor(
+            [
+                ("lr", LinearRegression()),
+                ("dropped", "drop"),
+                ("dt", DecisionTreeRegressor(max_depth=3)),
+            ],
+            weights=[1, 5, 3],
+        )
+        model, X = fit_regression_model(model)
+        model_onnx = convert_sklearn(
+            model,
+            "voting regression",
+            [("input", FloatTensorType([None, X.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        dump_data_and_model(
+            X.astype(numpy.float32),
+            model,
+            model_onnx,
+            basename="SklearnVotingRegressorWeightsListDrop-Dec4",
+            comparable_outputs=[0],
+        )
+
+    @unittest.skipIf(VotingRegressor is None, reason="new in 0.21")
     def test_model_voting_regression_int(self):
         model, X = fit_regression_model(model_to_test(), is_int=True)
         model_onnx = convert_sklearn(
