@@ -4,6 +4,8 @@
 
 * Fix VotingClassifier and VotingRegressor conversion when `weights` is a list
   or an estimator is set to `'drop'`
+* SGDClassifier with `loss='modified_huber'`: the multiclass label follows the
+  decision function like `predict`, instead of the (possibly tied) probabilities
 * Fix isotonic CalibratedClassifierCV to interpolate between calibrator thresholds instead of rounding to the nearest one [#1151](https://github.com/onnx/sklearn-onnx/issues/1151)
 * Fix BayesianRidge standard-deviation conversion to use the correct
   predictive variance.
