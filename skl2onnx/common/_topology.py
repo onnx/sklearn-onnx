@@ -1736,7 +1736,12 @@ def _update_domain_version(container, onnx_model, verbose=0):
         op_set.domain = op_domain
         if op_set != "":
             max_supported = get_default_opset_for_domain(op_domain)
-            if max_supported is not None and max_supported < op_version:
+            requested = container.target_opset_all.get(op_domain)
+            if (
+                max_supported is not None
+                and max_supported < op_version
+                and (requested is None or requested < op_version)
+            ):
                 raise RuntimeError(
                     "The model is using version %d of domain %r not supported "
                     "yet by this library. You need to specify "

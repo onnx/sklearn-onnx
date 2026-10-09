@@ -14,10 +14,12 @@ from ..common._apply_operation import (
 from ..common.data_types import BooleanTensorType, Int64TensorType, guess_numpy_type
 from ..common._registration import register_converter
 from ..common.tree_ensemble import (
+    add_tree_ensemble_node,
     add_tree_to_attribute_pairs,
     add_tree_to_attribute_pairs_hist_gradient_boosting,
     get_default_tree_classifier_attribute_pairs,
     get_default_tree_regressor_attribute_pairs,
+    uses_tree_ensemble,
 )
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
@@ -114,7 +116,9 @@ def convert_sklearn_random_forest_classifier(
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
-    attr_dtype = dtype if op_version >= 3 else np.float32
+    attr_dtype = (
+        dtype if op_version >= 3 or uses_tree_ensemble(container) else np.float32
+    )
     op = operator.raw_operator
 
     # For HistGradientBoosting models with float32 inputs, the float64
@@ -270,10 +274,13 @@ def convert_sklearn_random_forest_classifier(
                 ):
                     attr_pairs[k] = np.array(attr_pairs[k], dtype=attr_dtype).ravel()
 
-        container.add_node(
+        add_tree_ensemble_node(
+            scope,
+            container,
             op_type,
             input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
+            dtype,
             op_domain=op_domain,
             op_version=op_version,
             **attr_pairs,
@@ -552,10 +559,13 @@ def convert_sklearn_random_forest_regressor_converter(
         else operator.outputs[0].full_name
     )
 
-    container.add_node(
+    add_tree_ensemble_node(
+        scope,
+        container,
         op_type,
         input_name,
         tree_output,
+        dtype,
         op_domain=op_domain,
         op_version=op_version,
         **attrs,
