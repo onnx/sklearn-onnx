@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
+  the converted model returned the raw prediction instead of applying the exponential link
 * Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum
   absolute value) and keep rows of zeros at zero with double inputs
   [#793](https://github.com/onnx/sklearn-onnx/issues/793)
