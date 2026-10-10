@@ -2,6 +2,7 @@
 
 ## 1.21.0
 
+* Fix KNNImputer conversion failing at inference when a row has only missing values
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
   the converted model returned the raw prediction instead of applying the exponential link
 * Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum

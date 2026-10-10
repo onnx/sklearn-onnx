@@ -1550,6 +1550,42 @@ class TestNearestNeighbourConverter(unittest.TestCase):
                 backend="onnxruntime",
             )
 
+    @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
+    @unittest.skipIf(
+        pv.Version(ort_version) <= pv.Version("1.16.0"),
+        reason="onnxruntime not recent enough",
+    )
+    @ignore_warnings(category=DeprecationWarning)
+    def test_sklearn_knn_imputer_all_nan_row(self):
+        # a row with only missing values has no distance to any donor,
+        # scikit-learn imputes it with the column means
+        x_train = numpy.array(
+            [
+                [1, 2, numpy.nan, 12],
+                [3, numpy.nan, 3, 13],
+                [1, 4, numpy.nan, 1],
+                [numpy.nan, 4, 3, 12],
+            ],
+            dtype=numpy.float32,
+        )
+        all_nan = [numpy.nan] * 4
+        x_tests = [
+            numpy.array([all_nan], dtype=numpy.float32),
+            numpy.array([all_nan, [1.3, 2.4, numpy.nan, 1]], dtype=numpy.float32),
+            numpy.array(
+                [[1.3, numpy.nan, 3.1, numpy.nan], all_nan], dtype=numpy.float32
+            ),
+        ]
+        for n_neighbors in [1, 3]:
+            model = KNNImputer(n_neighbors=n_neighbors).fit(x_train)
+            model_onnx = to_onnx(model, x_train[:1], target_opset=TARGET_OPSET)
+            sess = InferenceSession(
+                model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+            )
+            for x_test in x_tests:
+                got = sess.run(None, {"X": x_test})[0]
+                assert_almost_equal(model.transform(x_test), got, decimal=5)
+
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="not available"
     )

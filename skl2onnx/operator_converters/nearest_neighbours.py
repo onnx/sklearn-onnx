@@ -1424,7 +1424,7 @@ def make_knn_imputer_column_nan_found(
                         all_nan_dist_mask,
                         dist_chunk,
                         dist_idx_map,
-                        potential_donors_idx,
+                        nonzero_numpy__0,
                     ],
                     ["A", "B", "C"],
                     domain="local_domain",
