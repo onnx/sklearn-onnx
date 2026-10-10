@@ -21,6 +21,7 @@ from ..common.data_types import (
     guess_proto_type,
 )
 from ..common.tree_ensemble import (
+    add_tree_ensemble_node,
     add_tree_to_attribute_pairs,
     get_default_tree_classifier_attribute_pairs,
     get_default_tree_regressor_attribute_pairs,
@@ -119,10 +120,13 @@ def predict(
         attrs = populate_tree_attributes(
             model, scope.get_unique_operator_name(op_type), dtype
         )
-        container.add_node(
+        add_tree_ensemble_node(
+            scope,
+            container,
             op_type,
             input_name,
             [indices_name, dummy_proba_name],
+            dtype,
             op_domain=op_domain,
             op_version=op_version,
             **attrs,
@@ -224,24 +228,26 @@ def _append_decision_output(
     attrs["name"] = scope.get_unique_operator_name(op_type)
     attrs["n_targets"] = 1
     attrs["post_transform"] = "NONE"
-    if regression:
-        attrs["target_weights"] = np.array(
-            [float(_) for _ in attrs["target_nodeids"]], dtype=dtype
-        )
-    else:
-        attrs["target_ids"] = [0 for _ in attrs["class_ids"]]
-        attrs["target_weights"] = [float(_) for _ in attrs["class_nodeids"]]
-        attrs["target_nodeids"] = attrs["class_nodeids"]
-        attrs["target_treeids"] = attrs["class_treeids"]
-
-    rem = [k for k in attrs if k.startswith("class")]
+    # One weight per leaf: its node id.
+    prefix = "target_" if regression else "class_"
+    leaves = list(
+        dict.fromkeys(zip(attrs[prefix + "treeids"], attrs[prefix + "nodeids"]))
+    )
+    rem = [k for k in attrs if k.startswith(("class", "target_"))]
     for k in rem:
         del attrs[k]
+    attrs["target_treeids"] = [t for t, _ in leaves]
+    attrs["target_nodeids"] = [n for _, n in leaves]
+    attrs["target_ids"] = [0] * len(leaves)
+    attrs["target_weights"] = np.array([float(n) for _, n in leaves], dtype=dtype)
     dpath = scope.get_unique_variable_name("dpath")
-    container.add_node(
+    add_tree_ensemble_node(
+        scope,
+        container,
         op_type.replace("Classifier", "Regressor"),
         input_name,
         dpath,
+        dtype,
         op_domain=op_domain,
         op_version=op_version,
         **attrs,
@@ -397,10 +403,13 @@ def convert_sklearn_decision_tree_classifier(
                 ):
                     attrs[k] = np.array(attrs[k], dtype=dtype)
 
-        container.add_node(
+        add_tree_ensemble_node(
+            scope,
+            container,
             op_type,
             input_name,
             [operator.outputs[0].full_name, operator.outputs[1].full_name],
+            dtype,
             op_domain=op_domain,
             op_version=op_version,
             **attrs,
@@ -552,10 +561,13 @@ def convert_sklearn_decision_tree_regressor(
         )
         input_name = [cast_input_name]
 
-    container.add_node(
+    add_tree_ensemble_node(
+        scope,
+        container,
         op_type,
         input_name,
         operator.outputs[0].full_name,
+        dtype,
         op_domain=op_domain,
         op_version=op_version,
         **attrs,

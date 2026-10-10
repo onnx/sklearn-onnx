@@ -2,6 +2,10 @@
 
 ## 1.21.0
 
+* Tree models (DecisionTree, ExtraTree(s), RandomForest, GradientBoosting,
+  HistGradientBoosting) are converted with operator TreeEnsemble when the target opset
+  of domain `ai.onnx.ml` is 5 or more
+  [#1160](https://github.com/onnx/sklearn-onnx/issues/1160)
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
   the converted model returned the raw prediction instead of applying the exponential link
 * Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum
