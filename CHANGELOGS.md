@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* CastTransformer: accept a dtype given as a string such as `"float64"`, like numpy does
+  [#927](https://github.com/onnx/sklearn-onnx/issues/927)
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
   the converted model returned the raw prediction instead of applying the exponential link
 * Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum

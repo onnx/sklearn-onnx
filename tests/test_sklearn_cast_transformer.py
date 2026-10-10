@@ -80,6 +80,23 @@ class TestSklearnCastTransformerConverter(unittest.TestCase):
     def test_cast_transformer_int64(self):
         self.common_test_cast_transformer(numpy.int64, Int64TensorType)
 
+    def test_cast_transformer_dtype_string(self):
+        # like numpy, the dtype can be given as a string
+        data = numpy.array(
+            [[0.1, 0.2, 3.1], [1, 1, 0], [0, 2, 1], [1, 0, 2]], dtype=numpy.float32
+        )
+        for dtype in ["float32", "float64", "int64"]:
+            with self.subTest(dtype=dtype):
+                model = CastTransformer(dtype=dtype).fit(data)
+                expected = model.transform(data)
+                onx = to_onnx(model, data, target_opset=TARGET_OPSET)
+                sess = InferenceSession(
+                    onx.SerializeToString(), providers=["CPUExecutionProvider"]
+                )
+                got = sess.run(None, {"X": data})[0]
+                self.assertEqual(got.dtype, expected.dtype)
+                numpy.testing.assert_allclose(got, expected)
+
     @unittest.skipIf(TARGET_OPSET < 9, reason="not supported")
     @unittest.skipIf(
         pv.Version(ort_version) < pv.Version("0.5.0"), reason="runtime too old"
