@@ -1353,20 +1353,10 @@ def make_knn_imputer_column_nan_found(
         value=from_array(np.array([-1], dtype=np.int64), name="value"),
         outputs=["init7_s1__1"],
     )
-    init7_s_0 = op.Constant(
-        value=from_array(np.array(0, dtype=np.int64), name="value"),
-        outputs=["init7_s_0"],
-    )
-    init7_s_1 = op.Constant(
-        value=from_array(np.array(1, dtype=np.int64), name="value"),
-        outputs=["init7_s_1"],
-    )
     c_lifted_tensor_2 = op.Constant(
         value=from_array(np.array([1], dtype=np.int64), name="value"),
         outputs=["c_lifted_tensor_2"],
     )
-
-    init7_s1_2 = op.UnsqueezeAnyOpset(init7_s_2, np.array([0], dtype=np.int64))
 
     select_1 = op.Gather(non_missing_fix_x, init7_s_2, axis=1, outputs=["select_1"])
     potential_donors_idx = op.NonZero(select_1, outputs=["potential_donors_idx"])
@@ -1455,6 +1445,86 @@ def make_knn_imputer_column_nan_found(
         outputs=["select_scatter", "dist_subset_updated", "receivers_idx_updated"],
     )
 
+    # Like scikit-learn, skip the imputation when every receiver was imputed
+    # with the column mean, the remaining tensors are empty.
+    size_receivers_idx = op.Size(receivers_idx)
+    receivers_left = op.Greater(size_receivers_idx, zero_i)
+    output_0 = op.If(
+        receivers_left,
+        then_branch=make_graph(
+            [
+                make_node(
+                    "knn_imputer_column_impute",
+                    [
+                        i_col,
+                        select_scatter,
+                        dist_subset,
+                        receivers_idx,
+                        mask_fit_x,
+                        _fit_x,
+                        nonzero_numpy__0,
+                        sym_size_int_23,
+                        n_neighours,
+                    ],
+                    ["X"],
+                    domain="local_domain",
+                )
+            ],
+            "then_branch",
+            [],
+            [make_tensor_value_info("X", itype, None)],
+        ),
+        else_branch=make_graph(
+            [make_node("Identity", [select_scatter], ["X"])],
+            "identity",
+            [],
+            [make_tensor_value_info("X", itype, None)],
+        ),
+        outputs=["output_0"],
+    )
+    gr.make_tensor_output(output_0)
+    g.make_local_function(
+        container=gr,
+        optimize=False,
+        name="knn_imputer_column_nan_found",
+        domain="local_domain",
+    )
+    return gr
+
+
+def make_knn_imputer_column_impute(
+    g: ModelComponentContainer, scope: Scope, itype: int
+):
+    gr = ModelComponentContainer(
+        {"": g.main_opset, "local_domain": 1}, as_function=True
+    )
+    i_col = gr.make_tensor_input("i_col")
+    select_scatter = gr.make_tensor_input("x")
+    dist_subset = gr.make_tensor_input("dist_subset")
+    receivers_idx = gr.make_tensor_input("receivers_idx")
+    mask_fit_x = gr.make_tensor_input("mask_fit_x")
+    _fit_x = gr.make_tensor_input("_fit_x")
+    nonzero_numpy__0 = gr.make_tensor_input("potential_donors_idx")
+    sym_size_int_23 = gr.make_tensor_input("n_potential_donors")
+    n_neighours = gr.make_tensor_input("n_neighbors")
+
+    op = gr.get_op_builder(scope)
+
+    init7_s_2 = i_col
+    init7_s1__1 = op.Constant(
+        value=from_array(np.array([-1], dtype=np.int64), name="value"),
+        outputs=["init7_s1__1"],
+    )
+    init7_s_0 = op.Constant(
+        value=from_array(np.array(0, dtype=np.int64), name="value"),
+        outputs=["init7_s_0"],
+    )
+    init7_s_1 = op.Constant(
+        value=from_array(np.array(1, dtype=np.int64), name="value"),
+        outputs=["init7_s_1"],
+    )
+    init7_s1_2 = op.UnsqueezeAnyOpset(init7_s_2, np.array([0], dtype=np.int64))
+
     lt = op.Less(n_neighours, sym_size_int_23, outputs=["lt"])
     where_1 = op.Where(lt, n_neighours, sym_size_int_23, outputs=["where_1"])
     le = op.LessOrEqual(where_1, init7_s_0, outputs=["le"])
@@ -1504,7 +1574,7 @@ def make_knn_imputer_column_nan_found(
     g.make_local_function(
         container=gr,
         optimize=False,
-        name="knn_imputer_column_nan_found",
+        name="knn_imputer_column_impute",
         domain="local_domain",
     )
     return gr
@@ -1692,6 +1762,7 @@ def convert_knn_imputer(
     make_calc_impute_make_new_neights(container, Scope("LF5"), itype=proto_type)
     make_calc_impute(container, Scope("LF6"), itype=proto_type)
     make_knn_imputer_column_all_nan(container, Scope("LF7"), itype=proto_type)
+    make_knn_imputer_column_impute(container, Scope("LF10"), itype=proto_type)
     make_knn_imputer_column_nan_found(container, Scope("LF8"), itype=proto_type)
     make_knn_imputer_column(container, Scope("LF9"), itype=proto_type)
     container.add_node("Identity", [result], [operator.outputs[0].full_name])
