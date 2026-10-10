@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* `select_model_inputs_outputs` keeps the type and shape of the selected outputs
+  [#857](https://github.com/onnx/sklearn-onnx/issues/857)
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
   the converted model returned the raw prediction instead of applying the exponential link
 * Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum
