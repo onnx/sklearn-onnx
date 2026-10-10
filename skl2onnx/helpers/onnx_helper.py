@@ -145,10 +145,16 @@ def select_model_inputs_outputs(model, outputs=None, inputs=None):
     # All nodes verifies mark_op[node.name] == 1
     keep_nodes = [node for node in nodes[::-1] if mark_op[node.name] == 1]
 
+    # keep the type and shape of the outputs when the model has them
+    known_types = {v.name: v for v in model.graph.value_info}
+    known_types.update({v.name: v for v in model.graph.output})
     var_out = []
     for out in outputs:
         value_info = ValueInfoProto()
-        value_info.name = out
+        if out in known_types:
+            value_info.CopyFrom(known_types[out])
+        else:
+            value_info.name = out
         var_out.append(value_info)
     graph = make_graph(
         keep_nodes,

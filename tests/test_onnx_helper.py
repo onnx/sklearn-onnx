@@ -132,6 +132,24 @@ class TestOnnxHelper(unittest.TestCase):
         vals = {p.key: p.value for p in new_model.metadata_props}
         assert vals == meta
 
+    def test_select_model_inputs_outputs_keeps_output_type(self):
+        model = make_pipeline(StandardScaler(), Binarizer(threshold=0.5))
+        X = numpy.array([[0.1, 1.1], [0.2, 2.2]])
+        model.fit(X)
+        model_onnx = convert_sklearn(
+            model,
+            "binarizer",
+            [("input", FloatTensorType([None, 2]))],
+            target_opset=TARGET_OPSET,
+        )
+        new_model = select_model_inputs_outputs(model_onnx, "variable")
+        self.assertEqual(len(new_model.graph.output), 1)
+        self.assertEqual(new_model.graph.output[0], model_onnx.graph.output[0])
+        self.assertEqual(
+            new_model.graph.output[0].type.tensor_type.elem_type,
+            onnx.TensorProto.FLOAT,
+        )
+
     def test_change_onnx_domain(self):
         model = make_pipeline(StandardScaler())
         X = numpy.array([[0.1, 1.1], [0.2, 2.2], [0.4, 2.2], [0.2, 2.4]])
