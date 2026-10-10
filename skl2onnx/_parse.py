@@ -252,7 +252,8 @@ def _parse_sklearn_simple_model(scope, model, inputs, custom_parsers=None, alias
         variable = scope.declare_local_variable("variable", otype)
         this_operator.outputs.append(variable)
     elif type(model) in {CastTransformer}:
-        dtype = model.dtype
+        # numpy also accepts a dtype given as a string such as "float64"
+        dtype = np.dtype(model.dtype)
         if dtype == np.float32:
             cls = FloatTensorType
         elif dtype == np.float64:
