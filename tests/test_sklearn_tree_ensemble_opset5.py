@@ -296,6 +296,25 @@ class TestSklearnTreeEnsembleOpset5(unittest.TestCase):
         assert_array_equal(got[0], expected[0])
         assert_allclose(got[1], expected[1], atol=1e-6)
 
+    def test_reference_evaluator_leaf_only_tree_after_split_tree(self):
+        # The leaf-only tree comes after a tree with more leaves than nodes.
+        # onnx.reference reads the leaf at the root's index.
+        X, y = _data("regressor")
+        Xt = X.astype(np.float32)
+        model = RandomForestRegressor(n_estimators=2, random_state=0).fit(X, y)
+        leaf_only = DecisionTreeRegressor().fit(X, np.full(y.shape, 7.0))
+        self.assertEqual(leaf_only.tree_.node_count, 1)
+        model.estimators_ = [
+            DecisionTreeRegressor(max_depth=2, random_state=0).fit(X, y),
+            leaf_only,
+        ]
+        onx = _convert(model, Xt, 5)
+        self._check_operators(onx)
+        expected = model.predict(Xt)
+        assert_allclose(_run(onx, Xt)[0].ravel(), expected, rtol=1e-5)
+        got = ReferenceEvaluator(onx).run(None, {"X": Xt})
+        assert_allclose(got[0].ravel(), expected, rtol=1e-5)
+
     def test_root_branches_have_different_indices(self):
         # Tree 0 has one split and two leaves. The root of tree 1 has a leaf
         # and a split as children which would both get index 2:
