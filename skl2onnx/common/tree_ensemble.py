@@ -387,9 +387,10 @@ def convert_to_tree_ensemble_attributes(attrs, dtype):
         # leaf_of(node_id) returns the (target, weight) of a leaf.
         if modes[nodes[root]] == "LEAF":
             # A tree reduced to one leaf is a node whose branches
-            # both point to that leaf. onnx.reference reads the leaf at
-            # the root's index instead of the leaf the root points to:
-            # unreachable nodes are inserted until both indices are equal.
+            # both point to that leaf. onnx.reference and onnxruntime
+            # (< 1.30) read the leaf at the root's index instead of the
+            # leaf the root points to: unreachable nodes are inserted
+            # until both indices are equal.
             leaf = add_leaf(*leaf_of(root))
             while True:
                 index = add_split(0, 0.0, 0, 0)
@@ -397,6 +398,8 @@ def convert_to_tree_ensemble_attributes(attrs, dtype):
                 set_child(index, "false", leaf, True)
                 if index >= leaf:
                     break
+            if index != leaf:
+                raise RuntimeError(f"Leaf-only tree with root {index} and leaf {leaf}.")
             new_attrs["tree_roots"].append(index)
             return
         index_of = {}
