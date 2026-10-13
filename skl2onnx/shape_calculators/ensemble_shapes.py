@@ -19,11 +19,10 @@ from ..common.data_types import (
 def calculate_tree_regressor_output_shapes(operator):
     """
     Allowed input/output patterns are
-        1. [N, C] ---> [N, 1]
+        1. [N, C] ---> [N, T]
 
-    This operator produces a scalar prediction for every example in a
-    batch. If the input batch size is N, the output shape may be
-    [N, 1].
+    This operator produces one prediction per target (T, ``n_outputs_``)
+    for every example in a batch of N.
     """
     check_input_and_output_numbers(
         operator, input_count_range=1, output_count_range=[1, 3]
@@ -41,7 +40,7 @@ def calculate_tree_regressor_output_shapes(operator):
     N = operator.inputs[0].get_first_dimension()
     if operator.outputs[0].type is None:
         raise RuntimeError("Output type is unknown for operator %r." % operator)
-    operator.outputs[0].type.shape = [N, 1]
+    operator.outputs[0].type.shape = [N, operator.raw_operator.n_outputs_]
 
     # decision_path, decision_leaf
     for n in range(2, len(operator.outputs)):

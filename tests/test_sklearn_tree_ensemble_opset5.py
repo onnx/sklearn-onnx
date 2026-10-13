@@ -95,7 +95,7 @@ class TestSklearnTreeEnsembleOpset5(unittest.TestCase):
         op_types = {node.op_type for node in onx.graph.node}
         self.assertIn("TreeEnsemble", op_types)
         self.assertFalse(op_types & LEGACY, op_types)
-        onnx.checker.check_model(onx)
+        onnx.checker.check_model(onx, full_check=True)
 
     def test_classifiers(self):
         for model, n_classes, missing in CLASSIFIERS:
