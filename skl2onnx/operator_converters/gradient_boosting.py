@@ -7,6 +7,7 @@ from ..common._apply_operation import apply_cast
 from ..common.data_types import BooleanTensorType, Int64TensorType, guess_numpy_type
 from ..common._registration import register_converter
 from ..common.tree_ensemble import (
+    add_tree_ensemble_node,
     add_tree_to_attribute_pairs,
     get_default_tree_classifier_attribute_pairs,
     get_default_tree_regressor_attribute_pairs,
@@ -117,10 +118,13 @@ def convert_sklearn_gradient_boosting_classifier(
 
     proba_output = scope.get_unique_variable_name("proba_output")
 
-    container.add_node(
+    add_tree_ensemble_node(
+        scope,
+        container,
         op_type,
         input_name,
         [operator.outputs[0].full_name, proba_output],
+        dtype,
         op_domain=op_domain,
         op_version=op_version,
         **attrs,
@@ -223,10 +227,13 @@ def convert_sklearn_gradient_boosting_regressor(
         )
         input_name = cast_input_name
 
-    container.add_node(
+    add_tree_ensemble_node(
+        scope,
+        container,
         op_type,
         input_name,
         operator.output_full_names,
+        dtype,
         op_domain=op_domain,
         op_version=op_version,
         **attrs,

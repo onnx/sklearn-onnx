@@ -2,6 +2,10 @@
 
 ## 1.21.0
 
+* Tree models (DecisionTree, ExtraTree(s), RandomForest, GradientBoosting,
+  HistGradientBoosting) are converted with operator TreeEnsemble when the target opset
+  of domain `ai.onnx.ml` is 5 or more
+  [#1160](https://github.com/onnx/sklearn-onnx/issues/1160)
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
