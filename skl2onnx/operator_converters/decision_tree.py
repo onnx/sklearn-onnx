@@ -591,6 +591,7 @@ def convert_sklearn_decision_tree_regressor(
             op_domain=op_domain,
             op_version=op_version,
             regression=True,
+            dtype=dtype,
         )
         n_out += 1
     if options["decision_leaf"]:
@@ -608,6 +609,7 @@ def convert_sklearn_decision_tree_regressor(
             op_version=op_version,
             regression=True,
             cast_encode=True,
+            dtype=dtype,
         )
         n_out += 1
 

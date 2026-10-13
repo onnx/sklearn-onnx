@@ -218,6 +218,49 @@ class TestSklearnTreeEnsembleOpset5(unittest.TestCase):
                     else:
                         assert_array_equal(g, e)
 
+    def test_decision_leaf_double_input(self):
+        # The decision trees use the thresholds of the prediction tree.
+        X, y = _data("regressor")
+        options = {"decision_path": True, "decision_leaf": True}
+        for model in (
+            DecisionTreeRegressor(max_depth=4, random_state=0),
+            RandomForestRegressor(n_estimators=3, max_depth=4, random_state=0),
+            RandomForestClassifier(n_estimators=3, max_depth=4, random_state=0),
+        ):
+            is_classifier = isinstance(model, RandomForestClassifier)
+            model.fit(X, y > 0 if is_classifier else y)
+            trees = getattr(model, "estimators_", [model])
+            # Inputs on both sides of every threshold rounded to float32.
+            rows = []
+            for tree in trees:
+                for feature, threshold in zip(tree.tree_.feature, tree.tree_.threshold):
+                    if feature < 0:
+                        continue
+                    t32 = np.float32(threshold)
+                    for step in (-0.6, -0.4, 0.4, 0.6):
+                        row = X[0].copy()
+                        row[feature] = float(t32) + step * float(np.spacing(t32))
+                        rows.append(row)
+            Xb = np.array(rows)
+            with self.subTest(model=type(model).__name__):
+                opts = dict(options, zipmap=False) if is_classifier else options
+                onx = _convert(model, Xb, 5, options=opts)
+                splits = [
+                    a.t.data_type
+                    for node in onx.graph.node
+                    if node.op_type == "TreeEnsemble"
+                    for a in node.attribute
+                    if a.name == "nodes_splits"
+                ]
+                self.assertGreater(len(splits), 1)
+                self.assertEqual(set(splits), {onnx.TensorProto.DOUBLE})
+                got = _run(onx, Xb)
+                assert_array_equal(
+                    got[-1].reshape(len(Xb), -1), model.apply(Xb).reshape(len(Xb), -1)
+                )
+                if not is_classifier:
+                    assert_allclose(got[0].ravel(), model.predict(Xb), rtol=1e-12)
+
     def test_multi_output_classifier(self):
         X, y = _data("classifier", n_classes=3)
         Y = np.stack([y, (y + 1) % 3], axis=1)

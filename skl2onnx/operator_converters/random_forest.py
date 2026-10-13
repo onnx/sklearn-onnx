@@ -339,6 +339,7 @@ def convert_sklearn_random_forest_classifier(
                         op_version=op_version,
                         regression=True,
                         overwrite_tree=tree.tree_,
+                        dtype=dtype,
                     )
                 )
             if options["decision_leaf"]:
@@ -357,6 +358,7 @@ def convert_sklearn_random_forest_classifier(
                         op_version=op_version,
                         regression=True,
                         cast_encode=True,
+                        dtype=dtype,
                     )
                 )
 
@@ -629,6 +631,7 @@ def convert_sklearn_random_forest_regressor_converter(
                     op_version=op_version,
                     regression=True,
                     overwrite_tree=tree.tree_,
+                    dtype=dtype,
                 )
             )
         if options.get("decision_leaf", False):
@@ -647,6 +650,7 @@ def convert_sklearn_random_forest_regressor_converter(
                     op_version=op_version,
                     regression=True,
                     cast_encode=True,
+                    dtype=dtype,
                 )
             )
 
