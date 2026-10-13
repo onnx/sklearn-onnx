@@ -50,6 +50,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.svm import SVC, LinearSVC
 from skl2onnx import convert_sklearn, to_onnx
 from skl2onnx.common.data_types import (
+    DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
     StringTensorType,
@@ -499,6 +500,41 @@ class TestSklearnPipeline(unittest.TestCase):
         dump_data_and_model(
             X, model, model_onnx, basename="SklearnColumnTransformerWeights-Dec4"
         )
+
+    @unittest.skipIf(
+        ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"
+    )
+    def test_column_transformer_selected_column_order(self):
+        for dtype, tensor_type in [
+            (numpy.float32, FloatTensorType),
+            (numpy.float64, DoubleTensorType),
+        ]:
+            train = numpy.array([[0, 10, -8], [2, 20, 8]], dtype=dtype)
+            data = numpy.array([[0.5, 15, 4], [1.5, 12, -4]], dtype=dtype)
+            for columns in [[0, 1, 2], [2, 0, 1], [1, 1, 0], [2, 0]]:
+                for transformer in ["passthrough", MinMaxScaler()]:
+                    with self.subTest(
+                        dtype=dtype, columns=columns, transformer=transformer
+                    ):
+                        model = ColumnTransformer(
+                            [("selected", transformer, columns)]
+                        ).fit(train)
+                        model_onnx = to_onnx(
+                            model,
+                            initial_types=[("input", tensor_type([None, 3]))],
+                            target_opset=TARGET_OPSET,
+                        )
+                        onnx.checker.check_model(model_onnx)
+                        session = InferenceSession(model_onnx.SerializeToString())
+                        result = session.run(None, {"input": data})[0]
+                        numpy.testing.assert_allclose(
+                            result, model.transform(data), rtol=1e-6, atol=1e-7
+                        )
+                        if columns == [0, 1, 2]:
+                            self.assertNotIn(
+                                "ArrayFeatureExtractor",
+                                [node.op_type for node in model_onnx.graph.node],
+                            )
 
     @unittest.skipIf(
         ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"

@@ -87,6 +87,7 @@ def _fetch_input_slice(scope, inputs, column_indices):
         isinstance(inputs[0].type, TensorType)
         and len(inputs[0].type.shape) == 2
         and inputs[0].type.shape[1] == len(column_indices)
+        and all(i == index for i, index in enumerate(column_indices))
     ):
         # No need to extract.
         return inputs
