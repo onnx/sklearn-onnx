@@ -13,6 +13,7 @@ from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from .._supported_operators import sklearn_operator_name_map
 from .._parse import _parse_sklearn
+from .imputer_op import append_missing_indicator
 
 
 def _make_tensor_type(dtype, shape):
@@ -231,12 +232,17 @@ def convert_sklearn_iterative_imputer(
         current_x_name = new_x_name
 
     # Connect final result to operator output
-    container.add_node(
-        "Identity",
-        [current_x_name],
-        [operator.outputs[0].full_name],
-        name=scope.get_unique_operator_name("Id_out"),
-    )
+    if op.add_indicator:
+        append_missing_indicator(
+            scope, container, operator, operator.inputs[0].full_name, current_x_name
+        )
+    else:
+        container.add_node(
+            "Identity",
+            [current_x_name],
+            [operator.outputs[0].full_name],
+            name=scope.get_unique_operator_name("Id_out"),
+        )
 
 
 register_converter("SklearnIterativeImputer", convert_sklearn_iterative_imputer)

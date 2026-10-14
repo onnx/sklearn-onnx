@@ -4,11 +4,47 @@
 import numpy as np
 from ..proto import onnx_proto
 from ..common._registration import register_converter
-from ..common.data_types import Int64TensorType, StringTensorType
+from ..common.data_types import Int64TensorType, StringTensorType, guess_proto_type
 from ..common._topology import Scope, Operator
 from ..common._container import ModelComponentContainer
 from ..common._apply_operation import apply_concat
 from .common import concatenate_variables
+
+
+def append_missing_indicator(scope, container, operator, input_name, imputed_name):
+    """
+    Appends the columns of the fitted *MissingIndicator* to the imputed
+    values, as scikit-learn does when ``add_indicator=True``.
+    """
+    op = operator.raw_operator
+    features = np.asarray(op.indicator_.features_, dtype=np.int64)
+    mask = scope.get_unique_variable_name("missing_mask")
+    missing = op.missing_values
+    if isinstance(missing, float) and np.isnan(missing):
+        container.add_node("IsNaN", [input_name], [mask])
+    else:
+        value = scope.get_unique_variable_name("missing_value")
+        container.add_initializer(
+            value, guess_proto_type(operator.inputs[0].type), [], [missing]
+        )
+        container.add_node("Equal", [input_name, value], [mask])
+    indices = scope.get_unique_variable_name("indicator_features")
+    container.add_initializer(
+        indices, onnx_proto.TensorProto.INT64, [len(features)], features.tolist()
+    )
+    selected = scope.get_unique_variable_name("indicator_mask")
+    container.add_node("Gather", [mask, indices], [selected], axis=1)
+    indicator = scope.get_unique_variable_name("indicator")
+    container.add_node(
+        "Cast", [selected], [indicator], to=guess_proto_type(operator.outputs[0].type)
+    )
+    apply_concat(
+        scope,
+        [imputed_name, indicator],
+        operator.outputs[0].full_name,
+        container,
+        axis=1,
+    )
 
 
 def convert_sklearn_imputer(
@@ -20,7 +56,13 @@ def convert_sklearn_imputer(
     if not hasattr(op, "statistics_"):
         raise RuntimeError("Member statistics_ is not present, was the model fitted?")
 
+    add_indicator = getattr(op, "add_indicator", False)
+
     if isinstance(operator.inputs[0].type, StringTensorType):
+        if add_indicator:
+            raise NotImplementedError(
+                "add_indicator=True is not supported for string inputs."
+            )
         if not isinstance(op.missing_values, (str, np.str_)):
             raise NotImplementedError(
                 "The converter is implemented when the missing values "
@@ -117,13 +159,22 @@ def convert_sklearn_imputer(
             )
 
         concatenated_feature = concatenate_variables(scope, operator.inputs, container)
+        imputed = (
+            scope.get_unique_variable_name("imputed")
+            if add_indicator
+            else operator.outputs[0].full_name
+        )
         container.add_node(
             op_type,
             concatenated_feature,
-            operator.outputs[0].full_name,
+            imputed,
             op_domain="ai.onnx.ml",
             **attrs,
         )
+        if add_indicator:
+            append_missing_indicator(
+                scope, container, operator, concatenated_feature, imputed
+            )
 
 
 register_converter("SklearnImputer", convert_sklearn_imputer)

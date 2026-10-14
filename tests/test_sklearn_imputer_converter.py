@@ -388,6 +388,33 @@ class TestSklearnImputerConverter(unittest.TestCase):
         self.assertEqual(len(model_onnx.graph.output), 1)
         self._check_outputs_strings(model, model_onnx, data)
 
+    @unittest.skipIf(SimpleImputer is None, reason="SimpleImputer changed in 0.20")
+    def test_simple_imputer_add_indicator(self):
+        X = np.array(
+            [[1, 2, np.nan], [np.nan, 3, 4], [7, 6, 5], [4, 1, np.nan]],
+            dtype=np.float32,
+        )
+        test = np.array([[np.nan, np.nan, 1], [2, 3, np.nan]], dtype=np.float32)
+        for missing_values, x, xt in [
+            (np.nan, X, test),
+            (-1.0, np.nan_to_num(X, nan=-1), np.nan_to_num(test, nan=-1)),
+        ]:
+            with self.subTest(missing_values=missing_values):
+                # Column 1 has no missing value at fit time, so it gets no indicator.
+                model = SimpleImputer(missing_values=missing_values, add_indicator=True)
+                model.fit(x)
+                model_onnx = convert_sklearn(
+                    model,
+                    "simple imputer",
+                    [("input", FloatTensorType([None, x.shape[1]]))],
+                    target_opset=TARGET_OPSET,
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(), providers=["CPUExecutionProvider"]
+                )
+                got = sess.run(None, {"input": xt})[0]
+                assert_almost_equal(model.transform(xt), got)
+
 
 @unittest.skipIf(IterativeImputer is None, reason="IterativeImputer not available")
 class TestSklearnIterativeImputerConverter(unittest.TestCase):
@@ -417,6 +444,12 @@ class TestSklearnIterativeImputerConverter(unittest.TestCase):
     def test_iterative_imputer_some_missing(self):
         model = IterativeImputer(random_state=0, max_iter=2)
         data = [[1, 2, 3], [np.nan, 3, 5], [7, 6, np.nan], [4, np.nan, 2]]
+        model.fit(data)
+        self._run_test(model, data)
+
+    def test_iterative_imputer_add_indicator(self):
+        model = IterativeImputer(random_state=0, max_iter=2, add_indicator=True)
+        data = [[1, 2, 3], [np.nan, 3, 5], [7, 6, np.nan], [4, 8, 2]]
         model.fit(data)
         self._run_test(model, data)
 
