@@ -1739,6 +1739,25 @@ class TestNearestNeighbourConverter(unittest.TestCase):
         )
 
     @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
+    def test_knn_imputer_add_indicator(self):
+        import onnxruntime as rt
+
+        data = numpy.random.RandomState(0).randn(20, 3).astype(numpy.float32)
+        data[::4, 0] = numpy.nan
+        data[1::5, 2] = numpy.nan
+        imputer = KNNImputer(n_neighbors=3, add_indicator=True).fit(data)
+        onnx_model = convert_sklearn(
+            imputer,
+            initial_types=[("input", FloatTensorType([None, data.shape[1]]))],
+            target_opset=TARGET_OPSET,
+        )
+        sess = rt.InferenceSession(
+            onnx_model.SerializeToString(), providers=["CPUExecutionProvider"]
+        )
+        got = sess.run(None, {"input": data})[0]
+        assert_almost_equal(imputer.transform(data), got, decimal=5)
+
+    @unittest.skipIf(KNNImputer is None, reason="new in 0.22")
     @unittest.skipIf(
         pv.Version(ort_version) <= pv.Version("1.16.0"),
         reason="onnxruntime not recent enough",
