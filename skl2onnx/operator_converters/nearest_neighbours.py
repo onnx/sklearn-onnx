@@ -70,6 +70,7 @@ from ..common.data_types import (
 from ..common.utils_classifier import get_label_classes
 from ..proto import onnx_proto
 from ._gp_kernels import py_make_float_array
+from .imputer_op import append_missing_indicator
 
 
 def onnx_nearest_neighbors_indices_k(
@@ -1765,7 +1766,12 @@ def convert_knn_imputer(
     make_knn_imputer_column_impute(container, Scope("LF10"), itype=proto_type)
     make_knn_imputer_column_nan_found(container, Scope("LF8"), itype=proto_type)
     make_knn_imputer_column(container, Scope("LF9"), itype=proto_type)
-    container.add_node("Identity", [result], [operator.outputs[0].full_name])
+    if knn_op.add_indicator:
+        append_missing_indicator(
+            scope, container, operator, operator.inputs[0].full_name, result
+        )
+    else:
+        container.add_node("Identity", [result], [operator.outputs[0].full_name])
 
 
 def convert_nca(scope: Scope, operator: Operator, container: ModelComponentContainer):
