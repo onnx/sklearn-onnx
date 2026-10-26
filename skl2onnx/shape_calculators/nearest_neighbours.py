@@ -80,7 +80,10 @@ def calculate_sklearn_knn_imputer(operator):
     check_input_and_output_types(operator, good_input_types=[FloatTensorType])
 
     operator.outputs[0].type = copy.deepcopy(operator.inputs[0].type)
-    operator.outputs[0].type.shape = operator.inputs[0].type.shape
+    N, C = operator.inputs[0].type.shape
+    if C is not None and operator.raw_operator.add_indicator:
+        C += len(operator.raw_operator.indicator_.features_)
+    operator.outputs[0].type.shape = [N, C]
 
 
 register_shape_calculator(
