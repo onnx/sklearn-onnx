@@ -20,6 +20,7 @@ from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
+    DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
 )
@@ -191,6 +192,33 @@ class TestGLMClassifierConverter(unittest.TestCase):
             model_onnx,
             basename="SklearnLinearDiscriminantAnalysisBin-Dec3",
         )
+
+    def test_model_linear_discriminant_analysis_binary_proba(self):
+        # scikit-learn computes the probabilities of a binary model with
+        # a sigmoid of the decision function
+        rng = np.random.RandomState(0)
+        X = rng.randn(100, 4)
+        y = (X[:, 0] + rng.randn(100) > 0).astype(np.int64)
+        model = LinearDiscriminantAnalysis().fit(X, y)
+        for dtype, tensor_type in [
+            (np.float32, FloatTensorType),
+            (np.float64, DoubleTensorType),
+        ]:
+            with self.subTest(dtype=dtype):
+                model_onnx = convert_sklearn(
+                    model,
+                    "linear model",
+                    [("input", tensor_type([None, X.shape[1]]))],
+                    options={id(model): {"zipmap": False}},
+                    target_opset=TARGET_OPSET,
+                )
+                sess = InferenceSession(
+                    model_onnx.SerializeToString(),
+                    providers=["CPUExecutionProvider"],
+                )
+                label, proba = sess.run(None, {"input": X.astype(dtype)})
+                assert_almost_equal(model.predict(X), label)
+                assert_almost_equal(model.predict_proba(X), proba, decimal=5)
 
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_linear_discriminant_analysis_decfunc(self):

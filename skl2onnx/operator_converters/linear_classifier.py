@@ -118,8 +118,10 @@ def convert_sklearn_linear_classifier(
             else "SOFTMAX"
         )
     else:
+        # LinearDiscriminantAnalysis: scikit-learn applies a sigmoid to the
+        # decision function with two classes and a softmax otherwise.
         classifier_attrs["post_transform"] = (
-            "LOGISTIC" if multi_class > 2 else "SOFTMAX"
+            "LOGISTIC" if number_of_classes == 2 else "SOFTMAX"
         )
 
     if all(isinstance(i, str) for i in classes):
