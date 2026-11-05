@@ -2,6 +2,9 @@
 
 ## 1.21.0
 
+* Fix the probabilities of a binary LinearDiscriminantAnalysis: scikit-learn applies
+  a sigmoid to the decision function, the converted model applied a softmax
+  [#1116](https://github.com/onnx/sklearn-onnx/issues/1116)
 * Fix KNNImputer conversion failing at inference when a row has only missing values
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)
