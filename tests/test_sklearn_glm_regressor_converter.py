@@ -36,6 +36,11 @@ try:
 except (ImportError, AttributeError):
     # available since sklearn>=0.23
     TweedieRegressor = None
+try:
+    from sklearn.linear_model import PassiveAggressiveRegressor
+except (ImportError, AttributeError):
+    # removed in scikit-learn 1.10
+    PassiveAggressiveRegressor = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
@@ -784,9 +789,12 @@ class TestGLMRegressorConverter(unittest.TestCase):
             basename="SklearnOrthogonalMatchingPursuit-Dec4",
         )
 
+    @unittest.skipIf(
+        PassiveAggressiveRegressor is None, reason="removed in scikit-learn 1.10"
+    )
     @ignore_warnings(category=(FutureWarning, ConvergenceWarning))
     def test_model_passive_aggressive_regressor(self):
-        model, X = fit_regression_model(linear_model.PassiveAggressiveRegressor())
+        model, X = fit_regression_model(PassiveAggressiveRegressor())
         model_onnx = convert_sklearn(
             model,
             "passive aggressive regressor",
