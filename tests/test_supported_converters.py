@@ -4,6 +4,9 @@
 Tests scikit-learn's binarizer converter.
 """
 
+import subprocess
+import sys
+import textwrap
 import unittest
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
@@ -40,6 +43,37 @@ class TestSupportedConverters(unittest.TestCase):
         names = supported_converters(True)
         assert "BernoulliNB" in names
         assert len(names) > 35
+
+    def test_import_without_passive_aggressive(self):
+        # scikit-learn 1.10 removed PassiveAggressiveClassifier and
+        # PassiveAggressiveRegressor, skl2onnx must still import.
+        code = textwrap.dedent("""
+            import numpy as np
+            import sklearn.linear_model as lm
+
+            for name in ("PassiveAggressiveClassifier", "PassiveAggressiveRegressor"):
+                if hasattr(lm, name):
+                    delattr(lm, name)
+
+            from sklearn.linear_model import LogisticRegression
+            from skl2onnx import to_onnx
+            from skl2onnx._supported_operators import (
+                sklearn_classifier_list,
+                sklearn_operator_name_map,
+            )
+
+            assert None not in sklearn_classifier_list
+            assert None not in sklearn_operator_name_map
+            assert LogisticRegression in sklearn_operator_name_map
+
+            X = np.array([[0, 1], [1, 0], [0.5, 0.5]], dtype=np.float32)
+            y = np.array([1, 0, 1], dtype=np.int64)
+            to_onnx(LogisticRegression().fit(X, y), X)
+            """)
+        res = subprocess.run(
+            [sys.executable, "-c", code], capture_output=True, text=True, check=False
+        )
+        self.assertEqual(res.returncode, 0, res.stderr)
 
     def test_ir_version(self):
         model, X = fit_regression_model(
