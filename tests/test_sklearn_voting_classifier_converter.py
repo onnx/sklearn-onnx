@@ -258,6 +258,39 @@ class TestVotingClassifierConverter(unittest.TestCase):
             model, suffix="WeightsListDropSoft", target_opset=TARGET_OPSET
         )
 
+    def test_voting_default_flatten_transform(self):
+        # flatten_transform=True is the scikit-learn default and only
+        # changes transform(), so predict and predict_proba still match
+        rng = numpy.random.RandomState(0)
+        X = rng.randn(200, 4).astype(numpy.float32)
+        for n_classes in [2, 3]:
+            y = numpy.digitize(X[:, 0], numpy.linspace(-1, 1, n_classes - 1))
+            for voting in ["hard", "soft"]:
+                with self.subTest(n_classes=n_classes, voting=voting):
+                    model = VotingClassifier(
+                        voting=voting,
+                        estimators=[
+                            ("lr", LogisticRegression()),
+                            ("dt", DecisionTreeClassifier(max_depth=3)),
+                        ],
+                    ).fit(X, y)
+                    self.assertTrue(model.flatten_transform)
+                    onx = to_onnx(
+                        model,
+                        X[:1],
+                        options={"zipmap": False},
+                        target_opset=TARGET_OPSET,
+                    )
+                    sess = InferenceSession(
+                        onx.SerializeToString(), providers=["CPUExecutionProvider"]
+                    )
+                    label, proba = sess.run(None, {"X": X})
+                    numpy.testing.assert_array_equal(model.predict(X), label)
+                    if voting == "soft":
+                        numpy.testing.assert_allclose(
+                            model.predict_proba(X), proba, atol=1e-5
+                        )
+
     @unittest.skipIf(
         pv.Version(sklver) < pv.Version("1.1.0"),
         reason="need more recent version of scikit-learn",
