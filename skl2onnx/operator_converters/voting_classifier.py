@@ -134,19 +134,14 @@ def convert_voting_classifier(
         apply_mul(scope, [prob_name, weights_name], wprob_name, container, broadcast=1)
         probs_names.append(wprob_name)
 
-    if op.flatten_transform in (False, None):
-        container.add_node(
-            "Sum",
-            probs_names,
-            operator.outputs[1].full_name,
-            name=scope.get_unique_operator_name("Sum"),
-        )
-    else:
-        raise NotImplementedError(
-            "flatten_transform==True is not implemented yet. "
-            "You may raise an issue at "
-            "https://github.com/onnx/sklearn-onnx/issues."
-        )
+    # flatten_transform only changes the shape of transform(), which the
+    # converted model does not output.
+    container.add_node(
+        "Sum",
+        probs_names,
+        operator.outputs[1].full_name,
+        name=scope.get_unique_operator_name("Sum"),
+    )
 
     # labels
     label_name = scope.get_unique_variable_name("label_name")
