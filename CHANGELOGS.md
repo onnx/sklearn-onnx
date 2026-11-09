@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix binary StackingClassifier conversion when an estimator is stacked with
+  `decision_function` (SVC, RidgeClassifier, ...): every estimator now contributes one column
 * Fix KNNImputer conversion failing at inference when a row has only missing values
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)
