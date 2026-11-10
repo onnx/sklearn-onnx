@@ -159,8 +159,10 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
 
+      # pandas is listed so that pip also downgrades it when the pinned numpy is
+      # older than what the installed pandas needs (pandas 3.1 requires numpy>=2.0.2).
       - name: Install specific versions
-        run: pip install "${{ matrix.onnx_version }}" "${{ matrix.onnxrt_version }}" "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}"
+        run: pip install "${{ matrix.onnx_version }}" "${{ matrix.onnxrt_version }}" "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}" pandas
 
       - name: Install
         run: pip install -e .
