@@ -159,8 +159,9 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
 
+      # Re-resolve NumPy-dependent packages when the matrix downgrades NumPy.
       - name: Install specific versions
-        run: pip install "${{ matrix.onnx_version }}" "${{ matrix.onnxrt_version }}" "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}"
+        run: pip install "${{ matrix.onnx_version }}" "${{ matrix.onnxrt_version }}" "numpy${{ matrix.numpy_version }}" "scikit-learn${{ matrix.sklearn_version}}" "scipy${{ matrix.scipy_version }}" pandas ml_dtypes
 
       - name: Install
         run: pip install -e .
@@ -169,6 +170,7 @@ jobs:
         run: |
           python -c "from numpy import __version__;print('numpy', __version__)"
           python -c "from pandas import __version__;print('pandas', __version__)"
+          python -c "from ml_dtypes import __version__;print('ml_dtypes', __version__)"
           python -c "from scipy import __version__;print('scipy', __version__)"
           python -c "from sklearn import __version__;print('sklearn', __version__)"
           python -c "from onnxruntime import __version__;print('onnxruntime', __version__)"
