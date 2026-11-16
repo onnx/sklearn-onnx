@@ -266,6 +266,8 @@ class TestVotingClassifierConverter(unittest.TestCase):
         for n_classes in [2, 3]:
             y = numpy.digitize(X[:, 0], numpy.linspace(-1, 1, n_classes - 1))
             for voting in ["hard", "soft"]:
+                if voting == "hard" and TARGET_OPSET < 9:
+                    continue
                 with self.subTest(n_classes=n_classes, voting=voting):
                     model = VotingClassifier(
                         voting=voting,
