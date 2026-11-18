@@ -50,6 +50,8 @@ def calculate_sklearn_imputer_output_shapes(operator):
             C = None
             break
 
+    if C is not None and getattr(operator.raw_operator, "add_indicator", False):
+        C += len(operator.raw_operator.indicator_.features_)
     output.type.shape = [N, C]
 
 
