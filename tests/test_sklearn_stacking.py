@@ -12,7 +12,8 @@ from onnxruntime import InferenceSession
 import sklearn
 from sklearn import __version__ as sklearn_version
 from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.linear_model import LinearRegression, LogisticRegression, RidgeClassifier
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeRegressor, DecisionTreeClassifier
 from sklearn.pipeline import make_pipeline, Pipeline
 from sklearn.preprocessing import OneHotEncoder, Normalizer
@@ -168,6 +169,37 @@ class TestStackingConverter(unittest.TestCase):
             basename="SklearnStackingClassifierNoZipMap",
             comparable_outputs=[0],
         )
+
+    @unittest.skipIf(StackingClassifier is None, reason="new in 0.22")
+    @ignore_warnings(category=FutureWarning)
+    def test_model_stacking_classifier_binary_decision_function(self):
+        # scikit-learn keeps one column per estimator for a binary problem,
+        # whether it stacks predict_proba or decision_function
+        rng = numpy.random.RandomState(0)
+        X = rng.randn(200, 4).astype(numpy.float32)
+        y = (X[:, 0] + X[:, 1] ** 2 > 1).astype(numpy.int64)
+        cases = {
+            "mixed": [("lr", LogisticRegression()), ("svc", SVC())],
+            "decision_function": [("svc", SVC()), ("ridge", RidgeClassifier())],
+        }
+        for name, estimators in cases.items():
+            for passthrough in [False, True]:
+                with self.subTest(estimators=name, passthrough=passthrough):
+                    model = StackingClassifier(estimators, passthrough=passthrough).fit(
+                        X, y
+                    )
+                    onx = to_onnx(
+                        model,
+                        X[:1],
+                        options={"zipmap": False},
+                        target_opset=TARGET_OPSET,
+                    )
+                    sess = InferenceSession(
+                        onx.SerializeToString(), providers=["CPUExecutionProvider"]
+                    )
+                    label, proba = sess.run(None, {"X": X})
+                    assert_almost_equal(model.predict(X), label)
+                    assert_almost_equal(model.predict_proba(X), proba, decimal=5)
 
     @unittest.skipIf(StackingClassifier is None, reason="new in 0.22")
     @ignore_warnings(category=FutureWarning)

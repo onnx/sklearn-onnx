@@ -76,9 +76,11 @@ def _transform(scope, operator, container, model):
     ]
 
     op = operator.raw_operator
+    # For a binary problem scikit-learn keeps one column per estimator: the
+    # probability of the positive class, or the decision function. Both are
+    # the last column of the converted scores.
     select_lact_column = len(op.classes_) == 2 and all(
-        op.stack_method_[est_idx] == "predict_proba"
-        for est_idx in range(0, len(op.estimators_))
+        meth in ("predict_proba", "decision_function") for meth in op.stack_method_
     )
     if select_lact_column:
         column_index_name = scope.get_unique_variable_name("stack_tr_column_index")
