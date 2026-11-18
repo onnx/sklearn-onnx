@@ -92,13 +92,27 @@ def convert_sklearn_polynomial_features(
             last_feat = prod_name
 
     if unit_name is not None:
+        unit_type = TensorProto.FLOAT
+        if last_feat is None:
+            # A bias-only expansion has no product column to provide its shape.
+            first_index = scope.get_unique_variable_name("first_index")
+            last_feat = scope.get_unique_variable_name("first_column")
+            container.add_initializer(first_index, TensorProto.INT64, [1], [0])
+            container.add_node(
+                "ArrayFeatureExtractor",
+                [operator.inputs[0].full_name, first_index],
+                last_feat,
+                op_domain="ai.onnx.ml",
+            )
+            if operator.inputs[0].type._get_element_onnx_type() == TensorProto.DOUBLE:
+                unit_type = TensorProto.DOUBLE
         shape_name = scope.get_unique_variable_name("shape")
         container.add_node("Shape", last_feat, shape_name)
         container.add_node(
             "ConstantOfShape",
             shape_name,
             unit_name,
-            value=make_tensor("ONE", TensorProto.FLOAT, [1], [1.0]),
+            value=make_tensor("ONE", unit_type, [1], [1.0]),
             op_version=9,
         )
 

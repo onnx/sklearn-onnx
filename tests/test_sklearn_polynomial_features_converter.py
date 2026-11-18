@@ -6,6 +6,8 @@ Tests scikit-learn's polynomial features converter.
 
 import unittest
 import numpy as np
+from onnx import checker
+from onnxruntime import InferenceSession, SessionOptions
 
 try:
     # scikit-learn >= 0.22
@@ -15,11 +17,56 @@ except ImportError:
     from sklearn.utils.testing import ignore_warnings
 from sklearn.preprocessing import PolynomialFeatures
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
+from skl2onnx.common.data_types import (
+    DoubleTensorType,
+    FloatTensorType,
+    Int64TensorType,
+)
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 
 class TestSklearnPolynomialFeatures(unittest.TestCase):
+    @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
+    def test_model_polynomial_features_bias_only(self):
+        options = SessionOptions()
+        options.intra_op_num_threads = 1
+        options.inter_op_num_threads = 1
+        for dtype, tensor_type in (
+            (np.float32, FloatTensorType),
+            (np.float64, DoubleTensorType),
+            (np.int64, Int64TensorType),
+        ):
+            X = np.array([[0, 2], [3, -4], [5, 6]], dtype=dtype)
+            for degree, interaction_only in (
+                (0, False),
+                ((0, 0), False),
+                ((3, 3), True),
+            ):
+                model = PolynomialFeatures(
+                    degree=degree, interaction_only=interaction_only
+                ).fit(X)
+                for opset in sorted({9, min(18, TARGET_OPSET), TARGET_OPSET}):
+                    with self.subTest(dtype=dtype, degree=degree, opset=opset):
+                        model_onnx = convert_sklearn(
+                            model,
+                            initial_types=[("input", tensor_type([None, X.shape[1]]))],
+                            target_opset=opset,
+                        )
+                        checker.check_model(model_onnx, full_check=True)
+                        session = InferenceSession(
+                            model_onnx.SerializeToString(),
+                            options,
+                            providers=["CPUExecutionProvider"],
+                        )
+                        self.assertEqual(session.get_outputs()[0].shape, [None, 1])
+                        for batch in (X[:1], X):
+                            actual = session.run(None, {"input": batch})[0]
+                            self.assertEqual(actual.dtype, dtype)
+                            self.assertEqual(actual.shape, (batch.shape[0], 1))
+                            np.testing.assert_array_equal(
+                                actual, model.transform(batch)
+                            )
+
     @unittest.skipIf(TARGET_OPSET < 9, reason="not available")
     @ignore_warnings(category=FutureWarning)
     def test_model_polynomial_features_float_degree_2(self):
