@@ -3,12 +3,20 @@
 """Tests scikit-learn's Passive Aggressive Classifier converter."""
 
 import unittest
-from sklearn.linear_model import PassiveAggressiveClassifier
+
+try:
+    from sklearn.linear_model import PassiveAggressiveClassifier
+except ImportError:
+    # removed in scikit-learn 1.10
+    PassiveAggressiveClassifier = None
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType, Int64TensorType
 from test_utils import dump_data_and_model, fit_classification_model, TARGET_OPSET
 
 
+@unittest.skipIf(
+    PassiveAggressiveClassifier is None, reason="removed in scikit-learn 1.10"
+)
 class TestPassiveAggressiveClassifierConverter(unittest.TestCase):
     def test_model_passive_aggressive_classifier_binary_class(self):
         model, X = fit_classification_model(
