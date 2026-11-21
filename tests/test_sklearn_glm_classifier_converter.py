@@ -4,6 +4,7 @@ import packaging.version as pv
 import unittest
 import numpy as np
 from numpy.testing import assert_almost_equal
+from onnx import checker
 import sklearn
 from sklearn import linear_model, __version__ as sklearn_version
 from sklearn.svm import LinearSVC
@@ -20,6 +21,7 @@ from onnxruntime import __version__ as ort_version
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import (
     BooleanTensorType,
+    DoubleTensorType,
     FloatTensorType,
     Int64TensorType,
 )
@@ -48,6 +50,38 @@ def skl12():
 
 
 class TestGLMClassifierConverter(unittest.TestCase):
+    def test_model_logistic_regression_int64_labels(self):
+        for dtype, tensor_type in [
+            (np.float64, DoubleTensorType),
+            (np.float32, FloatTensorType),
+        ]:
+            X = np.array([[-2.0], [-1.0], [1.0], [2.0]], dtype=dtype)
+            for labels in [
+                (0, 1),
+                (2**31, 2**31 + 1),
+                (-(2**31) - 2, -(2**31) - 1),
+                (2**53, 2**53 + 1),
+                (-(2**53) - 1, -(2**53)),
+                (-(2**63), 2**63 - 1),
+                (2**63 - 2, 2**63 - 1),
+            ]:
+                with self.subTest(dtype=dtype, labels=labels):
+                    y = np.repeat(np.array(labels, dtype=np.int64), 2)
+                    model = linear_model.LogisticRegression().fit(X, y)
+                    np.testing.assert_array_equal(model.predict(X), y)
+                    model_onnx = convert_sklearn(
+                        model,
+                        initial_types=[("input", tensor_type([None, 1]))],
+                        options={"zipmap": False},
+                        black_op={"LinearClassifier"} if dtype == np.float32 else None,
+                        target_opset=TARGET_OPSET,
+                    )
+                    checker.check_model(model_onnx, full_check=True)
+                    sess = InferenceSession(model_onnx.SerializeToString())
+                    got = sess.run(None, {"input": X})[0]
+                    self.assertEqual(got.dtype, np.int64)
+                    np.testing.assert_array_equal(got, y)
+
     @ignore_warnings(category=(DeprecationWarning, ConvergenceWarning))
     def test_model_logistic_regression_binary_class_boolean(self):
         X = np.array(

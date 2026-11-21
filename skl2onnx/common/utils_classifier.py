@@ -58,7 +58,7 @@ def _finalize_converter_classes(
         class_type = onnx_proto.TensorProto.INT32
         classes = np.array(list(map(lambda x: int(x), classes)))
     elif np.issubdtype(classes.dtype, np.signedinteger):
-        class_type = onnx_proto.TensorProto.INT32
+        class_type = onnx_proto.TensorProto.INT64
     else:
         classes = np.array([s.encode("utf-8") for s in classes])
         class_type = onnx_proto.TensorProto.STRING
@@ -102,7 +102,7 @@ def _finalize_converter_classes(
             container,
             to=onnx_proto.TensorProto.INT64,
         )
-    else:  # string labels
+    else:  # int64 or string labels
         apply_reshape(
             scope,
             array_feature_extractor_result_name,
