@@ -44,7 +44,7 @@ def convert_sklearn_ordinal_encoder(
 
     ordinal_categories = ordinal_op.categories_
 
-    for categories in ordinal_categories:
+    for feature_idx, categories in enumerate(ordinal_categories):
         if len(categories) == 0:
             continue
 
@@ -53,7 +53,7 @@ def convert_sklearn_ordinal_encoder(
             and ordinal_op._infrequent_enabled
         ):
             default_to_infrequent_mappings = ordinal_op._default_to_infrequent_mappings[
-                input_idx
+                feature_idx
             ]
         else:
             default_to_infrequent_mappings = None

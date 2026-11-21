@@ -3,6 +3,8 @@
 ## 1.21.0
 
 * Fix KNNImputer conversion failing at inference when a row has only missing values
+* Fix OrdinalEncoder infrequent category mappings for multiple features in one
+  input tensor
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
