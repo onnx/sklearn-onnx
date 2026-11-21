@@ -63,7 +63,7 @@ from test_utils import (
     InferenceSessionEx as InferenceSession,
     ReferenceEvaluatorEx,
 )
-from onnxruntime import __version__ as ort_version
+from onnxruntime import SessionOptions, __version__ as ort_version
 import onnx
 
 # pv.Version does not work with development versions
@@ -535,6 +535,30 @@ class TestSklearnPipeline(unittest.TestCase):
                                 "ArrayFeatureExtractor",
                                 [node.op_type for node in model_onnx.graph.node],
                             )
+
+    @unittest.skipIf(
+        ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"
+    )
+    def test_column_transformer_boolean_mask(self):
+        train = numpy.array([[0, 10], [2, 20]], dtype=numpy.float32)
+        data = numpy.array([[1, 15]], dtype=numpy.float32)
+        for columns in [[True, False], numpy.array([True, False])]:
+            for remainder in ["drop", "passthrough"]:
+                with self.subTest(columns=columns, remainder=remainder):
+                    model = ColumnTransformer(
+                        [("scale", MinMaxScaler(), columns)], remainder=remainder
+                    ).fit(train)
+                    model_onnx = to_onnx(model, train[:1], target_opset=TARGET_OPSET)
+                    onnx.checker.check_model(model_onnx)
+                    options = SessionOptions()
+                    options.intra_op_num_threads = options.inter_op_num_threads = 1
+                    session = InferenceSession(
+                        model_onnx.SerializeToString(), sess_options=options
+                    )
+                    result = session.run(None, {session.get_inputs()[0].name: data})[0]
+                    numpy.testing.assert_allclose(
+                        result, model.transform(data), rtol=1e-6, atol=1e-7
+                    )
 
     @unittest.skipIf(
         ColumnTransformer is None, reason="ColumnTransformer not available in 0.19"
