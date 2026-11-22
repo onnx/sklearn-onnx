@@ -375,6 +375,10 @@ def _parse_sklearn_column_transformer(scope, model, inputs, custom_parsers=None)
             )
         elif isinstance(column_indices, (int, str)):
             column_indices = [column_indices]
+        elif all(isinstance(i, (bool, np.bool_)) for i in column_indices):
+            column_indices = [
+                i for i, selected in enumerate(column_indices) if selected
+            ]
         names = get_column_indices(column_indices, inputs, multiple=True)
 
         # Skip transforms which apply to no columns at all
