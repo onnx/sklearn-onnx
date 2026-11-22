@@ -5,6 +5,8 @@
 * Fix KNNImputer conversion failing at inference when a row has only missing values
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)
+* Preserve signed int64 class labels when converting classifiers with an explicit
+  class lookup, including LogisticRegression with double inputs
 * Fix HistGradientBoostingRegressor conversion with `loss='poisson'` or `loss='gamma'`:
   the converted model returned the raw prediction instead of applying the exponential link
 * Fix Normalizer conversion for `norm='max'` (scikit-learn divides by the maximum
