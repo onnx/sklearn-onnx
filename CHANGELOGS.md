@@ -2,6 +2,9 @@
 
 ## 1.21.0
 
+* Make PassiveAggressiveClassifier and PassiveAggressiveRegressor optional so that
+  skl2onnx still imports with scikit-learn 1.10, which removes them
+  [#1286](https://github.com/onnx/sklearn-onnx/issues/1286)
 * Fix KNNImputer conversion failing at inference when a row has only missing values
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)

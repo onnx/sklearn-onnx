@@ -11,7 +11,6 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.linear_model import (
     LogisticRegression,
     LogisticRegressionCV,
-    PassiveAggressiveClassifier,
     Perceptron,
     RidgeClassifier,
     RidgeClassifierCV,
@@ -40,7 +39,6 @@ from sklearn.linear_model import (
     MultiTaskLassoCV,
     OrthogonalMatchingPursuit,
     OrthogonalMatchingPursuitCV,
-    PassiveAggressiveRegressor,
     RANSACRegressor,
     Ridge,
     RidgeCV,
@@ -48,6 +46,15 @@ from sklearn.linear_model import (
     TheilSenRegressor,
 )
 
+try:
+    from sklearn.linear_model import (
+        PassiveAggressiveClassifier,
+        PassiveAggressiveRegressor,
+    )
+except ImportError:
+    # deprecated in sklearn 1.8, removed in 1.10
+    PassiveAggressiveClassifier = None
+    PassiveAggressiveRegressor = None
 try:
     from sklearn.linear_model import GammaRegressor
 except ImportError:
