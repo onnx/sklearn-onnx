@@ -536,6 +536,37 @@ class TestSklearnOrdinalEncoderConverter(unittest.TestCase):
         got_test = sess.run(None, {"input": test_data})
         assert_almost_equal(expected_test.reshape(-1), got_test[0].reshape(-1))
 
+    @unittest.skipIf(
+        not max_categories_support(),
+        reason="OrdinalEncoder supports max_categories and min_frequency since 1.3",
+    )
+    def test_model_ordinal_encoder_infrequent_categories_per_feature(self):
+        data = np.array(
+            [["a", "a"], ["a", "b"], ["b", "b"], ["c", "b"], ["c", "c"]],
+            dtype=np.object_,
+        )
+        test_data = np.array([[a, b] for a in "abc" for b in "abc"], dtype=np.object_)
+        # The two columns have different infrequent category mappings.
+        options = onnxruntime.SessionOptions()
+        options.intra_op_num_threads = 1
+        options.inter_op_num_threads = 1
+        for params in ({"min_frequency": 2}, {"max_categories": 2}):
+            with self.subTest(**params):
+                model = OrdinalEncoder(**params).fit(data)
+                model_onnx = convert_sklearn(
+                    model,
+                    "scikit-learn ordinal encoder",
+                    [("input", StringTensorType([None, 2]))],
+                    target_opset=TARGET_OPSET,
+                )
+                sess = onnxruntime.InferenceSession(
+                    model_onnx.SerializeToString(),
+                    options,
+                    providers=["CPUExecutionProvider"],
+                )
+                got = sess.run(None, {"input": test_data})[0]
+                np.testing.assert_array_equal(model.transform(test_data), got)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
