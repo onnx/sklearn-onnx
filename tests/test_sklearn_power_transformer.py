@@ -10,8 +10,9 @@ import packaging.version as pv
 import numpy as np
 
 import sklearn
+from onnx import TensorProto
 from skl2onnx import convert_sklearn
-from skl2onnx.common.data_types import FloatTensorType
+from skl2onnx.common.data_types import DoubleTensorType, FloatTensorType
 from test_utils import dump_data_and_model, TARGET_OPSET
 
 try:
@@ -28,6 +29,35 @@ except ImportError:
 
 class TestSklearnPowerTransformer(unittest.TestCase):
     """Test cases for PowerTransform converter"""
+
+    @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
+    def test_powertransformer_double(self):
+        data = np.array([[1, 2], [2, 3], [3, 5], [4, 8], [5, 13]], dtype=np.float64)
+        for method, standardize in (
+            ("yeo-johnson", False),
+            ("yeo-johnson", True),
+            ("box-cox", False),
+            ("box-cox", True),
+        ):
+            with self.subTest(method=method, standardize=standardize):
+                model = PowerTransformer(method=method, standardize=standardize).fit(
+                    data
+                )
+                model_onnx = convert_sklearn(
+                    model,
+                    initial_types=[("input", DoubleTensorType([None, data.shape[1]]))],
+                    target_opset=TARGET_OPSET,
+                )
+                self.assertEqual(
+                    model_onnx.graph.output[0].type.tensor_type.elem_type,
+                    TensorProto.DOUBLE,
+                )
+                dump_data_and_model(
+                    data,
+                    model,
+                    model_onnx,
+                    basename=f"PowerTransformerDouble{method.replace('-', '')}{standardize}",
+                )
 
     @unittest.skipIf(PowerTransformer is None, "Problems with import occurred")
     def test_powertransformer_yeo_johnson_positive_without_scaler(self):
