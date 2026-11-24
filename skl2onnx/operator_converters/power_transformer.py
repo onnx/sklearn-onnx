@@ -18,6 +18,9 @@ from ..algebra.onnx_ops import (
     OnnxLog,
     OnnxNeg,
     OnnxImputer,
+    OnnxIsNaN,
+    OnnxIsInf,
+    OnnxWhere,
     OnnxIdentity,
     OnnxScaler,
 )
@@ -40,7 +43,23 @@ def convert_powertransformer(
     dtype = guess_numpy_type(operator.inputs[0].type)
     if dtype != np.float64:
         dtype = np.float32
+    proto_dtype = TensorProto.DOUBLE if dtype == np.float64 else TensorProto.FLOAT
     lambdas = op.lambdas_.astype(dtype)
+
+    def impute_zero(value, replaced_value):
+        if dtype == np.float64:
+            # ONNX Runtime's Imputer kernel does not support double tensors.
+            if np.isnan(replaced_value):
+                mask = OnnxIsNaN(value, op_version=opv)
+            else:
+                mask = OnnxIsInf(value, detect_negative=0, op_version=opv)
+            return OnnxWhere(mask, np.array([0.0], dtype=dtype), value, op_version=opv)
+        return OnnxImputer(
+            value,
+            imputed_value_floats=[0.0],
+            replaced_value_float=replaced_value,
+            op_version=opv,
+        )
 
     # tensors of units and zeros
     ones_ = OnnxDiv(op_in, op_in, op_version=opv)
@@ -48,16 +67,16 @@ def convert_powertransformer(
 
     # logical masks for input
     less_than_zero = OnnxLess(op_in, zeros_, op_version=opv)
-    less_mask = OnnxCast(less_than_zero, to=TensorProto.FLOAT, op_version=opv)
+    less_mask = OnnxCast(less_than_zero, to=proto_dtype, op_version=opv)
 
     greater_than_zero = OnnxNot(less_than_zero, op_version=opv)
-    greater_mask = OnnxCast(greater_than_zero, to=TensorProto.FLOAT, op_version=opv)
+    greater_mask = OnnxCast(greater_than_zero, to=proto_dtype, op_version=opv)
 
     # logical masks for lambdas
-    lambda_zero_mask = np.float32(lambdas == 0)
-    lambda_nonzero_mask = np.float32(lambdas != 0)
-    lambda_two_mask = np.float32(lambdas == 2)
-    lambda_nontwo_mask = np.float32(lambdas != 2)
+    lambda_zero_mask = (lambdas == 0).astype(dtype)
+    lambda_nonzero_mask = (lambdas != 0).astype(dtype)
+    lambda_two_mask = (lambdas == 2).astype(dtype)
+    lambda_nontwo_mask = (lambdas != 2).astype(dtype)
 
     if "yeo-johnson" in op.method:
         y0 = OnnxAdd(op_in, ones_, op_version=opv)  # For positive input
@@ -67,12 +86,7 @@ def convert_powertransformer(
         y_gr0_l_ne0 = OnnxPow(y0, lambdas, op_version=opv)
         y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_, op_version=opv)
         y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas, op_version=opv)
-        y_gr0_l_ne0 = OnnxImputer(
-            y_gr0_l_ne0,
-            imputed_value_floats=[0.0],
-            replaced_value_float=np.inf,
-            op_version=opv,
-        )
+        y_gr0_l_ne0 = impute_zero(y_gr0_l_ne0, np.inf)
         y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask, op_version=opv)
 
         # positive input, lambda == 0
@@ -81,24 +95,14 @@ def convert_powertransformer(
 
         # positive input, an arbitrary lambda
         y_gr0 = OnnxAdd(y_gr0_l_ne0, y_gr0_l_eq0, op_version=opv)
-        y_gr0 = OnnxImputer(
-            y_gr0,
-            imputed_value_floats=[0.0],
-            replaced_value_float=get_nan(),
-            op_version=opv,
-        )
+        y_gr0 = impute_zero(y_gr0, get_nan())
         y_gr0 = OnnxMul(y_gr0, greater_mask, op_version=opv)
 
         # negative input, lambda != 2
         y_le0_l_ne2 = OnnxPow(y1, 2 - lambdas, op_version=opv)
         y_le0_l_ne2 = OnnxSub(ones_, y_le0_l_ne2, op_version=opv)
         y_le0_l_ne2 = OnnxDiv(y_le0_l_ne2, (2 - lambdas).astype(dtype), op_version=opv)
-        y_le0_l_ne2 = OnnxImputer(
-            y_le0_l_ne2,
-            imputed_value_floats=[0.0],
-            replaced_value_float=np.inf,
-            op_version=opv,
-        )
+        y_le0_l_ne2 = impute_zero(y_le0_l_ne2, np.inf)
         y_le0_l_ne2 = OnnxMul(y_le0_l_ne2, lambda_nontwo_mask, op_version=opv)
 
         # negative input, lambda == 2
@@ -107,12 +111,7 @@ def convert_powertransformer(
 
         # negative input, an arbitrary lambda
         y_le0 = OnnxAdd(y_le0_l_ne2, y_le0_l_eq2, op_version=opv)
-        y_le0 = OnnxImputer(
-            y_le0,
-            imputed_value_floats=[0.0],
-            replaced_value_float=get_nan(),
-            op_version=opv,
-        )
+        y_le0 = impute_zero(y_le0, get_nan())
         y_le0 = OnnxMul(y_le0, less_mask, op_version=opv)
 
         # Arbitrary input and lambda
@@ -123,22 +122,12 @@ def convert_powertransformer(
         y_gr0_l_ne0 = OnnxPow(op_in, lambdas, op_version=opv)
         y_gr0_l_ne0 = OnnxSub(y_gr0_l_ne0, ones_, op_version=opv)
         y_gr0_l_ne0 = OnnxDiv(y_gr0_l_ne0, lambdas, op_version=opv)
-        y_gr0_l_ne0 = OnnxImputer(
-            y_gr0_l_ne0,
-            imputed_value_floats=[0.0],
-            replaced_value_float=np.inf,
-            op_version=opv,
-        )
+        y_gr0_l_ne0 = impute_zero(y_gr0_l_ne0, np.inf)
         y_gr0_l_ne0 = OnnxMul(y_gr0_l_ne0, lambda_nonzero_mask, op_version=opv)
 
         # positive input, lambda == 0
         y_gr0_l_eq0 = OnnxLog(op_in, op_version=opv)
-        y_gr0_l_eq0 = OnnxImputer(
-            y_gr0_l_eq0,
-            imputed_value_floats=[0.0],
-            replaced_value_float=get_nan(),
-            op_version=opv,
-        )
+        y_gr0_l_eq0 = impute_zero(y_gr0_l_eq0, get_nan())
         y_gr0_l_eq0 = OnnxMul(y_gr0_l_eq0, lambda_zero_mask, op_version=opv)
 
         # positive input, arbitrary lambda

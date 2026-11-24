@@ -2,6 +2,8 @@
 
 ## 1.21.0
 
+* Fix PowerTransformer conversion and ONNX Runtime execution with float64 inputs
+  [#1296](https://github.com/onnx/sklearn-onnx/issues/1296)
 * Fix KNNImputer conversion failing at inference when a row has only missing values
 * Preserve reordered and repeated columns when a ColumnTransformer selects as many
   columns as its input width [#1281](https://github.com/onnx/sklearn-onnx/issues/1281)
