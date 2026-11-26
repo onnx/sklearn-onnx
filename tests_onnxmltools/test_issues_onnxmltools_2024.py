@@ -1,4 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
+import os
+import tempfile
 import unittest
 import packaging.version as pv
 import onnx
@@ -80,14 +82,16 @@ class TestInvestigateOnnxmltools(unittest.TestCase):
         got = sess.run(None, dict(X=sample))[0]
         numpy.testing.assert_allclose(expected, got, 1e-4)
 
-        with open("dump_model.onnx", "wb") as f:
-            f.write(exported.SerializeToString())
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = os.path.join(temp_dir, "dump_model.onnx")
+            with open(model_path, "wb") as f:
+                f.write(exported.SerializeToString())
 
-        sess = onnxruntime.InferenceSession(
-            "dump_model.onnx", providers=["CPUExecutionProvider"]
-        )
-        got = sess.run(None, dict(X=sample))[0]
-        numpy.testing.assert_allclose(expected, got, 1e-4)
+            sess = onnxruntime.InferenceSession(
+                model_path, providers=["CPUExecutionProvider"]
+            )
+            got = sess.run(None, dict(X=sample))[0]
+            numpy.testing.assert_allclose(expected, got, 1e-4)
 
 
 if __name__ == "__main__":
