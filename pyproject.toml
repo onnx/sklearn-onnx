@@ -31,6 +31,34 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/onnx/sklearn-onnx"
 
+[project.optional-dependencies]
+build = [
+    "build",
+    "twine",
+    "wheel",
+]
+external = [
+    "lightgbm; sys_platform != 'darwin'",
+    "onnxmltools",
+    "xgboost",
+]
+lint = [
+    "black",
+    "ruff",
+]
+test = [
+    "jinja2",
+    "ndonnx",
+    "onnxruntime",
+    "onnxruntime-extensions; sys_platform != 'darwin' and sys_platform != 'win32'",
+    "onnxscript",
+    "pandas",
+    "py-cpuinfo",
+    "pybind11",
+    "pytest",
+    "pytest-cov",
+]
+
 [tool.setuptools.packages.find]
 include = ["skl2onnx*"]
 

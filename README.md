@@ -67,6 +67,19 @@ pred_onx = sess.run([label_name], {input_name: X_test.astype(np.float32)})[0]
 ## Contribute
 We welcome contributions in the form of feedback, ideas, or code.
 
+Install the local test, lint, and build dependencies with:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+The optional integrations with XGBoost, LightGBM, and onnxmltools can be
+installed separately:
+
+```bash
+pip install -e ".[external]"
+```
+
 ## PR
 Before you submit any PR, you should apply the following command lines
 to fix the style issues.

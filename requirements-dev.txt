@@ -1,18 +1,3 @@
-# tests
-black
-jinja2
-ndonnx
-onnxruntime-extensions; sys_platform != 'darwin' and sys_platform != 'win32'
-onnxscript
-pandas
-py-cpuinfo
-pybind11
-pytest
-pytest-cov
-ruff
-wheel
-
-# docs/examples
-xgboost
-lightgbm; sys_platform != 'darwin'
-matplotlib
+# Complete local development environment. Documentation and external converter
+# dependencies remain opt-in because they are substantially heavier.
+-e .[build,lint,test]
