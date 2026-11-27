@@ -35,6 +35,19 @@ class RegisteredConverter:
 # the associated value is the callable object used to infer the output
 # shape(s) for the operator specified by the key.
 _shape_calculator_pool = {}
+_parser_pool = {}
+_default_classifier_parser = None
+
+
+def get_default_classifier_parser():
+    if _default_classifier_parser is None:
+        raise RuntimeError("The default classifier parser has not been registered.")
+    return _default_classifier_parser
+
+
+def register_parser(model, parser_fct):
+    check_signature(parser_fct, get_default_classifier_parser())
+    _parser_pool[model] = parser_fct
 
 
 def register_converter(

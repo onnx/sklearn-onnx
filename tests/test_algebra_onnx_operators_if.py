@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import unittest
+import sys
+from unittest.mock import patch
 import packaging.version as pv
 import numpy as np
 from numpy.testing import assert_almost_equal
@@ -278,9 +280,12 @@ class TestOnnxOperatorsIf(unittest.TestCase):
             output_names=["y"],
             global_context={"xy": node_xy},
         )
-        model_def = ifnode.to_onnx(
-            {"x1": x1, "x2": x2}, target_opset=opv, outputs=[("y", FloatTensorType())]
-        )
+        with patch.dict(sys.modules, {"skl2onnx.algebra.onnx_ops": None}):
+            model_def = ifnode.to_onnx(
+                {"x1": x1, "x2": x2},
+                target_opset=opv,
+                outputs=[("y", FloatTensorType())],
+            )
 
         sess = InferenceSession(
             model_def.SerializeToString(), providers=["CPUExecutionProvider"]
