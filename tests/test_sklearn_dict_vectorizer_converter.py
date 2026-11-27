@@ -27,8 +27,8 @@ try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidGraph
 except ImportError:
-    InvalidArgument = None
-    InvalidGraph = None
+    InvalidArgument = ()
+    InvalidGraph = ()
 
 
 class TestSklearnDictVectorizerConverter(unittest.TestCase):
