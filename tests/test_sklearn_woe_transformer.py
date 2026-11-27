@@ -11,7 +11,7 @@ from numpy.testing import assert_almost_equal
 try:
     from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 except ImportError:
-    InvalidArgument = None
+    InvalidArgument = ()
 try:
     from sklearn.compose import ColumnTransformer
 except ImportError:
@@ -193,7 +193,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         got = sess.run(None, {"X": x})[0]
         assert_almost_equal(expected, got)
 
-    @unittest.skipIf(InvalidArgument is None, reason="onnxruntime is too old")
+    @unittest.skipIf(not InvalidArgument, reason="onnxruntime is too old")
     @unittest.skipIf(TARGET_OPSET < 12, reason="OneHotEncoder")
     def test_woe_transformer_conv_weights_onnx(self):
         x = numpy.array(
@@ -218,7 +218,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
         got = sess.run(None, {"X": x})[0]
         assert_almost_equal(expected, got)
 
-    @unittest.skipIf(InvalidArgument is None, reason="onnxruntime is too old")
+    @unittest.skipIf(not InvalidArgument, reason="onnxruntime is too old")
     def test_woe_transformer_conv_weights_onnx_noonehot(self):
         x = numpy.array(
             [[0.2, 0.7, 0.9], [0.51, 0.71, 0.91], [0.7, 1.5, 0.92]], dtype=numpy.float32
@@ -256,7 +256,7 @@ class TestSklearnWOETransformerConverter(unittest.TestCase):
             got = sess.run(None, {"X": x})[0]
             assert_almost_equal(expected, got)
 
-    @unittest.skipIf(InvalidArgument is None, reason="onnxruntime is too old")
+    @unittest.skipIf(not InvalidArgument, reason="onnxruntime is too old")
     @unittest.skipIf(TARGET_OPSET < 12, reason="OneHotEncoder")
     def test_woe_transformer_bigger(self):
         x = numpy.array([[0, 1, 2, 3, 4, 5, 6, -1]], dtype=numpy.float32).T

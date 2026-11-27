@@ -13,7 +13,7 @@ try:
         InvalidArgument as OrtInvalidArgument,
     )
 except ImportError:
-    OrtInvalidArgument = None
+    OrtInvalidArgument = RuntimeError
 from skl2onnx.common.data_types import FloatTensorType
 from skl2onnx.algebra.onnx_ops import OnnxAdd
 
