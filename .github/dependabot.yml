@@ -1,0 +1,22 @@
+# Copyright (c) ONNX Project Contributors
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Dependabot version updates, checked monthly. Each update gets its own pull
+# request (no groups).
+# https://docs.github.com/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    # Workflow files in the default location, .github/workflows
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+
+  # Python dependencies in requirements*.txt and pyproject.toml are not
+  # pinned, so Dependabot would have nothing to update. They are maintained
+  # manually.
