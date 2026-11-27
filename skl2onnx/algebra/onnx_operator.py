@@ -1006,24 +1006,27 @@ class OnnxOperator:
         self.add_to(scope, container, run_converters=True)
 
         extra_outputs = []
+        context_identities = []
         if other_outputs is not None:
             extra_outputs.extend(other_outputs)
         if self.global_context is not None:
             for name, var in self.global_context.items():
                 if var.output_names is None:
                     # The variable name is likely to be different.
-                    from .onnx_ops import OnnxIdentity
-
-                    var2 = OnnxIdentity(
-                        var, op_version=var.op_version, output_names=[name]
-                    )
-                else:
-                    var2 = var
-                extra_outputs.append(var2)
+                    context_identities.append((var, name))
+                extra_outputs.append(var)
         for out in extra_outputs:
             if not hasattr(out, "add_to"):
                 raise RuntimeError("Extra outputs must have method 'add_to'.")
             out.add_to(scope, container, run_converters=True)
+        for var, name in context_identities:
+            container.add_node(
+                "Identity",
+                var.get_output_name(0),
+                name,
+                name=scope.get_unique_operator_name("Identity"),
+                op_version=var.op_version,
+            )
         logger.debug(
             "[Ops.to_onnx] %s id=%d extra_outputs=%r",
             self.__class__.__name__,

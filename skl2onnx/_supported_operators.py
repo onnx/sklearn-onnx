@@ -617,15 +617,18 @@ def update_registered_converter(
     register_converter(alias, convert_fct, overwrite=overwrite, options=options)
     register_shape_calculator(alias, shape_fct, overwrite=overwrite)
     if parser is not None:
-        from ._parse import update_registered_parser
+        from .common._registration import register_parser
 
-        update_registered_parser(model, parser)
+        register_parser(model, parser)
     elif options is not None and (
         "zipmap" in options or "output_class_labels" in options
     ):
-        from ._parse import _parse_sklearn_classifier, update_registered_parser
+        from .common._registration import (
+            get_default_classifier_parser,
+            register_parser,
+        )
 
-        update_registered_parser(model, _parse_sklearn_classifier)
+        register_parser(model, get_default_classifier_parser())
 
 
 def _get_sklearn_operator_name(model_type):

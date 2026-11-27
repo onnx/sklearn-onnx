@@ -47,6 +47,7 @@ except ImportError:
 from ._supported_operators import _get_sklearn_operator_name, cluster_list, outlier_list
 from ._supported_operators import sklearn_classifier_list, sklearn_operator_name_map
 from .common._container import SklearnModelContainerNode
+from .common import _registration
 from .common._registration import _converter_pool, _shape_calculator_pool
 from .common._topology import Topology, Variable
 from .common.data_types import (
@@ -60,7 +61,6 @@ from .common.data_types import (
     guess_tensor_type,
 )
 from .common.utils import get_column_indices
-from .common.utils_checking import check_signature
 from .common.utils_classifier import get_label_classes
 from .common.utils_sklearn import _process_options
 from .sklapi import CastTransformer
@@ -955,9 +955,10 @@ def update_registered_parser(model, parser_fct):
         :func:`parse_sklearn_submodel
         <skl2onnx.parse_sklearn_submodel>`.
     """
-    check_signature(parser_fct, _parse_sklearn_classifier)
-    sklearn_parsers_map[model] = parser_fct
+    _registration.register_parser(model, parser_fct)
 
 
 # registered parsers
-sklearn_parsers_map = build_sklearn_parsers_map()
+_registration._default_classifier_parser = _parse_sklearn_classifier
+sklearn_parsers_map = _registration._parser_pool
+sklearn_parsers_map.update(build_sklearn_parsers_map())

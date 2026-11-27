@@ -5,6 +5,8 @@ Tests scikit-learn's binarizer converter.
 """
 
 import unittest
+import sys
+from unittest.mock import patch
 import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.linear_model import LogisticRegression
@@ -16,7 +18,9 @@ from skl2onnx import (
     convert_sklearn,
     to_onnx,
     update_registered_converter,
+    update_registered_parser,
 )
+from skl2onnx._parse import _parse_sklearn_classifier
 from skl2onnx.operator_converters.linear_classifier import (
     convert_sklearn_linear_classifier,
 )
@@ -115,6 +119,47 @@ class TestSupportedConverters(unittest.TestCase):
         )
         assert "zipmap" not in str(model_onnx).lower()
         self.assertEqual(3, len(model_onnx.graph.output))
+
+    def test_register_classifier_without_parse_import(self):
+        class IndependentClassifier(LogisticRegression):
+            pass
+
+        calls = []
+
+        def custom_parser(scope, model, inputs, custom_parsers=None):
+            calls.append(model)
+            return _parse_sklearn_classifier(
+                scope, model, inputs, custom_parsers=custom_parsers
+            )
+
+        X = np.array([[0, 1], [1, 0], [0.5, 0.5]], dtype=np.float32)
+        model = IndependentClassifier().fit(X, [1, 0, 1])
+        for parser in (None, custom_parser):
+            with self.subTest(parser=parser):
+                with patch.dict(sys.modules, {"skl2onnx._parse": None}):
+                    update_registered_converter(
+                        IndependentClassifier,
+                        "IndependentClassifierAlias",
+                        calculate_linear_classifier_output_shapes,
+                        convert_sklearn_linear_classifier,
+                        parser=parser,
+                        options={
+                            "nocl": [True, False],
+                            "zipmap": [True, False, "columns"],
+                            "output_class_labels": [False, True],
+                            "raw_scores": [True, False],
+                        },
+                    )
+                model_onnx = to_onnx(model, X, options={"zipmap": False})
+                self.assertEqual(2, len(model_onnx.graph.output))
+        self.assertEqual(calls, [model])
+
+        with patch.dict(sys.modules, {"skl2onnx._parse": None}):
+            with self.assertRaises(TypeError):
+                update_registered_parser(IndependentClassifier, lambda: None)
+            update_registered_parser(IndependentClassifier, custom_parser)
+        to_onnx(model, X, options={"zipmap": False})
+        self.assertEqual(calls, [model, model])
 
 
 if __name__ == "__main__":
