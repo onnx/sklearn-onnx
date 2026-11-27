@@ -78,6 +78,19 @@ class TestSklearnIsolationForest(unittest.TestCase):
         assert_almost_equal(expected_score, got[2].ravel())
 
     @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
+    def test_isolation_forest_single_training_sample(self):
+        train = np.array([[1.0, 2.0]], dtype=np.float32)
+        test = np.array([[1.0, 2.0], [100.0, -50.0], [-4.0, 10.0]], dtype=np.float32)
+        model = IsolationForest(n_estimators=3, random_state=0).fit(train)
+        model_onnx = to_onnx(
+            model,
+            train,
+            options={"score_samples": True},
+            target_opset={"": TARGET_OPSET, "ai.onnx.ml": TARGET_OPSET_ML},
+        )
+        self._check_outputs(model, model_onnx, test)
+
+    @unittest.skipIf(IsolationForest is None, reason="old scikit-learn")
     @unittest.skipIf(
         pv.Version(sklv2) < pv.Version("0.22.0"), reason="tree structure is different."
     )

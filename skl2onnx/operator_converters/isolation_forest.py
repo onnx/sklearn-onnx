@@ -132,13 +132,24 @@ def convert_sklearn_isolation_forest(
 
     # score_samples = -2 ** (-depth_sum / (n_estimators * c(max_samples)))
     norm = len(op.estimators_) * _average_path_length([op.max_samples_])[0]
-    neg_depth = OnnxMul(depth_sum, np.array([-1.0 / norm], dtype=dtype), op_version=opv)
     output_names = outputs[2].full_name if options["score_samples"] else None
-    score_samples = OnnxNeg(
-        OnnxPow(np.array([2], dtype=dtype), neg_depth, op_version=opv),
-        op_version=opv,
-        output_names=output_names,
-    )
+    if norm == 0:
+        # scikit-learn sets the normalized depth to zero when max_samples is 1.
+        score_samples = OnnxAdd(
+            depth_sum,
+            np.array([-0.5], dtype=dtype),
+            op_version=opv,
+            output_names=output_names,
+        )
+    else:
+        neg_depth = OnnxMul(
+            depth_sum, np.array([-1.0 / norm], dtype=dtype), op_version=opv
+        )
+        score_samples = OnnxNeg(
+            OnnxPow(np.array([2], dtype=dtype), neg_depth, op_version=opv),
+            op_version=opv,
+            output_names=output_names,
+        )
 
     # decision_function = score_samples - offset_
     decision = OnnxAdd(
